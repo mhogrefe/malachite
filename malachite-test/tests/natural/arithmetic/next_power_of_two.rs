@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::arithmetic::traits::{
     CeilingLogTwo, IsPowerOfTwo, NextPowerOfTwo, NextPowerOfTwoAssign,
 };
@@ -9,11 +10,12 @@ use malachite_nz::natural::arithmetic::next_power_of_two::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
-use rug;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

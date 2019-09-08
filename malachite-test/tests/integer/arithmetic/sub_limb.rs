@@ -1,7 +1,13 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+use num::BigInt;
+#[cfg(feature = "32_bit_limbs")]
+use rug::{self, Assign};
+
+use common::test_properties;
 use malachite_test::common::{bigint_to_integer, integer_to_bigint};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
@@ -11,10 +17,6 @@ use malachite_test::inputs::natural::{
     pairs_of_limb_and_natural_var_1, pairs_of_natural_and_limb_var_1,
 };
 use malachite_test::integer::arithmetic::sub_limb::num_sub_limb;
-use num::BigInt;
-#[cfg(feature = "32_bit_limbs")]
-use rug::{self, Assign};
-use std::str::FromStr;
 
 #[test]
 fn test_sub_assign_limb() {

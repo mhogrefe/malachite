@@ -1,6 +1,12 @@
-use common::test_properties;
+use std::cmp::Ordering;
+use std::str::FromStr;
+
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
+use num::BigInt;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{
@@ -8,10 +14,6 @@ use malachite_test::inputs::integer::{
     triples_of_signed_integer_and_signed,
 };
 use malachite_test::integer::comparison::partial_ord_signed_limb::num_partial_cmp_signed_limb;
-use num::BigInt;
-use rug;
-use std::cmp::Ordering;
-use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_signed_limb() {

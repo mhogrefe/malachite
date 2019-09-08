@@ -1,18 +1,20 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+use num::BigInt;
+use rug;
+use rug::Assign as rug_assign;
+
+use common::test_properties;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::integer::pairs_of_integer_and_unsigned;
 use malachite_test::integer::conversion::assign_limb::num_assign_limb;
-use num::BigInt;
-use rug;
-use rug::Assign as rug_assign;
-use std::str::FromStr;
 
 #[test]
 fn test_assign_limb() {

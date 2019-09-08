@@ -1,15 +1,17 @@
-use common::{test_properties, test_properties_no_special};
+use std::str::FromStr;
+
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+
+use common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_u64, pairs_of_integer_and_vec_of_bool_var_2,
 };
-use std::str::FromStr;
 
 #[test]
 pub fn test_bits_to_twos_complement_bits_non_negative() {

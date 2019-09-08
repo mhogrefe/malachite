@@ -7,8 +7,14 @@ use malachite_nz::platform::{
 };
 
 pub mod aorsmul;
+pub mod barrett_helper;
+pub mod barrett_product;
+pub mod basecase_to_newton;
 pub mod compare_two;
+pub mod divide_and_conquer_to_barrett;
 pub mod fft;
+pub mod schoolbook_approx_to_divide_and_conquer_approx;
+pub mod schoolbook_to_divide_and_conquer;
 pub mod toom_22;
 pub mod toom_32_to_43;
 pub mod toom_32_to_53;
@@ -38,6 +44,14 @@ pub fn tune(param_group: &str) {
         "Toom32to53" => display_lines(&toom_32_to_53::tune()),
         "Toom42to53" => display_lines(&toom_42_to_53::tune()),
         "Toom42to63" => display_lines(&toom_42_to_63::tune()),
+        "SchoolbookToDivideAndConquer" => display_lines(&schoolbook_to_divide_and_conquer::tune()),
+        "SchoolbookApproxToDivideAndConquerApprox" => {
+            display_lines(&schoolbook_approx_to_divide_and_conquer_approx::tune())
+        }
+        "BasecaseToNewton" => display_lines(&basecase_to_newton::tune()),
+        "DivideAndConquerToBarrett" => display_lines(&divide_and_conquer_to_barrett::tune()),
+        "BarrettProduct" => display_lines(&barrett_product::tune()),
+        "BarrettHelper" => display_lines(&barrett_helper::tune()),
         "all" => {
             let mut lines = Vec::new();
             lines.push(format!("pub type Limb = {};", Limb::NAME));
@@ -71,6 +85,13 @@ pub fn tune(param_group: &str) {
             lines.extend(toom_42_to_63::tune());
             lines.push(String::new());
             lines.extend(fft::tune());
+            lines.push(String::new());
+            lines.extend(schoolbook_to_divide_and_conquer::tune());
+            lines.extend(schoolbook_approx_to_divide_and_conquer_approx::tune());
+            lines.extend(basecase_to_newton::tune());
+            lines.extend(divide_and_conquer_to_barrett::tune());
+            lines.extend(barrett_product::tune());
+            lines.extend(barrett_helper::tune());
             let filename = "benchmarks/platform.txt";
             let mut output = File::create(filename).unwrap();
             for line in lines {

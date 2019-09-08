@@ -1,9 +1,11 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use std::cmp::{max, Ordering};
+
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use std::cmp::{max, Ordering};
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_cmp_abs);

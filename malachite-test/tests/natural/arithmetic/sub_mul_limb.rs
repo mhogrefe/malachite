@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::arithmetic::traits::{CheckedSubMul, SubMul, SubMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::sub_mul_limb::{
@@ -8,6 +9,8 @@ use malachite_nz::natural::arithmetic::sub_mul_limb::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
@@ -16,7 +19,6 @@ use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_limb_var_1, pairs_of_naturals_var_1,
     triples_of_natural_natural_and_limb_var_1,
 };
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

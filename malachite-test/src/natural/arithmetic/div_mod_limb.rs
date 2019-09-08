@@ -1,15 +1,3 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
-};
-#[cfg(feature = "32_bit_limbs")]
-use inputs::natural::{
-    nrm_pairs_of_natural_and_positive_unsigned, rm_pairs_of_natural_and_positive_unsigned,
-};
-use inputs::natural::{
-    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
-};
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
     NegMod,
@@ -23,6 +11,19 @@ use malachite_nz::natural::arithmetic::div_mod_limb::{
 use malachite_nz::platform::Limb;
 use num::{BigUint, Integer, ToPrimitive};
 use rug;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+};
+#[cfg(feature = "32_bit_limbs")]
+use inputs::natural::{
+    nrm_pairs_of_natural_and_positive_unsigned, rm_pairs_of_natural_and_positive_unsigned,
+};
+use inputs::natural::{
+    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
+};
 
 // For `Natural`s, `mod` is equivalent to `rem`.
 

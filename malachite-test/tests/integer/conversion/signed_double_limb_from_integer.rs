@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
@@ -11,8 +12,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, SignedDoubleLimb, SignedLimb};
+
+use common::test_properties;
 use malachite_test::inputs::integer::integers;
-use std::str::FromStr;
 
 #[test]
 fn test_signed_double_limb_checked_from_integer() {

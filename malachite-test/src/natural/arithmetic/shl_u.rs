@@ -1,12 +1,3 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
-};
-use inputs::natural::{
-    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
-};
 use malachite_base::named::Named;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
@@ -16,6 +7,16 @@ use malachite_nz::natural::arithmetic::shl_u::{
 };
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::platform::Limb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
+    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
+};
+use inputs::natural::{
+    pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shl);

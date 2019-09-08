@@ -1,15 +1,17 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;
-use rug;
-use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

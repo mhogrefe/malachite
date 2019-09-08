@@ -1,9 +1,10 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
 use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::natural::{pairs_of_natural_and_unsigned, pairs_of_unsigned_and_natural};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_saturating_sub_assign_limb);

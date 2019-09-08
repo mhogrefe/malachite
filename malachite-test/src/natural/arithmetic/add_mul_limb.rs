@@ -1,9 +1,5 @@
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
-};
-use inputs::natural::triples_of_natural_natural_and_unsigned;
+use std::cmp::max;
+
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -13,7 +9,13 @@ use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
 use malachite_nz::platform::Limb;
-use std::cmp::max;
+
+use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
+};
+use inputs::natural::triples_of_natural_natural_and_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_add_mul_limb);

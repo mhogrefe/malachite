@@ -1,17 +1,19 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use rug;
+
+use common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_signed,
     triples_of_natural_small_signed_and_rounding_mode_var_2,
 };
-use rug;
-use std::str::FromStr;
 
 macro_rules! tests_and_properties {
     (

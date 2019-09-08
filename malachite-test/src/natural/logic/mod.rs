@@ -1,8 +1,10 @@
-use common::DemoBenchRegistry;
+use std::iter::repeat;
+
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::iter::repeat;
+
+use common::DemoBenchRegistry;
 
 pub mod and;
 pub mod and_limb;

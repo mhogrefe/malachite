@@ -1,12 +1,14 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+
+use common::test_properties;
 use malachite_test::inputs::integer::integers;
 use malachite_test::inputs::integer::pairs_of_integer_and_natural;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
-use std::str::FromStr;
 
 #[test]
 fn test_checked_hamming_distance() {

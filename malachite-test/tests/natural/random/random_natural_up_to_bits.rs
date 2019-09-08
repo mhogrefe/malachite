@@ -1,4 +1,3 @@
-use common::test_properties_no_special;
 use malachite_base::num::logic::traits::SignificantBits;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
@@ -7,9 +6,11 @@ use malachite_nz::natural::random::random_natural_up_to_bits::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+
+use common::test_properties_no_special;
+use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
 
 #[test]
 fn test_limbs_random_up_to_bits() {

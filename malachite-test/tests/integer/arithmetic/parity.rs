@@ -1,10 +1,12 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+
+use common::test_properties;
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
-use std::str::FromStr;
 
 #[test]
 fn test_even() {

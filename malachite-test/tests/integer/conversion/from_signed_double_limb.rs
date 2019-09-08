@@ -1,15 +1,16 @@
-#[cfg(feature = "32_bit_limbs")]
-use common::test_properties;
 use malachite_base::comparison::{Max, Min};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedDoubleLimb;
+use num::BigInt;
+
+#[cfg(feature = "32_bit_limbs")]
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::bigint_to_integer;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::inputs::base::signeds;
-use num::BigInt;
 
 #[test]
 fn test_from_signed_double_limb() {

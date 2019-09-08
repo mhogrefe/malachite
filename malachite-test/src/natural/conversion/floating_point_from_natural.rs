@@ -1,11 +1,12 @@
+use malachite_base::named::Named;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::logic::traits::SignificantBits;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
     naturals, pairs_of_natural_and_rounding_mode_var_1_f32,
     pairs_of_natural_and_rounding_mode_var_1_f64,
 };
-use malachite_base::named::Named;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_f32_rounding_from_natural);

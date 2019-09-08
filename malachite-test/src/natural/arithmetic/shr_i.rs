@@ -1,11 +1,12 @@
+use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::conversion::traits::CheckedFrom;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
     pairs_of_natural_and_small_signed, rm_pairs_of_natural_and_small_signed,
     triples_of_natural_small_signed_and_rounding_mode_var_2,
 };
-use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
-use malachite_base::num::conversion::traits::CheckedFrom;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_shr_assign_i8);

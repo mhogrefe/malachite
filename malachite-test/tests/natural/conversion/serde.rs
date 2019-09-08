@@ -1,11 +1,13 @@
 extern crate serde;
 extern crate serde_json;
 
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::strings::string_is_subset;
 use malachite_nz::natural::Natural;
+
+use common::test_properties;
 use malachite_test::inputs::natural::naturals;
-use std::str::FromStr;
 
 //TODO just use a simple hex string (or base64)
 

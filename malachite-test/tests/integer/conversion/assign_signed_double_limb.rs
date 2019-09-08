@@ -1,14 +1,16 @@
-#[cfg(feature = "32_bit_limbs")]
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
+
+#[cfg(feature = "32_bit_limbs")]
+use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::inputs::base::pairs_of_signeds;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::inputs::integer::pairs_of_integer_and_signed;
-use std::str::FromStr;
 
 #[test]
 fn test_assign_signed_double_limb() {

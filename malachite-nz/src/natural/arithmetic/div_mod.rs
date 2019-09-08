@@ -39,7 +39,10 @@ use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_l
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use natural::Natural::{self, Large, Small};
-use platform::{DoubleLimb, Limb};
+use platform::{
+    DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
+    INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
+};
 
 /// Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
 /// highest bit of `hi` is set.
@@ -291,9 +294,6 @@ pub fn _limbs_div_mod_schoolbook(
     ns[d_len - 1] = n_1;
     highest_q
 }
-
-//TODO tune
-const DC_DIV_QR_THRESHOLD: usize = 51;
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
@@ -726,9 +726,6 @@ pub fn _limbs_div_mod_schoolbook_approx(
     highest_q
 }
 
-//TODO tune
-const DC_DIVAPPR_Q_THRESHOLD: usize = 171;
-
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
 /// Additional memory: worst case O(n * log(n) ^ 2)
@@ -1006,9 +1003,6 @@ pub fn _limbs_div_mod_divide_and_conquer_approx(
     highest_q
 }
 
-//TODO tune
-const MAYBE_DCP1_DIVAPPR: bool = true;
-
 /// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
 /// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
 /// `_limbs_invert_approx` for an explanation of the return value.
@@ -1058,10 +1052,6 @@ pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
     }
     true
 }
-
-//TODO tune all
-const INV_NEWTON_THRESHOLD: usize = 170;
-const INV_MULMOD_BNM1_THRESHOLD: usize = 38;
 
 /// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
 /// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
@@ -1291,6 +1281,44 @@ pub fn _limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
 
 const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
 
+// ds.len() >= 2
+// n_len >= 3
+// n_len >= ds.len()
+// i_len == _limbs_div_mod_barrett_is_len(n_len - ds.len(), ds.len())
+// qs.len() == i_len
+// scratch_len == _limbs_mul_mod_limb_width_to_n_minus_1_next_size(ds.len() + 1)
+// scratch.len() == _limbs_div_mod_barrett_scratch_len(n_len, d_len) - i_len
+// rs_hi.len() == i_len
+pub fn _limbs_div_mod_barrett_large_product(
+    scratch: &mut [Limb],
+    ds: &[Limb],
+    qs: &[Limb],
+    rs_hi: &[Limb],
+    scratch_len: usize,
+    i_len: usize,
+) {
+    let d_len = ds.len();
+    let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
+    _limbs_mul_mod_limb_width_to_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
+    // number of wrapped limbs
+    let d_len_plus_i_len = d_len + i_len;
+    if d_len_plus_i_len > scratch_len {
+        let m = d_len_plus_i_len - scratch_len;
+        // m == i_len + d_len - scratch_len and scratch_len >= d_len, so i_len >= m.
+        let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
+        let carry_1 = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
+            && limbs_sub_limb_in_place(&mut scratch_hi[..scratch_len - m], 1);
+        let carry_2 =
+            limbs_cmp_same_length(&rs_hi[..scratch_len - d_len], &scratch[d_len..scratch_len])
+                == Ordering::Less;
+        if !carry_1 && carry_2 {
+            assert!(!limbs_slice_add_limb_in_place(scratch, 1));
+        } else {
+            assert_eq!(carry_1, carry_2);
+        }
+    }
+}
+
 /// Time: Worst case O(n * log(d) * log(log(d)))
 ///
 /// Additional memory: Worst case O(d * log(d))
@@ -1349,26 +1377,7 @@ fn _limbs_div_mod_barrett_preinverted(
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             limbs_mul_greater_to_out(scratch, ds, qs);
         } else {
-            let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
-            // number of wrapped limbs
-            let d_len_plus_i_len = d_len + i_len;
-            if d_len_plus_i_len > scratch_len {
-                let m = d_len_plus_i_len - scratch_len;
-                // m == i_len + d_len - scratch_len and scratch_len >= d_len, so i_len >= m.
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
-                let carry_1 = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
-                    && limbs_sub_limb_in_place(&mut scratch_hi[..scratch_len - m], 1);
-                let carry_2 = limbs_cmp_same_length(
-                    &rs_hi[..scratch_len - d_len],
-                    &scratch[d_len..scratch_len],
-                ) == Ordering::Less;
-                if !carry_1 && carry_2 {
-                    assert!(!limbs_slice_add_limb_in_place(scratch, 1));
-                } else {
-                    assert_eq!(carry_1, carry_2);
-                }
-            }
+            _limbs_div_mod_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the
@@ -1422,7 +1431,7 @@ fn _limbs_div_mod_barrett_preinverted(
 /// Result is O(`q_len`)
 ///
 /// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, where k == 0.
-fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
+pub fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
         // Compute an inverse size that is a nice partition of the quotient.
@@ -1442,7 +1451,7 @@ fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
 /// where n = `ns.len()`
 ///
 /// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c.
-fn _limbs_div_mod_barrett_helper(
+pub fn _limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1486,9 +1495,6 @@ fn _limbs_div_mod_barrett_helper(
     _limbs_div_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi)
 }
 
-//TODO tune
-const MU_DIV_QR_SKEW_THRESHOLD: usize = 100;
-
 /// Time: Worst case O(1)
 ///
 /// Additional memory: Worst case O(1)
@@ -1527,6 +1533,51 @@ pub fn _limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     is_len + itch_preinv
 }
 
+pub fn _limbs_div_mod_barrett_large_helper(
+    qs: &mut [Limb],
+    rs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    let q_len = qs.len();
+    let q_len_plus_one = q_len + 1;
+    let n = n_len - q_len - q_len_plus_one; // 2 * d_len - n_len - 1
+    let (ns_lo, ns_hi) = ns.split_at(n);
+    let (ds_lo, ds_hi) = ds.split_at(d_len - q_len_plus_one);
+    let (rs_lo, rs_hi) = rs.split_at_mut(n);
+    let rs_hi = &mut rs_hi[..q_len_plus_one];
+    let mut highest_q = _limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
+    // Multiply the quotient by the divisor limbs ignored above.
+    // The product is d_len - 1 limbs long.
+    limbs_mul_to_out(scratch, ds_lo, qs);
+    let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
+    *scratch_last = if highest_q
+        && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo)
+    {
+        1
+    } else {
+        0
+    };
+    let (scratch_lo, scratch_hi) = scratch.split_at(n);
+    let scratch_hi = &scratch_hi[..q_len_plus_one];
+    if _limbs_sub_same_length_with_borrow_in_in_place_left(
+        rs_hi,
+        scratch_hi,
+        limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
+    ) {
+        // TODO This branch is untested!
+        if limbs_sub_limb_in_place(qs, 1) {
+            assert!(highest_q);
+            highest_q = false;
+        }
+        limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], ds);
+    }
+    highest_q
+}
+
 /// Block-wise Barrett division. The idea of the algorithm used herein is to compute a smaller
 /// inverted value than used in the standard Barrett algorithm, and thus save time in the Newton
 /// iterations, and pay just a small price when using the inverted value for developing quotient
@@ -1555,46 +1606,13 @@ pub fn _limbs_div_mod_barrett(
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
-    assert!(n_len >= d_len);
     let q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
     // Test whether 2 * d_len - n_len > MU_DIV_QR_SKEW_THRESHOLD
-    if q_len + MU_DIV_QR_SKEW_THRESHOLD < d_len {
-        let q_len_plus_one = q_len + 1;
-        let n = n_len - q_len - q_len_plus_one; // 2 * d_len - n_len - 1
-        let (ns_lo, ns_hi) = ns.split_at(n);
-        let (ds_lo, ds_hi) = ds.split_at(d_len - q_len_plus_one);
-        let (rs_lo, rs_hi) = rs.split_at_mut(n);
-        let rs_hi = &mut rs_hi[..q_len_plus_one];
-        let mut highest_q = _limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
-        // Multiply the quotient by the divisor limbs ignored above.
-        // The product is d_len - 1 limbs long.
-        limbs_mul_to_out(scratch, ds_lo, qs);
-        let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
-        *scratch_last = if highest_q
-            && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo)
-        {
-            1
-        } else {
-            0
-        };
-        let (scratch_lo, scratch_hi) = scratch.split_at(n);
-        let scratch_hi = &scratch_hi[..q_len_plus_one];
-        if _limbs_sub_same_length_with_borrow_in_in_place_left(
-            rs_hi,
-            scratch_hi,
-            limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
-        ) {
-            // TODO This branch is untested!
-            if limbs_sub_limb_in_place(qs, 1) {
-                assert!(highest_q);
-                highest_q = false;
-            }
-            limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], ds);
-        }
-        highest_q
-    } else {
+    if d_len <= q_len + MU_DIV_QR_SKEW_THRESHOLD {
         _limbs_div_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch)
+    } else {
+        _limbs_div_mod_barrett_large_helper(qs, rs, ns, ds, scratch)
     }
 }
 
@@ -1646,9 +1664,8 @@ fn _limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds:
     }
 }
 
-//TODO tune all
+//TODO tune
 const MUPI_DIV_QR_THRESHOLD: usize = 74;
-const MU_DIV_QR_THRESHOLD: usize = 1442;
 
 /// This function is optimized for the case when the numerator has at least twice the length of the
 /// denominator.
@@ -2628,6 +2645,41 @@ impl CeilingDivNegMod<Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value and returning the
+    /// ceiling of the quotient and the remainder of the negative of the first `Natural` divided by
+    /// the second. The quotient and remainder satisfy `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(
+    ///         format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///         "(3, 7)"
+    ///     );
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     assert_eq!(
+    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
+    ///          "(810000006724, 704498996588)"
+    ///      );
+    /// }
+    /// ```
     #[inline]
     fn ceiling_div_neg_mod(mut self, other: Natural) -> (Natural, Natural) {
         let remainder = self.ceiling_div_assign_neg_mod(other);
@@ -2639,6 +2691,41 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
+    /// reference, and returning the ceiling of the quotient and the remainder of the negative of
+    /// the first `Natural` divided by the second. The quotient and remainder satisfy `self` =
+    /// q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(
+    ///         format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///         "(3, 7)"
+    ///     );
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     assert_eq!(
+    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///          "(810000006724, 704498996588)"
+    ///      );
+    /// }
+    /// ```
     #[inline]
     fn ceiling_div_neg_mod(mut self, other: &'a Natural) -> (Natural, Natural) {
         let remainder = self.ceiling_div_assign_neg_mod(other);
@@ -2650,6 +2737,41 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
+    /// by value, and returning the ceiling of the quotient and the remainder of the negative of the
+    /// first `Natural` divided by the second. The quotient and remainder satisfy `self` =
+    /// q * `other` - r and 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(
+    ///         format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///         "(3, 7)"
+    ///     );
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     assert_eq!(
+    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
+    ///          "(810000006724, 704498996588)"
+    ///      );
+    /// }
+    /// ```
     #[inline]
     fn ceiling_div_neg_mod(self, other: Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(&other);
@@ -2665,6 +2787,41 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     type DivOutput = Natural;
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference and returning the
+    /// ceiling of the quotient and the remainder of the negative of the first `Natural` divided by
+    /// the second. The quotient and remainder satisfy `self` = q * `other` - r and
+    /// 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     assert_eq!(
+    ///         format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///         "(3, 7)"
+    ///     );
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     assert_eq!(
+    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///          "(810000006724, 704498996588)"
+    ///      );
+    /// }
+    /// ```
     #[inline]
     fn ceiling_div_neg_mod(self, other: &'b Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(other);
@@ -2679,6 +2836,43 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
 impl CeilingDivAssignNegMod<Natural> for Natural {
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value, taking
+    /// the ceiling of the quotient, and returning the remainder of the negative of the first
+    /// `Natural` divided by the second. The quotient and remainder satisfy `self` = q * `other` - r
+    /// and 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     let mut x = Natural::from(23u32);
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)).to_string(), "7");
+    ///     assert_eq!(x.to_string(), "3");
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    ///     assert_eq!(
+    ///         x.ceiling_div_assign_neg_mod(
+    ///             Natural::from_str("1234567890987").unwrap()
+    ///         ).to_string(),
+    ///         "704498996588",
+    ///     );
+    ///     assert_eq!(x.to_string(), "810000006724");
+    /// }
+    /// ```
     #[inline]
     fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
         let remainder = self.div_assign_mod(&other);
@@ -2694,6 +2888,43 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
 impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     type ModOutput = Natural;
 
+    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference,
+    /// taking the ceiling of the quotient, and returning the remainder of the negative of the first
+    /// `Natural` divided by the second. The quotient and remainder satisfy `self` = q * `other` - r
+    /// and 0 <= r < `other`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 3 * 10 - 7 = 23
+    ///     let mut x = Natural::from(23u32);
+    ///     assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)).to_string(), "7");
+    ///     assert_eq!(x.to_string(), "3");
+    ///
+    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    ///     assert_eq!(
+    ///         x.ceiling_div_assign_neg_mod(
+    ///             &Natural::from_str("1234567890987").unwrap()
+    ///         ).to_string(),
+    ///         "704498996588",
+    ///     );
+    ///     assert_eq!(x.to_string(), "810000006724");
+    /// }
+    /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &'a Natural) -> Natural {
         let remainder = self.div_assign_mod(other);
         if remainder == 0 as Limb {

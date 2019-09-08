@@ -1,8 +1,10 @@
-use common::test_properties_no_limit_exhaustive_no_special;
+use std::str::FromStr;
+
 use malachite_base::round::RoundingMode;
 use malachite_base::strings::string_is_subset;
+
+use common::test_properties_no_limit_exhaustive_no_special;
 use malachite_test::inputs::base::{rounding_modes, ROUNDING_MODE_CHARS};
-use std::str::FromStr;
 
 #[test]
 fn test_to_string() {

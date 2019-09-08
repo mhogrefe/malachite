@@ -14,7 +14,11 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use malachite_nz::natural::arithmetic::div_mod::{
+    _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
+};
 use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::mul_mod::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
@@ -38,7 +42,9 @@ use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 use rust_wheels::iterators::general::{random, random_from_vector, range_increasing};
-use rust_wheels::iterators::integers_geometric::{positive_u32s_geometric, u32s_geometric};
+use rust_wheels::iterators::integers_geometric::{
+    positive_u32s_geometric, range_up_geometric_u32, u32s_geometric,
+};
 use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_floats::{
     exhaustive_f32s, exhaustive_f64s, exhaustive_finite_f32s, exhaustive_finite_f64s,
@@ -2162,6 +2168,53 @@ pub fn triples_of_unsigned_vec_var_39(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     )
 }
 
+// All triples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`,`qs`, `ns`, and `ds`, meet certain
+// preconditions that enable comparing the performance of divide-and-conquer division and Barrett
+// division.
+pub fn triples_of_unsigned_vec_var_40(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs_min_length(3, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(9, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(5, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 9, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 5, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 9)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 5)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|(q, n, d_init, _)| {
+            let d_len = d_init.len() + 1;
+            if n.len() < d_len {
+                return false;
+            }
+            let q_len = n.len() - d_len + 1;
+            if (q_len << 1) > n.len() || q_len > d_len {
+                return false;
+            }
+            let n_len = q_len << 1;
+            let d_len = q_len;
+            q.len() >= q_len && d_len >= 6 && n_len >= d_len + 3 && d_len >= q_len
+        })
+        .map(|(q, n, mut d_init, d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,
@@ -2380,6 +2433,76 @@ pub fn quadruples_of_unsigned_vec_var_2(
             && n.len() >= d.len()
             && q.len() >= n.len() - d.len() + 1
     }))
+}
+
+pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, u32)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quintuples(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs(exhaustive_unsigned()),
+            range_up_increasing(3),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| range_up_geometric_u32(seed, scale, 3)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quintuples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| range_up_geometric_u32(seed, scale, 3)),
+        )),
+    };
+    Box::new(
+        qs.filter_map(|(ds, mut scratch, mut qs, mut rs_hi, n_len)| {
+            let n_len = usize::wrapping_from(n_len);
+            let d_len = ds.len();
+            if n_len < d_len {
+                return None;
+            }
+            let i_len = _limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
+            if i_len == 0 || qs.len() < i_len {
+                return None;
+            }
+            qs.truncate(i_len);
+            if rs_hi.len() < i_len {
+                return None;
+            }
+            rs_hi.truncate(i_len);
+            let scratch_len = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
+            let x = _limbs_div_mod_barrett_scratch_len(n_len, d_len);
+            if x < i_len {
+                return None;
+            }
+            let actual_scratch_len = x - i_len;
+            if actual_scratch_len < d_len + i_len {
+                return None;
+            }
+            if scratch.len() < actual_scratch_len {
+                return None;
+            }
+            scratch.truncate(actual_scratch_len);
+            Some((scratch, ds, qs, rs_hi, scratch_len, i_len))
+        }),
+    )
+}
+
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet certain preconditions that
+// enable comparing the performance of two kinds of Barrett division.
+pub fn quadruples_of_unsigned_vec_var_3(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(quadruples_of_unsigned_vec_var_1(gm).filter(|(_, _, n, d)| 2 * d.len() > n.len() + 1))
 }
 
 fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(

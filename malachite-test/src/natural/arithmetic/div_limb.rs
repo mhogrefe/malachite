@@ -1,3 +1,13 @@
+use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::div_limb::{
+    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
+    limbs_div_limb_to_out,
+};
+use malachite_nz::platform::Limb;
+
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
@@ -11,15 +21,6 @@ use inputs::natural::nrm_pairs_of_natural_and_positive_unsigned;
 use inputs::natural::{
     pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
 };
-use malachite_base::num::arithmetic::traits::DivRem;
-use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::div_limb::{
-    limbs_div_divisor_of_limb_max_with_carry_in_place,
-    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
-    limbs_div_limb_to_out,
-};
-use malachite_nz::platform::Limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_limb);

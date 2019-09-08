@@ -1,11 +1,13 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+use common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals};
-use std::str::FromStr;
 
 #[test]
 fn test_saturating_sub_natural() {

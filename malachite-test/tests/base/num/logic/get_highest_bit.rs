@@ -1,9 +1,10 @@
-use common::test_properties;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_test::inputs::base::{signeds, unsigneds};
 use rand::Rand;
+
+use common::test_properties;
+use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn get_highest_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds::<T>, |u| {

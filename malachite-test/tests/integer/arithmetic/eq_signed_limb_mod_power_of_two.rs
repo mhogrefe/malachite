@@ -1,4 +1,5 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
@@ -7,6 +8,9 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
+use rug;
+
+use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, triples_of_signed_signed_and_small_unsigned,
@@ -18,8 +22,6 @@ use malachite_test::inputs::integer::{
     triples_of_integer_signed_limb_and_small_unsigned_var_2,
 };
 use malachite_test::integer::arithmetic::eq_signed_limb_mod_power_of_two::*;
-use rug;
-use std::str::FromStr;
 
 #[test]
 fn test_eq_signed_limb_mod_power_of_two() {

@@ -106,9 +106,9 @@ where
     }
     let min_successes = min_successes.unwrap();
     let max_successes = max_successes.unwrap();
-    let result = if firsts * 100 < seconds {
+    let result = if firsts * 1000 < seconds {
         ComparisonResult::SecondAlwaysBetter
-    } else if seconds * 100 < firsts {
+    } else if seconds * 1000 < firsts {
         ComparisonResult::FirstAlwaysBetter
     } else if max_successes * 10 >= total {
         ComparisonResult::SecondBetterAbove(first_then_second_cutoff)

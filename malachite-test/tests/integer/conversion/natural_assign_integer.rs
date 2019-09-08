@@ -1,14 +1,16 @@
-use common::test_properties;
+use std::str::FromStr;
+
 use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use rug;
+use rug::Assign as rug_assign;
+
+use common::test_properties;
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::integer::pairs_of_natural_and_natural_integer;
-use rug;
-use rug::Assign as rug_assign;
-use std::str::FromStr;
 
 #[test]
 fn test_natural_assign_integer() {
