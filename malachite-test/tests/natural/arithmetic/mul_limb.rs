@@ -392,11 +392,15 @@ fn mul_limb_properties() {
                 assert!(product >= u);
             }
             if u != 0 {
-                let (q, r) = product.div_mod(u);
+                let (q, r) = (&product).div_mod(u);
                 assert_eq!(q, *n);
-                assert_eq!(r, 0);
+                assert_eq!(r, 0 as Limb);
             }
-            //TODO assert_eq!(product / n, u);
+            if *n != 0 as Limb {
+                let (q, r) = (&product).div_mod(n);
+                assert_eq!(q, u);
+                assert_eq!(r, 0 as Limb);
+            }
         },
     );
 

@@ -2057,7 +2057,7 @@ impl DivMod<Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .div_mod(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2103,7 +2103,7 @@ impl<'a> DivMod<&'a Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .div_mod(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2148,7 +2148,7 @@ impl<'a> DivMod<Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .div_mod(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2215,7 +2215,7 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .div_mod(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2413,7 +2413,7 @@ impl DivRem<Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .div_rem(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2458,7 +2458,7 @@ impl<'a> DivRem<&'a Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .div_rem(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2503,7 +2503,7 @@ impl<'a> DivRem<Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .div_rem(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2548,7 +2548,7 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .div_rem(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006723, 530068894399)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2677,7 +2677,7 @@ impl CeilingDivNegMod<Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006724, 704498996588)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2723,7 +2723,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
     ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006724, 704498996588)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2769,7 +2769,7 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006724, 704498996588)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]
@@ -2819,7 +2819,7 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
     ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
     ///          "(810000006724, 704498996588)"
-    ///      );
+    ///     );
     /// }
     /// ```
     #[inline]

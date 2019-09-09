@@ -31,7 +31,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
+    pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
     positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
@@ -40,8 +40,7 @@ fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
     let b = Natural::ONE << Limb::WIDTH;
     let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - 1 as Limb;
     let x = Natural::from(DoubleLimb::join_halves(hi, lo));
-    //TODO use /
-    let expected_result = (&b_cubed_minus_1).div_mod(&x).0 - &b;
+    let expected_result = &b_cubed_minus_1 / &x - &b;
     assert_eq!(result, expected_result);
     assert!(b_cubed_minus_1 - (result + b) * &x < x);
 }
@@ -4285,7 +4284,7 @@ fn verify_limbs_invert_approx(
     let bits = n << Limb::LOG_WIDTH;
     let product = Natural::ONE << (bits << 1);
     //TODO compare to limbs_invert
-    let mut expected_i = (&product - 1 as Limb).div_mod(&d).0;
+    let mut expected_i = (&product - 1 as Limb) / &d;
     let offset = Natural::ONE << bits;
     expected_i -= &offset;
     let i = Natural::from_limbs_asc(&is_out[..n]);
@@ -19351,12 +19350,6 @@ fn div_mod_properties() {
         },
     );
 
-    test_properties(naturals, |n| {
-        let (q, r) = n.div_mod(Natural::ONE);
-        assert_eq!(q, *n);
-        assert_eq!(r, 0 as Limb);
-    });
-
     test_properties(positive_naturals, |n| {
         assert_eq!(n.div_mod(Natural::ONE), (n.clone(), Natural::ZERO));
         assert_eq!(n.div_mod(n), (Natural::ONE, Natural::ZERO));
@@ -19434,12 +19427,6 @@ fn ceiling_div_neg_mod_limb_properties() {
             ceiling_div_neg_mod_properties_helper(x, y);
         },
     );
-
-    test_properties(naturals, |n| {
-        let (q, r) = n.ceiling_div_neg_mod(Natural::ONE);
-        assert_eq!(q, *n);
-        assert_eq!(r, 0 as Limb);
-    });
 
     test_properties(positive_naturals, |n| {
         assert_eq!(

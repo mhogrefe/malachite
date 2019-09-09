@@ -319,7 +319,7 @@ fn benchmark_natural_div_limb_library_comparison(
     m_run_benchmark(
         "Natural / Limb",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_natural_and_positive_unsigned(gm),
+        nrm_pairs_of_natural_and_positive_unsigned::<Limb>(gm),
         gm.name(),
         limit,
         file_name,

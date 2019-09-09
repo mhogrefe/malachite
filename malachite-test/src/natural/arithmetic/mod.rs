@@ -8,6 +8,7 @@ pub mod checked_sub;
 pub mod checked_sub_limb;
 pub mod checked_sub_mul;
 pub mod checked_sub_mul_limb;
+pub mod div;
 pub mod div_exact_limb;
 pub mod div_limb;
 pub mod div_mod;
@@ -49,6 +50,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     checked_sub_limb::register(registry);
     checked_sub_mul::register(registry);
     checked_sub_mul_limb::register(registry);
+    div::register(registry);
     div_exact_limb::register(registry);
     div_limb::register(registry);
     div_mod::register(registry);

@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
+use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -17567,8 +17568,16 @@ fn mul_properties() {
             product
         );
         assert_eq!(y * x, product);
-        //TODO assert_eq!((product / x).unwrap(), *y);
-        //TODO assert_eq!((product / y).unwrap(), *x);
+        if *x != 0 as Limb {
+            let (q, r) = (&product).div_mod(x);
+            assert_eq!(q, *y);
+            assert_eq!(r, 0 as Limb);
+        }
+        if *y != 0 as Limb {
+            let (q, r) = (&product).div_mod(y);
+            assert_eq!(q, *x);
+            assert_eq!(r, 0 as Limb);
+        }
 
         if *x != 0 as Limb && *y != 0 as Limb {
             assert!(product >= *x);
