@@ -8,7 +8,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
-    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+    _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
+    limbs_div_limb_to_out_mod,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -110,6 +111,13 @@ fn test_limbs_div_limb_to_out_mod() {
         let mut limbs_out = limbs_out_before.to_vec();
         assert_eq!(
             limbs_div_limb_to_out_mod(&mut limbs_out, limbs_in, limb),
+            remainder
+        );
+        assert_eq!(limbs_out, limbs_out_after);
+
+        let mut limbs_out = limbs_out_before.to_vec();
+        assert_eq!(
+            _limbs_div_limb_to_out_mod_alt(&mut limbs_out, limbs_in, limb),
             remainder
         );
         assert_eq!(limbs_out, limbs_out_after);
@@ -591,6 +599,14 @@ fn limbs_div_limb_to_out_mod_properties() {
             let len = in_limbs.len();
             assert_eq!(Natural::from_limbs_asc(&out[..len]), quotient);
             assert_eq!(&out[len..], &old_out[len..]);
+            let final_out = out.clone();
+
+            let mut out = old_out.to_vec();
+            assert_eq!(
+                _limbs_div_limb_to_out_mod_alt(&mut out, in_limbs, limb),
+                remainder
+            );
+            assert_eq!(out, final_out);
         },
     );
 }

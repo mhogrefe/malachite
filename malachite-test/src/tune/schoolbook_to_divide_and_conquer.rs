@@ -1,4 +1,4 @@
-use std::cmp::min;
+use std::cmp::max;
 
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook,
@@ -25,7 +25,7 @@ pub fn tune() -> Vec<String> {
     if let ComparisonResult::SecondBetterAbove(threshold) = result {
         lines.push(format!(
             "pub const DC_DIV_QR_THRESHOLD: usize = {};",
-            min(6, threshold)
+            max(6, threshold)
         ));
     } else {
         panic!(

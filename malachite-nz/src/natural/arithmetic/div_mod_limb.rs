@@ -3,17 +3,16 @@ use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{CheckedFrom, JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
-
-//TODO Consider using mpn_divrem_1 instead of mpn_div_qr_1
 
 /// Time: O(1)
 ///
@@ -1359,6 +1358,103 @@ fn _limbs_div_in_place_mod_naive(limbs: &mut [Limb], limb: Limb) -> Limb {
         upper = remainder.lower_half();
     }
     upper
+}
+
+//TODO remove
+fn udiv_qrnnd(q: &mut Limb, r: &mut Limb, n_hi: Limb, n_lo: Limb, d: Limb) {
+    let n = DoubleLimb::join_halves(n_hi, n_lo);
+    let d = DoubleLimb::from(d);
+    *r = (n % d).lower_half();
+    *q = (n / d).lower_half();
+}
+
+//TODO remove
+fn invert_limb(invxl: &mut Limb, xl: Limb) {
+    assert_ne!(xl, 0);
+    let mut _dummy = 0;
+    udiv_qrnnd(invxl, &mut _dummy, !xl, Limb::MAX, xl);
+}
+
+/// up.len() > 0
+///
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c. Experiments show that DIVREM_1_NORM_THRESHOLD
+/// and DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
+pub fn _limbs_div_limb_to_out_mod_alt(qp: &mut [Limb], up: &[Limb], mut d: Limb) -> Limb {
+    let mut r = 0;
+    let mut un = up.len();
+    assert_ne!(d, 0);
+    let mut n = un;
+    let mut qp_offset = n as isize - 1; // Make qp point at most significant quotient limb
+    if d.get_highest_bit() {
+        // High quotient limb is 0 or 1, skip a divide step.
+        r = up[un - 1];
+        let q = if r >= d { 1 } else { 0 };
+        qp[usize::checked_from(qp_offset).unwrap()] = q;
+        qp_offset -= 1;
+        r -= d & q.wrapping_neg();
+        un -= 1;
+        // Multiply-by-inverse, divisor already normalized.
+        let mut dinv = 0;
+        invert_limb(&mut dinv, d);
+        let mut i = un - 1;
+        loop {
+            let n0 = up[i];
+            let (x, y) = div_mod_by_preinversion(r, n0, d, dinv);
+            qp[usize::checked_from(qp_offset).unwrap()] = x;
+            r = y;
+            qp_offset -= 1;
+            if i == 0 {
+                break;
+            }
+            i -= 1;
+        }
+        return r;
+    } else {
+        // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
+        // still skip as often as possible.
+        if un != 0 {
+            let n1 = up[un - 1];
+            if n1 < d {
+                r = n1;
+                qp[usize::checked_from(qp_offset).unwrap()] = 0;
+                qp_offset -= 1;
+                n -= 1;
+                if n == 0 {
+                    return r;
+                }
+                un -= 1;
+            }
+        }
+        let cnt = d.leading_zeros();
+        d <<= cnt;
+        r <<= cnt;
+        let mut dinv = 0;
+        invert_limb(&mut dinv, d);
+        if un != 0 {
+            let mut n1 = up[un - 1];
+            r |= n1 >> (Limb::WIDTH - cnt);
+            if un > 1 {
+                let mut i = un - 2;
+                loop {
+                    let n0 = up[i];
+                    let nshift = (n1 << cnt) | (n0 >> (Limb::WIDTH - cnt));
+                    let (x, y) = div_mod_by_preinversion(r, nshift, d, dinv);
+                    qp[usize::checked_from(qp_offset).unwrap()] = x;
+                    r = y;
+                    qp_offset -= 1;
+                    n1 = n0;
+                    if i == 0 {
+                        break;
+                    }
+                    i -= 1;
+                }
+            }
+            let (x, y) = div_mod_by_preinversion(r, n1 << cnt, d, dinv);
+            qp[usize::checked_from(qp_offset).unwrap()] = x;
+            r = y;
+        }
+        return r >> cnt;
+    }
 }
 
 impl Natural {

@@ -6,7 +6,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
-    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+    _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
+    limbs_div_limb_to_out_mod,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, Integer, ToPrimitive};
@@ -53,7 +54,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_ceiling_div_assign_neg_mod_natural);
     register_demo!(registry, demo_limb_ceiling_div_assign_neg_mod_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_div_limb_mod);
-    register_bench!(registry, Small, benchmark_limbs_div_limb_to_out_mod);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_to_out_mod_algorithms
+    );
     register_bench!(registry, Small, benchmark_limbs_div_limb_in_place_mod);
     register_bench!(registry, Large, benchmark_natural_div_assign_mod_limb);
     #[cfg(feature = "32_bit_limbs")]
@@ -416,22 +421,34 @@ fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &st
     );
 }
 
-fn benchmark_limbs_div_limb_to_out_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_div_limb_to_out_mod_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "limbs_div_limb_to_out_mod(&mut [Limb], &[Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(_, ref in_limbs, _)| in_limbs.len()),
         "in_limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut out, in_limbs, limb)| {
-                no_out!(limbs_div_limb_to_out_mod(&mut out, &in_limbs, limb))
-            }),
-        )],
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(limbs_div_limb_to_out_mod(&mut out, &in_limbs, limb))
+                }),
+            ),
+            (
+                "alt",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(_limbs_div_limb_to_out_mod_alt(&mut out, &in_limbs, limb))
+                }),
+            ),
+        ],
     );
 }
 
