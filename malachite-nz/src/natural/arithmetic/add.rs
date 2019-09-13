@@ -232,9 +232,9 @@ pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
     assert!(in_size <= ys_len);
-    xs[in_size..ys_len].copy_from_slice(&ys[in_size..]);
-    limbs_slice_add_same_length_in_place_left(&mut xs[..in_size], &ys[..in_size])
-        && limbs_slice_add_limb_in_place(&mut xs[in_size..ys_len], 1)
+    let (ys_lo, ys_hi) = ys.split_at(in_size);
+    xs[in_size..ys_len].copy_from_slice(ys_hi);
+    limbs_slice_add_greater_in_place_left(&mut xs[..ys_len], ys_lo)
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two

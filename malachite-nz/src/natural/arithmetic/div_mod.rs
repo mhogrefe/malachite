@@ -1734,7 +1734,6 @@ fn _limbs_div_mod_unbalanced(
         let mut scratch = vec![0; scratch_len];
         _limbs_div_mod_barrett(qs, rs, ns_shifted, ds_shifted, &mut scratch);
         if bits != 0 {
-            // TODO This branch is untested!
             limbs_slice_shr_in_place(rs, bits);
         }
     }

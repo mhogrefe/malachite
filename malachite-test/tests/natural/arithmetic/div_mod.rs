@@ -7763,6 +7763,26 @@ fn test_limbs_div_mod() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
+        let test_only_verify = |qs_in: &[Limb], rs_in: &[Limb], ns: &[Limb], ds: &[Limb]| {
+            let mut qs = qs_in.to_vec();
+            let mut rs = rs_in.to_vec();
+            limbs_div_mod_to_out(&mut qs, &mut rs, ns, ds);
+            let qs_out_alt = qs;
+            let rs_out_alt = rs;
+
+            let (qs, rs) = limbs_div_mod(ns, ds);
+            let d_len = ds.len();
+            let qs_limit = ns.len() - d_len + 1;
+            let mut qs_out = qs_in.to_vec();
+            qs_out[..qs_limit].copy_from_slice(&qs);
+            let rs_limit = d_len;
+            let mut rs_out = rs_in.to_vec();
+            rs_out[..rs_limit].copy_from_slice(&rs);
+
+            assert_eq!(qs_out, qs_out_alt);
+            assert_eq!(rs_out, rs_out_alt);
+            verify_limbs_div_mod_3(qs_in, rs_in, ns, ds, &qs_out, &rs_out);
+        };
         // d_len == 2
         // bits != 0 in _limbs_div_mod_by_two_limb
         // carry == 0 in _limbs_div_mod_by_two_limb
@@ -9599,6 +9619,8 @@ fn test_limbs_div_mod() {
                 3985681094, 1514818198,
             ],
         );
+        // bits != 0 and Barrett condition in _limbs_div_mod_unbalanced
+        test_only_verify(&[10; 19_901], &[10; 100], &[123; 20_000], &[123; 100]);
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
