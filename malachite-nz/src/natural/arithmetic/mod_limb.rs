@@ -1,6 +1,5 @@
 use std::ops::{Rem, RemAssign};
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, NegMod, NegModAssign, WrappingAddAssign, WrappingSubAssign,
 };
@@ -10,6 +9,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
+use natural::arithmetic::div_mod_limb::limbs_invert_limb;
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
@@ -169,7 +169,7 @@ fn limbs_mod_limb_normalized_shl(
 ///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where the quotient is not computed and the
 /// remainder is returned.
-pub fn limbs_mod_limb(limbs: &[Limb], mut divisor: Limb) -> Limb {
+pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
@@ -180,14 +180,12 @@ pub fn limbs_mod_limb(limbs: &[Limb], mut divisor: Limb) -> Limb {
         if highest_limb >= divisor {
             highest_limb -= divisor;
         }
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         limbs_mod_limb_normalized(&limbs[..len_minus_1], highest_limb, divisor, limb_inverse)
     } else {
-        divisor <<= bits;
+        let divisor = divisor << bits;
         let cobits = Limb::WIDTH - bits;
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         let remainder = mod_by_preinversion(
             highest_limb >> cobits,
             (highest_limb << bits) | (limbs[len - 2] >> cobits),

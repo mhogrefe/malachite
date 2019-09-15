@@ -6,7 +6,7 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_exact_limb::{
     self, _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
     limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
-    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_invert_limb,
+    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_invert_limb_mod,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -32,9 +32,9 @@ fn test_invert_limb_table() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_invert_limb() {
+fn test_limbs_invert_limb_mod() {
     let test = |limb, inverse| {
-        assert_eq!(limbs_invert_limb(limb), inverse);
+        assert_eq!(limbs_invert_limb_mod(limb), inverse);
     };
     test(1, 1);
     test(3, 2_863_311_531);
@@ -50,15 +50,15 @@ fn test_limbs_invert_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_invert_limb_fail_1() {
-    limbs_invert_limb(0);
+fn limbs_invert_limb_mod_fail_1() {
+    limbs_invert_limb_mod(0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_invert_limb_fail_2() {
-    limbs_invert_limb(2);
+fn limbs_invert_limb_mod_fail_2() {
+    limbs_invert_limb_mod(2);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -365,11 +365,11 @@ fn limb_div_exact_assign_natural_ref_fail() {
 }
 
 #[test]
-fn limbs_invert_limb_properties() {
+fn limbs_invert_limb_mod_properties() {
     test_properties(odd_limbs, |&limb| {
-        let inverse = limbs_invert_limb(limb);
+        let inverse = limbs_invert_limb_mod(limb);
         assert_eq!(limb.wrapping_mul(inverse), 1);
-        assert_eq!(limbs_invert_limb(inverse), limb);
+        assert_eq!(limbs_invert_limb_mod(inverse), limb);
     });
 }
 

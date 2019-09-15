@@ -1,13 +1,12 @@
 use std::ops::{Div, DivAssign};
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{DivRem, WrappingAddAssign, WrappingSubAssign};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::div_mod_limb::div_mod_by_preinversion;
+use natural::arithmetic::div_mod_limb::{div_mod_by_preinversion, limbs_invert_limb};
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -303,7 +302,7 @@ pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, but not computing the remainder.
-pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: Limb) {
+pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
     assert!(len > 1);
@@ -318,8 +317,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: L
         } else {
             0
         };
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         limbs_div_limb_normalized_to_out(
             out,
             &in_limbs[..len_minus_1],
@@ -328,10 +326,9 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: L
             limb_inverse,
         )
     } else {
-        divisor <<= bits;
+        let divisor = divisor << bits;
         let highest_limb = limbs_shl_to_out(out, in_limbs, bits);
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         let (quotient, remainder) =
             div_mod_by_preinversion(highest_limb, out[len_minus_1], divisor, limb_inverse);
         out[len_minus_1] = quotient;
@@ -372,7 +369,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut divisor: L
 ///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, where qp == up, but not computing the
 /// remainder.
-pub fn limbs_div_limb_in_place(limbs: &mut [Limb], mut divisor: Limb) {
+pub fn limbs_div_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
@@ -386,8 +383,7 @@ pub fn limbs_div_limb_in_place(limbs: &mut [Limb], mut divisor: Limb) {
         } else {
             0
         };
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         limbs_div_limb_normalized_in_place(
             &mut limbs[..len_minus_1],
             highest_limb,
@@ -395,10 +391,9 @@ pub fn limbs_div_limb_in_place(limbs: &mut [Limb], mut divisor: Limb) {
             limb_inverse,
         )
     } else {
-        divisor <<= bits;
+        let divisor = divisor << bits;
         let highest_limb = limbs_slice_shl_in_place(limbs, bits);
-        let limb_inverse =
-            (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half();
+        let limb_inverse = limbs_invert_limb(divisor);
         let (quotient, remainder) =
             div_mod_by_preinversion(highest_limb, limbs[len_minus_1], divisor, limb_inverse);
         limbs[len_minus_1] = quotient;

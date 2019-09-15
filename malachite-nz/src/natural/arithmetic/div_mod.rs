@@ -17,6 +17,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::div_mod_limb::limbs_invert_limb;
 use natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
@@ -65,7 +66,7 @@ use platform::{
 /// This is invert_pi1 from gmp-impl.h, where the result is returned instead of being written to
 /// dinv.
 pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
-    let mut inverse = (DoubleLimb::join_halves(!hi, Limb::MAX) / DoubleLimb::from(hi)).lower_half();
+    let mut inverse = limbs_invert_limb(hi);
     let mut hi_product = hi.wrapping_mul(inverse);
     hi_product.wrapping_add_assign(lo);
     if hi_product < lo {
@@ -1026,7 +1027,7 @@ pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
     assert!(highest_d.get_highest_bit());
     if d_len == 1 {
         let d = ds[0];
-        is[0] = (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
+        is[0] = limbs_invert_limb(d);
     } else {
         let scratch = &mut scratch[..d_len << 1];
         {

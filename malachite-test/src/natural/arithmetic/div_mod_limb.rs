@@ -6,8 +6,9 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
-    _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
-    limbs_div_limb_to_out_mod,
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
+    _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, limbs_div_limb_in_place_mod,
+    limbs_div_limb_mod, limbs_div_limb_to_out_mod,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, Integer, ToPrimitive};
@@ -59,7 +60,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_div_limb_to_out_mod_algorithms
     );
-    register_bench!(registry, Small, benchmark_limbs_div_limb_in_place_mod);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_in_place_mod_algorithms
+    );
     register_bench!(registry, Large, benchmark_natural_div_assign_mod_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -448,24 +453,48 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
                     no_out!(_limbs_div_limb_to_out_mod_alt(&mut out, &in_limbs, limb))
                 }),
             ),
+            (
+                "naive",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(_limbs_div_limb_to_out_mod_naive(&mut out, &in_limbs, limb))
+                }),
+            ),
         ],
     );
 }
 
-fn benchmark_limbs_div_limb_in_place_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_div_limb_in_place_mod_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
         "limbs_div_limb_in_place_mod(&mut [Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut limbs, limb)| no_out!(limbs_div_limb_in_place_mod(&mut limbs, limb))),
-        )],
+        &mut [
+            (
+                "standard",
+                &mut (|(mut limbs, limb)| no_out!(limbs_div_limb_in_place_mod(&mut limbs, limb))),
+            ),
+            (
+                "alt",
+                &mut (|(mut limbs, limb)| {
+                    no_out!(_limbs_div_limb_in_place_mod_alt(&mut limbs, limb))
+                }),
+            ),
+            (
+                "naive",
+                &mut (|(mut limbs, limb)| {
+                    no_out!(_limbs_div_limb_in_place_mod_naive(&mut limbs, limb))
+                }),
+            ),
+        ],
     );
 }
 
@@ -527,7 +556,6 @@ fn benchmark_natural_div_mod_limb_algorithms(gm: GenerationMode, limit: usize, f
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            ("naive", &mut (|(x, y)| no_out!(x._div_mod_limb_naive(y)))),
             (
                 "using / and %",
                 &mut (|(x, y)| {

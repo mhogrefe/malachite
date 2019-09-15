@@ -8,8 +8,9 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
-    _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
-    limbs_div_limb_to_out_mod,
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
+    _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, limbs_div_limb_in_place_mod,
+    limbs_div_limb_mod, limbs_div_limb_to_out_mod,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -43,9 +44,24 @@ fn test_limbs_div_limb_mod_and_limbs_div_limb_in_place_mod() {
         let (quotient_alt, remainder_alt) = limbs_div_limb_mod(limbs, limb);
         assert_eq!(quotient_alt, quotient);
         assert_eq!(remainder_alt, remainder);
+        let old_limbs = limbs;
 
-        let mut limbs = limbs.to_vec();
+        let mut limbs = old_limbs.to_vec();
         assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, limb), remainder);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        assert_eq!(
+            _limbs_div_limb_in_place_mod_alt(&mut limbs, limb),
+            remainder
+        );
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        assert_eq!(
+            _limbs_div_limb_in_place_mod_naive(&mut limbs, limb),
+            remainder
+        );
         assert_eq!(limbs, quotient);
     };
     test(&[0, 0], 2, vec![0, 0], 0);
@@ -118,6 +134,13 @@ fn test_limbs_div_limb_to_out_mod() {
         let mut limbs_out = limbs_out_before.to_vec();
         assert_eq!(
             _limbs_div_limb_to_out_mod_alt(&mut limbs_out, limbs_in, limb),
+            remainder
+        );
+        assert_eq!(limbs_out, limbs_out_after);
+
+        let mut limbs_out = limbs_out_before.to_vec();
+        assert_eq!(
+            _limbs_div_limb_to_out_mod_naive(&mut limbs_out, limbs_in, limb),
             remainder
         );
         assert_eq!(limbs_out, limbs_out_after);
@@ -211,11 +234,6 @@ fn test_div_mod_limb() {
         assert_eq!(r, remainder);
 
         let (q, r) = (&Natural::from_str(u).unwrap()).div_rem(v);
-        assert_eq!(q.to_string(), quotient);
-        assert!(q.is_valid());
-        assert_eq!(r, remainder);
-
-        let (q, r) = Natural::from_str(u).unwrap()._div_mod_limb_naive(v);
         assert_eq!(q.to_string(), quotient);
         assert!(q.is_valid());
         assert_eq!(r, remainder);
@@ -607,6 +625,13 @@ fn limbs_div_limb_to_out_mod_properties() {
                 remainder
             );
             assert_eq!(out, final_out);
+
+            let mut out = old_out.to_vec();
+            assert_eq!(
+                _limbs_div_limb_to_out_mod_naive(&mut out, in_limbs, limb),
+                remainder
+            );
+            assert_eq!(out, final_out);
         },
     );
 }
@@ -621,6 +646,18 @@ fn limbs_div_limb_in_place_mod_properties() {
             let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
             let (quotient, remainder_alt) = Natural::from_limbs_asc(&old_limbs).div_mod(limb);
             assert_eq!(Natural::from_owned_limbs_asc(limbs), quotient);
+            assert_eq!(remainder, remainder_alt);
+
+            let mut limbs = old_limbs.clone();
+            let remainder_alt = _limbs_div_limb_in_place_mod_alt(&mut limbs, limb);
+            let quotient_alt = Natural::from_owned_limbs_asc(limbs);
+            assert_eq!(quotient, quotient_alt);
+            assert_eq!(remainder, remainder_alt);
+
+            let mut limbs = old_limbs.clone();
+            let remainder_alt = _limbs_div_limb_in_place_mod_naive(&mut limbs, limb);
+            let quotient_alt = Natural::from_owned_limbs_asc(limbs);
+            assert_eq!(quotient, quotient_alt);
             assert_eq!(remainder, remainder_alt);
         },
     );
@@ -654,11 +691,6 @@ fn div_mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(remainder_alt, remainder);
 
     let (quotient_alt, remainder_alt) = n.clone().div_rem(u);
-    assert!(quotient_alt.is_valid());
-    assert_eq!(quotient_alt, quotient);
-    assert_eq!(remainder_alt, remainder);
-
-    let (quotient_alt, remainder_alt) = n.clone()._div_mod_limb_naive(u);
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
