@@ -1,5 +1,5 @@
-use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_divide_and_conquer_approx, _limbs_div_mod_schoolbook_approx,
+use malachite_nz::natural::arithmetic::div::{
+    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook_approx,
 };
 use malachite_nz::platform::{Limb, DC_DIVAPPR_Q_THRESHOLD};
 
@@ -10,10 +10,10 @@ use tune::compare_two::{compare_two, ComparisonResult};
 pub fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut qs, mut ns, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
-            _limbs_div_mod_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
+            _limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
         }),
         &mut (|(mut qs, mut ns, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
-            _limbs_div_mod_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
+            _limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
         }),
         quadruples_of_three_unsigned_vecs_and_unsigned_var_3(GenerationMode::Random(1_024)),
         10000,

@@ -8,7 +8,7 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
     _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
     _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, limbs_div_limb_in_place_mod,
-    limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+    limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_invert_limb,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, Integer, ToPrimitive};
@@ -17,7 +17,7 @@ use rug;
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1, unsigneds_var_1,
 };
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{
@@ -30,6 +30,7 @@ use inputs::natural::{
 // For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_invert_limb);
     register_demo!(registry, demo_limbs_div_limb_mod);
     register_demo!(registry, demo_limbs_div_limb_to_out_mod);
     register_demo!(registry, demo_limbs_div_limb_in_place_mod);
@@ -54,6 +55,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_ceiling_div_neg_mod_natural_ref);
     register_demo!(registry, demo_limb_ceiling_div_assign_neg_mod_natural);
     register_demo!(registry, demo_limb_ceiling_div_assign_neg_mod_natural_ref);
+    register_bench!(registry, Small, benchmark_limbs_invert_limb);
     register_bench!(registry, Small, benchmark_limbs_div_limb_mod);
     register_bench!(
         registry,
@@ -166,6 +168,12 @@ pub fn rug_div_rem_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
 pub fn rug_ceiling_div_neg_mod_u32(x: rug::Integer, u: u32) -> (rug::Integer, u32) {
     let (quotient, remainder) = x.div_rem_ceil(rug::Integer::from(u));
     (quotient, (-remainder).to_u32_wrapping())
+}
+
+fn demo_limbs_invert_limb(gm: GenerationMode, limit: usize) {
+    for limb in unsigneds_var_1(gm).take(limit) {
+        println!("limbs_invert_limb({}) = {}", limb, limbs_invert_limb(limb));
+    }
 }
 
 fn demo_limbs_div_limb_mod(gm: GenerationMode, limit: usize) {
@@ -407,6 +415,20 @@ fn demo_limb_ceiling_div_assign_neg_mod_natural_ref(gm: GenerationMode, limit: u
             u_old, n, remainder, u
         );
     }
+}
+
+fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_invert_limb(Limb)",
+        BenchmarkType::Single,
+        unsigneds_var_1::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|limb| usize::checked_from(limb.significant_bits()).unwrap()),
+        "limb.significant_bits()",
+        &mut [("malachite", &mut (|limb| no_out!(limbs_invert_limb(limb))))],
+    );
 }
 
 fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {

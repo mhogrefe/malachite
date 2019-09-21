@@ -177,6 +177,23 @@ where
     Box::new(signeds(gm).filter(|&i| i != T::MIN))
 }
 
+// All `T`s, where `T` is unsigned and its most-significant bit is set.
+pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(range_up_increasing(T::ONE << (T::WIDTH - 1))),
+        GenerationMode::Random(_) => Box::new(random::<T>(&EXAMPLE_SEED).map(|mut u| {
+            u.set_bit(u64::from(T::WIDTH - 1));
+            u
+        })),
+        GenerationMode::SpecialRandom(_) => {
+            Box::new(special_random_unsigned::<T>(&EXAMPLE_SEED).map(|mut u| {
+                u.set_bit(u64::from(T::WIDTH - 1));
+                u
+            }))
+        }
+    }
+}
+
 macro_rules! float_gen {
     (
         $f: ident,
@@ -2666,7 +2683,7 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_2(
 }
 
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `qs`, `ns`, `ds`, and
-// `inverse` meet the preconditions of `_limbs_div_mod_divide_and_conquer_approx`.
+// `inverse` meet the preconditions of `_limbs_div_divide_and_conquer_approx`.
 pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_3(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {

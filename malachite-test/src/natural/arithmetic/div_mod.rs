@@ -7,8 +7,7 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper, _limbs_div_mod_barrett_large_helper,
     _limbs_div_mod_barrett_large_product, _limbs_div_mod_barrett_scratch_len,
-    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_divide_and_conquer_approx,
-    _limbs_div_mod_schoolbook, _limbs_div_mod_schoolbook_approx, _limbs_invert_approx,
+    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_mod,
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
     limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
@@ -21,8 +20,7 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{
     pairs_of_unsigned_vec_var_9, pairs_of_unsigneds_var_2,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_3, quadruples_of_unsigned_vec_var_1,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
     quadruples_of_unsigned_vec_var_2, quadruples_of_unsigned_vec_var_3,
     sextuples_of_four_limb_vecs_and_two_usizes_var_1, sextuples_of_limbs_var_1,
     triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
@@ -41,8 +39,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_mod_by_two_limb_normalized);
     register_demo!(registry, demo_limbs_div_mod_schoolbook);
     register_demo!(registry, demo_limbs_div_mod_divide_and_conquer);
-    register_demo!(registry, demo_limbs_div_mod_schoolbook_approx);
-    register_demo!(registry, demo_limbs_div_mod_divide_and_conquer_approx);
     register_demo!(registry, demo_limbs_invert_basecase_approx);
     register_demo!(registry, demo_limbs_invert_newton_approx);
     register_demo!(registry, demo_limbs_invert_approx);
@@ -77,16 +73,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Small,
         benchmark_limbs_div_mod_divide_and_conquer_algorithms
-    );
-    register_bench!(
-        registry,
-        Small,
-        benchmark_limbs_div_mod_schoolbook_approx_algorithms
-    );
-    register_bench!(
-        registry,
-        Small,
-        benchmark_limbs_div_mod_divide_and_conquer_approx_algorithms
     );
     register_bench!(registry, Small, benchmark_limbs_invert_basecase_approx);
     register_bench!(
@@ -238,38 +224,6 @@ fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
         println!(
             "qs := {:?}; ns := {:?}; \
              _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
-             qs = {:?}, ns = {:?}",
-            old_qs, old_ns, ds, inverse, highest_q, qs, ns
-        );
-    }
-}
-
-fn demo_limbs_div_mod_schoolbook_approx(gm: GenerationMode, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm).take(limit)
-    {
-        let old_qs = qs.clone();
-        let old_ns = ns.clone();
-        let highest_q = _limbs_div_mod_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
-        println!(
-            "qs := {:?}; ns := {:?}; \
-             _limbs_div_mod_schoolbook_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
-             qs = {:?}, ns = {:?}",
-            old_qs, old_ns, ds, inverse, highest_q, qs, ns
-        );
-    }
-}
-
-fn demo_limbs_div_mod_divide_and_conquer_approx(gm: GenerationMode, limit: usize) {
-    for (mut qs, mut ns, ds, inverse) in
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_3(gm).take(limit)
-    {
-        let old_qs = qs.clone();
-        let old_ns = ns.clone();
-        let highest_q = _limbs_div_mod_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
-        println!(
-            "qs := {:?}; ns := {:?}; \
-             _limbs_div_mod_divide_and_conquer_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -592,82 +546,6 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
                     no_out!(_limbs_div_mod_divide_and_conquer(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_div_mod_schoolbook_approx_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "_limbs_div_mod_schoolbook_approx(&mut [Limb], &mut [Limb], &[Limb], Limb)",
-        BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
-        "ns.len() - ds.len()",
-        &mut [
-            (
-                "Schoolbook",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
-                }),
-            ),
-            (
-                "Schoolbook approx",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook_approx(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_div_mod_divide_and_conquer_approx_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "_limbs_div_mod_divide_and_conquer_approx(&mut [Limb], &mut [Limb], &[Limb], Limb)",
-        BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_3(gm.with_scale(2_048)),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, _, ref ds, _)| ds.len()),
-        "ns.len()",
-        &mut [
-            (
-                "divide-and-conquer",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_divide_and_conquer(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
-                }),
-            ),
-            (
-                "Schoolbook approx",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook_approx(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
-                }),
-            ),
-            (
-                "divide-and-conquer approx",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_divide_and_conquer_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),

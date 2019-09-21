@@ -14,10 +14,22 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
 
-/// TODO test
+/// The highest bit of the input must be set.
+///
 /// Time: O(1)
 ///
 /// Additional memory: O(1)
+///
+/// # Panics
+/// Panics if `divisor` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod_limb::limbs_invert_limb;
+///
+/// assert_eq!(limbs_invert_limb(0x8000_0002), 0xffff_fff8);
+/// assert_eq!(limbs_invert_limb(0xffff_fffe), 2);
+/// ```
 ///
 /// This is mpn_invert_limb from gmp-impl.h.
 #[inline]
@@ -25,9 +37,9 @@ pub fn limbs_invert_limb(divisor: Limb) -> Limb {
     (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half()
 }
 
-/// Time: O(1)
+/// Time: worst case O(1)
 ///
-/// Additional memory: O(1)
+/// Additional memory: worst case O(1)
 ///
 /// This is udiv_qrnnd_preinv from gmp-impl.h.
 pub(crate) fn div_mod_by_preinversion(
@@ -76,7 +88,9 @@ pub(crate) fn div_mod_by_preinversion(
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where un > 1 and both results are returned.
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qxn is 0, un > 1, and both results are
+/// returned. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
+/// unnecessary (they would always be 0).
 pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
     let mut quotient_limbs = vec![0; limbs.len()];
     let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, divisor);
@@ -111,8 +125,9 @@ pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where un > 1. Experiments show that
-/// DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qxn is 0 and un > 1. Experiments show
+/// that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be
+/// 0).
 pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -199,9 +214,9 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], divisor: L
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qp == up and un > 1. Experiments show
-/// that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be
-/// 0).
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qp == up, qxn is 0, and un > 1.
+/// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
+/// (they would always be 0).
 pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();

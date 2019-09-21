@@ -10,7 +10,7 @@ use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod_limb::{
     _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
     _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, limbs_div_limb_in_place_mod,
-    limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+    limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_invert_limb,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -27,6 +27,7 @@ use malachite_test::common::{
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     positive_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    unsigneds_var_1,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_and_positive_unsigned,
@@ -36,6 +37,21 @@ use malachite_test::inputs::natural::{
 use malachite_test::natural::arithmetic::div_mod_limb::{
     num_div_mod_u32, num_div_rem_u32, rug_ceiling_div_neg_mod_u32, rug_div_mod_u32, rug_div_rem_u32,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_invert_limb() {
+    let test = |in_limb: Limb, out_limb: Limb| {
+        assert_eq!(limbs_invert_limb(in_limb), out_limb);
+    };
+    test(0x8000_0000, 0xffff_ffff);
+    test(0x8000_0001, 0xffff_fffc);
+    test(0x8000_0002, 0xffff_fff8);
+    test(0x89ab_cdef, 0xdc08_767e);
+    test(0xffff_fffd, 3);
+    test(0xffff_fffe, 2);
+    test(0xffff_ffff, 1);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -589,6 +605,13 @@ fn limb_ceiling_div_neg_mod_natural_fail() {
 #[should_panic]
 fn limb_ceiling_div_neg_mod_natural_ref_fail() {
     (10 as Limb).ceiling_div_neg_mod(&Natural::ZERO);
+}
+
+#[test]
+fn limbs_invert_limb_properties() {
+    test_properties(unsigneds_var_1, |&limb| {
+        limbs_invert_limb(limb);
+    });
 }
 
 #[test]
