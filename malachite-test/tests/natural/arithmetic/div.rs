@@ -59,17 +59,17 @@ fn test_limbs_div_schoolbook() {
     };
     #[cfg(feature = "32_bit_limbs")]
     {
-        // q_len + 1 < usize::checked_from(d_len).unwrap() first time
-        // !qh first time
-        // n1 >= Limb::checked_from(d_len & usize::wrapping_from(flag)).unwrap()
+        // q_len < d_len_m_1
+        // !highest_q first time
+        // !(!flag || n_1 < Limb::checked_from(d_len).unwrap())
         test(&[10], &[1, 2, 3], &[3, 4, 0x8000_0000], false, &[10]);
-        // q_len + 1 >= usize::checked_from(d_len).unwrap() first time
-        // !(n1 == d1 && ns[np_offset + 1] == d0)
-        // !cy first time
-        // d_len >= 0
-        // n1 < (d1 & Limb::wrapping_from(flag)) first time
-        // !cy second time
-        // n1 < (d1 & Limb::wrapping_from(flag)) second time
+        // q_len >= d_len_m_1
+        // !(n_1 == d_1 && ns[d_len_s_m_1] == d_2)
+        // !carry first time
+        // d_len_s >= 2
+        // !(!flag || n_1 >= d_1) first time
+        // !carry second time
+        // !(!flag || n_1 >= d_1) second time
         test(
             &[10, 10, 10, 10],
             &[1, 2, 3, 4, 5, 6],
@@ -77,24 +77,19 @@ fn test_limbs_div_schoolbook() {
             false,
             &[4294967207, 9, 12, 10],
         );
-        // n1 < Limb::checked_from(d_len & usize::wrapping_from(flag)).unwrap()
-        // d_len > 2 first time
-        // q_len + 1 < d_len second time
-        // d_len <= 2 second time
-        // q_len + 1 < d_len third time
-        // !qh second time
+        // !flag || n_1 < Limb::checked_from(d_len).unwrap()
+        // !highest_q second time
         // q_len != 0
-        // cy fourth time
-        // x == 0 third time
+        // limbs_sub_limb_in_place(
+        //      ns_hi,
+        //      limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs, ds[i])) fourth time
+        // n_1 == 0 third time
         test(&[10], &[0, 0, 0, 1], &[1, 0, 2147483648], false, &[1]);
         // q_len == 0
         test(&[10], &[0; 3], &[0, 0, 2147483648], false, &[10]);
-        // q_len + 1 >= d_len second time
-        // d_len > 2 second time
-        // y >= cy
-        // q_len + 1 >= d_len third time
+        // *ns_last >= carry
         test(&[10; 3], &[0; 5], &[0, 0, 2147483648], false, &[0, 0, 10]);
-        // x != 0 third time
+        // n_1 != 0 third time
         test(
             &[10; 2],
             &[0, 0, 1, 1],
@@ -102,7 +97,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[2, 10],
         );
-        // qh first time
+        // highest_q first time
         test(
             &[10, 10],
             &[
@@ -116,8 +111,8 @@ fn test_limbs_div_schoolbook() {
             true,
             &[10, 10],
         );
-        // n1 >= (d1 & Limb::wrapping_from(flag)) second time
-        // n1 == cy second time
+        // !flag || n_1 >= d_1 second time
+        // n_1 == carry second time
         test(
             &[10; 2],
             &[0, 0, 1, 0, 1],
@@ -125,7 +120,7 @@ fn test_limbs_div_schoolbook() {
             false,
             &[4294967295, 1],
         );
-        // cy second time
+        // carry second time
         test(
             &[10; 2],
             &[0, 0, 0, 0, 1],
@@ -133,10 +128,10 @@ fn test_limbs_div_schoolbook() {
             false,
             &[4294967295, 1],
         );
-        // y < cy
-        // x != 0 first time
-        // qh second time
-        // !cy third time
+        // *ns_last < carry
+        // n_1 != 0 first time
+        // highest_q second time
+        // !carry third time
         test(
             &[10; 20],
             &[
@@ -163,8 +158,8 @@ fn test_limbs_div_schoolbook() {
                 10, 10, 10, 10, 10, 10,
             ],
         );
-        // cy third time
-        // x != 0 second time
+        // carry third time
+        // n_1 != 0 second time
         test(
             &[10; 8],
             &[
@@ -184,8 +179,8 @@ fn test_limbs_div_schoolbook() {
                 10,
             ],
         );
-        // n1 >= (d1 & Limb::wrapping_from(flag)) first time
-        // n1 == cy first time
+        // !flag || n_1 >= d_1 first time
+        // n_1 == carry first time
         test(
             &[10; 10],
             &[
@@ -202,7 +197,7 @@ fn test_limbs_div_schoolbook() {
                 1716103827, 974820792, 10,
             ],
         );
-        // x == 0 first time
+        // n_1 == 0 first time
         test(
             &[10; 20],
             &[
@@ -240,8 +235,8 @@ fn test_limbs_div_schoolbook() {
                 91710029, 4264403435, 2579237268, 67618125, 523165989, 10,
             ],
         );
-        // n1 != cy first time
-        // n1 < (cy & Limb::wrapping_from(flag)) first time
+        // n_1 != carry first time
+        // flag && n_1 < carry first time
         test(
             &[10; 73],
             &[
@@ -305,7 +300,7 @@ fn test_limbs_div_schoolbook() {
                 1932936627, 288459805, 10,
             ],
         );
-        // cy first time
+        // carry first time
         test(
             &[10; 45],
             &[
@@ -330,8 +325,8 @@ fn test_limbs_div_schoolbook() {
                 2079332445, 1950605148, 10,
             ],
         );
-        // n1 != cy second time
-        // n1 < (cy & Limb::wrapping_from(flag)) second time
+        // n_1 != carry second time
+        // flag && n_1 < carry second time
         test(
             &[10; 10],
             &[
@@ -363,7 +358,9 @@ fn test_limbs_div_schoolbook() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // !cy fourth time
+        // !limbs_sub_limb_in_place(
+        //      ns_hi,
+        //      limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs, ds[i])) fourth time
         test(
             &[10],
             &[0, 0, 1, 1],
