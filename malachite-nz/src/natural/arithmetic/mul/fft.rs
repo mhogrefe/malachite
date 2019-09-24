@@ -1395,14 +1395,15 @@ pub(crate) fn _limbs_mul_fft(
                 break;
             }
             width_minus_one = (width_minus_one + shifted_k - 1) & shifted_k.wrapping_neg();
-            big_width_minus_one = width_minus_one << usize::wrapping_from(Limb::LOG_WIDTH);
+            big_width_minus_one = width_minus_one << Limb::LOG_WIDTH;
             // warning: since width_minus_one changed, shifted_k may change too!
         }
     }
     // width = O(log(p))
     let width = width_minus_one + 1;
     assert!(width_minus_one < p); // otherwise we'll loop
-                                  // O(log(p)) memory
+
+    // O(log(p)) memory
     let mut scratch = vec![0; width << 1];
     let mp = big_width_minus_one >> k;
     // O(p * log(p)) memory

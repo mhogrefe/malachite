@@ -16,7 +16,7 @@ use natural::arithmetic::div_mod::{
 };
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural;
@@ -262,6 +262,64 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
             }
         }
     }
+    highest_q
+}
+
+/// Recursive divide-and-conquer division.
+///
+/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
+/// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
+/// significant bit of `ds` must be set. `inverse` should be the result of
+/// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+///
+/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+///
+/// Additional memory: worst case O(n * log(n) ^ 2)
+///
+/// where n = max(`ns.len`, `ds.len()`)
+///
+/// # Panics
+/// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
+/// has length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest
+/// bit set.
+///
+/// This is mpn_dcpi1_div_q from mpn/generic/dcpi1_div_q.c.
+pub fn _limbs_div_divide_and_conquer(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    inverse: Limb,
+) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len >= 6);
+    assert!(n_len - d_len >= 3);
+    let q_len = n_len - d_len;
+    assert!(ds[d_len - 1].get_highest_bit());
+    let qs = &mut qs[..q_len];
+    let mut scratch = Vec::with_capacity(n_len + 1);
+    scratch.push(1);
+    scratch.extend_from_slice(ns);
+    let mut scratch_2 = vec![0; q_len + 1];
+    let highest_q = _limbs_div_divide_and_conquer_approx(&mut scratch_2, &mut scratch, ds, inverse);
+    let (scratch_2_head, scratch_2_tail) = scratch_2.split_first_mut().unwrap();
+    if *scratch_2_head == 0 {
+        limbs_mul_to_out(&mut scratch, scratch_2_tail, ds);
+        let scratch_init = &mut scratch[..n_len];
+        // At most is wrong by one, no cycle.
+        if highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
+            || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
+        {
+            return if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
+                assert!(highest_q);
+                false
+            } else {
+                highest_q
+            };
+        }
+    }
+    qs.copy_from_slice(scratch_2_tail);
     highest_q
 }
 
@@ -513,7 +571,7 @@ fn _limbs_div_divide_and_conquer_approx_helper(
 ///
 /// Additional memory: worst case O(n * log(n) ^ 2)
 ///
-/// where n = `ds.len()`
+/// where n = max(`ns.len`, `ds.len()`)
 ///
 /// # Panics
 /// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
@@ -680,19 +738,17 @@ pub fn _limbs_div_divide_and_conquer_approx(
         limbs_move_left(&mut qs[..offset + 1], 1);
         qs[offset] = q_save;
     } else {
-        assert!(b >= q_len);
-        let offset = b - q_len;
+        let offset = a - q_len;
         let q_len_plus_one = q_len + 1;
         let mut qs_2 = vec![0; q_len_plus_one];
-        let ns = &mut ns[offset..];
-        let ds = &ds[offset + 1..];
-        if q_len < DC_DIVAPPR_Q_THRESHOLD {
-            highest_q = _limbs_div_schoolbook_approx(&mut qs_2, ns, ds, inverse);
+        let ds = &ds[offset..];
+        if q_len < DC_DIVAPPR_Q_THRESHOLD && offset > 0 {
+            highest_q = _limbs_div_schoolbook_approx(&mut qs_2, &mut ns[offset - 1..], ds, inverse);
         } else {
             let mut scratch = vec![0; q_len_plus_one];
             highest_q = _limbs_div_divide_and_conquer_approx_helper(
                 &mut qs_2,
-                &mut ns[q_len_plus_one >> 1..],
+                &mut ns[offset + (q_len_plus_one >> 1) - 1..],
                 ds,
                 inverse,
                 &mut scratch,

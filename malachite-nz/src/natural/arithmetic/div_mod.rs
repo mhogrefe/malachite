@@ -378,7 +378,7 @@ pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
     highest_q
 }
 
-/// Recursive divide-and-conquer division for arbitrary-size operands.
+/// Recursive divide-and-conquer division.
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///

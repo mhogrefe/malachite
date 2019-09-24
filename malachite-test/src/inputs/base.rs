@@ -2682,21 +2682,6 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_2(
     )
 }
 
-// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `qs`, `ns`, `ds`, and
-// `inverse` meet the preconditions of `_limbs_div_divide_and_conquer_approx`.
-pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_3(
-    gm: GenerationMode,
-) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
-    Box::new(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).filter(|(_, ns, ds, _)| {
-            let n_len = ns.len();
-            let d_len = ds.len();
-            let q_len = n_len - d_len;
-            q_len >= d_len || n_len >= 2 * q_len + 2
-        }),
-    )
-}
-
 // All triples of `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor of `Limb::MAX`.
 pub fn triples_of_limb_vec_limb_and_limb_var_1(gm: GenerationMode) -> It<(Vec<Limb>, Limb, Limb)> {
     match gm {

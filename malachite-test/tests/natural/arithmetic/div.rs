@@ -3,7 +3,8 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div::{
-    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
+    _limbs_div_divide_and_conquer, _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook,
+    _limbs_div_schoolbook_approx,
 };
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
@@ -17,7 +18,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -401,6 +402,92 @@ fn limbs_div_schoolbook_fail_4() {
     let ds = &[3, 4, 5];
     let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook(&mut [10], &mut [1, 2, 3], ds, inverse);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_divide_and_conquer() {
+    let test = |qs_in: &[Limb], ns_in: &[Limb], ds: &[Limb], q_highest, qs_out: &[Limb]| {
+        let mut qs = qs_in.to_vec();
+        let mut ns = ns_in.to_vec();
+        let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+        assert_eq!(
+            _limbs_div_divide_and_conquer(&mut qs, &mut ns, ds, inverse),
+            q_highest
+        );
+        assert_eq!(qs, qs_out);
+        verify_limbs_div(qs_in, ns_in, ds, q_highest, &qs);
+    };
+    {
+        // *scratch_2_head != 0
+        test(
+            &[10; 4],
+            &[1, 2, 3, 4, 5, 6, 7, 8, 9],
+            &[3, 4, 5, 6, 7, 0x8000_0000],
+            false,
+            &[4294967057, 15, 18, 10],
+        );
+        // *scratch_2_head == 0
+        // !(highest_q &&
+        //      limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
+        //      || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater)
+        test(
+            &[10; 3],
+            &[0; 9],
+            &[0, 0, 0, 0, 0, 2147483648],
+            false,
+            &[0, 0, 0],
+        );
+        test(
+            &[10; 3],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 1],
+            &[0, 0, 0, 0, 0, 2147483648],
+            false,
+            &[0, 0, 2],
+        );
+        // highest_q &&
+        //      limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds)
+        //      || limbs_cmp_same_length(scratch_init, ns) == Ordering::Greater
+        test(
+            &[10; 3],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            &[0, 0, 0, 1, 0, 0, 0, 2147483648],
+            false,
+            &[1, 0, 0],
+        );
+    }
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_divide_and_conquer_fail_1() {
+    let ds = &[3, 4, 5, 6, 0x8000_0000];
+    let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+    _limbs_div_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inverse);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_divide_and_conquer_fail_2() {
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
+    let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+    _limbs_div_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8], ds, inverse);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_divide_and_conquer_fail_3() {
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
+    let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+    _limbs_div_divide_and_conquer(&mut [10, 10], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inverse);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_divide_and_conquer_fail_4() {
+    let ds = &[3, 4, 5, 6, 7, 8];
+    let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
+    _limbs_div_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inverse);
 }
 
 fn verify_limbs_div_approx(
@@ -1868,6 +1955,13 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 1219309116, 2158257939, 161673294, 1466523266,
             ],
         );
+        test(
+            &[10; 6],
+            &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            &[3, 4, 5, 6, 7, 0x8000_0000],
+            false,
+            &[3614, 4294966768, 4294967005, 19, 22, 10],
+        );
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
@@ -3310,6 +3404,19 @@ fn limbs_div_schoolbook_properties() {
 }
 
 #[test]
+fn limbs_div_divide_and_conquer_properties() {
+    test_properties(
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
+        |(ref qs_in, ref ns_in, ref ds, inverse)| {
+            let mut qs = qs_in.clone();
+            let mut ns = ns_in.clone();
+            let q_highest = _limbs_div_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
+            verify_limbs_div(qs_in, ns_in, ds, q_highest, &qs);
+        },
+    );
+}
+
+#[test]
 fn limbs_div_schoolbook_approx_properties() {
     test_properties(
         quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
@@ -3326,7 +3433,7 @@ fn limbs_div_schoolbook_approx_properties() {
 fn limbs_div_divide_and_conquer_approx_properties() {
     test_properties_custom_scale(
         128,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
