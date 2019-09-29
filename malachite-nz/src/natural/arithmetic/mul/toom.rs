@@ -1430,7 +1430,8 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     {
         let (bs2, as2) = out[2 * m..].split_at_mut(m); // bs2 length: n + 1
                                                        // v_neg_2, 2 * n + 1 limbs
-        limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], &as2[..m], bs2); // W1
+        limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], &as2[..m], bs2);
+        // W1
     }
     {
         let (bs1, remainder) = out.split_at_mut(2 * n); // bs1 length: 2 * n

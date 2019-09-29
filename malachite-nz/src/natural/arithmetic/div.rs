@@ -1,21 +1,34 @@
-use std::cmp::Ordering;
+use std::cmp::{min, Ordering};
 use std::ops::{Div, DivAssign};
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_move_left;
+use malachite_base::limbs::{limbs_move_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{CheckedFrom, JoinHalves, SplitInHalf};
 
-use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-use natural::arithmetic::div_mod::{
-    _limbs_div_mod_divide_and_conquer_helper, _limbs_div_mod_schoolbook,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
+use natural::arithmetic::add::{
+    limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
+use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::div_mod::{
+    _limbs_div_mod_divide_and_conquer_helper, _limbs_div_mod_schoolbook, _limbs_invert_approx,
+    _limbs_invert_approx_scratch_len, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_three_limb_by_two_limb, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
+};
+use natural::arithmetic::mul::mul_mod::{
+    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
+    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
+};
+use natural::arithmetic::mul::{
+    limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
+};
+use natural::arithmetic::sub::{
+    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
+};
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -757,6 +770,281 @@ pub fn _limbs_div_divide_and_conquer_approx(
         qs[..q_len].copy_from_slice(&qs_2[1..]);
     }
     highest_q
+}
+
+/// Compute Q = floor(N / D) + e.  N is nn limbs, D is dn limbs and must be
+/// normalized, and Q must be nn-dn limbs, 0 <= e <= 4.  The requirement that Q
+/// is nn-dn limbs (and not nn-dn+1 limbs) was put in place in order to allow us
+/// to let N be unmodified during the operation.
+///
+/// This is mpn_mu_divappr_q from mpn/generic/mu_divappr_q.c.
+pub fn _limbs_div_barrett_approx(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
+    let mut n_len = ns.len();
+    let mut d_len = ds.len();
+    assert!(d_len > 1);
+    assert!(n_len >= d_len);
+    assert!(ds[d_len - 1].get_highest_bit());
+    let q_len = n_len - d_len;
+    // If Q is smaller than D, truncate operands.
+    let mut np_offset = 0;
+    let mut dp_offset = 0;
+    if q_len + 1 < d_len {
+        np_offset += d_len - (q_len + 1);
+        n_len -= d_len - (q_len + 1);
+        dp_offset += d_len - (q_len + 1);
+        d_len = q_len + 1;
+    }
+    // Compute the inverse size.
+    let i_len = _limbs_div_barrett_approx_is_len(q_len, d_len, 0);
+    assert!(i_len <= d_len);
+    {
+        let (is, tp) = scratch.split_at_mut(i_len + 1);
+        // compute an approximate inverse on (in+1) limbs
+        if d_len == i_len {
+            tp[1..i_len + 1].copy_from_slice(&ds[dp_offset..dp_offset + i_len]);
+            tp[0] = 1;
+            let (tp_lo, tp_hi) = tp.split_at_mut(i_len + 1);
+            _limbs_invert_approx(is, tp_lo, tp_hi);
+            limbs_move_left(&mut is[..i_len + 1], 1);
+        } else {
+            let cy = limbs_add_limb_to_out(
+                tp,
+                &ds[dp_offset + d_len - (i_len + 1)..dp_offset + d_len],
+                1,
+            );
+            if cy {
+                // TODO This branch is untested!
+                limbs_set_zero(&mut is[..i_len]);
+            } else {
+                let (tp_lo, tp_hi) = tp.split_at_mut(i_len + 1);
+                _limbs_invert_approx(is, tp_lo, tp_hi);
+                limbs_move_left(&mut is[..i_len + 1], 1);
+            }
+        }
+    }
+    let (is, scratch_hi) = scratch.split_at_mut(i_len);
+    _limbs_div_barrett_approx_preinverted(
+        qs,
+        &ns[np_offset..np_offset + n_len],
+        &ds[dp_offset..dp_offset + d_len],
+        is,
+        scratch_hi,
+    )
+}
+
+/// This is mpn_preinv_mu_divappr_q from mpn/generic/mu_divappr_q.c.
+fn _limbs_div_barrett_approx_preinverted(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    is: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    let mut i_len = is.len();
+    let mut q_len = n_len - d_len;
+    let mut np_offset = q_len;
+    let mut qp_offset = q_len;
+    let mut qh =
+        limbs_cmp_same_length(&ns[np_offset..np_offset + d_len], &ds[..d_len]) >= Ordering::Equal;
+    let (rs, tp) = scratch.split_at_mut(d_len);
+    if qh {
+        limbs_sub_same_length_to_out(rs, &ns[np_offset..np_offset + d_len], &ds[..d_len]);
+    } else {
+        rs[..d_len].copy_from_slice(&ns[np_offset..np_offset + d_len]);
+    }
+    if q_len == 0 {
+        return qh;
+    }
+    let mut ip_offset = 0;
+    let mut cy = 0;
+    while q_len > 0 {
+        if q_len < i_len {
+            ip_offset += i_len - q_len;
+            i_len = q_len;
+        }
+        np_offset -= i_len;
+        qp_offset -= i_len;
+        // Compute the next block of quotient limbs by multiplying the inverse I
+        // by the upper part of the partial remainder R.
+        limbs_mul_same_length_to_out(
+            tp,
+            &rs[d_len - i_len..d_len],
+            &is[ip_offset..ip_offset + i_len],
+        );
+        // I's msb implicit
+        cy = if limbs_add_same_length_to_out(
+            &mut qs[qp_offset..],
+            &tp[i_len..2 * i_len],
+            &rs[d_len - i_len..d_len],
+        ) {
+            1
+        } else {
+            0
+        };
+        assert_eq!(cy, 0);
+        q_len -= i_len;
+        if q_len == 0 {
+            break;
+        }
+        // Compute the product of the quotient block and the divisor D, to be
+        // subtracted from the partial remainder combined with new limbs from the
+        // dividend N.  We only really need the low d_len limbs.
+        if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            // d_len+in limbs, high 'in' cancels
+            limbs_mul_greater_to_out(tp, &ds[..d_len], &qs[qp_offset..qp_offset + i_len]);
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
+            let (tp, scratch_out) = tp.split_at_mut(tn);
+            _limbs_mul_mod_limb_width_to_n_minus_1(
+                tp,
+                tn,
+                &ds[..d_len],
+                &qs[qp_offset..qp_offset + i_len],
+                scratch_out,
+            );
+            let wn = d_len + i_len - tn; // number of wrapped limbs
+                                         // TODO wn == 0 case is untested!
+            if wn > 0 {
+                cy = if limbs_sub_same_length_in_place_left(&mut tp[..wn], &rs[d_len - wn..d_len]) {
+                    1
+                } else {
+                    0
+                };
+                cy = if limbs_sub_limb_in_place(&mut tp[wn..tn], cy) {
+                    1
+                } else {
+                    0
+                };
+                let cx = if limbs_cmp_same_length(&rs[d_len - i_len..tn - i_len], &tp[d_len..tn])
+                    == Ordering::Less
+                {
+                    1
+                } else {
+                    0
+                };
+                assert!(cx >= cy);
+                assert!(!limbs_slice_add_limb_in_place(tp, cx - cy));
+            }
+        }
+        let mut r = rs[d_len - i_len].wrapping_sub(tp[d_len]);
+        // Subtract the product from the partial remainder combined with new
+        // limbs from the dividend N, generating a new partial remainder R.
+        if d_len != i_len {
+            // get next 'in' limbs from N
+            let cyb = limbs_sub_same_length_in_place_right(
+                &ns[np_offset..np_offset + i_len],
+                &mut tp[..i_len],
+            );
+            cy = if _limbs_sub_same_length_with_borrow_in_in_place_right(
+                &mut rs[..d_len - i_len],
+                &mut tp[i_len..d_len],
+                cyb,
+            ) {
+                1
+            } else {
+                0
+            };
+            rs[..d_len].copy_from_slice(&tp[..d_len]);
+        } else {
+            // get next 'in' limbs from N
+            cy = if limbs_sub_same_length_to_out(
+                rs,
+                &ns[np_offset..np_offset + i_len],
+                &tp[..i_len],
+            ) {
+                1
+            } else {
+                0
+            };
+        }
+        // Check the remainder R and adjust the quotient as needed.
+        r.wrapping_sub_assign(cy);
+        while r != 0 {
+            // We loop 0 times with about 69% probability, 1 time with about 31%
+            // probability, 2 times with about 0.6% probability, if inverse is
+            // computed as recommended.
+            assert!(!limbs_slice_add_limb_in_place(&mut qs[qp_offset..], 1));
+            cy = if limbs_sub_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]) {
+                1
+            } else {
+                0
+            };
+            r -= cy;
+        }
+        if limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) >= Ordering::Equal {
+            // This is executed with about 76% probability.
+            assert!(!limbs_slice_add_limb_in_place(&mut qs[qp_offset..], 1));
+            cy = if limbs_sub_same_length_in_place_left(&mut rs[..d_len], &ds[..d_len]) {
+                1
+            } else {
+                0
+            };
+        }
+    }
+    q_len = n_len - d_len;
+    cy += if limbs_slice_add_limb_in_place(&mut qs[qp_offset..qp_offset + q_len], 3) {
+        1
+    } else {
+        0
+    };
+    if cy != 0 {
+        // TODO This branch is untested!
+        if qh {
+            // Return a quotient of just 1-bits, with qh set.
+            for i in 0..q_len {
+                qs[qp_offset + i] = Limb::MAX;
+            }
+        } else {
+            // Propagate carry into qh.
+            qh = true;
+        }
+    }
+    qh
+}
+
+/// In case k=0 (automatic choice), we distinguish 3 cases:
+/// (a) dn < qn:         in = ceil(qn / ceil(qn/dn))
+/// (b) dn/3 < qn <= dn: in = ceil(qn / 2)
+/// (c) qn < dn/3:       in = qn
+/// In all cases we have in <= dn.
+///
+/// This is mpn_mu_divappr_q_choose_in from mpn/generic/mu_divappr_q.c.
+fn _limbs_div_barrett_approx_is_len(qn: usize, dn: usize, k: usize) -> usize {
+    if k == 0 {
+        if qn > dn {
+            // Compute an inverse size that is a nice partition of the quotient.
+            let b = qn.saturating_sub(1) / dn + 1; // ceil(qn/dn), number of blocks
+            qn.saturating_sub(1) / b + 1 // ceil(qn/b) = ceil(qn / ceil(qn/dn))
+        } else if 3 * qn > dn {
+            qn.saturating_sub(1) / 2 + 1 // b = 2
+        } else {
+            qn.saturating_sub(1) / 1 + 1 // b = 1
+        }
+    } else {
+        let xn = min(dn, qn);
+        xn.saturating_sub(1) / k + 1
+    }
+}
+
+/// This is mpn_mu_divappr_q_itch from mpn/generic/mu_divappr_q.c.
+pub fn _limbs_div_barrett_approx_scratch_len(nn: usize, mut dn: usize, mua_k: usize) -> usize {
+    let qn = nn - dn;
+    if qn + 1 < dn {
+        dn = qn + 1;
+    }
+    let n = _limbs_div_barrett_approx_is_len(qn, dn, mua_k);
+    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(dn + 1);
+    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(itch_local, dn, n);
+    let itch_invapp = _limbs_invert_approx_scratch_len(n + 1) + n + 2; // 3 * n + 4
+    assert!(dn + itch_local + itch_out >= itch_invapp);
+    n + dn + itch_local + itch_out
 }
 
 impl Div<Natural> for Natural {

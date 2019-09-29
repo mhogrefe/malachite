@@ -2232,6 +2232,43 @@ pub fn triples_of_unsigned_vec_var_40(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     )
 }
 
+// All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_div_barrett_approx`.
+pub fn triples_of_unsigned_vec_var_41(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(
+        qs.filter(|(q, n, d_init, _)| {
+            let d_len = d_init.len() + 1;
+            n.len() >= d_len && q.len() >= n.len() - d_len
+        })
+        .map(|(q, n, mut d_init, d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,
@@ -2452,6 +2489,14 @@ pub fn quadruples_of_unsigned_vec_var_2(
     }))
 }
 
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet certain preconditions that
+// enable comparing the performance of two kinds of Barrett division.
+pub fn quadruples_of_unsigned_vec_var_3(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(quadruples_of_unsigned_vec_var_1(gm).filter(|(_, _, n, d)| 2 * d.len() > n.len() + 1))
+}
+
 pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
@@ -2512,14 +2557,6 @@ pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
             Some((scratch, ds, qs, rs_hi, scratch_len, i_len))
         }),
     )
-}
-
-// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet certain preconditions that
-// enable comparing the performance of two kinds of Barrett division.
-pub fn quadruples_of_unsigned_vec_var_3(
-    gm: GenerationMode,
-) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
-    Box::new(quadruples_of_unsigned_vec_var_1(gm).filter(|(_, _, n, d)| 2 * d.len() > n.len() + 1))
 }
 
 fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -2805,10 +2842,10 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(Box::new(exhaustive_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_positive(),
-        ))),
+        )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),

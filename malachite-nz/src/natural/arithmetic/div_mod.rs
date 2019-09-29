@@ -844,7 +844,7 @@ pub fn _limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     }
 }
 
-const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
+pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
 
 // ds.len() >= 2
 // n_len >= 3
@@ -1079,7 +1079,7 @@ fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) ->
 /// Additional memory: Worst case O(1)
 ///
 /// This is mpn_invertappr_itch from gmp-impl.h.
-const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
+pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     is_len << 1
 }
 
