@@ -127,7 +127,7 @@ fn demo_limbs_div_divide_and_conquer_approx(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_barrett_approx(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_unsigned_vec_var_41(gm).take(limit) {
         let old_qs = qs.clone();
-        let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+        let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
         let highest_q = _limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; ns := {:?}; \
@@ -349,7 +349,7 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
                 "Barrett approx",
                 &mut (|(mut qs, ns, ds, _)| {
                     let mut scratch =
-                        vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+                        vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
                     no_out!(_limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch))
                 }),
             ),

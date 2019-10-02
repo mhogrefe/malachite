@@ -3277,7 +3277,7 @@ fn verify_limbs_div_approx_2(
             qs_in,
             ns,
             ds,
-            vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)]
+            vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())]
         );
         assert_eq!(expected_q * &d + expected_r, n);
     } else {
@@ -3290,7 +3290,7 @@ fn verify_limbs_div_approx_2(
 fn test_limbs_div_barrett_approx() {
     let test = |qs_in: &[Limb], ns: &[Limb], ds: &[Limb], q_highest, qs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
-        let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+        let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
         assert_eq!(
             _limbs_div_barrett_approx(&mut qs, ns, ds, &mut scratch),
             q_highest
@@ -3301,24 +3301,25 @@ fn test_limbs_div_barrett_approx() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // q_len + 1 < d_len
-        // d_len == i_len
-        // !qh first time in _limbs_div_barrett_approx_preinverted
+        // d_len_s == i_len
+        // !highest_q first time in _limbs_div_barrett_approx_preinverted
         // q_len == 0 first time in _limbs_div_barrett_approx_preinverted
         test(&[10; 3], &[1, 2], &[0, 0x8000_0000], false, &[10, 10, 10]);
         // q_len + 1 >= d_len
-        // d_len != i_len
-        // !cy
+        // d_len_s != i_len
+        // !limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1)
         // q_len != 0 first time in _limbs_div_barrett_approx_preinverted
-        // q_len >= i_len in _limbs_div_barrett_approx_preinverted
+        // i_len == chunk_len in _limbs_div_barrett_approx_preinverted
         // q_len == 0 second time in _limbs_div_barrett_approx_preinverted
-        // cy == 0 in _limbs_div_barrett_approx_preinverted
+        // !(limbs_slice_add_limb_in_place(qs, 3) || carry)
+        //      in _limbs_div_barrett_approx_preinverted
         test(&[10; 3], &[1, 2, 3], &[0, 0x8000_0000], false, &[8, 10, 10]);
         test(&[10; 3], &[1, 2, 3], &[3, 0x8000_0000], false, &[8, 10, 10]);
         // q_len != 0 second time in _limbs_div_barrett_approx_preinverted
         // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_barrett_approx_preinverted
-        // d_len != i_len in _limbs_div_barrett_approx_preinverted
-        // limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) < Ordering::Equal
-        // q_len < i_len in _limbs_div_barrett_approx_preinverted
+        // n != 0 in _limbs_div_barrett_approx_preinverted
+        // limbs_cmp_same_length(rs, ds) == Ordering::Less
+        // i_len != chunk_len in _limbs_div_barrett_approx_preinverted
         test(
             &[10; 100],
             &[
@@ -3369,7 +3370,7 @@ fn test_limbs_div_barrett_approx() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // d_len == i_len in _limbs_div_barrett_approx_preinverted
+        // n == 0 in _limbs_div_barrett_approx_preinverted
         // r != 0 in _limbs_div_barrett_approx_preinverted
         test(
             &[10; 28],
@@ -3394,10 +3395,9 @@ fn test_limbs_div_barrett_approx() {
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
-        // qh first time in _limbs_div_barrett_approx_preinverted
+        // highest_q first time in _limbs_div_barrett_approx_preinverted
         // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_barrett_approx_preinverted
-        // wn > 0 in _limbs_div_barrett_approx_preinverted
-        // limbs_cmp_same_length(&rs[..d_len], &ds[..d_len]) >= Ordering::Equal
+        // limbs_cmp_same_length(rs, ds) >= Ordering::Equal
         test(
             &[10; 100],
             &[
@@ -3719,7 +3719,7 @@ fn test_limbs_div_barrett_approx() {
 fn limbs_div_barrett_approx_fail_1() {
     let ns = &[1, 2];
     let ds = &[0x8000_0000];
-    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
@@ -3728,7 +3728,7 @@ fn limbs_div_barrett_approx_fail_1() {
 fn limbs_div_barrett_approx_fail_2() {
     let ns = &[1];
     let ds = &[0, 0x8000_0000];
-    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
@@ -3737,7 +3737,7 @@ fn limbs_div_barrett_approx_fail_2() {
 fn limbs_div_barrett_approx_fail_3() {
     let ns = &[1, 2];
     let ds = &[0, 1];
-    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
@@ -3746,7 +3746,7 @@ fn limbs_div_barrett_approx_fail_3() {
 fn limbs_div_barrett_approx_fail_4() {
     let ns = &[1, 2, 3, 4];
     let ds = &[0, 0x8000_0000];
-    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+    let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10], ns, ds, &mut scratch);
 }
 
@@ -3949,7 +3949,7 @@ fn limbs_div_barrett_approx_properties() {
         triples_of_unsigned_vec_var_41,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
-            let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len(), 0)];
+            let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
             let q_highest = _limbs_div_barrett_approx(&mut qs, &ns, ds, &mut scratch);
             verify_limbs_div_approx_2(qs_in, ns, ds, q_highest, &qs);
         },

@@ -1,4 +1,4 @@
-use malachite_nz::natural::arithmetic::div_mod::_limbs_div_mod_barrett_large_product;
+use malachite_nz::natural::arithmetic::div_mod::_limbs_div_barrett_large_product;
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
 
@@ -24,7 +24,7 @@ pub fn tune() -> Vec<String> {
             usize,
             usize,
         )| {
-            _limbs_div_mod_barrett_large_product(&mut scratch, &ds, &qs, &rs_hi, scratch_len, i_len)
+            _limbs_div_barrett_large_product(&mut scratch, &ds, &qs, &rs_hi, scratch_len, i_len)
         }),
         sextuples_of_four_limb_vecs_and_two_usizes_var_1(GenerationMode::Random(128)),
         10000,

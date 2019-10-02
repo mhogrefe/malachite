@@ -5,8 +5,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper, _limbs_div_mod_barrett_large_helper,
-    _limbs_div_mod_barrett_large_product, _limbs_div_mod_barrett_scratch_len,
+    _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
+    _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_mod,
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
@@ -716,7 +716,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_div_mod_barrett_large_product(\
+        "_limbs_div_barrett_large_product(\
          &mut [Limb], &[Limb], &[Limb], &[Limb], usize, usize)",
         BenchmarkType::Algorithms,
         sextuples_of_four_limb_vecs_and_two_usizes_var_1(gm.with_scale(128)),
@@ -733,9 +733,9 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
                 }),
             ),
             (
-                "_limbs_div_mod_barrett_large_product",
+                "_limbs_div_barrett_large_product",
                 &mut (|(mut scratch, ds, qs, rs_hi, scratch_len, i_len)| {
-                    _limbs_div_mod_barrett_large_product(
+                    _limbs_div_barrett_large_product(
                         &mut scratch,
                         &ds,
                         &qs,

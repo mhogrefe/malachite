@@ -3792,7 +3792,7 @@ fn test_limbs_div_mod_barrett() {
         );
         // highest_q in _limbs_div_mod_barrett_preinverted
         // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_mod_barrett_preinverted
-        // d_len_plus_i_len > scratch_len in _limbs_div_mod_barrett_large_product
+        // d_len_plus_i_len > scratch_len in _limbs_div_barrett_large_product
         // i_len != chunk_len in _limbs_div_mod_barrett_preinverted
         // limbs_cmp_same_length(ns_hi, ds) == Ordering::Less in _limbs_div_mod_barrett_preinverted
         test(

@@ -854,7 +854,7 @@ pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_
 // scratch_len == _limbs_mul_mod_limb_width_to_n_minus_1_next_size(ds.len() + 1)
 // scratch.len() == _limbs_div_mod_barrett_scratch_len(n_len, d_len) - i_len
 // rs_hi.len() == i_len
-pub fn _limbs_div_mod_barrett_large_product(
+pub fn _limbs_div_barrett_large_product(
     scratch: &mut [Limb],
     ds: &[Limb],
     qs: &[Limb],
@@ -865,17 +865,10 @@ pub fn _limbs_div_mod_barrett_large_product(
     let d_len = ds.len();
     let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
     _limbs_mul_mod_limb_width_to_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
-    // number of wrapped limbs
-    let d_len_plus_i_len = d_len + i_len;
-    if d_len_plus_i_len > scratch_len {
-        let m = d_len_plus_i_len - scratch_len;
-        // m == i_len + d_len - scratch_len and scratch_len >= d_len, so i_len >= m.
-        let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
-        let carry_1 = limbs_sub_same_length_in_place_left(scratch_lo, &rs_hi[i_len - m..])
-            && limbs_sub_limb_in_place(&mut scratch_hi[..scratch_len - m], 1);
-        let carry_2 =
-            limbs_cmp_same_length(&rs_hi[..scratch_len - d_len], &scratch[d_len..scratch_len])
-                == Ordering::Less;
+    if d_len + i_len > scratch_len {
+        let (rs_hi_lo, rs_hi_hi) = rs_hi.split_at(scratch_len - d_len);
+        let carry_1 = limbs_sub_in_place_left(scratch, rs_hi_hi);
+        let carry_2 = limbs_cmp_same_length(rs_hi_lo, &scratch[d_len..]) == Ordering::Less;
         if !carry_1 && carry_2 {
             assert!(!limbs_slice_add_limb_in_place(scratch, 1));
         } else {
@@ -942,16 +935,16 @@ fn _limbs_div_mod_barrett_preinverted(
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             limbs_mul_greater_to_out(scratch, ds, qs);
         } else {
-            _limbs_div_mod_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
+            _limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the
         // dividend, generating a new partial remainder.
+        let scratch = &mut scratch[..d_len];
         let carry = if n == 0 {
             // Get next i_len limbs from n.
-            limbs_sub_same_length_to_out(rs, ns, &scratch[..i_len])
+            limbs_sub_same_length_to_out(rs, ns, scratch)
         } else {
-            let scratch = &mut scratch[..d_len];
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
             // Get next i_len limbs from n.
             let carry = _limbs_sub_same_length_with_borrow_in_in_place_right(
@@ -984,9 +977,11 @@ fn _limbs_div_mod_barrett_preinverted(
 }
 
 /// We distinguish 3 cases:
+///
 /// (a) d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
 /// (b) d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
 /// (c) q_len < d_len / 3:          i_len = q_len
+///
 /// In all cases we have i_len <= d_len.
 ///
 /// Time: Worst case O(1)
@@ -1092,10 +1087,11 @@ pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
 /// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, where mua_k == 0.
 pub fn _limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = _limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
-    let itch_preinv = _limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
-    let itch_invapp = _limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2; // 3 * is_len + 4
-    assert!(itch_preinv >= itch_invapp);
-    is_len + itch_preinv
+    let preinverse_len = _limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
+    // 3 * is_len + 4
+    let inverse_approx_len = _limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2;
+    assert!(preinverse_len >= inverse_approx_len);
+    is_len + preinverse_len
 }
 
 pub fn _limbs_div_mod_barrett_large_helper(
