@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::iter::once;
 use std::ops::{Div, DivAssign};
 
 use malachite_base::comparison::Max;
@@ -335,6 +336,127 @@ pub fn _limbs_div_divide_and_conquer(
     }
     qs.copy_from_slice(scratch_2_tail);
     highest_q
+}
+
+/// The idea of the algorithm used herein is to compute a smaller inverted value than used in the
+/// standard Barrett algorithm, and thus save time in the Newton iterations, and pay just a small
+/// price when using the inverted value for developing quotient bits. This algorithm was presented
+/// at ICMS 2006.
+///
+/// This is mpn_mu_div_q from mpn/generic/mu_div_q.c.
+pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(n_len > d_len);
+    let q_len = n_len - d_len;
+    let mut tp = vec![0; q_len + 1];
+    let mut highest_q;
+    if q_len >= d_len {
+        // |_______________________|   dividend
+        // |________|   divisor
+        let mut rp = vec![0; n_len + 1];
+        rp[1..n_len + 1].copy_from_slice(&ns[..n_len]);
+        rp[0] = 0;
+        highest_q = limbs_cmp_same_length(&rp[1 + n_len - d_len..1 + n_len], &ds[..d_len])
+            >= Ordering::Equal;
+        if highest_q {
+            limbs_sub_same_length_in_place_left(
+                &mut rp[1 + n_len - d_len..1 + n_len],
+                &ds[..d_len],
+            );
+        }
+        let cy = _limbs_div_barrett_approx(&mut tp, &rp[..n_len + 1], &ds[..d_len], scratch);
+        if cy {
+            // TODO This branch is untested!
+            // Since the partial remainder fed to _limbs_div_barrett_approx_preinverted was
+            // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
+            // the largest possible value.
+            for i in 0..q_len + 1 {
+                tp[i] = Limb::MAX;
+            }
+        }
+        // The max error of _limbs_div_barrett_approx is +4. If the low quotient limb is smaller
+        // than the max error, we cannot trust the quotient.
+        if tp[0] > 4 {
+            qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+        } else {
+            let pp = &mut rp;
+            limbs_mul_greater_to_out(pp, &tp[1..q_len + 1], &ds[..d_len]);
+            let cy = if highest_q {
+                // TODO This branch is untested!
+                limbs_slice_add_same_length_in_place_left(&mut pp[q_len..d_len], &ds[..d_len])
+            } else {
+                false
+            };
+            if cy || limbs_cmp_same_length(&pp[..n_len], &ns[..n_len]) == Ordering::Greater {
+                // At most is wrong by one, no cycle.
+                if limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) {
+                    // TODO This branch is untested!
+                    assert!(highest_q);
+                    highest_q = false;
+                }
+            } else {
+                qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+            }
+        }
+    } else {
+        //  |_______________________|   dividend
+        //  |________________|   divisor
+        highest_q = if n_len >= 2 * q_len + 2 {
+            _limbs_div_barrett_approx(
+                &mut tp,
+                &ns[n_len - (2 * q_len + 2)..n_len],
+                &ds[d_len - (q_len + 1)..d_len],
+                scratch,
+            )
+        } else {
+            // n_len == 2 * d_len - 1, so there is 1 ghost limb.
+            _limbs_div_barrett_approx_helper(
+                &mut tp,
+                &ns[..n_len],
+                true,
+                &ds[d_len - (q_len + 1)..d_len],
+                scratch,
+            )
+        };
+        // The max error of _limbs_div_barrett_approx is +4, but we get an additional error from the
+        // divisor truncation.
+        if tp[0] > 6 {
+            qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+        } else {
+            let mut rp = vec![0; n_len];
+            limbs_mul_greater_to_out(&mut rp, &ds[..d_len], &tp[1..q_len + 1]);
+            let cy = if highest_q {
+                limbs_slice_add_same_length_in_place_left(
+                    &mut rp[q_len..q_len + d_len],
+                    &ds[..d_len],
+                )
+            } else {
+                false
+            };
+            if cy || limbs_cmp_same_length(&rp[..n_len], &ns[..n_len]) == Ordering::Greater {
+                // At most is wrong by one, no cycle.
+                if limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) {
+                    // TODO This branch is untested!
+                    assert!(highest_q);
+                    highest_q = false;
+                }
+            } else {
+                qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+            }
+        }
+    }
+    highest_q
+}
+
+/// This is mpn_mu_div_q_itch from mpn/generic/mu_div_q.c, where mua_k == 0.
+pub fn _limbs_div_barrett_scratch_len(nn: usize, dn: usize) -> usize {
+    let qn = nn - dn;
+    if qn >= dn {
+        _limbs_div_barrett_approx_scratch_len(nn + 1, dn)
+    } else {
+        _limbs_div_barrett_approx_scratch_len(2 * qn + 2, qn + 1)
+    }
 }
 
 /// Schoolbook division using the Möller-Granlund 3/2 division algorithm, returning approximate
@@ -791,7 +913,21 @@ pub fn _limbs_div_barrett_approx(
     ds: &[Limb],
     scratch: &mut [Limb],
 ) -> bool {
-    let n_len = ns.len();
+    _limbs_div_barrett_approx_helper(qs, ns, false, ds, scratch)
+}
+
+fn _limbs_div_barrett_approx_helper(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    mut ns_ghost_limb: bool,
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
+    let n_len = if ns_ghost_limb {
+        ns.len() + 1
+    } else {
+        ns.len()
+    };
     let d_len = ds.len();
     assert!(d_len > 1);
     assert!(n_len >= d_len);
@@ -799,8 +935,13 @@ pub fn _limbs_div_barrett_approx(
     let q_len = n_len - d_len;
     // If Q is smaller than D, truncate operands.
     let (ns, ds) = if q_len + 1 < d_len {
-        let start = d_len - q_len - 1;
-        (&ns[start..], &ds[start..])
+        let start = d_len - q_len - 1; // start > 0
+        if ns_ghost_limb {
+            ns_ghost_limb = false;
+            (&ns[start - 1..], &ds[start..])
+        } else {
+            (&ns[start..], &ds[start..])
+        }
     } else {
         (ns, ds)
     };
@@ -830,7 +971,7 @@ pub fn _limbs_div_barrett_approx(
         }
     }
     let (is, scratch_hi) = scratch.split_at_mut(i_len);
-    _limbs_div_barrett_approx_preinverted(qs, ns, ds, is, scratch_hi)
+    _limbs_div_barrett_approx_preinverted(qs, ns, ns_ghost_limb, ds, is, scratch_hi)
 }
 
 /// Time: Worst case O(n * log(d) * log(log(d)))
@@ -843,16 +984,25 @@ pub fn _limbs_div_barrett_approx(
 fn _limbs_div_barrett_approx_preinverted(
     qs: &mut [Limb],
     ns: &[Limb],
+    ns_ghost_limb: bool,
     ds: &[Limb],
     mut is: &[Limb],
     scratch: &mut [Limb],
 ) -> bool {
-    let n_len = ns.len();
+    let n_len = if ns_ghost_limb {
+        ns.len() + 1
+    } else {
+        ns.len()
+    };
     let d_len = ds.len();
     let mut i_len = is.len();
     let mut q_len = n_len - d_len;
     let qs = &mut qs[..q_len];
-    let (ns_lo, ns_hi) = ns.split_at(q_len);
+    if ns_ghost_limb {
+        assert_ne!(q_len, 0);
+        assert_ne!(i_len, 0);
+    }
+    let (ns_lo, ns_hi) = ns.split_at(if ns_ghost_limb { q_len - 1 } else { q_len });
     let highest_q = limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal;
     if q_len == 0 {
         return highest_q;
@@ -870,8 +1020,14 @@ fn _limbs_div_barrett_approx_preinverted(
     };
     let mut carry = false; // This value is never used
     let mut n = d_len - i_len;
-    for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {
-        let chunk_len = ns.len();
+    let empty_slice: &[Limb] = &[];
+    let ns_iter: Box<dyn Iterator<Item = &[Limb]>> = if ns_ghost_limb {
+        Box::new(ns_lo.rchunks(i_len).chain(once(empty_slice)))
+    } else {
+        Box::new(ns_lo.rchunks(i_len))
+    };
+    for (ns, qs) in ns_iter.zip(qs.rchunks_mut(i_len)) {
+        let chunk_len = qs.len();
         if i_len != chunk_len {
             // last iteration
             is = &is[i_len - chunk_len..];

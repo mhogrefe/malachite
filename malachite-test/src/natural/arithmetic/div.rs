@@ -2,18 +2,20 @@ use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div::{
-    _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
-    _limbs_div_divide_and_conquer, _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook,
-    _limbs_div_schoolbook_approx,
+    _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
+    _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
+    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
 };
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook,
+    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
+    _limbs_div_mod_schoolbook,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, triples_of_unsigned_vec_var_41,
+    triples_of_unsigned_vec_var_42,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -22,6 +24,7 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_schoolbook);
     register_demo!(registry, demo_limbs_div_divide_and_conquer);
+    register_demo!(registry, demo_limbs_div_barrett);
     register_demo!(registry, demo_limbs_div_schoolbook_approx);
     register_demo!(registry, demo_limbs_div_divide_and_conquer_approx);
     register_demo!(registry, demo_limbs_div_barrett_approx);
@@ -37,6 +40,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_div_divide_and_conquer_algorithms
     );
+    register_bench!(registry, Small, benchmark_limbs_div_barrett_algorithms);
     register_bench!(
         registry,
         Small,
@@ -88,6 +92,19 @@ fn demo_limbs_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
             "qs := {:?}; ns := {:?}; _limbs_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = \
              {}; qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
+        );
+    }
+}
+
+fn demo_limbs_div_barrett(gm: GenerationMode, limit: usize) {
+    for (mut qs, ns, ds) in triples_of_unsigned_vec_var_42(gm).take(limit) {
+        let old_qs = qs.clone();
+        let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+        let highest_q = _limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch);
+        println!(
+            "qs := {:?}; ns := {:?}; \
+             _limbs_div_barrett(&mut qs, ns, {:?}, &mut scratch) = {}; qs = {:?}",
+            old_qs, ns, ds, highest_q, qs
         );
     }
 }
@@ -250,6 +267,51 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
     );
 }
 
+fn benchmark_limbs_div_barrett_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "_limbs_div_barrett(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(2_048)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
+        "ns.len() - ds.len()",
+        &mut [
+            (
+                "divide-and-conquer div",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_divide_and_conquer(
+                        &mut qs, &mut ns, &ds, inverse
+                    ))
+                }),
+            ),
+            (
+                "Barrett div/mod",
+                &mut (|(mut qs, ns, ds, _)| {
+                    let mut rs = vec![0; ds.len()];
+                    let mut scratch =
+                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(_limbs_div_mod_barrett(
+                        &mut qs,
+                        &mut rs,
+                        &ns,
+                        &ds,
+                        &mut scratch
+                    ))
+                }),
+            ),
+            (
+                "Barrett div",
+                &mut (|(mut qs, ns, ds, _)| {
+                    let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(_limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+                }),
+            ),
+        ],
+    );
+}
+
 fn benchmark_limbs_div_schoolbook_approx_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -258,7 +320,7 @@ fn benchmark_limbs_div_schoolbook_approx_algorithms(
     m_run_benchmark(
         "_limbs_div_schoolbook_approx(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
@@ -343,6 +405,13 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
                     no_out!(_limbs_div_divide_and_conquer_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
+                }),
+            ),
+            (
+                "Barrett",
+                &mut (|(mut qs, ns, ds, _)| {
+                    let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(_limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
                 }),
             ),
             (
