@@ -526,16 +526,17 @@ fn test_limbs_div_barrett() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // q_len < d_len
-        // n_len < 2 * q_len + 2
-        // tp[0] <= 6
+        // ghost_limb
+        // *scratch_2_head <= 6
         // !highest_q third time
-        // !(cy || limbs_cmp_same_length(&rp[..n_len], &ns[..n_len]) == Ordering::Greater)
+        // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
+        //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater)
         test(&[10; 3], &[1, 2, 3], &[0, 0x8000_0000], false, &[6, 10, 10]);
         test(&[10; 3], &[1, 2, 3], &[3, 0x8000_0000], false, &[6, 10, 10]);
         // q_len >= d_len
         // !highest_q first time
-        // !cy
-        // tp[0] > 4
+        // !_limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch)
+        // *scratch_2_head > 4
         test(
             &[10; 3],
             &[1, 2, 3, 4],
@@ -550,9 +551,9 @@ fn test_limbs_div_barrett() {
             false,
             &[5, 8, 10],
         );
-        // tp[0] > 6
+        // *scratch_2_head > 6
         test(&[10; 3], &[0, 0, 1], &[0, 0x8000_0001], false, &[1, 10, 10]);
-        // n_len >= 2 * q_len + 2
+        // !ghost_limb
         test(
             &[10; 3],
             &[0, 0, 0, 0],
@@ -560,12 +561,14 @@ fn test_limbs_div_barrett() {
             false,
             &[0, 10, 10],
         );
-        // cy || limbs_cmp_same_length(&rp[..n_len], &ns[..n_len]) == Ordering::Greater
-        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1)
+        // highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
+        //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
+        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) second time
         test(&[10; 3], &[0, 0, 1], &[1, 0x8000_0000], false, &[1, 10, 10]);
-        // tp[0] <= 4
+        // *scratch_2_head <= 4
         // !highest_q second time
-        // !(cy || limbs_cmp_same_length(&pp[..n_len], &ns[..n_len]) == Ordering::Greater)
+        // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
+        //      || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater)
         test(
             &[10; 3],
             &[0, 0, 0, 0],
@@ -573,8 +576,9 @@ fn test_limbs_div_barrett() {
             false,
             &[0, 0, 10],
         );
-        // cy || limbs_cmp_same_length(&pp[..n_len], &ns[..n_len]) == Ordering::Greater
-        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1)
+        // highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
+        //      || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
+        // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) first time
         test(
             &[10; 3],
             &[0, 0, 1, 0],

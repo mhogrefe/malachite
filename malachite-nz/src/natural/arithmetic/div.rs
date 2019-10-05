@@ -338,10 +338,21 @@ pub fn _limbs_div_divide_and_conquer(
     highest_q
 }
 
+/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
+/// `ds` must have length greater than 2, `ns` must be longer than `ds`, and the most significant
+/// bit of `ds` must be set.
+///
 /// The idea of the algorithm used herein is to compute a smaller inverted value than used in the
 /// standard Barrett algorithm, and thus save time in the Newton iterations, and pay just a small
 /// price when using the inverted value for developing quotient bits. This algorithm was presented
 /// at ICMS 2006.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
 ///
 /// This is mpn_mu_div_q from mpn/generic/mu_div_q.c.
 pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
@@ -349,113 +360,104 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
     let d_len = ds.len();
     assert!(n_len > d_len);
     let q_len = n_len - d_len;
-    let mut tp = vec![0; q_len + 1];
-    let mut highest_q;
+    let qs = &mut qs[..q_len];
+    let q_len_plus_1 = q_len + 1;
+    let mut scratch_2 = vec![0; q_len_plus_1];
+    let highest_q;
     if q_len >= d_len {
         // |_______________________|   dividend
         // |________|   divisor
-        let mut rp = vec![0; n_len + 1];
-        rp[1..n_len + 1].copy_from_slice(&ns[..n_len]);
-        rp[0] = 0;
-        highest_q = limbs_cmp_same_length(&rp[1 + n_len - d_len..1 + n_len], &ds[..d_len])
-            >= Ordering::Equal;
+        let mut rs = Vec::with_capacity(n_len + 1);
+        rs.push(0);
+        rs.extend_from_slice(ns);
+        let rs_hi = &mut rs[q_len_plus_1..];
+        highest_q = limbs_cmp_same_length(rs_hi, ds) >= Ordering::Equal;
         if highest_q {
-            limbs_sub_same_length_in_place_left(
-                &mut rp[1 + n_len - d_len..1 + n_len],
-                &ds[..d_len],
-            );
+            limbs_sub_same_length_in_place_left(rs_hi, ds);
         }
-        let cy = _limbs_div_barrett_approx(&mut tp, &rp[..n_len + 1], &ds[..d_len], scratch);
-        if cy {
+        if _limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch) {
             // TODO This branch is untested!
             // Since the partial remainder fed to _limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
             // the largest possible value.
-            for i in 0..q_len + 1 {
-                tp[i] = Limb::MAX;
+            for limb in scratch_2.iter_mut() {
+                *limb = Limb::MAX;
             }
         }
         // The max error of _limbs_div_barrett_approx is +4. If the low quotient limb is smaller
         // than the max error, we cannot trust the quotient.
-        if tp[0] > 4 {
-            qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+        let (scratch_2_head, scratch_2_tail) = scratch_2.split_first().unwrap();
+        if *scratch_2_head > 4 {
+            qs.copy_from_slice(scratch_2_tail);
         } else {
-            let pp = &mut rp;
-            limbs_mul_greater_to_out(pp, &tp[1..q_len + 1], &ds[..d_len]);
-            let cy = if highest_q {
-                // TODO This branch is untested!
-                limbs_slice_add_same_length_in_place_left(&mut pp[q_len..d_len], &ds[..d_len])
-            } else {
-                false
-            };
-            if cy || limbs_cmp_same_length(&pp[..n_len], &ns[..n_len]) == Ordering::Greater {
+            limbs_mul_greater_to_out(&mut rs, scratch_2_tail, ds);
+            if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
+                || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
+            {
                 // At most is wrong by one, no cycle.
-                if limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) {
+                if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
                     // TODO This branch is untested!
                     assert!(highest_q);
-                    highest_q = false;
+                    return false;
                 }
             } else {
-                qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+                qs.copy_from_slice(scratch_2_tail);
             }
         }
     } else {
         //  |_______________________|   dividend
         //  |________________|   divisor
-        highest_q = if n_len >= 2 * q_len + 2 {
-            _limbs_div_barrett_approx(
-                &mut tp,
-                &ns[n_len - (2 * q_len + 2)..n_len],
-                &ds[d_len - (q_len + 1)..d_len],
-                scratch,
-            )
-        } else {
-            // n_len == 2 * d_len - 1, so there is 1 ghost limb.
-            _limbs_div_barrett_approx_helper(
-                &mut tp,
-                &ns[..n_len],
-                true,
-                &ds[d_len - (q_len + 1)..d_len],
-                scratch,
-            )
-        };
+        let ghost_limb = n_len == (d_len << 1) - 1;
+        highest_q = _limbs_div_barrett_approx_helper(
+            &mut scratch_2,
+            &ns[if ghost_limb {
+                0
+            } else {
+                n_len - (q_len_plus_1 << 1)
+            }..],
+            ghost_limb,
+            &ds[d_len - q_len_plus_1..],
+            scratch,
+        );
         // The max error of _limbs_div_barrett_approx is +4, but we get an additional error from the
         // divisor truncation.
-        if tp[0] > 6 {
-            qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+        let (scratch_2_head, scratch_2_tail) = scratch_2.split_first().unwrap();
+        if *scratch_2_head > 6 {
+            qs.copy_from_slice(scratch_2_tail);
         } else {
-            let mut rp = vec![0; n_len];
-            limbs_mul_greater_to_out(&mut rp, &ds[..d_len], &tp[1..q_len + 1]);
-            let cy = if highest_q {
-                limbs_slice_add_same_length_in_place_left(
-                    &mut rp[q_len..q_len + d_len],
-                    &ds[..d_len],
-                )
-            } else {
-                false
-            };
-            if cy || limbs_cmp_same_length(&rp[..n_len], &ns[..n_len]) == Ordering::Greater {
+            let mut rs = vec![0; n_len];
+            limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail);
+            if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
+                || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
+            {
                 // At most is wrong by one, no cycle.
-                if limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) {
+                if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
                     // TODO This branch is untested!
                     assert!(highest_q);
-                    highest_q = false;
+                    return false;
                 }
             } else {
-                qs[..q_len].copy_from_slice(&tp[1..q_len + 1]);
+                qs.copy_from_slice(scratch_2_tail);
             }
         }
     }
     highest_q
 }
 
+/// Time: Worst case O(1)
+///
+/// Additional memory: Worst case O(1)
+///
+/// Result is O(`n_len`)
+///
 /// This is mpn_mu_div_q_itch from mpn/generic/mu_div_q.c, where mua_k == 0.
-pub fn _limbs_div_barrett_scratch_len(nn: usize, dn: usize) -> usize {
-    let qn = nn - dn;
-    if qn >= dn {
-        _limbs_div_barrett_approx_scratch_len(nn + 1, dn)
+pub fn _limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+    let q_len = n_len - d_len;
+    if q_len >= d_len {
+        _limbs_div_barrett_approx_scratch_len(n_len + 1, d_len)
     } else {
-        _limbs_div_barrett_approx_scratch_len(2 * qn + 2, qn + 1)
+        let q_len_plus_1 = q_len + 1;
+        _limbs_div_barrett_approx_scratch_len(q_len_plus_1 << 1, q_len_plus_1)
     }
 }
 
