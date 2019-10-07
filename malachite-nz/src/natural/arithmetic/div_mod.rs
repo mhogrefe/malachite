@@ -1226,7 +1226,7 @@ fn _limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds:
 }
 
 //TODO tune
-const MUPI_DIV_QR_THRESHOLD: usize = 74;
+pub(crate) const MUPI_DIV_QR_THRESHOLD: usize = 74;
 
 /// This function is optimized for the case when the numerator has at least twice the length of the
 /// denominator.

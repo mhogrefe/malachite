@@ -15808,33 +15808,25 @@ fn limbs_div_mod_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_div_mod_to_out_fail_1() {
-    let ns = &[1, 2, 3];
-    let ds = &[4];
-    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], &[1, 2, 3], &[4]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_mod_to_out_fail_2() {
-    let ns = &[1];
-    let ds = &[4, 5];
-    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], &[1], &[4, 5]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_mod_to_out_fail_3() {
-    let ns = &[1, 2, 3, 4];
-    let ds = &[4, 5];
-    limbs_div_mod_to_out(&mut [10], &mut [10; 4], ns, ds);
+    limbs_div_mod_to_out(&mut [10], &mut [10; 4], &[1, 2, 3, 4], &[4, 5]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_mod_to_out_fail_4() {
-    let ns = &[1, 2, 3];
-    let ds = &[4, 0];
-    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], ns, ds);
+    limbs_div_mod_to_out(&mut [10; 4], &mut [10; 4], &[1, 2, 3], &[4, 0]);
 }
 
 #[test]

@@ -18,7 +18,7 @@ use natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_mod_divide_and_conquer_helper,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_approx_scratch_len,
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
-    MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
+    limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
 };
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
@@ -27,6 +27,7 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
+use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
@@ -88,7 +89,6 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
         let ns = &mut ns[i - d_len_s..i];
         let mut quotient;
         if n_1 == d_1 && ns[d_len_s_m_1] == d_2 {
-            // TODO This branch is untested!
             quotient = Limb::MAX;
             limbs_sub_mul_limb_same_length_in_place_left(ns, ds_s, quotient);
             n_1 = ns[d_len_s_m_1]; // update n_1; last loop's value will now be invalid
@@ -195,7 +195,6 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
                     ns[1] = new_n_1;
                     ns[0] = new_n_0;
                 } else {
-                    // TODO This branch is untested!
                     flag = false;
                 }
             }
@@ -216,7 +215,7 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
     };
     let (ns_last, ns_init) = ns[..offset].split_last_mut().unwrap();
     assert_eq!(*ns_last, n_1);
-    if !flag || n_1 < Limb::checked_from(d_len).unwrap() {
+    if flag && n_1 < Limb::checked_from(d_len).unwrap() {
         let qs = &mut qs[offset - d_len..];
         let qs = &mut qs[..q_len];
         // The quotient may be too large if the remainder is small. Recompute for above ignored
@@ -390,9 +389,10 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
         if *scratch_2_head > 4 {
             qs.copy_from_slice(scratch_2_tail);
         } else {
-            limbs_mul_greater_to_out(&mut rs, scratch_2_tail, ds);
-            if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
-                || limbs_cmp_same_length(&rs[..n_len], ns) == Ordering::Greater
+            let rs = &mut rs[..n_len];
+            limbs_mul_greater_to_out(rs, scratch_2_tail, ds);
+            if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
+                || limbs_cmp_same_length(rs, ns) == Ordering::Greater
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
@@ -1152,6 +1152,215 @@ pub fn _limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> 
     let inverse_approx_len = _limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2;
     assert!(d_len + local_len + out_len >= inverse_approx_len);
     is_len + d_len + local_len + out_len
+}
+
+const DC_DIV_Q_THRESHOLD: usize = DC_DIVAPPR_Q_THRESHOLD;
+const MU_DIV_Q_THRESHOLD: usize = MU_DIVAPPR_Q_THRESHOLD;
+const MUPI_DIV_Q_THRESHOLD: usize = MUPI_DIVAPPR_Q_THRESHOLD;
+const MUPI_DIVAPPR_Q_THRESHOLD: usize = MUPI_DIV_QR_THRESHOLD;
+//TODO tune
+const FUDGE: usize = 5;
+const MU_DIVAPPR_Q_THRESHOLD: usize = 1_387;
+
+fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    let q_len = n_len - d_len + 1;
+    // |________________________|
+    //                  |_______|
+    let new_ns = scratch;
+    let dh = ds[d_len - 1];
+    if !dh.get_highest_bit() {
+        let cnt = dh.leading_zeros();
+        let cy = limbs_shl_to_out(new_ns, &ns[..n_len], cnt);
+        new_ns[n_len] = cy;
+        let new_nn = n_len + if cy != 0 { 1 } else { 0 };
+        let mut new_dp = vec![0; d_len];
+        limbs_shl_to_out(&mut new_dp, &ds[..d_len], cnt);
+        let qh = if d_len == 2 {
+            limbs_div_mod_by_two_limb_normalized(qs, &mut new_ns[..new_nn], &new_dp)
+        } else if d_len < DC_DIV_Q_THRESHOLD || new_nn - d_len < DC_DIV_Q_THRESHOLD {
+            let inverse = limbs_two_limb_inverse_helper(new_dp[d_len - 1], new_dp[d_len - 2]);
+            _limbs_div_schoolbook(qs, &mut new_ns[..new_nn], &new_dp[..d_len], inverse)
+        } else if d_len < MUPI_DIV_Q_THRESHOLD
+            || n_len < 2 * MU_DIV_Q_THRESHOLD
+            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
+                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+                > d_len as f64 * n_len as f64
+        {
+            let inverse = limbs_two_limb_inverse_helper(new_dp[d_len - 1], new_dp[d_len - 2]);
+            _limbs_div_divide_and_conquer(qs, &mut new_ns[..new_nn], &new_dp[..d_len], inverse)
+        } else {
+            let mut scratch = vec![0; _limbs_div_barrett_scratch_len(new_nn, d_len)];
+            _limbs_div_barrett(qs, &new_ns[..new_nn], &new_dp[..d_len], &mut scratch)
+        };
+        if cy == 0 {
+            qs[q_len - 1] = if qh { 1 } else { 0 };
+        } else if qh {
+            // TODO This branch is untested!
+            // This happens only when the quotient is close to B^n and mpn_*_divappr_q returned B^n.
+            let n = new_nn - d_len;
+            for i in 0..n {
+                qs[i] = Limb::MAX;
+            }
+        }
+    } else {
+        // divisor is already normalised
+        new_ns[..n_len].copy_from_slice(&ns[..n_len]);
+        let qh = if d_len == 2 {
+            limbs_div_mod_by_two_limb_normalized(qs, &mut new_ns[..n_len], ds)
+        } else if d_len < DC_DIV_Q_THRESHOLD || n_len - d_len < DC_DIV_Q_THRESHOLD {
+            let inverse = limbs_two_limb_inverse_helper(dh, ds[d_len - 2]);
+            _limbs_div_schoolbook(qs, &mut new_ns[..n_len], &ds[..d_len], inverse)
+        } else if d_len < MUPI_DIV_Q_THRESHOLD
+            || n_len < 2 * MU_DIV_Q_THRESHOLD
+            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
+                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+                > d_len as f64 * n_len as f64
+        {
+            let inverse = limbs_two_limb_inverse_helper(dh, ds[d_len - 2]);
+            _limbs_div_divide_and_conquer(qs, &mut new_ns[..n_len], &ds[..d_len], inverse)
+        } else {
+            let mut scratch = vec![0; _limbs_div_barrett_scratch_len(n_len, d_len)];
+            _limbs_div_barrett(qs, &ns[..n_len], &ds[..d_len], &mut scratch)
+        };
+        qs[n_len - d_len] = if qh { 1 } else { 0 };
+    }
+}
+
+fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    let q_len = n_len - d_len + 1;
+    // |________________________|
+    //        |_________________|
+    let mut scratch_2 = vec![0; q_len + 1];
+    let new_ns = scratch;
+    let mut new_n_len = 2 * q_len + 1;
+    let dh = ds[d_len - 1];
+    if !dh.get_highest_bit() {
+        let cnt = dh.leading_zeros();
+        let cy = limbs_shl_to_out(new_ns, &ns[n_len - new_n_len..n_len], cnt);
+        new_ns[new_n_len] = cy;
+        new_n_len += if cy != 0 { 1 } else { 0 };
+        let mut new_dp = vec![0; q_len + 1];
+        limbs_shl_to_out(&mut new_dp, &ds[d_len - (q_len + 1)..d_len], cnt);
+        new_dp[0] |= ds[d_len - (q_len + 1) - 1] >> (Limb::WIDTH - cnt);
+        let qh = if q_len + 1 == 2 {
+            limbs_div_mod_by_two_limb_normalized(&mut scratch_2, &mut new_ns[..new_n_len], &new_dp)
+        } else if q_len < DC_DIVAPPR_Q_THRESHOLD - 1 {
+            let inverse = limbs_two_limb_inverse_helper(new_dp[q_len], new_dp[q_len - 1]);
+            _limbs_div_schoolbook_approx(
+                &mut scratch_2,
+                &mut new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                inverse,
+            )
+        } else if q_len < MU_DIVAPPR_Q_THRESHOLD - 1 {
+            let inverse = limbs_two_limb_inverse_helper(new_dp[q_len], new_dp[q_len - 1]);
+            _limbs_div_divide_and_conquer_approx(
+                &mut scratch_2,
+                &mut new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                inverse,
+            )
+        } else {
+            let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(new_n_len, q_len + 1)];
+            _limbs_div_barrett_approx(
+                &mut scratch_2,
+                &new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                &mut scratch,
+            )
+        };
+        if cy == 0 {
+            scratch_2[q_len] = if qh { 1 } else { 0 };
+        } else if qh {
+            // TODO This branch is untested!
+            // This happens only when the quotient is close to B^n and mpn_*_divappr_q returned B^n.
+            let n = new_n_len - (q_len + 1);
+            for i in 0..n {
+                scratch_2[i] = Limb::MAX;
+            }
+        }
+    } else {
+        // divisor is already normalised
+        // pointless if MU will be used
+        new_ns[..new_n_len].copy_from_slice(&ns[n_len - new_n_len..n_len]);
+        let new_dp = &ds[d_len - (q_len + 1)..];
+        let qh = if q_len == 2 - 1 {
+            limbs_div_mod_by_two_limb_normalized(&mut scratch_2, &mut new_ns[..new_n_len], &new_dp)
+        } else if q_len < DC_DIVAPPR_Q_THRESHOLD - 1 {
+            let inverse = limbs_two_limb_inverse_helper(dh, new_dp[q_len - 1]);
+            _limbs_div_schoolbook_approx(
+                &mut scratch_2,
+                &mut new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                inverse,
+            )
+        } else if q_len < MU_DIVAPPR_Q_THRESHOLD - 1 {
+            let inverse = limbs_two_limb_inverse_helper(dh, new_dp[q_len - 1]);
+            _limbs_div_divide_and_conquer_approx(
+                &mut scratch_2,
+                &mut new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                inverse,
+            )
+        } else {
+            let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(new_n_len, q_len + 1)];
+            _limbs_div_barrett_approx(
+                &mut scratch_2,
+                &new_ns[..new_n_len],
+                &new_dp[..q_len + 1],
+                &mut scratch,
+            )
+        };
+        scratch_2[q_len] = if qh { 1 } else { 0 };
+    }
+    qs[..q_len].copy_from_slice(&scratch_2[1..q_len + 1]);
+    if scratch_2[0] <= 4 {
+        let mut rs = vec![0; d_len + q_len];
+        limbs_mul_greater_to_out(&mut rs, &ds[..d_len], &scratch_2[1..q_len + 1]);
+        let mut r_len = d_len + q_len;
+        r_len -= if rs[r_len - 1] == 0 { 1 } else { 0 };
+        if r_len > n_len || limbs_cmp_same_length(&ns[..n_len], &rs[..n_len]) == Ordering::Less {
+            assert!(!limbs_sub_limb_in_place(qs, 1));
+        }
+    }
+}
+
+/// Division for arbitrary-size operands.
+///
+/// Compute Q = N/D with truncation.
+///      N = {ns,nn}
+///      D = {ds,dn}
+///      Q = {qs,nn-dn+1}
+///      T = {scratch,nn+1} is scratch space
+///    N and D are both untouched by the computation.
+///
+///    Operand requirements:
+///      N >= D > 0
+///      ds[dn-1] != 0
+///
+/// FUDGE determines when to try getting an approximate quotient from the upper
+///    parts of the dividend and divisor, then adjust.  N.B. FUDGE must be >= 2
+///    for the code to be correct.
+///
+/// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally.
+pub fn limbs_div_to_out(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(n_len >= d_len);
+    assert!(d_len > 1);
+    assert_ne!(ds[d_len - 1], 0);
+    assert!(FUDGE >= 2);
+    let q_len = n_len - d_len + 1; // Quotient size, high limb might be zero
+    let mut scratch = vec![0; n_len + 1];
+    if q_len + FUDGE >= d_len {
+        _limbs_div_to_out_unbalanced(qs, ns, ds, &mut scratch);
+    } else {
+        _limbs_div_to_out_balanced(qs, ns, ds, &mut scratch);
+    }
 }
 
 impl Div<Natural> for Natural {
