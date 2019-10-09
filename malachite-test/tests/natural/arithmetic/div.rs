@@ -8,7 +8,8 @@ use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    limbs_div_to_out,
+    limbs_div, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
+    limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
@@ -1439,6 +1440,24 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
             ],
+        );
+        test(
+            &[10; 3],
+            &[
+                536870912,
+                4503599090491408,
+                31664835368329200,
+                18410716373991817215,
+                18157950747604419646,
+                2301339547025015295,
+            ],
+            &[
+                18446744073172680704,
+                18442240474082189295,
+                18410716376202215423,
+            ],
+            false,
+            &[18446744073709551615, 0, 2305843009213431808],
         );
     }
 }
@@ -5236,12 +5255,32 @@ fn verify_limbs_div_2(qs_in: &[Limb], ns: &[Limb], ds: &[Limb], qs_out: &[Limb])
 }
 
 #[test]
-fn test_limbs_div_to_out() {
+fn test_limbs_div() {
     let test = |qs_in: &[Limb], ns: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
-        limbs_div_to_out(&mut qs, ns, ds);
+        limbs_div_to_out_ref_ref(&mut qs, ns, ds);
         assert_eq!(qs, qs_out);
         verify_limbs_div_2(qs_in, ns, ds, qs_out);
+
+        let mut qs = qs_in.to_vec();
+        let mut ns_cloned = ns.to_vec();
+        let mut ds_cloned = ds.to_vec();
+        limbs_div_to_out(&mut qs, &mut ns_cloned, &mut ds_cloned);
+        assert_eq!(qs, qs_out);
+
+        let mut qs = qs_in.to_vec();
+        let mut ns_cloned = ns.to_vec();
+        limbs_div_to_out_val_ref(&mut qs, &mut ns_cloned, ds);
+        assert_eq!(qs, qs_out);
+
+        let mut qs = qs_in.to_vec();
+        let mut ds_cloned = ds.to_vec();
+        limbs_div_to_out_ref_val(&mut qs, ns, &mut ds_cloned);
+        assert_eq!(qs, qs_out);
+
+        let qs = limbs_div(ns, ds);
+        let qs: &[Limb] = &qs;
+        assert_eq!(&qs_out[..qs.len()], qs);
     };
     #[cfg(feature = "32_bit_limbs")]
     {
@@ -10449,31 +10488,134 @@ fn test_limbs_div_to_out() {
             ],
             &[127, 0, 0, 0, 1],
         );
+        test(
+            &[10; 4],
+            &[
+                18446463148488654849,
+                280925229285374,
+                16285016218270955520,
+                37348968499195,
+                18437754466102935552,
+                4286578943,
+            ],
+            &[280925220896767, 18446744073701163008, 34292631551],
+            &[18446744073709551615, 0, 2305843009213431808, 0],
+        );
     }
 }
 
 #[test]
 #[should_panic]
+fn limbs_div_fail_1() {
+    limbs_div(&[1, 2, 3], &[4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_fail_2() {
+    limbs_div(&[1], &[4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_fail_3() {
+    limbs_div(&[1, 2, 3], &[4, 0]);
+}
+
+#[test]
+#[should_panic]
 fn limbs_div_to_out_fail_1() {
-    limbs_div_to_out(&mut [10; 4], &[1, 2, 3], &[4]);
+    limbs_div_to_out(&mut [10; 4], &mut [1, 2, 3], &mut [4]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_to_out_fail_2() {
-    limbs_div_to_out(&mut [10; 4], &[1], &[4, 5]);
+    limbs_div_to_out(&mut [10; 4], &mut [1], &mut [4, 5]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_to_out_fail_3() {
-    limbs_div_to_out(&mut [10], &[1, 2, 3, 4], &[4, 5]);
+    limbs_div_to_out(&mut [10], &mut [1, 2, 3, 4], &mut [4, 5]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_div_to_out_fail_4() {
-    limbs_div_to_out(&mut [10; 4], &[1, 2, 3], &[4, 0]);
+    limbs_div_to_out(&mut [10; 4], &mut [1, 2, 3], &mut [4, 0]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_val_ref_fail_1() {
+    limbs_div_to_out_val_ref(&mut [10; 4], &mut [1, 2, 3], &[4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_val_ref_fail_2() {
+    limbs_div_to_out_val_ref(&mut [10; 4], &mut [1], &[4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_val_ref_fail_3() {
+    limbs_div_to_out_val_ref(&mut [10], &mut [1, 2, 3, 4], &[4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_val_ref_fail_4() {
+    limbs_div_to_out_val_ref(&mut [10; 4], &mut [1, 2, 3], &[4, 0]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_val_fail_1() {
+    limbs_div_to_out_ref_val(&mut [10; 4], &[1, 2, 3], &mut [4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_val_fail_2() {
+    limbs_div_to_out_ref_val(&mut [10; 4], &[1], &mut [4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_val_fail_3() {
+    limbs_div_to_out_ref_val(&mut [10], &[1, 2, 3, 4], &mut [4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_val_fail_4() {
+    limbs_div_to_out_ref_val(&mut [10; 4], &[1, 2, 3], &mut [4, 0]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_ref_fail_1() {
+    limbs_div_to_out_ref_ref(&mut [10; 4], &[1, 2, 3], &[4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_ref_fail_2() {
+    limbs_div_to_out_ref_ref(&mut [10; 4], &[1], &[4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_ref_fail_3() {
+    limbs_div_to_out_ref_ref(&mut [10], &[1, 2, 3, 4], &[4, 5]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_div_to_out_ref_ref_fail_4() {
+    limbs_div_to_out_ref_ref(&mut [10; 4], &[1, 2, 3], &[4, 0]);
 }
 
 #[test]
@@ -10571,6 +10713,12 @@ fn test_div() {
     );
     test("0", "1000000000000000000000000", "0");
     test("123", "1000000000000000000000000", "0");
+    test(
+        "915607705283450388306561139234228660872677067256472842161753852459689688332903348325308112\
+        7923093090598913",
+        "11669177832462215441614364516705357863717491965951",
+        "784637716923245892498679555408392159158150581185689944063"
+    );
 }
 
 #[test]
@@ -10703,8 +10851,29 @@ fn limbs_div_to_out_properties() {
         triples_of_unsigned_vec_var_43,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
-            limbs_div_to_out(&mut qs, ns, ds);
+            limbs_div_to_out_ref_ref(&mut qs, ns, ds);
             verify_limbs_div_2(qs_in, ns, ds, &qs);
+            let qs_out = qs;
+
+            let mut qs = qs_in.clone();
+            let mut ns_cloned = ns.clone();
+            let mut ds_cloned = ds.clone();
+            limbs_div_to_out(&mut qs, &mut ns_cloned, &mut ds_cloned);
+            assert_eq!(qs, qs_out);
+
+            let mut qs = qs_in.clone();
+            let mut ns_cloned = ns.clone();
+            limbs_div_to_out_val_ref(&mut qs, &mut ns_cloned, ds);
+            assert_eq!(qs, qs_out);
+
+            let mut qs = qs_in.clone();
+            let mut ds_cloned = ds.clone();
+            limbs_div_to_out_ref_val(&mut qs, ns, &mut ds_cloned);
+            assert_eq!(qs, qs_out);
+
+            let qs = limbs_div(ns, ds);
+            let qs: &[Limb] = &qs;
+            assert_eq!(&qs_out[..qs.len()], qs);
         },
     );
 }

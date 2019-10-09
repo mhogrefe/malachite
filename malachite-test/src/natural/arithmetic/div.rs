@@ -5,16 +5,17 @@ use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    limbs_div_to_out,
+    limbs_div, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
+    limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, limbs_div_mod_to_out,
+    _limbs_div_mod_schoolbook, limbs_div_mod, limbs_div_mod_to_out,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    pairs_of_unsigned_vec_var_9, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_2,
     triples_of_unsigned_vec_var_41, triples_of_unsigned_vec_var_42, triples_of_unsigned_vec_var_43,
 };
@@ -29,7 +30,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_schoolbook_approx);
     register_demo!(registry, demo_limbs_div_divide_and_conquer_approx);
     register_demo!(registry, demo_limbs_div_barrett_approx);
+    register_demo!(registry, demo_limbs_div);
     register_demo!(registry, demo_limbs_div_to_out);
+    register_demo!(registry, demo_limbs_div_to_out_val_ref);
+    register_demo!(registry, demo_limbs_div_to_out_ref_val);
+    register_demo!(registry, demo_limbs_div_to_out_ref_ref);
     register_demo!(registry, demo_natural_div_assign);
     register_demo!(registry, demo_natural_div_assign_ref);
     register_demo!(registry, demo_natural_div);
@@ -58,7 +63,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_div_barrett_approx_algorithms
     );
-    register_bench!(registry, Small, benchmark_limbs_div_to_out_algorithms);
+    register_bench!(registry, Small, benchmark_limbs_div_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_to_out_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_to_out_ref_ref_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -157,12 +172,56 @@ fn demo_limbs_div_barrett_approx(gm: GenerationMode, limit: usize) {
     }
 }
 
+fn demo_limbs_div(gm: GenerationMode, limit: usize) {
+    for (ns, ds) in pairs_of_unsigned_vec_var_9(gm).take(limit) {
+        println!("limbs_div({:?}, {:?}) = {:?}", ns, ds, limbs_div(&ns, &ds));
+    }
+}
+
 fn demo_limbs_div_to_out(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut ns, mut ds) in triples_of_unsigned_vec_var_43(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        let old_ds = ds.clone();
+        limbs_div_to_out(&mut qs, &mut ns, &mut ds);
+        println!(
+            "qs := {:?}; ns := {:?}; ds := {:?}; limbs_div_to_out(&mut qs, &mut ns, &mut ds); \
+             qs = {:?}",
+            old_qs, old_ns, old_ds, qs,
+        );
+    }
+}
+
+fn demo_limbs_div_to_out_val_ref(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut ns, ds) in triples_of_unsigned_vec_var_43(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        limbs_div_to_out_val_ref(&mut qs, &mut ns, &ds);
+        println!(
+            "qs := {:?}; ns := {:?}; limbs_div_to_out_val_ref(&mut qs, &mut ns, {:?}); qs = {:?}",
+            old_qs, old_ns, ds, qs,
+        );
+    }
+}
+
+fn demo_limbs_div_to_out_ref_val(gm: GenerationMode, limit: usize) {
+    for (mut qs, ns, mut ds) in triples_of_unsigned_vec_var_43(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_ds = ds.clone();
+        limbs_div_to_out_ref_val(&mut qs, &ns, &mut ds);
+        println!(
+            "qs := {:?}; ds := {:?}; limbs_div_to_out_ref_val(&mut qs, {:?}, &mut ds); qs = {:?}",
+            old_qs, old_ds, ns, qs,
+        );
+    }
+}
+
+fn demo_limbs_div_to_out_ref_ref(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_unsigned_vec_var_43(gm).take(limit) {
         let old_qs = qs.clone();
-        limbs_div_to_out(&mut qs, &ns, &ds);
+        limbs_div_to_out_ref_ref(&mut qs, &ns, &ds);
         println!(
-            "qs := {:?}; limbs_div_to_out(&mut qs, {:?}, {:?}); qs = {:?}",
+            "qs := {:?}; limbs_div_to_out_ref_ref(&mut qs, {:?}, {:?}); qs = {:?}",
             old_qs, ns, ds, qs,
         );
     }
@@ -440,9 +499,68 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
     );
 }
 
-fn benchmark_limbs_div_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_div_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_div_to_out(&mut [Limb], &[Limb], &[Limb])",
+        "limbs_div(&[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_var_9(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "div_mod",
+                &mut (|(ns, ds)| no_out!(limbs_div_mod(&ns, &ds))),
+            ),
+            ("div", &mut (|(ns, ds)| no_out!(limbs_div(&ns, &ds)))),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_to_out_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_to_out(&mut [Limb], &mut [Limb], &mut [Limb])",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_unsigned_vec_var_43(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "limbs_div_to_out(&mut [Limb], &mut [Limb], &mut [Limb])",
+                &mut (|(mut qs, mut ns, mut ds)| limbs_div_to_out(&mut qs, &mut ns, &mut ds)),
+            ),
+            (
+                "limbs_div_to_out_val_ref(&mut [Limb], &mut [Limb], &[Limb])",
+                &mut (|(mut qs, mut ns, ds)| limbs_div_to_out_val_ref(&mut qs, &mut ns, &ds)),
+            ),
+            (
+                "limbs_div_to_out_ref_val(&mut [Limb], &[Limb], &mut [Limb])",
+                &mut (|(mut qs, ns, mut ds)| limbs_div_to_out_ref_val(&mut qs, &ns, &mut ds)),
+            ),
+            (
+                "limbs_div_to_out_ref_ref(&mut [Limb], &[Limb], &[Limb])",
+                &mut (|(mut qs, ns, ds)| limbs_div_to_out_ref_ref(&mut qs, &ns, &ds)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_to_out_ref_ref_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_to_out_ref_ref(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         quadruples_of_unsigned_vec_var_2(gm),
         gm.name(),
@@ -457,7 +575,7 @@ fn benchmark_limbs_div_to_out_algorithms(gm: GenerationMode, limit: usize, file_
             ),
             (
                 "div",
-                &mut (|(mut qs, _, ns, ds)| limbs_div_to_out(&mut qs, &ns, &ds)),
+                &mut (|(mut qs, _, ns, ds)| limbs_div_to_out_ref_ref(&mut qs, &ns, &ds)),
             ),
         ],
     );

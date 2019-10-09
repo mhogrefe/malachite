@@ -1712,7 +1712,7 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// }
     /// ```
     #[inline]
-    fn div_mod(self, other: Natural) -> (Natural, Natural) {
+    fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
         if other == 0 as Limb {
             panic!("division by zero");
         } else if other == 1 as Limb {
@@ -1720,22 +1720,22 @@ impl<'a> DivMod<Natural> for &'a Natural {
         } else if self.limb_count() < other.limb_count() {
             (Natural::ZERO, self.clone())
         } else {
-            let (qs, rs) = match (self, other) {
-                (x, Small(y)) => {
+            let qs = match (self, &mut other) {
+                (x, &mut Small(y)) => {
                     let (q, r) = x.div_mod(y);
                     return (q, Small(r));
                 }
-                (&Small(x), y) => {
-                    let (q, r) = x.div_mod(y);
-                    return (Small(q), Small(r));
+                (&Large(ref xs), &mut Large(ref mut ys)) => {
+                    let (qs, mut rs) = limbs_div_mod(xs, ys);
+                    swap(&mut rs, ys);
+                    qs
                 }
-                (&Large(ref xs), Large(ref ys)) => limbs_div_mod(xs, ys),
+                _ => unreachable!(),
             };
             let mut q = Large(qs);
             q.trim();
-            let mut r = Large(rs);
-            r.trim();
-            (q, r)
+            other.trim();
+            (q, other)
         }
     }
 }
@@ -1794,11 +1794,8 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
                     let (q, r) = x.div_mod(y);
                     return (q, Small(r));
                 }
-                (&Small(x), y) => {
-                    let (q, r) = x.div_mod(y);
-                    return (Small(q), Small(r));
-                }
                 (&Large(ref xs), &Large(ref ys)) => limbs_div_mod(xs, ys),
+                _ => unreachable!(),
             };
             let mut q = Large(qs);
             q.trim();
@@ -1844,7 +1841,7 @@ impl DivAssignMod<Natural> for Natural {
     ///     assert_eq!(x.to_string(), "810000006723");
     /// }
     /// ```
-    fn div_assign_mod(&mut self, other: Natural) -> Natural {
+    fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
         if other == 0 as Limb {
             panic!("division by zero");
         } else if other == 1 as Limb {
@@ -1854,21 +1851,20 @@ impl DivAssignMod<Natural> for Natural {
             swap(self, &mut r);
             r
         } else {
-            let (qs, rs) = match (&mut *self, other) {
-                (x, Small(y)) => {
+            match (&mut *self, &mut other) {
+                (x, &mut Small(y)) => {
                     return Small(x.div_assign_mod(y));
                 }
-                (&mut Small(mut x), y) => {
-                    return Small(x.div_assign_mod(y));
+                (&mut Large(ref mut xs), &mut Large(ref mut ys)) => {
+                    let (mut qs, mut rs) = limbs_div_mod(xs, ys);
+                    swap(&mut qs, xs);
+                    swap(&mut rs, ys);
                 }
-                (&mut Large(ref mut xs), Large(ref ys)) => limbs_div_mod(xs, ys),
+                _ => unreachable!(),
             };
-            let mut q = Large(qs);
-            q.trim();
-            *self = q;
-            let mut r = Large(rs);
-            r.trim();
-            r
+            self.trim();
+            other.trim();
+            other
         }
     }
 }
@@ -1918,18 +1914,18 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
             swap(self, &mut r);
             r
         } else {
-            let (qs, rs) = match (&mut *self, other) {
+            let rs = match (&mut *self, other) {
                 (x, &Small(y)) => {
                     return Small(x.div_assign_mod(y));
                 }
-                (&mut Small(mut x), y) => {
-                    return Small(x.div_assign_mod(y));
+                (&mut Large(ref mut xs), Large(ref ys)) => {
+                    let (mut qs, rs) = limbs_div_mod(xs, ys);
+                    swap(&mut qs, xs);
+                    rs
                 }
-                (&mut Large(ref mut xs), Large(ref ys)) => limbs_div_mod(xs, ys),
+                _ => unreachable!(),
             };
-            let mut q = Large(qs);
-            q.trim();
-            *self = q;
+            self.trim();
             let mut r = Large(rs);
             r.trim();
             r
