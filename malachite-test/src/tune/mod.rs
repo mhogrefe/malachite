@@ -11,6 +11,8 @@ pub mod barrett_helper;
 pub mod barrett_product;
 pub mod basecase_to_newton;
 pub mod compare_two;
+pub mod div_balance;
+pub mod divide_and_conquer_approx_to_barrett_approx;
 pub mod divide_and_conquer_to_barrett;
 pub mod fft;
 pub mod schoolbook_approx_to_divide_and_conquer_approx;
@@ -52,6 +54,10 @@ pub fn tune(param_group: &str) {
         "DivideAndConquerToBarrett" => display_lines(&divide_and_conquer_to_barrett::tune()),
         "BarrettProduct" => display_lines(&barrett_product::tune()),
         "BarrettHelper" => display_lines(&barrett_helper::tune()),
+        "DivideAndConquerApproxToBarrettApprox" => {
+            display_lines(&divide_and_conquer_approx_to_barrett_approx::tune())
+        }
+        "DivBalance" => display_lines(&div_balance::tune()),
         "all" => {
             let mut lines = Vec::new();
             lines.push(format!("pub type Limb = {};", Limb::NAME));
@@ -92,6 +98,9 @@ pub fn tune(param_group: &str) {
             lines.extend(divide_and_conquer_to_barrett::tune());
             lines.extend(barrett_product::tune());
             lines.extend(barrett_helper::tune());
+            lines.push(String::new());
+            lines.extend(divide_and_conquer_approx_to_barrett_approx::tune());
+            lines.extend(div_balance::tune());
             let filename = "benchmarks/platform.txt";
             let mut output = File::create(filename).unwrap();
             for line in lines {

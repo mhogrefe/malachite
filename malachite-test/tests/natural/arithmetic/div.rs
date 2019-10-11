@@ -5285,9 +5285,9 @@ fn test_limbs_div() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // q_len + FUDGE >= d_len
-        // !dh.get_highest_bit() in _limbs_div_to_out_unbalanced
-        // !dh.get_highest_bit() and two-limb division in _limbs_div_to_out_unbalanced
-        // cy == 0 in _limbs_div_to_out_unbalanced
+        // bits != 0 in _limbs_div_to_out_unbalanced
+        // bits != 0 and two-limb division in _limbs_div_to_out_unbalanced
+        // carry == 0 in _limbs_div_to_out_unbalanced
         test(&[10; 4], &[1, 2], &[3, 4], &[0, 10, 10, 10]);
         test(
             &[10; 4],
@@ -5295,8 +5295,8 @@ fn test_limbs_div() {
             &[5, 6],
             &[2624702236, 2863311530, 0, 10],
         );
-        // dh.get_highest_bit() in _limbs_div_to_out_unbalanced
-        // dh.get_highest_bit() and schoolbook division in _limbs_div_to_out_unbalanced
+        // bits == 0 in _limbs_div_to_out_unbalanced
+        // bits == 0 and schoolbook division in _limbs_div_to_out_unbalanced
         test(
             &[10; 256],
             &[
@@ -5364,15 +5364,15 @@ fn test_limbs_div() {
                 0, 0, 0, 0, 0, 0, 1,
             ],
         );
-        // !dh.get_highest_bit() and schoolbook division in _limbs_div_to_out_unbalanced
+        // bits != 0 and schoolbook division in _limbs_div_to_out_unbalanced
         test(&[10; 3], &[0; 3], &[0, 0, 1], &[0, 10, 10]);
-        // cy != 0 and !qh in _limbs_div_to_out_unbalanced
+        // carry != 0 and !highest_q in _limbs_div_to_out_unbalanced
         test(&[10; 3], &[0, 0, 2], &[0, 1], &[0, 2, 10]);
         // q_len + FUDGE < d_len
-        // !dh.get_highest_bit() in _limbs_div_to_out_balanced
-        // !dh.get_highest_bit() and schoolbook division in _limbs_div_to_out_balanced
-        // cy == 0 in _limbs_div_to_out_balanced
-        // scratch_2[0] > 4 in _limbs_div_to_out_balanced
+        // bits != 0 in _limbs_div_to_out_balanced
+        // bits != 0 and schoolbook division in _limbs_div_to_out_balanced
+        // carry == 0 in _limbs_div_to_out_balanced
+        // *scratch_2_head > 4 in _limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -5387,8 +5387,8 @@ fn test_limbs_div() {
             ],
             &[839942670, 1, 10],
         );
-        // !dh.get_highest_bit() and two-limb division in _limbs_div_to_out_balanced
-        // cy != 0 and !qh in _limbs_div_to_out_balanced
+        // bits != 0 and two-limb division in _limbs_div_to_out_balanced
+        // carry != 0 and !highest_q in _limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -5403,7 +5403,7 @@ fn test_limbs_div() {
             ],
             &[1, 10, 10],
         );
-        // dh.get_highest_bit() and two-limb division in _limbs_div_to_out_unbalanced
+        // bits == 0 and two-limb division in _limbs_div_to_out_unbalanced
         test(
             &[10; 233],
             &[
@@ -5480,8 +5480,8 @@ fn test_limbs_div() {
                 3290134248, 0,
             ],
         );
-        // dh.get_highest_bit() in _limbs_div_to_out_balanced
-        // dh.get_highest_bit() and two-limb division in _limbs_div_to_out_balanced
+        // bits == 0 in _limbs_div_to_out_balanced
+        // bits == 0 and two-limb division in _limbs_div_to_out_balanced
         test(
             &[10; 3],
             &[
@@ -5494,7 +5494,7 @@ fn test_limbs_div() {
             ],
             &[0, 10, 10],
         );
-        // dh.get_highest_bit() and schoolbook division in _limbs_div_to_out_balanced
+        // bits == 0 and schoolbook division in _limbs_div_to_out_balanced
         test(
             &[10; 5],
             &[
@@ -5509,8 +5509,8 @@ fn test_limbs_div() {
             ],
             &[985368501, 2737353193, 3370693165, 1798455938, 0],
         );
-        // scratch_2[0] <= 4 in _limbs_div_to_out_balanced
-        // !(r_len > n_len || limbs_cmp_same_length(&ns[..n_len], &rs[..n_len]) == Ordering::Less)
+        // *scratch_2_head <= 4 in _limbs_div_to_out_balanced
+        // !(r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less)
         test(
             &[10; 3],
             &[
@@ -5523,7 +5523,7 @@ fn test_limbs_div() {
             ],
             &[4294950912, 0, 10],
         );
-        // dh.get_highest_bit() and divide-and-conquer division in _limbs_div_to_out_balanced
+        // bits == 0 and divide-and-conquer division in _limbs_div_to_out_balanced
         test(
             &[10; 265],
             &[
@@ -5704,7 +5704,7 @@ fn test_limbs_div() {
                 2696660773, 1238552336, 3193475557, 1525093066, 1459803910, 0,
             ],
         );
-        // !dh.get_highest_bit() and divide-and-conquer division in _limbs_div_to_out_unbalanced
+        // bits != 0 and divide-and-conquer division in _limbs_div_to_out_unbalanced
         test(
             &[10; 744],
             &[
@@ -5987,7 +5987,7 @@ fn test_limbs_div() {
                 1828982470, 1,
             ],
         );
-        // !dh.get_highest_bit() and divide-and-conquer division in _limbs_div_to_out_balanced
+        // bits != 0 and divide-and-conquer division in _limbs_div_to_out_balanced
         test(
             &[10; 276],
             &[
@@ -6288,7 +6288,7 @@ fn test_limbs_div() {
                 1956694410, 2508860583, 2,
             ],
         );
-        // dh.get_highest_bit() and divide-and-conquer division in _limbs_div_to_out_unbalanced
+        // bits == 0 and divide-and-conquer division in _limbs_div_to_out_unbalanced
         test(
             &[10; 166],
             &[
@@ -6389,7 +6389,7 @@ fn test_limbs_div() {
                 2938339245, 1916419568, 824070112, 65967478, 0,
             ],
         );
-        // dh.get_highest_bit() and Barrett division in _limbs_div_to_out_unbalanced
+        // bits == 0 and Barrett division in _limbs_div_to_out_unbalanced
         test(
             &[10; 1770],
             &[
@@ -6888,7 +6888,7 @@ fn test_limbs_div() {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
             ],
         );
-        // !dh.get_highest_bit() and Barrett division in _limbs_div_to_out_balanced
+        // bits != 0 and Barrett division in _limbs_div_to_out_balanced
         test(
             &[10; 1_401],
             &[123; 2_800],
@@ -7096,7 +7096,7 @@ fn test_limbs_div() {
                 10, 10,
             ],
         );
-        // dh.get_highest_bit() and Barrett division in _limbs_div_to_out_balanced
+        // bits == 0 and Barrett division in _limbs_div_to_out_balanced
         let mut ds = vec![0; 1_409];
         ds.push(Limb::MAX);
         test(
@@ -8302,7 +8302,7 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // !dh.get_highest_bit() and Barrett division in _limbs_div_to_out_unbalanced
+        // bits != 0 and Barrett division in _limbs_div_to_out_unbalanced
         test(
             &[10; 1770],
             &[
@@ -10443,8 +10443,7 @@ fn test_limbs_div() {
                 1,
             ],
         );
-        // r_len > n_len ||
-        //      limbs_cmp_same_length(&ns[..n_len], &rs[..n_len]) == Ordering::Less
+        // r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Ordering::Less
         //      in _limbs_div_to_out_balanced
         test(
             &[10; 5],

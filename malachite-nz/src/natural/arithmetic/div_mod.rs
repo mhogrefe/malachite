@@ -1485,7 +1485,7 @@ fn _limbs_div_mod_balanced(
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, returns the quotient and remainder. The quotient has
+/// `Natural`s, divides them, returning the quotient and remainder. The quotient has
 /// `ns.len() - ds.len() + 1` limbs and the remainder `ds.len()` limbs.
 ///
 /// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,

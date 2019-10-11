@@ -36,7 +36,9 @@ use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_o
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
-use platform::{DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD};
+use platform::{
+    DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
+};
 
 /// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
 ///
@@ -1158,11 +1160,15 @@ const DC_DIV_Q_THRESHOLD: usize = DC_DIVAPPR_Q_THRESHOLD;
 const MU_DIV_Q_THRESHOLD: usize = MU_DIVAPPR_Q_THRESHOLD;
 const MUPI_DIV_Q_THRESHOLD: usize = MUPI_DIVAPPR_Q_THRESHOLD;
 const MUPI_DIVAPPR_Q_THRESHOLD: usize = MUPI_DIV_QR_THRESHOLD;
-//TODO tune
-const FUDGE: usize = 5;
-const MU_DIVAPPR_Q_THRESHOLD: usize = 1_387;
 
-fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+/// Division when n_len >= 2 * d_len - FUDGE.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+pub fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     // |________________________|
     //                  |_______|
     let n_len = ns.len();
@@ -1223,6 +1229,13 @@ fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb
     }
 }
 
+/// Division when n_len >= 2 * d_len - FUDGE.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
 fn _limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     // |________________________|
     //                  |_______|
@@ -1285,6 +1298,13 @@ fn _limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[
     }
 }
 
+/// Division when n_len >= 2 * d_len - FUDGE.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
 fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     // |________________________|
     //                  |_______|
@@ -1349,6 +1369,13 @@ fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [
     }
 }
 
+/// Division when n_len >= 2 * d_len - FUDGE.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
 fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     // |________________________|
     //                  |_______|
@@ -1414,7 +1441,14 @@ fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb
     }
 }
 
-fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+/// Division when n_len < 2 * d_len - FUDGE.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     // |________________________|
     //        |_________________|
     let n_len = ns.len();
@@ -1423,7 +1457,7 @@ fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let q_len_plus_1 = q_len + 1;
     let mut scratch_2 = vec![0; q_len_plus_1];
     let new_n_len = q_len + q_len_plus_1;
-    let ns_tail = &ns[n_len - new_n_len..];
+    let ns_tail = &ns[n_len.checked_sub(new_n_len).unwrap()..];
     let highest_d = ds[d_len - 1];
     let bits = highest_d.leading_zeros();
     if bits == 0 {
@@ -1490,12 +1524,73 @@ fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     }
 }
 
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
+/// limbs.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+/// most-significant limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div::limbs_div;
+///
+/// let qs = &mut [10; 4];
+/// assert_eq!(limbs_div(&[1, 2], &[3, 4]), vec![0]);
+///
+/// let qs = &mut [10; 4];
+/// assert_eq!(limbs_div(&[1, 2, 3], &[4, 5]), vec![2576980377, 0]);
+/// ```
+///
+/// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally and qp is
+/// returned.
 pub fn limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_to_out_ref_ref(&mut qs, ns, ds);
     qs
 }
 
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+/// most-significant limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out(qs, &mut [1, 2], &mut [3, 4]);
+/// assert_eq!(qs, &[0, 10, 10, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out(qs, &mut [1, 2, 3], &mut [4, 5]);
+/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
+/// ```
+///
+/// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally and np and dp
+/// are consumed, saving some memory allocations.
 pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1511,6 +1606,37 @@ pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     }
 }
 
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+/// most-significant limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_val_ref;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_val_ref(qs, &mut [1, 2], &[3, 4]);
+/// assert_eq!(qs, &[0, 10, 10, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_val_ref(qs, &mut [1, 2, 3], &[4, 5]);
+/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
+/// ```
+///
+/// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally and np is
+/// consumed, saving some memory allocations.
 pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1526,6 +1652,37 @@ pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     }
 }
 
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+/// most-significant limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_val;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_ref_val(qs, &[1, 2], &mut [3, 4]);
+/// assert_eq!(qs, &[0, 10, 10, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_ref_val(qs, &[1, 2, 3], &mut [4, 5]);
+/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
+/// ```
+///
+/// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally and dp is
+/// consumed, saving some memory allocations.
 pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1541,7 +1698,34 @@ pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     }
 }
 
-/// Division for arbitrary-size operands.
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+/// most-significant limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_ref;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_ref_ref(qs, &[1, 2], &[3, 4]);
+/// assert_eq!(qs, &[0, 10, 10, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_to_out_ref_ref(qs, &[1, 2, 3], &[4, 5]);
+/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
+/// ```
 ///
 /// This is mpn_div_q from mpn/generic/div_q.c, where scratch is allocated internally.
 pub fn limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {

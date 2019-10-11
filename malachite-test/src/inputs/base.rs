@@ -2333,6 +2333,12 @@ pub fn triples_of_unsigned_vec_var_43(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     }))
 }
 
+// All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_div_to_out` and both the balanced and unbalanced div helper functions.
+pub fn triples_of_unsigned_vec_var_44(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(triples_of_unsigned_vec_var_43(gm).filter(|(_, n, d)| n.len() < (d.len() - 1) << 1))
+}
+
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,

@@ -1,3 +1,5 @@
+use std::cmp::max;
+
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -5,12 +7,12 @@ use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    limbs_div, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
-    limbs_div_to_out_val_ref,
+    _limbs_div_to_out_balanced, _limbs_div_to_out_unbalanced, limbs_div, limbs_div_to_out,
+    limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val, limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, limbs_div_mod, limbs_div_mod_to_out,
+    _limbs_div_mod_schoolbook, limbs_div_mod, limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -18,6 +20,7 @@ use inputs::base::{
     pairs_of_unsigned_vec_var_9, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_2,
     triples_of_unsigned_vec_var_41, triples_of_unsigned_vec_var_42, triples_of_unsigned_vec_var_43,
+    triples_of_unsigned_vec_var_44,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -64,6 +67,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_limbs_div_barrett_approx_algorithms
     );
     register_bench!(registry, Small, benchmark_limbs_div_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_to_out_balancing_algorithms
+    );
     register_bench!(
         registry,
         Small,
@@ -428,7 +436,7 @@ fn benchmark_limbs_div_divide_and_conquer_approx_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref ds, _)| ds.len()),
+        &(|&(_, ref ns, _, _)| ns.len()),
         "ns.len()",
         &mut [
             (
@@ -469,12 +477,14 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref ds, _)| ds.len()),
-        "ns.len()",
+        &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
+        "ns.len() - ds.len()",
         &mut [
             (
                 "divide-and-conquer approx",
-                &mut (|(mut qs, mut ns, ds, inverse)| {
+                &mut (|(mut qs, mut ns, ds, _)| {
+                    // recompute inverse to make benchmark fair
+                    let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
                     no_out!(_limbs_div_divide_and_conquer_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
@@ -515,6 +525,35 @@ fn benchmark_limbs_div_algorithms(gm: GenerationMode, limit: usize, file_name: &
                 &mut (|(ns, ds)| no_out!(limbs_div_mod(&ns, &ds))),
             ),
             ("div", &mut (|(ns, ds)| no_out!(limbs_div(&ns, &ds)))),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_to_out_balancing_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_to_out(&mut [Limb], &mut [Limb], &mut [Limb]) balancing",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_44(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, ref ds)| max(2, (ds.len() << 1).saturating_sub(ns.len()))),
+        "max(2, 2 * ds.len() - ns.len())",
+        &mut [
+            (
+                "unbalanced",
+                &mut (|(mut qs, mut ns, mut ds)| {
+                    _limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds)
+                }),
+            ),
+            (
+                "balanced",
+                &mut (|(mut qs, ns, ds)| _limbs_div_to_out_balanced(&mut qs, &ns, &ds)),
+            ),
         ],
     );
 }
