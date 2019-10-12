@@ -578,13 +578,7 @@ fn benchmark_natural_div_mod_limb_algorithms(gm: GenerationMode, limit: usize, f
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            (
-                "using / and %",
-                &mut (|(x, y)| {
-                    let remainder = &x % y;
-                    (x / y, remainder);
-                }),
-            ),
+            ("using / and %", &mut (|(x, y)| no_out!((&x / y, x % y)))),
         ],
     );
 }

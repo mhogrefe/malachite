@@ -15836,15 +15836,12 @@ fn test_div_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO
-        /*
         let (q, r) = (
-            Natural::from_str(u).unwrap() / v,
-            Natural::from_str(u).unwrap() % v,
+            Natural::from_str(u).unwrap() / Natural::from_str(v).unwrap(),
+            Natural::from_str(u).unwrap() % Natural::from_str(v).unwrap(),
         );
         assert_eq!(q.to_string(), quotient);
-        assert_eq!(r, remainder);
-        */
+        assert_eq!(r.to_string(), remainder);
     };
     test("0", "1", "0", "0");
     test("0", "123", "0", "0");
@@ -16072,11 +16069,12 @@ fn test_ceiling_div_neg_mod() {
         //TODO
         /*
         let (q, r) = (
-            Natural::from_str(u).unwrap().div_round(v, RoundingMode::Ceiling),
-            Natural::from_str(u).unwrap().neg_mod(v),
+            Natural::from_str(u).unwrap().div_round(Natural::from_str(v).unwrap(),
+                    RoundingMode::Ceiling),
+            Natural::from_str(u).unwrap().neg_mod(Natural::from_str(v).unwrap()),
         );
         assert_eq!(q.to_string(), quotient);
-        assert_eq!(r, remainder);
+        assert_eq!(r.to_string(), remainder);
         */
     };
     test("0", "1", "0", "0");
@@ -16429,12 +16427,9 @@ fn div_mod_properties_helper(x: &Natural, y: &Natural) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO
-    /*
     let (quotient_alt, remainder_alt) = (x / y, x % y);
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
-    */
 
     let (num_quotient, num_remainder) = natural_to_biguint(x).div_mod_floor(&natural_to_biguint(y));
     assert_eq!(biguint_to_natural(&num_quotient), quotient);
@@ -16542,7 +16537,7 @@ fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
 }
 
 #[test]
-fn ceiling_div_neg_mod_limb_properties() {
+fn ceiling_div_neg_mod_properties() {
     test_properties(pairs_of_natural_and_positive_natural, |&(ref x, ref y)| {
         ceiling_div_neg_mod_properties_helper(x, y);
     });

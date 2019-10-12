@@ -109,7 +109,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_div_mod_library_comparison
     );
-    //TODO register_bench!(registry, Large, benchmark_natural_div_mod_algorithms);
+    register_bench!(registry, Large, benchmark_natural_div_mod_algorithms);
     register_bench!(
         registry,
         Large,
@@ -877,13 +877,11 @@ fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-//TODO
-/*
 fn benchmark_natural_div_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.div_mod(Natural)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_unsigned::<Limb>(gm),
+        pairs_of_natural_and_positive_natural(gm),
         gm.name(),
         limit,
         file_name,
@@ -891,17 +889,10 @@ fn benchmark_natural_div_mod_algorithms(gm: GenerationMode, limit: usize, file_n
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            ("naive", &mut (|(x, y)| no_out!(x._div_mod_limb_naive(y)))),
-            (
-                "using / and %",
-                &mut (|(x, y)| {
-                    let remainder = &x % y;
-                    (x / y, remainder);
-                }),
-            ),
+            ("using / and %", &mut (|(x, y)| no_out!((&x / &y, x % y)))),
         ],
     );
-}*/
+}
 
 fn benchmark_natural_div_mod_evaluation_strategy(
     gm: GenerationMode,
