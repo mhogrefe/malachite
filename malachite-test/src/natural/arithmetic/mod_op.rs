@@ -1,10 +1,17 @@
 use malachite_base::num::arithmetic::traits::{DivMod, Mod, ModAssign, NegMod, NegModAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
+use malachite_nz::natural::arithmetic::mod_op::{
+    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb,
+};
 use num::Integer;
 use rug::ops::RemRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    pairs_of_unsigned_vec_var_10, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
+};
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
@@ -13,6 +20,8 @@ use inputs::natural::{
 // For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_mod_three_limb_by_two_limb);
+    register_demo!(registry, demo_limbs_mod_by_two_limb_normalized);
     register_demo!(registry, demo_natural_mod_assign);
     register_demo!(registry, demo_natural_mod_assign_ref);
     register_demo!(registry, demo_natural_mod);
@@ -31,6 +40,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_neg_mod_val_ref);
     register_demo!(registry, demo_natural_neg_mod_ref_val);
     register_demo!(registry, demo_natural_neg_mod_ref_ref);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mod_by_two_limb_normalized_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -72,6 +86,32 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {
     -x.rem_ceil(y)
+}
+
+fn demo_limbs_mod_three_limb_by_two_limb(gm: GenerationMode, limit: usize) {
+    for (n2, n1, n0, d1, d0, inverse) in sextuples_of_limbs_var_1(gm).take(limit) {
+        println!(
+            "limbs_mod_three_limb_by_two_limb({}, {}, {}, {}, {}, {}) = {}",
+            n2,
+            n1,
+            n0,
+            d1,
+            d0,
+            inverse,
+            limbs_mod_three_limb_by_two_limb(n2, n1, n0, d1, d0, inverse)
+        );
+    }
+}
+
+fn demo_limbs_mod_by_two_limb_normalized(gm: GenerationMode, limit: usize) {
+    for (ns, ds) in pairs_of_unsigned_vec_var_10(gm).take(limit) {
+        println!(
+            "limbs_mod_by_two_limb_normalized({:?}, {:?}) = {:?}",
+            ns,
+            ds,
+            limbs_mod_by_two_limb_normalized(&ns, &ds),
+        );
+    }
 }
 
 fn demo_natural_mod_assign(gm: GenerationMode, limit: usize) {
@@ -207,6 +247,35 @@ fn demo_natural_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_natural_and_positive_natural(gm).take(limit) {
         println!("(&{}).neg_mod(&{}) = {}", x, y, (&x).neg_mod(&y));
     }
+}
+
+fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mod_by_two_limb_normalized(&[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_37(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "using div/mod",
+                &mut (|(mut qs, mut ns, ds)| {
+                    no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds))
+                }),
+            ),
+            (
+                "standard",
+                &mut (|(_, ns, ds)| no_out!(limbs_mod_by_two_limb_normalized(&ns, &ds))),
+            ),
+        ],
+    );
 }
 
 fn benchmark_natural_mod_assign_evaluation_strategy(

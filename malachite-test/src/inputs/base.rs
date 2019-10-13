@@ -1542,6 +1542,30 @@ pub fn pairs_of_unsigned_vec_var_9(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Lim
     Box::new(qs.filter(|(n, d)| *d.last().unwrap() != Limb::ZERO && n.len() >= d.len()))
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned and `ns` and `ds` meet the preconditions of
+// `limbs_mod_by_two_limb_normalized`.
+pub fn pairs_of_unsigned_vec_var_10<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    let ps: It<(Vec<T>, (T, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            pairs_of_unsigneds_var_2(gm),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| pairs_of_unsigneds_var_2_with_seed(gm, seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| pairs_of_unsigneds_var_2_with_seed(gm, seed)),
+        )),
+    };
+    Box::new(ps.map(|(n, (d_1, d_0))| (n, vec![d_0, d_1])))
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {

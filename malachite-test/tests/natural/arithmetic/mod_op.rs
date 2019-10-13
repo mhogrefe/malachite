@@ -4,8 +4,14 @@ use malachite_base::num::arithmetic::traits::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
 };
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::JoinHalves;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use malachite_nz::natural::arithmetic::mod_op::{
+    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb,
+};
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
 use num::{BigUint, Integer};
 use rug;
 use rug::ops::RemRounding;
@@ -14,11 +20,94 @@ use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_10, sextuples_of_limbs_var_1};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
     positive_naturals,
 };
 use malachite_test::natural::arithmetic::mod_op::rug_neg_mod;
+
+fn verify_limbs_mod_three_limb_by_two_limb(
+    n_2: Limb,
+    n_1: Limb,
+    n_0: Limb,
+    d_1: Limb,
+    d_0: Limb,
+    r: DoubleLimb,
+) {
+    let n = Natural::from_owned_limbs_asc(vec![n_0, n_1, n_2]);
+    let d = Natural::from(DoubleLimb::join_halves(d_1, d_0));
+    let r = Natural::from(r);
+    assert_eq!(n % &d, r);
+    assert!(r < d);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_three_limb_by_two_limb() {
+    let test = |n_2, n_1, n_0, d_1, d_0, r| {
+        assert_eq!(
+            limbs_mod_three_limb_by_two_limb(
+                n_2,
+                n_1,
+                n_0,
+                d_1,
+                d_0,
+                limbs_two_limb_inverse_helper(d_1, d_0)
+            ),
+            r
+        );
+        verify_limbs_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, r);
+    };
+    test(1, 2, 3, 0x8000_0004, 5, 0x7fff_fffd_ffff_fffe);
+    test(2, 0x4000_0000, 4, 0x8000_0000, 0, 0x4000_0000_0000_0004);
+    test(
+        1614123406,
+        3687984980,
+        2695202596,
+        2258238141,
+        1642523191,
+        274277675918877623,
+    );
+}
+
+fn verify_limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb], r_0: Limb, r_1: Limb) {
+    let n = Natural::from_limbs_asc(ns);
+    let d = Natural::from_limbs_asc(ds);
+    let expected_r = n % &d;
+    let r = Natural::from_owned_limbs_asc(vec![r_0, r_1]);
+    assert_eq!(r, expected_r);
+    assert!(r < d);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_by_two_limb_normalized() {
+    let test = |ns: &[Limb], ds: &[Limb], r_0: Limb, r_1: Limb| {
+        assert_eq!(limbs_mod_by_two_limb_normalized(ns, ds), (r_0, r_1));
+        verify_limbs_mod_by_two_limb_normalized(ns, ds, r_0, r_1);
+    };
+    test(&[1, 2], &[3, 0x8000_0000], 1, 2);
+    test(&[1, 2, 3, 4, 5], &[3, 0x8000_0000], 166, 2147483626);
+    test(
+        &[4142767597, 2922703399, 3921445909],
+        &[2952867570, 2530544119],
+        3037232599,
+        1218898013,
+    );
+}
+
+#[test]
+#[should_panic]
+fn limbs_mod_by_two_limb_normalized_fail_1() {
+    limbs_mod_by_two_limb_normalized(&[1, 2], &[3, 4]);
+}
+
+#[test]
+#[should_panic]
+fn limbs_mod_by_two_limb_normalized_fail_2() {
+    limbs_mod_by_two_limb_normalized(&[1, 2], &[3, 0x8000_0000, 4]);
+}
 
 #[test]
 fn test_div_mod() {
@@ -388,6 +477,25 @@ fn neg_mod_ref_val_fail() {
 #[should_panic]
 fn neg_mod_ref_ref_fail() {
     (&Natural::from(10u32)).neg_mod(&Natural::ZERO);
+}
+
+#[test]
+fn limbs_mod_three_limb_by_two_limb_properties() {
+    test_properties(
+        sextuples_of_limbs_var_1,
+        |&(n_2, n_1, n_0, d_1, d_0, inverse)| {
+            let r = limbs_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, inverse);
+            verify_limbs_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, r);
+        },
+    );
+}
+
+#[test]
+fn limbs_mod_by_two_limb_normalized_properties() {
+    test_properties(pairs_of_unsigned_vec_var_10, |(ns, ds)| {
+        let (r_0, r_1) = limbs_mod_by_two_limb_normalized(&ns, &ds);
+        verify_limbs_mod_by_two_limb_normalized(&ns, &ds, r_0, r_1);
+    });
 }
 
 fn mod_properties_helper(x: &Natural, y: &Natural) {

@@ -1,11 +1,148 @@
 use std::ops::{Rem, RemAssign};
 
 use malachite_base::num::arithmetic::traits::{
-    DivAssignMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
+    DivAssignMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
+use natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::Natural;
-use platform::Limb;
+use platform::{DoubleLimb, Limb};
+
+/// Computes the remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest bit of `d_1` to
+/// be set, and `[n_2, n_1]` < `[d_1, d_0]`. `inverse` is the inverse of `[d_1, d_0]` computed by
+/// `limbs_two_limb_inverse_helper`.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_three_limb_by_two_limb;
+///
+/// let d_1 = 0x8000_0004;
+/// let d_0 = 5;
+/// assert_eq!(
+///     limbs_mod_three_limb_by_two_limb(
+///         1, 2, 3, d_1, d_0,
+///         limbs_two_limb_inverse_helper(d_1, d_0)),
+///     0x7fff_fffd_ffff_fffe
+/// );
+///
+/// let d_1 = 0x8000_0000;
+/// let d_0 = 0;
+/// assert_eq!(
+///     limbs_mod_three_limb_by_two_limb(
+///         2, 0x4000_0000, 4, d_1, d_0,
+///         limbs_two_limb_inverse_helper(d_1, d_0)),
+///     0x4000_0000_0000_0004
+/// );
+/// ```
+///
+/// This is udiv_qr_3by2 from gmp-impl.h, returning only the remainder.
+pub fn limbs_mod_three_limb_by_two_limb(
+    n_2: Limb,
+    n_1: Limb,
+    n_0: Limb,
+    d_1: Limb,
+    d_0: Limb,
+    inverse: Limb,
+) -> DoubleLimb {
+    let (q, q_lo) = (DoubleLimb::from(n_2) * DoubleLimb::from(inverse))
+        .wrapping_add(DoubleLimb::join_halves(n_2, n_1))
+        .split_in_half();
+    let d = DoubleLimb::join_halves(d_1, d_0);
+    // Compute the two most significant limbs of n - q * d
+    let r = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(q)), n_0)
+        .wrapping_sub(d)
+        .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(q));
+    // Conditionally adjust the remainder
+    if r.upper_half() >= q_lo {
+        let (r_plus_d, overflow) = r.overflowing_add(d);
+        if overflow {
+            return r_plus_d;
+        }
+    } else if r >= d {
+        return r.wrapping_sub(d);
+    }
+    r
+}
+
+/// Divides `ns` by `ds`, returning the limbs of the remainder. `ds` must have length 2, `ns` must
+/// have length at least 2, and the most significant bit of `ds[1]` must be set.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
+/// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_by_two_limb_normalized;
+///
+/// assert_eq!(
+///     limbs_mod_by_two_limb_normalized(&[1, 2, 3, 4, 5], &[3, 0x8000_0000]),
+///     (166, 2147483626)
+/// );
+/// ```
+///
+/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, returning the two limbs of the remainder.
+pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
+    assert_eq!(ds.len(), 2);
+    let n_len = ns.len();
+    assert!(n_len >= 2);
+    let n_limit = n_len - 2;
+    assert!(ds[1].get_highest_bit());
+    let d_1 = ds[1];
+    let d_0 = ds[0];
+    let d = DoubleLimb::join_halves(d_1, d_0);
+    let mut r = DoubleLimb::join_halves(ns[n_limit + 1], ns[n_limit]);
+    if r >= d {
+        r.wrapping_sub_assign(d);
+    }
+    let (mut r_1, mut r_0) = r.split_in_half();
+    let inverse = limbs_two_limb_inverse_helper(d_1, d_0);
+    for &n in ns[..n_limit].iter().rev() {
+        let (new_r_1, new_r_0) =
+            limbs_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, inverse).split_in_half();
+        r_1 = new_r_1;
+        r_0 = new_r_0;
+    }
+    (r_0, r_1)
+}
+
+//TODO not pub
+pub fn _limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
+    let n_len = ns.len();
+    let ds_1 = ds[1];
+    let bits = ds_1.leading_zeros();
+    if bits == 0 {
+        limbs_mod_by_two_limb_normalized(ns, ds)
+    } else {
+        let ds_0 = ds[0];
+        let cobits = Limb::WIDTH - bits;
+        let mut ns_shifted = vec![0; n_len + 1];
+        let ns_shifted = &mut ns_shifted;
+        let carry = limbs_shl_to_out(ns_shifted, ns, bits);
+        let ds_shifted = &mut [ds_0 << bits, (ds_1 << bits) | (ds_0 >> cobits)];
+        let (r_0, r_1) = if carry == 0 {
+            limbs_mod_by_two_limb_normalized(&ns_shifted[..n_len], ds_shifted)
+        } else {
+            ns_shifted[n_len] = carry;
+            limbs_mod_by_two_limb_normalized(ns_shifted, ds_shifted)
+        };
+        ((r_0 >> bits) | (r_1 << cobits), r_1 >> bits)
+    }
+}
 
 impl Mod<Natural> for Natural {
     type Output = Natural;
