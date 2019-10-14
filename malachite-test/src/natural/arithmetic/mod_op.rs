@@ -2,21 +2,24 @@ use malachite_base::num::arithmetic::traits::{DivMod, Mod, ModAssign, NegMod, Ne
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook,
-    limbs_div_mod_by_two_limb_normalized,
+    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
+    _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb_normalized, limbs_div_mod_to_out,
 };
 use malachite_nz::natural::arithmetic::mod_op::{
-    _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod_by_two_limb_normalized,
-    limbs_mod_three_limb_by_two_limb,
+    _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod,
+    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
 };
 use num::Integer;
 use rug::ops::RemRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_10, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, sextuples_of_limbs_var_1,
+    pairs_of_unsigned_vec_var_10, pairs_of_unsigned_vec_var_9,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
+    quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1,
     triples_of_two_unsigned_vecs_and_unsigned_var_1, triples_of_unsigned_vec_var_37,
+    triples_of_unsigned_vec_var_45,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -30,6 +33,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_by_two_limb_normalized);
     register_demo!(registry, demo_limbs_mod_schoolbook);
     register_demo!(registry, demo_limbs_mod_divide_and_conquer);
+    register_demo!(registry, demo_limbs_mod_barrett);
+    register_demo!(registry, demo_limbs_mod);
+    register_demo!(registry, demo_limbs_mod_to_out);
     register_demo!(registry, demo_natural_mod_assign);
     register_demo!(registry, demo_natural_mod_assign_ref);
     register_demo!(registry, demo_natural_mod);
@@ -59,6 +65,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_limbs_mod_divide_and_conquer_algorithms
     );
+    register_bench!(registry, Large, benchmark_limbs_mod_barrett_algorithms);
+    register_bench!(registry, Large, benchmark_limbs_mod);
+    register_bench!(registry, Large, benchmark_limbs_mod_to_out_algorithms);
     register_bench!(
         registry,
         Large,
@@ -150,6 +159,36 @@ fn demo_limbs_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
             "qs := {:?}; ns := {:?}; \
              _limbs_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); ns = {:?}",
             old_qs, old_ns, ds, inverse, ns
+        );
+    }
+}
+
+fn demo_limbs_mod_barrett(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut rs, ns, ds) in quadruples_of_unsigned_vec_var_1(gm).take(limit) {
+        let old_qs = qs.clone();
+        let old_rs = rs.clone();
+        let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        _limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+        println!(
+            "qs := {:?}; rs := {:?}; _limbs_mod_barrett(&mut qs, &mut ns, {:?}, {:?}); rs = {:?}",
+            old_qs, old_rs, ns, ds, rs
+        );
+    }
+}
+
+fn demo_limbs_mod(gm: GenerationMode, limit: usize) {
+    for (ns, ds) in pairs_of_unsigned_vec_var_9(gm).take(limit) {
+        println!("limbs_mod({:?}, {:?}) = {:?}", ns, ds, limbs_mod(&ns, &ds));
+    }
+}
+
+fn demo_limbs_mod_to_out(gm: GenerationMode, limit: usize) {
+    for (mut rs, ns, ds) in triples_of_unsigned_vec_var_45(gm).take(limit) {
+        let old_rs = rs.clone();
+        limbs_mod_to_out(&mut rs, &ns, &ds);
+        println!(
+            "rs := {:?}; limbs_mod_to_out(&mut rs, {:?}, {:?}); rs = {:?}",
+            old_rs, ns, ds, rs
         );
     }
 }
@@ -375,6 +414,78 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
                 &mut (|(mut qs, mut ns, ds, inverse)| {
                     _limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
                 }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_barrett_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "_limbs_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
+        BenchmarkType::Algorithms,
+        quadruples_of_unsigned_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, _, ref ds)| ds.len()),
+        "ds.len()",
+        &mut [
+            (
+                "Barrett using div/mod",
+                &mut (|(mut qs, mut rs, ns, ds)| {
+                    let mut scratch =
+                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    _limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+                }),
+            ),
+            (
+                "Barrett",
+                &mut (|(mut qs, mut rs, ns, ds)| {
+                    let mut scratch =
+                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    _limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mod(&[Limb], &[Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_9(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [("malachite", &mut (|(ns, ds)| no_out!(limbs_mod(&ns, &ds))))],
+    );
+}
+
+fn benchmark_limbs_mod_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mod_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        quadruples_of_unsigned_vec_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "using div/mod",
+                &mut (|(qs, mut rs, ns, ds)| {
+                    // Allocate again to make benchmark fair
+                    let mut qs = vec![0; qs.len()];
+                    limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds);
+                }),
+            ),
+            (
+                "standard",
+                &mut (|(_, mut rs, ns, ds)| limbs_mod_to_out(&mut rs, &ns, &ds)),
             ),
         ],
     );

@@ -288,8 +288,12 @@ fn demo_limbs_div_mod_barrett(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_div_mod(gm: GenerationMode, limit: usize) {
     for (ns, ds) in pairs_of_unsigned_vec_var_9(gm).take(limit) {
-        let result = limbs_div_mod(&ns, &ds);
-        println!("limbs_div_mod({:?}, {:?}) = {:?}", ns, ds, result);
+        println!(
+            "limbs_div_mod({:?}, {:?}) = {:?}",
+            ns,
+            ds,
+            limbs_div_mod(&ns, &ds)
+        );
     }
 }
 

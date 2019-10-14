@@ -1336,7 +1336,7 @@ fn _limbs_div_mod_unbalanced(
 /// Additional memory: Worst case O(n * log(n))
 ///
 /// where n = `ns.len()`
-fn _limbs_div_mod_balanced(
+pub(crate) fn _limbs_div_mod_balanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1488,8 +1488,7 @@ fn _limbs_div_mod_balanced(
 /// `Natural`s, divides them, returning the quotient and remainder. The quotient has
 /// `ns.len() - ds.len() + 1` limbs and the remainder `ds.len()` limbs.
 ///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// `rs` must be at least as long as `ds`, and `ds` must have length at least 2 and its most
+/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
 /// significant limb must be greater than zero.
 ///
 /// Time: Worst case O(n * log(n) * log(log(n)))
@@ -1499,19 +1498,14 @@ fn _limbs_div_mod_balanced(
 /// where n = `ns.len()`
 ///
 /// # Panics
-/// Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
-/// the most-significant limb of `ds` is zero.
+/// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
+/// of `ds` is zero.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod;
 ///
-/// let qs = &mut [10; 4];
-/// let rs = &mut [10; 4];
 /// assert_eq!(limbs_div_mod(&[1, 2], &[3, 4]), (vec![0], vec![1, 2]));
-///
-/// let qs = &mut [10; 4];
-/// let rs = &mut [10; 4];
 /// assert_eq!(limbs_div_mod(&[1, 2, 3], &[4, 5]), (vec![2576980377, 0], vec![2576980381, 2]));
 /// ```
 ///
@@ -1574,7 +1568,7 @@ pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &
         // conservative tests for quotient size
         let adjust = ns[n_len - 1] >= ds_last;
         let adjusted_n_len = if adjust { n_len + 1 } else { n_len };
-        if adjusted_n_len < 2 * d_len {
+        if adjusted_n_len < d_len << 1 {
             _limbs_div_mod_balanced(qs, rs, ns, ds, adjust);
         } else {
             _limbs_div_mod_unbalanced(qs, rs, ns, ds, adjusted_n_len);

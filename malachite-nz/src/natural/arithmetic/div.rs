@@ -1528,8 +1528,8 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
 /// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
 /// limbs.
 ///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
+/// significant limb must be greater than zero.
 ///
 /// Time: Worst case O(n * log(n) * log(log(n)))
 ///
@@ -1538,17 +1538,14 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
 /// where n = `ns.len()`
 ///
 /// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
-/// most-significant limb of `ds` is zero.
+/// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
+/// of `ds` is zero.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div;
 ///
-/// let qs = &mut [10; 4];
 /// assert_eq!(limbs_div(&[1, 2], &[3, 4]), vec![0]);
-///
-/// let qs = &mut [10; 4];
 /// assert_eq!(limbs_div(&[1, 2, 3], &[4, 5]), vec![2576980377, 0]);
 /// ```
 ///
