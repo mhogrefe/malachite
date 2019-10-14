@@ -1,15 +1,28 @@
+use std::cmp::Ordering;
 use std::ops::{Rem, RemAssign};
 
+use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
-    DivAssignMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, WrappingSubAssign,
+    DivAssignMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, WrappingAddAssign,
+    WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
-use natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
+use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
+use natural::arithmetic::div_mod::{
+    _limbs_div_mod_divide_and_conquer_helper, _limbs_div_mod_schoolbook,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
+    limbs_two_limb_inverse_helper,
+};
+use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::shl_u::limbs_shl_to_out;
+use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
+use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use platform::{DoubleLimb, Limb, DC_DIV_QR_THRESHOLD};
 
 /// Computes the remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest bit of `d_1` to
 /// be set, and `[n_2, n_1]` < `[d_1, d_0]`. `inverse` is the inverse of `[d_1, d_0]` computed by
@@ -118,6 +131,321 @@ pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb
         r_0 = new_r_0;
     }
     (r_0, r_1)
+}
+
+/// Divides `ns` by `ds` and writes the `ds.len()` limbs of the remainder to `ns`. `ds` must have
+/// length greater than 2, `ns` must be at least as long as `ds`, and the most significant bit of
+/// `ds` must be set. `inverse` should be the result of `limbs_two_limb_inverse_helper` applied to
+/// the two highest limbs of the denominator.
+///
+/// Time: worst case O(d * (n - d + 1)); also, O(n ^ 2)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ns.len()`
+///       d = `ds.len()`
+///
+/// # Panics
+/// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, or the last limb of `ds`
+/// does not have its highest bit set.
+///
+/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, where only the remainder is
+/// calculated.
+pub fn _limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], inverse: Limb) {
+    let d_len = ds.len();
+    assert!(d_len > 2);
+    let n_len = ns.len();
+    assert!(n_len >= d_len);
+    let d_1 = ds[d_len - 1];
+    assert!(d_1.get_highest_bit());
+    let d_0 = ds[d_len - 2];
+    let ds_except_last = &ds[..d_len - 1];
+    let ds_except_last_two = &ds[..d_len - 2];
+    {
+        let ns_hi = &mut ns[n_len - d_len..];
+        if limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal {
+            limbs_sub_same_length_in_place_left(ns_hi, ds);
+        }
+    }
+    let mut n_1 = ns[n_len - 1];
+    for i in (d_len..n_len).rev() {
+        let j = i - d_len;
+        if n_1 == d_1 && ns[i - 1] == d_0 {
+            limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j..i], ds, Limb::MAX);
+            n_1 = ns[i - 1]; // update n_1, last loop's value will now be invalid
+        } else {
+            let carry;
+            {
+                let (ns_lo, ns_hi) = ns.split_at_mut(i - 2);
+                let (q, new_n) = limbs_div_mod_three_limb_by_two_limb(
+                    n_1, ns_hi[1], ns_hi[0], d_1, d_0, inverse,
+                );
+                let (new_n_1, mut n_0) = new_n.split_in_half();
+                n_1 = new_n_1;
+                let local_carry_1 = limbs_sub_mul_limb_same_length_in_place_left(
+                    &mut ns_lo[j..],
+                    ds_except_last_two,
+                    q,
+                );
+                let local_carry_2 = n_0 < local_carry_1;
+                n_0.wrapping_sub_assign(local_carry_1);
+                carry = local_carry_2 && n_1 == 0;
+                if local_carry_2 {
+                    n_1.wrapping_sub_assign(1);
+                }
+                ns_hi[0] = n_0;
+            }
+            if carry {
+                n_1.wrapping_add_assign(d_1);
+                if limbs_slice_add_same_length_in_place_left(&mut ns[j..i - 1], ds_except_last) {
+                    n_1.wrapping_add_assign(1);
+                }
+            }
+        }
+    }
+    ns[d_len - 1] = n_1;
+}
+
+/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+///
+/// Additional memory: worst case O(n * log(n) ^ 2)
+///
+/// where n = `ds.len()`
+///
+/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, where only the remainder is
+/// calculated.
+fn _limbs_mod_divide_and_conquer_helper(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+    scratch: &mut [Limb],
+) {
+    let n = ds.len();
+    let lo = n >> 1; // floor(n / 2)
+    let hi = n - lo; // ceil(n / 2)
+    {
+        let qs_hi = &mut qs[lo..];
+        let (ds_lo, ds_hi) = ds.split_at(lo);
+        let highest_q = if hi < DC_DIV_QR_THRESHOLD {
+            _limbs_div_mod_schoolbook(qs_hi, &mut ns[2 * lo..2 * n], ds_hi, inverse)
+        } else {
+            _limbs_div_mod_divide_and_conquer_helper(
+                qs_hi,
+                &mut ns[2 * lo..],
+                ds_hi,
+                inverse,
+                scratch,
+            )
+        };
+        let qs_hi = &mut qs_hi[..hi];
+        limbs_mul_greater_to_out(scratch, qs_hi, ds_lo);
+        let ns_lo = &mut ns[..n + lo];
+        let mut carry = if limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], &scratch[..n]) {
+            1
+        } else {
+            0
+        };
+        if highest_q && limbs_sub_same_length_in_place_left(&mut ns_lo[n..], ds_lo) {
+            carry += 1;
+        }
+        while carry != 0 {
+            limbs_sub_limb_in_place(qs_hi, 1);
+            if limbs_slice_add_same_length_in_place_left(&mut ns_lo[lo..], ds) {
+                carry -= 1;
+            }
+        }
+    }
+    let (ds_lo, ds_hi) = ds.split_at(hi);
+    let q_lo = if lo < DC_DIV_QR_THRESHOLD {
+        _limbs_div_mod_schoolbook(qs, &mut ns[hi..n + lo], ds_hi, inverse)
+    } else {
+        _limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[hi..], ds_hi, inverse, scratch)
+    };
+    let qs_lo = &mut qs[..lo];
+    let ns_lo = &mut ns[..n];
+    limbs_mul_greater_to_out(scratch, ds_lo, qs_lo);
+    let mut carry = if limbs_sub_same_length_in_place_left(ns_lo, &scratch[..n]) {
+        1
+    } else {
+        0
+    };
+    if q_lo && limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], ds_lo) {
+        carry += 1;
+    }
+    while carry != 0 {
+        if limbs_slice_add_same_length_in_place_left(ns_lo, ds) {
+            carry -= 1;
+        }
+    }
+}
+
+/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+///
+/// Additional memory: worst case O(n * log(n) ^ 2)
+///
+/// where n = `ds.len()`
+///
+/// # Panics
+/// Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has
+/// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
+/// set.
+///
+/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, where only the remainder is
+/// calculated.
+pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inverse: Limb) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len >= 6); // to adhere to _limbs_div_mod_schoolbook's limits
+    assert!(n_len >= d_len + 3); // to adhere to _limbs_div_mod_schoolbook's limits
+    let a = d_len - 1;
+    let d_1 = ds[a];
+    let b = d_len - 2;
+    assert!(d_1.get_highest_bit());
+    let mut scratch = vec![0; d_len];
+    let q_len = n_len - d_len;
+    if q_len > d_len {
+        let q_len_mod_d_len = {
+            let mut m = q_len % d_len;
+            if m == 0 {
+                m = d_len;
+            }
+            m
+        };
+        // Perform the typically smaller block first.
+        {
+            // point at low limb of next quotient block
+            let qs = &mut qs[q_len - q_len_mod_d_len..q_len];
+            if q_len_mod_d_len == 1 {
+                // Handle highest_q up front, for simplicity.
+                let ns = &mut ns[q_len - 1..];
+                {
+                    let ns = &mut ns[1..];
+                    if limbs_cmp_same_length(ns, ds) >= Ordering::Equal {
+                        assert!(!limbs_sub_same_length_in_place_left(ns, ds));
+                    }
+                }
+                // A single iteration of schoolbook: One 3/2 division, followed by the bignum update
+                // and adjustment.
+                let (last_n, ns) = ns.split_last_mut().unwrap();
+                let n_2 = *last_n;
+                let mut n_1 = ns[a];
+                let mut n_0 = ns[b];
+                let d_0 = ds[b];
+                assert!(n_2 < d_1 || n_2 == d_1 && n_1 <= d_0);
+                let mut q;
+                if n_2 == d_1 && n_1 == d_0 {
+                    // TODO This branch is untested!
+                    q = Limb::MAX;
+                    assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(ns, ds, q), n_2);
+                } else {
+                    let (new_q, new_n) =
+                        limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, inverse);
+                    q = new_q;
+                    let (new_n_1, new_n_0) = new_n.split_in_half();
+                    n_1 = new_n_1;
+                    n_0 = new_n_0;
+                    // d_len > 2 because of precondition. No need to check
+                    let local_carry_1 =
+                        limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..b], &ds[..b], q);
+                    let local_carry_2 = n_0 < local_carry_1;
+                    n_0.wrapping_sub_assign(local_carry_1);
+                    let carry = local_carry_2 && n_1 == 0;
+                    if local_carry_2 {
+                        n_1.wrapping_sub_assign(1);
+                    }
+                    ns[b] = n_0;
+                    let (last_n, ns) = ns.split_last_mut().unwrap();
+                    if carry {
+                        n_1.wrapping_add_assign(d_1);
+                        if limbs_slice_add_same_length_in_place_left(ns, &ds[..a]) {
+                            n_1.wrapping_add_assign(1);
+                        }
+                        q.wrapping_sub_assign(1);
+                    }
+                    *last_n = n_1;
+                }
+                qs[0] = q;
+            } else {
+                // Do a 2 * q_len_mod_d_len / q_len_mod_d_len division
+                let (ds_lo, ds_hi) = ds.split_at(d_len - q_len_mod_d_len);
+                let highest_q = {
+                    let ns = &mut ns[n_len - (q_len_mod_d_len << 1)..];
+                    if q_len_mod_d_len == 2 {
+                        limbs_div_mod_by_two_limb_normalized(qs, ns, ds_hi)
+                    } else if q_len_mod_d_len < DC_DIV_QR_THRESHOLD {
+                        _limbs_div_mod_schoolbook(qs, ns, ds_hi, inverse)
+                    } else {
+                        _limbs_div_mod_divide_and_conquer_helper(
+                            qs,
+                            ns,
+                            ds_hi,
+                            inverse,
+                            &mut scratch,
+                        )
+                    }
+                };
+                if q_len_mod_d_len != d_len {
+                    limbs_mul_to_out(&mut scratch, qs, ds_lo);
+                    let ns = &mut ns[q_len - q_len_mod_d_len..n_len - q_len_mod_d_len];
+                    let mut carry = if limbs_sub_same_length_in_place_left(ns, &scratch) {
+                        1
+                    } else {
+                        0
+                    };
+                    if highest_q {
+                        if limbs_sub_same_length_in_place_left(&mut ns[q_len_mod_d_len..], ds_lo) {
+                            carry += 1;
+                        }
+                    }
+                    while carry != 0 {
+                        limbs_sub_limb_in_place(qs, 1);
+                        if limbs_slice_add_same_length_in_place_left(ns, ds) {
+                            carry -= 1;
+                        }
+                    }
+                }
+            }
+        }
+        // offset is a multiple of d_len
+        let mut offset = n_len.checked_sub(d_len + q_len_mod_d_len).unwrap();
+        while offset != 0 {
+            offset -= d_len;
+            _limbs_mod_divide_and_conquer_helper(
+                &mut qs[offset..],
+                &mut ns[offset..],
+                ds,
+                inverse,
+                &mut scratch,
+            );
+        }
+    } else {
+        let m = d_len - q_len;
+        let (ds_lo, ds_hi) = ds.split_at(m);
+        let highest_q = if q_len < DC_DIV_QR_THRESHOLD {
+            _limbs_div_mod_schoolbook(qs, &mut ns[m..], ds_hi, inverse)
+        } else {
+            _limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[m..], ds_hi, inverse, &mut scratch)
+        };
+        if m != 0 {
+            let qs = &mut qs[..q_len];
+            let ns = &mut ns[..d_len];
+            limbs_mul_to_out(&mut scratch, &qs, ds_lo);
+            let mut carry = if limbs_sub_same_length_in_place_left(ns, &scratch) {
+                1
+            } else {
+                0
+            };
+            if highest_q && limbs_sub_same_length_in_place_left(&mut ns[q_len..], ds_lo) {
+                carry += 1;
+            }
+            while carry != 0 {
+                if limbs_slice_add_same_length_in_place_left(ns, ds) {
+                    carry -= 1;
+                }
+            }
+        }
+    }
 }
 
 //TODO not pub

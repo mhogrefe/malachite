@@ -356,8 +356,6 @@ fn mod_limb_properties_helper(n: &Natural, u: Limb) {
 
     assert_eq!(n.div_mod(u).1, remainder);
 
-    //TODO assert_eq!(n.mod_op(Natural::from(u)), remainder);
-
     #[cfg(feature = "32_bit_limbs")]
     {
         assert_eq!(num_rem_u32(natural_to_biguint(n), u), remainder);
@@ -468,8 +466,6 @@ fn neg_mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(n.clone().neg_mod(u), remainder);
 
     assert_eq!(n.ceiling_div_neg_mod(u).1, remainder);
-
-    //TODO assert_eq!(n.neg_mod(Natural::from(u)), remainder);
 
     #[cfg(feature = "32_bit_limbs")]
     assert_eq!(rug_neg_mod_u32(natural_to_rug_integer(n), u), remainder);

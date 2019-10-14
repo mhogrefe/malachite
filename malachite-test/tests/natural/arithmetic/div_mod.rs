@@ -30,6 +30,7 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
+    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
     positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
@@ -16479,6 +16480,25 @@ fn div_mod_properties() {
             assert_eq!(Natural::ONE.div_mod(n), (Natural::ZERO, Natural::ONE));
         }
     });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned,
+        |&(ref n, u): &(Natural, Limb)| {
+            let (q, r) = n.div_mod(u);
+            assert_eq!(n.div_mod(Natural::from(u)), (q, Natural::from(r)));
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural,
+        |&(u, ref n): &(Limb, Natural)| {
+            let (q, r) = u.div_mod(n);
+            assert_eq!(
+                Natural::from(u).div_mod(n),
+                (Natural::from(q), Natural::from(r))
+            );
+        },
+    );
 }
 
 fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
@@ -16566,4 +16586,26 @@ fn ceiling_div_neg_mod_properties() {
             );
         }
     });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned,
+        |&(ref n, u): &(Natural, Limb)| {
+            let (q, r) = n.ceiling_div_neg_mod(u);
+            assert_eq!(
+                n.ceiling_div_neg_mod(Natural::from(u)),
+                (q, Natural::from(r))
+            );
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural,
+        |&(u, ref n): &(Limb, Natural)| {
+            let (q, r) = u.ceiling_div_neg_mod(n);
+            assert_eq!(
+                Natural::from(u).ceiling_div_neg_mod(n),
+                (Natural::from(q), r)
+            );
+        },
+    );
 }

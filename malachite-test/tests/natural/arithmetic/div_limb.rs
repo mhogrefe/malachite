@@ -351,8 +351,6 @@ fn div_limb_properties_helper(n: &Natural, u: Limb) {
 
     assert_eq!(n.div_rem(u).0, quotient);
 
-    //TODO assert_eq!(n / Natural::from(u), quotient);
-
     assert_eq!(biguint_to_natural(&(natural_to_biguint(n) / u)), quotient);
     #[cfg(feature = "32_bit_limbs")]
     assert_eq!(

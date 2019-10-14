@@ -1,16 +1,22 @@
 use malachite_base::num::arithmetic::traits::{DivMod, Mod, ModAssign, NegMod, NegModAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
+use malachite_nz::natural::arithmetic::div_mod::{
+    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook,
+    limbs_div_mod_by_two_limb_normalized,
+};
 use malachite_nz::natural::arithmetic::mod_op::{
-    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb,
+    _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod_by_two_limb_normalized,
+    limbs_mod_three_limb_by_two_limb,
 };
 use num::Integer;
 use rug::ops::RemRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_10, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
+    pairs_of_unsigned_vec_var_10, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, sextuples_of_limbs_var_1,
+    triples_of_two_unsigned_vecs_and_unsigned_var_1, triples_of_unsigned_vec_var_37,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -22,6 +28,8 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_three_limb_by_two_limb);
     register_demo!(registry, demo_limbs_mod_by_two_limb_normalized);
+    register_demo!(registry, demo_limbs_mod_schoolbook);
+    register_demo!(registry, demo_limbs_mod_divide_and_conquer);
     register_demo!(registry, demo_natural_mod_assign);
     register_demo!(registry, demo_natural_mod_assign_ref);
     register_demo!(registry, demo_natural_mod);
@@ -44,6 +52,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mod_by_two_limb_normalized_algorithms
+    );
+    register_bench!(registry, Large, benchmark_limbs_mod_schoolbook_algorithms);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mod_divide_and_conquer_algorithms
     );
     register_bench!(
         registry,
@@ -110,6 +124,32 @@ fn demo_limbs_mod_by_two_limb_normalized(gm: GenerationMode, limit: usize) {
             ns,
             ds,
             limbs_mod_by_two_limb_normalized(&ns, &ds),
+        );
+    }
+}
+
+fn demo_limbs_mod_schoolbook(gm: GenerationMode, limit: usize) {
+    for (mut ns, ds, inverse) in triples_of_two_unsigned_vecs_and_unsigned_var_1(gm).take(limit) {
+        let old_ns = ns.clone();
+        _limbs_mod_schoolbook(&mut ns, &ds, inverse);
+        println!(
+            "ns := {:?}; _limbs_mod_schoolbook(&mut ns, {:?}, {}); ns = {:?}",
+            old_ns, ds, inverse, ns
+        );
+    }
+}
+
+fn demo_limbs_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
+    for (mut qs, mut ns, ds, inverse) in
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).take(limit)
+    {
+        let old_qs = qs.clone();
+        let old_ns = ns.clone();
+        _limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+        println!(
+            "qs := {:?}; ns := {:?}; \
+             _limbs_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); ns = {:?}",
+            old_qs, old_ns, ds, inverse, ns
         );
     }
 }
@@ -273,6 +313,68 @@ fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
             (
                 "standard",
                 &mut (|(_, ns, ds)| no_out!(limbs_mod_by_two_limb_normalized(&ns, &ds))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_schoolbook_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "_limbs_mod_schoolbook(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, _, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "using div/mod",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                }),
+            ),
+            (
+                "standard",
+                &mut (|(_, mut ns, ds, inverse)| _limbs_mod_schoolbook(&mut ns, &ds, inverse)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_divide_and_conquer_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
+        "ns.len()",
+        &mut [
+            (
+                "Schoolbook",
+                &mut (|(_, mut ns, ds, inverse)| _limbs_mod_schoolbook(&mut ns, &ds, inverse)),
+            ),
+            (
+                "divide-and-conquer using div/mod",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    no_out!(_limbs_div_mod_divide_and_conquer(
+                        &mut qs, &mut ns, &ds, inverse
+                    ))
+                }),
+            ),
+            (
+                "divide-and-conquer",
+                &mut (|(mut qs, mut ns, ds, inverse)| {
+                    _limbs_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                }),
             ),
         ],
     );

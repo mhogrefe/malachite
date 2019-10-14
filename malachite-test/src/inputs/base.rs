@@ -1602,6 +1602,40 @@ pub fn triples_of_two_unsigned_vecs_and_bool_var_1<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `ns`, `ds`, and `inverse` meet the
+// preconditions of `_limbs_mod_schoolbook`.
+pub fn triples_of_two_unsigned_vecs_and_unsigned_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    let ts: It<(Vec<Limb>, Vec<Limb>, Limb)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs_min_length(3, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            range_up_increasing(1 << (Limb::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+        )),
+    };
+    Box::new(ts.filter(|(n, d_init, _)| n.len() >= d_init.len() + 1).map(
+        |(n, mut d_init, d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (n, d_init, inverse)
+        },
+    ))
+}
+
 pub fn triples_of_unsigned_vec<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {

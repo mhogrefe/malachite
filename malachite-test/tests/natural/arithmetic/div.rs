@@ -28,6 +28,7 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
+    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
     positive_naturals,
 };
 
@@ -10948,4 +10949,18 @@ fn div_properties() {
             assert_eq!(Natural::ONE / n, Natural::ZERO);
         }
     });
+
+    test_properties(
+        pairs_of_natural_and_positive_unsigned,
+        |&(ref n, u): &(Natural, Limb)| {
+            assert_eq!(n / u, n / Natural::from(u));
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_natural,
+        |&(u, ref n): &(Limb, Natural)| {
+            assert_eq!(u / n, Natural::from(u) / n);
+        },
+    );
 }

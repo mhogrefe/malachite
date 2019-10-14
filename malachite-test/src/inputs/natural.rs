@@ -179,6 +179,30 @@ pub fn triples_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural, Na
     Box::new(triples_of_naturals(gm).filter(|&(ref a, ref b, ref c)| a >= &(b * c)))
 }
 
+pub fn triples_of_natural_natural_and_positive_natural(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_positive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_positive_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_positive_naturals(seed, scale)),
+        )),
+    }
+}
+
 fn random_pairs_of_natural_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Natural, T)> {
