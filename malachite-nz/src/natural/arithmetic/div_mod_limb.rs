@@ -222,9 +222,9 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len > 1);
     let bits = divisor.leading_zeros();
+    let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
-        let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
         let mut remainder = *limbs_last;
         *limbs_last = if remainder >= divisor {
             remainder -= divisor;
@@ -244,7 +244,6 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
     } else {
         // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
         // still skip as often as possible.
-        let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
         let (limbs, mut remainder) = if *limbs_last < divisor {
             let remainder = *limbs_last;
             *limbs_last = 0;
@@ -261,9 +260,9 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
         remainder |= previous_limb >> cobits;
         for i in (0..last_index).rev() {
             let limb = limbs[i];
-            let nshift = (previous_limb << bits) | (limb >> cobits);
+            let shifted_limb = (previous_limb << bits) | (limb >> cobits);
             let (quotient, new_remainder) =
-                div_mod_by_preinversion(remainder, nshift, divisor, inverse);
+                div_mod_by_preinversion(remainder, shifted_limb, divisor, inverse);
             limbs[i + 1] = quotient;
             remainder = new_remainder;
             previous_limb = limb;

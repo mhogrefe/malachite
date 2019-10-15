@@ -986,7 +986,7 @@ fn verify_limbs_mod_2(rs_in: &[Limb], ns: &[Limb], ds: &[Limb], rs_out: &[Limb])
 }
 
 #[test]
-fn test_limbs_div_mod_barrett() {
+fn test_limbs_mod_barrett() {
     let test = |qs_in: &[Limb], rs_in: &[Limb], ns: &[Limb], ds: &[Limb], rs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut rs = rs_in.to_vec();
@@ -9626,7 +9626,7 @@ fn limbs_mod_to_out_fail_3() {
 }
 
 #[test]
-fn test_div_mod() {
+fn test_mod() {
     let test = |u, v, remainder| {
         let mut x = Natural::from_str(u).unwrap();
         x.mod_assign(Natural::from_str(v).unwrap());
@@ -10149,7 +10149,7 @@ fn mod_properties_helper(x: &Natural, y: &Natural) {
 }
 
 #[test]
-fn div_mod_properties() {
+fn mod_properties() {
     test_properties_custom_scale(
         512,
         pairs_of_natural_and_positive_natural,

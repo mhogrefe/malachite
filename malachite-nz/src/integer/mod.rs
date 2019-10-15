@@ -9,21 +9,21 @@ use platform::Limb;
 
 /// An integer.
 ///
-/// Any `Integer` whose absolute value is small enough to fit into an `Limb` is represented inline.
+/// Any `Integer` whose absolute value is small enough to fit into a `Limb` is represented inline.
 /// Only integers outside this range incur the costs of heap-allocation.
 ///
 /// On a 64-bit system, an `Integer` takes up 40 bytes of space on the stack.
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Integer {
-    // whether the Integer is non-negative
+    // whether the `Integer` is non-negative
     pub(crate) sign: bool,
     pub(crate) abs: Natural,
 }
 
 impl Integer {
     /// Returns true iff `self` is valid. To be valid, its absolute value must be valid, and if the
-    /// absolute value is zero, the sign must be true. All Integers must be valid.
+    /// absolute value is zero, the sign must be true. All `Integer`s must be valid.
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0 as Limb)
     }

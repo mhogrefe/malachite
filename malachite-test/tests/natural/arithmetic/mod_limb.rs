@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_limb::{_limbs_mod_limb_alt, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
@@ -33,6 +33,7 @@ use malachite_test::natural::arithmetic::mod_limb::{num_rem_u32, rug_neg_mod_u32
 fn test_limbs_mod_limb() {
     let test = |limbs: &[Limb], limb: Limb, remainder: Limb| {
         assert_eq!(limbs_mod_limb(limbs, limb), remainder);
+        assert_eq!(_limbs_mod_limb_alt(limbs, limb), remainder);
     };
     test(&[0, 0], 2, 0);
     test(&[6, 7], 1, 0);
@@ -328,10 +329,9 @@ fn limbs_mod_limb_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, limb)| {
-            assert_eq!(
-                limbs_mod_limb(limbs, limb),
-                Natural::from_limbs_asc(limbs) % limb
-            );
+            let remainder = limbs_mod_limb(limbs, limb);
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % limb);
+            assert_eq!(remainder, _limbs_mod_limb_alt(limbs, limb));
         },
     );
 }

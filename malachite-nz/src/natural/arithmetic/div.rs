@@ -1854,7 +1854,6 @@ impl<'a> Div<Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn div(self, mut other: Natural) -> Natural {
         if other == 0 as Limb {
             panic!("division by zero");
@@ -1915,7 +1914,6 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn div(self, other: &'b Natural) -> Natural {
         if *other == 0 as Limb {
             panic!("division by zero");
@@ -1971,7 +1969,6 @@ impl DivAssign<Natural> for Natural {
     ///     assert_eq!(x.to_string(), "810000006723");
     /// }
     /// ```
-    #[inline]
     fn div_assign(&mut self, other: Natural) {
         if other == 0 as Limb {
             panic!("division by zero");
@@ -2027,7 +2024,6 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     ///     assert_eq!(x.to_string(), "810000006723");
     /// }
     /// ```
-    #[inline]
     fn div_assign(&mut self, other: &'a Natural) {
         if *other == 0 as Limb {
             panic!("division by zero");

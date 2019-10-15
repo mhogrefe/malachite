@@ -3,6 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div_limb::{
+    _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
     limbs_div_limb_to_out,
@@ -35,7 +36,12 @@ fn test_limbs_div_limb_and_limbs_div_limb_in_place() {
         assert_eq!(limbs_div_limb(limbs, limb), quotient);
 
         let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
         limbs_div_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = limbs_old.clone();
+        _limbs_div_limb_in_place_alt(&mut limbs, limb);
         assert_eq!(limbs, quotient);
     };
     test(&[0, 0], 2, &[0, 0]);
@@ -82,6 +88,10 @@ fn test_limbs_div_limb_to_out() {
         |limbs_out_before: &[Limb], limbs_in: &[Limb], limb: Limb, limbs_out_after: &[Limb]| {
             let mut limbs_out = limbs_out_before.to_vec();
             limbs_div_limb_to_out(&mut limbs_out, limbs_in, limb);
+            assert_eq!(limbs_out, limbs_out_after);
+
+            let mut limbs_out = limbs_out_before.to_vec();
+            _limbs_div_limb_to_out_alt(&mut limbs_out, limbs_in, limb);
             assert_eq!(limbs_out, limbs_out_after);
         };
     test(&[10, 10, 10, 10], &[0, 0], 2, &[0, 0, 10, 10]);
@@ -291,6 +301,10 @@ fn limbs_div_limb_to_out_properties() {
                 Natural::from_limbs_asc(in_limbs) / limb
             );
             assert_eq!(&out[len..], &old_out[len..]);
+
+            let mut out_alt = old_out.clone();
+            _limbs_div_limb_to_out_alt(&mut out_alt, in_limbs, limb);
+            assert_eq!(out, out_alt);
         },
     );
 }
@@ -303,10 +317,15 @@ fn limbs_div_limb_in_place_properties() {
             let mut limbs = limbs.to_vec();
             let old_limbs = limbs.clone();
             limbs_div_limb_in_place(&mut limbs, limb);
+            let limbs_out = limbs.clone();
             assert_eq!(
                 Natural::from_owned_limbs_asc(limbs),
                 Natural::from_limbs_asc(&old_limbs) / limb
             );
+
+            let mut limbs = old_limbs.clone();
+            _limbs_div_limb_in_place_alt(&mut limbs, limb);
+            assert_eq!(limbs, limbs_out);
         },
     );
 }

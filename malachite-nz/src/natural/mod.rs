@@ -11,7 +11,7 @@ use platform::Limb;
 
 /// A natural (non-negative) integer.
 ///
-/// Any `Natural` small enough to fit into an `u32` is represented inline. Only naturals outside
+/// Any `Natural` small enough to fit into a `Limb` is represented inline. Only naturals outside
 /// this range incur the costs of heap-allocation.
 ///
 /// On a 64-bit system, a `Natural` takes up 32 bytes of space on the stack.
@@ -70,6 +70,7 @@ impl Natural {
         }
     }
 
+    /// A `Large` value used for testing.
     pub fn trillion() -> Natural {
         Natural::from_str("1000000000000").unwrap()
     }

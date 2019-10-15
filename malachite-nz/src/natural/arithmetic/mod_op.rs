@@ -1,14 +1,15 @@
 use std::cmp::Ordering;
+use std::mem::swap;
 use std::ops::{Rem, RemAssign};
 
 use malachite_base::comparison::Max;
 use malachite_base::limbs::{limbs_move_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{
-    DivAssignMod, DivMod, Mod, ModAssign, NegMod, NegModAssign, WrappingAddAssign,
-    WrappingSubAssign,
+    Mod, ModAssign, NegMod, NegModAssign, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{Assign, JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
@@ -35,7 +36,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::Natural;
+use natural::Natural::{self, Large, Small};
 use platform::{
     DoubleLimb, Limb, DC_DIV_QR_THRESHOLD, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
@@ -1220,9 +1221,25 @@ impl<'a> Rem<Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn rem(self, other: Natural) -> Natural {
-        self.div_mod(other).1
+        if other == 0 as Limb {
+            panic!("division by zero");
+        } else if other == 1 as Limb {
+            Natural::ZERO
+        } else if self.limb_count() < other.limb_count() {
+            self.clone()
+        } else {
+            let rs = match (self, other) {
+                (x, Small(y)) => {
+                    return Small(x % y);
+                }
+                (&Large(ref xs), Large(ref ys)) => limbs_mod(xs, ys),
+                _ => unreachable!(),
+            };
+            let mut r = Large(rs);
+            r.trim();
+            r
+        }
     }
 }
 
@@ -1259,9 +1276,25 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn rem(self, other: &'b Natural) -> Natural {
-        self.div_mod(other).1
+        if *other == 0 as Limb {
+            panic!("division by zero");
+        } else if *other == 1 as Limb || self as *const Natural == other as *const Natural {
+            Natural::ZERO
+        } else if self.limb_count() < other.limb_count() {
+            self.clone()
+        } else {
+            let rs = match (self, other) {
+                (x, &Small(y)) => {
+                    return Small(x % y);
+                }
+                (&Large(ref xs), &Large(ref ys)) => limbs_mod(xs, ys),
+                _ => unreachable!(),
+            };
+            let mut r = Large(rs);
+            r.trim();
+            r
+        }
     }
 }
 
@@ -1298,7 +1331,7 @@ impl RemAssign<Natural> for Natural {
     /// ```
     #[inline]
     fn rem_assign(&mut self, other: Natural) {
-        *self = self.div_assign_mod(other);
+        *self %= &other;
     }
 }
 
@@ -1333,9 +1366,27 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     ///     assert_eq!(x.to_string(), "530068894399");
     /// }
     /// ```
-    #[inline]
     fn rem_assign(&mut self, other: &'a Natural) {
-        *self = self.div_assign_mod(other);
+        if *other == 0 as Limb {
+            panic!("division by zero");
+        } else if *other == 1 as Limb {
+            self.assign(0 as Limb);
+        } else if self.limb_count() < other.limb_count() {
+        } else {
+            match (&mut *self, other) {
+                (x, &Small(y)) => {
+                    *x %= y;
+                    return;
+                }
+                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                    let mut rs = vec![0; ys.len()];
+                    limbs_mod_to_out(&mut rs, xs, ys);
+                    swap(&mut rs, xs);
+                }
+                _ => unreachable!(),
+            };
+            self.trim();
+        }
     }
 }
 
@@ -1455,7 +1506,6 @@ impl<'a> NegMod<Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn neg_mod(self, other: Natural) -> Natural {
         let remainder = self % &other;
         if remainder == 0 as Limb {
@@ -1500,7 +1550,6 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    #[inline]
     fn neg_mod(self, other: &'b Natural) -> Natural {
         let remainder = self % other;
         if remainder == 0 as Limb {
@@ -1543,7 +1592,6 @@ impl NegModAssign<Natural> for Natural {
     ///     assert_eq!(x.to_string(), "704498996588");
     /// }
     /// ```
-    #[inline]
     fn neg_mod_assign(&mut self, other: Natural) {
         *self %= &other;
         if *self != 0 as Limb {

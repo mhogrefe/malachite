@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_limb::{
+    _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
     limbs_div_limb_to_out,
@@ -42,8 +43,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_div_assign_natural);
     register_demo!(registry, demo_limb_div_assign_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_div_limb);
-    register_bench!(registry, Small, benchmark_limbs_div_limb_to_out);
-    register_bench!(registry, Small, benchmark_limbs_div_limb_in_place);
+    register_bench!(registry, Small, benchmark_limbs_div_limb_to_out_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_in_place_algorithms
+    );
     register_bench!(
         registry,
         Small,
@@ -212,37 +217,51 @@ fn benchmark_limbs_div_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     );
 }
 
-fn benchmark_limbs_div_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_div_limb_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_div_limb_to_out(&mut [Limb], &[Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(_, ref in_limbs, _)| in_limbs.len()),
         "in_limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut out, in_limbs, limb)| limbs_div_limb_to_out(&mut out, &in_limbs, limb)),
-        )],
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, in_limbs, limb)| limbs_div_limb_to_out(&mut out, &in_limbs, limb)),
+            ),
+            (
+                "alt",
+                &mut (|(mut out, in_limbs, limb)| {
+                    _limbs_div_limb_to_out_alt(&mut out, &in_limbs, limb)
+                }),
+            ),
+        ],
     );
 }
 
-fn benchmark_limbs_div_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_div_limb_in_place_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_div_limb_in_place(&mut [Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut limbs, limb)| limbs_div_limb_in_place(&mut limbs, limb)),
-        )],
+        &mut [
+            (
+                "standard",
+                &mut (|(mut limbs, limb)| limbs_div_limb_in_place(&mut limbs, limb)),
+            ),
+            (
+                "alt",
+                &mut (|(mut limbs, limb)| _limbs_div_limb_in_place_alt(&mut limbs, limb)),
+            ),
+        ],
     );
 }
 

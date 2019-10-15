@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_limb::{_limbs_mod_limb_alt, limbs_mod_limb};
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};
 use rug::{self, ops::RemRounding};
@@ -41,7 +41,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_mod_assign_natural_ref);
     register_demo!(registry, demo_limb_neg_mod_natural);
     register_demo!(registry, demo_limb_neg_mod_natural_ref);
-    register_bench!(registry, Small, benchmark_limbs_mod_limb);
+    register_bench!(registry, Small, benchmark_limbs_mod_limb_algorithms);
     register_bench!(registry, Large, benchmark_natural_rem_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -265,20 +265,26 @@ fn demo_limb_neg_mod_natural_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_mod_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_mod_limb(&[Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(limbs, limb)| no_out!(limbs_mod_limb(&limbs, limb))),
-        )],
+        &mut [
+            (
+                "standard",
+                &mut (|(limbs, limb)| no_out!(limbs_mod_limb(&limbs, limb))),
+            ),
+            (
+                "alt",
+                &mut (|(limbs, limb)| no_out!(_limbs_mod_limb_alt(&limbs, limb))),
+            ),
+        ],
     );
 }
 
