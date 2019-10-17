@@ -434,8 +434,6 @@ fn div_round_limb_properties() {
             assert_eq!(quotient_alt, quotient);
 
             assert!(quotient <= *n);
-
-            //TODO assert_eq!(n.div_round(Natural::from(u), rm), quotient);
         },
     );
 
@@ -526,8 +524,6 @@ fn div_round_limb_properties() {
             assert_eq!(quotient_alt, quotient);
 
             assert!(quotient <= u);
-
-            //TODO assert_eq!(Natural::from(u).div_round(n, rm), quotient);
         },
     );
 

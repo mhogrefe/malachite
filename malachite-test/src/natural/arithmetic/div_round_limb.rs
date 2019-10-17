@@ -226,7 +226,7 @@ fn benchmark_natural_div_round_limb_down_library_comparison(
     m_run_benchmark(
         "Natural.div_round(Limb, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_positive_unsigned(gm),
+        rm_pairs_of_natural_and_positive_unsigned::<Limb>(gm),
         gm.name(),
         limit,
         file_name,
@@ -308,7 +308,7 @@ fn benchmark_natural_div_round_limb_ceiling_library_comparison(
     m_run_benchmark(
         "Natural.div_round(Limb, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_positive_unsigned(gm),
+        rm_pairs_of_natural_and_positive_unsigned::<Limb>(gm),
         gm.name(),
         limit,
         file_name,

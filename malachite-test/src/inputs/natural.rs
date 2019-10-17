@@ -544,6 +544,13 @@ pub fn pairs_of_natural_and_positive_natural_var_1(gm: GenerationMode) -> It<(Na
     Box::new(pairs_of_natural_and_positive_natural(gm).map(|(n, u)| (n * &u, u)))
 }
 
+//TODO use divisible
+// All pairs of `Natural` and positive `Natural`, where the first `Natural` is not divisible by the
+// second.
+pub fn pairs_of_natural_and_positive_natural_var_2(gm: GenerationMode) -> It<(Natural, Natural)> {
+    Box::new(pairs_of_natural_and_positive_natural(gm).filter(|(x, y)| x % y != 0 as Limb))
+}
+
 fn random_triples_of_natural_natural_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Natural, Natural, T)> {
@@ -1224,6 +1231,45 @@ float_gen!(
     naturals_var_2_f64
 );
 
+fn triples_of_natural_positive_natural_and_rounding_mode(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_naturals(), exhaustive_positive_naturals()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_positive_naturals(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_positive_naturals(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `Natural`, positive `Nagtural`, and `RoundingMode`, where if the `RoundingMode` is
+// `RoundingMode::Exact`, the first `Natural` is divisible by the second.
+pub fn triples_of_natural_positive_natural_and_rounding_mode_var_1(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        triples_of_natural_positive_natural_and_rounding_mode(gm).map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
 fn triples_of_natural_small_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, T, RoundingMode)> {
@@ -1309,25 +1355,6 @@ fn triples_of_natural_small_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Ra
     }
 }
 
-// All triples of `Natural`, small `T`, and `RoundingMode`, where `T` is unsigned and if the
-// `RoundingMode` is `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the `T`.
-pub fn triples_of_natural_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Natural, T, RoundingMode)>
-where
-    Natural: Shl<T, Output = Natural>,
-{
-    Box::new(
-        triples_of_natural_small_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
-            if rm == RoundingMode::Exact {
-                (n << u, u, rm)
-            } else {
-                (n, u, rm)
-            }
-        }),
-    )
-}
-
 fn triples_of_natural_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, T, RoundingMode)> {
@@ -1349,6 +1376,25 @@ fn triples_of_natural_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned +
             &(|seed| random_rounding_modes(seed)),
         )),
     }
+}
+
+// All triples of `Natural`, small `T`, and `RoundingMode`, where `T` is unsigned and if the
+// `RoundingMode` is `RoundingMode::Exact`, the `Natural` is divisible by 2 to the power of the `T`.
+pub fn triples_of_natural_small_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        triples_of_natural_small_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
 }
 
 // All triples of `Natural`, positive `T`, and `RoundingMode`, where `T` is unsigned and if the

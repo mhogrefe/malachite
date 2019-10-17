@@ -1,9 +1,11 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
+    NegMod,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
@@ -140,13 +142,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_ceiling_div_neg_mod_library_comparison
     );
-    //TODO
-    /*
     register_bench!(
         registry,
         Large,
-        benchmark_natural_ceiling_div_neg_mod_limb_algorithms
-    );*/
+        benchmark_natural_ceiling_div_neg_mod_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -1067,8 +1067,6 @@ fn benchmark_natural_ceiling_div_neg_mod_library_comparison(
     );
 }
 
-//TODO
-/*
 fn benchmark_natural_ceiling_div_neg_mod_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -1091,13 +1089,12 @@ fn benchmark_natural_ceiling_div_neg_mod_algorithms(
             (
                 "using div_round and %",
                 &mut (|(x, y)| {
-                    let remainder = (&x).neg_mod(y);
-                    (x.div_round(y, RoundingMode::Ceiling), remainder);
+                    ((&x).div_round(&y, RoundingMode::Ceiling), x.neg_mod(y));
                 }),
             ),
         ],
     );
-}*/
+}
 
 fn benchmark_natural_ceiling_div_neg_mod_evaluation_strategy(
     gm: GenerationMode,

@@ -87,7 +87,7 @@ impl DivRound<Limb> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `other.significant_bits()`
+    /// where n = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -139,7 +139,7 @@ impl<'a> DivRound<Limb> for &'a Natural {
     ///
     /// Additional memory: worst case O(n)
     ///
-    /// where n = `other.significant_bits()`
+    /// where n = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -322,7 +322,7 @@ impl DivRoundAssign<Limb> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `other.significant_bits()`
+    /// where n = `self.significant_bits()`
     ///
     /// # Examples
     /// ```

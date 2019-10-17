@@ -1,11 +1,13 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
+    NegMod,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
@@ -16067,16 +16069,16 @@ fn test_ceiling_div_neg_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO
-        /*
         let (q, r) = (
-            Natural::from_str(u).unwrap().div_round(Natural::from_str(v).unwrap(),
-                    RoundingMode::Ceiling),
-            Natural::from_str(u).unwrap().neg_mod(Natural::from_str(v).unwrap()),
+            Natural::from_str(u)
+                .unwrap()
+                .div_round(Natural::from_str(v).unwrap(), RoundingMode::Ceiling),
+            Natural::from_str(u)
+                .unwrap()
+                .neg_mod(Natural::from_str(v).unwrap()),
         );
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
-        */
     };
     test("0", "1", "0", "0");
     test("0", "123", "0", "0");
@@ -16540,12 +16542,9 @@ fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO
-    /*
     let (quotient_alt, remainder_alt) = (x.div_round(y, RoundingMode::Ceiling), x.neg_mod(y));
     assert_eq!(quotient_alt, quotient);
     assert_eq!(remainder_alt, remainder);
-    */
 
     let (rug_quotient, rug_remainder) =
         rug_ceiling_div_neg_mod(natural_to_rug_integer(x), natural_to_rug_integer(y));

@@ -201,6 +201,7 @@ pub mod arithmetic {
     pub mod div_limb;
     pub mod div_mod;
     pub mod div_mod_limb;
+    pub mod div_round;
     pub mod div_round_limb;
     pub mod divisible_by_limb;
     pub mod divisible_by_power_of_two;
