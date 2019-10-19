@@ -220,6 +220,7 @@ pub mod natural {
         pub mod checked_sub_mul;
         pub mod checked_sub_mul_limb;
         pub mod div;
+        pub mod div_exact;
         pub mod div_exact_limb;
         pub mod div_limb;
         pub mod div_mod;

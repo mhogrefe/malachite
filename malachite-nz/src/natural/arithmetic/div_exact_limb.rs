@@ -62,14 +62,14 @@ pub fn test_invert_limb_table() {
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::arithmetic::div_exact_limb::limbs_invert_limb_mod;
+/// use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 ///
-/// assert_eq!(limbs_invert_limb_mod(3), 2_863_311_531);
-/// assert_eq!(limbs_invert_limb_mod(1_000_000_001), 2_211_001_857);
+/// assert_eq!(limbs_modular_invert_limb(3), 2_863_311_531);
+/// assert_eq!(limbs_modular_invert_limb(1_000_000_001), 2_211_001_857);
 /// ```
 ///
 /// This is binvert_limb from gmp-impl.h.
-pub fn limbs_invert_limb_mod(limb: Limb) -> Limb {
+pub fn limbs_modular_invert_limb(limb: Limb) -> Limb {
     assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
     let mut inverse: Limb = INVERT_LIMB_TABLE[usize::checked_from(index).unwrap()].into();
@@ -148,7 +148,7 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor:
         let shift = divisor.trailing_zeros();
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
-        let inverse = limbs_invert_limb_mod(shifted_divisor);
+        let inverse = limbs_modular_invert_limb(shifted_divisor);
         let mut upper_half = 0;
         let mut previous_in_limb = in_limbs[0];
         for i in 1..len {
@@ -168,7 +168,7 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor:
             .wrapping_sub(upper_half)
             .wrapping_mul(inverse);
     } else {
-        let inverse = limbs_invert_limb_mod(divisor);
+        let inverse = limbs_modular_invert_limb(divisor);
         let mut out_limb = in_limbs[0].wrapping_mul(inverse);
         out[0] = out_limb;
         let mut previous_carry = false;
@@ -222,7 +222,7 @@ pub fn limbs_div_exact_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
         let shift = divisor.trailing_zeros();
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
-        let inverse = limbs_invert_limb_mod(shifted_divisor);
+        let inverse = limbs_modular_invert_limb(shifted_divisor);
         let shifted_divisor = DoubleLimb::from(shifted_divisor);
         let mut upper_half = 0;
         let mut previous_in_limb = limbs[0];
@@ -242,7 +242,7 @@ pub fn limbs_div_exact_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
             .wrapping_sub(upper_half)
             .wrapping_mul(inverse);
     } else {
-        let inverse = limbs_invert_limb_mod(divisor);
+        let inverse = limbs_modular_invert_limb(divisor);
         let divisor = DoubleLimb::from(divisor);
         let mut out_limb = limbs[0].wrapping_mul(inverse);
         limbs[0] = out_limb;

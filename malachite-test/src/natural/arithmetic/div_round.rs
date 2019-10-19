@@ -48,11 +48,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_natural_div_round_assign_evaluation_strategy
     );
 }

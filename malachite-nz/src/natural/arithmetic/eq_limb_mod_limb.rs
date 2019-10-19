@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::SplitInHalf;
 
-use natural::arithmetic::div_exact_limb::limbs_invert_limb_mod;
+use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::{DoubleLimb, Limb};
@@ -16,7 +16,7 @@ const BMOD_1_TO_MOD_1_THRESHOLD: usize = 10;
 /// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
 pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
     let len = limbs.len();
-    let inverse = limbs_invert_limb_mod(divisor);
+    let inverse = limbs_modular_invert_limb(divisor);
     let divisor_double = DoubleLimb::from(divisor);
     let last_index = len - 1;
     for &limb in &limbs[..last_index] {

@@ -4,7 +4,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_exact_limb::{
     _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt, limbs_div_exact_3,
     limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
-    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_invert_limb_mod,
+    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_modular_invert_limb,
 };
 use malachite_nz::platform::Limb;
 use rug;
@@ -20,7 +20,7 @@ use inputs::natural::{
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_invert_limb_mod);
+    register_demo!(registry, demo_limbs_modular_invert_limb);
     register_demo!(registry, demo_limbs_div_exact_limb);
     register_demo!(registry, demo_limbs_div_exact_limb_to_out);
     register_demo!(registry, demo_limbs_div_exact_limb_in_place);
@@ -34,7 +34,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_div_exact_natural_ref);
     register_demo!(registry, demo_limb_div_exact_assign_natural);
     register_demo!(registry, demo_limb_div_exact_assign_natural_ref);
-    register_bench!(registry, Small, benchmark_limbs_invert_limb_mod);
+    register_bench!(registry, Small, benchmark_limbs_modular_invert_limb);
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb);
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb_to_out);
     register_bench!(registry, Small, benchmark_limbs_div_exact_limb_in_place);
@@ -97,12 +97,12 @@ pub fn rug_div_exact_limb(x: rug::Integer, u: Limb) -> rug::Integer {
     x.div_exact(&rug::Integer::from(u))
 }
 
-fn demo_limbs_invert_limb_mod(gm: GenerationMode, limit: usize) {
+fn demo_limbs_modular_invert_limb(gm: GenerationMode, limit: usize) {
     for limb in odd_limbs(gm).take(limit) {
         println!(
-            "limbs_invert_limb_mod({}) = {}",
+            "limbs_modular_invert_limb({}) = {}",
             limb,
-            limbs_invert_limb_mod(limb)
+            limbs_modular_invert_limb(limb)
         );
     }
 }
@@ -231,9 +231,9 @@ fn demo_limb_div_exact_assign_natural_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_invert_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_modular_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_invert_limb_mod(Limb)",
+        "limbs_modular_invert_limb(Limb)",
         BenchmarkType::Single,
         odd_limbs(gm),
         gm.name(),
@@ -243,7 +243,7 @@ fn benchmark_limbs_invert_limb_mod(gm: GenerationMode, limit: usize, file_name: 
         "limb.significant_bits()",
         &mut [(
             "malachite",
-            &mut (|limb| no_out!(limbs_invert_limb_mod(limb))),
+            &mut (|limb| no_out!(limbs_modular_invert_limb(limb))),
         )],
     );
 }
