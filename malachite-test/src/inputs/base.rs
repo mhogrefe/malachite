@@ -2877,14 +2877,47 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_3(
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples_from_single(
-            random_vecs_min_length(&EXAMPLE_SEED, scale, 3, &(|seed| random(seed))),
+            random_vecs_min_length(&EXAMPLE_SEED, scale, 1, &(|seed| random(seed))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
-            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 3),
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 1),
         )),
     };
     Box::new(
         ts.filter(|(q, n, d)| q.len() >= n.len() && n.len() >= d.len() && d[0].odd())
+            .map(|(q, n, d)| {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                (q, n, d, inverse)
+            }),
+    )
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `qs`, `ns`, `ds`, and
+// `inverse` meet the preconditions of `_limbs_modular_div_mod_schoolbook`.
+pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_4(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    let ts: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+        )),
+    };
+    Box::new(
+        ts.filter(|(q, n, d)| q.len() >= n.len() && n.len() > d.len() && d[0].odd())
             .map(|(q, n, d)| {
                 let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
                 (q, n, d, inverse)
