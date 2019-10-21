@@ -5,7 +5,9 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
+use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_left};
+use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use platform::Limb;
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `inverse`
@@ -81,6 +83,177 @@ pub fn _limbs_modular_div_mod_schoolbook(
         assert!(carry || !highest_r);
         carry != highest_r
     }
+}
+
+//TODO tune
+const DC_BDIV_QR_THRESHOLD: usize = 44;
+
+/// This is mpn_dcpi1_bdiv_qr_n from mpn/generic/dcpi1_bdiv_qr.c.
+fn _limbs_modular_div_mod_divide_and_conquer_helper(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+    scratch: &mut [Limb],
+) -> bool {
+    let n = ds.len();
+    let lo = n >> 1; // floor(n/2)
+    let hi = n - lo; // ceil(n/2)
+    let carry = if lo < DC_BDIV_QR_THRESHOLD {
+        _limbs_modular_div_mod_schoolbook(qs, &mut ns[..2 * lo], &ds[..lo], inverse)
+    } else {
+        _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], inverse, scratch)
+    };
+    limbs_mul_greater_to_out(scratch, &ds[lo..lo + hi], &qs[..lo]);
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut scratch[lo..],
+        if carry { 1 } else { 0 }
+    ));
+    let mut highest_r = if limbs_sub_in_place_left(&mut ns[lo..lo + hi + n], &scratch[..n]) {
+        1
+    } else {
+        0
+    };
+    let carry = if hi < DC_BDIV_QR_THRESHOLD {
+        _limbs_modular_div_mod_schoolbook(
+            &mut qs[lo..],
+            &mut ns[lo..lo + 2 * hi],
+            &ds[..hi],
+            inverse,
+        )
+    } else {
+        _limbs_modular_div_mod_divide_and_conquer_helper(
+            &mut qs[lo..],
+            &mut ns[lo..],
+            &ds[..hi],
+            inverse,
+            scratch,
+        )
+    };
+    limbs_mul_greater_to_out(scratch, &qs[lo..lo + hi], &ds[hi..hi + lo]);
+    assert!(!limbs_slice_add_limb_in_place(
+        &mut scratch[hi..],
+        if carry { 1 } else { 0 }
+    ));
+    highest_r += if limbs_sub_same_length_in_place_left(&mut ns[n..2 * n], &scratch[..n]) {
+        1
+    } else {
+        0
+    };
+    assert!(highest_r <= 1);
+    highest_r > 0
+}
+
+/// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c.
+pub fn _limbs_modular_div_mod_divide_and_conquer(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len >= 2); // to adhere to _limbs_modular_div_mod_schoolbook's limits
+    assert!(n_len > d_len); // to adhere to _limbs_modular_div_mod_schoolbook's limits
+    assert!(ds[0].odd());
+    let mut scratch = vec![0; d_len];
+    let mut q_len = n_len - d_len;
+    if q_len > d_len {
+        // Reduce qn mod dn without division, optimizing small operations.
+        loop {
+            q_len -= d_len;
+            if q_len <= d_len {
+                break;
+            }
+        }
+        // Perform the typically smaller block first.
+        let mut carry = if q_len < DC_BDIV_QR_THRESHOLD {
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..2 * q_len], &ds[..q_len], inverse)
+        } else {
+            _limbs_modular_div_mod_divide_and_conquer_helper(
+                qs,
+                ns,
+                &ds[..q_len],
+                inverse,
+                &mut scratch,
+            )
+        };
+        let mut rr = 0;
+        if q_len != d_len {
+            limbs_mul_to_out(&mut scratch, &ds[q_len..d_len], &qs[..q_len]);
+            assert!(!limbs_slice_add_limb_in_place(
+                &mut scratch[q_len..],
+                if carry { 1 } else { 0 }
+            ));
+            rr = if limbs_sub_in_place_left(&mut ns[q_len..n_len], &scratch[..d_len]) {
+                1
+            } else {
+                0
+            };
+            carry = false;
+        }
+        let mut np_offset = q_len;
+        let mut qp_offset = q_len;
+        q_len = n_len - d_len - q_len; // qn is now a multiple of dn
+        loop {
+            rr += if limbs_sub_limb_in_place(
+                &mut ns[np_offset + d_len..np_offset + d_len + q_len],
+                if carry { 1 } else { 0 },
+            ) {
+                1
+            } else {
+                0
+            };
+            carry = _limbs_modular_div_mod_divide_and_conquer_helper(
+                &mut qs[qp_offset..],
+                &mut ns[np_offset..],
+                &ds[..d_len],
+                inverse,
+                &mut scratch,
+            );
+            qp_offset += d_len;
+            np_offset += d_len;
+            q_len -= d_len;
+            if q_len == 0 {
+                break;
+            }
+        }
+        rr += if carry { 1 } else { 0 };
+        assert!(rr <= 1);
+        rr > 0
+    } else {
+        let mut cy = if q_len < DC_BDIV_QR_THRESHOLD {
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..2 * q_len], &ds[..q_len], inverse)
+        } else {
+            _limbs_modular_div_mod_divide_and_conquer_helper(
+                qs,
+                ns,
+                &ds[..q_len],
+                inverse,
+                &mut scratch,
+            )
+        };
+        let mut rr = false;
+        if q_len != d_len {
+            limbs_mul_to_out(&mut scratch, &ds[q_len..d_len], &qs[..q_len]);
+            assert!(!limbs_slice_add_limb_in_place(
+                &mut scratch[q_len..],
+                if cy { 1 } else { 0 }
+            ));
+            rr = limbs_sub_in_place_left(&mut ns[q_len..n_len], &scratch[..d_len]);
+            cy = false;
+        }
+        let mut rr = if rr { 1 } else { 0 };
+        rr += if cy { 1 } else { 0 };
+        assert!(rr <= 1);
+        rr > 0
+    }
+}
+
+/// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c.
+#[inline]
+pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+    n
 }
 
 /// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `inverse`

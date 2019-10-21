@@ -40,7 +40,6 @@ use platform::{
 /// where k = `k`
 ///
 /// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
-#[allow(clippy::cyclomatic_complexity)]
 pub(crate) fn _limbs_mul_toom_interpolate_5_points(
     c: &mut [Limb],
     v_2: &mut [Limb],
@@ -247,7 +246,6 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 ///
 /// This is mpn_toom_interpolate_6pts from mpn/generic/toom_interpolate_6pts.c, but the argument
 /// w0n == `n_high` is moved to immediately after `n`.
-#[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     out: &mut [Limb],
     n: usize,
@@ -467,7 +465,6 @@ const WANT_ASSERT: bool = true;
 ///
 /// This is mpn_toom_interpolate_7pts from mpn/generic/toom_interpolate_7pts.c, but the argument
 /// w6n == `n_high` is moved to immediately after `n`.
-#[allow(clippy::cyclomatic_complexity, clippy::too_many_arguments)]
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     out: &mut [Limb],
     n: usize,

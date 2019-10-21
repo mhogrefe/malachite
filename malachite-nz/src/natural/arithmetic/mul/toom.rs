@@ -446,8 +446,6 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom32_mul from mpn/generic/toom32_mul.c.
-#[allow(unreachable_code)] //TODO remove
-#[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_greater_to_out_toom_32(
     out: &mut [Limb],
     xs: &[Limb],
@@ -689,8 +687,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
         }
 
         if hi < 0 {
-            //TODO remove once this is seen
-            panic!("hi < 0 second time: {:?} {:?}", xs, ys);
+            // TODO This branch is untested!
             assert!(!limbs_sub_limb_in_place(
                 out_hi,
                 Limb::checked_from(-hi).unwrap(),
@@ -804,7 +801,6 @@ pub fn _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom33_mul from mpn/generic/toom33_mul.c.
-#[allow(clippy::cyclomatic_complexity)]
 pub fn _limbs_mul_greater_to_out_toom_33(
     out: &mut [Limb],
     xs: &[Limb],
@@ -945,7 +941,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
                 }
                 *v_neg_1_last = carry;
             } else {
-                // this branch not tested
+                // TODO This branch is untested!
                 _limbs_mul_same_length_to_out_toom_33_recursive(
                     v_neg_1,
                     asm1,
@@ -1004,7 +1000,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
             }
             v_1_hi[0] = carry;
         } else {
-            // this branch not tested
+            // TODO This branch is untested!
             let carry = v_1[2 * n + 1];
             _limbs_mul_same_length_to_out_toom_33_recursive(v_1, as1, &bs1[..n + 1], scratch_out);
             v_1[2 * n + 1] = carry;
@@ -2200,7 +2196,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             }
             *v_neg_1_last = carry;
         } else {
-            // this branch not tested
+            // TODO This branch is untested!
             v_neg_1[2 * n] = 0;
             if (asm1[n] | bsm1[n]) == 0 {
                 limbs_mul_same_length_to_out(v_neg_1, &asm1[..n], &bsm1[..n]);
@@ -2242,7 +2238,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             }
             v_1_hi[0] = carry;
         } else {
-            // this branch not tested
+            // TODO This branch is untested!
             v_1[2 * n] = 0;
             if (as1[n] | bs1[n]) == 0 {
                 limbs_mul_same_length_to_out(v_1, &as1[..n], &bs1[..n]);
