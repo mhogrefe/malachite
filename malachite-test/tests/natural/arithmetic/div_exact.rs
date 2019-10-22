@@ -128,8 +128,8 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
             verify_limbs_modular_div_mod(ns_in, ds, borrow, qs_out, ns_out);
         };
     // q_len <= d_len
-    // q_len < DC_BDIV_QR_THRESHOLD second time
-    // q_len != d_len second time
+    // q_len < DC_BDIV_QR_THRESHOLD
+    // q_len != d_len
     test(&[10; 3], &[0, 0, 0], &[1, 2], false, &[0], &[0, 0]);
     test(&[10; 3], &[1, 2, 3], &[1, 2], false, &[1], &[0, 3]);
     test(
@@ -149,11 +149,11 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[1],
         &[3, 4294967295, 3],
     );
-    // q_len == d_len second time
+    // q_len == d_len
     test(&[10; 4], &[0; 4], &[1, 0], false, &[0, 0], &[0, 0]);
     // q_len > d_len
-    // q_len < DC_BDIV_QR_THRESHOLD first time
-    // q_len != d_len first time
+    // q_len_mod_d_len < DC_BDIV_QR_THRESHOLD
+    // q_len_mod_d_len != d_len
     // lo < DC_BDIV_QR_THRESHOLD in _limbs_modular_div_mod_divide_and_conquer_helper
     // hi < DC_BDIV_QR_THRESHOLD in _limbs_modular_div_mod_divide_and_conquer_helper
     test(&[10; 5], &[0; 5], &[1, 0], false, &[0, 0, 0], &[0, 0]);
@@ -173,7 +173,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[3067833783, 175304787],
         &[1051828726, 2717224210, 4],
     );
-    // q_len == d_len first time
+    // q_len_mod_d_len == d_len
     test(
         &[10; 6],
         &[1, 2, 3, 4, 5, 6],
@@ -182,7 +182,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
         &[3067833783, 175304787, 3481052211, 2770888938],
         &[3602692266, 0],
     );
-    // q_len >= DC_BDIV_QR_THRESHOLD second time
+    // q_len >= DC_BDIV_QR_THRESHOLD
     test(
         &[10; 111],
         &[
@@ -233,7 +233,7 @@ fn test_limbs_modular_div_mod_divide_and_conquer() {
             3130583770,
         ],
     );
-    // q_len >= DC_BDIV_QR_THRESHOLD first time
+    // q_len_mod_d_len >= DC_BDIV_QR_THRESHOLD
     test(
         &[10; 172],
         &[

@@ -291,7 +291,7 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = max(`ns.len`, `ds.len()`)
 ///
@@ -626,7 +626,7 @@ pub fn _limbs_div_schoolbook_approx(
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = `ds.len()`
 ///
@@ -709,7 +709,7 @@ fn _limbs_div_divide_and_conquer_approx_helper(
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = max(`ns.len`, `ds.len()`)
 ///

@@ -300,7 +300,7 @@ pub fn _limbs_div_mod_schoolbook(
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = `ds.len()`
 ///
@@ -382,7 +382,7 @@ pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = `ds.len()`
 ///
@@ -574,7 +574,7 @@ pub fn _limbs_div_mod_divide_and_conquer(
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
-/// Additional memory: worst case O(n * log(n) ^ 2)
+/// Additional memory: worst case O(n * log(n))
 ///
 /// where n = `ds.len()`
 ///
