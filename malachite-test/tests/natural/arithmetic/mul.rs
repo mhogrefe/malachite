@@ -9,6 +9,9 @@ use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
     _limbs_mul_fft_normalize_mod_f,
 };
+use malachite_nz::natural::arithmetic::mul::mul_low::{
+    _limbs_mul_low_same_length_to_out, _limbs_mul_low_same_length_to_out_alt,
+};
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -46,7 +49,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18,
     triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20, triples_of_unsigned_vec_var_21,
     triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_24,
-    triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_26,
+    triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_26, triples_of_unsigned_vec_var_46,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
@@ -17130,6 +17133,75 @@ fn test_limbs_mul_fft_internal() {
     );
 }
 
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_low_same_length_to_out() {
+    let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
+        let mut out = out_before.clone();
+        _limbs_mul_low_same_length_to_out(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.clone();
+        _limbs_mul_low_same_length_to_out_alt(&mut out, &xs, &ys);
+        assert_eq!(out, out_after);
+    };
+    test(vec![2], vec![3], vec![10; 3], vec![6, 10, 10]);
+    test(
+        vec![1; 3],
+        series(1, 3),
+        vec![5; 8],
+        vec![1, 3, 6, 5, 5, 5, 5, 5],
+    );
+    test(
+        vec![100, 101, 102],
+        vec![102, 101, 100],
+        vec![10; 7],
+        vec![10_200, 20_402, 30_605, 10, 10, 10, 10],
+    );
+    test(
+        vec![0xffff_ffff],
+        vec![1],
+        vec![10; 3],
+        vec![0xffff_ffff, 10, 10],
+    );
+    test(
+        vec![0xffff_ffff],
+        vec![0xffff_ffff],
+        vec![10; 4],
+        vec![1, 10, 10, 10],
+    );
+    test(
+        vec![0xffff_ffff; 3],
+        vec![0xffff_ffff; 3],
+        vec![10; 6],
+        vec![1, 0, 0, 10, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_low_same_length_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10, 10];
+    _limbs_mul_low_same_length_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_low_same_length_to_out_fail_2() {
+    let mut out = vec![10];
+    _limbs_mul_low_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_low_same_length_to_out_fail_3() {
+    let mut out = vec![10];
+    _limbs_mul_low_same_length_to_out(&mut out, &[], &[]);
+}
+
 #[test]
 fn test_mul() {
     let test = |u, v, out| {
@@ -17530,6 +17602,28 @@ fn limbs_mul_greater_to_out_fft_properties() {
             let mut out = out.to_vec();
             _limbs_mul_greater_to_out_fft(&mut out, xs, ys);
             assert_eq!(out, expected_out);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_low_same_length_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_46,
+        |&(ref out_before, ref xs, ref ys)| {
+            let mut out = out_before.to_vec();
+            _limbs_mul_low_same_length_to_out(&mut out, xs, ys);
+            let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
+            let mut limbs = n.into_limbs_asc();
+            let len = xs.len();
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &out_before[len..]);
+
+            let out_after = out;
+            let mut out = out_before.to_vec();
+            _limbs_mul_low_same_length_to_out_alt(&mut out, xs, ys);
+            assert_eq!(out, out_after);
         },
     );
 }

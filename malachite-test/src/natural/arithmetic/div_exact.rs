@@ -99,7 +99,7 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
     m_run_benchmark(
         "limbs_modular_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_5(gm),
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_5(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,

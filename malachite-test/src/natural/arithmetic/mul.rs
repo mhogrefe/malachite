@@ -4,6 +4,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
 };
+use malachite_nz::natural::arithmetic::mul::mul_low::{
+    _limbs_mul_low_same_length_to_out, _limbs_mul_low_same_length_to_out_alt,
+};
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_22_scratch_len, _limbs_mul_greater_to_out_toom_32,
@@ -51,7 +54,8 @@ use inputs::base::{
     triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_25,
     triples_of_unsigned_vec_var_26, triples_of_unsigned_vec_var_30, triples_of_unsigned_vec_var_31,
     triples_of_unsigned_vec_var_32, triples_of_unsigned_vec_var_33, triples_of_unsigned_vec_var_34,
-    triples_of_unsigned_vec_var_35, triples_of_unsigned_vec_var_36,
+    triples_of_unsigned_vec_var_35, triples_of_unsigned_vec_var_36, triples_of_unsigned_vec_var_46,
+    triples_of_unsigned_vec_var_47,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 
@@ -117,6 +121,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         demo_limbs_mul_greater_to_out_fft_input_sizes_threshold
     );
+    register_demo!(registry, demo_limbs_mul_low_same_length_to_out);
     register_demo!(registry, demo_natural_mul_assign);
     register_demo!(registry, demo_natural_mul_assign_ref);
     register_demo!(registry, demo_natural_mul);
@@ -241,6 +246,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_low_same_length_to_out_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_low_same_length_to_out_algorithms_2
     );
     register_bench!(
         registry,
@@ -508,6 +523,17 @@ fn demo_limbs_mul_greater_to_out_fft_input_sizes_threshold(
     }
 }
 
+fn demo_limbs_mul_low_same_length_to_out(gm: GenerationMode, limit: usize) {
+    for (mut out, xs, ys) in triples_of_unsigned_vec_var_46(gm).take(limit) {
+        let out_old = out.clone();
+        _limbs_mul_low_same_length_to_out(&mut out, &xs, &ys);
+        println!(
+            "out := {:?}; _limbs_mul_low_same_length_to_out(&mut out, {:?}, {:?}); out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
+
 fn demo_natural_mul_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_naturals(gm).take(limit) {
         let x_old = x.clone();
@@ -554,7 +580,7 @@ fn demo_natural_mul_ref_ref(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_mul_greater(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_mul_greater(&[u32], &[u32])",
+        "limbs_mul_greater(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_4(gm),
         gm.name(),
@@ -571,7 +597,7 @@ fn benchmark_limbs_mul_greater(gm: GenerationMode, limit: usize, file_name: &str
 
 fn benchmark_limbs_mul(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_mul(&[u32], &[u32])",
+        "limbs_mul(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_5(gm),
         gm.name(),
@@ -606,7 +632,7 @@ fn benchmark_limbs_mul_greater_to_out_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_mul_greater_to_out(&mut [u32], &[u32], &[u32])",
+        "limbs_mul_greater_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_10(gm.with_scale(2_048)),
         gm.name(),
@@ -650,7 +676,7 @@ fn benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_mul_greater_to_out_basecase_mem_opt(&mut [u32], &[u32], &[u32])",
+        "limbs_mul_greater_to_out_basecase_mem_opt(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_10(gm.with_scale(512)),
         gm.name(),
@@ -679,7 +705,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_22_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_22(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_22(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_11(gm),
         gm.name(),
@@ -710,7 +736,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_32_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_32(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_32(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_12(gm),
         gm.name(),
@@ -741,7 +767,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_33_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_33(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_33(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_13(gm),
         gm.name(),
@@ -772,7 +798,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_33(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_33(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_30(gm),
         gm.name(),
@@ -811,7 +837,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_42(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_42(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_14(gm),
         gm.name(),
@@ -842,7 +868,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_43_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_43(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_43(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_15(gm),
         gm.name(),
@@ -908,7 +934,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_44(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_44(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_16(gm),
         gm.name(),
@@ -939,7 +965,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_same_length_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_44(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_44(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_31(gm),
         gm.name(),
@@ -978,7 +1004,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_52_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_52(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_52(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_17(gm),
         gm.name(),
@@ -1009,7 +1035,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_53_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_53(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_53(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_18(gm),
         gm.name(),
@@ -1091,7 +1117,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_54_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_54(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_54(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_19(gm),
         gm.name(),
@@ -1122,7 +1148,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_62_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_62(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_62(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_20(gm),
         gm.name(),
@@ -1153,7 +1179,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_63(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_63(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_21(gm),
         gm.name(),
@@ -1192,7 +1218,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_6h(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_6h(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_22(gm),
         gm.name(),
@@ -1223,7 +1249,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_6h(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_6h(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_32(gm),
         gm.name(),
@@ -1262,7 +1288,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_8h(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_8h(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_23(gm),
         gm.name(),
@@ -1293,7 +1319,7 @@ fn benchmark_limbs_mul_greater_to_out_toom_8h_same_length_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_toom_8h(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_toom_8h(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_33(gm),
         gm.name(),
@@ -1332,7 +1358,7 @@ fn benchmark_limbs_mul_greater_to_out_fft_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_fft(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_10(gm),
         gm.name(),
@@ -1359,7 +1385,7 @@ fn benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mul_greater_to_out_fft(&mut [u32], &[u32], &[u32])",
+        "_limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_34(gm.with_scale(8_192)),
         gm.name(),
@@ -1379,6 +1405,62 @@ fn benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms(
             (
                 "FFT",
                 &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_to_out_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_low_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_46(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, xs, ys)| _limbs_mul_low_same_length_to_out(&mut out, &xs, &ys)),
+            ),
+            (
+                "alt",
+                &mut (|(mut out, xs, ys)| {
+                    _limbs_mul_low_same_length_to_out_alt(&mut out, &xs, &ys)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_to_out_algorithms_2(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_low_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_47(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, xs, ys)| _limbs_mul_low_same_length_to_out(&mut out, &xs, &ys)),
+            ),
+            (
+                "regular basecase mul",
+                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
             ),
         ],
     );

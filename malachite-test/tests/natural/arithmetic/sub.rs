@@ -126,6 +126,13 @@ fn test_limbs_sub_same_length_to_out() {
         true,
         vec![4_294_967_295, 4_294_967_295, 4_294_967_295, 10],
     );
+    test(
+        &[4294967295, 4294967295, 16777215, 0, 0],
+        &[0, 0, 0, 4294967232, 4294967295],
+        &[10, 10, 10, 10, 10, 10],
+        true,
+        vec![4294967295, 4294967295, 16777215, 64, 0, 10],
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -777,19 +784,16 @@ fn limbs_sub_to_out_helper(
     let mut out = out.to_vec();
     let old_out = out.clone();
     let len = xs.len();
-    let limbs = if f(&mut out, xs, ys) {
+    let mut limbs = if f(&mut out, xs, ys) {
         let n = Integer::from(Natural::from_limbs_asc(xs))
             - Integer::from(Natural::from_limbs_asc(ys))
             + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
-        let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
-        limbs.resize(len, Limb::MAX);
-        limbs
+        Natural::checked_from(n).unwrap().into_limbs_asc()
     } else {
         let n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
-        let mut limbs = n.into_limbs_asc();
-        limbs.resize(len, 0);
-        limbs
+        n.into_limbs_asc()
     };
+    limbs.resize(len, 0);
     assert_eq!(limbs, &out[..len]);
     assert_eq!(&out[len..], &old_out[len..]);
 }

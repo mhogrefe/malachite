@@ -148,11 +148,11 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
 /// Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
 /// the subtraction N - Q * D.
 ///
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+/// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = `ds.len()`
+/// where n = `ns.len()`, d = `ds.len()`
 ///
 /// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c.
 pub fn _limbs_modular_div_mod_divide_and_conquer(
@@ -237,6 +237,10 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
     borrow
 }
 
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
 /// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c.
 #[inline]
 pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
