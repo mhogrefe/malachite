@@ -2013,8 +2013,8 @@ pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
             &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
         )),
     };
-    reshape_1_2_to_3(Box::new(xs.filter(|&(ref out, (ref xs, ref ys))| {
-        !xs.is_empty() && xs.len() == ys.len() && out.len() >= xs.len() + ys.len()
+    reshape_1_2_to_3(Box::new(xs.filter(|&(ref out, (ref xs, _))| {
+        !xs.is_empty() && out.len() >= xs.len() << 1
     })))
 }
 
@@ -2499,6 +2499,22 @@ pub fn triples_of_unsigned_vec_var_47<T: PrimitiveUnsigned + Rand>(
     reshape_1_2_to_3(permute_2_1(Box::new(
         ts.filter(|&((ref xs, _), ref out)| out.len() >= xs.len() << 1),
     )))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same lengths, which are at
+// least 2, and `out` is at least twice as long as `xs`.
+pub fn triples_of_unsigned_vec_var_48<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(triples_of_unsigned_vec_var_25(gm).filter(|(_, xs, _)| xs.len() > 1))
+}
+
+// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
+// second, and the second and third are equally long and have length at least 2.
+pub fn triples_of_unsigned_vec_var_49<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(triples_of_unsigned_vec_var_46(gm).filter(|(_, xs, _)| xs.len() > 1))
 }
 
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
