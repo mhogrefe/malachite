@@ -87,8 +87,8 @@ fn demo_limbs_or_same_length_to_out(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         limbs_or_same_length_to_out(&mut xs, &ys, &zs);
         println!(
-            "limbs_out := {:?}; limbs_or_same_length_to_out(&mut limbs_out, {:?}, {:?}); \
-             limbs_out = {:?}",
+            "out := {:?}; limbs_or_same_length_to_out(&mut out, {:?}, {:?}); \
+             out = {:?}",
             xs_old, ys, zs, xs
         );
     }
@@ -100,7 +100,7 @@ fn demo_limbs_or_to_out(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         limbs_or_to_out(&mut xs, &ys, &zs);
         println!(
-            "limbs_out := {:?}; limbs_or_to_out(&mut limbs_out, {:?}, {:?}); limbs_out = {:?}",
+            "out := {:?}; limbs_or_to_out(&mut out, {:?}, {:?}); out = {:?}",
             xs_old, ys, zs, xs
         );
     }

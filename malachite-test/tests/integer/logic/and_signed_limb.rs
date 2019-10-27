@@ -52,12 +52,11 @@ fn limbs_pos_and_limb_neg_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_and_limb_neg_to_out() {
-    let test =
-        |limbs_out_before: &[Limb], limbs_in: &[Limb], limb: Limb, limbs_out_after: &[Limb]| {
-            let mut limbs_out = limbs_out_before.to_vec();
-            limbs_pos_and_limb_neg_to_out(&mut limbs_out, limbs_in, limb);
-            assert_eq!(limbs_out, limbs_out_after);
-        };
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_pos_and_limb_neg_to_out(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+    };
     test(&[10, 10, 10, 10], &[6, 7], 2, &[2, 7, 10, 10]);
     test(&[10, 10, 10, 10], &[100, 101, 102], 10, &[0, 101, 102, 10]);
     test(&[10, 10, 10, 10], &[123, 456], 789, &[17, 456, 10, 10]);
@@ -280,11 +279,11 @@ fn limbs_pos_and_limb_neg_properties() {
     test_properties(
         pairs_of_nonempty_unsigned_vec_and_unsigned,
         |&(ref limbs, limb)| {
-            let limbs_out = limbs_pos_and_limb_neg(limbs, limb);
+            let out = limbs_pos_and_limb_neg(limbs, limb);
             let n = Integer::from(Natural::from_limbs_asc(limbs))
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             assert_eq!(
-                Natural::from_owned_limbs_asc(limbs_out),
+                Natural::from_owned_limbs_asc(out),
                 Natural::checked_from(n).unwrap()
             );
         },
@@ -330,11 +329,11 @@ fn limbs_pos_and_limb_neg_in_place_properties() {
 #[test]
 fn limbs_neg_and_limb_neg_properties() {
     test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        let limbs_out = limbs_neg_and_limb_neg(limbs, limb);
+        let out = limbs_neg_and_limb_neg(limbs, limb);
         let n = -Natural::from_limbs_asc(limbs)
             & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
         assert_eq!(
-            Natural::from_owned_limbs_asc(limbs_out),
+            Natural::from_owned_limbs_asc(out),
             Natural::checked_from(-n).unwrap()
         );
     });

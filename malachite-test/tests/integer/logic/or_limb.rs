@@ -54,12 +54,11 @@ fn limbs_neg_or_limb_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_neg_or_limb_to_out() {
-    let test =
-        |limbs_out_before: &[Limb], limbs_in: &[Limb], limb: Limb, limbs_out_after: &[Limb]| {
-            let mut limbs_out = limbs_out_before.to_vec();
-            limbs_neg_or_limb_to_out(&mut limbs_out, limbs_in, limb);
-            assert_eq!(limbs_out, limbs_out_after);
-        };
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_neg_or_limb_to_out(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+    };
     test(&[10, 10, 10, 10], &[6, 7], 0, &[6, 7, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 2, &[6, 7, 10, 10]);
     test(&[10, 10, 10, 10], &[100, 101, 102], 10, &[98, 101, 102, 10]);

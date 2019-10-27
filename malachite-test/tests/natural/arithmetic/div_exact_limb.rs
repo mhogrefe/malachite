@@ -113,12 +113,11 @@ fn limbs_div_exact_limb_in_place_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_div_exact_limb_to_out() {
-    let test =
-        |limbs_out_before: &[Limb], limbs_in: &[Limb], limb: Limb, limbs_out_after: &[Limb]| {
-            let mut limbs_out = limbs_out_before.to_vec();
-            limbs_div_exact_limb_to_out(&mut limbs_out, limbs_in, limb);
-            assert_eq!(limbs_out, limbs_out_after);
-        };
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_div_exact_limb_to_out(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+    };
     test(&[10, 10, 10, 10], &[0], 2, &[0, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[6], 2, &[3, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[0, 0], 2, &[0, 0, 10, 10]);
@@ -211,14 +210,14 @@ fn limbs_div_exact_3_in_place_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_div_exact_3_to_out() {
-    let test = |limbs_out_before: &[Limb], limbs_in: &[Limb], limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        limbs_div_exact_3_to_out(&mut limbs_out, limbs_in);
-        assert_eq!(limbs_out, limbs_out_after);
+    let test = |out_before: &[Limb], limbs_in: &[Limb], out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_div_exact_3_to_out(&mut out, limbs_in);
+        assert_eq!(out, out_after);
 
-        let mut limbs_out = limbs_out_before.to_vec();
-        _limbs_div_exact_3_to_out_alt(&mut limbs_out, limbs_in);
-        assert_eq!(limbs_out, limbs_out_after);
+        let mut out = out_before.to_vec();
+        _limbs_div_exact_3_to_out_alt(&mut out, limbs_in);
+        assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0], &[0, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[6], &[2, 10, 10, 10]);

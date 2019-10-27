@@ -26,12 +26,12 @@ fn demo_limbs_not(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_not_to_out(gm: GenerationMode, limit: usize) {
-    for (limbs_out, limbs_in) in pairs_of_unsigned_vec_var_3(gm).take(limit) {
-        let mut mut_limbs_out = limbs_out.clone();
-        limbs_not_to_out(&mut mut_limbs_out, &limbs_in);
+    for (out, limbs_in) in pairs_of_unsigned_vec_var_3(gm).take(limit) {
+        let mut mut_out = out.clone();
+        limbs_not_to_out(&mut mut_out, &limbs_in);
         println!(
-            "limbs_out := {:?}; limbs_not_to_out(&mut limbs_out, &{:?}); limbs_out = {:?}",
-            &limbs_out, &limbs_in, &mut_limbs_out
+            "out := {:?}; limbs_not_to_out(&mut out, &{:?}); out = {:?}",
+            &out, &limbs_in, &mut_out
         );
     }
 }
@@ -85,7 +85,7 @@ fn benchmark_limbs_not_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         "limbs_in.len()",
         &mut [(
             "malachite",
-            &mut (|(ref mut limbs_out, ref limbs_in)| limbs_not_to_out(limbs_out, limbs_in)),
+            &mut (|(ref mut out, ref limbs_in)| limbs_not_to_out(out, limbs_in)),
         )],
     );
 }

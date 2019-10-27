@@ -91,8 +91,8 @@ fn demo_limbs_add_same_length_to_out(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         let carry = limbs_add_same_length_to_out(&mut xs, &ys, &zs);
         println!(
-            "limbs_out := {:?}; limbs_add_same_length_to_out(&mut limbs_out, {:?}, {:?}) = \
-             {}; limbs_out = {:?}",
+            "out := {:?}; limbs_add_same_length_to_out(&mut out, {:?}, {:?}) = \
+             {}; out = {:?}",
             xs_old, ys, zs, carry, xs
         );
     }
@@ -104,8 +104,8 @@ fn demo_limbs_add_greater_to_out(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         let carry = limbs_add_greater_to_out(&mut xs, &ys, &zs);
         println!(
-            "limbs_out := {:?}; limbs_add_greater_to_out(&mut limbs_out, {:?}, {:?}) = \
-             {}; limbs_out = {:?}",
+            "out := {:?}; limbs_add_greater_to_out(&mut out, {:?}, {:?}) = \
+             {}; out = {:?}",
             xs_old, ys, zs, carry, xs
         );
     }
@@ -117,8 +117,8 @@ fn demo_limbs_add_to_out(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         let carry = limbs_add_to_out(&mut xs, &ys, &zs);
         println!(
-            "limbs_out := {:?}; limbs_add_to_out(&mut limbs_out, {:?}, {:?}) = {}; \
-             limbs_out = {:?}",
+            "out := {:?}; limbs_add_to_out(&mut out, {:?}, {:?}) = {}; \
+             out = {:?}",
             xs_old, ys, zs, carry, xs
         );
     }

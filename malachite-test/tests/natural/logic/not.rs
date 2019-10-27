@@ -13,12 +13,12 @@ use malachite_test::inputs::natural::naturals;
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_not_and_limbs_not_in_place() {
-    let test = |limbs_in: &[Limb], limbs_out: &[Limb]| {
-        assert_eq!(limbs_not(limbs_in), limbs_out);
+    let test = |limbs_in: &[Limb], out: &[Limb]| {
+        assert_eq!(limbs_not(limbs_in), out);
 
         let mut mut_limbs = limbs_in.to_vec();
         limbs_not_in_place(&mut mut_limbs);
-        assert_eq!(mut_limbs, limbs_out);
+        assert_eq!(mut_limbs, out);
     };
     test(&[], &[]);
     test(&[0, 1, 2], &[0xffff_ffff, 0xffff_fffe, 0xffff_fffd]);
@@ -28,10 +28,10 @@ pub fn test_limbs_not_and_limbs_not_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 pub fn test_limbs_not_to_out() {
-    let test = |limbs_in: &[Limb], limbs_out_before: &[Limb], limbs_out_after: &[Limb]| {
-        let mut mut_limbs_out = limbs_out_before.to_vec();
-        limbs_not_to_out(&mut mut_limbs_out, limbs_in);
-        assert_eq!(mut_limbs_out, limbs_out_after);
+    let test = |limbs_in: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
+        let mut mut_out = out_before.to_vec();
+        limbs_not_to_out(&mut mut_out, limbs_in);
+        assert_eq!(mut_out, out_after);
     };
     test(&[], &[], &[]);
     test(&[0x1111_1111], &[5], &[0xeeee_eeee]);
@@ -46,8 +46,8 @@ pub fn test_limbs_not_to_out() {
 #[test]
 #[should_panic]
 fn limbs_not_to_out_fail() {
-    let mut limbs_out = vec![1, 2];
-    limbs_not_to_out(&mut limbs_out, &[1, 2, 3]);
+    let mut out = vec![1, 2];
+    limbs_not_to_out(&mut out, &[1, 2, 3]);
 }
 
 #[test]
@@ -78,15 +78,12 @@ fn limbs_not_properties() {
 
 #[test]
 fn limbs_not_to_out_properties() {
-    test_properties(
-        pairs_of_unsigned_vec_var_3,
-        |&(ref limbs_out, ref limbs_in)| {
-            let mut mut_limbs_out = limbs_out.to_vec();
-            limbs_not_to_out(&mut mut_limbs_out, limbs_in);
-            limbs_not_in_place(&mut mut_limbs_out[..limbs_in.len()]);
-            assert_eq!(mut_limbs_out[..limbs_in.len()], **limbs_in);
-        },
-    );
+    test_properties(pairs_of_unsigned_vec_var_3, |&(ref out, ref limbs_in)| {
+        let mut mut_out = out.to_vec();
+        limbs_not_to_out(&mut mut_out, limbs_in);
+        limbs_not_in_place(&mut mut_out[..limbs_in.len()]);
+        assert_eq!(mut_out[..limbs_in.len()], **limbs_in);
+    });
 }
 
 #[test]

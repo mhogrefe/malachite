@@ -42,18 +42,12 @@ fn test_limbs_sub_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_sub_limb_to_out() {
-    let test = |limbs_out_before: &[Limb],
-                limbs_in: &[Limb],
-                limb: Limb,
-                borrow: bool,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        assert_eq!(
-            limbs_sub_limb_to_out(&mut limbs_out, limbs_in, limb),
-            borrow
-        );
-        assert_eq!(limbs_out, limbs_out_after);
-    };
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, borrow: bool, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(limbs_sub_limb_to_out(&mut out, limbs_in, limb), borrow);
+            assert_eq!(out, out_after);
+        };
     test(&[10, 10, 10, 10], &[], 0, false, &[10, 10, 10, 10]);
     test(
         &[10, 10, 10, 10],

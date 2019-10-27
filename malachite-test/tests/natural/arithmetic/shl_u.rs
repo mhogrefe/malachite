@@ -53,15 +53,12 @@ fn test_limbs_shl_and_limbs_vec_shl_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shl_to_out() {
-    let test = |limbs_out_before: &[Limb],
-                limbs_in: &[Limb],
-                bits: Limb,
-                carry: Limb,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        assert_eq!(limbs_shl_to_out(&mut limbs_out, limbs_in, bits), carry);
-        assert_eq!(limbs_out, limbs_out_after);
-    };
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], bits: Limb, carry: Limb, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(limbs_shl_to_out(&mut out, limbs_in, bits), carry);
+            assert_eq!(out, out_after);
+        };
     test(&[10, 10, 10, 10], &[], 5, 0, &[10, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 2, 0, &[24, 28, 10, 10]);
     test(
@@ -134,18 +131,15 @@ fn limbs_slice_shl_in_place_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_shl_with_complement_to_out() {
-    let test = |limbs_out_before: &[Limb],
-                limbs_in: &[Limb],
-                bits: Limb,
-                carry: Limb,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        assert_eq!(
-            limbs_shl_with_complement_to_out(&mut limbs_out, limbs_in, bits),
-            carry
-        );
-        assert_eq!(limbs_out, limbs_out_after);
-    };
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], bits: Limb, carry: Limb, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(
+                limbs_shl_with_complement_to_out(&mut out, limbs_in, bits),
+                carry
+            );
+            assert_eq!(out, out_after);
+        };
     test(
         &[10, 10, 10, 10],
         &[6, 7],

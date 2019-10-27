@@ -135,31 +135,31 @@ fn limbs_div_limb_in_place_mod_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_div_limb_to_out_mod() {
-    let test = |limbs_out_before: &[Limb],
+    let test = |out_before: &[Limb],
                 limbs_in: &[Limb],
                 limb: Limb,
                 remainder: Limb,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
+                out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
         assert_eq!(
-            limbs_div_limb_to_out_mod(&mut limbs_out, limbs_in, limb),
+            limbs_div_limb_to_out_mod(&mut out, limbs_in, limb),
             remainder
         );
-        assert_eq!(limbs_out, limbs_out_after);
+        assert_eq!(out, out_after);
 
-        let mut limbs_out = limbs_out_before.to_vec();
+        let mut out = out_before.to_vec();
         assert_eq!(
-            _limbs_div_limb_to_out_mod_alt(&mut limbs_out, limbs_in, limb),
+            _limbs_div_limb_to_out_mod_alt(&mut out, limbs_in, limb),
             remainder
         );
-        assert_eq!(limbs_out, limbs_out_after);
+        assert_eq!(out, out_after);
 
-        let mut limbs_out = limbs_out_before.to_vec();
+        let mut out = out_before.to_vec();
         assert_eq!(
-            _limbs_div_limb_to_out_mod_naive(&mut limbs_out, limbs_in, limb),
+            _limbs_div_limb_to_out_mod_naive(&mut out, limbs_in, limb),
             remainder
         );
-        assert_eq!(limbs_out, limbs_out_after);
+        assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0, 0], 2, 0, &[0, 0, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 1, 0, &[6, 7, 10, 10]);

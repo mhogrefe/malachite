@@ -49,18 +49,18 @@ fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_limb_with_carry_to_out() {
-    let test = |limbs_out_before: &[Limb],
+    let test = |out_before: &[Limb],
                 limbs_in: &[Limb],
                 limb: Limb,
                 carry: Limb,
                 carry_out: Limb,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
+                out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
         assert_eq!(
-            limbs_mul_limb_with_carry_to_out(&mut limbs_out, limbs_in, limb, carry),
+            limbs_mul_limb_with_carry_to_out(&mut out, limbs_in, limb, carry),
             carry_out
         );
-        assert_eq!(limbs_out, limbs_out_after);
+        assert_eq!(out, out_after);
     };
     test(
         &[10, 10, 10, 10],
@@ -83,15 +83,12 @@ fn limbs_mul_limb_with_carry_to_out_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_limb_to_out() {
-    let test = |limbs_out_before: &[Limb],
-                limbs_in: &[Limb],
-                limb: Limb,
-                carry: Limb,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        assert_eq!(limbs_mul_limb_to_out(&mut limbs_out, limbs_in, limb), carry);
-        assert_eq!(limbs_out, limbs_out_after);
-    };
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, carry: Limb, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(limbs_mul_limb_to_out(&mut out, limbs_in, limb), carry);
+            assert_eq!(out, out_after);
+        };
     test(&[10, 10, 10, 10], &[], 0, 0, &[10, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[], 5, 0, &[10, 10, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 2, 0, &[12, 14, 10, 10]);

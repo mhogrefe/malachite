@@ -47,17 +47,10 @@ fn test_limbs_neg_xor_limb_and_limbs_vec_neg_xor_limb_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_neg_xor_limb_to_out() {
-    let test = |limbs_out_before: &[Limb],
-                limbs_in: &[Limb],
-                limb: Limb,
-                carry,
-                limbs_out_after: &[Limb]| {
-        let mut limbs_out = limbs_out_before.to_vec();
-        assert_eq!(
-            limbs_neg_xor_limb_to_out(&mut limbs_out, limbs_in, limb),
-            carry
-        );
-        assert_eq!(limbs_out, limbs_out_after);
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, carry, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        assert_eq!(limbs_neg_xor_limb_to_out(&mut out, limbs_in, limb), carry);
+        assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[6, 7], 0, false, &[6, 7, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 2, false, &[8, 7, 10, 10]);

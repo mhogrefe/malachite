@@ -4,12 +4,14 @@ use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use natural::arithmetic::mul::{_limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
 use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use platform::Limb;
 use platform::{
-    MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+    MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
+    MUL_TOOM8H_THRESHOLD,
 };
 
 /// Time: worst case O(n<sup>2</sup>)
@@ -245,8 +247,51 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_mullo_n_itch from mpn/generic/mullo_n.c.
-pub const fn mpn_mullo_n_itch(n: usize) -> usize {
+pub const fn _limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
     n << 1
+}
+
+const MULLO_BASECASE_THRESHOLD_LIMIT: usize = MULLO_BASECASE_THRESHOLD;
+
+//TODO tune
+const MULLO_MUL_N_THRESHOLD: usize = 8_907;
+
+/// Multiply two n-limb numbers and return the lowest n limbs of their products.
+///
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `xs.len()`
+///
+/// This is mpn_mullo_n from mpn/generic/mullo_n.c.
+pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+    let n = xs.len();
+    assert_eq!(ys.len(), n);
+    assert!(n >= 1);
+    let out = &mut out[..n];
+    if n < MULLO_BASECASE_THRESHOLD {
+        // Allocate workspace of fixed size on stack: fast!
+        let scratch = &mut [0; MULLO_BASECASE_THRESHOLD_LIMIT];
+        _limbs_mul_greater_to_out_basecase(scratch, xs, ys);
+        out.copy_from_slice(&scratch[..n]);
+    } else if n < MULLO_DC_THRESHOLD {
+        _limbs_mul_low_same_length_basecase(out, xs, ys);
+    } else {
+        let mut scratch = vec![0; _limbs_mul_low_same_length_divide_and_conquer_scratch_len(n)];
+        if n < MULLO_MUL_N_THRESHOLD {
+            _limbs_mul_low_same_length_divide_and_conquer(out, xs, ys, &mut scratch);
+        } else {
+            // For really large operands, use plain limbs_mul_same_length_to_out but throw away
+            // the upper n limbs of the result.
+            if !TUNE_PROGRAM_BUILD && MULLO_MUL_N_THRESHOLD > MUL_FFT_THRESHOLD {
+                _limbs_mul_greater_to_out_fft(&mut scratch, xs, ys);
+            } else {
+                limbs_mul_same_length_to_out(&mut scratch, xs, ys);
+            }
+            out.copy_from_slice(&scratch[..n]);
+        }
+    }
 }
 
 /// Time: worst case O(n<sup>2</sup>)
