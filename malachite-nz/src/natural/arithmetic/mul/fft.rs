@@ -1,5 +1,3 @@
-use std::cmp::{max, Ordering};
-
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{
     Parity, ShrRound, WrappingAddAssign, WrappingSubAssign,
@@ -8,7 +6,6 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
-
 use natural::arithmetic::add::{limbs_add_to_out, limbs_slice_add_same_length_in_place_left};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
@@ -27,6 +24,7 @@ use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::Limb;
+use std::cmp::{max, Ordering};
 
 //TODO double check this
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;

@@ -1,13 +1,15 @@
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
 
 use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_left};
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::Limb;
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `inverse`
@@ -295,4 +297,138 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
     }
     qs[last_index] = !inverse.wrapping_mul(ns[last_index]);
     limbs_slice_add_limb_in_place(qs, 1);
+}
+
+//TODO tune
+const DC_BDIV_Q_THRESHOLD: usize = 104;
+
+/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+///
+/// Additional memory: worst case O(n * log(n))
+///
+/// where n = `ds.len()`
+///
+/// This is mpn_dcpi1_bdiv_q_n from mpn/generic/dcpi1_bdiv_q.c.
+fn _limbs_modular_div_divide_and_conquer_helper(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+    scratch: &mut [Limb],
+) {
+    let n = ds.len();
+    let mut n_rem = n;
+    while n_rem >= DC_BDIV_Q_THRESHOLD {
+        let m = n - n_rem;
+        let lo = n_rem >> 1; // floor(n / 2)
+        let hi = n_rem - lo; // ceil(n / 2)
+        let qs = &mut qs[m..];
+        let ns = &mut ns[m..];
+        let carry_1 =
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], inverse, scratch);
+        let qs = &qs[..lo];
+        limbs_mul_low_same_length(scratch, qs, &ds[hi..n_rem]);
+        limbs_sub_same_length_in_place_left(&mut ns[hi..n_rem], &scratch[..lo]);
+        if lo < hi {
+            let carry_2 =
+                limbs_sub_mul_limb_same_length_in_place_left(&mut ns[lo..lo << 1], qs, ds[lo]);
+            let n_limb = &mut ns[n_rem - 1];
+            n_limb.wrapping_sub_assign(carry_2);
+            if carry_1 {
+                n_limb.wrapping_sub_assign(1);
+            }
+        }
+        n_rem = hi;
+    }
+    let m = n - n_rem;
+    _limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], inverse);
+}
+
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `inverse`
+/// is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+///
+/// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
+///
+/// Additional memory: worst case O(n * log(n))
+///
+/// where n = `ns.len()`, d = `ds.len()`
+///
+/// This is mpn_dcpi1_bdiv_q from mpn/generic/dcpi1_bdiv_q.c.
+pub fn _limbs_modular_div_divide_and_conquer(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len >= 2);
+    assert!(n_len >= d_len);
+    assert!(ds[0].odd());
+    if n_len > d_len {
+        let n_len_mod_d_len = {
+            let mut m = n_len % d_len;
+            if m == 0 {
+                m = d_len;
+            }
+            m
+        };
+        let mut scratch = vec![0; d_len];
+        // Perform the typically smaller block first.
+        let (ds_lo, ds_hi) = ds.split_at(n_len_mod_d_len);
+        let mut carry = if n_len_mod_d_len < DC_BDIV_QR_THRESHOLD {
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..n_len_mod_d_len << 1], ds_lo, inverse)
+        } else {
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, inverse, &mut scratch)
+        };
+        if n_len_mod_d_len != d_len {
+            limbs_mul_to_out(&mut scratch, ds_hi, &qs[..n_len_mod_d_len]);
+            if carry {
+                assert!(!limbs_slice_add_limb_in_place(
+                    &mut scratch[n_len_mod_d_len..],
+                    1
+                ));
+            }
+            limbs_sub_in_place_left(&mut ns[n_len_mod_d_len..], &scratch[..d_len]);
+            carry = false;
+        }
+        let mut m = n_len_mod_d_len;
+        let diff = n_len - d_len;
+        while m != diff {
+            if carry {
+                limbs_sub_limb_in_place(&mut ns[m + d_len..], 1);
+            }
+            carry = _limbs_modular_div_mod_divide_and_conquer_helper(
+                &mut qs[m..],
+                &mut ns[m..],
+                ds,
+                inverse,
+                &mut scratch,
+            );
+            m += d_len;
+        }
+        _limbs_modular_div_divide_and_conquer_helper(
+            &mut qs[diff..],
+            &mut ns[diff..],
+            ds,
+            inverse,
+            &mut scratch,
+        );
+    } else {
+        if n_len < DC_BDIV_Q_THRESHOLD {
+            _limbs_modular_div_schoolbook(qs, ns, ds, inverse);
+        } else {
+            let mut scratch = vec![0; n_len];
+            _limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, inverse, &mut scratch);
+        }
+    }
+}
+
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c.
+pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+    n
 }
