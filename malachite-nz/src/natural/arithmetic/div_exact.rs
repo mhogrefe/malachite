@@ -1,16 +1,76 @@
+use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
 
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use natural::arithmetic::mul::mul_mod::{
+    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
+    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
+};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_left};
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::Limb;
+
+/// This is mpn_binvert_itch from mpn/generic/binvert.c.
+pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
+    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n);
+    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(itch_local, n, (n + 1) >> 1);
+    itch_local + itch_out
+}
+
+//TODO tune
+const BINV_NEWTON_THRESHOLD: usize = 224;
+
+/// This is mpn_binvert from mpn/generic/binvert.c.
+pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let d_len = ds.len();
+    // Compute the computation precisions from highest to lowest, leaving the base case size in rn.
+    let mut rn = d_len;
+    let mut sizes = Vec::new();
+    let mut sizes_offset = 0;
+    while rn >= BINV_NEWTON_THRESHOLD {
+        sizes.push(rn);
+        sizes_offset += 1;
+        rn = (rn + 1) >> 1;
+    }
+    // Compute a base value of rn limbs.
+    limbs_set_zero(&mut scratch[..rn]);
+    scratch[0] = 1;
+    let inverse = limbs_modular_invert_limb(ds[0]);
+    if rn < DC_BDIV_Q_THRESHOLD {
+        _limbs_modular_div_schoolbook(is, &mut scratch[..rn], &ds[..rn], inverse.wrapping_neg());
+    } else {
+        _limbs_modular_div_divide_and_conquer(
+            is,
+            &mut scratch[..rn],
+            &ds[..rn],
+            inverse.wrapping_neg(),
+        );
+    }
+    // Use Newton iterations to get the desired precision.
+    while rn < d_len {
+        sizes_offset -= 1;
+        let newrn = sizes[sizes_offset];
+        // X <- UR
+        let m = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(newrn);
+        let (scratch_lo, scratch_hi) = scratch.split_at_mut(m);
+        _limbs_mul_mod_limb_width_to_n_minus_1(scratch_lo, m, &ds[..newrn], &is[..rn], scratch_hi);
+        limbs_sub_limb_to_out(scratch_hi, &scratch_lo[..rn - (m - newrn)], 1);
+        // R = R(X / B ^ rn)
+        let (rp_lo, rp_hi) = is.split_at_mut(rn);
+        limbs_mul_low_same_length(rp_hi, &rp_lo[..newrn - rn], &scratch[rn..newrn]);
+        limbs_twos_complement_in_place(&mut rp_hi[..newrn - rn]);
+        rn = newrn;
+    }
+}
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `inverse`
 /// is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.

@@ -1582,6 +1582,17 @@ pub fn pairs_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
     Box::new(pairs_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned and first `Vec` is at least as long as the second,
+// neither `Vec` is empty, and the first element of the second `Vec` is odd.
+pub fn pairs_of_unsigned_vec_var_12<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec::<T>(gm)
+            .filter(|&(ref xs, ref ys)| !ys.is_empty() && xs.len() >= ys.len() && ys[0].odd()),
+    )
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {

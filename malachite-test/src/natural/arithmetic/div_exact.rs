@@ -1,21 +1,24 @@
 use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_divide_and_conquer,
-    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook,
+    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook, limbs_modular_invert,
+    limbs_modular_invert_scratch_len,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
+    pairs_of_unsigned_vec_var_12, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_6,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_modular_invert);
     register_demo!(registry, demo_limbs_modular_div_mod_schoolbook);
     register_demo!(registry, demo_limbs_modular_div_mod_divide_and_conquer);
     register_demo!(registry, demo_limbs_modular_div_schoolbook);
     register_demo!(registry, demo_limbs_modular_div_divide_and_conquer);
+    register_bench!(registry, Small, benchmark_limbs_modular_invert);
     register_bench!(registry, Small, benchmark_limbs_modular_div_mod_schoolbook);
     register_bench!(
         registry,
@@ -28,6 +31,18 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_modular_div_divide_and_conquer_algorithms
     );
+}
+
+fn demo_limbs_modular_invert(gm: GenerationMode, limit: usize) {
+    for (mut is, ds) in pairs_of_unsigned_vec_var_12(gm).take(limit) {
+        let old_is = is.clone();
+        let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
+        limbs_modular_invert(&mut is, &ds, &mut scratch);
+        println!(
+            "is := {:?}; _limbs_modular_invert(&mut is, {:?}, &mut scratch); is = {:?}, ",
+            old_is, ds, is,
+        );
+    }
 }
 
 fn demo_limbs_modular_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
@@ -90,6 +105,26 @@ fn demo_limbs_modular_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
             qs_old, ns_old, ds, inverse, qs
         );
     }
+}
+
+fn benchmark_limbs_modular_invert(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_modular_invert(&mut [Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_12(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ds)| ds.len()),
+        "ds.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut is, ds)| {
+                let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
+                limbs_modular_invert(&mut is, &ds, &mut scratch);
+            }),
+        )],
+    );
 }
 
 fn benchmark_limbs_modular_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_name: &str) {
