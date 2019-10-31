@@ -1,5 +1,8 @@
+use std::cmp::max;
+
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -8,13 +11,18 @@ use natural::arithmetic::add::{
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
     _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_same_length_in_place_left};
+use natural::arithmetic::sub::{
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap,
+};
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::Limb;
@@ -341,6 +349,275 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
 #[inline]
 pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
+}
+
+//TODO tune
+const MU_BDIV_Q_THRESHOLD: usize = 1_442;
+
+/// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c.
+pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+    assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
+    let q_len = n_len - d_len;
+    let i_len = if q_len > d_len {
+        let b = (q_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
+        (q_len - 1) / b + 1 // ceil(qn / ceil(qn / dn))
+    } else {
+        q_len - (q_len >> 1)
+    };
+    let (temp_len, itch_out) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+        (d_len + i_len, 0)
+    } else {
+        let temp_len = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        (
+            temp_len,
+            _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(temp_len, d_len, i_len),
+        )
+    };
+    let modular_invert_scratch_len = limbs_modular_invert_scratch_len(i_len);
+    let scratch_len = temp_len + itch_out;
+    i_len + max(scratch_len, modular_invert_scratch_len)
+}
+
+/// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c.
+pub fn _limbs_modular_div_mod_barrett(
+    qs: &mut [Limb],
+    rs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert!(d_len >= 2);
+    assert!(n_len >= d_len + 2);
+    let mut q_len = n_len - d_len;
+    if q_len > d_len {
+        // |_______________________|   dividend
+        // |________|   divisor
+        // Compute an inverse size that is a nice partition of the quotient.
+        let b = (q_len - 1) / d_len + 1; // ceil(qn/dn), number of blocks
+        let i_len = (q_len - 1) / b + 1; // ceil(qn/b) = ceil(qn / ceil(qn/dn))
+        let (ip, tp) = scratch.split_at_mut(i_len);
+        // Some notes on allocation:
+        //
+        // When in = dn, R dies when mpn_mullo returns, if in < dn the low in
+        // limbs of R dies at that point.  We could save memory by letting T live
+        // just under R, and let the upper part of T expand into R. These changes
+        // should reduce itch to perhaps 3dn.
+        //
+        limbs_modular_invert(ip, &ds[..i_len], tp);
+        rs[..d_len].copy_from_slice(&ns[..d_len]);
+        let mut np_offset = d_len;
+        let mut cy = 0;
+        let mut qp_offset = 0;
+        while q_len > i_len {
+            limbs_mul_low_same_length(&mut qs[qp_offset..], &rs[..i_len], &ip[..i_len]);
+            if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+                // mulhi, need tp[dn+in-1...in]
+                limbs_mul_greater_to_out(tp, &ds[..d_len], &qs[qp_offset..qp_offset + i_len]);
+            } else {
+                let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+                {
+                    let (tp, scratch_out) = tp.split_at_mut(tn);
+                    _limbs_mul_mod_limb_width_to_n_minus_1(
+                        tp,
+                        tn,
+                        &ds[..d_len],
+                        &qs[qp_offset..qp_offset + i_len],
+                        scratch_out,
+                    );
+                }
+                // number of wrapped limbs
+                let wn =
+                    isize::checked_from(d_len + i_len).unwrap() - isize::checked_from(tn).unwrap();
+                //TODO Else is untested!
+                if wn > 0 {
+                    let wn = usize::checked_from(wn).unwrap();
+                    let (tp_lo, tp_hi) = tp.split_at_mut(tn);
+                    let c0 = limbs_sub_same_length_to_out(tp_hi, &tp_lo[..wn], &rs[..wn]);
+                    assert!(!limbs_sub_limb_in_place(
+                        &mut tp[wn..],
+                        if c0 { 1 } else { 0 }
+                    ));
+                }
+            }
+            qp_offset += i_len;
+            q_len -= i_len;
+            if d_len != i_len {
+                // Subtract tp[dn-1...in] from partial remainder.
+                let (rp_lo, rp_hi) = rs.split_at_mut(i_len);
+                cy += if limbs_sub_same_length_to_out(
+                    rp_lo,
+                    &rp_hi[..d_len - i_len],
+                    &tp[i_len..d_len],
+                ) {
+                    1
+                } else {
+                    0
+                };
+                if cy == 2 {
+                    assert!(!limbs_slice_add_limb_in_place(&mut tp[d_len..], 1));
+                    cy = 1;
+                }
+            }
+            // Subtract tp[dn+in-1...dn] from dividend.
+            cy = if _limbs_sub_same_length_with_borrow_in_to_out(
+                &mut rs[d_len - i_len..],
+                &ns[np_offset..np_offset + i_len],
+                &tp[d_len..i_len + d_len],
+                cy > 0,
+            ) {
+                1
+            } else {
+                0
+            };
+            np_offset += i_len;
+        }
+        // Generate last qn limbs.
+        limbs_mul_low_same_length(&mut qs[qp_offset..], &rs[..q_len], &ip[..q_len]);
+        if q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            // mulhi, need tp[qn+in-1...in]
+            limbs_mul_greater_to_out(tp, &ds[..d_len], &qs[qp_offset..qp_offset + q_len]);
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            {
+                let (tp, scratch_out) = tp.split_at_mut(tn);
+                _limbs_mul_mod_limb_width_to_n_minus_1(
+                    tp,
+                    tn,
+                    &ds[..d_len],
+                    &qs[qp_offset..qp_offset + q_len],
+                    scratch_out,
+                );
+            }
+            // number of wrapped limbs
+            let wn = isize::checked_from(d_len + q_len).unwrap() - isize::checked_from(tn).unwrap();
+            //TODO Else is untested!
+            if wn > 0 {
+                let wn = usize::checked_from(wn).unwrap();
+                let (tp_lo, tp_hi) = tp.split_at_mut(tn);
+                let c0 = limbs_sub_same_length_to_out(tp_hi, &tp_lo[..wn], &rs[..wn]);
+                assert!(!limbs_sub_limb_in_place(
+                    &mut tp[wn..],
+                    if c0 { 1 } else { 0 }
+                ));
+            }
+        }
+        if d_len != q_len {
+            cy += if limbs_sub_same_length_to_out_with_overlap(
+                &mut rs[..d_len],
+                q_len,
+                &tp[q_len..d_len],
+            ) {
+                1
+            } else {
+                0
+            };
+            if cy == 2 {
+                assert!(!limbs_slice_add_limb_in_place(&mut tp[d_len..], 1));
+                cy = 1;
+            }
+        }
+        return _limbs_sub_same_length_with_borrow_in_to_out(
+            &mut rs[d_len - q_len..],
+            &ns[np_offset..np_offset + q_len],
+            &tp[d_len..d_len + q_len],
+            cy > 0,
+        );
+    } else {
+        // |_______________________|   dividend
+        // |________________|   divisor
+        // Compute half-sized inverse.
+        let i_len = q_len - (q_len >> 1);
+        let (ip, tp) = scratch.split_at_mut(i_len);
+        limbs_modular_invert(ip, &ds[..i_len], tp);
+        limbs_mul_low_same_length(qs, &ns[..i_len], &ip[..i_len]); // low i_len quotient limbs
+        if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            limbs_mul_greater_to_out(tp, &ds[..d_len], &qs[..i_len]); // mulhigh
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            {
+                let (tp, scratch_out) = tp.split_at_mut(tn);
+                _limbs_mul_mod_limb_width_to_n_minus_1(
+                    tp,
+                    tn,
+                    &ds[..d_len],
+                    &qs[..i_len],
+                    scratch_out,
+                );
+            }
+            // number of wrapped limbs
+            let wn = isize::checked_from(d_len + i_len).unwrap() - isize::checked_from(tn).unwrap();
+            if wn > 0 {
+                let wn = usize::checked_from(wn).unwrap();
+                let (tp_lo, tp_hi) = tp.split_at_mut(tn);
+                let c0 = limbs_sub_same_length_to_out(tp_hi, &tp_lo[..wn], &ns[..wn]);
+                assert!(!limbs_sub_limb_in_place(
+                    &mut tp[wn..],
+                    if c0 { 1 } else { 0 }
+                ));
+            }
+        }
+        let qp_offset = i_len;
+        q_len -= i_len;
+        let mut cy = if limbs_sub_same_length_to_out(
+            rs,
+            &ns[i_len..i_len + d_len],
+            &tp[i_len..i_len + d_len],
+        ) {
+            1
+        } else {
+            0
+        };
+        // high qn quotient limbs
+        limbs_mul_low_same_length(&mut qs[qp_offset..], &rs[..q_len], &ip[..q_len]);
+        if q_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            limbs_mul_greater_to_out(tp, &ds[..d_len], &qs[qp_offset..qp_offset + q_len]);
+        // mulhigh
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            {
+                let (tp, scratch_out) = tp.split_at_mut(tn);
+                _limbs_mul_mod_limb_width_to_n_minus_1(
+                    tp,
+                    tn,
+                    &ds[..d_len],
+                    &qs[qp_offset..qp_offset + q_len],
+                    scratch_out,
+                );
+            }
+            // number of wrapped limbs
+            let wn = isize::checked_from(d_len + q_len).unwrap() - isize::checked_from(tn).unwrap();
+            if wn > 0 {
+                let wn = usize::checked_from(wn).unwrap();
+                let (tp_lo, tp_hi) = tp.split_at_mut(tn);
+                let c0 = limbs_sub_same_length_to_out(tp_hi, &tp_lo[..wn], &rs[..wn]);
+                assert!(!limbs_sub_limb_in_place(
+                    &mut tp[wn..],
+                    if c0 { 1 } else { 0 }
+                ));
+            }
+        }
+        cy += if limbs_sub_same_length_to_out_with_overlap(
+            &mut rs[..d_len],
+            q_len,
+            &tp[q_len..d_len],
+        ) {
+            1
+        } else {
+            0
+        };
+        if cy == 2 {
+            assert!(!limbs_slice_add_limb_in_place(&mut tp[d_len..], 1));
+            cy = 1;
+        }
+        return _limbs_sub_same_length_with_borrow_in_to_out(
+            &mut rs[d_len - q_len..],
+            &ns[d_len + i_len..d_len + i_len + q_len],
+            &tp[d_len..d_len + q_len],
+            cy > 0,
+        );
+    }
 }
 
 /// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `inverse`

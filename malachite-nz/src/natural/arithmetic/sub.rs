@@ -392,6 +392,22 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
     borrow
 }
 
+//TODO test
+// `&xs[..xs.len() - right_start]` <- `&xs[right_start..]` - `ys`
+pub fn limbs_sub_same_length_to_out_with_overlap(
+    xs: &mut [Limb],
+    right_start: usize,
+    ys: &[Limb],
+) -> bool {
+    let len = xs.len() - right_start;
+    assert_eq!(ys.len(), len);
+    let mut borrow = false;
+    for i in 0..len {
+        xs[i] = sub_and_borrow(xs[i + right_start], ys[i], &mut borrow);
+    }
+    borrow
+}
+
 /// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
 /// `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether

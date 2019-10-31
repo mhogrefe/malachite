@@ -2756,6 +2756,79 @@ pub fn quadruples_of_unsigned_vec_var_3(
     Box::new(quadruples_of_unsigned_vec_var_1(gm).filter(|(_, _, n, d)| 2 * d.len() > n.len() + 1))
 }
 
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_modular_div_mod_barrett`.
+pub fn quadruples_of_unsigned_vec_var_4(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(4, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+        )),
+    };
+    Box::new(qs.filter(|(q, r, n, d)| {
+        if n.len() < d.len() + 2 {
+            return false;
+        }
+        let q_len = n.len() - d.len();
+        q.len() >= q_len && r.len() >= d.len() && d[0].odd()
+    }))
+}
+
+// All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
+// `_limbs_modular_div_mod_barrett` and `qs`, `ns`, and `ds` would meet the preconditions of
+// `_limbs_modular_div_mod_divide_and_conquer`, given the correct `inverse`.
+pub fn quadruples_of_unsigned_vec_var_5(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
+            exhaustive_vecs_min_length(4, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(4, exhaustive_unsigned()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+        )),
+    };
+    Box::new(qs.filter(|(q, r, n, d)| {
+        if n.len() < d.len() + 2 {
+            return false;
+        }
+        let q_len = n.len() - d.len();
+        q.len() >= q_len && r.len() >= d.len() && d[0].odd()
+    }))
+}
+
 pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
