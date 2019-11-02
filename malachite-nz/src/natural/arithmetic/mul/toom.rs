@@ -887,10 +887,11 @@ pub fn _limbs_mul_greater_to_out_toom_33(
             }
 
             // Compute bs2.
-            let mut carry = 0;
-            if limbs_add_same_length_to_out(bs2, &bs1[..t], ys_2) {
-                carry = 1;
-            }
+            let mut carry = if limbs_add_same_length_to_out(bs2, &bs1[..t], ys_2) {
+                1
+            } else {
+                0
+            };
             if t != n {
                 carry = if limbs_add_limb_to_out(&mut bs2[t..], &bs1[t..n], carry) {
                     1
@@ -2639,28 +2640,26 @@ pub fn _limbs_mul_greater_to_out_toom_62(
                 0
             };
             true
-        } else {
-            if t < n {
-                if limbs_test_zero(&bsm1[t..])
-                    && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
-                {
-                    assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, &bsm1[..t]));
-                    limbs_set_zero(&mut bsm2[t..]);
-                    true
-                } else {
-                    assert!(!limbs_sub_to_out(bsm2, bsm1, ys_1));
-                    bsm2[n] = 0;
-                    false
-                }
+        } else if t < n {
+            if limbs_test_zero(&bsm1[t..])
+                && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
+            {
+                assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, &bsm1[..t]));
+                limbs_set_zero(&mut bsm2[t..]);
+                true
             } else {
+                assert!(!limbs_sub_to_out(bsm2, bsm1, ys_1));
                 bsm2[n] = 0;
-                if limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less {
-                    assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, bsm1));
-                    true
-                } else {
-                    assert!(!limbs_sub_same_length_to_out(bsm2, bsm1, ys_1));
-                    false
-                }
+                false
+            }
+        } else {
+            bsm2[n] = 0;
+            if limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less {
+                assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, bsm1));
+                true
+            } else {
+                assert!(!limbs_sub_same_length_to_out(bsm2, bsm1, ys_1));
+                false
             }
         };
 
@@ -3936,7 +3935,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     {
         let (v3, scratch3) = scratch2.split_at_mut(m);
         let (r2, v2) = out[11 * n..].split_at_mut(2 * n + 2);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r2, &mut v2[..m], v3, scratch3);
+        _limbs_mul_same_length_to_out_toom_8h_recursive(r2, &v2[..m], v3, scratch3);
     }
     {
         let (pp_lo, r2) = out.split_at_mut(11 * n);

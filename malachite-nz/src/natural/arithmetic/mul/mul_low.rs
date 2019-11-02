@@ -90,6 +90,7 @@ fn get_n_lo(n: usize) -> usize {
 /// where n = `xs.len()`
 ///
 /// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, where rp == tp.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     out: &mut [Limb],
     xs: &[Limb],
@@ -200,6 +201,7 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 /// where n = `xs.len()`
 ///
 /// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, where rp != tp.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mul_low_same_length_divide_and_conquer(
     out: &mut [Limb],
     xs: &[Limb],
@@ -264,6 +266,7 @@ const MULLO_MUL_N_THRESHOLD: usize = 8_907;
 /// where n = `xs.len()`
 ///
 /// This is mpn_mullo_n from mpn/generic/mullo_n.c.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_eq!(ys.len(), n);

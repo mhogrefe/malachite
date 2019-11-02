@@ -436,8 +436,9 @@ pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
     scratch: &mut [Limb],
 ) -> Limb {
     let n = ys.len();
+    let scratch = &mut scratch[..n];
     let mut carry = limbs_shl_to_out(scratch, ys, shift);
-    if limbs_slice_add_same_length_in_place_left(&mut xs[..n], &mut scratch[..n]) {
+    if limbs_slice_add_same_length_in_place_left(&mut xs[..n], scratch) {
         carry.wrapping_add_assign(1);
     }
     carry

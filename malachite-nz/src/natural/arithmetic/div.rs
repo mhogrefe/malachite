@@ -376,7 +376,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
         if highest_q {
             limbs_sub_same_length_in_place_left(rs_hi, ds);
         }
-        if _limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch) {
+        if _limbs_div_barrett_approx(&mut scratch_2, &rs, ds, scratch) {
             // TODO This branch is untested!
             // Since the partial remainder fed to _limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
@@ -430,7 +430,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             let mut rs = vec![0; n_len];
             limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-                || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
+                || limbs_cmp_same_length(&rs, ns) == Ordering::Greater
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
@@ -838,13 +838,13 @@ pub fn _limbs_div_divide_and_conquer_approx(
                         } else {
                             0
                         };
-                    if highest_q {
-                        if limbs_sub_same_length_in_place_left(
+                    if highest_q
+                        && limbs_sub_same_length_in_place_left(
                             &mut ns[q_len_mod_d_len..d_len],
                             ds_lo,
-                        ) {
-                            carry += 1;
-                        }
+                        )
+                    {
+                        carry += 1;
                     }
                     while carry != 0 {
                         if limbs_sub_limb_in_place(qs, 1) {
@@ -963,15 +963,13 @@ fn _limbs_div_barrett_approx_helper(
             let (scratch_2_lo, scratch_2_hi) = scratch_2.split_at_mut(n);
             _limbs_invert_approx(is, scratch_2_lo, scratch_2_hi);
             limbs_move_left(is, 1);
+        } else if limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1) {
+            // TODO This branch is untested!
+            limbs_set_zero(&mut is[..i_len]);
         } else {
-            if limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1) {
-                // TODO This branch is untested!
-                limbs_set_zero(&mut is[..i_len]);
-            } else {
-                let (scratch_2_lo, scratch_2_hi) = scratch_2.split_at_mut(n);
-                _limbs_invert_approx(is, scratch_2_lo, scratch_2_hi);
-                limbs_move_left(is, 1);
-            }
+            let (scratch_2_lo, scratch_2_hi) = scratch_2.split_at_mut(n);
+            _limbs_invert_approx(is, scratch_2_lo, scratch_2_hi);
+            limbs_move_left(is, 1);
         }
     }
     let (is, scratch_hi) = scratch.split_at_mut(i_len);
@@ -1131,7 +1129,7 @@ fn _limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
     } else if 3 * q_len > d_len {
         q_len.saturating_sub(1) / 2 + 1 // b = 2
     } else {
-        q_len.saturating_sub(1) / 1 + 1 // b = 1
+        q_len.saturating_sub(1) + 1 // b = 1
     }
 }
 
@@ -1327,8 +1325,7 @@ fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
-            let mut new_ns = ns.to_vec();
-            _limbs_div_divide_and_conquer(qs, &mut new_ns, ds, inverse)
+            _limbs_div_divide_and_conquer(qs, ns, ds, inverse)
         } else {
             let mut scratch = vec![0; _limbs_div_barrett_scratch_len(n_len, d_len)];
             _limbs_div_barrett(qs, ns, ds, &mut scratch)
@@ -1398,8 +1395,7 @@ fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
-            let mut new_ns = ns.to_vec();
-            _limbs_div_divide_and_conquer(qs, &mut new_ns, ds, inverse)
+            _limbs_div_divide_and_conquer(qs, ns, ds, inverse)
         } else {
             let mut scratch = vec![0; _limbs_div_barrett_scratch_len(n_len, d_len)];
             _limbs_div_barrett(qs, ns, ds, &mut scratch)

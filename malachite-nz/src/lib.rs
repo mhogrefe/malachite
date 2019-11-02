@@ -1,7 +1,11 @@
 #![allow(
-    unknown_lints,
+    clippy::assertions_on_constants,
+    clippy::cognitive_complexity,
+    clippy::many_single_char_names,
+    clippy::range_plus_one,
     clippy::suspicious_arithmetic_impl,
-    clippy::suspicious_op_assign_impl
+    clippy::suspicious_op_assign_impl,
+    clippy::too_many_arguments
 )]
 
 #[macro_use]

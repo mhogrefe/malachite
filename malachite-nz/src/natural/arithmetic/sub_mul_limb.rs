@@ -37,9 +37,7 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Optio
     let borrow = limbs_sub_mul_limb_same_length_in_place_left(&mut result[..ys_len], ys, limb);
     if borrow == 0 {
         Some(result)
-    } else if xs.len() == ys_len {
-        None
-    } else if limbs_sub_limb_in_place(&mut result[ys_len..], borrow) {
+    } else if xs.len() == ys_len || limbs_sub_limb_in_place(&mut result[ys_len..], borrow) {
         None
     } else {
         Some(result)

@@ -413,10 +413,10 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
                     } else {
                         0
                     };
-                    if highest_q {
-                        if limbs_sub_same_length_in_place_left(&mut ns[q_len_mod_d_len..], ds_lo) {
-                            carry += 1;
-                        }
+                    if highest_q
+                        && limbs_sub_same_length_in_place_left(&mut ns[q_len_mod_d_len..], ds_lo)
+                    {
+                        carry += 1;
                     }
                     while carry != 0 {
                         limbs_sub_limb_in_place(qs, 1);
@@ -604,14 +604,12 @@ pub fn _limbs_mod_barrett_helper(
             }
             _limbs_invert_approx(is, &scratch_lo, scratch_hi);
             limbs_move_left(is, 1);
+        } else if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
+            limbs_set_zero(&mut is[..i_len]);
         } else {
-            if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
-                limbs_set_zero(&mut is[..i_len]);
-            } else {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
-                _limbs_invert_approx(is, scratch_lo, scratch_hi);
-                limbs_move_left(is, 1);
-            }
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
+            _limbs_invert_approx(is, scratch_lo, scratch_hi);
+            limbs_move_left(is, 1);
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);

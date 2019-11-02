@@ -643,11 +643,11 @@ impl Natural {
             }
             _ => {
                 let bc = b * c;
-                return if *self >= bc {
+                if *self >= bc {
                     (self - bc, true)
                 } else {
                     (bc - self, false)
-                };
+                }
             }
         }
     }

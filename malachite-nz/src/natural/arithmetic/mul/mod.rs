@@ -277,7 +277,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             let mut scratch = vec![0; toom_x3_scratch_len];
             if 2 * xs_len >= 5 * ys_len {
                 // The maximum scratch2 usage is for the `limbs_mul_to_out` result.
-                let mut scratch2 = vec![0; 7 * ys_len >> 1];
+                let mut scratch2 = vec![0; (7 * ys_len) >> 1];
                 if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
                     _limbs_mul_greater_to_out_toom_42(out, &xs[..2 * ys_len], ys, &mut scratch);
                 } else {
@@ -308,50 +308,42 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
                 let (scratch2_lo, scratch2_hi) = scratch2.split_at(ys_len);
                 out[ys_len..xs_len + ys_len].copy_from_slice(&scratch2_hi[..xs_len]);
                 assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
-            } else {
-                if 6 * xs_len < 7 * ys_len {
-                    _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
-                } else if 2 * xs_len < 3 * ys_len {
-                    if ys_len < MUL_TOOM32_TO_TOOM43_THRESHOLD {
+            } else if 6 * xs_len < 7 * ys_len {
+                _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
+            } else if 2 * xs_len < 3 * ys_len {
+                if ys_len < MUL_TOOM32_TO_TOOM43_THRESHOLD {
+                    _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
+                } else {
+                    _limbs_mul_greater_to_out_toom_43(out, xs, ys, &mut scratch);
+                }
+            } else if 6 * xs_len < 11 * ys_len {
+                if 4 * xs_len < 7 * ys_len {
+                    if ys_len < MUL_TOOM32_TO_TOOM53_THRESHOLD {
                         _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
                     } else {
-                        _limbs_mul_greater_to_out_toom_43(out, xs, ys, &mut scratch);
+                        _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
                     }
-                } else if 6 * xs_len < 11 * ys_len {
-                    if 4 * xs_len < 7 * ys_len {
-                        if ys_len < MUL_TOOM32_TO_TOOM53_THRESHOLD {
-                            _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
-                        } else {
-                            _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
-                        }
-                    } else {
-                        if ys_len < MUL_TOOM42_TO_TOOM53_THRESHOLD {
-                            _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
-                        } else {
-                            _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
-                        }
-                    }
+                } else if ys_len < MUL_TOOM42_TO_TOOM53_THRESHOLD {
+                    _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
                 } else {
-                    if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-                        _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
-                    } else {
-                        _limbs_mul_greater_to_out_toom_63(out, xs, ys, &mut scratch);
-                    }
+                    _limbs_mul_greater_to_out_toom_53(out, xs, ys, &mut scratch);
                 }
-            }
-        } else {
-            if ys_len < MUL_TOOM6H_THRESHOLD {
-                let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len)];
-                _limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
-            } else if ys_len < MUL_TOOM8H_THRESHOLD {
-                let mut scratch =
-                    vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)];
-                _limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
+            } else if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                _limbs_mul_greater_to_out_toom_42(out, xs, ys, &mut scratch);
             } else {
-                let mut scratch =
-                    vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)];
-                _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
+                _limbs_mul_greater_to_out_toom_63(out, xs, ys, &mut scratch);
             }
+        } else if ys_len < MUL_TOOM6H_THRESHOLD {
+            let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len)];
+            _limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
+        } else if ys_len < MUL_TOOM8H_THRESHOLD {
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)];
+            _limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
+        } else {
+            let mut scratch =
+                vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)];
+            _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
         }
     } else {
         _limbs_mul_greater_to_out_fft(out, xs, ys);

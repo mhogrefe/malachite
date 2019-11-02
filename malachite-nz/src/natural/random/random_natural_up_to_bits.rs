@@ -108,7 +108,7 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]
-pub fn _transform_32_to_64_bit_limbs(limbs: &Vec<u32>) -> Vec<u64> {
+pub fn _transform_32_to_64_bit_limbs(limbs: &[u32]) -> Vec<u64> {
     let mut result_limbs = Vec::with_capacity(limbs.len() << 1);
     let mut iter = limbs.chunks_exact(2);
     for chunk in &mut iter {
