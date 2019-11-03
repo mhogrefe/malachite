@@ -1,7 +1,8 @@
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -24,6 +25,7 @@ use natural::arithmetic::sub::{
 };
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
+use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
 
 /// Time: worst case O(1)
@@ -659,6 +661,15 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
     limbs_slice_add_limb_in_place(qs, 1);
 }
 
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c.
+pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+    n
+}
+
 //TODO tune
 const DC_BDIV_Q_THRESHOLD: usize = 104;
 
@@ -782,11 +793,228 @@ pub fn _limbs_modular_div_divide_and_conquer(
     }
 }
 
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c.
-pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
-    n
+/// This is mpn_mu_bdiv_q_itch from mpn/generic/mu_bdiv_q.c.
+pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+    assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
+    let q_len = n_len;
+    let i_len;
+    let itches = if q_len > d_len {
+        let blocks = (q_len - 1) / d_len + 1; // ceil(qn/dn), number of blocks
+        i_len = (q_len - 1) / blocks + 1; // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+        let (tn, itch_out) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            (d_len + i_len, 0)
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            (
+                tn,
+                _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(tn, d_len, i_len),
+            )
+        };
+        d_len + tn + itch_out
+    } else {
+        i_len = q_len - (q_len >> 1);
+        let (tn, itch_out) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            (q_len + i_len, 0)
+        } else {
+            let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(q_len);
+            (
+                tn,
+                _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(tn, q_len, i_len),
+            )
+        };
+        tn + itch_out
+    };
+    let itch_binvert = limbs_modular_invert_scratch_len(i_len);
+    i_len + max(itches, itch_binvert)
+}
+
+/// This is mpn_mu_bdiv_q from mpn/generic/mu_bdiv_q.c.
+pub fn _limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    let mut q_len = n_len;
+    assert!(d_len >= 2);
+    assert!(q_len >= 2);
+    assert!(n_len >= d_len);
+    if q_len > d_len {
+        // |_______________________| dividend
+        // |________| divisor
+        // Compute an inverse size that is a nice partition of the quotient.
+        let blocks = (q_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
+        let i_len = (q_len - 1) / blocks + 1; // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+        let (is, rs) = scratch.split_at_mut(i_len);
+        limbs_modular_invert(is, &ds[..i_len], rs);
+        let mut carry = 0;
+        rs[..d_len].copy_from_slice(&ns[..d_len]);
+        let mut np_offset = d_len;
+        limbs_mul_low_same_length(qs, &rs[..i_len], &is[..i_len]);
+        q_len -= i_len;
+        let mut qp_offset = 0;
+        let (rs, scratch) = rs.split_at_mut(d_len);
+        while q_len > i_len {
+            if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+                limbs_mul_greater_to_out(scratch, &ds[..d_len], &qs[qp_offset..qp_offset + i_len]);
+            } else {
+                let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+                {
+                    let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
+                    _limbs_mul_mod_limb_width_to_n_minus_1(
+                        scratch,
+                        mul_size,
+                        &ds[..d_len],
+                        &qs[qp_offset..qp_offset + i_len],
+                        scratch_out,
+                    );
+                }
+                //TODO Else is untested!
+                let wrapped_n = isize::checked_from(d_len + i_len).unwrap()
+                    - isize::checked_from(mul_size).unwrap();
+                if wrapped_n > 0 {
+                    let wrapped_n = usize::checked_from(wrapped_n).unwrap();
+                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
+                    let c0 = if limbs_sub_same_length_to_out(
+                        scratch_hi,
+                        &scratch_lo[..wrapped_n],
+                        &rs[..wrapped_n],
+                    ) {
+                        1
+                    } else {
+                        0
+                    };
+                    assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_n..], c0));
+                }
+            }
+            qp_offset += i_len;
+            if d_len != i_len {
+                let (rs_lo, rs_hi) = rs.split_at_mut(i_len);
+                carry += if limbs_sub_same_length_to_out(
+                    rs_lo,
+                    &rs_hi[..d_len - i_len],
+                    &scratch[i_len..d_len],
+                ) {
+                    1
+                } else {
+                    0
+                };
+                if carry == 2 {
+                    assert!(!limbs_slice_add_limb_in_place(&mut scratch[d_len..], 1));
+                    carry = 1;
+                }
+            }
+            carry = if _limbs_sub_same_length_with_borrow_in_to_out(
+                &mut rs[d_len - i_len..],
+                &ns[np_offset..np_offset + i_len],
+                &scratch[d_len..d_len + i_len],
+                carry > 0,
+            ) {
+                1
+            } else {
+                0
+            };
+            np_offset += i_len;
+            limbs_mul_low_same_length(&mut qs[qp_offset..], &rs[..i_len], &is[..i_len]);
+            q_len -= i_len;
+        }
+        // Generate last qn limbs.
+        if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            limbs_mul_greater_to_out(scratch, &ds[..d_len], &qs[qp_offset..qp_offset + i_len]);
+        } else {
+            let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            {
+                let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
+                _limbs_mul_mod_limb_width_to_n_minus_1(
+                    scratch,
+                    mul_size,
+                    &ds[..d_len],
+                    &qs[qp_offset..qp_offset + i_len],
+                    scratch_out,
+                );
+            }
+            let wrapped_n = isize::checked_from(d_len + i_len).unwrap()
+                - isize::checked_from(mul_size).unwrap();
+            if wrapped_n > 0 {
+                let wrapped_n = usize::checked_from(wrapped_n).unwrap();
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
+                let c0 = if limbs_sub_same_length_to_out(
+                    scratch_hi,
+                    &scratch_lo[..wrapped_n],
+                    &rs[..wrapped_n],
+                ) {
+                    1
+                } else {
+                    0
+                };
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_n..], c0));
+            }
+        }
+        qp_offset += i_len;
+        if d_len != i_len {
+            let (rs_lo, rs_hi) = rs.split_at_mut(i_len);
+            carry += if limbs_sub_same_length_to_out(
+                rs_lo,
+                &rs_hi[..d_len - i_len],
+                &scratch[i_len..d_len],
+            ) {
+                1
+            } else {
+                0
+            };
+            if carry == 2 {
+                assert!(!limbs_slice_add_limb_in_place(&mut scratch[d_len..], 1));
+                carry = 1;
+            }
+        }
+        _limbs_sub_same_length_with_borrow_in_to_out(
+            &mut rs[d_len - i_len..],
+            &ns[np_offset..np_offset + q_len - (d_len - i_len)],
+            &scratch[d_len..q_len + i_len],
+            carry > 0,
+        );
+        limbs_mul_low_same_length(&mut qs[qp_offset..], &rs[..q_len], &is[..q_len]);
+    } else {
+        // |________________| dividend
+        // |________________| divisor
+        // Compute half-sized inverse.
+        let i_len = q_len - (q_len >> 1);
+        let (is, scratch) = scratch.split_at_mut(i_len);
+        limbs_modular_invert(is, &ds[..i_len], scratch);
+        limbs_mul_low_same_length(qs, &ns[..i_len], &is[..i_len]); // low `in' quotient limbs
+        if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
+            limbs_mul_greater_to_out(scratch, &ds[..q_len], &qs[..i_len]); // mulhigh
+        } else {
+            let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(q_len);
+            {
+                let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
+                _limbs_mul_mod_limb_width_to_n_minus_1(
+                    scratch,
+                    mul_size,
+                    &ds[..q_len],
+                    &qs[..i_len],
+                    scratch_out,
+                );
+            }
+            //TODO Else is untested!
+            let wrapped_n = isize::checked_from(q_len + i_len).unwrap()
+                - isize::checked_from(mul_size).unwrap();
+            if wrapped_n > 0 {
+                let wrapped_n = usize::checked_from(wrapped_n).unwrap();
+                let c0 = if limbs_cmp_same_length(&scratch[..wrapped_n], &ns[..wrapped_n])
+                    == Ordering::Less
+                {
+                    1
+                } else {
+                    0
+                };
+                assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_n..], c0));
+            }
+        }
+        let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
+        limbs_sub_same_length_to_out(scratch_lo, &ns[i_len..q_len], &scratch_hi[..q_len - i_len]);
+        // high qn - in quotient limbs
+        limbs_mul_low_same_length(
+            &mut qs[i_len..],
+            &scratch[..q_len - i_len],
+            &is[..q_len - i_len],
+        );
+    }
 }
