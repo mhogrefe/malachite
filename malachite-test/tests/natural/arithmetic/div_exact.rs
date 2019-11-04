@@ -5780,14 +5780,14 @@ fn test_limbs_modular_div_barrett() {
         assert_eq!(&qs[n..], &qs_in[n..]);
         verify_limbs_modular_div(ns, ds, qs_out);
     };
-    // in _limbs_modular_div_barrett_balanced
-    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_balanced
+    // in _limbs_modular_div_barrett_same_length
+    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_same_length
     test(&[10; 3], &[0, 0], &[1, 2], &[0, 0]);
     test(&[10; 3], &[1, 2], &[1, 1], &[1, 1]);
     test(&[10; 3], &[1, 2], &[1, 2], &[1, 0]);
     test(&[10; 3], &[1, 2], &[5, 6], &[3435973837, 3607772528]);
-    // in _limbs_modular_div_barrett_unbalanced
-    // carry != 2 second time in _limbs_modular_div_barrett_unbalanced
+    // in _limbs_modular_div_barrett_greater
+    // !carry second time in _limbs_modular_div_barrett_greater
     test(&[10; 4], &[1, 2, 3, 4], &[1, 2, 3], &[1, 0, 0, 4]);
     test(
         &[10; 4],
@@ -5795,17 +5795,17 @@ fn test_limbs_modular_div_barrett() {
         &[1, 0xffff_ffff, 3],
         &[1, 3, 2, 4294967290],
     );
-    // q_len > i_len in _limbs_modular_div_barrett_unbalanced
-    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_unbalanced
-    // d_len == i_len in _limbs_modular_div_barrett_unbalanced
+    // q_len > i_len in _limbs_modular_div_barrett_greater
+    // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_greater
+    // d_len == i_len in _limbs_modular_div_barrett_greater
     test(
         &[10; 5],
         &[1, 2, 3, 4, 5],
         &[7, 8],
         &[3067833783, 175304787, 3481052211, 2770888938, 2968937350],
     );
-    // d_len != i_len in _limbs_modular_div_barrett_unbalanced
-    // carry != 2 first time in _limbs_modular_div_barrett_unbalanced
+    // d_len != i_len in _limbs_modular_div_barrett_greater
+    // !carry first time in _limbs_modular_div_barrett_greater
     test(
         &[10; 17],
         &[
@@ -5821,7 +5821,7 @@ fn test_limbs_modular_div_barrett() {
             901277614,
         ],
     );
-    // carry == 2 first time in _limbs_modular_div_barrett_unbalanced
+    // carry first time in _limbs_modular_div_barrett_greater
     test(
         &[10; 98],
         &[
@@ -5862,7 +5862,7 @@ fn test_limbs_modular_div_barrett() {
             2450050482, 2554796526, 3366193628, 4244612028, 1102253197, 3744549054, 521836615,
         ],
     );
-    // carry == 2 second time in _limbs_modular_div_barrett_unbalanced
+    // carry second time in _limbs_modular_div_barrett_greater
     test(
         &[10; 37],
         &[
@@ -5887,8 +5887,8 @@ fn test_limbs_modular_div_barrett() {
             1415086525, 3673678347,
         ],
     );
-    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_balanced
-    // wrapped_n > 0 in _limbs_modular_div_barrett_balanced
+    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_same_length
+    // n_len + i_len > mul_size in _limbs_modular_div_barrett_same_length
     test(
         &[10; 69],
         &[
@@ -5928,8 +5928,8 @@ fn test_limbs_modular_div_barrett() {
             83156101, 1563034919, 1982884392, 689027156, 3848414016, 2735835897,
         ],
     );
-    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_unbalanced
-    // wrapped_n > 0 in _limbs_modular_div_barrett_unbalanced
+    // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_modular_div_barrett_greater
+    // d_len + i_len > mul_size in _limbs_modular_div_barrett_greater
     test(
         &[10; 369],
         &[
