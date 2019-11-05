@@ -1000,3 +1000,39 @@ pub fn _limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scr
         _limbs_modular_div_barrett_same_length(qs, ns, ds, scratch);
     }
 }
+
+/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c.
+pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
+    if d_len < MU_BDIV_Q_THRESHOLD {
+        n_len
+    } else {
+        _limbs_modular_div_barrett_scratch_len(n_len, d_len)
+    }
+}
+
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`). D must be odd.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// This is mpn_bdiv_q from mpn/generic/bdiv_q.c.
+pub fn _limbs_modular_div(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    if d_len < DC_BDIV_Q_THRESHOLD {
+        let scratch = &mut scratch[..n_len];
+        scratch.copy_from_slice(ns);
+        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_schoolbook(qs, scratch, ds, inverse);
+    } else if d_len < MU_BDIV_Q_THRESHOLD {
+        let scratch = &mut scratch[..n_len];
+        scratch.copy_from_slice(ns);
+        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_divide_and_conquer(qs, scratch, ds, inverse);
+    } else {
+        _limbs_modular_div_barrett(qs, ns, ds, scratch);
+    }
+}
