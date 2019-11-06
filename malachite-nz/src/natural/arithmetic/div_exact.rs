@@ -25,7 +25,9 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use platform::Limb;
+use platform::{
+    Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD, MU_BDIV_Q_THRESHOLD,
+};
 
 /// Time: worst case O(1)
 ///
@@ -40,8 +42,19 @@ pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
     itch_local + itch_out
 }
 
-//TODO tune
-const BINV_NEWTON_THRESHOLD: usize = 224;
+pub fn _limbs_modular_invert_small(
+    size: usize,
+    is: &mut [Limb],
+    scratch: &mut [Limb],
+    ds: &[Limb],
+    inverse: Limb,
+) {
+    if size < DC_BDIV_Q_THRESHOLD {
+        _limbs_modular_div_schoolbook(is, scratch, ds, inverse);
+    } else {
+        _limbs_modular_div_divide_and_conquer(is, scratch, ds, inverse);
+    }
+}
 
 /// Finds the inverse of a slice `Limb` mod 2<sup>`ds.len() * Limb::WIDTH`</sup>; given x, returns y
 /// such that x * y === 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
@@ -84,11 +97,7 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     limbs_set_zero(scratch_lo);
     scratch_lo[0] = 1;
     let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-    if size < DC_BDIV_Q_THRESHOLD {
-        _limbs_modular_div_schoolbook(is, scratch_lo, ds_lo, inverse);
-    } else {
-        _limbs_modular_div_divide_and_conquer(is, scratch_lo, ds_lo, inverse);
-    }
+    _limbs_modular_invert_small(size, is, scratch_lo, ds_lo, inverse);
     let mut previous_size = size;
     // Use Newton iterations to get the desired precision.
     for &size in sizes.iter().rev() {
@@ -188,9 +197,6 @@ pub fn _limbs_modular_div_mod_schoolbook(
         carry != highest_r
     }
 }
-
-//TODO tune
-const DC_BDIV_QR_THRESHOLD: usize = 44;
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
@@ -351,9 +357,6 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
 pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }
-
-//TODO tune
-const MU_BDIV_Q_THRESHOLD: usize = 1_442;
 
 /// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c.
 pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
@@ -668,9 +671,6 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
 pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }
-
-//TODO tune
-const DC_BDIV_Q_THRESHOLD: usize = 104;
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///

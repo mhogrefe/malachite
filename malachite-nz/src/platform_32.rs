@@ -34,3 +34,12 @@ pub const MU_DIV_QR_SKEW_THRESHOLD: usize = 233;
 
 pub const MU_DIVAPPR_Q_THRESHOLD: usize = 2297;
 pub const FUDGE: usize = 261;
+
+pub const MULLO_BASECASE_THRESHOLD: usize = 0;
+pub const MULLO_DC_THRESHOLD: usize = 62;
+pub const MULLO_MUL_N_THRESHOLD: usize = 8_907;
+
+pub const BINV_NEWTON_THRESHOLD: usize = 224;
+pub const DC_BDIV_QR_THRESHOLD: usize = 44;
+pub const DC_BDIV_Q_THRESHOLD: usize = 104;
+pub const MU_BDIV_Q_THRESHOLD: usize = 1_442;

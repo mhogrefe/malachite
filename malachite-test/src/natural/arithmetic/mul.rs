@@ -7,7 +7,9 @@ use malachite_nz::natural::arithmetic::mul::fft::{
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
     _limbs_mul_low_same_length_divide_and_conquer,
-    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch, limbs_mul_low_same_length,
+    _limbs_mul_low_same_length_divide_and_conquer_scratch_len,
+    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch, _limbs_mul_low_same_length_large,
+    limbs_mul_low_same_length,
 };
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
@@ -58,6 +60,7 @@ use inputs::base::{
     triples_of_unsigned_vec_var_32, triples_of_unsigned_vec_var_33, triples_of_unsigned_vec_var_34,
     triples_of_unsigned_vec_var_35, triples_of_unsigned_vec_var_36, triples_of_unsigned_vec_var_46,
     triples_of_unsigned_vec_var_47, triples_of_unsigned_vec_var_48, triples_of_unsigned_vec_var_49,
+    triples_of_unsigned_vec_var_52,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 
@@ -268,12 +271,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch
+        benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch_algorithms
     );
     register_bench!(
         registry,
         Large,
         benchmark_limbs_mul_low_same_length_divide_and_conquer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_mul_low_same_length_large_algorithms
     );
     register_bench!(
         registry,
@@ -1531,7 +1539,7 @@ fn benchmark_limbs_mul_low_same_length_basecase_algorithms_2(
     );
 }
 
-fn benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
+fn benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -1539,19 +1547,25 @@ fn benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     m_run_benchmark(
         "limbs_mul_low_same_length_divide_and_conquer_shared_scratch\
          (&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_48(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(_, ref xs, _)| xs.len()),
         "xs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut out, xs, ys)| {
-                _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys)
-            }),
-        )],
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out, xs, ys)| _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)),
+            ),
+            (
+                "divide-and-conquer",
+                &mut (|(mut out, xs, ys)| {
+                    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys)
+                }),
+            ),
+        ],
     );
 }
 
@@ -1579,6 +1593,47 @@ fn benchmark_limbs_mul_low_same_length_divide_and_conquer_algorithms(
                 &mut (|(mut out, xs, ys)| {
                     let mut scratch = vec![0; ys.len() << 1];
                     _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_large_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_mul_low_same_length_large(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_52(gm.with_scale(1 << 15)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "mul low divide-and-conquer",
+                &mut (|(mut out, xs, ys)| {
+                    let mut scratch =
+                        vec![
+                            0;
+                            _limbs_mul_low_same_length_divide_and_conquer_scratch_len(xs.len())
+                        ];
+                    _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch)
+                }),
+            ),
+            (
+                "mul low large",
+                &mut (|(mut out, xs, ys)| {
+                    let mut scratch =
+                        vec![
+                            0;
+                            _limbs_mul_low_same_length_divide_and_conquer_scratch_len(xs.len())
+                        ];
+                    _limbs_mul_low_same_length_large(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
         ],

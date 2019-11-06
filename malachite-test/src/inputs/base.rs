@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, Wrap
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::natural::arithmetic::div_exact::limbs_modular_invert_scratch_len;
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
@@ -2562,6 +2563,14 @@ pub fn triples_of_unsigned_vec_var_51(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     Box::new(ts.filter(|(q, n, d)| q.len() >= n.len() && n.len() >= d.len() && d[0].odd()))
 }
 
+// All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same
+// length, which is at least 2.
+pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(triples_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _, _)| xs.len() >= 2))
+}
+
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,
@@ -3199,6 +3208,34 @@ pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_6(
                 (q, n, d, inverse)
             }),
     )
+}
+
+// All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `is`, `scratch`, `ds`,
+// and `inverse` meet the preconditions of `_limbs_modular_invert_small`.
+pub fn quadruples_of_three_unsigned_vecs_and_unsigned_var_7(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    let vs: It<Vec<Limb>> =
+        match gm {
+            GenerationMode::Exhaustive => {
+                Box::new(exhaustive_vecs_min_length(1, exhaustive_unsigned()))
+            }
+            GenerationMode::Random(scale) => Box::new(random_vecs_min_length(
+                &EXAMPLE_SEED,
+                scale,
+                1,
+                &(|seed| random(seed)),
+            )),
+            GenerationMode::SpecialRandom(scale) => Box::new(
+                special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 1),
+            ),
+        };
+    Box::new(vs.filter(|d| d[0].odd()).map(|d| {
+        let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+        let is = vec![0; d.len()];
+        let scratch = vec![0; limbs_modular_invert_scratch_len(d.len())];
+        (is, scratch, d, inverse)
+    }))
 }
 
 // All triples of `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor of `Limb::MAX`.

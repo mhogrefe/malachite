@@ -3,7 +3,8 @@ use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
     _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
     _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_scratch_len,
+    _limbs_modular_div_scratch_len, _limbs_modular_invert_small, limbs_modular_invert,
+    limbs_modular_invert_scratch_len,
 };
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 
@@ -12,7 +13,8 @@ use inputs::base::{
     pairs_of_unsigned_vec_var_12, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_6, quadruples_of_unsigned_vec_var_4,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_6,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_7, quadruples_of_unsigned_vec_var_4,
     quadruples_of_unsigned_vec_var_5, triples_of_unsigned_vec_var_50,
     triples_of_unsigned_vec_var_51,
 };
@@ -26,7 +28,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_modular_div_divide_and_conquer);
     register_demo!(registry, demo_limbs_modular_div_barrett);
     register_demo!(registry, demo_limbs_modular_div);
-    register_bench!(registry, Small, benchmark_limbs_modular_invert);
+    register_bench!(registry, Small, benchmark_limbs_modular_invert_algorithms);
     register_bench!(registry, Small, benchmark_limbs_modular_div_mod_schoolbook);
     register_bench!(
         registry,
@@ -165,23 +167,31 @@ fn demo_limbs_modular_div(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_modular_invert(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_modular_invert_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_modular_invert(&mut [Limb], &[Limb], &mut [Limb])",
-        BenchmarkType::Single,
-        pairs_of_unsigned_vec_var_12(gm),
+        BenchmarkType::Algorithms,
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_7(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref ds)| ds.len()),
+        &(|&(_, _, ref ds, _)| ds.len()),
         "ds.len()",
-        &mut [(
-            "malachite",
-            &mut (|(mut is, ds)| {
-                let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
-                limbs_modular_invert(&mut is, &ds, &mut scratch);
-            }),
-        )],
+        &mut [
+            (
+                "modular invert small",
+                &mut (|(mut is, mut scratch, ds, inverse)| {
+                    let n = ds.len();
+                    _limbs_modular_invert_small(n, &mut is, &mut scratch[..n], &ds, inverse);
+                }),
+            ),
+            (
+                "modular invert",
+                &mut (|(mut is, mut scratch, ds, _)| {
+                    limbs_modular_invert(&mut is, &ds, &mut scratch);
+                }),
+            ),
+        ],
     );
 }
 
@@ -218,8 +228,8 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref ns, _, _)| ns.len()),
-        "ns.len()",
+        &(|&(_, _, ref ds, _)| ds.len()),
+        "ds.len()",
         &mut [
             (
                 "schoolbook",
@@ -310,12 +320,12 @@ fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
     m_run_benchmark(
         "limbs_modular_div_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_6(gm.with_scale(512)),
+        quadruples_of_three_unsigned_vecs_and_unsigned_var_6(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref ns, _, _)| ns.len()),
-        "ns.len()",
+        &(|&(_, _, ref ds, _)| ds.len()),
+        "ds.len()",
         &mut [
             (
                 "schoolbook",
