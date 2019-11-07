@@ -1528,12 +1528,12 @@ fn benchmark_limbs_mul_low_same_length_basecase_algorithms_2(
         "xs.len()",
         &mut [
             (
-                "basecase mul low",
-                &mut (|(mut out, xs, ys)| _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)),
-            ),
-            (
                 "basecase mul",
                 &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
+            ),
+            (
+                "basecase mul low",
+                &mut (|(mut out, xs, ys)| _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)),
             ),
         ],
     );

@@ -8,7 +8,6 @@ name = "malachite_nz"
 path = "src/lib.rs"
 
 [features]
-
 32_bit_limbs = []
 
 [dependencies]

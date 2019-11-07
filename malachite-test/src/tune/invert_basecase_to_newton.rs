@@ -26,7 +26,10 @@ pub fn tune() -> Vec<String> {
             threshold
         ));
     } else {
-        panic!("Unexpected basecase to Newton tuning result: {:?}", result);
+        panic!(
+            "Unexpected invert basecase to Newton tuning result: {:?}",
+            result
+        );
     }
     lines
 }

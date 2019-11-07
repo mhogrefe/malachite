@@ -5,6 +5,7 @@
     unnecessary_operation,
     unused_must_use
 )]
+#![cfg_attr(feature = "tune", feature(test))]
 
 extern crate itertools;
 #[macro_use]
@@ -32,6 +33,7 @@ pub mod base;
 pub mod integer;
 pub mod natural;
 
+#[cfg(feature = "tune")]
 pub mod tune;
 
 pub fn register(registry: &mut common::DemoBenchRegistry) {

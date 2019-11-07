@@ -37,7 +37,7 @@ pub fn tune() -> Vec<String> {
             lines.push("pub const MAYBE_DCP1_DIVAPPR: bool = false;".to_string());
         }
         _ => panic!(
-            "Unexpected Schoolbook approx to divide-and-conquer approx tuning result: {:?}",
+            "Unexpected div approx schoolbook to divide-and-conquer tuning result: {:?}",
             result
         ),
     }

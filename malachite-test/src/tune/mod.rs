@@ -9,14 +9,22 @@ use malachite_nz::platform::{
 pub mod aorsmul;
 pub mod barrett_helper;
 pub mod barrett_product;
-pub mod basecase_to_newton;
 pub mod compare_two;
+pub mod div_approx_divide_and_conquer_to_barrett;
+pub mod div_approx_schoolbook_to_divide_and_conquer;
 pub mod div_balance;
-pub mod divide_and_conquer_approx_to_barrett_approx;
-pub mod divide_and_conquer_to_barrett;
+pub mod div_mod_divide_and_conquer_to_barrett;
+pub mod div_mod_schoolbook_to_divide_and_conquer;
 pub mod fft;
-pub mod schoolbook_approx_to_divide_and_conquer_approx;
-pub mod schoolbook_to_divide_and_conquer;
+pub mod invert_basecase_to_newton;
+pub mod modular_div_divide_and_conquer_to_barrett;
+pub mod modular_div_mod_divide_and_conquer_to_barrett;
+pub mod modular_div_mod_schoolbook_to_divide_and_conquer;
+pub mod modular_div_schoolbook_to_divide_and_conquer;
+pub mod modular_invert_small_to_large;
+pub mod mul_basecase_to_mul_low_basecase;
+pub mod mul_low_basecase_to_divide_and_conquer;
+pub mod mul_low_divide_and_conquer_to_large;
 pub mod toom_22;
 pub mod toom_32_to_43;
 pub mod toom_32_to_53;
@@ -46,21 +54,45 @@ pub fn tune(param_group: &str) {
         "Toom32to53" => display_lines(&toom_32_to_53::tune()),
         "Toom42to53" => display_lines(&toom_42_to_53::tune()),
         "Toom42to63" => display_lines(&toom_42_to_63::tune()),
-        "SchoolbookToDivideAndConquer" => display_lines(&schoolbook_to_divide_and_conquer::tune()),
-        "SchoolbookApproxToDivideAndConquerApprox" => {
-            display_lines(&schoolbook_approx_to_divide_and_conquer_approx::tune())
+        "DivModSchoolbookToDivideAndConquer" => {
+            display_lines(&div_mod_schoolbook_to_divide_and_conquer::tune())
         }
-        "BasecaseToNewton" => display_lines(&basecase_to_newton::tune()),
-        "DivideAndConquerToBarrett" => display_lines(&divide_and_conquer_to_barrett::tune()),
+        "DivApproxSchoolbookToDivideAndConquer" => {
+            display_lines(&div_approx_schoolbook_to_divide_and_conquer::tune())
+        }
+        "InvertBasecaseToNewton" => display_lines(&invert_basecase_to_newton::tune()),
+        "DivModDivideAndConquerToBarrett" => {
+            display_lines(&div_mod_divide_and_conquer_to_barrett::tune())
+        }
         "BarrettProduct" => display_lines(&barrett_product::tune()),
         "BarrettHelper" => display_lines(&barrett_helper::tune()),
-        "DivideAndConquerApproxToBarrettApprox" => {
-            display_lines(&divide_and_conquer_approx_to_barrett_approx::tune())
+        "DivApproxDivideAndConquerToBarrett" => {
+            display_lines(&div_approx_divide_and_conquer_to_barrett::tune())
         }
         "DivBalance" => display_lines(&div_balance::tune()),
+        "MulBasecaseToMulLowBasecase" => display_lines(&mul_basecase_to_mul_low_basecase::tune()),
+        "MulLowBasecaseToDivideAndConquer" => {
+            display_lines(&mul_low_basecase_to_divide_and_conquer::tune())
+        }
+        "MulLowDivideAndConquerToLarge" => {
+            display_lines(&mul_low_divide_and_conquer_to_large::tune())
+        }
+        "ModularInvertSmallToLarge" => display_lines(&modular_invert_small_to_large::tune()),
+        "ModularDivModSchoolbookToDivideAndConquer" => {
+            display_lines(&modular_div_mod_schoolbook_to_divide_and_conquer::tune())
+        }
+        "ModularDivModDivideAndConquerToBarett" => {
+            display_lines(&modular_div_mod_divide_and_conquer_to_barrett::tune())
+        }
+        "ModularDivSchoolbookToDivideAndConquer" => {
+            display_lines(&modular_div_schoolbook_to_divide_and_conquer::tune())
+        }
+        "ModularDivDivideAndConquerToBarett" => {
+            display_lines(&modular_div_divide_and_conquer_to_barrett::tune())
+        }
         "all" => {
             let mut lines = Vec::new();
-            lines.push(format!("pub type Limb = {};", Limb::NAME));
+            /*lines.push(format!("pub type Limb = {};", Limb::NAME));
             lines.push(format!("pub type HalfLimb = {};", HalfLimb::NAME));
             lines.push(format!("pub type DoubleLimb = {};", DoubleLimb::NAME));
             lines.push(format!("pub type SignedLimb = {};", SignedLimb::NAME));
@@ -92,16 +124,26 @@ pub fn tune(param_group: &str) {
             lines.push(String::new());
             lines.extend(fft::tune());
             lines.push(String::new());
-            lines.extend(schoolbook_to_divide_and_conquer::tune());
-            lines.extend(schoolbook_approx_to_divide_and_conquer_approx::tune());
-            lines.extend(basecase_to_newton::tune());
-            lines.extend(divide_and_conquer_to_barrett::tune());
+            lines.extend(div_mod_schoolbook_to_divide_and_conquer::tune());
+            lines.extend(div_approx_schoolbook_to_divide_and_conquer::tune());
+            lines.extend(invert_basecase_to_newton::tune());
+            lines.extend(div_mod_divide_and_conquer_to_barrett::tune());
             lines.extend(barrett_product::tune());
             lines.extend(barrett_helper::tune());
             lines.push(String::new());
-            lines.extend(divide_and_conquer_approx_to_barrett_approx::tune());
+            lines.extend(div_approx_divide_and_conquer_to_barrett::tune());
             lines.extend(div_balance::tune());
-            let filename = "benchmarks/platform.txt";
+            lines.push(String::new());*/
+            lines.extend(mul_basecase_to_mul_low_basecase::tune());
+            lines.extend(mul_low_basecase_to_divide_and_conquer::tune());
+            lines.extend(mul_low_divide_and_conquer_to_large::tune());
+            lines.push(String::new());
+            lines.extend(modular_invert_small_to_large::tune());
+            lines.extend(modular_div_mod_schoolbook_to_divide_and_conquer::tune());
+            lines.extend(modular_div_mod_divide_and_conquer_to_barrett::tune());
+            lines.extend(modular_div_schoolbook_to_divide_and_conquer::tune());
+            lines.extend(modular_div_divide_and_conquer_to_barrett::tune());
+            let filename = format!("benchmarks/platform{}.txt", Limb::NAME);
             let mut output = File::create(filename).unwrap();
             for line in lines {
                 writeln!(output, "{}", line);

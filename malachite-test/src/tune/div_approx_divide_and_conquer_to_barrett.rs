@@ -31,7 +31,7 @@ pub fn tune() -> Vec<String> {
         ));
     } else {
         panic!(
-            "Unexpected divide-and-conquer approx to Barrett approx tuning result: {:?}",
+            "Unexpected div approx divide-and-conquer to Barrett tuning result: {:?}",
             result
         );
     }

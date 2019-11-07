@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
+use std::hint::black_box;
 
 use stats::{mean, median};
 use time::precise_time_ns;
@@ -33,12 +34,12 @@ where
         for _ in 0..reps {
             let x_1 = x.clone();
             let start_time = precise_time_ns();
-            first(x_1);
+            black_box(first(x_1));
             let end_time = precise_time_ns();
             durations_vec_1.push(end_time - start_time);
             let x_2 = x.clone();
             let start_time = precise_time_ns();
-            second(x_2);
+            black_box(second(x_2));
             let end_time = precise_time_ns();
             durations_vec_2.push(end_time - start_time);
         }

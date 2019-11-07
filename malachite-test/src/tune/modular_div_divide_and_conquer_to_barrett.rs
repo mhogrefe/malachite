@@ -1,0 +1,43 @@
+use std::hint::black_box;
+
+use malachite_nz::natural::arithmetic::div_exact::{
+    _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
+    _limbs_modular_div_divide_and_conquer,
+};
+use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use malachite_nz::platform::Limb;
+
+use common::GenerationMode;
+use inputs::base::triples_of_unsigned_vec_var_50;
+use tune::compare_two::{compare_two, ComparisonResult};
+
+pub fn tune() -> Vec<String> {
+    let result = compare_two(
+        &mut (|(mut qs, mut ns, ds): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
+            let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+            black_box(_limbs_modular_div_divide_and_conquer(
+                &mut qs, &mut ns, &ds, inverse,
+            ))
+        }),
+        &mut (|(mut qs, ns, ds): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
+            let mut scratch = vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
+            black_box(_limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+        }),
+        triples_of_unsigned_vec_var_50(GenerationMode::Random(2_048)),
+        10000,
+        &(|&(_, ref ns, _)| ns.len()),
+    );
+    let mut lines = Vec::new();
+    if let ComparisonResult::SecondBetterAbove(threshold) = result {
+        lines.push(format!(
+            "pub const MU_BDIV_Q_THRESHOLD: usize = {};",
+            threshold
+        ));
+    } else {
+        panic!(
+            "Unexpected modular div divide-and-conquer to Barrett tuning result: {:?}",
+            result
+        );
+    }
+    lines
+}
