@@ -1,6 +1,6 @@
-use std::cmp::{max, Ordering};
+use std::cmp::{max, min, Ordering};
 
-use malachite_base::limbs::limbs_set_zero;
+use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -9,7 +9,7 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use natural::arithmetic::div_exact_limb::{limbs_div_exact_limb_to_out, limbs_modular_invert_limb};
 use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
@@ -17,6 +17,7 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
+use natural::arithmetic::shr_u::limbs_shr_to_out;
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
@@ -1035,4 +1036,77 @@ pub fn _limbs_modular_div(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
     } else {
         _limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
+}
+
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+///
+/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+/// meaningless result.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must be nonempty and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+/// limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out(qs, &[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
+/// assert_eq!(qs, &[0, 6, 7, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out(qs, &[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]);
+/// assert_eq!(qs, &[102, 101, 100, 10]);
+/// ```
+///
+/// This is mpn_divexact from mpn/generic/divexact.c.
+pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    assert!(n_len >= d_len);
+    assert_ne!(ds[d_len - 1], 0);
+    let leading_zero_limbs = limbs_leading_zero_limbs(ds);
+    assert!(
+        limbs_test_zero(&ns[..leading_zero_limbs]),
+        "division not exact"
+    );
+    let mut ns_scratch;
+    let mut ds_scratch;
+    let mut ns = &ns[leading_zero_limbs..];
+    let mut ds = &ds[leading_zero_limbs..];
+    let n_len = ns.len();
+    let d_len = ds.len();
+    if d_len == 1 {
+        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        return;
+    }
+    let q_len = n_len - d_len + 1;
+    let shift = ds[0].trailing_zeros();
+    if shift != 0 {
+        let q_len_plus_1 = q_len + 1;
+        let ds_scratch_len = if d_len > q_len { q_len_plus_1 } else { d_len };
+        ds_scratch = vec![0; ds_scratch_len];
+        limbs_shr_to_out(&mut ds_scratch, &ds[..ds_scratch_len], shift);
+        ds = &ds_scratch;
+        // Since we have excluded d_len == 1, we have n_len > q_len, and we need to shift one limb
+        // beyond q_len.
+        ns_scratch = vec![0; q_len_plus_1];
+        limbs_shr_to_out(&mut ns_scratch, &ns[..q_len_plus_1], shift);
+        ns = &ns_scratch;
+    }
+    let d_len = min(d_len, q_len);
+    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
+    _limbs_modular_div(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
 }

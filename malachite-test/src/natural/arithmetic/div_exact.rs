@@ -1,10 +1,11 @@
+use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_ref;
 use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div, _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
     _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
     _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, _limbs_modular_invert_small, limbs_modular_invert,
-    limbs_modular_invert_scratch_len,
+    _limbs_modular_div_scratch_len, _limbs_modular_invert_small, limbs_div_exact_to_out,
+    limbs_modular_invert, limbs_modular_invert_scratch_len,
 };
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 
@@ -16,7 +17,7 @@ use inputs::base::{
     quadruples_of_three_unsigned_vecs_and_unsigned_var_6,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_7, quadruples_of_unsigned_vec_var_4,
     quadruples_of_unsigned_vec_var_5, triples_of_unsigned_vec_var_50,
-    triples_of_unsigned_vec_var_51,
+    triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53, triples_of_unsigned_vec_var_54,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -28,6 +29,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_modular_div_divide_and_conquer);
     register_demo!(registry, demo_limbs_modular_div_barrett);
     register_demo!(registry, demo_limbs_modular_div);
+    register_demo!(registry, demo_limbs_div_exact_to_out);
     register_bench!(registry, Small, benchmark_limbs_modular_invert_algorithms);
     register_bench!(registry, Small, benchmark_limbs_modular_div_mod_schoolbook);
     register_bench!(
@@ -52,6 +54,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_limbs_modular_div_barrett_algorithms
     );
     register_bench!(registry, Small, benchmark_limbs_modular_div);
+    register_bench!(registry, Small, benchmark_limbs_div_exact_to_out_algorithms);
 }
 
 fn demo_limbs_modular_invert(gm: GenerationMode, limit: usize) {
@@ -162,6 +165,17 @@ fn demo_limbs_modular_div(gm: GenerationMode, limit: usize) {
         _limbs_modular_div(&mut qs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; _limbs_modular_div(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
+            qs_old, ns, ds, qs
+        );
+    }
+}
+
+fn demo_limbs_div_exact_to_out(gm: GenerationMode, limit: usize) {
+    for (mut qs, ns, ds) in triples_of_unsigned_vec_var_53(gm).take(limit) {
+        let qs_old = qs.clone();
+        limbs_div_exact_to_out(&mut qs, &ns, &ds);
+        println!(
+            "qs := {:?}; limbs_div_exact_to_out(&mut qs, {:?}, {:?}); qs = {:?}",
             qs_old, ns, ds, qs
         );
     }
@@ -394,5 +408,28 @@ fn benchmark_limbs_modular_div(gm: GenerationMode, limit: usize, file_name: &str
                 _limbs_modular_div(&mut qs, &ns, &ds, &mut scratch)
             }),
         )],
+    );
+}
+
+fn benchmark_limbs_div_exact_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_exact_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_var_54(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref ns, _)| ns.len()),
+        "ns.len()",
+        &mut [
+            (
+                "div",
+                &mut (|(mut qs, ns, ds)| limbs_div_to_out_ref_ref(&mut qs, &ns, &ds)),
+            ),
+            (
+                "div exact",
+                &mut (|(mut qs, ns, ds)| limbs_div_exact_to_out(&mut qs, &ns, &ds)),
+            ),
+        ],
     );
 }

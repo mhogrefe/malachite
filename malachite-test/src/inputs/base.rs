@@ -20,6 +20,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::limbs_mul;
 use malachite_nz::natural::arithmetic::mul::mul_mod::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
@@ -2571,6 +2572,31 @@ pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
     Box::new(triples_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _, _)| xs.len() >= 2))
 }
 
+// All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
+// `limbs_div_exact_to_out`.
+pub fn triples_of_unsigned_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes_3(gm, 1)
+            .filter(|&(ref qs, ref ns, ref ds)| {
+                qs.len() >= ns.len() - 1 && *ds.last().unwrap() != 0
+            })
+            .map(|(out, ns, ds)| {
+                let mut new_ns = limbs_mul(&ns, &ds);
+                if *new_ns.last().unwrap() == 0 {
+                    new_ns.pop();
+                }
+                (out, new_ns, ds)
+            })
+            .filter(|&(ref qs, ref ns, ref ds)| qs.len() >= ns.len() - ds.len() + 1),
+    )
+}
+
+// All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of both
+// `limbs_div_to_out` and `limbs_div_exact_to_out`.
+pub fn triples_of_unsigned_vec_var_54(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(triples_of_unsigned_vec_var_53(gm).filter(|&(_, _, ref ds)| ds.len() > 1))
+}
+
 fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,
@@ -2654,6 +2680,23 @@ pub fn triples_of_unsigned_vec_min_sizes_1_2<T: PrimitiveUnsigned + Rand>(
         )),
     };
     reshape_1_2_to_3(permute_2_1(xss))
+}
+
+pub fn triples_of_unsigned_vec_min_sizes_3<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    min_len: u64,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(min_len, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, min_len),
+        )),
+    }
 }
 
 pub fn quadruples_of_three_unsigned_vecs_and_bool<T: PrimitiveUnsigned + Rand>(

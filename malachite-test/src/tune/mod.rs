@@ -92,7 +92,7 @@ pub fn tune(param_group: &str) {
         }
         "all" => {
             let mut lines = Vec::new();
-            /*lines.push(format!("pub type Limb = {};", Limb::NAME));
+            lines.push(format!("pub type Limb = {};", Limb::NAME));
             lines.push(format!("pub type HalfLimb = {};", HalfLimb::NAME));
             lines.push(format!("pub type DoubleLimb = {};", DoubleLimb::NAME));
             lines.push(format!("pub type SignedLimb = {};", SignedLimb::NAME));
@@ -133,7 +133,7 @@ pub fn tune(param_group: &str) {
             lines.push(String::new());
             lines.extend(div_approx_divide_and_conquer_to_barrett::tune());
             lines.extend(div_balance::tune());
-            lines.push(String::new());*/
+            lines.push(String::new());
             lines.extend(mul_basecase_to_mul_low_basecase::tune());
             lines.extend(mul_low_basecase_to_divide_and_conquer::tune());
             lines.extend(mul_low_divide_and_conquer_to_large::tune());

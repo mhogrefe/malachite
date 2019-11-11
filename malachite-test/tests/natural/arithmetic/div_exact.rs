@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
+use malachite_base::num::arithmetic::traits::{DivMod, EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_nz::integer::Integer;
@@ -7,7 +7,8 @@ use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
     _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
     _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, limbs_modular_invert, limbs_modular_invert_scratch_len,
+    _limbs_modular_div_scratch_len, limbs_div_exact_to_out, limbs_modular_invert,
+    limbs_modular_invert_scratch_len,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
@@ -20,7 +21,7 @@ use malachite_test::inputs::base::{
     quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_6, quadruples_of_unsigned_vec_var_4,
-    triples_of_unsigned_vec_var_50, triples_of_unsigned_vec_var_51,
+    triples_of_unsigned_vec_var_50, triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53,
 };
 
 fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
@@ -7240,6 +7241,93 @@ fn limbs_modular_div_fail_5() {
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
 }
 
+fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
+    let n = Natural::from_limbs_asc(ns);
+    let d = Natural::from_limbs_asc(ds);
+    let expected_q = Natural::from_limbs_asc(qs);
+    let (q, r) = n.div_mod(d);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, 0 as Limb);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_div_exact_to_out() {
+    let test = |qs_in: &[Limb], ns: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
+        let mut qs = qs_in.to_vec();
+        limbs_div_exact_to_out(&mut qs, ns, ds);
+        let q_len = ns.len() - ds.len() + 1;
+        assert_eq!(&qs[..q_len], qs_out);
+        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+        verify_limbs_div_exact(ns, ds, qs_out);
+    };
+    // d_len == 1
+    test(&[10; 3], &[6], &[2], &[3]);
+    // leading_zero_limbs == 0
+    // d_len != 1
+    // shift == 0
+    // d_len <= q_len
+    test(&[5; 8], &[1, 3, 6, 5, 3], &[1; 3], &[1, 2, 3]);
+    // d_len > q_len
+    test(&[0; 5], &[6, 19, 32, 21], &[1, 2, 3], &[6, 7]);
+    // shift != 0
+    test(&[0; 5], &[6, 19, 32, 21], &[6, 7], &[1, 2, 3]);
+    test(
+        &[10; 7],
+        &[10_200, 20_402, 30_605, 20_402, 10_200],
+        &[100, 101, 102],
+        &[102, 101, 100],
+    );
+    test(&[10; 3], &[0xffff_ffff], &[0xffff_ffff], &[1]);
+    test(
+        &[10; 4],
+        &[1, 0xffff_fffe],
+        &[0xffff_ffff],
+        &[0xffff_ffff, 0],
+    );
+    test(
+        &[10; 6],
+        &[1, 0, 0, 0xffff_fffe, 0xffff_ffff, 0xffff_ffff],
+        &[0xffff_ffff; 3],
+        &[0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0],
+    );
+    // leading_zero_limbs != 0
+    test(
+        &[0; 5],
+        &[0, 0, 0, 6, 19, 32, 21],
+        &[0, 0, 1, 2, 3],
+        &[0, 6, 7],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_fail_1() {
+    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_fail_2() {
+    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_fail_3() {
+    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_fail_4() {
+    limbs_div_exact_to_out(&mut [10], &[6, 19, 32, 21], &[1, 2, 3]);
+}
+
 #[test]
 fn limbs_modular_invert_properties() {
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_12, |&(ref is, ref ds)| {
@@ -7352,6 +7440,19 @@ fn limbs_modular_div_properties() {
             let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
             _limbs_modular_div(&mut qs, ns, ds, &mut scratch);
             verify_limbs_modular_div(ns, ds, &qs[..ns.len()]);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_var_53,
+        |&(ref qs, ref ns, ref ds)| {
+            let mut qs = qs.to_vec();
+            limbs_div_exact_to_out(&mut qs, ns, ds);
+            let q_len = ns.len() - ds.len() + 1;
+            verify_limbs_div_exact(ns, ds, &qs[..q_len]);
         },
     );
 }
