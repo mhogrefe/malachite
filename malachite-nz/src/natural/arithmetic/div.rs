@@ -1749,6 +1749,9 @@ impl Div<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1789,6 +1792,9 @@ impl<'a> Div<&'a Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1828,6 +1834,9 @@ impl<'a> Div<Natural> for &'a Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1889,6 +1898,9 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1945,6 +1957,9 @@ impl DivAssign<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1999,6 +2014,9 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

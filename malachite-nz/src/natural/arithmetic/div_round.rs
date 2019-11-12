@@ -36,6 +36,9 @@ impl DivRound<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -108,6 +111,9 @@ impl<'a> DivRound<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -183,6 +189,9 @@ impl<'a> DivRound<Natural> for &'a Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -271,6 +280,9 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -357,6 +369,9 @@ impl DivRoundAssign<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -433,6 +448,9 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```

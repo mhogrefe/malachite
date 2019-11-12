@@ -1,3 +1,6 @@
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_ref;
 use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div, _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
@@ -19,6 +22,9 @@ use inputs::base::{
     quadruples_of_unsigned_vec_var_5, triples_of_unsigned_vec_var_50,
     triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53, triples_of_unsigned_vec_var_54,
 };
+use inputs::natural::{
+    nrm_pairs_of_natural_and_positive_natural_var_1, pairs_of_natural_and_positive_natural_var_1,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_modular_invert);
@@ -30,6 +36,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_modular_div_barrett);
     register_demo!(registry, demo_limbs_modular_div);
     register_demo!(registry, demo_limbs_div_exact_to_out);
+    register_demo!(registry, demo_natural_div_exact_assign);
+    register_demo!(registry, demo_natural_div_exact_assign_ref);
+    register_demo!(registry, demo_natural_div_exact);
+    register_demo!(registry, demo_natural_div_exact_val_ref);
+    register_demo!(registry, demo_natural_div_exact_ref_val);
+    register_demo!(registry, demo_natural_div_exact_ref_ref);
     register_bench!(registry, Small, benchmark_limbs_modular_invert_algorithms);
     register_bench!(registry, Small, benchmark_limbs_modular_div_mod_schoolbook);
     register_bench!(
@@ -55,6 +67,27 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Small, benchmark_limbs_modular_div);
     register_bench!(registry, Small, benchmark_limbs_div_exact_to_out_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_div_exact_assign_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_div_exact_assign_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_div_exact_library_comparison
+    );
+    register_bench!(registry, Small, benchmark_natural_div_exact_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_natural_div_exact_evaluation_strategy
+    );
 }
 
 fn demo_limbs_modular_invert(gm: GenerationMode, limit: usize) {
@@ -178,6 +211,51 @@ fn demo_limbs_div_exact_to_out(gm: GenerationMode, limit: usize) {
             "qs := {:?}; limbs_div_exact_to_out(&mut qs, {:?}, {:?}); qs = {:?}",
             qs_old, ns, ds, qs
         );
+    }
+}
+
+fn demo_natural_div_exact_assign(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        x.div_exact_assign(y);
+        println!("x := {}; x.div_exact_assign({}); x = {}", x_old, y_old, x);
+    }
+}
+
+fn demo_natural_div_exact_assign_ref(gm: GenerationMode, limit: usize) {
+    for (mut x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        let x_old = x.clone();
+        x.div_exact_assign(&y);
+        println!("x := {}; x.div_exact_assign(&{}); x = {}", x_old, y, x);
+    }
+}
+
+fn demo_natural_div_exact(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("{}.div_exact({}) = {}", x_old, y_old, x.div_exact(y));
+    }
+}
+
+fn demo_natural_div_exact_val_ref(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        let x_old = x.clone();
+        println!("{}.div_exact(&{}) = {}", x_old, y, x.div_exact(&y));
+    }
+}
+
+fn demo_natural_div_exact_ref_val(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        let y_old = y.clone();
+        println!("(&{}).div_exact({}) = {}", x, y_old, (&x).div_exact(y));
+    }
+}
+
+fn demo_natural_div_exact_ref_ref(gm: GenerationMode, limit: usize) {
+    for (x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
+        println!("(&{}).div_exact(&{}) = {}", x, y, (&x).div_exact(&y));
     }
 }
 
@@ -429,6 +507,128 @@ fn benchmark_limbs_div_exact_to_out_algorithms(gm: GenerationMode, limit: usize,
             (
                 "div exact",
                 &mut (|(mut qs, ns, ds)| limbs_div_exact_to_out(&mut qs, &ns, &ds)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_assign_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.div_exact_assign(Natural)",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_positive_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("ordinary division", &mut (|(mut x, y)| x /= y)),
+            ("exact division", &mut (|(mut x, y)| x.div_exact_assign(y))),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_assign_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.div_exact_assign(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_positive_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural.div_exact_assign(Natural)",
+                &mut (|(mut x, y)| x.div_exact_assign(y)),
+            ),
+            (
+                "Natural.div_exact_assign(&Natural)",
+                &mut (|(mut x, y)| x.div_exact_assign(&y)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_library_comparison(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.div_exact(Natural)",
+        BenchmarkType::LibraryComparison,
+        nrm_pairs_of_natural_and_positive_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("num", &mut (|((x, y), _, _)| no_out!(x / y))),
+            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.div_exact(y)))),
+            ("rug", &mut (|(_, (x, y), _)| no_out!(x.div_exact(&y)))),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.div_exact(Natural)",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_positive_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("ordinary division", &mut (|(x, y)| no_out!(x / y))),
+            ("exact division", &mut (|(x, y)| no_out!(x.div_exact(y)))),
+        ],
+    );
+}
+
+fn benchmark_natural_div_exact_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.div_exact(Natural)",
+        BenchmarkType::EvaluationStrategy,
+        pairs_of_natural_and_positive_natural_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural.div_exact(Natural)",
+                &mut (|(x, y)| no_out!(x.div_exact(y))),
+            ),
+            (
+                "Natural.div_exact(&Natural)",
+                &mut (|(x, y)| no_out!(x.div_exact(&y))),
+            ),
+            (
+                "(&Natural).div_exact(Natural)",
+                &mut (|(x, y)| no_out!((&x).div_exact(y))),
+            ),
+            (
+                "(&Natural).div_exact(&Natural)",
+                &mut (|(x, y)| no_out!((&x).div_exact(&y))),
             ),
         ],
     );

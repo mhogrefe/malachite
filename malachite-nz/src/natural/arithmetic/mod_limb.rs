@@ -157,6 +157,9 @@ impl<'a> Mod<Limb> for &'a Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -195,6 +198,9 @@ impl ModAssign<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -235,6 +241,9 @@ impl Mod<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -274,6 +283,9 @@ impl<'a> Mod<&'a Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -312,6 +324,9 @@ impl ModAssign<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -349,6 +364,9 @@ impl<'a> ModAssign<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -392,6 +410,9 @@ impl Rem<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -432,6 +453,9 @@ impl<'a> Rem<Limb> for &'a Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -477,6 +501,9 @@ impl RemAssign<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -527,6 +554,9 @@ impl Rem<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -565,6 +595,9 @@ impl<'a> Rem<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -611,6 +644,9 @@ impl RemAssign<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -647,6 +683,9 @@ impl<'a> RemAssign<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -689,6 +728,9 @@ impl NegMod<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -730,6 +772,9 @@ impl<'a> NegMod<Limb> for &'a Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -774,6 +819,9 @@ impl NegModAssign<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -815,6 +863,9 @@ impl NegMod<Natural> for Limb {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -861,6 +912,9 @@ impl<'a> NegMod<&'a Natural> for Limb {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

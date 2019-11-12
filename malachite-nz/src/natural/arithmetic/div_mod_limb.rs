@@ -288,6 +288,9 @@ impl DivMod<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -333,6 +336,9 @@ impl<'a> DivMod<Limb> for &'a Natural {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -394,6 +400,9 @@ impl DivAssignMod<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -448,6 +457,9 @@ impl DivMod<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -490,6 +502,9 @@ impl<'a> DivMod<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -541,6 +556,9 @@ impl DivAssignMod<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -584,6 +602,9 @@ impl<'a> DivAssignMod<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -634,6 +655,9 @@ impl DivRem<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -679,6 +703,9 @@ impl<'a> DivRem<Limb> for &'a Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -721,6 +748,9 @@ impl DivAssignRem<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -765,6 +795,9 @@ impl DivRem<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -808,6 +841,9 @@ impl<'a> DivRem<&'a Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -848,6 +884,9 @@ impl DivAssignRem<Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -890,6 +929,9 @@ impl<'a> DivAssignRem<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -936,6 +978,9 @@ impl CeilingDivNegMod<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -981,6 +1026,9 @@ impl<'a> CeilingDivNegMod<Limb> for &'a Natural {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1029,6 +1077,9 @@ impl CeilingDivAssignNegMod<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1079,6 +1130,9 @@ impl CeilingDivNegMod<Natural> for Limb {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1123,6 +1177,9 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Limb {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1172,6 +1229,9 @@ impl CeilingDivAssignNegMod<Natural> for Limb {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1218,6 +1278,9 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Limb {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

@@ -432,6 +432,9 @@ impl DivExact<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -478,6 +481,9 @@ impl<'a> DivExact<Limb> for &'a Natural {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -538,6 +544,9 @@ impl DivExactAssign<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -600,6 +609,9 @@ impl DivExact<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -647,6 +659,9 @@ impl<'a> DivExact<&'a Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -692,6 +707,9 @@ impl DivExactAssign<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -729,6 +747,9 @@ impl<'a> DivExactAssign<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

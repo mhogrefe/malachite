@@ -337,6 +337,9 @@ impl<'a> Div<Limb> for &'a Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
@@ -381,6 +384,9 @@ impl DivAssign<Limb> for Natural {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
@@ -424,6 +430,9 @@ impl Div<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
@@ -463,6 +472,9 @@ impl<'a> Div<&'a Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
@@ -500,6 +512,9 @@ impl DivAssign<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
@@ -530,6 +545,9 @@ impl<'a> DivAssign<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

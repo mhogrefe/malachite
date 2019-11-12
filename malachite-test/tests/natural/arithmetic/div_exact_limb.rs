@@ -493,10 +493,7 @@ fn div_exact_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(quotient_alt, quotient);
 
     let quotient_alt = n.div_round(u, RoundingMode::Exact);
-    assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
-
-    //TODO assert_eq!(n.div_exact(Natural::from(u)), quotient);
 
     assert_eq!(
         rug_integer_to_natural(&rug_div_exact_limb(natural_to_rug_integer(n), u)),

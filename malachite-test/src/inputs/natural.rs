@@ -428,7 +428,7 @@ pub fn nm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All pairs of `Natural` and positive `u32` where the `Natural` is divisible by the `u32`.
+// All pairs of `Natural` and positive `Limb` where the `Natural` is divisible by the `Limb`.
 pub fn pairs_of_natural_and_positive_limb_var_1(gm: GenerationMode) -> It<(Natural, Limb)> {
     Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
 }
@@ -542,6 +542,24 @@ pub fn nrm_pairs_of_natural_and_positive_natural(
 // second.
 pub fn pairs_of_natural_and_positive_natural_var_1(gm: GenerationMode) -> It<(Natural, Natural)> {
     Box::new(pairs_of_natural_and_positive_natural(gm).map(|(n, u)| (n * &u, u)))
+}
+
+pub fn nrm_pairs_of_natural_and_positive_natural_var_1(
+    gm: GenerationMode,
+) -> It<(
+    (BigUint, BigUint),
+    (rug::Integer, rug::Integer),
+    (Natural, Natural),
+)> {
+    Box::new(
+        pairs_of_natural_and_positive_natural_var_1(gm).map(|(x, y)| {
+            (
+                (natural_to_biguint(&x), natural_to_biguint(&y)),
+                (natural_to_rug_integer(&x), natural_to_rug_integer(&y)),
+                (x, y),
+            )
+        }),
+    )
 }
 
 //TODO use divisible

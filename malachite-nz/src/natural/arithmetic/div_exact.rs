@@ -1,7 +1,9 @@
 use std::cmp::{max, min, Ordering};
 
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero, limbs_test_zero};
-use malachite_base::num::arithmetic::traits::{Parity, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    DivExact, DivExactAssign, Parity, WrappingSubAssign,
+};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -26,6 +28,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
+use natural::Natural;
 use platform::{
     Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD, MU_BDIV_Q_THRESHOLD,
 };
@@ -1109,4 +1112,299 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let d_len = min(d_len, q_len);
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
     _limbs_modular_div(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
+}
+
+impl DivExact<Natural> for Natural {
+    type Output = Natural;
+
+    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value. The first `Natural`
+    /// must be exactly divisible by the second. If it isn't, this function will crash or return
+    /// a meaningless result.
+    ///
+    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExact;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)).to_string(), "123");
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     assert_eq!(
+    ///         Natural::from_str("121932631112635269000000").unwrap()
+    ///             .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
+    ///         "123456789000"
+    ///     );
+    /// }
+    /// ```
+    #[inline]
+    fn div_exact(mut self, other: Natural) -> Natural {
+        self.div_exact_assign(other);
+        self
+    }
+}
+
+impl<'a> DivExact<&'a Natural> for Natural {
+    type Output = Natural;
+
+    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
+    /// reference. The first `Natural` must be exactly divisible by the second. If it isn't, this
+    /// function will crash or return a meaningless result.
+    ///
+    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExact;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     assert_eq!(
+    ///         Natural::from(56088u32).div_exact(&Natural::from(456u32)).to_string(),
+    ///         "123"
+    ///     );
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     assert_eq!(
+    ///         Natural::from_str("121932631112635269000000").unwrap()
+    ///             .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
+    ///         "123456789000"
+    ///     );
+    /// }
+    /// ```
+    #[inline]
+    fn div_exact(mut self, other: &'a Natural) -> Natural {
+        self.div_exact_assign(other);
+        self
+    }
+}
+
+impl<'a> DivExact<Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
+    /// by value. The first `Natural` must be exactly divisible by the second. If it isn't, this
+    /// function will crash or return a meaningless result.
+    ///
+    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExact;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     assert_eq!(
+    ///         (&Natural::from(56088u32)).div_exact(Natural::from(456u32)).to_string(),
+    ///         "123"
+    ///     );
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     assert_eq!(
+    ///         (&Natural::from_str("121932631112635269000000").unwrap())
+    ///             .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
+    ///         "123456789000"
+    ///     );
+    /// }
+    /// ```
+    fn div_exact(self, other: Natural) -> Natural {
+        //TODO
+        self / other
+    }
+}
+
+impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference. The first `Natural`
+    /// must be exactly divisible by the second. If it isn't, this function will crash or return
+    /// a meaningless result.
+    ///
+    /// If you are unsure whether the division will be exact use `self / other` instead. If you're
+    /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
+    /// zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExact;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     assert_eq!(
+    ///         (&Natural::from(56088u32)).div_exact(&Natural::from(456u32)).to_string(),
+    ///         "123"
+    ///     );
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     assert_eq!(
+    ///         (&Natural::from_str("121932631112635269000000").unwrap())
+    ///             .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
+    ///         "123456789000"
+    ///     );
+    /// }
+    /// ```
+    fn div_exact(self, other: &'b Natural) -> Natural {
+        //TODO
+        self / other
+    }
+}
+
+impl DivExactAssign<Natural> for Natural {
+    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value. The
+    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
+    /// isn't, this function will crash or assign the first `Natural` to a meaningless value.
+    ///
+    /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
+    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round_assign(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExactAssign;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     let mut x = Natural::from(56088u32);
+    ///     x.div_exact_assign(Natural::from(456u32));
+    ///     assert_eq!(x.to_string(), "123");
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     let mut x = Natural::from_str("121932631112635269000000").unwrap();
+    ///     x.div_exact_assign(Natural::from_str("987654321000").unwrap());
+    ///     assert_eq!(x.to_string(), "123456789000");
+    /// }
+    /// ```
+    fn div_exact_assign(&mut self, other: Natural) {
+        //TODO
+        *self /= other;
+    }
+}
+
+impl<'a> DivExactAssign<&'a Natural> for Natural {
+    /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference. The
+    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
+    /// isn't, this function will crash or assign the first `Natural` to a meaningless value.
+    ///
+    /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
+    /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
+    /// remainder is zero. If you want a function that panics if the division is not exact, use
+    /// `self.div_round_assign(other, RoundingMode::Exact)`.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivExactAssign;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     // 123 * 456 = 56088
+    ///     let mut x = Natural::from(56088u32);
+    ///     x.div_exact_assign(&Natural::from(456u32));
+    ///     assert_eq!(x.to_string(), "123");
+    ///
+    ///     // 123456789000 * 987654321000 = 121932631112635269000000
+    ///     let mut x = Natural::from_str("121932631112635269000000").unwrap();
+    ///     x.div_exact_assign(&Natural::from_str("987654321000").unwrap());
+    ///     assert_eq!(x.to_string(), "123456789000");
+    /// }
+    /// ```
+    fn div_exact_assign(&mut self, other: &'a Natural) {
+        //TODO
+        *self /= other;
+    }
 }

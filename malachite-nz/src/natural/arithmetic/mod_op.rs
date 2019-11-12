@@ -885,6 +885,9 @@ impl Mod<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -924,6 +927,9 @@ impl<'a> Mod<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -965,6 +971,9 @@ impl<'a> Mod<Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1004,6 +1013,9 @@ impl<'a, 'b> Mod<&'b Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1041,6 +1053,9 @@ impl ModAssign<Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1080,6 +1095,9 @@ impl<'a> ModAssign<&'a Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1118,6 +1136,9 @@ impl Rem<Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1159,6 +1180,9 @@ impl<'a> Rem<&'a Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1198,6 +1222,9 @@ impl<'a> Rem<Natural> for &'a Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1254,6 +1281,9 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1307,6 +1337,9 @@ impl RemAssign<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1343,6 +1376,9 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1401,6 +1437,9 @@ impl NegMod<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1442,6 +1481,9 @@ impl<'a> NegMod<&'a Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1482,6 +1524,9 @@ impl<'a> NegMod<Natural> for &'a Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -1527,6 +1572,9 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1569,6 +1617,9 @@ impl NegModAssign<Natural> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -1609,6 +1660,9 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     /// Additional memory: Worst case O(n * log(n))
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

@@ -89,6 +89,9 @@ impl DivRound<Limb> for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -140,6 +143,9 @@ impl<'a> DivRound<Limb> for &'a Natural {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -218,6 +224,9 @@ impl DivRound<Natural> for Limb {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -266,6 +275,9 @@ impl<'a> DivRound<&'a Natural> for Limb {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -323,6 +335,9 @@ impl DivRoundAssign<Limb> for Natural {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -412,6 +427,9 @@ impl DivRoundAssign<Natural> for Limb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -480,6 +498,9 @@ impl<'a> DivRoundAssign<&'a Natural> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
