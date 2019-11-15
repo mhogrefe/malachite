@@ -2573,7 +2573,7 @@ pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
-// `limbs_div_exact_to_out`.
+// `limbs_div_exact_to_out_ref_ref`.
 pub fn triples_of_unsigned_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(
         triples_of_unsigned_vec_min_sizes_3(gm, 1)
@@ -2592,7 +2592,7 @@ pub fn triples_of_unsigned_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
 }
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of both
-// `limbs_div_to_out` and `limbs_div_exact_to_out`.
+// `limbs_div_to_out` and `limbs_div_exact_to_out_ref_ref`.
 pub fn triples_of_unsigned_vec_var_54(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(triples_of_unsigned_vec_var_53(gm).filter(|&(_, _, ref ds)| ds.len() > 1))
 }

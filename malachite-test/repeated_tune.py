@@ -2,7 +2,7 @@ import subprocess
 from shutil import copyfile
 import time
 
-platform_32 = True
+platform_32 = False
 while True:
 	if platform_32:
 		assert subprocess.call('cargo run --features 32_bit_limbs --release tune all', shell = True) == 0

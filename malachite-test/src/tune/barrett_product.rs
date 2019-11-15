@@ -1,10 +1,10 @@
+use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::div_mod::_limbs_div_barrett_large_product;
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
 use inputs::base::sextuples_of_four_limb_vecs_and_two_usizes_var_1;
-use tune::compare_two::{compare_two, ComparisonResult};
 
 pub fn tune() -> Vec<String> {
     let result = compare_two(

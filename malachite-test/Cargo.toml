@@ -13,11 +13,11 @@ path = "src/bin.rs"
 
 [features]
 32_bit_limbs = ["malachite-nz/32_bit_limbs", "rust-wheels/32_bit_limbs"]
-tune = []
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
 malachite-nz = { path = "../malachite-nz", default-features = false, features = ["serde"] }
+malachite-bench = { path = "../malachite-bench", default-features = false }
 rust-wheels = { path = "../../rust-wheels", default-features = false }
 itertools = "0.7.8"
 num = "0.2.0"

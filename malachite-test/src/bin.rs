@@ -3,10 +3,8 @@ extern crate malachite_test;
 use std::env;
 
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
-#[cfg(feature = "tune")]
 use malachite_test::tune::tune;
 
-#[cfg(feature = "tune")]
 fn optionally_tune(args: &[String]) -> bool {
     if args.len() == 3 && args[1] == "tune" {
         tune(&args[2]);
@@ -14,11 +12,6 @@ fn optionally_tune(args: &[String]) -> bool {
     } else {
         false
     }
-}
-
-#[cfg(not(feature = "tune"))]
-fn optionally_tune(_: &[String]) -> bool {
-    false
 }
 
 pub fn main() {

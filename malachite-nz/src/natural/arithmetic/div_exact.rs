@@ -1,9 +1,11 @@
 use std::cmp::{max, min, Ordering};
+use std::mem::swap;
 
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, Parity, WrappingSubAssign,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -19,7 +21,7 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
-use natural::arithmetic::shr_u::limbs_shr_to_out;
+use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
@@ -28,7 +30,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::Natural;
+use natural::Natural::{self, Large, Small};
 use platform::{
     Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD, MU_BDIV_Q_THRESHOLD,
 };
@@ -1005,16 +1007,17 @@ pub fn _limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scr
     }
 }
 
-/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c.
+/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, where nothing is allocated for inputs that
+/// are too small for Barrett division.
 pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
-        n_len
+        0
     } else {
         _limbs_modular_div_barrett_scratch_len(n_len, d_len)
     }
 }
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`). D must be odd.
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by value. D must be odd.
 ///
 /// Time: Worst case O(n * log(n) * log(log(n)))
 ///
@@ -1023,7 +1026,38 @@ pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
 /// where n = `ns.len()`
 ///
 /// This is mpn_bdiv_q from mpn/generic/bdiv_q.c.
-pub fn _limbs_modular_div(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+pub fn _limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+    let d_len = ds.len();
+    if d_len < DC_BDIV_Q_THRESHOLD {
+        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_schoolbook(qs, ns, ds, inverse);
+    } else if d_len < MU_BDIV_Q_THRESHOLD {
+        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_divide_and_conquer(qs, ns, ds, inverse);
+    } else {
+        _limbs_modular_div_barrett(qs, ns, ds, scratch);
+    }
+}
+
+/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c.
+pub fn _limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
+    if d_len < MU_BDIV_Q_THRESHOLD {
+        n_len
+    } else {
+        _limbs_modular_div_barrett_scratch_len(n_len, d_len)
+    }
+}
+
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by reference. D must be odd.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// This is mpn_bdiv_q from mpn/generic/bdiv_q.c.
+pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
@@ -1043,6 +1077,7 @@ pub fn _limbs_modular_div(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
 /// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+/// `ns` and `ds` are taken by value.
 ///
 /// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
 /// meaningless result.
@@ -1065,29 +1100,237 @@ pub fn _limbs_modular_div(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out;
 ///
 /// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out(qs, &[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
+/// limbs_div_exact_to_out(qs, &mut [0, 0, 0, 6, 19, 32, 21], &mut [0, 0, 1, 2, 3]);
 /// assert_eq!(qs, &[0, 6, 7, 10]);
 ///
 /// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out(qs, &[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]);
+/// limbs_div_exact_to_out(qs, &mut [10_200, 20_402, 30_605, 20_402, 10_200], &mut [100, 101, 102]);
 /// assert_eq!(qs, &[102, 101, 100, 10]);
 /// ```
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c.
-pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
     assert!(n_len >= d_len);
     assert_ne!(ds[d_len - 1], 0);
     let leading_zero_limbs = limbs_leading_zero_limbs(ds);
-    assert!(
-        limbs_test_zero(&ns[..leading_zero_limbs]),
-        "division not exact"
-    );
+    let (ns_lo, ns) = ns.split_at_mut(leading_zero_limbs);
+    assert!(limbs_test_zero(ns_lo), "division not exact");
+    let ds = &mut ds[leading_zero_limbs..];
+    let n_len = ns.len();
+    let d_len = ds.len();
+    if d_len == 1 {
+        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        return;
+    }
+    let q_len = n_len - d_len + 1;
+    let shift = ds[0].trailing_zeros();
+    if shift != 0 {
+        let q_len_plus_1 = q_len + 1;
+        let ds_limit_len = if d_len > q_len { q_len_plus_1 } else { d_len };
+        limbs_slice_shr_in_place(&mut ds[..ds_limit_len], shift);
+        // Since we have excluded d_len == 1, we have n_len > q_len, and we need to shift one limb
+        // beyond q_len.
+        limbs_slice_shr_in_place(&mut ns[..q_len_plus_1], shift);
+    }
+    let d_len = min(d_len, q_len);
+    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
+    _limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
+}
+
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+/// `ns` is taken by value and `ds` by reference.
+///
+/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+/// meaningless result.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must be nonempty and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+/// limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_val_ref;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_val_ref(qs, &mut [0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
+/// assert_eq!(qs, &[0, 6, 7, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_val_ref(
+///     qs,
+///     &mut [10_200, 20_402, 30_605, 20_402, 10_200],
+///     &[100, 101, 102]
+/// );
+/// assert_eq!(qs, &[102, 101, 100, 10]);
+/// ```
+///
+/// This is mpn_divexact from mpn/generic/divexact.c.
+pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    assert!(n_len >= d_len);
+    assert_ne!(ds[d_len - 1], 0);
+    let leading_zero_limbs = limbs_leading_zero_limbs(ds);
+    let (ns_lo, ns) = ns.split_at_mut(leading_zero_limbs);
+    assert!(limbs_test_zero(ns_lo), "division not exact");
+    let mut ds_scratch;
+    let mut ds = &ds[leading_zero_limbs..];
+    let n_len = ns.len();
+    let d_len = ds.len();
+    if d_len == 1 {
+        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        return;
+    }
+    let q_len = n_len - d_len + 1;
+    let shift = ds[0].trailing_zeros();
+    if shift != 0 {
+        let q_len_plus_1 = q_len + 1;
+        let ds_scratch_len = if d_len > q_len { q_len_plus_1 } else { d_len };
+        ds_scratch = vec![0; ds_scratch_len];
+        limbs_shr_to_out(&mut ds_scratch, &ds[..ds_scratch_len], shift);
+        ds = &ds_scratch;
+        // Since we have excluded d_len == 1, we have n_len > q_len, and we need to shift one limb
+        // beyond q_len.
+        limbs_slice_shr_in_place(&mut ns[..q_len_plus_1], shift);
+    }
+    let d_len = min(d_len, q_len);
+    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
+    _limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
+}
+
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+/// `ns` is taken by reference and `ds` by value.
+///
+/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+/// meaningless result.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must be nonempty and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+/// limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_val;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_ref_val(qs, &[0, 0, 0, 6, 19, 32, 21], &mut [0, 0, 1, 2, 3]);
+/// assert_eq!(qs, &[0, 6, 7, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_ref_val(
+///     qs,
+///     &[10_200, 20_402, 30_605, 20_402, 10_200],
+///     &mut [100, 101, 102]
+/// );
+/// assert_eq!(qs, &[102, 101, 100, 10]);
+/// ```
+///
+/// This is mpn_divexact from mpn/generic/divexact.c.
+pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    assert!(n_len >= d_len);
+    assert_ne!(ds[d_len - 1], 0);
+    let leading_zero_limbs = limbs_leading_zero_limbs(ds);
+    let (ns_lo, ns_hi) = ns.split_at(leading_zero_limbs);
+    assert!(limbs_test_zero(ns_lo), "division not exact");
+    let mut ns_scratch;
+    let mut ns = ns_hi;
+    let ds = &mut ds[leading_zero_limbs..];
+    let n_len = ns.len();
+    let d_len = ds.len();
+    if d_len == 1 {
+        limbs_div_exact_limb_to_out(qs, ns, ds[0]);
+        return;
+    }
+    let q_len = n_len - d_len + 1;
+    let shift = ds[0].trailing_zeros();
+    if shift != 0 {
+        let q_len_plus_1 = q_len + 1;
+        let ds_limit_len = if d_len > q_len { q_len_plus_1 } else { d_len };
+        limbs_slice_shr_in_place(&mut ds[..ds_limit_len], shift);
+        // Since we have excluded d_len == 1, we have n_len > q_len, and we need to shift one limb
+        // beyond q_len.
+        ns_scratch = vec![0; q_len_plus_1];
+        limbs_shr_to_out(&mut ns_scratch, &ns[..q_len_plus_1], shift);
+        ns = &ns_scratch;
+    }
+    let d_len = min(d_len, q_len);
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(q_len, d_len)];
+    _limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
+}
+
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+/// `ns` and `ds` are taken by reference.
+///
+/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+/// meaningless result.
+///
+/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+/// and `ds` must be nonempty and its most significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+/// limb of `ds` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_ref;
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_ref_ref(qs, &[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
+/// assert_eq!(qs, &[0, 6, 7, 10]);
+///
+/// let qs = &mut [10; 4];
+/// limbs_div_exact_to_out_ref_ref(qs, &[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]);
+/// assert_eq!(qs, &[102, 101, 100, 10]);
+/// ```
+///
+/// This is mpn_divexact from mpn/generic/divexact.c.
+pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+    let n_len = ns.len();
+    let d_len = ds.len();
+    assert_ne!(d_len, 0);
+    assert!(n_len >= d_len);
+    assert_ne!(ds[d_len - 1], 0);
+    let leading_zero_limbs = limbs_leading_zero_limbs(ds);
+    let (ns_lo, ns_hi) = ns.split_at(leading_zero_limbs);
+    assert!(limbs_test_zero(ns_lo), "division not exact");
     let mut ns_scratch;
     let mut ds_scratch;
-    let mut ns = &ns[leading_zero_limbs..];
+    let mut ns = ns_hi;
     let mut ds = &ds[leading_zero_limbs..];
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1110,8 +1353,8 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
         ns = &ns_scratch;
     }
     let d_len = min(d_len, q_len);
-    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
-    _limbs_modular_div(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(q_len, d_len)];
+    _limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
 }
 
 impl DivExact<Natural> for Natural {
@@ -1260,9 +1503,31 @@ impl<'a> DivExact<Natural> for &'a Natural {
     ///     );
     /// }
     /// ```
-    fn div_exact(self, other: Natural) -> Natural {
-        //TODO
-        self / other
+    fn div_exact(self, mut other: Natural) -> Natural {
+        if other == 0 as Limb {
+            panic!("division by zero");
+        } else if other == 1 as Limb {
+            self.clone()
+        } else if *self == 0 as Limb {
+            Natural::ZERO
+        } else if self.limb_count() < other.limb_count() {
+            panic!("division not exact");
+        } else {
+            let qs = match (self, &mut other) {
+                (x, &mut Small(y)) => {
+                    return x.div_exact(y);
+                }
+                (&Large(ref xs), &mut Large(ref mut ys)) => {
+                    let mut qs = vec![0; xs.len() - ys.len() + 1];
+                    limbs_div_exact_to_out_ref_val(&mut qs, xs, ys);
+                    qs
+                }
+                _ => unreachable!(),
+            };
+            let mut q = Large(qs);
+            q.trim();
+            q
+        }
     }
 }
 
@@ -1312,8 +1577,32 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// }
     /// ```
     fn div_exact(self, other: &'b Natural) -> Natural {
-        //TODO
-        self / other
+        if *other == 0 as Limb {
+            panic!("division by zero");
+        } else if *other == 1 as Limb {
+            self.clone()
+        } else if *self == 0 as Limb {
+            Natural::ZERO
+        } else if self as *const Natural == other as *const Natural {
+            Natural::ONE
+        } else if self.limb_count() < other.limb_count() {
+            panic!("division not exact");
+        } else {
+            let qs = match (self, other) {
+                (x, &Small(y)) => {
+                    return x.div_exact(y);
+                }
+                (&Large(ref xs), &Large(ref ys)) => {
+                    let mut qs = vec![0; xs.len() - ys.len() + 1];
+                    limbs_div_exact_to_out_ref_ref(&mut qs, xs, ys);
+                    qs
+                }
+                _ => unreachable!(),
+            };
+            let mut q = Large(qs);
+            q.trim();
+            q
+        }
     }
 }
 
@@ -1358,8 +1647,28 @@ impl DivExactAssign<Natural> for Natural {
     /// }
     /// ```
     fn div_exact_assign(&mut self, other: Natural) {
-        //TODO
-        *self /= other;
+        if other == 0 as Limb {
+            panic!("division by zero");
+        } else if other == 1 as Limb {
+        } else if *self == 0 as Limb {
+            *self = Small(0);
+        } else if self.limb_count() < other.limb_count() {
+            panic!("division not exact");
+        } else {
+            match (&mut *self, other) {
+                (x, Small(y)) => {
+                    x.div_exact_assign(y);
+                    return;
+                }
+                (&mut Large(ref mut xs), Large(ref mut ys)) => {
+                    let mut qs = vec![0; xs.len() - ys.len() + 1];
+                    limbs_div_exact_to_out(&mut qs, xs, ys);
+                    swap(&mut qs, xs);
+                }
+                _ => unreachable!(),
+            };
+            self.trim();
+        }
     }
 }
 
@@ -1404,7 +1713,27 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// }
     /// ```
     fn div_exact_assign(&mut self, other: &'a Natural) {
-        //TODO
-        *self /= other;
+        if *other == 0 as Limb {
+            panic!("division by zero");
+        } else if *other == 1 as Limb {
+        } else if *self == 0 as Limb {
+            *self = Small(0);
+        } else if self.limb_count() < other.limb_count() {
+            panic!("division not exact");
+        } else {
+            match (&mut *self, other) {
+                (x, &Small(y)) => {
+                    x.div_exact_assign(y);
+                    return;
+                }
+                (&mut Large(ref mut xs), Large(ref ys)) => {
+                    let mut qs = vec![0; xs.len() - ys.len() + 1];
+                    limbs_div_exact_to_out_val_ref(&mut qs, xs, ys);
+                    swap(&mut qs, xs);
+                }
+                _ => unreachable!(),
+            };
+            self.trim();
+        }
     }
 }

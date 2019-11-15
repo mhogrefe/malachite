@@ -9,7 +9,6 @@ use malachite_nz::platform::{
 pub mod aorsmul;
 pub mod barrett_helper;
 pub mod barrett_product;
-pub mod compare_two;
 pub mod div_approx_divide_and_conquer_to_barrett;
 pub mod div_approx_schoolbook_to_divide_and_conquer;
 pub mod div_balance;
@@ -143,7 +142,7 @@ pub fn tune(param_group: &str) {
             lines.extend(modular_div_mod_divide_and_conquer_to_barrett::tune());
             lines.extend(modular_div_schoolbook_to_divide_and_conquer::tune());
             lines.extend(modular_div_divide_and_conquer_to_barrett::tune());
-            let filename = format!("benchmarks/platform{}.txt", Limb::NAME);
+            let filename = "benchmarks/platform.txt";
             let mut output = File::create(filename).unwrap();
             for line in lines {
                 writeln!(output, "{}", line);

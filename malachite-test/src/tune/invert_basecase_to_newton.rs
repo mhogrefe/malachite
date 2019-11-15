@@ -1,3 +1,4 @@
+use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx,
 };
@@ -5,7 +6,6 @@ use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
 use inputs::base::triples_of_unsigned_vec_var_39;
-use tune::compare_two::{compare_two, ComparisonResult};
 
 pub fn tune() -> Vec<String> {
     let result = compare_two(

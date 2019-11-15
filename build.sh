@@ -15,6 +15,10 @@ cargo clippy &&
 cargo doc &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cargo build --release --target wasm32-unknown-unknown &&
+cd ../malachite-bench &&
+cargo update &&
+cargo fmt &&
+cargo clippy &&
 cd ../malachite-test &&
 cargo update &&
 cargo fmt &&

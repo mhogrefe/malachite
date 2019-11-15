@@ -12,9 +12,10 @@ use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div, _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
     _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
-    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, limbs_div_exact_to_out, limbs_modular_invert,
-    limbs_modular_invert_scratch_len,
+    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len,
+    _limbs_modular_div_schoolbook, _limbs_modular_div_scratch_len, limbs_div_exact_to_out,
+    limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
+    limbs_modular_invert, limbs_modular_invert_scratch_len,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
@@ -6145,9 +6146,18 @@ fn test_limbs_modular_div() {
         let mut qs = qs_in.to_vec();
         let n = ns.len();
         let mut scratch = vec![0; _limbs_modular_div_scratch_len(n, ds.len())];
-        _limbs_modular_div(&mut qs, ns, ds, &mut scratch);
+        let mut mut_ns = ns.to_vec();
+        _limbs_modular_div(&mut qs, &mut mut_ns, ds, &mut scratch);
         assert_eq!(&qs[..n], qs_out);
         assert_eq!(&qs[n..], &qs_in[n..]);
+
+        let mut qs = qs_in.to_vec();
+        let n = ns.len();
+        let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(n, ds.len())];
+        _limbs_modular_div_ref(&mut qs, ns, ds, &mut scratch);
+        assert_eq!(&qs[..n], qs_out);
+        assert_eq!(&qs[n..], &qs_in[n..]);
+
         verify_limbs_modular_div(ns, ds, qs_out);
     };
     // schoolbook branch
@@ -7206,7 +7216,7 @@ fn test_limbs_modular_div() {
 #[test]
 #[should_panic]
 fn limbs_modular_div_fail_1() {
-    let ns = &[1, 2];
+    let ns = &mut [1, 2];
     let ds = &[];
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
@@ -7216,7 +7226,7 @@ fn limbs_modular_div_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_modular_div_fail_2() {
-    let ns = &[];
+    let ns = &mut [];
     let ds = &[];
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
@@ -7226,7 +7236,7 @@ fn limbs_modular_div_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_modular_div_fail_3() {
-    let ns = &[1, 2];
+    let ns = &mut [1, 2];
     let ds = &[1, 2, 3];
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
@@ -7236,7 +7246,7 @@ fn limbs_modular_div_fail_3() {
 #[test]
 #[should_panic]
 fn limbs_modular_div_fail_4() {
-    let ns = &[1, 2, 3, 4];
+    let ns = &mut [1, 2, 3, 4];
     let ds = &[1, 2];
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
@@ -7246,10 +7256,60 @@ fn limbs_modular_div_fail_4() {
 #[test]
 #[should_panic]
 fn limbs_modular_div_fail_5() {
-    let ns = &[1, 2, 3, 4];
+    let ns = &mut [1, 2, 3, 4];
     let ds = &[4, 5];
     let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
     _limbs_modular_div(&mut [10; 3], ns, ds, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_ref_fail_1() {
+    let ns = &[1, 2];
+    let ds = &[];
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+    _limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_ref_fail_2() {
+    let ns = &[];
+    let ds = &[];
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+    _limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_ref_fail_3() {
+    let ns = &[1, 2];
+    let ds = &[1, 2, 3];
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+    _limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_ref_fail_4() {
+    let ns = &[1, 2, 3, 4];
+    let ds = &[1, 2];
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+    _limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_div_ref_fail_5() {
+    let ns = &[1, 2, 3, 4];
+    let ds = &[4, 5];
+    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+    _limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
 }
 
 fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
@@ -7266,10 +7326,33 @@ fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
 fn test_div_exact_to_out() {
     let test = |qs_in: &[Limb], ns: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
-        limbs_div_exact_to_out(&mut qs, ns, ds);
+        let mut mut_ns = ns.to_vec();
+        let mut mut_ds = ds.to_vec();
+        limbs_div_exact_to_out(&mut qs, &mut mut_ns, &mut mut_ds);
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
         assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+
+        let mut qs = qs_in.to_vec();
+        let mut mut_ns = ns.to_vec();
+        limbs_div_exact_to_out_val_ref(&mut qs, &mut mut_ns, ds);
+        let q_len = ns.len() - ds.len() + 1;
+        assert_eq!(&qs[..q_len], qs_out);
+        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+
+        let mut qs = qs_in.to_vec();
+        let mut mut_ds = ds.to_vec();
+        limbs_div_exact_to_out_ref_val(&mut qs, ns, &mut mut_ds);
+        let q_len = ns.len() - ds.len() + 1;
+        assert_eq!(&qs[..q_len], qs_out);
+        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+
+        let mut qs = qs_in.to_vec();
+        limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
+        let q_len = ns.len() - ds.len() + 1;
+        assert_eq!(&qs[..q_len], qs_out);
+        assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+
         verify_limbs_div_exact(ns, ds, qs_out);
     };
     // d_len == 1
@@ -7315,28 +7398,112 @@ fn test_div_exact_to_out() {
 #[test]
 #[should_panic]
 fn limbs_div_exact_to_out_fail_1() {
-    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[]);
+    limbs_div_exact_to_out(&mut [10; 5], &mut [6, 19, 32, 21], &mut []);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_to_out_fail_2() {
-    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 3, 4, 5]);
+    limbs_div_exact_to_out(&mut [10; 5], &mut [6, 19, 32, 21], &mut [1, 2, 3, 4, 5]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_to_out_fail_3() {
-    limbs_div_exact_to_out(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 0]);
+    limbs_div_exact_to_out(&mut [10; 5], &mut [6, 19, 32, 21], &mut [1, 2, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_div_exact_to_out_fail_4() {
-    limbs_div_exact_to_out(&mut [10], &[6, 19, 32, 21], &[1, 2, 3]);
+    limbs_div_exact_to_out(&mut [10], &mut [6, 19, 32, 21], &mut [1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_val_ref_fail_1() {
+    limbs_div_exact_to_out_val_ref(&mut [10; 5], &mut [6, 19, 32, 21], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_val_ref_fail_2() {
+    limbs_div_exact_to_out_val_ref(&mut [10; 5], &mut [6, 19, 32, 21], &[1, 2, 3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_val_ref_fail_3() {
+    limbs_div_exact_to_out_val_ref(&mut [10; 5], &mut [6, 19, 32, 21], &[1, 2, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_val_ref_fail_4() {
+    limbs_div_exact_to_out_val_ref(&mut [10], &mut [6, 19, 32, 21], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_val_fail_1() {
+    limbs_div_exact_to_out_ref_val(&mut [10; 5], &[6, 19, 32, 21], &mut []);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_val_fail_2() {
+    limbs_div_exact_to_out_ref_val(&mut [10; 5], &[6, 19, 32, 21], &mut [1, 2, 3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_val_fail_3() {
+    limbs_div_exact_to_out_ref_val(&mut [10; 5], &[6, 19, 32, 21], &mut [1, 2, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_val_fail_4() {
+    limbs_div_exact_to_out_ref_val(&mut [10], &[6, 19, 32, 21], &mut [1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_ref_fail_1() {
+    limbs_div_exact_to_out_ref_ref(&mut [10; 5], &[6, 19, 32, 21], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_ref_fail_2() {
+    limbs_div_exact_to_out_ref_ref(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_ref_fail_3() {
+    limbs_div_exact_to_out_ref_ref(&mut [10; 5], &[6, 19, 32, 21], &[1, 2, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_to_out_ref_ref_fail_4() {
+    limbs_div_exact_to_out_ref_ref(&mut [10], &[6, 19, 32, 21], &[1, 2, 3]);
 }
 
 #[test]
@@ -7574,21 +7741,49 @@ fn limbs_modular_div_properties() {
         512,
         triples_of_unsigned_vec_var_51,
         |&(ref qs, ref ns, ref ds)| {
-            let mut qs = qs.to_vec();
+            let qs_old = qs;
+            let mut qs = qs_old.to_vec();
+            let mut mut_ns = ns.to_vec();
             let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
-            _limbs_modular_div(&mut qs, ns, ds, &mut scratch);
+            _limbs_modular_div(&mut qs, &mut mut_ns, ds, &mut scratch);
+            let result = qs;
+
+            let mut qs = qs_old.to_vec();
+            let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+            _limbs_modular_div_ref(&mut qs, ns, ds, &mut scratch);
+            assert_eq!(qs, result);
+
             verify_limbs_modular_div(ns, ds, &qs[..ns.len()]);
         },
     );
 }
 
 #[test]
-fn limbs_div_exact_to_out_properties() {
+fn limbs_div_exact_to_out_ref_ref_properties() {
     test_properties(
         triples_of_unsigned_vec_var_53,
         |&(ref qs, ref ns, ref ds)| {
-            let mut qs = qs.to_vec();
-            limbs_div_exact_to_out(&mut qs, ns, ds);
+            let qs_old = qs;
+            let mut qs = qs_old.to_vec();
+            let mut mut_ns = ns.to_vec();
+            let mut mut_ds = ds.to_vec();
+            limbs_div_exact_to_out(&mut qs, &mut mut_ns, &mut mut_ds);
+            let result = qs;
+
+            let mut qs = qs_old.to_vec();
+            let mut mut_ns = ns.to_vec();
+            limbs_div_exact_to_out_val_ref(&mut qs, &mut mut_ns, ds);
+            assert_eq!(qs, result);
+
+            let mut qs = qs_old.to_vec();
+            let mut mut_ds = ds.to_vec();
+            limbs_div_exact_to_out_ref_val(&mut qs, ns, &mut mut_ds);
+            assert_eq!(qs, result);
+
+            let mut qs = qs_old.to_vec();
+            limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
+            assert_eq!(qs, result);
+
             let q_len = ns.len() - ds.len() + 1;
             verify_limbs_div_exact(ns, ds, &qs[..q_len]);
         },

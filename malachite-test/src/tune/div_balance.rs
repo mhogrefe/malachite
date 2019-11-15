@@ -1,5 +1,6 @@
 use std::cmp::max;
 
+use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_to_out_balanced, _limbs_div_to_out_unbalanced,
 };
@@ -7,7 +8,6 @@ use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
 use inputs::base::triples_of_unsigned_vec_var_44;
-use tune::compare_two::{compare_two, ComparisonResult};
 
 pub fn tune() -> Vec<String> {
     let result = compare_two(

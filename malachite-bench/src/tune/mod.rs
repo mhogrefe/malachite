@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, HashMap};
-use std::hint::black_box;
 
 use stats::{mean, median};
 use time::precise_time_ns;
@@ -23,7 +22,7 @@ pub fn compare_two<'a, I: Iterator>(
 where
     I::Item: Clone,
 {
-    let reps = 10;
+    let reps = 5;
     let min_bucket_size = 2;
     let mut durations_map_1 = HashMap::new();
     let mut durations_map_2 = HashMap::new();
@@ -34,12 +33,12 @@ where
         for _ in 0..reps {
             let x_1 = x.clone();
             let start_time = precise_time_ns();
-            black_box(first(x_1));
+            first(x_1);
             let end_time = precise_time_ns();
             durations_vec_1.push(end_time - start_time);
             let x_2 = x.clone();
             let start_time = precise_time_ns();
-            black_box(second(x_2));
+            second(x_2);
             let end_time = precise_time_ns();
             durations_vec_2.push(end_time - start_time);
         }
@@ -107,7 +106,7 @@ where
     }
     let min_successes = min_successes.unwrap();
     let max_successes = max_successes.unwrap();
-    let result = if firsts * 1000 < seconds {
+    if firsts * 1000 < seconds {
         ComparisonResult::SecondAlwaysBetter
     } else if seconds * 1000 < firsts {
         ComparisonResult::FirstAlwaysBetter
@@ -117,11 +116,5 @@ where
         ComparisonResult::FirstBetterAbove(second_then_first_cutoff)
     } else {
         ComparisonResult::NeitherBetter
-    };
-    //println!("max_successes: {}", max_successes);
-    //println!("first_then_second_cutoff: {}", first_then_second_cutoff);
-    //println!("min_successes: {}", min_successes);
-    //println!("second_then_first_cutoff: {}", second_then_first_cutoff);
-    //println!("result: {:?}", result);
-    result
+    }
 }

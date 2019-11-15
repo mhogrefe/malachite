@@ -12,35 +12,35 @@ pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
 pub const MUL_TOOM22_THRESHOLD: usize = 106;
-pub const MUL_TOOM33_THRESHOLD: usize = 62;
-pub const MUL_TOOM44_THRESHOLD: usize = 165;
+pub const MUL_TOOM33_THRESHOLD: usize = 74;
+pub const MUL_TOOM44_THRESHOLD: usize = 178;
 pub const MUL_TOOM6H_THRESHOLD: usize = 624;
-pub const MUL_TOOM8H_THRESHOLD: usize = 348;
+pub const MUL_TOOM8H_THRESHOLD: usize = 371;
 
-pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 96;
-pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 307;
+pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 310;
+pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
 pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 314;
-pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 100;
+pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
-pub const MUL_FFT_THRESHOLD: usize = 4505;
+pub const MUL_FFT_THRESHOLD: usize = 4037;
 
-pub const DC_DIV_QR_THRESHOLD: usize = 105;
+pub const DC_DIV_QR_THRESHOLD: usize = 85;
 pub const DC_DIVAPPR_Q_THRESHOLD: usize = 211;
 pub const MAYBE_DCP1_DIVAPPR: bool = true;
 pub const INV_NEWTON_THRESHOLD: usize = 789;
-pub const MU_DIV_QR_THRESHOLD: usize = 2211;
-pub const INV_MULMOD_BNM1_THRESHOLD: usize = 58;
-pub const MU_DIV_QR_SKEW_THRESHOLD: usize = 233;
+pub const MU_DIV_QR_THRESHOLD: usize = 2094;
+pub const INV_MULMOD_BNM1_THRESHOLD: usize = 62;
+pub const MU_DIV_QR_SKEW_THRESHOLD: usize = 231;
 
-pub const MU_DIVAPPR_Q_THRESHOLD: usize = 2494;
-pub const FUDGE: usize = 280;
+pub const MU_DIVAPPR_Q_THRESHOLD: usize = 2965;
+pub const FUDGE: usize = 311;
 
-pub const MULLO_BASECASE_THRESHOLD: usize = 0;
-pub const MULLO_DC_THRESHOLD: usize = 165;
-pub const MULLO_MUL_N_THRESHOLD: usize = 100_000;
+pub const MULLO_BASECASE_THRESHOLD: usize = 1;
+pub const MULLO_DC_THRESHOLD: usize = 56;
+pub const MULLO_MUL_N_THRESHOLD: usize = 10806;
 
-pub const BINV_NEWTON_THRESHOLD: usize = 2_140;
-pub const DC_BDIV_QR_THRESHOLD: usize = 245;
-pub const MU_BDIV_QR_THRESHOLD: usize = 50_000;
-pub const DC_BDIV_Q_THRESHOLD: usize = 420;
-pub const MU_BDIV_Q_THRESHOLD: usize = 1_874;
+pub const BINV_NEWTON_THRESHOLD: usize = 2211;
+pub const DC_BDIV_QR_THRESHOLD: usize = 211;
+pub const MU_BDIV_QR_THRESHOLD: usize = 7547;
+pub const DC_BDIV_Q_THRESHOLD: usize = 211;
+pub const MU_BDIV_Q_THRESHOLD: usize = 1998;

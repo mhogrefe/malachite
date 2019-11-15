@@ -2,11 +2,11 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::str::FromStr;
 
+use malachite_bench::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::{BigInt, BigUint};
 use rug;
-use rust_wheels::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
 
 pub fn biguint_to_natural(n: &BigUint) -> Natural {
     Natural::from_str(n.to_string().as_ref()).unwrap()

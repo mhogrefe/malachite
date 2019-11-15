@@ -1,3 +1,4 @@
+use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook_approx,
 };
@@ -5,7 +6,6 @@ use malachite_nz::platform::{Limb, DC_DIVAPPR_Q_THRESHOLD};
 
 use common::GenerationMode;
 use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
-use tune::compare_two::{compare_two, ComparisonResult};
 
 pub fn tune() -> Vec<String> {
     let result = compare_two(
