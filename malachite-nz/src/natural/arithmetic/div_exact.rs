@@ -369,8 +369,8 @@ pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) ->
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
     let i_len = if q_len > d_len {
-        let blocks = (q_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
-        (q_len - 1) / blocks + 1 // ceil(qn / ceil(qn / dn))
+        let blocks = (q_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
+        (q_len - 1) / blocks + 1 // ceil(q_len / ceil(q_len / d_len))
     } else {
         q_len - (q_len >> 1)
     };
@@ -403,8 +403,8 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
     // |_______________________| dividend
     // |________| divisor
     // Compute an inverse size that is a nice partition of the quotient.
-    let blocks = (q_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
-    let i_len = (q_len - 1) / blocks + 1; // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+    let blocks = (q_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
+    let i_len = (q_len - 1) / blocks + 1; // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
     let (is, scratch) = scratch.split_at_mut(i_len);
     limbs_modular_invert(is, &ds[..i_len], scratch);
     rs.copy_from_slice(&ns[..d_len]);
@@ -583,7 +583,7 @@ fn _limbs_modular_div_mod_barrett_balanced(
 }
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
-/// `rs.len()`. D must be odd.
+/// `ds.len()`. D must be odd.
 ///
 /// Output:
 ///    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
@@ -803,8 +803,8 @@ pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usi
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
     let mul_len = if n_len > d_len {
-        let blocks = (n_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
-        i_len = (n_len - 1) / blocks + 1; // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+        let blocks = (n_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
+        i_len = (n_len - 1) / blocks + 1; // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
         let (mul_len_1, mul_len_2) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             (d_len + i_len, 0)
         } else {
@@ -843,8 +843,8 @@ fn _limbs_modular_div_barrett_greater(
     // |_______________________| dividend
     // |________| divisor
     // Compute an inverse size that is a nice partition of the quotient.
-    let blocks = (n_len - 1) / d_len + 1; // ceil(qn / dn), number of blocks
-    let i_len = (n_len - 1) / blocks + 1; // ceil(qn / b) = ceil(qn / ceil(qn / dn))
+    let blocks = (n_len - 1) / d_len + 1; // ceil(q_len / d_len), number of blocks
+    let i_len = (n_len - 1) / blocks + 1; // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
     let (is, rs) = scratch.split_at_mut(i_len);
     limbs_modular_invert(is, &ds[..i_len], rs);
     let mut carry = false;

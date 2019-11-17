@@ -31,15 +31,15 @@ fn test_limbs_divisible_by() {
     test(&[6], &[4], false);
     // d_len != 1
     // d_len != 2
-    // twos == 0
+    // trailing_zeros == 0
     // rs[n_len - 1] >= ds[d_len - 1]
     // schoolbook
     test(&[1, 3, 6, 5, 3], &[1; 3], true);
     test(&[1, 3, 7, 5, 3], &[1; 3], false);
     test(&[6, 19, 32, 21], &[1, 2, 3], true);
     // d_len == 2
-    // d_second > d_mask
-    // twos != 0
+    // d_1 > d_mask
+    // trailing_zeros != 0
     test(&[6, 19, 32, 21], &[6, 7], true);
     test(
         &[10_200, 20_402, 30_605, 20_402, 10_200],
@@ -68,7 +68,7 @@ fn test_limbs_divisible_by() {
     test(&[0, 1], &[1, 2], false);
     // rs[n_len - 1] < ds[d_len - 1] && n_len != d_len
     test(&[0, 0, 1], &[1, 2], false);
-    // d_second <= d_mask
+    // d_1 <= d_mask
     // d_len == 2 && n_len < BMOD_1_TO_MOD_1_THRESHOLD
     test(&[0, 1], &[2, 1], false);
     // d_len == 1 && n_len >= BMOD_1_TO_MOD_1_THRESHOLD

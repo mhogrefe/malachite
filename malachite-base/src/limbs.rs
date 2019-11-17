@@ -109,8 +109,8 @@ pub fn limbs_delete_left<T: Copy>(limbs: &mut Vec<T>, delete_size: usize) {
 /// ```
 /// use malachite_base::limbs::limbs_leading_zero_limbs;
 ///
-/// assert_eq!(limbs_leading_zero_limbs(&[1u32, 2, 3]), 0);
-/// assert_eq!(limbs_leading_zero_limbs(&[0u32, 0, 0, 1, 2, 3]), 3);
+/// assert_eq!(limbs_leading_zero_limbs::<u32>(&[1, 2, 3]), 0);
+/// assert_eq!(limbs_leading_zero_limbs::<u32>(&[0, 0, 0, 1, 2, 3]), 3);
 /// ```
 pub fn limbs_leading_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
     limbs.iter().take_while(|&&limb| limb == T::ZERO).count()
@@ -128,8 +128,8 @@ pub fn limbs_leading_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
 /// ```
 /// use malachite_base::limbs::limbs_trailing_zero_limbs;
 ///
-/// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3]), 0);
-/// assert_eq!(limbs_trailing_zero_limbs(&[1u32, 2, 3, 0, 0, 0]), 3);
+/// assert_eq!(limbs_trailing_zero_limbs::<u32>(&[1, 2, 3]), 0);
+/// assert_eq!(limbs_trailing_zero_limbs::<u32>(&[1, 2, 3, 0, 0, 0]), 3);
 /// ```
 pub fn limbs_trailing_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
     limbs
@@ -139,7 +139,26 @@ pub fn limbs_trailing_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
         .count()
 }
 
-//TODO test
+/// Given a slice of limbs and an amount, copies the contents of `&limbs[amount..]` to
+/// `&limbs[..limbs.len() - amount]`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `amount` is greater than the length of `limbs`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::limbs::limbs_move_left;
+///
+/// let limbs = &mut [1, 2, 3, 4, 5, 6];
+/// limbs_move_left::<u32>(limbs, 2);
+/// assert_eq!(limbs, &[3, 4, 5, 6, 5, 6]);
+/// ```
 #[inline]
 pub fn limbs_move_left<T: Copy>(limbs: &mut [T], amount: usize) {
     limbs.copy_within(amount..limbs.len(), 0);

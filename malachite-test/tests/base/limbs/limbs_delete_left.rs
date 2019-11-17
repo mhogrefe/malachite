@@ -4,7 +4,7 @@ use common::test_properties;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_usize_var_1, vecs_of_unsigned};
 
 #[test]
-fn limbs_pad_left_properties() {
+fn limbs_delete_left_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_usize_var_1,
         |&(ref limbs, delete_size): &(Vec<u32>, usize)| {
