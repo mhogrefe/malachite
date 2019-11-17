@@ -1529,7 +1529,7 @@ pub fn pairs_of_unsigned_vec_var_8(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Lim
     )
 }
 
-// All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `_limbs_div_mod`.
+// All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_mod`.
 pub fn pairs_of_unsigned_vec_var_9(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
     let qs: It<(Vec<Limb>, Vec<Limb>)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
@@ -1592,6 +1592,57 @@ pub fn pairs_of_unsigned_vec_var_12<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_unsigned_vec::<T>(gm)
             .filter(|&(ref xs, ref ys)| !ys.is_empty() && xs.len() >= ys.len() && ys[0].odd()),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned, neither `Vec` is empty, and the last `T`s of both
+// `Vec`s are nonzero.
+pub fn pairs_of_unsigned_vec_var_13<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    let ps: It<(Vec<T>, Vec<T>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_vecs(exhaustive_unsigned())
+                .filter(|limbs| !limbs.is_empty() && *limbs.last().unwrap() != T::ZERO),
+        )),
+        _ => Box::new(random_pairs_from_single(vecs_of_unsigned_var_1(gm))),
+    };
+    Box::new(ps.filter(|(n, d)| n.len() >= d.len()))
+}
+
+// All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of both `limbs_div_mod` and
+// `limbs_divisible_by`.
+pub fn pairs_of_unsigned_vec_var_14(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+    let qs: It<(Vec<Limb>, Vec<Limb>)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, 2, &(|seed_2| random(seed_2))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2),
+        )),
+    };
+    Box::new(qs.filter(|(n, d)| {
+        *n.last().unwrap() != Limb::ZERO && *d.last().unwrap() != Limb::ZERO && n.len() >= d.len()
+    }))
+}
+
+// All triples of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact` and
+// `limbs_divisible_by`.
+pub fn pairs_of_unsigned_vec_var_15(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes_2(gm, 1)
+            .filter(|&(_, ref ds)| *ds.last().unwrap() != 0)
+            .map(|(ns, ds)| {
+                let mut new_ns = limbs_mul(&ns, &ds);
+                if *new_ns.last().unwrap() == 0 {
+                    new_ns.pop();
+                }
+                (new_ns, ds)
+            })
+            .filter(|&(ref ns, _)| *ns.last().unwrap() != 0),
     )
 }
 
@@ -2629,6 +2680,23 @@ fn pairs_of_unsigned_vec_min_sizes_var_1<T: PrimitiveUnsigned + Rand>(
     min_len: u64,
 ) -> It<(Vec<T>, Vec<T>)> {
     pairs_of_unsigned_vec_min_sizes_var_1_with_seed(gm, min_len, &EXAMPLE_SEED)
+}
+
+pub fn pairs_of_unsigned_vec_min_sizes_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    min_len: u64,
+) -> It<(Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
+            exhaustive_vecs_min_length(min_len, exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, min_len),
+        )),
+    }
 }
 
 pub fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(

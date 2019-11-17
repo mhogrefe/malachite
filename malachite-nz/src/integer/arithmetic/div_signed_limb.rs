@@ -18,6 +18,9 @@ impl Div<SignedLimb> for Integer {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -68,6 +71,9 @@ impl<'a> Div<SignedLimb> for &'a Integer {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -117,6 +123,9 @@ impl DivAssign<SignedLimb> for Integer {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -174,6 +183,9 @@ impl Div<Integer> for SignedLimb {
     ///
     /// Additional memory: worst case O(1)
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -224,6 +236,9 @@ impl<'a> Div<&'a Integer> for SignedLimb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

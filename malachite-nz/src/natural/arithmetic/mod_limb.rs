@@ -60,6 +60,7 @@ pub(crate) fn mod_by_preinversion(
 /// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// ```
 ///
+/// TODO use mpn_mod_1!
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, where qxn is 0 and un > 1, but not computing
 /// the quotient.
 pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {

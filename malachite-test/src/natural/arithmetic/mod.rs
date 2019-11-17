@@ -16,6 +16,7 @@ pub mod div_mod;
 pub mod div_mod_limb;
 pub mod div_round;
 pub mod div_round_limb;
+pub mod divisible_by;
 pub mod divisible_by_limb;
 pub mod divisible_by_power_of_two;
 pub mod eq_limb_mod_limb;
@@ -61,6 +62,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     div_mod_limb::register(registry);
     div_round::register(registry);
     div_round_limb::register(registry);
+    divisible_by::register(registry);
     divisible_by_limb::register(registry);
     divisible_by_power_of_two::register(registry);
     eq_limb_mod_limb::register(registry);

@@ -16,6 +16,9 @@ impl Div<Limb> for Integer {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -60,6 +63,9 @@ impl<'a> Div<Limb> for &'a Integer {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -106,6 +112,9 @@ impl DivAssign<Limb> for Integer {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -148,6 +157,9 @@ impl Div<Integer> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```
@@ -195,6 +207,9 @@ impl<'a> Div<&'a Integer> for Limb {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
+    ///
+    /// # Panics
+    /// Panics if `other` is zero.
     ///
     /// # Examples
     /// ```

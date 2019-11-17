@@ -5,8 +5,9 @@ use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
+//TODO tune
 // must be >= 1
-const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
+pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
 
 /// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
 ///

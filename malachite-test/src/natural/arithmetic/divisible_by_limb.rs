@@ -69,15 +69,10 @@ fn demo_limb_divisible_by_natural(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    let new_gm = match gm {
-        GenerationMode::Random(scale) => GenerationMode::Random(scale * 10),
-        GenerationMode::SpecialRandom(scale) => GenerationMode::SpecialRandom(scale * 10),
-        gm => gm,
-    };
     m_run_benchmark(
-        "limbs_divisible_by_limb(&mut [Limb], Limb)",
+        "limbs_divisible_by_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        pairs_of_unsigned_vec_and_positive_unsigned_var_1(new_gm),
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
@@ -89,7 +84,7 @@ fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize
                 &mut (|(ref limbs, limb)| no_out!(limbs_divisible_by_limb(limbs, limb))),
             ),
             (
-                "limbs_mod_limb",
+                "divisibility using limbs_mod_limb",
                 &mut (|(ref limbs, limb)| no_out!(limbs_mod_limb(limbs, limb) == 0)),
             ),
             (
