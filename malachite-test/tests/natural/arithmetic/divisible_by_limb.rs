@@ -55,7 +55,7 @@ fn limbs_divisible_by_limb_fail() {
 fn test_divisible_by_limb() {
     let test = |u, v: Limb, divisible| {
         let n = Natural::from_str(u).unwrap();
-        assert_eq!(n.divisible_by(v), divisible);
+        assert_eq!((&n).divisible_by(v), divisible);
         assert_eq!(n == 0 as Limb || v != 0 && n % v == 0, divisible);
 
         assert_eq!(
@@ -122,7 +122,10 @@ fn limbs_divisible_by_limb_properties() {
         pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, limb)| {
             let divisible = limbs_divisible_by_limb(limbs, limb);
-            assert_eq!(Natural::from_limbs_asc(limbs).divisible_by(limb), divisible);
+            assert_eq!(
+                (&Natural::from_limbs_asc(limbs)).divisible_by(limb),
+                divisible
+            );
             assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible);
             assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible);
         },
@@ -132,9 +135,7 @@ fn limbs_divisible_by_limb_properties() {
 fn divisible_by_limb_properties_helper(n: &Natural, u: Limb) {
     let divisible = n.divisible_by(u);
     assert_eq!(*n == 0 as Limb || u != 0 && n % u == 0, divisible);
-
-    //TODO assert_eq!(n.divisible_by(Natural::from(u)), remainder);
-
+    assert_eq!(n.divisible_by(Natural::from(u)), divisible);
     assert_eq!(num_divisible_by_limb(natural_to_biguint(n), u), divisible);
     #[cfg(feature = "32_bit_limbs")]
     assert_eq!(natural_to_rug_integer(n).is_divisible_u(u), divisible);
@@ -161,9 +162,7 @@ fn divisible_by_limb_properties() {
         |&(ref n, u): &(Natural, Limb)| {
             assert!(n.divisible_by(u));
             assert!(*n == 0 as Limb || u != 0 && n % u == 0);
-
-            //TODO assert!(n.divisible_by(Natural::from(u));
-
+            assert!(n.divisible_by(Natural::from(u)));
             assert!(num_divisible_by_limb(natural_to_biguint(n), u));
             #[cfg(feature = "32_bit_limbs")]
             assert!(natural_to_rug_integer(n).is_divisible_u(u));
@@ -175,9 +174,7 @@ fn divisible_by_limb_properties() {
         |&(ref n, u): &(Natural, Limb)| {
             assert!(!n.divisible_by(u));
             assert!(*n != 0 as Limb && (u == 0 || n % u != 0));
-
-            //TODO assert!(n.divisible_by(Natural::from(u));
-
+            assert!(!n.divisible_by(Natural::from(u)));
             assert!(!num_divisible_by_limb(natural_to_biguint(n), u));
             #[cfg(feature = "32_bit_limbs")]
             assert!(!natural_to_rug_integer(n).is_divisible_u(u));
@@ -194,7 +191,7 @@ fn divisible_by_limb_properties() {
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
         let divisible = x.divisible_by(y);
-        assert_eq!(divisible, Natural::from(x).divisible_by(y));
+        assert_eq!(divisible, (&Natural::from(x)).divisible_by(y));
         assert_eq!(divisible, x.divisible_by(&Natural::from(y)));
     });
 
@@ -207,9 +204,9 @@ fn divisible_by_limb_properties() {
     });
 
     test_properties(positive_unsigneds, |&u: &Limb| {
-        assert!(Natural::ZERO.divisible_by(u));
+        assert!((&Natural::ZERO).divisible_by(u));
         if u > 1 {
-            assert!(!Natural::ONE.divisible_by(u));
+            assert!(!(&Natural::ONE).divisible_by(u));
         }
         assert!(u.divisible_by(&Natural::from(u)));
     });

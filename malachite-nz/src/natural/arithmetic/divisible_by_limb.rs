@@ -77,9 +77,9 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::ZERO.divisible_by(0), true);
-    ///     assert_eq!(Natural::from(100u32).divisible_by(3), false);
-    ///     assert_eq!(Natural::from(102u32).divisible_by(3), true);
+    ///     assert_eq!((&Natural::ZERO).divisible_by(0), true);
+    ///     assert_eq!((&Natural::from(100u32)).divisible_by(3), false);
+    ///     assert_eq!((&Natural::from(102u32)).divisible_by(3), true);
     /// }
     /// ```
     fn divisible_by(self, other: Limb) -> bool {

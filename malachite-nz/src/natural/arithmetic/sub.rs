@@ -392,17 +392,39 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
     borrow
 }
 
-//TODO test
-// `&xs[..xs.len() - right_start]` <- `&xs[right_start..]` - `ys`
-pub fn limbs_sub_same_length_to_out_with_overlap(
-    xs: &mut [Limb],
-    right_start: usize,
-    ys: &[Limb],
-) -> bool {
-    let len = xs.len() - right_start;
-    assert_eq!(ys.len(), len);
+/// Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
+/// `&xs[xs.len() - ys.len()..]` and `&ys`, and writes the limbs of the result to `&xs[..ys.len()]`.
+/// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
+/// than the first `Natural`. As implied by the name, the input and output ranges may overlap. `xs`
+/// must be at least as long as `ys`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ys.len()`
+///
+/// # Panics
+/// Panics if `xs.len()` is shorter than `ys.len()`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out_with_overlap;
+///
+/// let xs = &mut [1, 2, 3, 4];
+/// limbs_sub_same_length_to_out_with_overlap(xs, &[2, 2, 2]);
+/// assert_eq!(xs, &[0, 1, 2, 4]);
+/// ```
+///
+/// This is mpn_sub_n from gmp.h, where the output is a prefix of a slice and the left operand of
+/// the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
+pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
+    let xs_len = xs.len();
+    let ys_len = ys.len();
+    assert!(xs_len >= ys_len);
+    let right_start = xs_len - ys_len;
     let mut borrow = false;
-    for i in 0..len {
+    for i in 0..ys_len {
         xs[i] = sub_and_borrow(xs[i + right_start], ys[i], &mut borrow);
     }
     borrow

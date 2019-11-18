@@ -1,19 +1,30 @@
+use std::str::FromStr;
+
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by;
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use num::BigUint;
 
-use common::test_properties_custom_scale;
+use common::{test_properties, test_properties_custom_scale};
+use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_13, pairs_of_unsigned_vec_var_14, pairs_of_unsigned_vec_var_15,
 };
+use malachite_test::inputs::natural::{
+    naturals, pairs_of_natural_and_positive_natural_var_1,
+    pairs_of_natural_and_positive_natural_var_2, pairs_of_naturals, positive_naturals,
+};
+use malachite_test::natural::arithmetic::divisible_by::num_divisible_by;
 
 fn verify_limbs_divisible_by(ns: &[Limb], ds: &[Limb], divisible: bool) {
-    let n = Natural::from_limbs_asc(ns);
-    let d = Natural::from_limbs_asc(ds);
-    assert_eq!(n % d == Natural::ZERO, divisible);
+    assert_eq!(
+        Natural::from_limbs_asc(ns).divisible_by(Natural::from_limbs_asc(ds)),
+        divisible
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -652,6 +663,131 @@ fn limbs_divisible_by_fail_4() {
 }
 
 #[test]
+fn test_divisible_by() {
+    let test = |u, v, divisible| {
+        assert_eq!(
+            Natural::from_str(u)
+                .unwrap()
+                .divisible_by(Natural::from_str(v).unwrap()),
+            divisible
+        );
+        assert_eq!(
+            Natural::from_str(u)
+                .unwrap()
+                .divisible_by(&Natural::from_str(v).unwrap()),
+            divisible
+        );
+        assert_eq!(
+            (&Natural::from_str(u).unwrap()).divisible_by(Natural::from_str(v).unwrap()),
+            divisible
+        );
+        assert_eq!(
+            (&Natural::from_str(u).unwrap()).divisible_by(&Natural::from_str(v).unwrap()),
+            divisible
+        );
+
+        let x = Natural::from_str(u).unwrap();
+        let y = Natural::from_str(v).unwrap();
+        assert_eq!(
+            x == Natural::ZERO || y != Natural::ZERO && x % y == Natural::ZERO,
+            divisible
+        );
+
+        assert_eq!(
+            num_divisible_by(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap()),
+            divisible
+        );
+        assert_eq!(
+            rug::Integer::from_str(u)
+                .unwrap()
+                .is_divisible(&rug::Integer::from_str(v).unwrap()),
+            divisible
+        );
+    };
+    test("0", "0", true);
+    test("1", "0", false);
+    test("1000000000000", "0", false);
+    test("0", "1", true);
+    test("0", "123", true);
+    test("1", "1", true);
+    test("123", "1", true);
+    test("123", "123", true);
+    test("123", "456", false);
+    test("456", "123", false);
+    test("369", "123", true);
+    test("4294967295", "1", true);
+    test("4294967295", "4294967295", true);
+    test("1000000000000", "1", true);
+    test("1000000000000", "3", false);
+    test("1000000000002", "3", true);
+    test("1000000000000", "123", false);
+    test("1000000000000", "4294967295", false);
+    test("1000000000000000000000000", "1", true);
+    test("1000000000000000000000000", "3", false);
+    test("1000000000000000000000002", "3", true);
+    test("1000000000000000000000000", "123", false);
+    test("1000000000000000000000000", "4294967295", false);
+    test("1000000000000000000000000", "1000000000000", true);
+    test("1000000000000000000000000", "1000000000001", false);
+    test(
+        "851673906388325341550957943071111911557800036845129556099360938813259608650267079456739978\
+        1156959952275409185911771336067392377245918291754269000751186715279414560474882570499082990\
+        4913122978897463970860833616251189242098804876664368441608727895141238953179204529256780277\
+        5978105200286025161944212712977056343127682601975191673217459602567633602198262568921008081\
+        9448556670912575287371251190800855926311768876808375177446530243635212748346921654224589861\
+        0625170426812525829689862407515510419445335472631905610235915226032848323874067128872385291\
+        3730739275467227364692195226129501338887049710586931141309357190341064532366013123280106098\
+        6468151628797945455179649866890394481799639832540978091736379482964522229064478167730317490\
+        8194108506704480750395054067032502530392147690725919399930683143510771646869931527123340650\
+        0547649792331568913460415939722111305270588701531404490040034302102101083691706550376288655\
+        2667382899390792494118931379237432071316543313379792218794371176529684614085109418328963817\
+        0601432767270419229719490809539776535671938041618536196941370647945336401901450921413823163\
+        4059991707077834107830876756821880651429748186401020760113859498185638133726165286481741014\
+        9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
+        3448224036804997350851153108395928780441635856",
+        "147502279655636565600250358452694051893980186696958535174009956523855720107322638159749368\
+        0808217479494744305876890972595771484769733857514529616096199394092858302265998260483416016\
+        5763904522044264005938281072568140883513713255548643044250086110483617215935636533809248102\
+        6926590789142079805638445494760177551776636747830014495012489743990407355232286842071418922\
+        9921358409573480901624487977319782755422730834468673438076805532952821406024399006814390166\
+        6949827530796971086011267864607814906313334525518102221919643040440267323688341889035864376\
+        1377246644579088153222669672271414315240318439843720039808993886410874969340996645010795670\
+        2133518716987668865936529827437388042190084309005369564717390726257594902619365180097509576\
+        6240189037770619308206906414128686856349950952623970023039440323701643457411485666776354448\
+        186307133288106956593939073729500658176632828099789",
+        true
+    );
+    test(
+        "851673906388325341550957943071111911557800036845129556099360938813259608650267079456739978\
+        1156959952275409185911771336067392377245918291754269000751186715279414560474882570499082990\
+        4913122978897463970860833616251189242098804876664368441608727895141238953179204529256780277\
+        5978105200286025161944212712977056343127682601975191673217459602567633602198262568921008081\
+        9448556670912575287371251190800855926311768876808375177446530243635212748346921654224589861\
+        0625170426812525829689862407515510419445335472631905610235915226032848323874067128872385291\
+        3730739275467227364692195226129501338887049710586931141309357190341064532366013123280106098\
+        6468151628797945455179649866890394481799639832540978091736379482964522229064478167730317490\
+        8194108506704480750395054067032502530392147690725919399930683143510771646869931527123340650\
+        0547649792331568913460415939722111305270588701531404490040034302102101083691706550376288655\
+        2667382899390792494118931379237432071316543313379792218794371176529684614085109418328963817\
+        0601432767270419229719490809539776535671938041618536196941370647945336401901450921413823163\
+        4059991707077834107830876756821880651429748186401020760113859498185638133726165286481741014\
+        9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
+        3448224036804997350851153108395928780441635856",
+        "147502279655636565600250358452694051893980186696958535174009956523855720107322638159749368\
+        0808217479494744305876890972595771484769733857514529616096199394092858302265998260483416016\
+        5763904522044264005938281072568140883513713255548643044250086110483617215935636533809248102\
+        6926590789142079805638445494760177551776636747830014495012489743990407355232286842071418922\
+        9921358409573480901624487977319782755422730834468673438076805532952821406024399006814390166\
+        6949827530796971086011267864607814906313334525518102221919643040440267323688341889035864376\
+        1377246644579088153222669672271414315240318439843720039808993886410874969340996645010795670\
+        2133518716987668865936529827437388042190084309005369564717390726257594902619365180097509576\
+        6240189037770619308206906414128686856349950952623970023039440323701643457411485666776354448\
+        186307133288106956593939073729500658176632828099788",
+        false
+    );
+}
+
+#[test]
 fn limbs_divisible_by_properties() {
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_13, |&(ref ns, ref ds)| {
         let divisible = limbs_divisible_by(ns, ds);
@@ -666,5 +802,67 @@ fn limbs_divisible_by_properties() {
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_14, |&(ref ns, ref ds)| {
         let divisible = limbs_divisible_by(ns, ds);
         assert_eq!(limbs_test_zero(&limbs_mod(ns, ds)), divisible);
+    });
+}
+
+#[test]
+fn divisible_by_properties() {
+    test_properties(pairs_of_naturals, |&(ref x, ref y)| {
+        let divisible = x.divisible_by(y);
+        assert_eq!(x.divisible_by(y.clone()), divisible);
+        assert_eq!(x.clone().divisible_by(y), divisible);
+        assert_eq!(x.clone().divisible_by(y.clone()), divisible);
+
+        assert_eq!(
+            *x == Natural::ZERO || *y != Natural::ZERO && x % y == Natural::ZERO,
+            divisible
+        );
+        assert_eq!(
+            num_divisible_by(natural_to_biguint(x), natural_to_biguint(y)),
+            divisible
+        );
+        assert_eq!(
+            natural_to_rug_integer(x).is_divisible(&natural_to_rug_integer(y)),
+            divisible
+        );
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_natural_var_1,
+        |&(ref x, ref y)| {
+            assert!(x.divisible_by(y));
+            assert!(*x == Natural::ZERO || *y != Natural::ZERO && x % y == Natural::ZERO);
+            assert!(num_divisible_by(
+                natural_to_biguint(x),
+                natural_to_biguint(y)
+            ));
+            assert!(natural_to_rug_integer(x).is_divisible(&natural_to_rug_integer(y)));
+        },
+    );
+
+    test_properties(
+        pairs_of_natural_and_positive_natural_var_2,
+        |&(ref x, ref y)| {
+            assert!(!x.divisible_by(y));
+            assert!(*x != Natural::ZERO && (*y == Natural::ZERO || x * y != Natural::ZERO));
+            assert!(!num_divisible_by(
+                natural_to_biguint(x),
+                natural_to_biguint(y)
+            ));
+            assert!(!natural_to_rug_integer(x).is_divisible(&natural_to_rug_integer(y)));
+        },
+    );
+
+    test_properties(naturals, |n| {
+        assert!(n.divisible_by(Natural::ONE));
+    });
+
+    test_properties(positive_naturals, |n| {
+        assert!(!n.divisible_by(Natural::ZERO));
+        assert!(Natural::ZERO.divisible_by(n));
+        if *n > Natural::ONE {
+            assert!(!Natural::ONE.divisible_by(n));
+        }
+        assert!(n.divisible_by(n));
     });
 }

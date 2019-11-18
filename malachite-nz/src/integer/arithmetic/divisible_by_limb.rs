@@ -32,7 +32,7 @@ impl<'a> DivisibleBy<Limb> for &'a Integer {
     /// }
     /// ```
     fn divisible_by(self, other: Limb) -> bool {
-        self.abs.divisible_by(other)
+        (&self.abs).divisible_by(other)
     }
 }
 

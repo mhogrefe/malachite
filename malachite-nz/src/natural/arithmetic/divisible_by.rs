@@ -1,4 +1,5 @@
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
+use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use natural::arithmetic::div_exact::{
@@ -10,6 +11,7 @@ use natural::arithmetic::divisible_by_limb::BMOD_1_TO_MOD_1_THRESHOLD;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::shr_u::limbs_shr_to_out;
+use natural::Natural::{self, Large, Small};
 use platform::{Limb, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -115,4 +117,159 @@ pub fn limbs_divisible_by(ns: &[Limb], ds: &[Limb]) -> bool {
         &mut rs[..d_len]
     };
     limbs_test_zero(rs)
+}
+
+impl DivisibleBy<Natural> for Natural {
+    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
+    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
+    /// taken by value.
+    ///
+    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.divisible_by(Natural::ZERO), true);
+    ///     assert_eq!(Natural::from(100u32).divisible_by(Natural::from(3u32)), false);
+    ///     assert_eq!(Natural::from(102u32).divisible_by(Natural::from(3u32)), true);
+    ///     assert_eq!(Natural::from_str("1000000000000000000000000").unwrap()
+    ///         .divisible_by(Natural::from_str("1000000000000").unwrap()), true);
+    /// }
+    /// ```
+    fn divisible_by(self, other: Natural) -> bool {
+        //TODO
+        (&self).divisible_by(&other)
+    }
+}
+
+impl<'a> DivisibleBy<&'a Natural> for Natural {
+    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
+    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
+    /// is taken by value and the second by reference.
+    ///
+    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(Natural::ZERO.divisible_by(&Natural::ZERO), true);
+    ///     assert_eq!(Natural::from(100u32).divisible_by(&Natural::from(3u32)), false);
+    ///     assert_eq!(Natural::from(102u32).divisible_by(&Natural::from(3u32)), true);
+    ///     assert_eq!(Natural::from_str("1000000000000000000000000").unwrap()
+    ///         .divisible_by(&Natural::from_str("1000000000000").unwrap()), true);
+    /// }
+    /// ```
+    fn divisible_by(self, other: &'a Natural) -> bool {
+        //TODO
+        (&self).divisible_by(other)
+    }
+}
+
+impl<'a> DivisibleBy<Natural> for &'a Natural {
+    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
+    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
+    /// is taken by reference and the second by value.
+    ///
+    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!((&Natural::ZERO).divisible_by(Natural::ZERO), true);
+    ///     assert_eq!((&Natural::from(100u32)).divisible_by(Natural::from(3u32)), false);
+    ///     assert_eq!((&Natural::from(102u32)).divisible_by(Natural::from(3u32)), true);
+    ///     assert_eq!((&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .divisible_by(Natural::from_str("1000000000000").unwrap()), true);
+    /// }
+    /// ```
+    fn divisible_by(self, other: Natural) -> bool {
+        //TODO
+        self.divisible_by(&other)
+    }
+}
+
+impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
+    /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
+    /// first `Natural` is a multiple of the second. This means that zero is divisible by any
+    /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
+    /// taken by reference.
+    ///
+    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivisibleBy;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!((&Natural::ZERO).divisible_by(&Natural::ZERO), true);
+    ///     assert_eq!((&Natural::from(100u32)).divisible_by(&Natural::from(3u32)), false);
+    ///     assert_eq!((&Natural::from(102u32)).divisible_by(&Natural::from(3u32)), true);
+    ///     assert_eq!((&Natural::from_str("1000000000000000000000000").unwrap())
+    ///         .divisible_by(&Natural::from_str("1000000000000").unwrap()), true);
+    /// }
+    /// ```
+    fn divisible_by(self, other: &'b Natural) -> bool {
+        match (self, other) {
+            (x, &Small(y)) => x.divisible_by(y),
+            (&Small(x), y) => x.divisible_by(y),
+            (&Large(ref xs), &Large(ref ys)) => xs.len() >= ys.len() && limbs_divisible_by(xs, ys),
+        }
+    }
 }

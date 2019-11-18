@@ -562,11 +562,10 @@ pub fn nrm_pairs_of_natural_and_positive_natural_var_1(
     )
 }
 
-//TODO use divisible
 // All pairs of `Natural` and positive `Natural`, where the first `Natural` is not divisible by the
 // second.
 pub fn pairs_of_natural_and_positive_natural_var_2(gm: GenerationMode) -> It<(Natural, Natural)> {
-    Box::new(pairs_of_natural_and_positive_natural(gm).filter(|(x, y)| x % y != 0 as Limb))
+    Box::new(pairs_of_natural_and_positive_natural(gm).filter(|(x, y)| !x.divisible_by(y)))
 }
 
 fn random_triples_of_natural_natural_and_primitive<T: PrimitiveInteger + Rand>(

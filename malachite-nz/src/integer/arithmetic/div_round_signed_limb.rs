@@ -18,6 +18,9 @@ impl DivRound<SignedLimb> for Integer {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -81,6 +84,9 @@ impl<'a> DivRound<SignedLimb> for &'a Integer {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -167,6 +173,9 @@ impl DivRound<Integer> for SignedLimb {
     ///
     /// where n = `other.significant_bits()`
     ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -233,6 +242,9 @@ impl<'a> DivRound<&'a Integer> for SignedLimb {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```
@@ -315,6 +327,9 @@ impl DivRoundAssign<SignedLimb> for Integer {
     /// Additional memory: worst case O(1)
     ///
     /// where n = `other.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by `other`.
     ///
     /// # Examples
     /// ```

@@ -1,12 +1,14 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::divisible_by_limb::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };
 use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use num::{BigUint, Integer, Zero};
+use num::{BigUint, Integer, Zero as NumZero};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
@@ -24,6 +26,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Small,
         benchmark_limbs_divisible_by_limb_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_divisible_by_limb_algorithms
     );
     register_bench!(
         registry,
@@ -50,7 +57,7 @@ fn demo_limbs_divisible_by_limb(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_divisible_by_limb(gm: GenerationMode, limit: usize) {
     for (n, u) in pairs_of_natural_and_unsigned::<Limb>(gm).take(limit) {
-        if n.divisible_by(u) {
+        if (&n).divisible_by(u) {
             println!("{} is divisible by {}", n, u);
         } else {
             println!("{} is not divisible by {}", n, u);
@@ -95,6 +102,30 @@ fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize
     );
 }
 
+fn benchmark_natural_divisible_by_limb_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural.divisible_by(Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_natural_and_unsigned::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        "n.significant_bits()",
+        &mut [
+            ("standard", &mut (|(x, y)| no_out!((&x).divisible_by(y)))),
+            (
+                "using %",
+                &mut (|(x, y)| no_out!(x == Natural::ZERO || y != 0 && x % y == 0)),
+            ),
+        ],
+    );
+}
+
 #[cfg(feature = "32_bit_limbs")]
 fn benchmark_natural_divisible_by_limb_library_comparison(
     gm: GenerationMode,
@@ -113,7 +144,7 @@ fn benchmark_natural_divisible_by_limb_library_comparison(
         &mut [
             (
                 "malachite",
-                &mut (|(_, _, (x, y))| no_out!(x.divisible_by(y))),
+                &mut (|(_, _, (x, y))| no_out!((&x).divisible_by(y))),
             ),
             (
                 "num",
@@ -140,7 +171,10 @@ fn benchmark_natural_divisible_by_limb_library_comparison(
         &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.divisible_by(y)))),
+            (
+                "malachite",
+                &mut (|(_, (x, y))| no_out!((&x).divisible_by(y))),
+            ),
             (
                 "num",
                 &mut (|((x, y), _)| no_out!(num_divisible_by_limb(x, y))),

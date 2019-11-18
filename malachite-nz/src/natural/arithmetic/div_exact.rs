@@ -481,9 +481,7 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
-    if d_len != q_len_s
-        && limbs_sub_same_length_to_out_with_overlap(rs, q_len_s, &scratch_lo[q_len_s..])
-    {
+    if d_len != q_len_s && limbs_sub_same_length_to_out_with_overlap(rs, &scratch_lo[q_len_s..]) {
         if carry {
             assert!(!limbs_slice_add_limb_in_place(scratch_hi, 1));
         } else {
@@ -567,7 +565,7 @@ fn _limbs_modular_div_mod_barrett_balanced(
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
-    if limbs_sub_same_length_to_out_with_overlap(rs, q_len_s, &scratch_lo[q_len_s..]) {
+    if limbs_sub_same_length_to_out_with_overlap(rs, &scratch_lo[q_len_s..]) {
         if carry {
             assert!(!limbs_slice_add_limb_in_place(scratch_hi, 1));
         } else {
