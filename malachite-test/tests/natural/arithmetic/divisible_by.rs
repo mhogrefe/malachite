@@ -3,7 +3,10 @@ use std::str::FromStr;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by;
+use malachite_nz::natural::arithmetic::divisible_by::{
+    limbs_divisible_by, limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val,
+    limbs_divisible_by_val_ref,
+};
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -31,7 +34,18 @@ fn verify_limbs_divisible_by(ns: &[Limb], ds: &[Limb], divisible: bool) {
 #[test]
 fn test_limbs_divisible_by() {
     let test = |ns: &[Limb], ds: &[Limb], divisible: bool| {
-        assert_eq!(limbs_divisible_by(ns, ds), divisible);
+        let mut mut_ns = ns.to_vec();
+        let mut mut_ds = ds.to_vec();
+        assert_eq!(limbs_divisible_by(&mut mut_ns, &mut mut_ds), divisible);
+
+        let mut mut_ns = ns.to_vec();
+        assert_eq!(limbs_divisible_by_val_ref(&mut mut_ns, ds), divisible);
+
+        let mut mut_ds = ds.to_vec();
+        assert_eq!(limbs_divisible_by_ref_val(ns, &mut mut_ds), divisible);
+
+        assert_eq!(limbs_divisible_by_ref_ref(ns, ds), divisible);
+
         verify_limbs_divisible_by(ns, ds, divisible);
     };
     // n_low & d_mask == 0
@@ -638,28 +652,112 @@ fn test_limbs_divisible_by() {
 #[test]
 #[should_panic]
 fn limbs_divisible_by_fail_1() {
-    limbs_divisible_by(&[1, 2], &[3, 4, 5]);
+    limbs_divisible_by(&mut [1, 2], &mut [3, 4, 5]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_divisible_by_fail_2() {
-    limbs_divisible_by(&[], &[]);
+    limbs_divisible_by(&mut [], &mut []);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_divisible_by_fail_3() {
-    limbs_divisible_by(&[1, 2, 0], &[4, 5]);
+    limbs_divisible_by(&mut [1, 2, 0], &mut [4, 5]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_divisible_by_fail_4() {
-    limbs_divisible_by(&[1, 2, 3], &[4, 0]);
+    limbs_divisible_by(&mut [1, 2, 3], &mut [4, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_val_ref_fail_1() {
+    limbs_divisible_by_val_ref(&mut [1, 2], &[3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_val_ref_fail_2() {
+    limbs_divisible_by_val_ref(&mut [], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_val_ref_fail_3() {
+    limbs_divisible_by_val_ref(&mut [1, 2, 0], &[4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_val_ref_fail_4() {
+    limbs_divisible_by_val_ref(&mut [1, 2, 3], &[4, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_val_fail_1() {
+    limbs_divisible_by_ref_val(&[1, 2], &mut [3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_val_fail_2() {
+    limbs_divisible_by_ref_val(&[], &mut []);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_val_fail_3() {
+    limbs_divisible_by_ref_val(&[1, 2, 0], &mut [4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_val_fail_4() {
+    limbs_divisible_by_ref_val(&[1, 2, 3], &mut [4, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_ref_fail_1() {
+    limbs_divisible_by_ref_ref(&[1, 2], &[3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_ref_fail_2() {
+    limbs_divisible_by_ref_ref(&[], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_ref_fail_3() {
+    limbs_divisible_by_ref_ref(&[1, 2, 0], &[4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_ref_ref_fail_4() {
+    limbs_divisible_by_ref_ref(&[1, 2, 3], &[4, 0]);
 }
 
 #[test]
@@ -790,17 +888,38 @@ fn test_divisible_by() {
 #[test]
 fn limbs_divisible_by_properties() {
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_13, |&(ref ns, ref ds)| {
-        let divisible = limbs_divisible_by(ns, ds);
+        let mut mut_ns = ns.to_vec();
+        let mut mut_ds = ds.to_vec();
+        let divisible = limbs_divisible_by(&mut mut_ns, &mut mut_ds);
+
+        let mut mut_ns = ns.to_vec();
+        assert_eq!(limbs_divisible_by_val_ref(&mut mut_ns, ds), divisible);
+
+        let mut mut_ds = ds.to_vec();
+        assert_eq!(limbs_divisible_by_ref_val(ns, &mut mut_ds), divisible);
+
+        assert_eq!(limbs_divisible_by_ref_ref(ns, ds), divisible);
+
         verify_limbs_divisible_by(ns, ds, divisible);
     });
 
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_15, |&(ref ns, ref ds)| {
-        assert!(limbs_divisible_by(ns, ds));
+        let mut mut_ns = ns.to_vec();
+        let mut mut_ds = ds.to_vec();
+        assert!(limbs_divisible_by(&mut mut_ns, &mut mut_ds));
+
+        let mut mut_ns = ns.to_vec();
+        assert!(limbs_divisible_by_val_ref(&mut mut_ns, ds));
+
+        let mut mut_ds = ds.to_vec();
+        assert!(limbs_divisible_by_ref_val(ns, &mut mut_ds));
+
+        assert!(limbs_divisible_by_ref_ref(ns, ds));
         verify_limbs_divisible_by(ns, ds, true);
     });
 
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_14, |&(ref ns, ref ds)| {
-        let divisible = limbs_divisible_by(ns, ds);
+        let divisible = limbs_divisible_by_ref_ref(ns, ds);
         assert_eq!(limbs_test_zero(&limbs_mod(ns, ds)), divisible);
     });
 }

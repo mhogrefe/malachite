@@ -412,7 +412,7 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out_with_overlap;
 ///
 /// let xs = &mut [1, 2, 3, 4];
-/// limbs_sub_same_length_to_out_with_overlap(xs, &[2, 2, 2]);
+/// assert_eq!(limbs_sub_same_length_to_out_with_overlap(xs, &[2, 2, 2]), false);
 /// assert_eq!(xs, &[0, 1, 2, 4]);
 /// ```
 ///

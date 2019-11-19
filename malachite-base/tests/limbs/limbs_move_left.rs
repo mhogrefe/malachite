@@ -1,10 +1,20 @@
 use malachite_base::limbs::limbs_move_left;
 
+fn limbs_move_left_naive<T: Copy>(limbs: &mut [u32], amount: usize) {
+    let slice = limbs[amount..].to_vec();
+    let limit = limbs.len() - amount;
+    limbs[..limit].copy_from_slice(&slice);
+}
+
 #[test]
 fn test_limbs_move_left() {
     let test = |limbs_in: &[u32], amount, limbs_out: &[u32]| {
         let mut limbs = limbs_in.to_vec();
         limbs_move_left(&mut limbs, amount);
+        assert_eq!(limbs, limbs_out);
+
+        let mut limbs = limbs_in.to_vec();
+        limbs_move_left_naive::<u32>(&mut limbs, amount);
         assert_eq!(limbs, limbs_out);
     };
     test(&[], 0, &[]);

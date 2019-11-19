@@ -1,6 +1,7 @@
 use malachite_base::limbs::limbs_move_left;
 
 use common::test_properties;
+use malachite_test::base::limbs::limbs_move_left::limbs_move_left_naive;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_usize_var_1, vecs_of_unsigned};
 
 #[test]
@@ -14,6 +15,10 @@ fn limbs_move_left_properties() {
             let (out_limbs_lo, out_limbs_hi) = out_limbs.split_at(boundary);
             assert_eq!(out_limbs_lo, &limbs[amount..]);
             assert_eq!(out_limbs_hi, &limbs[boundary..]);
+
+            let mut out_limbs_alt = limbs.clone();
+            limbs_move_left_naive(&mut out_limbs_alt, amount);
+            assert_eq!(out_limbs_alt, out_limbs);
         },
     );
 

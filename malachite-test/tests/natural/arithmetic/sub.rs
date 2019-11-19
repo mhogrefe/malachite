@@ -11,7 +11,8 @@ use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
     limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
-    limbs_sub_same_length_to_out, limbs_sub_to_out, limbs_vec_sub_in_place_right,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out,
+    limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -33,6 +34,10 @@ use malachite_test::inputs::base::{
 use malachite_test::inputs::natural::{
     naturals, pairs_of_limb_and_natural_var_1, pairs_of_natural_and_limb_var_1,
     pairs_of_naturals_var_1,
+};
+use malachite_test::natural::arithmetic::sub::{
+    limbs_sub_same_length_in_place_with_overlap_naive,
+    limbs_sub_same_length_to_out_with_overlap_naive,
 };
 
 #[cfg(feature = "32_bit_limbs")]
@@ -631,6 +636,13 @@ fn test_limbs_sub_same_length_in_place_with_overlap() {
             borrow
         );
         assert_eq!(xs, xs_after);
+
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_sub_same_length_in_place_with_overlap_naive(&mut xs, right_start),
+            borrow
+        );
+        assert_eq!(xs, xs_after);
     };
     test(&[], 0, false, &[]);
 
@@ -662,6 +674,67 @@ fn test_limbs_sub_same_length_in_place_with_overlap() {
 #[should_panic]
 fn limbs_sub_same_length_in_place_with_overlap_fail() {
     limbs_sub_same_length_in_place_with_overlap(&mut [1, 2, 3], 4);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_same_length_to_out_with_overlap() {
+    let test = |xs_before: &[Limb], ys: &[Limb], borrow: bool, xs_after: &[Limb]| {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_sub_same_length_to_out_with_overlap(&mut xs, ys),
+            borrow
+        );
+        assert_eq!(xs, xs_after);
+
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_sub_same_length_to_out_with_overlap_naive(&mut xs, ys),
+            borrow
+        );
+        assert_eq!(xs, xs_after);
+    };
+    test(&[], &[], false, &[]);
+    test(&[5], &[], false, &[5]);
+    test(&[5], &[3], false, &[2]);
+    test(&[5, 5, 5], &[3, 3], false, &[2, 2, 5]);
+    test(&[1, 2, 3, 4], &[], false, &[1, 2, 3, 4]);
+    test(&[1, 2, 3, 4], &[2], false, &[2, 2, 3, 4]);
+    test(&[1, 2, 3, 4], &[2, 2], false, &[1, 2, 3, 4]);
+    test(&[1, 2, 3, 4], &[2, 2, 2], false, &[0, 1, 2, 4]);
+    test(
+        &[1, 2, 3, 4],
+        &[2, 2, 2, 2],
+        false,
+        &[4294967295, 4294967295, 0, 2],
+    );
+    test(&[1, 2, 3, 4], &[], false, &[1, 2, 3, 4]);
+    test(&[1, 2, 3, 4], &[4], false, &[0, 2, 3, 4]);
+    test(
+        &[1, 2, 3, 4],
+        &[4, 4],
+        true,
+        &[4294967295, 4294967295, 3, 4],
+    );
+    test(
+        &[1, 2, 3, 4],
+        &[4, 4, 4],
+        true,
+        &[4294967294, 4294967294, 4294967295, 4],
+    );
+    test(
+        &[1, 2, 3, 4],
+        &[4, 4, 4, 4],
+        true,
+        &[4294967293, 4294967293, 4294967294, 4294967295],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_same_length_to_out_with_overlap_fail() {
+    limbs_sub_same_length_to_out_with_overlap(&mut [1, 2, 3], &[1, 2, 3, 4]);
 }
 
 #[test]
@@ -1014,6 +1087,13 @@ fn limbs_sub_same_length_in_place_with_overlap_properties() {
                 assert_eq!(n, x - y);
             }
             assert_eq!(&xs[len..], &xs_old[len..]);
+
+            let mut xs_alt = xs_old.clone();
+            assert_eq!(
+                limbs_sub_same_length_in_place_with_overlap_naive(&mut xs_alt, right_start),
+                borrow
+            );
+            assert_eq!(xs_alt, xs);
         },
     );
 
@@ -1028,6 +1108,48 @@ fn limbs_sub_same_length_in_place_with_overlap_properties() {
             &mut xs,
             xs_old.len(),
         ));
+        assert_eq!(xs, **xs_old);
+    });
+}
+
+#[test]
+fn limbs_sub_same_length_to_out_with_overlap_properties() {
+    test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
+        let xs_old = xs;
+        let mut xs = xs_old.clone();
+        let borrow = limbs_sub_same_length_to_out_with_overlap(&mut xs, ys);
+        let len = ys.len();
+        let x = Natural::from_limbs_asc(&xs_old[xs.len() - len..]);
+        let y = Natural::from_limbs_asc(ys);
+        let n = Natural::from_limbs_asc(&xs[..len]);
+        if borrow {
+            assert_eq!(
+                n,
+                Integer::from(x) - y + (Natural::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+            );
+        } else {
+            assert_eq!(n, x - y);
+        }
+        if len <= xs.len() - len {
+            assert_eq!(&xs[len..xs.len() - len], &xs_old[len..xs.len() - len]);
+        }
+
+        let mut xs_alt = xs_old.clone();
+        assert_eq!(
+            limbs_sub_same_length_to_out_with_overlap_naive(&mut xs_alt, ys),
+            borrow
+        );
+        assert_eq!(xs_alt, xs);
+    });
+
+    test_properties(vecs_of_unsigned, |ref xs| {
+        let xs_old = xs;
+        let mut xs = xs_old.to_vec();
+        assert!(!limbs_sub_same_length_to_out_with_overlap(&mut xs, xs_old));
+        assert!(limbs_test_zero(&xs));
+
+        let mut xs = xs_old.to_vec();
+        assert!(!limbs_sub_same_length_to_out_with_overlap(&mut xs, &[]));
         assert_eq!(xs, **xs_old);
     });
 }
