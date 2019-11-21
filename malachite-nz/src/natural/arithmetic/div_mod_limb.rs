@@ -31,7 +31,7 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_invert_limb(0xffff_fffe), 2);
 /// ```
 ///
-/// This is mpn_invert_limb from gmp-impl.h.
+/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h.
 #[inline]
 pub fn limbs_invert_limb(divisor: Limb) -> Limb {
     (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half()

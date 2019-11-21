@@ -3,13 +3,18 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::mod_limb::{_limbs_mod_limb_alt, limbs_mod_limb};
+use malachite_nz::natural::arithmetic::mod_limb::{
+    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_norm,
+};
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};
 use rug::{self, ops::RemRounding};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
+use inputs::base::{
+    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+};
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_unsigned, rm_pairs_of_natural_and_positive_unsigned,
@@ -22,6 +27,7 @@ use inputs::natural::{
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_limb);
+    register_demo!(registry, demo_mpn_mod_1_norm);
     register_demo!(registry, demo_natural_rem_assign_limb);
     register_demo!(registry, demo_natural_rem_limb);
     register_demo!(registry, demo_natural_rem_limb_ref);
@@ -42,6 +48,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_neg_mod_natural);
     register_demo!(registry, demo_limb_neg_mod_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_mod_limb_algorithms);
+    register_bench!(registry, Small, benchmark_mpn_mod_1_norm);
     register_bench!(registry, Large, benchmark_natural_rem_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -122,6 +129,17 @@ fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {
             limbs,
             limb,
             limbs_mod_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_mpn_mod_1_norm(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
+        println!(
+            "mpn_mod_1_norm({:?}, {}) = {}",
+            limbs,
+            limb,
+            mpn_mod_1_norm(&limbs, limb)
         );
     }
 }
@@ -285,6 +303,23 @@ fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_na
                 &mut (|(limbs, limb)| no_out!(_limbs_mod_limb_alt(&limbs, limb))),
             ),
         ],
+    );
+}
+
+fn benchmark_mpn_mod_1_norm(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "mpn_mod_1_norm(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(mpn_mod_1_norm(&limbs, limb))),
+        )],
     );
 }
 

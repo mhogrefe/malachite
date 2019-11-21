@@ -3468,6 +3468,39 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
     Box::new(pairs_of_unsigned_vec_and_unsigned(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
+// All pairs of nonempty `Vec<T>` and `T`, where `T` is unsigned and the most-significant bit of the
+// `T` is set.
+pub fn pairs_of_nonempty_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| {
+                random::<T>(seed).map(|mut u| {
+                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u
+                })
+            }),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| {
+                special_random_unsigned::<T>(seed).map(|mut u| {
+                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u
+                })
+            }),
+        )),
+    }
+}
+
 pub fn pairs_of_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {

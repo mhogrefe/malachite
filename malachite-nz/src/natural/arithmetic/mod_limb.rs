@@ -60,7 +60,6 @@ pub(crate) fn mod_by_preinversion(
 /// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
 /// ```
 ///
-/// TODO use mpn_mod_1!
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, where qxn is 0 and un > 1, but not computing
 /// the quotient.
 pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
@@ -1114,4 +1113,73 @@ pub fn _limbs_mod_limb_alt(limbs: &[Limb], divisor: Limb) -> Limb {
             bits,
         ) >> bits
     }
+}
+
+/// Dividing (`n_high`, `n_low`) by `divisor`, returning the remainder only. Unlike
+/// `mod_by_preinversion`, works also for the case `n_high` == `divisor`, where the quotient doesn't
+/// quite fit in a single limb.
+///
+/// Time: O(1)
+///
+/// Additional memory: O(1)
+///
+/// This is udiv_rnnd_preinv from gmp-impl.h.
+fn mod_by_preinversion_special(
+    n_high: Limb,
+    n_low: Limb,
+    divisor: Limb,
+    divisor_inverse: Limb,
+) -> Limb {
+    let (quotient_high, quotient_low) = ((DoubleLimb::from(n_high)
+        * DoubleLimb::from(divisor_inverse))
+    .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low)))
+    .split_in_half();
+    let mut remainder = n_low.wrapping_sub(quotient_high.wrapping_mul(divisor));
+    // both > and >= are OK
+    if remainder > quotient_low {
+        remainder.wrapping_add_assign(divisor);
+    }
+    if remainder >= divisor {
+        remainder.wrapping_sub_assign(divisor);
+    }
+    remainder
+}
+
+//TODO tune
+const MOD_1_NORM_THRESHOLD: usize = 0;
+
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_mod_1_norm from mpn/generic/mod_1.c.
+#[allow(clippy::absurd_extreme_comparisons)]
+pub fn mpn_mod_1_norm(limbs: &[Limb], divisor: Limb) -> Limb {
+    let mut len = limbs.len();
+    assert_ne!(len, 0);
+    assert!(divisor.get_highest_bit());
+    // High limb is initial remainder, possibly with one subtraction of d to get r < d.
+    let mut remainder = limbs[len - 1];
+    if remainder >= divisor {
+        remainder -= divisor;
+    }
+    len -= 1;
+    if len == 0 {
+        return remainder;
+    }
+    let limbs = &limbs[..len];
+    if len < MOD_1_NORM_THRESHOLD {
+        let divisor = DoubleLimb::from(divisor);
+        for &limb in limbs.iter().rev() {
+            remainder = (DoubleLimb::join_halves(remainder, limb) % divisor).lower_half();
+        }
+    } else {
+        let inverse = limbs_invert_limb(divisor);
+        for &limb in limbs.iter().rev() {
+            remainder = mod_by_preinversion_special(remainder, limb, divisor, inverse);
+        }
+    }
+    remainder
 }

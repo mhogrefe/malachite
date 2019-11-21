@@ -47,7 +47,7 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_fft_next_size from mpn/generic/mul-fft.c.
-pub(crate) fn mpn_fft_next_size(pl: usize, k: usize) -> usize {
+pub(crate) fn _limbs_fft_next_size(pl: usize, k: usize) -> usize {
     pl.shr_round(u64::wrapping_from(k), RoundingMode::Ceiling) << k
 }
 
@@ -1391,7 +1391,7 @@ pub(crate) fn _limbs_mul_fft(
     k: usize,
 ) -> bool {
     let square = xs as *const [Limb] == ys as *const [Limb];
-    assert_eq!(mpn_fft_next_size(p, k), p);
+    assert_eq!(_limbs_fft_next_size(p, k), p);
     let n = p << Limb::LOG_WIDTH;
     let two_pow_k = 1 << k;
     let m = n >> k; // n == 2 ^ k * m

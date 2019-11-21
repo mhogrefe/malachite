@@ -5,7 +5,9 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_nz::natural::arithmetic::mod_limb::{_limbs_mod_limb_alt, limbs_mod_limb};
+use malachite_nz::natural::arithmetic::mod_limb::{
+    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_norm,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
@@ -17,8 +19,8 @@ use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_positive_unsigned, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-    positive_unsigneds,
+    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1, pairs_of_unsigned_and_positive_unsigned,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_limb_var_1, pairs_of_natural_and_positive_unsigned,
@@ -40,8 +42,15 @@ fn test_limbs_mod_limb() {
     test(&[6, 7], 2, 0);
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
+    test(&[0, 0], 0xa000_0000, 0);
+    test(&[6, 7], 0x8000_0000, 6);
+    test(&[6, 7], 0xa000_0000, 536870918);
+    test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
     test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
+    test(&[100, 101, 102], 0xffff_ffff, 303);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -56,6 +65,36 @@ fn limbs_mod_limb_fail_1() {
 #[should_panic]
 fn limbs_mod_limb_fail_2() {
     limbs_mod_limb(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_mpn_mod_1_norm() {
+    let test = |limbs: &[Limb], limb: Limb, remainder: Limb| {
+        assert_eq!(mpn_mod_1_norm(limbs, limb), remainder);
+    };
+    test(&[0x8000_0123], 0x8000_0000, 0x123);
+    test(&[0, 0], 0xa000_0000, 0);
+    test(&[6, 7], 0x8000_0000, 6);
+    test(&[6, 7], 0xa000_0000, 536870918);
+    test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
+    test(&[100, 101, 102], 0xffff_ffff, 303);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_norm_fail_1() {
+    mpn_mod_1_norm(&[], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_norm_fail_2() {
+    mpn_mod_1_norm(&[10, 10], 0);
 }
 
 #[test]
@@ -332,6 +371,22 @@ fn limbs_mod_limb_properties() {
             let remainder = limbs_mod_limb(limbs, limb);
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % limb);
             assert_eq!(remainder, _limbs_mod_limb_alt(limbs, limb));
+        },
+    );
+}
+
+#[test]
+fn mpn_mod_1_norm_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let remainder = mpn_mod_1_norm(limbs, limb);
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % limb);
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % limb);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, limb));
+            }
         },
     );
 }

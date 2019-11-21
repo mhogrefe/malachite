@@ -10,7 +10,7 @@ use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul::fft::{_limbs_mul_fft, _limbs_mul_fft_best_k, mpn_fft_next_size};
+use natural::arithmetic::mul::fft::{_limbs_fft_next_size, _limbs_mul_fft, _limbs_mul_fft_best_k};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
@@ -44,7 +44,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
         if ceiling_half_n < MUL_FFT_MODF_THRESHOLD {
             (n + 7) >> 3 << 3
         } else {
-            mpn_fft_next_size(ceiling_half_n, _limbs_mul_fft_best_k(ceiling_half_n, false)) << 1
+            _limbs_fft_next_size(ceiling_half_n, _limbs_mul_fft_best_k(ceiling_half_n, false)) << 1
         }
     }
 }
