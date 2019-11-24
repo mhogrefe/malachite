@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_norm,
+    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};
@@ -28,6 +28,8 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_limb);
     register_demo!(registry, demo_mpn_mod_1_norm);
+    register_demo!(registry, demo_mpn_mod_1_1p_1);
+    register_demo!(registry, demo_mpn_mod_1_1p_2);
     register_demo!(registry, demo_natural_rem_assign_limb);
     register_demo!(registry, demo_natural_rem_limb);
     register_demo!(registry, demo_natural_rem_limb_ref);
@@ -123,23 +125,45 @@ pub fn rug_neg_mod_u32(x: rug::Integer, u: u32) -> u32 {
 }
 
 fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {
-    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         println!(
             "limbs_mod_limb({:?}, {}) = {}",
             limbs,
-            limb,
-            limbs_mod_limb(&limbs, limb)
+            divisor,
+            limbs_mod_limb(&limbs, divisor)
         );
     }
 }
 
 fn demo_mpn_mod_1_norm(gm: GenerationMode, limit: usize) {
-    for (limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
+    for (limbs, divisor) in pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
         println!(
             "mpn_mod_1_norm({:?}, {}) = {}",
             limbs,
-            limb,
-            mpn_mod_1_norm(&limbs, limb)
+            divisor,
+            mpn_mod_1_norm(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_mpn_mod_1_1p_1(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "mpn_mod_1_1p_1({:?}, {}) = {}",
+            limbs,
+            divisor,
+            mpn_mod_1_1p_1(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_mpn_mod_1_1p_2(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "mpn_mod_1_1p_2({:?}, {}) = {}",
+            limbs,
+            divisor,
+            mpn_mod_1_1p_2(&limbs, divisor)
         );
     }
 }
@@ -296,11 +320,23 @@ fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_na
         &mut [
             (
                 "standard",
-                &mut (|(limbs, limb)| no_out!(limbs_mod_limb(&limbs, limb))),
+                &mut (|(limbs, divisor)| no_out!(limbs_mod_limb(&limbs, divisor))),
             ),
             (
                 "alt",
-                &mut (|(limbs, limb)| no_out!(_limbs_mod_limb_alt(&limbs, limb))),
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt(&limbs, divisor))),
+            ),
+            (
+                "mpn_mod_1_1p_1",
+                &mut (|(limbs, divisor)| {
+                    mpn_mod_1_1p_1(&limbs, divisor);
+                }),
+            ),
+            (
+                "mpn_mod_1_1p_2",
+                &mut (|(limbs, divisor)| {
+                    mpn_mod_1_1p_2(&limbs, divisor);
+                }),
             ),
         ],
     );
@@ -318,7 +354,7 @@ fn benchmark_mpn_mod_1_norm(gm: GenerationMode, limit: usize, file_name: &str) {
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(limbs, limb)| no_out!(mpn_mod_1_norm(&limbs, limb))),
+            &mut (|(limbs, divisor)| no_out!(mpn_mod_1_norm(&limbs, divisor))),
         )],
     );
 }

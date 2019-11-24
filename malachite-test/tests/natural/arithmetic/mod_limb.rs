@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_norm,
+    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -33,19 +33,27 @@ use malachite_test::natural::arithmetic::mod_limb::{num_rem_u32, rug_neg_mod_u32
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_limb() {
-    let test = |limbs: &[Limb], limb: Limb, remainder: Limb| {
-        assert_eq!(limbs_mod_limb(limbs, limb), remainder);
-        assert_eq!(_limbs_mod_limb_alt(limbs, limb), remainder);
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(limbs_mod_limb(limbs, divisor), remainder);
+        assert_eq!(mpn_mod_1_1p_1(limbs, divisor), remainder);
+        assert_eq!(mpn_mod_1_1p_2(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_alt(limbs, divisor), remainder);
     };
     test(&[0, 0], 2, 0);
+    // shift != 0
+    // rh < b
+    // n == 2
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
+    // n > 2
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
     test(&[0, 0], 0xa000_0000, 0);
+    // shift == 0
     test(&[6, 7], 0x8000_0000, 6);
     test(&[6, 7], 0xa000_0000, 536870918);
     test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
+    // rh >= b
     test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
     test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
@@ -69,9 +77,37 @@ fn limbs_mod_limb_fail_2() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
+#[should_panic]
+fn mpn_mod_1_1p_1_fail_1() {
+    mpn_mod_1_1p_1(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_1p_1_fail_2() {
+    mpn_mod_1_1p_1(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_1p_2_fail_1() {
+    mpn_mod_1_1p_2(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_1p_2_fail_2() {
+    mpn_mod_1_1p_2(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
 fn test_mpn_mod_1_norm() {
-    let test = |limbs: &[Limb], limb: Limb, remainder: Limb| {
-        assert_eq!(mpn_mod_1_norm(limbs, limb), remainder);
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(mpn_mod_1_norm(limbs, divisor), remainder);
     };
     test(&[0x8000_0123], 0x8000_0000, 0x123);
     test(&[0, 0], 0xa000_0000, 0);
@@ -367,10 +403,12 @@ fn limb_neg_mod_natural_ref_fail() {
 fn limbs_mod_limb_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_positive_unsigned_var_1,
-        |&(ref limbs, limb)| {
-            let remainder = limbs_mod_limb(limbs, limb);
-            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % limb);
-            assert_eq!(remainder, _limbs_mod_limb_alt(limbs, limb));
+        |&(ref limbs, divisor)| {
+            let remainder = limbs_mod_limb(limbs, divisor);
+            assert_eq!(Natural::from_limbs_asc(limbs) % divisor, remainder);
+            assert_eq!(mpn_mod_1_1p_1(limbs, divisor), remainder);
+            assert_eq!(mpn_mod_1_1p_2(limbs, divisor), remainder);
+            assert_eq!(_limbs_mod_limb_alt(limbs, divisor), remainder);
         },
     );
 }
@@ -379,13 +417,13 @@ fn limbs_mod_limb_properties() {
 fn mpn_mod_1_norm_properties() {
     test_properties(
         pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
-        |&(ref limbs, limb)| {
-            let remainder = mpn_mod_1_norm(limbs, limb);
-            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % limb);
+        |&(ref limbs, divisor)| {
+            let remainder = mpn_mod_1_norm(limbs, divisor);
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
-                assert_eq!(remainder, limbs[0] % limb);
+                assert_eq!(remainder, limbs[0] % divisor);
             } else {
-                assert_eq!(remainder, limbs_mod_limb(limbs, limb));
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
             }
         },
     );
