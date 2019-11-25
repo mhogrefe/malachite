@@ -40,6 +40,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
 use malachite_nz::natural::arithmetic::mul_limb::limbs_mul_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
+use rand::distributions::range::SampleRange;
 use rand::Rand;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
@@ -1415,7 +1416,7 @@ pub fn vecs_of_unsigned_var_4<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -
 pub fn vecs_of_unsigned_var_5(gm: GenerationMode) -> It<Vec<Limb>> {
     Box::new(
         vecs_of_unsigned(gm)
-            .filter(|ref limbs| limbs.len() > 0)
+            .filter(|ref limbs| !limbs.is_empty())
             .map(|limbs| limbs_mul_limb(&limbs, 3)),
     )
 }
@@ -1525,7 +1526,7 @@ pub fn pairs_of_unsigned_vec_var_8(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Lim
     Box::new(
         pairs_of_unsigned_vec(gm)
             .map(|(out, in_limbs)| (out, limbs_mul_limb(&in_limbs, 3)))
-            .filter(|(ref out, ref in_limbs)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
+            .filter(|(ref out, ref in_limbs)| out.len() >= in_limbs.len() && !in_limbs.is_empty()),
     )
 }
 
@@ -3501,6 +3502,38 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + 
     }
 }
 
+// All pairs of nonempty `Vec<T>` and `T`, where `T` is unsigned, the most-significant bit of the
+// `T` is unset, and the `T` is positive.
+pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| {
+                special_random_unsigned::<T>(seed)
+                    .filter(|&u| u != T::ZERO)
+                    .map(|mut u| {
+                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u
+                    })
+            }),
+        )),
+    }
+}
+
 pub fn pairs_of_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {
@@ -3527,7 +3560,22 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {
-    Box::new(pairs_of_unsigned_vec_and_positive_unsigned(gm).filter(|&(ref xs, _)| xs.len() > 1))
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
 }
 
 // All pairs of `Vec<Limb>` and positive `Limb`, where the `Vec` is nonempty and represents a
@@ -3535,7 +3583,7 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_1<T: PrimitiveUnsigned + 
 pub fn pairs_of_limb_vec_and_positive_limb_var_2(gm: GenerationMode) -> It<(Vec<Limb>, Limb)> {
     Box::new(
         pairs_of_unsigned_vec_and_positive_unsigned(gm)
-            .filter(|(ref limbs, _)| limbs.len() > 0)
+            .filter(|(ref limbs, _)| !limbs.is_empty())
             .map(|(limbs, limb)| (limbs_mul_limb(&limbs, limb), limb)),
     )
 }
@@ -3835,7 +3883,9 @@ pub fn triples_of_limb_vec_limb_vec_and_positive_limb_var_2(
     Box::new(
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned(gm)
             .map(|(out, in_limbs, limb)| (out, limbs_mul_limb(&in_limbs, limb), limb))
-            .filter(|(ref out, ref in_limbs, _)| out.len() >= in_limbs.len() && in_limbs.len() > 0),
+            .filter(|(ref out, ref in_limbs, _)| {
+                out.len() >= in_limbs.len() && !in_limbs.is_empty()
+            }),
     )
 }
 

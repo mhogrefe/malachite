@@ -7,6 +7,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
     _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
+    mpn_mod_1_unnorm,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -19,6 +20,7 @@ use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1, pairs_of_unsigned_and_positive_unsigned,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
@@ -131,6 +133,40 @@ fn mpn_mod_1_norm_fail_1() {
 #[should_panic]
 fn mpn_mod_1_norm_fail_2() {
     mpn_mod_1_norm(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_mpn_mod_1_unnorm() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(mpn_mod_1_unnorm(limbs, divisor), remainder);
+    };
+    test(&[0, 0], 2, 0);
+    test(&[0], 2, 0);
+    // remainder >= divisor
+    test(&[6], 2, 0);
+    test(&[6], 4, 2);
+    test(&[6, 7], 1, 0);
+    test(&[6, 7], 2, 0);
+    test(&[100, 101, 102], 10, 8);
+    // remainder < divisor
+    test(&[123, 456], 789, 636);
+    test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_unnorm_fail_1() {
+    mpn_mod_1_unnorm(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1_unnorm_fail_2() {
+    mpn_mod_1_unnorm(&[10, 10], 0xffff_ffff);
 }
 
 #[test]
@@ -419,6 +455,22 @@ fn mpn_mod_1_norm_properties() {
         pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
         |&(ref limbs, divisor)| {
             let remainder = mpn_mod_1_norm(limbs, divisor);
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % divisor);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
+            }
+        },
+    );
+}
+
+#[test]
+fn mpn_mod_1_unnorm_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, divisor)| {
+            let remainder = mpn_mod_1_unnorm(limbs, divisor);
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
