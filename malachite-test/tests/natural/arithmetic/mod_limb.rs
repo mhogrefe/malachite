@@ -7,7 +7,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
     _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
-    mpn_mod_1_unnorm,
+    mpn_mod_1_unnorm, mpn_mod_1s_2p,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -140,19 +140,27 @@ fn mpn_mod_1_norm_fail_2() {
 fn test_mpn_mod_1_unnorm() {
     let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
         assert_eq!(mpn_mod_1_unnorm(limbs, divisor), remainder);
+        assert_eq!(mpn_mod_1s_2p(limbs, divisor), remainder);
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
-    // remainder >= divisor
+    // remainder >= divisor in mpn_mod_1_unnorm
+    // len.odd() in mpn_mod_1s_2p
+    // len == 1 in mpn_mod_1s_2p
     test(&[6], 2, 0);
     test(&[6], 4, 2);
+    // len.even() in mpn_mod_1s_2p
+    // len < 4 in mpn_mod_1s_2p
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
+    // len.odd() && len != 1 in mpn_mod_1s_2p
     test(&[100, 101, 102], 10, 8);
-    // remainder < divisor
+    // remainder < divisor in mpn_mod_1_unnorm
     test(&[123, 456], 789, 636);
     test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    // len >= 4 in mpn_mod_1s_2p
+    test(&[1, 2, 3, 4, 5], 6, 3);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -167,6 +175,20 @@ fn mpn_mod_1_unnorm_fail_1() {
 #[should_panic]
 fn mpn_mod_1_unnorm_fail_2() {
     mpn_mod_1_unnorm(&[10, 10], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1s_2p_fail_1() {
+    mpn_mod_1s_2p(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1s_2p_fail_2() {
+    mpn_mod_1s_2p(&[10, 10], 0xffff_ffff);
 }
 
 #[test]
@@ -472,6 +494,7 @@ fn mpn_mod_1_unnorm_properties() {
         |&(ref limbs, divisor)| {
             let remainder = mpn_mod_1_unnorm(limbs, divisor);
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
+            assert_eq!(remainder, mpn_mod_1s_2p(limbs, divisor));
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
             } else {

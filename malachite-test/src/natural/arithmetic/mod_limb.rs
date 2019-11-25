@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::{
     _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
-    mpn_mod_1_unnorm,
+    mpn_mod_1_unnorm, mpn_mod_1s_2p,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};
@@ -33,6 +33,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_mpn_mod_1_unnorm);
     register_demo!(registry, demo_mpn_mod_1_1p_1);
     register_demo!(registry, demo_mpn_mod_1_1p_2);
+    register_demo!(registry, demo_mpn_mod_1s_2p);
     register_demo!(registry, demo_natural_rem_assign_limb);
     register_demo!(registry, demo_natural_rem_limb);
     register_demo!(registry, demo_natural_rem_limb_ref);
@@ -55,6 +56,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_mod_limb_algorithms);
     register_bench!(registry, Small, benchmark_mpn_mod_1_norm);
     register_bench!(registry, Small, benchmark_mpn_mod_1_unnorm);
+    register_bench!(registry, Small, benchmark_mpn_mod_1s_2p_algorithms);
     register_bench!(registry, Large, benchmark_natural_rem_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -181,6 +183,19 @@ fn demo_mpn_mod_1_1p_2(gm: GenerationMode, limit: usize) {
             limbs,
             divisor,
             mpn_mod_1_1p_2(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_mpn_mod_1s_2p(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "mpn_mod_1s_2p({:?}, {}) = {}",
+            limbs,
+            divisor,
+            mpn_mod_1s_2p(&limbs, divisor)
         );
     }
 }
@@ -386,6 +401,29 @@ fn benchmark_mpn_mod_1_unnorm(gm: GenerationMode, limit: usize, file_name: &str)
             "malachite",
             &mut (|(limbs, divisor)| no_out!(mpn_mod_1_unnorm(&limbs, divisor))),
         )],
+    );
+}
+
+fn benchmark_mpn_mod_1s_2p_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "mpn_mod_1s_2p(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "mpn_mod_1_unnorm",
+                &mut (|(limbs, divisor)| no_out!(mpn_mod_1_unnorm(&limbs, divisor))),
+            ),
+            (
+                "mpn_mod_1s_2p",
+                &mut (|(limbs, divisor)| no_out!(mpn_mod_1s_2p(&limbs, divisor))),
+            ),
+        ],
     );
 }
 
