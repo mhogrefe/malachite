@@ -13,9 +13,8 @@ use natural::arithmetic::add::{limbs_add_to_out, limbs_slice_add_same_length_in_
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
-    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len, MULMOD_BNM1_THRESHOLD,
-    MUL_FFT_MODF_THRESHOLD,
+    _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
+    _limbs_mul_mod_base_pow_n_minus_1_scratch_len, MULMOD_BNM1_THRESHOLD, MUL_FFT_MODF_THRESHOLD,
 };
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
@@ -35,7 +34,7 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
     if xs_len == 0 || xs_len < ys_len {
         return false;
     }
-    let n = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(xs_len + ys_len);
+    let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
     n.even() && n >= MULMOD_BNM1_THRESHOLD
 }
 
@@ -544,10 +543,9 @@ pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     assert_ne!(ys_len, 0);
 
     //TODO special case for squaring
-    let n = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(xs_len + ys_len);
-    let mut scratch =
-        vec![0; _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(n, xs_len, ys_len)];
-    _limbs_mul_mod_limb_width_to_n_minus_1(out, n, xs, ys, &mut scratch);
+    let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
+    let mut scratch = vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, xs_len, ys_len)];
+    _limbs_mul_mod_base_pow_n_minus_1(out, n, xs, ys, &mut scratch);
 }
 
 /// Initialize table[i][j] with bitrev(j).

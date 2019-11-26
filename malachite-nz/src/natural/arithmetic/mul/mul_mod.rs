@@ -32,7 +32,7 @@ pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 /// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
-pub fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
+pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
         n
     } else if n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 {
@@ -56,7 +56,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n: usize) -> usize {
 /// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
-pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(
+pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
     ys_len: usize,
@@ -74,7 +74,7 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(
 }
 
 /// Interpreting two equal-length, nonempty slices of `Limb`s as the limbs (in ascending order) of
-/// two `Natural`s, multiplies the `Natural`s mod `Limb::WIDTH`<sup>n</sup> - 1, where n is the
+/// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1, where n is the
 /// length of either slice. The result is semi-normalized: zero is represented as either 0 or
 /// `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written to `out`. `out` should have
 /// length at least n, and `scratch` at least 2 * n. This is the basecase algorithm.
@@ -90,7 +90,7 @@ pub(crate) fn _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(
 /// input slices are empty.
 ///
 /// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-fn _limbs_mul_mod_limb_width_to_n_minus_1_basecase(
+fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -108,8 +108,8 @@ fn _limbs_mul_mod_limb_width_to_n_minus_1_basecase(
 }
 
 /// Interpreting the first n + 1 limbs of two slices of `Limb`s as the limbs (in ascending order) of
-/// two `Natural`s, multiplies the `Natural`s mod `Limb::WIDTH`<sup>n</sup> + 1. The limbs of the
-/// result are written to `out`, which should have length at least 2 * n + 2.
+/// two `Natural`s, multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> + 1. The limbs of
+/// the result are written to `out`, which should have length at least 2 * n + 2.
 ///
 /// Time: O(n * log(n) * log(log(n)))
 ///
@@ -121,12 +121,7 @@ fn _limbs_mul_mod_limb_width_to_n_minus_1_basecase(
 /// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
 ///
 // This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, where rp == tp.
-fn _limbs_mul_mod_limb_width_to_n_plus_1_basecase(
-    out: &mut [Limb],
-    xs: &[Limb],
-    ys: &[Limb],
-    n: usize,
-) {
+fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     limbs_mul_same_length_to_out(out, &xs[..n + 1], &ys[..n + 1]);
     assert_eq!(out[2 * n + 1], 0);
@@ -148,18 +143,18 @@ fn _limbs_mul_mod_limb_width_to_n_plus_1_basecase(
 const FFT_FIRST_K: usize = 4;
 
 /// Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// multiplies the `Natural`s mod `Limb::WIDTH`<sup>n</sup> - 1. The limbs of the result are written
-/// to `out`.
+/// multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are
+/// written to `out`.
 ///
 /// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
-/// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by `Limb::WIDTH`<sup>n</sup> - 1.
-/// This should not be a problem if `_limbs_mul_mod_limb_width_to_n_minus_1` is used to combine
+/// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
+/// This should not be a problem if `_limbs_mul_mod_base_pow_n_minus_1` is used to combine
 /// results and obtain a natural number when one knows in advance that the final value is less than
-/// `Limb::WIDTH`<sup>n</sup> - 1. Moreover it should not be a problem if
-/// `_limbs_mul_mod_limb_width_to_n_minus_1` is used to compute the full product with `xs.len()` +
+/// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
+/// `_limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
 /// `ys.len()` <= n, because this condition implies
-/// (`Limb::WIDTH`<sup>`xs.len()`</sup> - 1)(`Limb::WIDTH`<sup>`ys.len()`</sup> - 1) <
-/// `Limb::WIDTH`<sup>n</sup> - 1.
+/// (2<sup>`Limb::WIDTH` * `xs.len()`</sup> - 1)(2<sup>`Limb::WIDTH` * `ys.len()`</sup> - 1) <
+/// 2<sup>`Limb::WIDTH` * n</sup> - 1.
 ///
 /// Requires 0 < `ys.len()` <= `xs.len()` <= n and an + `ys.len()` > n / 2.
 /// Scratch need: n + (need for recursive call OR n + 4). This gives
@@ -176,7 +171,7 @@ const FFT_FIRST_K: usize = 4;
 /// `scratch` are too short.
 ///
 /// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
-pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
+pub fn _limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
     xs: &[Limb],
@@ -200,7 +195,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                 }
             }
         } else {
-            _limbs_mul_mod_limb_width_to_n_minus_1_basecase(out, &xs[..n], ys, scratch);
+            _limbs_mul_mod_base_pow_n_minus_1_basecase(out, &xs[..n], ys, scratch);
         }
     } else {
         let half_n = n >> 1;
@@ -211,11 +206,11 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
         // xs_len + ys_len <= n/2.
         assert!(xs_len + ys_len > half_n);
 
-        // Compute xm = a * b mod (Limb::WIDTH ^ half_n - 1),
-        // xp = a * b mod (Limb::WIDTH ^ half_n + 1) and Chinese-Remainder-Theorem together as
-        //
-        // x = -xp * Limb::WIDTH ^ half_n + (Limb::WIDTH ^ half_n + 1) *
-        // ((xp + xm) / 2 mod (Limb::WIDTH ^ half_n - 1))
+        // Compute xm = a * b mod (2 ^ (Limb::WIDTH * half_n) - 1),
+        // xp = a * b mod (2 ^ (Limb::WIDTH * half_n) + 1), and Chinese-Remainder-Theorem together
+        // as
+        // x = -xp * 2 ^ (Limb::WIDTH * half_n) + (2 ^ (Limb::WIDTH * half_n) + 1) *
+        // ((xp + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1))
         if xs_len > half_n {
             let (xs_0, xs_1) = xs.split_at(half_n);
             let carry = limbs_add_to_out(scratch, xs_0, xs_1);
@@ -230,14 +225,12 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_1, 1));
                 }
-                _limbs_mul_mod_limb_width_to_n_minus_1(
-                    out, half_n, scratch_0, scratch_1, scratch_2,
-                );
+                _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_0, scratch_1, scratch_2);
             } else {
-                _limbs_mul_mod_limb_width_to_n_minus_1(out, half_n, scratch_0, ys, scratch_hi);
+                _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_0, ys, scratch_hi);
             }
         } else {
-            _limbs_mul_mod_limb_width_to_n_minus_1(out, half_n, xs, ys, scratch);
+            _limbs_mul_mod_base_pow_n_minus_1(out, half_n, xs, ys, scratch);
         }
         {
             let mut anp = xs_len;
@@ -332,7 +325,7 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
             } else {
                 assert!(!ap1_is_xs_0);
                 let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
-                _limbs_mul_mod_limb_width_to_n_plus_1_basecase(
+                _limbs_mul_mod_base_pow_n_plus_1_basecase(
                     scratch_lo,
                     scratch_hi,
                     &scratch_hi[m..],
@@ -342,13 +335,13 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
         }
         // Here the Chinese Remainder Theorem recomposition begins.
         //
-        // let xm = (scratch + xm) / 2 = (scratch + xm) * Limb::WIDTH ^ half_n / 2 mod
-        // (Limb::WIDTH ^ half_n - 1).
+        // let xm = (scratch + xm) / 2 = (scratch + xm) * 2 ^ (Limb::WIDTH * half_n) / 2 mod
+        // (2 ^ (Limb::WIDTH * half_n) - 1).
         // Division by 2 is a bitwise rotation.
         //
-        // Assumes scratch normalised mod (Limb::WIDTH ^ half_n + 1).
+        // Assumes scratch normalised mod (2 ^ (Limb::WIDTH * half_n) + 1).
         //
-        // The residue class 0 is represented by [Limb::WIDTH ^ half_n - 1]; except when
+        // The residue class 0 is represented by [2 ^ (Limb::WIDTH * half_n) - 1]; except when
         // both inputs are zero.
         //
         // scratch[half_n] == 1 implies limbs_test_zero(scratch[..half_n]).
@@ -375,13 +368,15 @@ pub fn _limbs_mul_mod_limb_width_to_n_minus_1(
         }
 
         // Compute the highest half:
-        // ([(scratch + xm) / 2 mod (Limb::WIDTH ^ half_n - 1)] - scratch) * Limb::WIDTH ^ half_n
+        // ([(scratch + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1)] - scratch) *
+        // 2 ^ (Limb::WIDTH * half_n)
         if xs_len + ys_len < n {
             let a = xs_len + ys_len - half_n;
             // Note that in this case, the only way the result can equal zero mod
-            // Limb::WIDTH ^ n - 1 is if one of the inputs is zero, and then the output of both the
-            // recursive calls and this CRT reconstruction is zero, not Limb::WIDTH ^ n - 1. Which
-            // is good, since the latter representation doesn't fit in the output area.
+            // 2 ^ (Limb::WIDTH * n) - 1 is if one of the inputs is zero, and then the output of
+            // both the recursive calls and this CRT reconstruction is zero, not
+            // 2 ^ (Limb::WIDTH * n) - 1. Which is good, since the latter representation doesn't fit
+            // in the output area.
             let bool_carry = {
                 let (out_lo, out_hi) = out.split_at_mut(half_n);
                 limbs_sub_same_length_to_out(out_hi, &out_lo[..a], &scratch[..a])

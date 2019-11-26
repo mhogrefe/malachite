@@ -22,7 +22,7 @@ use natural::arithmetic::div_mod::{
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
     limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
 };
-use natural::arithmetic::mul::mul_mod::_limbs_mul_mod_limb_width_to_n_minus_1_next_size;
+use natural::arithmetic::mul::mul_mod::_limbs_mul_mod_base_pow_n_minus_1_next_size;
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
@@ -501,7 +501,7 @@ fn _limbs_mod_barrett_preinverted(
     let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         0
     } else {
-        _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1)
+        _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
     };
     let mut n = d_len - i_len;
     for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {

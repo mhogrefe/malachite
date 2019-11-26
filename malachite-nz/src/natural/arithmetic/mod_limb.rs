@@ -1,8 +1,8 @@
 use std::ops::{Rem, RemAssign};
 
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, NegMod, NegModAssign, Parity, WrappingAddAssign, WrappingMulAssign,
-    WrappingSubAssign,
+    Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, WrappingAddAssign,
+    WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
@@ -1262,21 +1262,22 @@ pub fn mpn_mod_1_1p_1(limbs: &[Limb], divisor: Limb) -> Limb {
     let shift = divisor.leading_zeros();
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
-    let mut divisor_a = divisor.wrapping_neg();
+    let mut base_mod_divisor = divisor.wrapping_neg();
     if shift != 0 {
-        divisor_a.wrapping_mul_assign((divisor_inverse >> (Limb::WIDTH - shift)) | (1 << shift));
+        base_mod_divisor
+            .wrapping_mul_assign((divisor_inverse >> (Limb::WIDTH - shift)) | (1 << shift));
     }
-    assert!(divisor_a <= divisor); // not fully reduced mod divisor
-    let divisor_b = DoubleLimb::from(
-        mod_by_preinversion_special(divisor_a, 0, divisor, divisor_inverse) >> shift,
+    assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
+    let base_pow_2_mod_divisor = DoubleLimb::from(
+        mod_by_preinversion_special(base_mod_divisor, 0, divisor, divisor_inverse) >> shift,
     );
-    let divisor_a = DoubleLimb::from(divisor_a >> shift);
-    let (mut r_hi, mut r_lo) = (DoubleLimb::from(limbs[len - 1]) * divisor_a)
+    let base_mod_divisor = DoubleLimb::from(base_mod_divisor >> shift);
+    let (mut r_hi, mut r_lo) = (DoubleLimb::from(limbs[len - 1]) * base_mod_divisor)
         .wrapping_add(DoubleLimb::from(limbs[len - 2]))
         .split_in_half();
     for &limb in limbs[..len - 2].iter().rev() {
-        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * divisor_b)
-            .wrapping_add(DoubleLimb::from(r_lo) * divisor_a)
+        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_2_mod_divisor)
+            .wrapping_add(DoubleLimb::from(r_lo) * base_mod_divisor)
             .wrapping_add(DoubleLimb::from(limb))
             .split_in_half();
         r_hi = new_r_hi;
@@ -1304,36 +1305,37 @@ pub fn mpn_mod_1_1p_2(limbs: &[Limb], divisor: Limb) -> Limb {
     let shift = divisor.leading_zeros();
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
-    let divisor_a = if shift == 0 {
+    let base_mod_divisor = if shift == 0 {
         0
     } else {
-        let divisor_a = divisor
+        let base_mod_divisor = divisor
             .wrapping_neg()
             .wrapping_mul((divisor_inverse >> (Limb::WIDTH - shift)) | (1 << shift));
-        assert!(divisor_a <= divisor); // not fully reduced mod divisor
-        DoubleLimb::from(divisor_a >> shift)
+        assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
+        DoubleLimb::from(base_mod_divisor >> shift)
     };
-    let small_divisor_b = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
-    assert!(small_divisor_b <= divisor); // equality iff divisor = 2 ^ Limb::WIDTH / 2
-    let divisor_b = DoubleLimb::from(small_divisor_b);
+    let small_base_pow_2_mod_divisor = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
+    // equality iff divisor = 2 ^ (Limb::WIDTH - 1)
+    assert!(small_base_pow_2_mod_divisor <= divisor);
+    let base_pow_2_mod_divisor = DoubleLimb::from(small_base_pow_2_mod_divisor);
     let mut r_lo = limbs[len - 2];
     let mut r_hi = limbs[len - 1];
     if len > 2 {
         let (r, mut carry) = DoubleLimb::join_halves(r_lo, limbs[len - 3])
-            .overflowing_add(DoubleLimb::from(r_hi) * divisor_b);
+            .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_divisor);
         let (new_r_hi, new_r_lo) = r.split_in_half();
         r_hi = new_r_hi;
         r_lo = new_r_lo;
         for &limb in limbs[..len - 3].iter().rev() {
             if carry {
-                let (new_r_lo, carry) = r_lo.overflowing_add(small_divisor_b);
+                let (new_r_lo, carry) = r_lo.overflowing_add(small_base_pow_2_mod_divisor);
                 r_lo = new_r_lo;
                 if carry {
                     r_lo.wrapping_sub_assign(divisor);
                 }
             }
             let (r, new_carry) = DoubleLimb::join_halves(r_lo, limb)
-                .overflowing_add(DoubleLimb::from(r_hi) * divisor_b);
+                .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_divisor);
             carry = new_carry;
             let (new_r_hi, new_r_lo) = r.split_in_half();
             r_hi = new_r_hi;
@@ -1344,7 +1346,7 @@ pub fn mpn_mod_1_1p_2(limbs: &[Limb], divisor: Limb) -> Limb {
         }
     }
     if shift != 0 {
-        let (new_r_hi, temp) = (DoubleLimb::from(r_hi) * divisor_a).split_in_half();
+        let (new_r_hi, temp) = (DoubleLimb::from(r_hi) * base_mod_divisor).split_in_half();
         let (new_r_hi, new_r_lo) =
             (DoubleLimb::join_halves(new_r_hi, r_lo).wrapping_add(DoubleLimb::from(temp)) << shift)
                 .split_in_half();
@@ -1372,16 +1374,17 @@ pub fn mpn_mod_1s_2p(limbs: &[Limb], divisor: Limb) -> Limb {
     let co_shift = Limb::WIDTH - shift;
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
-    let divisor_a = divisor
+    let base_mod_divisor = divisor
         .wrapping_neg()
         .wrapping_mul((divisor_inverse >> co_shift) | (1 << shift));
-    assert!(divisor_a <= divisor); // not fully reduced mod divisor
-    let divisor_b = mod_by_preinversion_special(divisor_a, 0, divisor, divisor_inverse);
-    let divisor_c = DoubleLimb::from(
-        mod_by_preinversion_special(divisor_b, 0, divisor, divisor_inverse) >> shift,
+    assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
+    let base_pow_2_mod_divisor =
+        mod_by_preinversion_special(base_mod_divisor, 0, divisor, divisor_inverse);
+    let base_mod_divisor = DoubleLimb::from(base_mod_divisor >> shift);
+    let base_pow_3_mod_divisor = DoubleLimb::from(
+        mod_by_preinversion_special(base_pow_2_mod_divisor, 0, divisor, divisor_inverse) >> shift,
     );
-    let divisor_a = DoubleLimb::from(divisor_a >> shift);
-    let divisor_b = DoubleLimb::from(divisor_b >> shift);
+    let base_pow_2_mod_divisor = DoubleLimb::from(base_pow_2_mod_divisor >> shift);
     let (mut r_hi, mut r_lo) = if len.odd() {
         len -= 1;
         if len == 0 {
@@ -1393,23 +1396,103 @@ pub fn mpn_mod_1s_2p(limbs: &[Limb], divisor: Limb) -> Limb {
                 divisor_inverse,
             ) >> shift;
         }
-        (DoubleLimb::from(limbs[len]) * divisor_b)
-            .wrapping_add(DoubleLimb::from(limbs[len - 1]) * divisor_a)
+        (DoubleLimb::from(limbs[len]) * base_pow_2_mod_divisor)
+            .wrapping_add(DoubleLimb::from(limbs[len - 1]) * base_mod_divisor)
             .wrapping_add(DoubleLimb::from(limbs[len - 2]))
             .split_in_half()
     } else {
         (limbs[len - 1], limbs[len - 2])
     };
     for chunk in limbs[..len - 2].rchunks_exact(2) {
-        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * divisor_c)
-            .wrapping_add(DoubleLimb::from(r_lo) * divisor_b)
-            .wrapping_add(DoubleLimb::from(chunk[1]) * divisor_a)
+        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_3_mod_divisor)
+            .wrapping_add(DoubleLimb::from(r_lo) * base_pow_2_mod_divisor)
+            .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_divisor)
             .wrapping_add(DoubleLimb::from(chunk[0]))
             .split_in_half();
         r_hi = new_r_hi;
         r_lo = new_r_lo;
     }
-    let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * divisor_a)
+    let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_divisor)
+        .wrapping_add(DoubleLimb::from(r_lo))
+        .split_in_half();
+    mod_by_preinversion_special(
+        (r_hi << shift) | (r_lo >> co_shift),
+        r_lo << shift,
+        divisor,
+        divisor_inverse,
+    ) >> shift
+}
+
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// This is mpn_mod_1s_4p_cps combined with mpn_mod_1s_4p from mpn/generic/mod_1_4.c.
+pub fn mpn_mod_1s_4p(limbs: &[Limb], divisor: Limb) -> Limb {
+    let mut len = limbs.len();
+    assert_ne!(len, 0);
+    let shift = divisor.leading_zeros();
+    assert!(shift >= 2);
+    let co_shift = Limb::WIDTH - shift;
+    let divisor = divisor << shift;
+    let divisor_inverse = limbs_invert_limb(divisor);
+    let base_mod_divisor = divisor
+        .wrapping_neg()
+        .wrapping_mul((divisor_inverse >> co_shift) | (1 << shift));
+    assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
+    let base_pow_2_mod_divisor =
+        mod_by_preinversion_special(base_mod_divisor, 0, divisor, divisor_inverse);
+    let base_mod_divisor = DoubleLimb::from(base_mod_divisor >> shift);
+    let base_pow_3_mod_divisor =
+        mod_by_preinversion_special(base_pow_2_mod_divisor, 0, divisor, divisor_inverse);
+    let base_pow_2_mod_divisor = DoubleLimb::from(base_pow_2_mod_divisor >> shift);
+    let base_pow_4_mod_divisor =
+        mod_by_preinversion_special(base_pow_3_mod_divisor, 0, divisor, divisor_inverse);
+    let base_pow_3_mod_divisor = DoubleLimb::from(base_pow_3_mod_divisor >> shift);
+    let base_pow_5_mod_divisor = DoubleLimb::from(
+        mod_by_preinversion_special(base_pow_4_mod_divisor, 0, divisor, divisor_inverse) >> shift,
+    );
+    let base_pow_4_mod_divisor = DoubleLimb::from(base_pow_4_mod_divisor >> shift);
+    let (mut r_hi, mut r_lo) = match len.mod_power_of_two(2) {
+        0 => {
+            len -= 4;
+            (DoubleLimb::from(limbs[len + 3]) * base_pow_3_mod_divisor)
+                .wrapping_add(DoubleLimb::from(limbs[len + 2]) * base_pow_2_mod_divisor)
+                .wrapping_add(DoubleLimb::from(limbs[len + 1]) * base_mod_divisor)
+                .wrapping_add(DoubleLimb::from(limbs[len]))
+                .split_in_half()
+        }
+        1 => {
+            len -= 1;
+            (0, limbs[len])
+        }
+        2 => {
+            len -= 2;
+            (limbs[len + 1], limbs[len])
+        }
+        3 => {
+            len -= 3;
+            (DoubleLimb::from(limbs[len + 2]) * base_pow_2_mod_divisor)
+                .wrapping_add(DoubleLimb::from(limbs[len + 1]) * base_mod_divisor)
+                .wrapping_add(DoubleLimb::from(limbs[len]))
+                .split_in_half()
+        }
+        _ => unreachable!(),
+    };
+    for chunk in limbs[..len].rchunks_exact(4) {
+        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_5_mod_divisor)
+            .wrapping_add(DoubleLimb::from(r_lo) * base_pow_4_mod_divisor)
+            .wrapping_add(DoubleLimb::from(chunk[3]) * base_pow_3_mod_divisor)
+            .wrapping_add(DoubleLimb::from(chunk[2]) * base_pow_2_mod_divisor)
+            .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_divisor)
+            .wrapping_add(DoubleLimb::from(chunk[0]))
+            .split_in_half();
+        r_hi = new_r_hi;
+        r_lo = new_r_lo;
+    }
+    let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_divisor)
         .wrapping_add(DoubleLimb::from(r_lo))
         .split_in_half();
     mod_by_preinversion_special(

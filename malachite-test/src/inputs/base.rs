@@ -3028,7 +3028,7 @@ pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
                 return None;
             }
             rs_hi.truncate(i_len);
-            let scratch_len = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
+            let scratch_len = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
             let x = _limbs_div_mod_barrett_scratch_len(n_len, d_len);
             if x < i_len {
                 return None;
@@ -3524,11 +3524,44 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1<
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
             &(|seed| {
                 special_random_unsigned::<T>(seed)
-                    .filter(|&u| u != T::ZERO)
                     .map(|mut u| {
                         u.clear_bit(u64::from(T::WIDTH - 1));
                         u
                     })
+                    .filter(|&u| u != T::ZERO)
+            }),
+        )),
+    }
+}
+
+// All pairs of nonempty `Vec<T>` and `T`, where `T` is unsigned, the two most-significant bit of
+// the `T` are unset, and the `T` is positive.
+pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned()),
+            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 2)) - T::ONE),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 2)) - T::ONE)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
+            &(|seed| {
+                special_random_unsigned::<T>(seed)
+                    .map(|mut u| {
+                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u.clear_bit(u64::from(T::WIDTH - 2));
+                        u
+                    })
+                    .filter(|&u| u != T::ZERO)
             }),
         )),
     }

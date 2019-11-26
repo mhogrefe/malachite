@@ -21,8 +21,7 @@ use natural::arithmetic::div_mod::{
     limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
 };
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
-    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
+    _limbs_mul_mod_base_pow_n_minus_1_next_size, _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
@@ -1018,7 +1017,7 @@ fn _limbs_div_barrett_approx_preinverted(
     let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         0
     } else {
-        _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1)
+        _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
     };
     let mut carry = false; // This value is never used
     let mut n = d_len - i_len;
@@ -1146,8 +1145,8 @@ pub fn _limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> 
         d_len = qn + 1;
     }
     let is_len = _limbs_div_barrett_approx_is_len(qn, d_len);
-    let local_len = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
-    let out_len = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(local_len, d_len, is_len);
+    let local_len = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+    let out_len = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(local_len, d_len, is_len);
     // 3 * is_len + 4
     let inverse_approx_len = _limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2;
     assert!(d_len + local_len + out_len >= inverse_approx_len);

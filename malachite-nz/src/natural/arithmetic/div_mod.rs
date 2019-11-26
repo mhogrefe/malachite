@@ -22,8 +22,8 @@ use natural::arithmetic::div::{
 };
 use natural::arithmetic::div_mod_limb::limbs_invert_limb;
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
-    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
+    _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
+    _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
@@ -659,9 +659,8 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
     let mut scratch2 = vec![];
     let mut mul_size = 0;
     if d_len >= INV_MULMOD_BNM1_THRESHOLD {
-        mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
-        scratch2 =
-            vec![0; _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(mul_size, d_len, size)];
+        mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+        scratch2 = vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(mul_size, d_len, size)];
     }
     while size >= INV_NEWTON_THRESHOLD {
         sizes.push(size);
@@ -680,7 +679,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
         // Compute i_j * d
         let ds_hi = &ds[d_len - size..];
         let condition = size < INV_MULMOD_BNM1_THRESHOLD || {
-            mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(size + 1);
+            mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(size + 1);
             mul_size > size + previous_size
         };
         let diff = size - previous_size;
@@ -696,13 +695,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             // We computed (truncated) xp of length d + 1 <- 1.is * 0.ds
             } else {
                 // Use B ^ mul_size - 1 wraparound
-                _limbs_mul_mod_limb_width_to_n_minus_1(
-                    scratch,
-                    mul_size,
-                    ds_hi,
-                    is_hi,
-                    &mut scratch2,
-                );
+                _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds_hi, is_hi, &mut scratch2);
                 let scratch = &mut scratch[..mul_size + 1];
                 // We computed {xp, mul_size} <- {is, previous_d} * {ds, d} mod (B ^ mul_size - 1)
                 // We know that 2 * |is * ds + ds * B ^ previous_d - B ^ {previous_d + d}| <
@@ -843,7 +836,7 @@ pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_
 // n_len >= ds.len()
 // i_len == _limbs_div_mod_barrett_is_len(n_len - ds.len(), ds.len())
 // qs.len() == i_len
-// scratch_len == _limbs_mul_mod_limb_width_to_n_minus_1_next_size(ds.len() + 1)
+// scratch_len ==  _limbs_mul_mod_base_pow_n_minus_1_next_size(ds.len() + 1)
 // scratch.len() == _limbs_div_mod_barrett_scratch_len(n_len, d_len) - i_len
 // rs_hi.len() == i_len
 pub fn _limbs_div_barrett_large_product(
@@ -856,7 +849,7 @@ pub fn _limbs_div_barrett_large_product(
 ) {
     let d_len = ds.len();
     let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
-    _limbs_mul_mod_limb_width_to_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
+    _limbs_mul_mod_base_pow_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
     if d_len + i_len > scratch_len {
         let (rs_hi_lo, rs_hi_hi) = rs_hi.split_at(scratch_len - d_len);
         let carry_1 = limbs_sub_in_place_left(scratch, rs_hi_hi);
@@ -900,7 +893,7 @@ fn _limbs_div_mod_barrett_preinverted(
     let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         0
     } else {
-        _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1)
+        _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
     };
     let mut n = d_len - i_len;
     for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {
@@ -1054,8 +1047,8 @@ pub fn _limbs_div_mod_barrett_helper(
 /// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, but nn is omitted from the
 /// arguments as it is unused.
 fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
-    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len + 1);
-    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(itch_local, d_len, is_len);
+    let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+    let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
     itch_local + itch_out
 }
 

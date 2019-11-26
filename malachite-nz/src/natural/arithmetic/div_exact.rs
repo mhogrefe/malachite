@@ -17,8 +17,8 @@ use natural::arithmetic::div_exact_limb::{limbs_div_exact_limb_to_out, limbs_mod
 use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_limb_width_to_n_minus_1, _limbs_mul_mod_limb_width_to_n_minus_1_next_size,
-    _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len,
+    _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
+    _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
@@ -43,8 +43,8 @@ use platform::{
 ///
 /// This is mpn_binvert_itch from mpn/generic/binvert.c.
 pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
-    let itch_local = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n);
-    let itch_out = _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(itch_local, n, (n + 1) >> 1);
+    let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(n);
+    let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, n, (n + 1) >> 1);
     itch_local + itch_out
 }
 
@@ -107,16 +107,10 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     let mut previous_size = size;
     // Use Newton iterations to get the desired precision.
     for &size in sizes.iter().rev() {
-        let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(size);
+        let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(size);
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
         let (is_lo, is_hi) = is.split_at_mut(previous_size);
-        _limbs_mul_mod_limb_width_to_n_minus_1(
-            scratch_lo,
-            mul_size,
-            &ds[..size],
-            is_lo,
-            scratch_hi,
-        );
+        _limbs_mul_mod_base_pow_n_minus_1(scratch_lo, mul_size, &ds[..size], is_lo, scratch_hi);
         limbs_sub_limb_to_out(
             scratch_hi,
             &scratch_lo[..previous_size - (mul_size - size)],
@@ -377,10 +371,10 @@ pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) ->
     let (mul_len_1, mul_len_2) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         (d_len + i_len, 0)
     } else {
-        let temp_len = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        let temp_len = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         (
             temp_len,
-            _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(temp_len, d_len, i_len),
+            _limbs_mul_mod_base_pow_n_minus_1_scratch_len(temp_len, d_len, i_len),
         )
     };
     let modular_invert_scratch_len = limbs_modular_invert_scratch_len(i_len);
@@ -418,10 +412,10 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             limbs_mul_greater_to_out(scratch, ds, qs);
         } else {
-            let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
             {
                 let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-                _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs, scratch_out);
+                _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs, scratch_out);
             }
             //TODO Else is untested!
             if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
@@ -462,10 +456,10 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
     if q_len_s < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         limbs_mul_greater_to_out(scratch, ds, qs);
     } else {
-        let tn = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        let tn = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         {
             let (scratch, scratch_out) = scratch.split_at_mut(tn);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, tn, ds, qs, scratch_out);
+            _limbs_mul_mod_base_pow_n_minus_1(scratch, tn, ds, qs, scratch_out);
         }
         if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(tn) {
             if wrapped_len != 0 {
@@ -519,10 +513,10 @@ fn _limbs_modular_div_mod_barrett_balanced(
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         limbs_mul_greater_to_out(scratch, ds, qs_lo);
     } else {
-        let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         {
             let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
+            _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
         }
         if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
             if wrapped_len != 0 {
@@ -546,10 +540,10 @@ fn _limbs_modular_div_mod_barrett_balanced(
     if q_len_s < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         limbs_mul_greater_to_out(scratch, ds, qs_hi);
     } else {
-        let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         {
             let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs_hi, scratch_out);
+            _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_hi, scratch_out);
         }
         if let Some(wrapped_len) = (d_len + q_len_s).checked_sub(mul_size) {
             if wrapped_len != 0 {
@@ -806,10 +800,10 @@ pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usi
         let (mul_len_1, mul_len_2) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             (d_len + i_len, 0)
         } else {
-            let mul_len_1 = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            let mul_len_1 = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
             (
                 mul_len_1,
-                _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(mul_len_1, d_len, i_len),
+                _limbs_mul_mod_base_pow_n_minus_1_scratch_len(mul_len_1, d_len, i_len),
             )
         };
         d_len + mul_len_1 + mul_len_2
@@ -818,10 +812,10 @@ pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usi
         let (mul_len_1, mul_len_2) = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             (n_len + i_len, 0)
         } else {
-            let mul_len_1 = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n_len);
+            let mul_len_1 = _limbs_mul_mod_base_pow_n_minus_1_next_size(n_len);
             (
                 mul_len_1,
-                _limbs_mul_mod_limb_width_to_n_minus_1_scratch_len(mul_len_1, n_len, i_len),
+                _limbs_mul_mod_base_pow_n_minus_1_scratch_len(mul_len_1, n_len, i_len),
             )
         };
         mul_len_1 + mul_len_2
@@ -857,10 +851,10 @@ fn _limbs_modular_div_barrett_greater(
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             limbs_mul_greater_to_out(scratch, ds, qs_lo);
         } else {
-            let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+            let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
             {
                 let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-                _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
+                _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
             }
             //TODO Else is untested!
             if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
@@ -904,10 +898,10 @@ fn _limbs_modular_div_barrett_greater(
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         limbs_mul_greater_to_out(scratch, ds, qs_lo);
     } else {
-        let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(d_len);
+        let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len);
         {
             let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
+            _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
         }
         if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
             if wrapped_len != 0 {
@@ -962,10 +956,10 @@ fn _limbs_modular_div_barrett_same_length(
     if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         limbs_mul_greater_to_out(scratch, ds, qs_lo);
     } else {
-        let mul_size = _limbs_mul_mod_limb_width_to_n_minus_1_next_size(n_len);
+        let mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(n_len);
         {
             let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
-            _limbs_mul_mod_limb_width_to_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
+            _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
         }
         //TODO Else is untested!
         if let Some(wrapped_len) = (n_len + i_len).checked_sub(mul_size) {

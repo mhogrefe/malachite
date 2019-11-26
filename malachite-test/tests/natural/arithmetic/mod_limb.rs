@@ -7,7 +7,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
     _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
-    mpn_mod_1_unnorm, mpn_mod_1s_2p,
+    mpn_mod_1_unnorm, mpn_mod_1s_2p, mpn_mod_1s_4p,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -21,6 +21,7 @@ use common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1, pairs_of_unsigned_and_positive_unsigned,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, positive_unsigneds,
 };
@@ -61,6 +62,7 @@ fn test_limbs_mod_limb() {
     test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
     test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
     test(&[100, 101, 102], 0xffff_ffff, 303);
+    test(&[1, 2, 3, 4], 6, 1);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -161,6 +163,7 @@ fn test_mpn_mod_1_unnorm() {
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
     // len >= 4 in mpn_mod_1s_2p
     test(&[1, 2, 3, 4, 5], 6, 3);
+    test(&[1, 2, 3, 4], 6, 1);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -189,6 +192,46 @@ fn mpn_mod_1s_2p_fail_1() {
 #[should_panic]
 fn mpn_mod_1s_2p_fail_2() {
     mpn_mod_1s_2p(&[10, 10], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_mpn_mod_1s_4p() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(mpn_mod_1s_4p(limbs, divisor), remainder);
+    };
+    test(&[0, 0], 2, 0);
+    test(&[0], 2, 0);
+    // len === 1 mod 4
+    // len < 4
+    test(&[6], 2, 0);
+    test(&[6], 4, 2);
+    // len === 2 mod 4
+    test(&[6, 7], 1, 0);
+    test(&[6, 7], 2, 0);
+    // len === 3 mod 4
+    test(&[100, 101, 102], 10, 8);
+    test(&[123, 456], 789, 636);
+    test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    // len === 0 mod 4
+    test(&[1, 2, 3, 4], 6, 1);
+    // len >= 4
+    test(&[1, 2, 3, 4, 5], 6, 3);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1s_4p_fail_1() {
+    mpn_mod_1s_4p(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn mpn_mod_1s_4p_fail_2() {
+    mpn_mod_1s_4p(&[10, 10], 0x7fff_ffff);
 }
 
 #[test]
@@ -493,8 +536,24 @@ fn mpn_mod_1_unnorm_properties() {
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, divisor)| {
             let remainder = mpn_mod_1_unnorm(limbs, divisor);
-            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             assert_eq!(remainder, mpn_mod_1s_2p(limbs, divisor));
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % divisor);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
+            }
+        },
+    );
+}
+
+#[test]
+fn mpn_mod_1s_4p_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
+        |&(ref limbs, divisor)| {
+            let remainder = mpn_mod_1s_4p(limbs, divisor);
+            assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
             } else {
