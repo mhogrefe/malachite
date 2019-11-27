@@ -16,6 +16,9 @@ pub mod div_mod_divide_and_conquer_to_barrett;
 pub mod div_mod_schoolbook_to_divide_and_conquer;
 pub mod fft;
 pub mod invert_basecase_to_newton;
+pub mod mod_limb_any_leading_zeros;
+pub mod mod_limb_small_normalized;
+pub mod mod_limb_small_unnormalized;
 pub mod modular_div_divide_and_conquer_to_barrett;
 pub mod modular_div_mod_divide_and_conquer_to_barrett;
 pub mod modular_div_mod_schoolbook_to_divide_and_conquer;
@@ -89,6 +92,9 @@ pub fn tune(param_group: &str) {
         "ModularDivDivideAndConquerToBarett" => {
             display_lines(&modular_div_divide_and_conquer_to_barrett::tune())
         }
+        "ModLimbAnyLeadingZeros" => display_lines(&mod_limb_any_leading_zeros::tune()),
+        "ModLimbSmallNormalized" => display_lines(&mod_limb_small_normalized::tune()),
+        "ModLimbSmallUnnormalized" => display_lines(&mod_limb_small_unnormalized::tune()),
         "all" => {
             let mut lines = Vec::new();
             lines.push(format!("pub type Limb = {};", Limb::NAME));
@@ -142,6 +148,10 @@ pub fn tune(param_group: &str) {
             lines.extend(modular_div_mod_divide_and_conquer_to_barrett::tune());
             lines.extend(modular_div_schoolbook_to_divide_and_conquer::tune());
             lines.extend(modular_div_divide_and_conquer_to_barrett::tune());
+            lines.push(String::new());
+            lines.extend(mod_limb_any_leading_zeros::tune());
+            lines.extend(mod_limb_small_normalized::tune());
+            lines.extend(mod_limb_small_unnormalized::tune());
             let filename = "benchmarks/platform.txt";
             let mut output = File::create(filename).unwrap();
             for line in lines {

@@ -44,3 +44,7 @@ pub const DC_BDIV_QR_THRESHOLD: usize = 211;
 pub const MU_BDIV_QR_THRESHOLD: usize = 7547;
 pub const DC_BDIV_Q_THRESHOLD: usize = 211;
 pub const MU_BDIV_Q_THRESHOLD: usize = 1998;
+
+pub const MOD_1_NORM_THRESHOLD: usize = 0;
+pub const MOD_1_UNNORM_THRESHOLD: usize = 0;
+pub const MOD_1_1P_METHOD: bool = false;

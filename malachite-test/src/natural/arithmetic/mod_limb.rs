@@ -4,8 +4,11 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
-    mpn_mod_1_unnorm, mpn_mod_1s_2p, mpn_mod_1s_4p,
+    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
+    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
+    _limbs_mod_limb_small_normalized_large, _limbs_mod_limb_small_small,
+    _limbs_mod_limb_small_unnormalized, _limbs_mod_limb_small_unnormalized_large, limbs_mod_limb,
 };
 use malachite_nz::platform::Limb;
 use num::{BigUint, ToPrimitive};
@@ -30,12 +33,12 @@ use inputs::natural::{
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_limb);
-    register_demo!(registry, demo_mpn_mod_1_norm);
-    register_demo!(registry, demo_mpn_mod_1_unnorm);
-    register_demo!(registry, demo_mpn_mod_1_1p_1);
-    register_demo!(registry, demo_mpn_mod_1_1p_2);
-    register_demo!(registry, demo_mpn_mod_1s_2p);
-    register_demo!(registry, demo_mpn_mod_1s_4p);
+    register_demo!(registry, demo_limbs_mod_limb_small_normalized);
+    register_demo!(registry, demo_limbs_mod_limb_small_unnormalized);
+    register_demo!(registry, demo_limbs_mod_limb_any_leading_zeros_1);
+    register_demo!(registry, demo_limbs_mod_limb_any_leading_zeros_2);
+    register_demo!(registry, demo_limbs_mod_limb_at_least_1_leading_zero);
+    register_demo!(registry, demo_limbs_mod_limb_at_least_2_leading_zeros);
     register_demo!(registry, demo_natural_rem_assign_limb);
     register_demo!(registry, demo_natural_rem_limb);
     register_demo!(registry, demo_natural_rem_limb_ref);
@@ -56,10 +59,26 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limb_neg_mod_natural);
     register_demo!(registry, demo_limb_neg_mod_natural_ref);
     register_bench!(registry, Small, benchmark_limbs_mod_limb_algorithms);
-    register_bench!(registry, Small, benchmark_mpn_mod_1_norm);
-    register_bench!(registry, Small, benchmark_mpn_mod_1_unnorm);
-    register_bench!(registry, Small, benchmark_mpn_mod_1s_2p_algorithms);
-    register_bench!(registry, Small, benchmark_mpn_mod_1s_4p);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_small_normalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_small_unnormalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_at_least_2_leading_zeros
+    );
     register_bench!(registry, Large, benchmark_natural_rem_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
     register_bench!(
@@ -144,74 +163,74 @@ fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_mpn_mod_1_norm(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_small_normalized(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
         println!(
-            "mpn_mod_1_norm({:?}, {}) = {}",
+            "_limbs_mod_limb_small_normalized({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1_norm(&limbs, divisor)
+            _limbs_mod_limb_small_normalized(&limbs, divisor)
         );
     }
 }
 
-fn demo_mpn_mod_1_unnorm(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_small_unnormalized(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
     {
         println!(
-            "mpn_mod_1_unnorm({:?}, {}) = {}",
+            "_limbs_mod_limb_small_unnormalized({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1_unnorm(&limbs, divisor)
+            _limbs_mod_limb_small_unnormalized(&limbs, divisor)
         );
     }
 }
 
-fn demo_mpn_mod_1_1p_1(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         println!(
-            "mpn_mod_1_1p_1({:?}, {}) = {}",
+            "_limbs_mod_limb_any_leading_zeros_1({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1_1p_1(&limbs, divisor)
+            _limbs_mod_limb_any_leading_zeros_1(&limbs, divisor)
         );
     }
 }
 
-fn demo_mpn_mod_1_1p_2(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
         println!(
-            "mpn_mod_1_1p_2({:?}, {}) = {}",
+            "_limbs_mod_limb_any_leading_zeros_2({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1_1p_2(&limbs, divisor)
+            _limbs_mod_limb_any_leading_zeros_2(&limbs, divisor)
         );
     }
 }
 
-fn demo_mpn_mod_1s_2p(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
     {
         println!(
-            "mpn_mod_1s_2p({:?}, {}) = {}",
+            "_limbs_mod_limb_at_least_1_leading_zero({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1s_2p(&limbs, divisor)
+            _limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor)
         );
     }
 }
 
-fn demo_mpn_mod_1s_4p(gm: GenerationMode, limit: usize) {
+fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenerationMode, limit: usize) {
     for (limbs, divisor) in
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm).take(limit)
     {
         println!(
-            "mpn_mod_1s_4p({:?}, {}) = {}",
+            "_limbs_mod_limb_at_least_2_leading_zeros({:?}, {}) = {}",
             limbs,
             divisor,
-            mpn_mod_1s_4p(&limbs, divisor)
+            _limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor)
         );
     }
 }
@@ -359,7 +378,7 @@ fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_na
     m_run_benchmark(
         "limbs_mod_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
@@ -371,58 +390,146 @@ fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_na
                 &mut (|(limbs, divisor)| no_out!(limbs_mod_limb(&limbs, divisor))),
             ),
             (
-                "alt",
-                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt(&limbs, divisor))),
+                "alt 1",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_1(&limbs, divisor))),
             ),
             (
-                "mpn_mod_1_1p_1",
-                &mut (|(limbs, divisor)| no_out!(mpn_mod_1_1p_1(&limbs, divisor))),
+                "alt 2",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_2(&limbs, divisor))),
             ),
             (
-                "mpn_mod_1_1p_2",
-                &mut (|(limbs, divisor)| no_out!(mpn_mod_1_1p_2(&limbs, divisor))),
+                "_limbs_mod_limb_any_leading_zeros_1",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros_1(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros_2",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros_2(&limbs, divisor))
+                }),
             ),
         ],
     );
 }
 
-fn benchmark_mpn_mod_1_norm(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod_limb_small_normalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
-        "mpn_mod_1_norm(&[Limb], Limb)",
-        BenchmarkType::Single,
+        "_limbs_mod_limb_small_normalized(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, _)| limbs.len()),
-        "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(limbs, divisor)| no_out!(mpn_mod_1_norm(&limbs, divisor))),
-        )],
+        &(|&(ref limbs, _)| limbs.len() - 1),
+        "limbs.len() - 1",
+        &mut [
+            (
+                "small",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder >= divisor {
+                        remainder -= divisor;
+                    }
+                    len -= 1;
+                    if len == 0 {
+                        return;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_small(&limbs, divisor, remainder);
+                }),
+            ),
+            (
+                "large",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder >= divisor {
+                        remainder -= divisor;
+                    }
+                    len -= 1;
+                    if len == 0 {
+                        return;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_normalized_large(&limbs, divisor, remainder);
+                }),
+            ),
+        ],
     );
 }
 
-fn benchmark_mpn_mod_1_unnorm(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
-        "mpn_mod_1_unnorm(&[Limb], Limb)",
-        BenchmarkType::Single,
+        "_limbs_mod_limb_small_unnormalized(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, _)| limbs.len()),
-        "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(limbs, divisor)| no_out!(mpn_mod_1_unnorm(&limbs, divisor))),
-        )],
+        &(|&(ref limbs, divisor)| {
+            if *limbs.last().unwrap() < divisor {
+                limbs.len() - 1
+            } else {
+                limbs.len()
+            }
+        }),
+        "adjusted limbs.len()",
+        &mut [
+            (
+                "small",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder < divisor {
+                        len -= 1;
+                        if len == 0 {
+                            return;
+                        }
+                    } else {
+                        remainder = 0;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_small(limbs, divisor, remainder);
+                }),
+            ),
+            (
+                "large",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder < divisor {
+                        len -= 1;
+                        if len == 0 {
+                            return;
+                        }
+                    } else {
+                        remainder = 0;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_unnormalized_large(limbs, divisor, remainder);
+                }),
+            ),
+        ],
     );
 }
 
-fn benchmark_mpn_mod_1s_2p_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
-        "mpn_mod_1s_2p(&[Limb], Limb)",
+        "_limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
         gm.name(),
@@ -432,20 +539,28 @@ fn benchmark_mpn_mod_1s_2p_algorithms(gm: GenerationMode, limit: usize, file_nam
         "limbs.len()",
         &mut [
             (
-                "mpn_mod_1_unnorm",
-                &mut (|(limbs, divisor)| no_out!(mpn_mod_1_unnorm(&limbs, divisor))),
+                "_limbs_mod_limb_small_unnormalized",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_small_unnormalized(&limbs, divisor))
+                }),
             ),
             (
-                "mpn_mod_1s_2p",
-                &mut (|(limbs, divisor)| no_out!(mpn_mod_1s_2p(&limbs, divisor))),
+                "_limbs_mod_limb_at_least_1_leading_zero",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
+                }),
             ),
         ],
     );
 }
 
-fn benchmark_mpn_mod_1s_4p(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_mod_limb_at_least_2_leading_zeros(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
-        "mpn_mod_1s_4p(&[Limb], Limb)",
+        "_limbs_mod_limb_at_least_2_leading_zeros(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm),
         gm.name(),
@@ -455,7 +570,9 @@ fn benchmark_mpn_mod_1s_4p(gm: GenerationMode, limit: usize, file_name: &str) {
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(limbs, divisor)| no_out!(mpn_mod_1s_4p(&limbs, divisor))),
+            &mut (|(limbs, divisor)| {
+                no_out!(_limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor))
+            }),
         )],
     );
 }

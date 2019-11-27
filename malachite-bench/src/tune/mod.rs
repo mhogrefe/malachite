@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use stats::{mean, median};
 use time::precise_time_ns;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ComparisonResult {
     NeitherBetter,
     FirstAlwaysBetter,

@@ -1,5 +1,6 @@
 use std::ops::{Rem, RemAssign};
 
+use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
@@ -12,7 +13,7 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::div_mod_limb::limbs_invert_limb;
 use natural::Natural::{self, Large, Small};
-use platform::{DoubleLimb, Limb};
+use platform::{DoubleLimb, Limb, MOD_1_1P_METHOD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD};
 
 /// Time: O(1)
 ///
@@ -1083,7 +1084,7 @@ fn limbs_mod_limb_normalized_shl(
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where the quotient is not computed and the
 /// remainder is returned. Experiments show that this is always slower than `_limbs_mod_limb`.
-pub fn _limbs_mod_limb_alt(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_alt_1(limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
@@ -1146,8 +1147,25 @@ fn mod_by_preinversion_special(
     remainder
 }
 
-//TODO tune
-const MOD_1_NORM_THRESHOLD: usize = 0;
+pub fn _limbs_mod_limb_small_small(limbs: &[Limb], divisor: Limb, mut remainder: Limb) -> Limb {
+    let divisor = DoubleLimb::from(divisor);
+    for &limb in limbs.iter().rev() {
+        remainder = (DoubleLimb::join_halves(remainder, limb) % divisor).lower_half();
+    }
+    remainder
+}
+
+pub fn _limbs_mod_limb_small_normalized_large(
+    limbs: &[Limb],
+    divisor: Limb,
+    mut remainder: Limb,
+) -> Limb {
+    let inverse = limbs_invert_limb(divisor);
+    for &limb in limbs.iter().rev() {
+        remainder = mod_by_preinversion_special(remainder, limb, divisor, inverse);
+    }
+    remainder
+}
 
 /// Time: worst case O(n)
 ///
@@ -1157,7 +1175,7 @@ const MOD_1_NORM_THRESHOLD: usize = 0;
 ///
 /// This is mpn_mod_1_norm from mpn/generic/mod_1.c.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn mpn_mod_1_norm(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_small_normalized(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
     assert!(divisor.get_highest_bit());
@@ -1172,21 +1190,32 @@ pub fn mpn_mod_1_norm(limbs: &[Limb], divisor: Limb) -> Limb {
     }
     let limbs = &limbs[..len];
     if len < MOD_1_NORM_THRESHOLD {
-        let divisor = DoubleLimb::from(divisor);
-        for &limb in limbs.iter().rev() {
-            remainder = (DoubleLimb::join_halves(remainder, limb) % divisor).lower_half();
-        }
+        _limbs_mod_limb_small_small(limbs, divisor, remainder)
     } else {
-        let inverse = limbs_invert_limb(divisor);
-        for &limb in limbs.iter().rev() {
-            remainder = mod_by_preinversion_special(remainder, limb, divisor, inverse);
-        }
+        _limbs_mod_limb_small_normalized_large(limbs, divisor, remainder)
     }
-    remainder
 }
 
-//TODO tune
-const MOD_1_UNNORM_THRESHOLD: usize = 0;
+pub fn _limbs_mod_limb_small_unnormalized_large(
+    limbs: &[Limb],
+    mut divisor: Limb,
+    mut remainder: Limb,
+) -> Limb {
+    let shift = divisor.leading_zeros();
+    divisor <<= shift;
+    let (limbs_last, limbs_init) = limbs.split_last().unwrap();
+    let mut previous_limb = *limbs_last;
+    let co_shift = Limb::WIDTH - shift;
+    remainder = (remainder << shift) | (previous_limb >> co_shift);
+    let divisor_inverse = limbs_invert_limb(divisor);
+    for &limb in limbs_init.iter().rev() {
+        let shifted_limb = (previous_limb << shift) | (limb >> co_shift);
+        remainder = mod_by_preinversion_special(remainder, shifted_limb, divisor, divisor_inverse);
+        previous_limb = limb;
+    }
+    mod_by_preinversion_special(remainder, previous_limb << shift, divisor, divisor_inverse)
+        >> shift
+}
 
 /// Time: worst case O(n)
 ///
@@ -1196,7 +1225,7 @@ const MOD_1_UNNORM_THRESHOLD: usize = 0;
 ///
 /// This is mpn_mod_1_unnorm from mpn/generic/mod_1.c, where UDIV_NEEDS_NORMALIZATION is false.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn mpn_mod_1_unnorm(limbs: &[Limb], mut divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_small_unnormalized(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
     assert_ne!(divisor, 0);
@@ -1214,38 +1243,17 @@ pub fn mpn_mod_1_unnorm(limbs: &[Limb], mut divisor: Limb) -> Limb {
     }
     let limbs = &limbs[..len];
     if len < MOD_1_UNNORM_THRESHOLD {
-        for &limb in limbs.iter().rev() {
-            remainder =
-                (DoubleLimb::join_halves(remainder, limb) % DoubleLimb::from(divisor)).lower_half();
-        }
-        remainder
+        _limbs_mod_limb_small_small(limbs, divisor, remainder)
     } else {
-        let shift = divisor.leading_zeros();
-        divisor <<= shift;
-        let (limbs_last, limbs_init) = limbs.split_last().unwrap();
-        let mut previous_limb = *limbs_last;
-        let co_shift = Limb::WIDTH - shift;
-        remainder = (remainder << shift) | (previous_limb >> co_shift);
-        let divisor_inverse = limbs_invert_limb(divisor);
-        for &limb in limbs_init.iter().rev() {
-            let shifted_limb = (previous_limb << shift) | (limb >> co_shift);
-            remainder =
-                mod_by_preinversion_special(remainder, shifted_limb, divisor, divisor_inverse);
-            previous_limb = limb;
-        }
-        mod_by_preinversion_special(remainder, previous_limb << shift, divisor, divisor_inverse)
-            >> shift
+        _limbs_mod_limb_small_unnormalized_large(limbs, divisor, remainder)
     }
 }
 
-//TODO tune
-const MOD_1_1P_METHOD: bool = false;
-
-pub fn mpn_mod_1_1p(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_any_leading_zeros(limbs: &[Limb], divisor: Limb) -> Limb {
     if MOD_1_1P_METHOD {
-        mpn_mod_1_1p_1(limbs, divisor)
+        _limbs_mod_limb_any_leading_zeros_1(limbs, divisor)
     } else {
-        mpn_mod_1_1p_2(limbs, divisor)
+        _limbs_mod_limb_any_leading_zeros_2(limbs, divisor)
     }
 }
 
@@ -1256,7 +1264,7 @@ pub fn mpn_mod_1_1p(limbs: &[Limb], divisor: Limb) -> Limb {
 /// where n = `limbs.len()`
 ///
 /// This is mpn_mod_1_1p_cps_1 combined with mpn_mod_1_1p_1 from mpn/generic/mod_1.c.
-pub fn mpn_mod_1_1p_1(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_any_leading_zeros_1(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len >= 2);
     let shift = divisor.leading_zeros();
@@ -1299,7 +1307,7 @@ pub fn mpn_mod_1_1p_1(limbs: &[Limb], divisor: Limb) -> Limb {
 /// where n = `limbs.len()`
 ///
 /// This is mpn_mod_1_1p_cps_2 combined with mpn_mod_1_1p_2 from mpn/generic/mod_1.c.
-pub fn mpn_mod_1_1p_2(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_any_leading_zeros_2(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len >= 2);
     let shift = divisor.leading_zeros();
@@ -1366,7 +1374,7 @@ pub fn mpn_mod_1_1p_2(limbs: &[Limb], divisor: Limb) -> Limb {
 /// where n = `limbs.len()`
 ///
 /// This is mpn_mod_1s_2p_cps combined with mpn_mod_1s_2p from mpn/generic/mod_1_2.c.
-pub fn mpn_mod_1s_2p(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_at_least_1_leading_zero(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
     let shift = divisor.leading_zeros();
@@ -1430,7 +1438,7 @@ pub fn mpn_mod_1s_2p(limbs: &[Limb], divisor: Limb) -> Limb {
 /// where n = `limbs.len()`
 ///
 /// This is mpn_mod_1s_4p_cps combined with mpn_mod_1s_4p from mpn/generic/mod_1_4.c.
-pub fn mpn_mod_1s_4p(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_at_least_2_leading_zeros(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
     let shift = divisor.leading_zeros();
@@ -1501,4 +1509,34 @@ pub fn mpn_mod_1s_4p(limbs: &[Limb], divisor: Limb) -> Limb {
         divisor,
         divisor_inverse,
     ) >> shift
+}
+
+//TODO tune all
+const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
+const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 3;
+const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 9;
+const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 22;
+
+const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
+
+/// This is mpn_mod_1 from mpn/generic/mod_1.c, where n > 1.
+pub fn _limbs_mod_limb_alt_2(limbs: &[Limb], divisor: Limb) -> Limb {
+    let len = limbs.len();
+    assert!(len > 1);
+    assert_ne!(divisor, 0);
+    if divisor.get_highest_bit() {
+        if len < MOD_1N_TO_MOD_1_1_THRESHOLD {
+            _limbs_mod_limb_small_normalized(limbs, divisor)
+        } else {
+            _limbs_mod_limb_any_leading_zeros(limbs, divisor)
+        }
+    } else if len < MOD_1U_TO_MOD_1_1_THRESHOLD {
+        _limbs_mod_limb_small_unnormalized(limbs, divisor)
+    } else if len < MOD_1_1_TO_MOD_1_2_THRESHOLD {
+        _limbs_mod_limb_any_leading_zeros(limbs, divisor)
+    } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || divisor & HIGHEST_TWO_BITS_MASK != 0 {
+        _limbs_mod_limb_at_least_1_leading_zero(limbs, divisor)
+    } else {
+        _limbs_mod_limb_at_least_2_leading_zeros(limbs, divisor)
+    }
 }

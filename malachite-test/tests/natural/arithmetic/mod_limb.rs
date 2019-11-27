@@ -6,8 +6,10 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt, limbs_mod_limb, mpn_mod_1_1p_1, mpn_mod_1_1p_2, mpn_mod_1_norm,
-    mpn_mod_1_unnorm, mpn_mod_1s_2p, mpn_mod_1s_4p,
+    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
+    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
+    _limbs_mod_limb_small_unnormalized, limbs_mod_limb,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -38,31 +40,70 @@ use malachite_test::natural::arithmetic::mod_limb::{num_rem_u32, rug_neg_mod_u32
 fn test_limbs_mod_limb() {
     let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
         assert_eq!(limbs_mod_limb(limbs, divisor), remainder);
-        assert_eq!(mpn_mod_1_1p_1(limbs, divisor), remainder);
-        assert_eq!(mpn_mod_1_1p_2(limbs, divisor), remainder);
-        assert_eq!(_limbs_mod_limb_alt(limbs, divisor), remainder);
+        assert_eq!(
+            _limbs_mod_limb_any_leading_zeros_1(limbs, divisor),
+            remainder
+        );
+        assert_eq!(
+            _limbs_mod_limb_any_leading_zeros_2(limbs, divisor),
+            remainder
+        );
+        assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
     };
     test(&[0, 0], 2, 0);
-    // shift != 0
-    // rh < b
-    // n == 2
+    // shift != 0 in _limbs_mod_limb_any_leading_zeros_1
+    // r_hi < b in _limbs_mod_limb_any_leading_zeros_1
+    // n == 2 in _limbs_mod_limb_any_leading_zeros_1
+    // !divisor.get_highest_bit() in _limbs_mod_limb_alt_2
+    // !divisor.get_highest_bit() && len < MOD_1U_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // n > 2
+    // n > 2 in _limbs_mod_limb_any_leading_zeros_1
+    // !divisor.get_highest_bit() &&
+    //      MOD_1U_TO_MOD_1_1_THRESHOLD <= len < MOD_1_1_TO_MOD_1_2_THRESHOLD
+    //      in _limbs_mod_limb_alt_2
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
     test(&[0, 0], 0xa000_0000, 0);
-    // shift == 0
+    // shift == 0 in _limbs_mod_limb_any_leading_zeros_1
+    // divisor.get_highest_bit() in _limbs_mod_limb_alt_2
+    // divisor.get_highest_bit() && len < MOD_1N_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
     test(&[6, 7], 0x8000_0000, 6);
     test(&[6, 7], 0xa000_0000, 536870918);
+    // divisor.get_highest_bit() && len >= MOD_1N_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
     test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
-    // rh >= b
+    // r_hi >= b in _limbs_mod_limb_any_leading_zeros_1
     test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
     test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
     test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
     test(&[100, 101, 102], 0xffff_ffff, 303);
     test(&[1, 2, 3, 4], 6, 1);
+    // !divisor.get_highest_bit() && len >= MOD_1_1_TO_MOD_1_2_THRESHOLD &&
+    //      (len < MOD_1_2_TO_MOD_1_4_THRESHOLD || divisor & HIGHEST_TWO_BITS_MASK != 0)
+    //      in _limbs_mod_limb_alt_2
+    test(
+        &[
+            3713432036, 2475243626, 3960734766, 244755020, 3760002601, 301563516, 2499010086,
+            1451814771, 1299826235, 3628218184, 2565364972, 3729936002,
+        ],
+        565832495,
+        295492150,
+    );
+    // !divisor.get_highest_bit() && len >= MOD_1_2_TO_MOD_1_4_THRESHOLD &&
+    //      divisor & HIGHEST_TWO_BITS_MASK == 0
+    //      in _limbs_mod_limb_alt_2
+    test(
+        &[
+            540286473, 1475101238, 1863380542, 2517905739, 81646271, 3172818884, 2759300635,
+            852345965, 3647245071, 3875987988, 4229899590, 4100778302, 1641902155, 1289745333,
+            3414845068, 119899697, 2175381145, 2490291811, 3047506964, 1815484255, 3379971995,
+            1695675424, 1418284338,
+        ],
+        436775226,
+        165213921,
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -82,36 +123,36 @@ fn limbs_mod_limb_fail_2() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_1p_1_fail_1() {
-    mpn_mod_1_1p_1(&[10], 10);
+fn _limbs_mod_limb_any_leading_zeros_1_fail_1() {
+    _limbs_mod_limb_any_leading_zeros_1(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_1p_1_fail_2() {
-    mpn_mod_1_1p_1(&[10, 10], 0);
+fn _limbs_mod_limb_any_leading_zeros_1_fail_2() {
+    _limbs_mod_limb_any_leading_zeros_1(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_1p_2_fail_1() {
-    mpn_mod_1_1p_2(&[10], 10);
+fn _limbs_mod_limb_any_leading_zeros_2_fail_1() {
+    _limbs_mod_limb_any_leading_zeros_2(&[10], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_1p_2_fail_2() {
-    mpn_mod_1_1p_2(&[10, 10], 0);
+fn _limbs_mod_limb_any_leading_zeros_2_fail_2() {
+    _limbs_mod_limb_any_leading_zeros_2(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_mpn_mod_1_norm() {
+fn test_limbs_mod_limb_small_normalized() {
     let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
-        assert_eq!(mpn_mod_1_norm(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_small_normalized(limbs, divisor), remainder);
     };
     test(&[0x8000_0123], 0x8000_0000, 0x123);
     test(&[0, 0], 0xa000_0000, 0);
@@ -126,42 +167,48 @@ fn test_mpn_mod_1_norm() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_norm_fail_1() {
-    mpn_mod_1_norm(&[], 0xffff_ffff);
+fn _limbs_mod_limb_small_normalized_fail_1() {
+    _limbs_mod_limb_small_normalized(&[], 0xffff_ffff);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_norm_fail_2() {
-    mpn_mod_1_norm(&[10, 10], 0);
+fn _limbs_mod_limb_small_normalized_fail_2() {
+    _limbs_mod_limb_small_normalized(&[10, 10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_mpn_mod_1_unnorm() {
+fn test_limbs_mod_limb_small_unnormalized() {
     let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
-        assert_eq!(mpn_mod_1_unnorm(limbs, divisor), remainder);
-        assert_eq!(mpn_mod_1s_2p(limbs, divisor), remainder);
+        assert_eq!(
+            _limbs_mod_limb_small_unnormalized(limbs, divisor),
+            remainder
+        );
+        assert_eq!(
+            _limbs_mod_limb_at_least_1_leading_zero(limbs, divisor),
+            remainder
+        );
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
-    // remainder >= divisor in mpn_mod_1_unnorm
-    // len.odd() in mpn_mod_1s_2p
-    // len == 1 in mpn_mod_1s_2p
+    // remainder >= divisor in _limbs_mod_limb_small_unnormalized
+    // len.odd() in _limbs_mod_limb_at_least_1_leading_zero
+    // len == 1 in _limbs_mod_limb_at_least_1_leading_zero
     test(&[6], 2, 0);
     test(&[6], 4, 2);
-    // len.even() in mpn_mod_1s_2p
-    // len < 4 in mpn_mod_1s_2p
+    // len.even() in _limbs_mod_limb_at_least_1_leading_zero
+    // len < 4 in _limbs_mod_limb_at_least_1_leading_zero
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // len.odd() && len != 1 in mpn_mod_1s_2p
+    // len.odd() && len != 1 in _limbs_mod_limb_at_least_1_leading_zero
     test(&[100, 101, 102], 10, 8);
-    // remainder < divisor in mpn_mod_1_unnorm
+    // remainder < divisor in _limbs_mod_limb_small_unnormalized
     test(&[123, 456], 789, 636);
     test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
     test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
-    // len >= 4 in mpn_mod_1s_2p
+    // len >= 4 in _limbs_mod_limb_at_least_1_leading_zero
     test(&[1, 2, 3, 4, 5], 6, 3);
     test(&[1, 2, 3, 4], 6, 1);
 }
@@ -169,36 +216,39 @@ fn test_mpn_mod_1_unnorm() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_unnorm_fail_1() {
-    mpn_mod_1_unnorm(&[], 10);
+fn _limbs_mod_limb_small_unnormalized_fail_1() {
+    _limbs_mod_limb_small_unnormalized(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1_unnorm_fail_2() {
-    mpn_mod_1_unnorm(&[10, 10], 0xffff_ffff);
+fn _limbs_mod_limb_small_unnormalized_fail_2() {
+    _limbs_mod_limb_small_unnormalized(&[10, 10], 0xffff_ffff);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1s_2p_fail_1() {
-    mpn_mod_1s_2p(&[], 10);
+fn _limbs_mod_limb_at_least_1_leading_zero_fail_1() {
+    _limbs_mod_limb_at_least_1_leading_zero(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1s_2p_fail_2() {
-    mpn_mod_1s_2p(&[10, 10], 0xffff_ffff);
+fn _limbs_mod_limb_at_least_1_leading_zero_fail_2() {
+    _limbs_mod_limb_at_least_1_leading_zero(&[10, 10], 0xffff_ffff);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_mpn_mod_1s_4p() {
+fn test_limbs_mod_limb_at_least_2_leading_zeros() {
     let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
-        assert_eq!(mpn_mod_1s_4p(limbs, divisor), remainder);
+        assert_eq!(
+            _limbs_mod_limb_at_least_2_leading_zeros(limbs, divisor),
+            remainder
+        );
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
@@ -223,15 +273,15 @@ fn test_mpn_mod_1s_4p() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1s_4p_fail_1() {
-    mpn_mod_1s_4p(&[], 10);
+fn _limbs_mod_limb_at_least_2_leading_zeros_fail_1() {
+    _limbs_mod_limb_at_least_2_leading_zeros(&[], 10);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn mpn_mod_1s_4p_fail_2() {
-    mpn_mod_1s_4p(&[10, 10], 0x7fff_ffff);
+fn _limbs_mod_limb_at_least_2_leading_zeros_fail_2() {
+    _limbs_mod_limb_at_least_2_leading_zeros(&[10, 10], 0x7fff_ffff);
 }
 
 #[test]
@@ -507,19 +557,26 @@ fn limbs_mod_limb_properties() {
         |&(ref limbs, divisor)| {
             let remainder = limbs_mod_limb(limbs, divisor);
             assert_eq!(Natural::from_limbs_asc(limbs) % divisor, remainder);
-            assert_eq!(mpn_mod_1_1p_1(limbs, divisor), remainder);
-            assert_eq!(mpn_mod_1_1p_2(limbs, divisor), remainder);
-            assert_eq!(_limbs_mod_limb_alt(limbs, divisor), remainder);
+            assert_eq!(
+                _limbs_mod_limb_any_leading_zeros_1(limbs, divisor),
+                remainder
+            );
+            assert_eq!(
+                _limbs_mod_limb_any_leading_zeros_2(limbs, divisor),
+                remainder
+            );
+            assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
+            assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
         },
     );
 }
 
 #[test]
-fn mpn_mod_1_norm_properties() {
+fn _limbs_mod_limb_small_normalized_properties() {
     test_properties(
         pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
         |&(ref limbs, divisor)| {
-            let remainder = mpn_mod_1_norm(limbs, divisor);
+            let remainder = _limbs_mod_limb_small_normalized(limbs, divisor);
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
@@ -531,12 +588,15 @@ fn mpn_mod_1_norm_properties() {
 }
 
 #[test]
-fn mpn_mod_1_unnorm_properties() {
+fn _limbs_mod_limb_small_unnormalized_properties() {
     test_properties(
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, divisor)| {
-            let remainder = mpn_mod_1_unnorm(limbs, divisor);
-            assert_eq!(remainder, mpn_mod_1s_2p(limbs, divisor));
+            let remainder = _limbs_mod_limb_small_unnormalized(limbs, divisor);
+            assert_eq!(
+                remainder,
+                _limbs_mod_limb_at_least_1_leading_zero(limbs, divisor)
+            );
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
@@ -548,11 +608,11 @@ fn mpn_mod_1_unnorm_properties() {
 }
 
 #[test]
-fn mpn_mod_1s_4p_properties() {
+fn _limbs_mod_limb_at_least_2_leading_zeros_properties() {
     test_properties(
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
         |&(ref limbs, divisor)| {
-            let remainder = mpn_mod_1s_4p(limbs, divisor);
+            let remainder = _limbs_mod_limb_at_least_2_leading_zeros(limbs, divisor);
             assert_eq!(remainder, Natural::from_limbs_asc(limbs) % divisor);
             if limbs.len() == 1 {
                 assert_eq!(remainder, limbs[0] % divisor);
