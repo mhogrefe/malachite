@@ -48,3 +48,9 @@ pub const MU_BDIV_Q_THRESHOLD: usize = 1998;
 pub const MOD_1_NORM_THRESHOLD: usize = 0;
 pub const MOD_1_UNNORM_THRESHOLD: usize = 0;
 pub const MOD_1_1P_METHOD: bool = false;
+pub const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
+pub const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 0;
+pub const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
+pub const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
+
+pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = std::usize::MAX;

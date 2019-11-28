@@ -3,17 +3,14 @@ use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
-use platform::Limb;
-
-//TODO tune
-// must be >= 1
-pub(crate) const BMOD_1_TO_MOD_1_THRESHOLD: usize = 29;
+use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
 ///
 /// limbs.len() must be greater than 1; divisor must be nonzero.
 ///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     if limbs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_divisible_by_limb(limbs, divisor)

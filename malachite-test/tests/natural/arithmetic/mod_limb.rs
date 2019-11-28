@@ -6,10 +6,10 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
-    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
-    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
-    _limbs_mod_limb_small_unnormalized, limbs_mod_limb,
+    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3,
+    _limbs_mod_limb_any_leading_zeros_1, _limbs_mod_limb_any_leading_zeros_2,
+    _limbs_mod_limb_at_least_1_leading_zero, _limbs_mod_limb_at_least_2_leading_zeros,
+    _limbs_mod_limb_small_normalized, _limbs_mod_limb_small_unnormalized, limbs_mod_limb,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -50,6 +50,7 @@ fn test_limbs_mod_limb() {
         );
         assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
         assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_alt_3(limbs, divisor), remainder);
     };
     test(&[0, 0], 2, 0);
     // shift != 0 in _limbs_mod_limb_any_leading_zeros_1
@@ -567,6 +568,7 @@ fn limbs_mod_limb_properties() {
             );
             assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
             assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
+            assert_eq!(_limbs_mod_limb_alt_3(limbs, divisor), remainder);
         },
     );
 }

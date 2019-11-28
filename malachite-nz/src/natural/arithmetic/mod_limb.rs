@@ -13,7 +13,11 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::div_mod_limb::limbs_invert_limb;
 use natural::Natural::{self, Large, Small};
-use platform::{DoubleLimb, Limb, MOD_1_1P_METHOD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD};
+use platform::{
+    DoubleLimb, Limb, MOD_1N_TO_MOD_1_1_THRESHOLD, MOD_1U_TO_MOD_1_1_THRESHOLD, MOD_1_1P_METHOD,
+    MOD_1_1_TO_MOD_1_2_THRESHOLD, MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD,
+    MOD_1_UNNORM_THRESHOLD,
+};
 
 /// Time: O(1)
 ///
@@ -40,31 +44,15 @@ pub(crate) fn mod_by_preinversion(
     remainder
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// remainder when the `Natural` is divided by a `Limb`.
-///
-/// The divisor limb cannot be zero and the input limb slice must have at least two elements.
-///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// where n = `limbs.len()`
 ///
-/// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
-///
-/// # Example
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
-///
-/// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
-/// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
-/// ```
-///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, where qxn is 0 and un > 1, but not computing
 /// the quotient.
-pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
+pub fn _limbs_mod_limb_alt_3(limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
@@ -104,6 +92,38 @@ pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
         }
         mod_by_preinversion(remainder, previous_limb << bits, divisor, inverse) >> bits
     }
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// remainder when the `Natural` is divided by a `Limb`.
+///
+/// The divisor limb cannot be zero and the input limb slice must have at least two elements.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+///
+/// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
+/// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
+/// ```
+#[cfg(feature = "32_bit_limbs")]
+#[inline]
+pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
+    _limbs_mod_limb_alt_2(limbs, divisor)
+}
+#[cfg(not(feature = "32_bit_limbs"))]
+#[inline]
+pub fn limbs_mod_limb(limbs: &[Limb], divisor: Limb) -> Limb {
+    _limbs_mod_limb_alt_1(limbs, divisor)
 }
 
 impl Mod<Limb> for Natural {
@@ -1511,15 +1531,16 @@ pub fn _limbs_mod_limb_at_least_2_leading_zeros(limbs: &[Limb], divisor: Limb) -
     ) >> shift
 }
 
-//TODO tune all
-const MOD_1N_TO_MOD_1_1_THRESHOLD: usize = 3;
-const MOD_1U_TO_MOD_1_1_THRESHOLD: usize = 3;
-const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 9;
-const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 22;
-
 const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
 
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
 /// This is mpn_mod_1 from mpn/generic/mod_1.c, where n > 1.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mod_limb_alt_2(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len > 1);

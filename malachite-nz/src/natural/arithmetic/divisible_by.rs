@@ -7,12 +7,11 @@ use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
 };
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
-use natural::arithmetic::divisible_by_limb::BMOD_1_TO_MOD_1_THRESHOLD;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::Natural::{self, Large, Small};
-use platform::{Limb, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
+use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
 /// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
@@ -41,6 +40,7 @@ use platform::{Limb, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 /// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -147,6 +147,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 /// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -256,6 +257,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -361,6 +363,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 /// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+#[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();

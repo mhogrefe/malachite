@@ -4,7 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::{
-    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3,
+    _limbs_mod_limb_any_leading_zeros, _limbs_mod_limb_any_leading_zeros_1,
     _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
     _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
     _limbs_mod_limb_small_normalized_large, _limbs_mod_limb_small_small,
@@ -20,6 +21,7 @@ use inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_3, pairs_of_unsigned_vec_and_unsigned_var_1,
 };
 #[cfg(feature = "32_bit_limbs")]
 use inputs::natural::{
@@ -72,12 +74,22 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
+        benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
         benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms
     );
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_mod_limb_at_least_2_leading_zeros
+        benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms
     );
     register_bench!(registry, Large, benchmark_natural_rem_assign_limb);
     #[cfg(feature = "32_bit_limbs")]
@@ -386,16 +398,16 @@ fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_na
         "limbs.len()",
         &mut [
             (
-                "standard",
-                &mut (|(limbs, divisor)| no_out!(limbs_mod_limb(&limbs, divisor))),
-            ),
-            (
                 "alt 1",
                 &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_1(&limbs, divisor))),
             ),
             (
                 "alt 2",
                 &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_2(&limbs, divisor))),
+            ),
+            (
+                "alt 3",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_3(&limbs, divisor))),
             ),
             (
                 "_limbs_mod_limb_any_leading_zeros_1",
@@ -523,15 +535,46 @@ fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
     );
 }
 
-fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
+fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "_limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
+        "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from normalized",
         BenchmarkType::Algorithms,
-        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
+        pairs_of_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_mod_limb_small_normalized",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_small_normalized(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from unnormalized",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
         gm.name(),
         limit,
         file_name,
@@ -545,6 +588,37 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
                 }),
             ),
             (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+            (
                 "_limbs_mod_limb_at_least_1_leading_zero",
                 &mut (|(limbs, divisor)| {
                     no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
@@ -554,26 +628,34 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
     );
 }
 
-fn benchmark_limbs_mod_limb_at_least_2_leading_zeros(
+fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
         "_limbs_mod_limb_at_least_2_leading_zeros(&[Limb], Limb)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(limbs, divisor)| {
-                no_out!(_limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor))
-            }),
-        )],
+        &mut [
+            (
+                "malachite",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_at_least_2_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
     );
 }
 

@@ -3463,6 +3463,39 @@ pub fn pairs_of_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+// All pairs of `Vec<T>` and `T`, where `T` is unsigned, the `Vec` has length at least 2, and the
+// most-significant bit of the `T` is set.
+pub fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| {
+                random::<T>(seed).map(|mut u| {
+                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u
+                })
+            }),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| {
+                special_random_unsigned::<T>(seed).map(|mut u| {
+                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u
+                })
+            }),
+        )),
+    }
+}
+
 pub fn pairs_of_nonempty_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {
@@ -3619,6 +3652,38 @@ pub fn pairs_of_limb_vec_and_positive_limb_var_2(gm: GenerationMode) -> It<(Vec<
             .filter(|(ref limbs, _)| !limbs.is_empty())
             .map(|(limbs, limb)| (limbs_mul_limb(&limbs, limb), limb)),
     )
+}
+
+// All pairs of `Vec<T>` and `T`, where `T` is unsigned, the `Vec` has length at least 2, the most-
+// significant bit of the `T` is unset, and the `T` is positive.
+pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned()),
+            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| {
+                special_random_unsigned::<T>(seed)
+                    .map(|mut u| {
+                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u
+                    })
+                    .filter(|&u| u != T::ZERO)
+            }),
+        )),
+    }
 }
 
 // All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive.

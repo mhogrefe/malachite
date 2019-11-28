@@ -14,9 +14,14 @@ pub mod div_approx_schoolbook_to_divide_and_conquer;
 pub mod div_balance;
 pub mod div_mod_divide_and_conquer_to_barrett;
 pub mod div_mod_schoolbook_to_divide_and_conquer;
+pub mod divisible_by_limb;
 pub mod fft;
 pub mod invert_basecase_to_newton;
 pub mod mod_limb_any_leading_zeros;
+pub mod mod_limb_any_leading_zeros_from_normalized;
+pub mod mod_limb_any_leading_zeros_from_unnormalized;
+pub mod mod_limb_at_least_1_leading_zero;
+pub mod mod_limb_at_least_2_leading_zeros;
 pub mod mod_limb_small_normalized;
 pub mod mod_limb_small_unnormalized;
 pub mod modular_div_divide_and_conquer_to_barrett;
@@ -95,6 +100,15 @@ pub fn tune(param_group: &str) {
         "ModLimbAnyLeadingZeros" => display_lines(&mod_limb_any_leading_zeros::tune()),
         "ModLimbSmallNormalized" => display_lines(&mod_limb_small_normalized::tune()),
         "ModLimbSmallUnnormalized" => display_lines(&mod_limb_small_unnormalized::tune()),
+        "ModLimbAnyLeadingZerosFromNormalized" => {
+            display_lines(&mod_limb_any_leading_zeros_from_normalized::tune())
+        }
+        "ModLimbAnyLeadingZerosFromUnnormalized" => {
+            display_lines(&mod_limb_any_leading_zeros_from_unnormalized::tune())
+        }
+        "ModLimbAtLeast1LeadingZero" => display_lines(&mod_limb_at_least_1_leading_zero::tune()),
+        "ModLimbAtLeast2LeadingZeros" => display_lines(&mod_limb_at_least_2_leading_zeros::tune()),
+        "DivisibleByLimb" => display_lines(&divisible_by_limb::tune()),
         "all" => {
             let mut lines = Vec::new();
             lines.push(format!("pub type Limb = {};", Limb::NAME));
@@ -152,6 +166,12 @@ pub fn tune(param_group: &str) {
             lines.extend(mod_limb_any_leading_zeros::tune());
             lines.extend(mod_limb_small_normalized::tune());
             lines.extend(mod_limb_small_unnormalized::tune());
+            lines.extend(mod_limb_any_leading_zeros_from_normalized::tune());
+            lines.extend(mod_limb_any_leading_zeros_from_unnormalized::tune());
+            lines.extend(mod_limb_at_least_1_leading_zero::tune());
+            lines.extend(mod_limb_at_least_2_leading_zeros::tune());
+            lines.push(String::new());
+            lines.extend(divisible_by_limb::tune());
             let filename = "benchmarks/platform.txt";
             let mut output = File::create(filename).unwrap();
             for line in lines {
