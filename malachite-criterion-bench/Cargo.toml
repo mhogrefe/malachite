@@ -1,0 +1,22 @@
+[package]
+name = "malachite-criterion-bench"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+malachite-nz = { path = "../malachite-nz", default-features = false }
+rand = "0.3.0"
+num = "0.2.0"
+
+[dependencies.rug]
+version = "^1.2.0"
+default-features = false
+features = ["integer"]
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "natural_mul"
+harness = false
