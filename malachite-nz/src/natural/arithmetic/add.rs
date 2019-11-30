@@ -326,9 +326,6 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
 ///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_vec_add_in_place_left;

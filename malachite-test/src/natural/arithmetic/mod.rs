@@ -21,6 +21,7 @@ pub mod divisible_by_limb;
 pub mod divisible_by_power_of_two;
 pub mod eq_limb_mod_limb;
 pub mod eq_limb_mod_power_of_two;
+pub mod eq_mod;
 pub mod eq_mod_power_of_two;
 pub mod is_power_of_two;
 pub mod log_two;
@@ -67,6 +68,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     divisible_by_power_of_two::register(registry);
     eq_limb_mod_limb::register(registry);
     eq_limb_mod_power_of_two::register(registry);
+    eq_mod::register(registry);
     eq_mod_power_of_two::register(registry);
     is_power_of_two::register(registry);
     log_two::register(registry);

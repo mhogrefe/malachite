@@ -6,16 +6,26 @@ use malachite_base::num::conversion::traits::SplitInHalf;
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::Natural::{self, Large, Small};
-use platform::{DoubleLimb, Limb};
+use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
-// must be > 0
-const BMOD_1_TO_MOD_1_THRESHOLD: usize = 10;
-
-/// limbs.len() must be greater than 1; divisor must be odd.
+/// divisor must be odd. //TODO test
 ///
 /// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
 pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
     let len = limbs.len();
+    if len == 1 {
+        let limb = limbs[0];
+        return if limb > carry {
+            let result = (limb - carry) % divisor;
+            if result == 0 {
+                0
+            } else {
+                divisor - result
+            }
+        } else {
+            (carry - limb) % divisor
+        };
+    }
     let inverse = limbs_modular_invert_limb(divisor);
     let divisor_double = DoubleLimb::from(divisor);
     let last_index = len - 1;
@@ -69,7 +79,7 @@ pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Lim
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2.
+/// Panics if the length of `limbs` is less than 2 or `modulus` is zero.
 ///
 /// # Example
 /// ```
@@ -82,6 +92,7 @@ pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Lim
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative and the ABOVE_THRESHOLD
 /// branch is excluded.
 pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+    assert_ne!(modulus, 0);
     assert!(limbs.len() > 1);
     let remainder = if modulus.even() {
         let twos = modulus.trailing_zeros();

@@ -16,8 +16,9 @@ use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_unsigneds, triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
-    triples_of_unsigneds,
+    pairs_of_unsigneds, triples_of_limb_vec_limb_and_positive_limb_var_3,
+    triples_of_limb_vec_limb_and_positive_limb_var_4,
+    triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1, triples_of_unsigneds,
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_unsigned, triples_of_natural_limb_and_limb_var_2,
@@ -30,10 +31,7 @@ use malachite_test::inputs::natural::{
 fn test_limbs_eq_limb_mod_limb() {
     let test = |limbs: &[Limb], limb: Limb, modulus: Limb, equal: bool| {
         assert_eq!(limbs_eq_limb_mod_limb(limbs, limb, modulus), equal);
-        assert_eq!(
-            modulus != 0 && limbs_mod_limb(limbs, modulus) == limb % modulus,
-            equal
-        );
+        assert_eq!(limbs_mod_limb(limbs, modulus) == limb % modulus, equal);
         assert_eq!(
             _combined_limbs_eq_limb_mod_limb(limbs, limb, modulus),
             equal
@@ -57,8 +55,15 @@ fn test_limbs_eq_limb_mod_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_eq_limb_mod_limb_fail() {
+fn limbs_eq_limb_mod_limb_fail_1() {
     limbs_eq_limb_mod_limb(&[10], 10, 15);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_eq_limb_mod_limb_fail_2() {
+    limbs_eq_limb_mod_limb(&[6, 7], 4, 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -126,14 +131,31 @@ fn limbs_eq_limb_mod_limb_properties() {
         |&(ref limbs, limb, modulus)| {
             let equal = limbs_eq_limb_mod_limb(limbs, limb, modulus);
             assert_eq!(Natural::from_limbs_asc(limbs).eq_mod(limb, modulus), equal);
-            assert_eq!(
-                modulus != 0 && limbs_mod_limb(limbs, modulus) == limb % modulus,
-                equal
-            );
+            assert_eq!(limbs_mod_limb(limbs, modulus) == limb % modulus, equal);
             assert_eq!(
                 _combined_limbs_eq_limb_mod_limb(limbs, limb, modulus),
                 equal
             );
+        },
+    );
+
+    test_properties(
+        triples_of_limb_vec_limb_and_positive_limb_var_3,
+        |&(ref limbs, limb, modulus)| {
+            assert!(limbs_eq_limb_mod_limb(limbs, limb, modulus));
+            assert!(Natural::from_limbs_asc(limbs).eq_mod(limb, modulus));
+            assert_eq!(limbs_mod_limb(limbs, modulus), limb % modulus);
+            assert!(_combined_limbs_eq_limb_mod_limb(limbs, limb, modulus));
+        },
+    );
+
+    test_properties(
+        triples_of_limb_vec_limb_and_positive_limb_var_4,
+        |&(ref limbs, limb, modulus)| {
+            assert!(!limbs_eq_limb_mod_limb(limbs, limb, modulus));
+            assert!(!Natural::from_limbs_asc(limbs).eq_mod(limb, modulus));
+            assert_ne!(limbs_mod_limb(limbs, modulus), limb % modulus);
+            assert!(!_combined_limbs_eq_limb_mod_limb(limbs, limb, modulus));
         },
     );
 }

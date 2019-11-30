@@ -90,15 +90,10 @@ fn demo_limb_eq_limb_mod_natural(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_limb_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    let new_gm = match gm {
-        GenerationMode::Random(scale) => GenerationMode::Random(scale * 10),
-        GenerationMode::SpecialRandom(scale) => GenerationMode::SpecialRandom(scale * 10),
-        gm => gm,
-    };
     m_run_benchmark(
         "limbs_eq_limb_mod_limb(&mut [Limb], Limb, Limb)",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(new_gm),
+        triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,

@@ -33,13 +33,16 @@ pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, compares
-/// the two `Natural`s. It is assumed that neither limb slice contains trailing zeros.
+/// the two `Natural`s. Neither limb slice can contain trailing zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// where n = min(`xs.len`, `ys.len`)
+///
+/// # Panics
+/// Panics if the last element of `xs` or `ys` is zero.
 ///
 /// # Example
 /// ```
@@ -52,6 +55,8 @@ pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
 /// assert_eq!(limbs_cmp(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
 /// ```
 pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
+    assert_ne!(xs.last(), Some(&0));
+    assert_ne!(ys.last(), Some(&0));
     xs.len()
         .cmp(&ys.len())
         .then_with(|| limbs_cmp_same_length(xs, ys))

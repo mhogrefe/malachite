@@ -233,6 +233,7 @@ pub mod natural {
         pub mod divisible_by_power_of_two;
         pub mod eq_limb_mod_limb;
         pub mod eq_limb_mod_power_of_two;
+        pub mod eq_mod;
         pub mod eq_mod_power_of_two;
         pub mod is_power_of_two;
         pub mod log_two;
