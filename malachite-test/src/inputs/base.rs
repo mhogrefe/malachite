@@ -2657,10 +2657,20 @@ pub fn triples_of_unsigned_vec_var_54(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
 pub fn triples_of_unsigned_vec_var_55<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec_var_2(gm)
-            .filter(|(xs, ys, modulus)| !modulus.is_empty() && (!xs.is_empty() || !ys.is_empty())),
-    )
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigned())
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, 2, &(|seed| random(seed)))
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2)
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+    }
 }
 
 // All triples of `Vec<T>` that meet the preconditions for `limbs_mod_eq`, where the `Natural`
@@ -4348,6 +4358,51 @@ pub fn triples_of_unsigned_vec_usize_and_unsigned_vec_var_1<T: PrimitiveUnsigned
         triples_of_unsigned_vec_usize_and_unsigned_vec(gm)
             .filter(|&(ref xs, y, ref zs)| xs.len() >= zs.len() && y <= zs.len()),
     )
+}
+
+// All triples of `Vec<T>`, `T`, and `Vec<T>`, where `T` is unsigned, the `T` is positive, each
+// `Vec` has length at least 2, and the last element of each `Vec` is nonzero.
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T, Vec<T>)> {
+    permute_1_3_2(triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2(gm))
+}
+
+// All triples of `Vec<T>`, and `Vec<T>`, and `T`, where `T` is unsigned, the `T` is positive, each
+// `Vec` has length at least 2, and the last element of each `Vec` is nonzero.
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    let ps: It<((Vec<T>, Vec<T>), T)> = match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_pairs_from_single(
+                exhaustive_vecs_min_length(2, exhaustive_unsigned())
+                    .filter(|xs| *xs.last().unwrap() != T::ZERO),
+            ),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(
+                    random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))
+                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
+                )
+            }),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(
+                    special_random_unsigned_vecs_min_length(seed, scale, 2)
+                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
+                )
+            }),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    };
+    reshape_2_1_to_3(ps)
 }
 
 fn triples_of_unsigned_vec_small_unsigned_and_rounding_mode<

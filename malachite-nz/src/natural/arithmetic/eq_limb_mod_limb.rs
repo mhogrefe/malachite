@@ -89,8 +89,8 @@ pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Lim
 /// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1_238, 10), true);
 /// ```
 ///
-/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative and the ABOVE_THRESHOLD
-/// branch is excluded.
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is positive and the ABOVE_THRESHOLD branch
+/// is excluded.
 pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
     assert_ne!(modulus, 0);
     assert!(limbs.len() > 1);
