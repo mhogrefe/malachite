@@ -8,7 +8,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
-    triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2, triples_of_unsigned_vec_var_55,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -34,7 +34,7 @@ fn demo_limbs_eq_limb_mod(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_eq_mod_limb(gm: GenerationMode, limit: usize) {
-    for (xs, ys, modulus) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2(gm).take(limit)
+    for (xs, ys, modulus) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit)
     {
         println!(
             "limbs_eq_mod_limb({:?}, {:?}, {}) = {}",
@@ -85,7 +85,7 @@ fn benchmark_limbs_eq_mod_limb_algorithms(gm: GenerationMode, limit: usize, file
     m_run_benchmark(
         "limbs_eq_mod_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm),
         gm.name(),
         limit,
         file_name,

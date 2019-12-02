@@ -22,7 +22,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::limbs_eq_limb_mod_limb;
-use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod;
+use malachite_nz::natural::arithmetic::eq_mod::{
+    limbs_eq_limb_mod, limbs_eq_mod, limbs_eq_mod_limb,
+};
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limbs_mul;
 use malachite_nz::natural::arithmetic::mul::mul_mod::*;
@@ -41,7 +43,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
-use malachite_nz::natural::arithmetic::mul_limb::{limbs_mul_limb, limbs_slice_mul_limb_in_place};
+use malachite_nz::natural::arithmetic::mul_limb::{
+    limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};
 use rand::distributions::range::SampleRange;
@@ -1651,6 +1655,21 @@ pub fn pairs_of_unsigned_vec_var_15(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Li
     )
 }
 
+// All triples of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact`.
+pub fn pairs_of_unsigned_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes_2(gm, 1)
+            .filter(|&(_, ref ds)| *ds.last().unwrap() != 0)
+            .map(|(ns, ds)| {
+                let mut new_ns = limbs_mul(&ns, &ds);
+                if *new_ns.last().unwrap() == 0 {
+                    new_ns.pop();
+                }
+                (new_ns, ds)
+            }),
+    )
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {
@@ -2629,7 +2648,7 @@ pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
 }
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
-// `limbs_div_exact_to_out_ref_ref`.
+// `limbs_div_exact_to_out`.
 pub fn triples_of_unsigned_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(
         triples_of_unsigned_vec_min_sizes_3(gm, 1)
@@ -2648,12 +2667,12 @@ pub fn triples_of_unsigned_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
 }
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of both
-// `limbs_div_to_out` and `limbs_div_exact_to_out_ref_ref`.
+// `limbs_div_to_out` and `limbs_div_exact_to_out`.
 pub fn triples_of_unsigned_vec_var_54(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(triples_of_unsigned_vec_var_53(gm).filter(|&(_, _, ref ds)| ds.len() > 1))
 }
 
-// All triples of `Vec<T>` that meet the preconditions for `limbs_mod_eq`.
+// All triples of `Vec<T>` that meet the preconditions for `limbs_eq_mod`.
 pub fn triples_of_unsigned_vec_var_55<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
@@ -2673,7 +2692,7 @@ pub fn triples_of_unsigned_vec_var_55<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-// All triples of `Vec<T>` that meet the preconditions for `limbs_mod_eq`, where the `Natural`
+// All triples of `Vec<T>` that meet the preconditions for `limbs_eq_mod`, where the `Natural`
 // represented by the first `Vec` is equal to the `Natural` represented by the second `Vec` mod the
 // `Natural` represented by the third `Vec`.
 pub fn triples_of_unsigned_vec_var_56(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
@@ -2691,7 +2710,7 @@ pub fn triples_of_unsigned_vec_var_56(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     }))
 }
 
-// All triples of `Vec<T>` that meet the preconditions for `limbs_mod_eq`, where the `Natural`
+// All triples of `Vec<T>` that meet the preconditions for `limbs_eq_mod`, where the `Natural`
 // represented by the first `Vec` is not equal to the `Natural` represented by the second `Vec` mod
 // the `Natural` represented by the third `Vec`.
 pub fn triples_of_unsigned_vec_var_57(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
@@ -4010,6 +4029,73 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7<T: PrimitiveUnsig
     )
 }
 
+// All triples of `Vec<T>`, and `Vec<T>`, and `T` that meet the preconditions for
+// `limbs_eq_mod_limb`.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    let ps: It<((Vec<T>, Vec<T>), T)> = match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_pairs_from_single(
+                exhaustive_vecs_min_length(2, exhaustive_unsigned())
+                    .filter(|xs| *xs.last().unwrap() != T::ZERO),
+            ),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(
+                    random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))
+                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
+                )
+            }),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(
+                    special_random_unsigned_vecs_min_length(seed, scale, 2)
+                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
+                )
+            }),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    };
+    reshape_2_1_to_3(ps)
+}
+
+// All triples of `Vec<T>`, and `Vec<T>`, and `T` that meet the preconditions for
+// `limbs_eq_mod_limb`, where the `Natural` represented by the first `Vec` is equal to the `Natural`
+// represented by the second `Vec` mod the `T`.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_9(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).map(|(mut xs, ys, modulus)| {
+            limbs_vec_mul_limb_in_place(&mut xs, modulus);
+            if xs.last() == Some(&0) {
+                xs.pop();
+            }
+            limbs_vec_add_in_place_left(&mut xs, &ys);
+            (xs, ys, modulus)
+        }),
+    )
+}
+
+// All triples of `Vec<T>`, and `Vec<T>`, and `T` that meet the preconditions for
+// `limbs_eq_mod_limb`, where the `Natural` represented by the first `Vec` is not equal to the
+// `Natural` represented by the second `Vec` mod the `T`.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_10(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8::<Limb>(gm)
+            .filter(|(xs, ys, modulus)| !limbs_eq_mod_limb(&*xs, &*ys, *modulus)),
+    )
+}
+
 // All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as
 // long as the second, and the length of the second `Vec` is greater than 1.
 pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<
@@ -4360,49 +4446,45 @@ pub fn triples_of_unsigned_vec_usize_and_unsigned_vec_var_1<T: PrimitiveUnsigned
     )
 }
 
-// All triples of `Vec<T>`, `T`, and `Vec<T>`, where `T` is unsigned, the `T` is positive, each
-// `Vec` has length at least 2, and the last element of each `Vec` is nonzero.
+// All triples of `Vec<T>`, `T`, and `Vec<T>` that meet the preconditions for `limbs_eq_limb_mod`.
 pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T, Vec<T>)> {
-    permute_1_3_2(triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2(gm))
+    permute_1_3_2(triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm))
 }
 
-// All triples of `Vec<T>`, and `Vec<T>`, and `T`, where `T` is unsigned, the `T` is positive, each
-// `Vec` has length at least 2, and the last element of each `Vec` is nonzero.
-pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2<T: PrimitiveUnsigned + Rand>(
+// All triples of `Vec<T>`, `T`, and `Vec<T>` that meet the preconditions for `limbs_eq_limb_mod`,
+// where the `Natural` represented by the first `Vec` is equal to the `T` mod the `Natural`
+// represented by the second `Vec`.
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2(
     gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, T)> {
-    let ps: It<((Vec<T>, Vec<T>), T)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
-            exhaustive_pairs_from_single(
-                exhaustive_vecs_min_length(2, exhaustive_unsigned())
-                    .filter(|xs| *xs.last().unwrap() != T::ZERO),
-            ),
-            exhaustive_positive(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| {
-                random_pairs_from_single(
-                    random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))
-                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
-                )
-            }),
-            &(|seed| random_positive_unsigned(seed)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| {
-                random_pairs_from_single(
-                    special_random_unsigned_vecs_min_length(seed, scale, 2)
-                        .filter(|xs| *xs.last().unwrap() != T::ZERO),
-                )
-            }),
-            &(|seed| special_random_positive_unsigned(seed)),
-        )),
-    };
-    reshape_2_1_to_3(ps)
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).map(|(xs, y, modulus)| {
+            let mut product_limbs = if xs.is_empty() {
+                Vec::new()
+            } else {
+                limbs_mul(&xs, &modulus)
+            };
+            if product_limbs.last() == Some(&0) {
+                product_limbs.pop();
+            }
+            limbs_vec_add_limb_in_place(&mut product_limbs, y);
+            (product_limbs, y, modulus)
+        }),
+    )
+}
+
+// All triples of `Vec<T>`, `T`, and `Vec<T>` that meet the preconditions for `limbs_eq_limb_mod`,
+// where the `Natural` represented by the first `Vec` is not equal to the `T` mod the `Natural`
+// represented by the second `Vec`.
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_3(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1::<Limb>(gm)
+            .filter(|(xs, y, modulus)| !limbs_eq_limb_mod(&*xs, *y, &*modulus)),
+    )
 }
 
 fn triples_of_unsigned_vec_small_unsigned_and_rounding_mode<

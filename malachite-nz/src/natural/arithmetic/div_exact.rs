@@ -1068,6 +1068,45 @@ pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+/// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
+/// limbs.
+///
+/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+/// meaningless result.
+///
+/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
+/// significant limb must be greater than zero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `ns.len()`
+///
+/// # Panics
+/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
+/// zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact;
+///
+/// assert_eq!(limbs_div_exact(&[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]), vec![0, 6, 7]);
+/// assert_eq!(
+///     limbs_div_exact(&[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]),
+///     vec![102, 101, 100]
+/// );
+/// ```
+///
+/// This is mpn_divexact from mpn/generic/divexact.c, where scratch is allocated internally and qp
+/// is returned.
+pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+    let mut qs = vec![0; ns.len() - ds.len() + 1];
+    limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
+    qs
+}
+
+/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
 /// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
 /// `ns` and `ds` are taken by value.
 ///

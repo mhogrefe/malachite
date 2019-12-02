@@ -13,9 +13,9 @@ use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
     _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
     _limbs_modular_div_mod_schoolbook, _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len,
-    _limbs_modular_div_schoolbook, _limbs_modular_div_scratch_len, limbs_div_exact_to_out,
-    limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
-    limbs_modular_invert, limbs_modular_invert_scratch_len,
+    _limbs_modular_div_schoolbook, _limbs_modular_div_scratch_len, limbs_div_exact,
+    limbs_div_exact_to_out, limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val,
+    limbs_div_exact_to_out_val_ref, limbs_modular_invert, limbs_modular_invert_scratch_len,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
@@ -7323,7 +7323,7 @@ fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_div_exact_to_out() {
+fn test_limbs_div_exact() {
     let test = |qs_in: &[Limb], ns: &[Limb], ds: &[Limb], qs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut mut_ns = ns.to_vec();
@@ -7352,6 +7352,10 @@ fn test_div_exact_to_out() {
         let q_len = ns.len() - ds.len() + 1;
         assert_eq!(&qs[..q_len], qs_out);
         assert_eq!(&qs[q_len..], &qs_in[q_len..]);
+
+        let qs = limbs_div_exact(ns, ds);
+        let qs: &[Limb] = &qs;
+        assert_eq!(&qs_out[..qs.len()], qs);
 
         verify_limbs_div_exact(ns, ds, qs_out);
     };
@@ -7392,6 +7396,27 @@ fn test_div_exact_to_out() {
         &[0, 0, 1, 2, 3],
         &[0, 6, 7],
     );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_fail_1() {
+    limbs_div_exact(&[6, 19, 32, 21], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_fail_2() {
+    limbs_div_exact(&[6, 19, 32, 21], &[1, 2, 3, 4, 5]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_fail_3() {
+    limbs_div_exact(&[6, 19, 32, 21], &[1, 2, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -7759,7 +7784,7 @@ fn limbs_modular_div_properties() {
 }
 
 #[test]
-fn limbs_div_exact_to_out_ref_ref_properties() {
+fn limbs_div_exact_properties() {
     test_properties(
         triples_of_unsigned_vec_var_53,
         |&(ref qs, ref ns, ref ds)| {
@@ -7785,6 +7810,9 @@ fn limbs_div_exact_to_out_ref_ref_properties() {
             assert_eq!(qs, result);
 
             let q_len = ns.len() - ds.len() + 1;
+            let qs = limbs_div_exact(ns, ds);
+            assert_eq!(qs, &result[..q_len]);
+
             verify_limbs_div_exact(ns, ds, &qs[..q_len]);
         },
     );

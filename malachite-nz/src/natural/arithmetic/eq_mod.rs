@@ -4,7 +4,7 @@ use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqModPowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
-use natural::arithmetic::divisible_by::{limbs_divisible_by_ref_ref, limbs_divisible_by_val_ref};
+use natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
 use natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
@@ -14,7 +14,32 @@ use natural::arithmetic::sub_limb::limbs_sub_limb_to_out;
 use natural::comparison::ord::limbs_cmp;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
-// xs.len() > 1, modulus.len() > 1
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
+/// three numbers x, y, and m, determines whether x === y mod m.
+///
+/// This function assumes that each of the two input slices have at least two elements, their last
+/// elements are nonzero, and `y` is nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
+/// slices is zero, or if `y` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod;
+///
+/// assert_eq!(limbs_eq_limb_mod(&[1, 1], 1, &[0, 1]), true);
+/// assert_eq!(limbs_eq_limb_mod(&[0, 1], 1, &[0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and d are longer than
+/// one limb, and c is one limb long.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_eq_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     let m_len = modulus.len();
@@ -24,6 +49,10 @@ pub fn limbs_eq_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(y, 0);
     assert_ne!(*modulus.last().unwrap(), 0);
+    if m_len > x_len {
+        // x < m, y < m, and x != y, so x != y mod m
+        return false;
+    }
     let x_0 = xs[0];
     let m_0 = modulus[0];
     // Check xs == ys mod low zero bits of m_0.
@@ -56,6 +85,32 @@ pub fn limbs_eq_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
 }
 
+/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
+/// m, determines whether x === y mod m.
+///
+/// This function assumes that each of the two input slices have at least two elements, their last
+/// elements are nonzero, and `modulus` is nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
+/// is zero, or if `modulus` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb;
+///
+/// assert_eq!(limbs_eq_mod_limb(&[1, 1], &[3, 4], 5), true);
+/// assert_eq!(limbs_eq_mod_limb(&[0, 1], &[3, 4], 5), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and c are longer than
+/// one limb, and m is one limb long.
 pub fn limbs_eq_mod_limb(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_greater(xs, ys, modulus)
@@ -64,7 +119,7 @@ pub fn limbs_eq_mod_limb(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     }
 }
 
-// xs.len() > 1, ys.len() > 1
+// xs.len() >= ys.len()
 fn limbs_eq_mod_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     let x_len = xs.len();
     let y_len = ys.len();
@@ -90,17 +145,40 @@ fn limbs_eq_mod_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
     scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
-    match scratch.len() {
-        0 => true,
-        1 => scratch[0].divisible_by(modulus),
-        _ => limbs_divisible_by_limb(&scratch, modulus),
+    // scratch is non-empty here because xs != ys
+    if scratch.len() == 1 {
+        scratch[0].divisible_by(modulus)
+    } else {
+        limbs_divisible_by_limb(&scratch, modulus)
     }
 }
 
-/// all slices must be empty or have last limb nonzero; d must be nonempty, and a and c cannot both
-/// be empty.
+/// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
+/// first `Natural` is equal to the second `Natural` mod the third `Natural`.
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive.
+/// This function assumes that each of the three input slices have at least two elements, and their
+/// last elements are nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// of the slices is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod;
+///
+/// assert_eq!(limbs_eq_mod(&[1, 1, 1], &[1, 0, 3], &[0, 7]), true);
+/// assert_eq!(limbs_eq_mod(&[0, 1, 1], &[1, 0, 3], &[0, 7]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive and each is longer than
+/// one limb.
 pub fn limbs_eq_mod(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater(xs, ys, modulus)
@@ -109,7 +187,7 @@ pub fn limbs_eq_mod(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     }
 }
 
-// xs.len() > 1, ys.len() > 1, modulus.len() > 1
+// xs.len() >= ys.len()
 fn limbs_eq_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     let m_len = modulus.len();
     assert!(m_len > 1);
@@ -117,14 +195,15 @@ fn limbs_eq_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     let y_len = ys.len();
     assert!(y_len > 1);
     assert!(x_len >= y_len);
-    if y_len == 0 {
-        return xs.len() >= modulus.len() && limbs_divisible_by_ref_ref(xs, modulus);
-    }
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(*ys.last().unwrap(), 0);
     assert_ne!(*modulus.last().unwrap(), 0);
     if xs == ys {
         return true;
+    }
+    if m_len > x_len {
+        // x < m, y < m, and x != y, so x != y mod m
+        return false;
     }
     let x_0 = xs[0];
     let y_0 = ys[0];
