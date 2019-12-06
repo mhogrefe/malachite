@@ -172,6 +172,24 @@ pub fn triples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural)
     }
 }
 
+pub fn rm_triples_of_naturals(
+    gm: GenerationMode,
+) -> It<(
+    (rug::Integer, rug::Integer, rug::Integer),
+    (Natural, Natural, Natural),
+)> {
+    Box::new(triples_of_naturals(gm).map(|(x, y, z)| {
+        (
+            (
+                natural_to_rug_integer(&x),
+                natural_to_rug_integer(&y),
+                natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
 // All triples of `Natural`s where the first is greater than or equal to the product of the second
 // and third.
 #[allow(op_ref)]

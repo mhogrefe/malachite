@@ -1,6 +1,7 @@
-use malachite_base::num::arithmetic::traits::EqMod;
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
@@ -61,7 +62,7 @@ fn demo_limbs_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
     for (n, u, modulus) in triples_of_natural_unsigned_and_unsigned::<Limb>(gm).take(limit) {
-        if n.eq_mod(u, modulus) {
+        if (&n).eq_mod(u, modulus) {
             println!("{} is equal to {} mod {}", n, u, modulus);
         } else {
             println!("{} is not equal to {} mod {}", n, u, modulus);
@@ -140,7 +141,7 @@ fn benchmark_natural_eq_limb_mod_limb_library_comparison(
         &mut [
             (
                 "malachite",
-                &mut (|(_, (n, u, modulus))| no_out!(n.eq_mod(u, modulus))),
+                &mut (|(_, (n, u, modulus))| no_out!((&n).eq_mod(u, modulus))),
             ),
             (
                 "rug",
@@ -167,12 +168,18 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
         &mut [
             (
                 "Natural.eq_mod(Limb, Limb)",
-                &mut (|(n, u, modulus)| no_out!(n.eq_mod(u, modulus))),
+                &mut (|(n, u, modulus)| no_out!((&n).eq_mod(u, modulus))),
             ),
             (
                 "Natural == Limb || Limb != 0 && Natural % Limb == Limb % Limb",
                 &mut (|(n, u, modulus)| {
                     no_out!(n == u || modulus != 0 && n % modulus == u % modulus)
+                }),
+            ),
+            (
+                "|Natural - Limb|.divisible_by(Limb)",
+                &mut (|(n, u, modulus)| {
+                    no_out!((&(Integer::from(n) - u).unsigned_abs()).divisible_by(modulus))
                 }),
             ),
         ],
@@ -200,8 +207,14 @@ fn benchmark_limb_eq_natural_mod_limb_algorithms(
             ),
             (
                 "Limb == Natural || Limb != 0 && Limb % Limb == Natural % Limb",
-                &mut (|(n, u, modulus)| {
+                &mut (|(u, n, modulus)| {
                     no_out!(u == n || modulus != 0 && u % modulus == n % modulus)
+                }),
+            ),
+            (
+                "|Limb - Natural|.divisible_by(Limb)",
+                &mut (|(u, n, modulus)| {
+                    no_out!((&(Integer::from(u) - n).unsigned_abs()).divisible_by(modulus))
                 }),
             ),
         ],
@@ -231,6 +244,12 @@ fn benchmark_limb_eq_limb_mod_natural_algorithms(
                 "Limb == Limb || Natural != 0 && Limb % &Natural == Limb % &Natural",
                 &mut (|(u, v, modulus)| {
                     no_out!(u == v || modulus != 0 as Limb && u % &modulus == v % &modulus)
+                }),
+            ),
+            (
+                "|Limb - Limb|.divisible_by(Natural)",
+                &mut (|(u, v, modulus)| {
+                    no_out!((Integer::from(u) - v).unsigned_abs().divisible_by(modulus))
                 }),
             ),
         ],

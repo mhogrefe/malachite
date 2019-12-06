@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::limbs::limbs_trailing_zero_limbs;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqModPowerOfTwo};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
@@ -9,9 +9,10 @@ use natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::mod_op::limbs_mod;
-use natural::arithmetic::sub::{limbs_sub_same_length_to_out, limbs_sub_to_out};
-use natural::arithmetic::sub_limb::limbs_sub_limb_to_out;
+use natural::arithmetic::sub::{limbs_sub, limbs_sub_same_length_to_out, limbs_sub_to_out};
+use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_to_out};
 use natural::comparison::ord::limbs_cmp;
+use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
@@ -53,11 +54,10 @@ pub fn limbs_eq_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
         // x < m, y < m, and x != y, so x != y mod m
         return false;
     }
-    let x_0 = xs[0];
     let m_0 = modulus[0];
     // Check xs == ys mod low zero bits of m_0.
     let m_trailing_zeros = m_0.trailing_zeros();
-    if !x_0.eq_mod_power_of_two(y, u64::from(m_trailing_zeros)) {
+    if !xs[0].eq_mod_power_of_two(y, u64::from(m_trailing_zeros)) {
         return false;
     }
     if m_len == 2 && m_0 != 0 {
@@ -131,10 +131,8 @@ fn limbs_eq_mod_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     if xs == ys {
         return true;
     }
-    let x_0 = xs[0];
-    let y_0 = ys[0];
     // Check xs == ys mod low zero bits of m.
-    if !x_0.eq_mod_power_of_two(y_0, u64::from(modulus.trailing_zeros())) {
+    if !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros())) {
         return false;
     }
     let mut scratch = vec![0; x_len + 1];
@@ -205,12 +203,8 @@ fn limbs_eq_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
         // x < m, y < m, and x != y, so x != y mod m
         return false;
     }
-    let x_0 = xs[0];
-    let y_0 = ys[0];
-    let m_0 = modulus[0];
     // Check xs == ys mod low zero bits of m_0. This helps the y_len == 1 special cases below.
-    let m_trailing_zeros = m_0.trailing_zeros();
-    if !x_0.eq_mod_power_of_two(y_0, u64::from(m_trailing_zeros)) {
+    if !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros())) {
         return false;
     }
     let mut scratch = vec![0; x_len + 1];
@@ -224,7 +218,7 @@ fn limbs_eq_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
 }
 
-pub fn _limbs_eq_limb_mod_naive(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
+pub fn _limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     assert!(xs.len() > 1);
     assert!(modulus.len() > 1);
     let mut xs_mod = if xs.len() >= modulus.len() {
@@ -236,13 +230,37 @@ pub fn _limbs_eq_limb_mod_naive(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool 
     xs_mod == [y]
 }
 
-pub fn _limbs_eq_mod_limb_naive(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+pub fn _limbs_eq_limb_mod_naive_2(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
+    let mut difference = limbs_sub_limb(xs, y).0;
+    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
+}
+
+pub fn _limbs_eq_mod_limb_naive_1(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     assert!(xs.len() > 1);
     assert!(ys.len() > 1);
     limbs_mod_limb(xs, modulus) == limbs_mod_limb(ys, modulus)
 }
 
-pub fn _limbs_eq_mod_naive(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+pub fn _limbs_eq_mod_limb_naive_2(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+    if xs == ys {
+        return true;
+    }
+    let mut difference = if limbs_cmp(xs, ys) >= Ordering::Equal {
+        limbs_sub(xs, ys)
+    } else {
+        limbs_sub(ys, xs)
+    }
+    .0;
+    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    if difference.len() == 1 {
+        difference[0].divisible_by(modulus)
+    } else {
+        limbs_divisible_by_limb(&difference, modulus)
+    }
+}
+
+pub fn _limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     let mut xs_mod = if xs.len() >= modulus.len() {
         limbs_mod(xs, modulus)
     } else {
@@ -256,4 +274,406 @@ pub fn _limbs_eq_mod_naive(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     xs_mod.truncate(xs_mod.len() - limbs_trailing_zero_limbs(&xs_mod));
     ys_mod.truncate(ys_mod.len() - limbs_trailing_zero_limbs(&ys_mod));
     limbs_cmp(&xs_mod, &ys_mod) == Ordering::Equal
+}
+
+pub fn _limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+    if xs == ys {
+        return true;
+    }
+    let mut difference = if limbs_cmp(xs, ys) >= Ordering::Equal {
+        limbs_sub(xs, ys)
+    } else {
+        limbs_sub(ys, xs)
+    }
+    .0;
+    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
+}
+
+impl EqMod<Natural, Natural> for Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self`, `other`, and `modulus` are all taken
+    /// by value.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(123u32).eq_mod(Natural::from(223u32), Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 Natural::from_str("2000000987654").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 Natural::from_str("2000000987655").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
+        //TODO
+        (&self).eq_mod(&other, &modulus)
+    }
+}
+
+impl<'a> EqMod<Natural, &'a Natural> for Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self` and `other` are taken by value, and
+    /// `modulus` is taken by reference.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(123u32).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 Natural::from_str("2000000987654").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 Natural::from_str("2000000987655").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: Natural, modulus: &'a Natural) -> bool {
+        //TODO
+        (&self).eq_mod(&other, modulus)
+    }
+}
+
+impl<'a> EqMod<&'a Natural, Natural> for Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self` and `modulus` are taken by value, and
+    /// `other` is taken by reference.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(123u32).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 &Natural::from_str("2000000987654").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 &Natural::from_str("2000000987655").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: &'a Natural, modulus: Natural) -> bool {
+        //TODO
+        (&self).eq_mod(other, &modulus)
+    }
+}
+
+impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `other` and `modulus` are taken by reference,
+    /// and `self` is taken by value.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         Natural::from(123u32).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 &Natural::from_str("2000000987654").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         Natural::from_str("1000000987654").unwrap().eq_mod(
+    ///                 &Natural::from_str("2000000987655").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: &'a Natural, modulus: &'b Natural) -> bool {
+        //TODO
+        (&self).eq_mod(other, modulus)
+    }
+}
+
+impl<'a> EqMod<Natural, Natural> for &'a Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `other` and `modulus` are taken by value, and
+    /// `self` is taken by reference.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         (&Natural::from(123u32)).eq_mod(Natural::from(223u32), Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 Natural::from_str("2000000987654").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 Natural::from_str("2000000987655").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
+        //TODO
+        self.eq_mod(&other, &modulus)
+    }
+}
+
+impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self` and `modulus` are taken by reference,
+    /// and `other` is taken by value.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         (&Natural::from(123u32)).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 Natural::from_str("2000000987654").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 Natural::from_str("2000000987655").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: Natural, modulus: &'b Natural) -> bool {
+        //TODO
+        self.eq_mod(&other, modulus)
+    }
+}
+
+impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self` and `other` are taken by reference,
+    /// and `modulus` is taken by value.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 &Natural::from_str("2000000987654").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 &Natural::from_str("2000000987655").unwrap(),
+    ///                 Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: &'b Natural, modulus: Natural) -> bool {
+        //TODO
+        self.eq_mod(other, &modulus)
+    }
+}
+
+impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
+    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
+    /// equal to each other mod 0 iff they are equal. `self`, `other`, and `modulus` are all taken
+    /// by reference.
+    ///
+    /// Time: Worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: Worst case O(n * log(n))
+    ///
+    /// where n = max(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::EqMod;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// fn main() {
+    ///     assert_eq!(
+    ///         (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 &Natural::from_str("2000000987654").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///                 &Natural::from_str("2000000987655").unwrap(),
+    ///                 &Natural::from_str("1000000000000").unwrap()
+    ///         ),
+    ///         false
+    ///     );
+    /// }
+    /// ```
+    fn eq_mod(self, other: &'b Natural, modulus: &'c Natural) -> bool {
+        //TODO
+        if *modulus == 0 as Limb {
+            self == other
+        } else {
+            self % modulus == other % modulus
+        }
+    }
 }

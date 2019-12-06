@@ -130,9 +130,15 @@ impl<'a> EqMod<Limb, Limb> for &'a Natural {
     /// use std::str::FromStr;
     ///
     /// fn main() {
-    ///     assert_eq!(Natural::from(13u32).eq_mod(21, 8), true);
-    ///     assert_eq!(Natural::from_str("12345678987654321").unwrap().eq_mod(321, 1_000), true);
-    ///     assert_eq!(Natural::from_str("12345678987654321").unwrap().eq_mod(322, 1_000), false);
+    ///     assert_eq!((&Natural::from(13u32)).eq_mod(21, 8), true);
+    ///     assert_eq!(
+    ///         (&Natural::from_str("12345678987654321").unwrap()).eq_mod(321, 1_000),
+    ///         true
+    ///     );
+    ///     assert_eq!(
+    ///         (&Natural::from_str("12345678987654321").unwrap()).eq_mod(322, 1_000),
+    ///         false
+    ///     );
     /// }
     /// ```
     fn eq_mod(self, other: Limb, modulus: Limb) -> bool {

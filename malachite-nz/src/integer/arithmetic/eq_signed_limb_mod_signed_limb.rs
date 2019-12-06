@@ -46,8 +46,7 @@ impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
     /// ```
     fn eq_mod(self, other: SignedLimb, modulus: SignedLimb) -> bool {
         if self.sign == (other >= 0) {
-            self.abs
-                .eq_mod(other.unsigned_abs(), modulus.unsigned_abs())
+            (&self.abs).eq_mod(other.unsigned_abs(), modulus.unsigned_abs())
         } else {
             self.abs
                 .eq_neg_limb_mod_limb(other.unsigned_abs(), modulus.unsigned_abs())

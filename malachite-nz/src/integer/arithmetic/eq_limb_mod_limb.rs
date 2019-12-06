@@ -63,7 +63,7 @@ impl<'a> EqMod<Limb, Limb> for &'a Integer {
     /// ```
     fn eq_mod(self, other: Limb, modulus: Limb) -> bool {
         if self.sign {
-            self.abs.eq_mod(other, modulus)
+            (&self.abs).eq_mod(other, modulus)
         } else {
             self.abs.eq_neg_limb_mod_limb(other, modulus)
         }
