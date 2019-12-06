@@ -440,7 +440,7 @@ fn div_round_limb_properties() {
     test_properties(
         pairs_of_natural_and_positive_unsigned::<Limb>,
         |&(ref n, u)| {
-            let left_multiplied = n * u;
+            let left_multiplied = n * Natural::from(u);
             assert_eq!((&left_multiplied).div_round(u, RoundingMode::Down), *n);
             assert_eq!((&left_multiplied).div_round(u, RoundingMode::Up), *n);
             assert_eq!((&left_multiplied).div_round(u, RoundingMode::Floor), *n);

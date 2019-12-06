@@ -259,7 +259,7 @@ fn div_exact_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
 
     assert_eq!((-n).div_exact(i), -&quotient);
 
-    assert_eq!(quotient * i, *n);
+    assert_eq!(quotient * Integer::from(i), *n);
 }
 
 #[test]

@@ -528,7 +528,10 @@ pub fn _limbs_add_same_length_with_carry_in_in_place_left(
 ///     assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((Natural::trillion() + Natural::trillion() * 2).to_string(), "3000000000000");
+///     assert_eq!(
+///         (Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
+///         "3000000000000"
+///     );
 /// }
 /// ```
 impl Add<Natural> for Natural {
@@ -561,7 +564,10 @@ impl Add<Natural> for Natural {
 ///     assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((Natural::trillion() + &(Natural::trillion() * 2)).to_string(), "3000000000000");
+///     assert_eq!(
+///         (Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
+///         "3000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Add<&'a Natural> for Natural {
@@ -595,7 +601,10 @@ impl<'a> Add<&'a Natural> for Natural {
 ///     assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((&Natural::trillion() + Natural::trillion() * 2).to_string(), "3000000000000");
+///     assert_eq!(
+///         (&Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
+///         "3000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Add<Natural> for &'a Natural {
@@ -628,8 +637,10 @@ impl<'a> Add<Natural> for &'a Natural {
 ///     assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
-///     assert_eq!((&Natural::trillion() + &(Natural::trillion() * 2)).to_string(),
-///         "3000000000000");
+///     assert_eq!(
+///         (&Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
+///         "3000000000000"
+///     );
 /// }
 /// ```
 impl<'a, 'b> Add<&'a Natural> for &'b Natural {
@@ -667,9 +678,9 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 /// fn main() {
 ///     let mut x = Natural::ZERO;
 ///     x += Natural::trillion();
-///     x += Natural::trillion() * 2;
-///     x += Natural::trillion() * 3;
-///     x += Natural::trillion() * 4;
+///     x += Natural::trillion() * Natural::from(2u32);
+///     x += Natural::trillion() * Natural::from(3u32);
+///     x += Natural::trillion() * Natural::from(4u32);
 ///     assert_eq!(x.to_string(), "10000000000000");
 /// }
 /// ```
@@ -708,9 +719,9 @@ impl AddAssign<Natural> for Natural {
 /// fn main() {
 ///     let mut x = Natural::ZERO;
 ///     x += &Natural::trillion();
-///     x += &(Natural::trillion() * 2);
-///     x += &(Natural::trillion() * 3);
-///     x += &(Natural::trillion() * 4);
+///     x += &(Natural::trillion() * Natural::from(2u32));
+///     x += &(Natural::trillion() * Natural::from(3u32));
+///     x += &(Natural::trillion() * Natural::from(4u32));
 ///     assert_eq!(x.to_string(), "10000000000000");
 /// }
 /// ```

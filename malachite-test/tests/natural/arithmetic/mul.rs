@@ -9,6 +9,11 @@ use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
     _limbs_mul_fft_normalize_mod_f,
 };
+use malachite_nz::natural::arithmetic::mul::limb::{
+    limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
+    limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
+    limbs_vec_mul_limb_in_place,
+};
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
     _limbs_mul_low_same_length_divide_and_conquer,
@@ -45,21 +50,165 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5, pairs_of_unsigneds,
-    triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12,
-    triples_of_unsigned_vec_var_13, triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15,
-    triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18,
-    triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20, triples_of_unsigned_vec_var_21,
-    triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_24,
-    triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_26, triples_of_unsigned_vec_var_46,
-    triples_of_unsigned_vec_var_48,
+    pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
+    pairs_of_unsigneds, quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_and_unsigned,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_10,
+    triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13,
+    triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16,
+    triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19,
+    triples_of_unsigned_vec_var_20, triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22,
+    triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_24, triples_of_unsigned_vec_var_25,
+    triples_of_unsigned_vec_var_26, triples_of_unsigned_vec_var_46, triples_of_unsigned_vec_var_48,
 };
-use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
-};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 
 fn series(start: Limb, len: usize) -> Vec<Limb> {
     (start..start + len as Limb).collect()
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
+    let test = |limbs: &[Limb], limb: Limb, out: &[Limb]| {
+        assert_eq!(limbs_mul_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_vec_mul_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
+    };
+    test(&[], 0, &[]);
+    test(&[], 5, &[]);
+    test(&[6, 7], 2, &[12, 14]);
+    test(&[100, 101, 102], 10, &[1000, 1010, 1020]);
+    test(&[123, 456], 789, &[97_047, 359_784]);
+    test(&[0xffff_ffff, 5], 2, &[4_294_967_294, 11]);
+    test(&[0xffff_ffff], 2, &[4_294_967_294, 1]);
+    test(&[0xffff_ffff], 0xffff_ffff, &[1, 4_294_967_294]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_limb_with_carry_to_out() {
+    let test = |out_before: &[Limb],
+                limbs_in: &[Limb],
+                limb: Limb,
+                carry: Limb,
+                carry_out: Limb,
+                out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        assert_eq!(
+            limbs_mul_limb_with_carry_to_out(&mut out, limbs_in, limb, carry),
+            carry_out
+        );
+        assert_eq!(out, out_after);
+    };
+    test(
+        &[10, 10, 10, 10],
+        &[123, 456],
+        789,
+        10,
+        0,
+        &[97_057, 359_784, 10, 10],
+    );
+    test(&[10, 10, 10, 10], &[0xffff_ffff], 2, 3, 2, &[1, 10, 10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_limb_with_carry_to_out_fail() {
+    limbs_mul_limb_with_carry_to_out(&mut [10], &[10, 10], 10, 2);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_limb_to_out() {
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, carry: Limb, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(limbs_mul_limb_to_out(&mut out, limbs_in, limb), carry);
+            assert_eq!(out, out_after);
+        };
+    test(&[10, 10, 10, 10], &[], 0, 0, &[10, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[], 5, 0, &[10, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[6, 7], 2, 0, &[12, 14, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        10,
+        0,
+        &[1000, 1010, 1020, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[123, 456],
+        789,
+        0,
+        &[97_047, 359_784, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 5],
+        2,
+        0,
+        &[4_294_967_294, 11, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff],
+        2,
+        1,
+        &[4_294_967_294, 10, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff],
+        0xffff_ffff,
+        4_294_967_294,
+        &[1, 10, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mul_limb_to_out_fail() {
+    limbs_mul_limb_to_out(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mul_limb_with_carry_in_place() {
+    let test =
+        |limbs_before: &[Limb], limb: Limb, carry: Limb, carry_out: Limb, limbs_after: &[Limb]| {
+            let mut limbs = limbs_before.to_vec();
+            assert_eq!(
+                limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry),
+                carry_out
+            );
+            assert_eq!(limbs, limbs_after);
+        };
+    test(&[123, 456], 789, 10, 0, &[97_057, 359_784]);
+    test(&[0xffff_ffff], 2, 3, 2, &[1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_slice_mul_limb_in_place() {
+    let test = |limbs: &[Limb], limb: Limb, carry: Limb, out: &[Limb]| {
+        let mut limbs = limbs.to_vec();
+        assert_eq!(limbs_slice_mul_limb_in_place(&mut limbs, limb), carry);
+        assert_eq!(limbs, out);
+    };
+    test(&[], 0, 0, &[]);
+    test(&[], 5, 0, &[]);
+    test(&[6, 7], 2, 0, &[12, 14]);
+    test(&[100, 101, 102], 10, 0, &[1000, 1010, 1020]);
+    test(&[123, 456], 789, 0, &[97_047, 359_784]);
+    test(&[0xffff_ffff, 5], 2, 0, &[4_294_967_294, 11]);
+    test(&[0xffff_ffff], 2, 1, &[4_294_967_294]);
+    test(&[0xffff_ffff], 0xffff_ffff, 4_294_967_294, &[1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -19762,6 +19911,7 @@ fn test_mul() {
     test("123", "1000000000000", "123000000000000");
     test("123456789000", "987654321000", "121932631112635269000000");
     test("4294967295", "2", "8589934590");
+    test("18446744073709551615", "2", "36893488147419103230");
     test("4294967295", "4294967295", "18446744065119617025");
     test(
         "147502279655636565600250358452694051893980186696958535174009956523855720107322638159749368\
@@ -19795,6 +19945,108 @@ fn test_mul() {
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
     );
+}
+
+#[test]
+fn limbs_mul_limb_properties() {
+    test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_mul_limb(limbs, limb)),
+            Natural::from_limbs_asc(limbs) * Natural::from(limb)
+        );
+    });
+}
+
+#[test]
+fn limbs_mul_limb_with_carry_to_out_properties() {
+    test_properties(
+        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
+        |&(ref out, ref in_limbs, limb, carry)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, in_limbs, limb, carry);
+            let n = Natural::from_limbs_asc(in_limbs) * Natural::from(limb) + carry;
+            let len = in_limbs.len();
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(carry_out != 0, limbs.len() == len + 1);
+            if carry_out != 0 {
+                assert_eq!(*limbs.last().unwrap(), carry_out);
+            }
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_mul_limb_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let carry = limbs_mul_limb_to_out(&mut out, in_limbs, limb);
+            let n = Natural::from_limbs_asc(in_limbs) * Natural::from(limb);
+            let len = in_limbs.len();
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(carry != 0, limbs.len() == len + 1);
+            if carry != 0 {
+                assert_eq!(*limbs.last().unwrap(), carry);
+            }
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_slice_mul_limb_with_carry_in_place_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_and_unsigned,
+        |&(ref limbs, limb, carry)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
+            let n = Natural::from_limbs_asc(&old_limbs) * Natural::from(limb) + carry;
+            let mut expected_limbs = n.into_limbs_asc();
+            assert_eq!(carry_out != 0, expected_limbs.len() == limbs.len() + 1);
+            if carry_out != 0 {
+                assert_eq!(*expected_limbs.last().unwrap(), carry_out);
+            }
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
+        },
+    );
+}
+
+#[test]
+fn limbs_slice_mul_limb_in_place_properties() {
+    test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
+        let mut limbs = limbs.to_vec();
+        let old_limbs = limbs.clone();
+        let carry = limbs_slice_mul_limb_in_place(&mut limbs, limb);
+        let n = Natural::from_limbs_asc(&old_limbs) * Natural::from(limb);
+        let mut expected_limbs = n.into_limbs_asc();
+        assert_eq!(carry != 0, expected_limbs.len() == limbs.len() + 1);
+        if carry != 0 {
+            assert_eq!(*expected_limbs.last().unwrap(), carry);
+        }
+        expected_limbs.resize(limbs.len(), 0);
+        assert_eq!(limbs, expected_limbs);
+    });
+}
+
+#[test]
+fn limbs_vec_mul_limb_in_place_properties() {
+    test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
+        let mut limbs = limbs.to_vec();
+        let old_limbs = limbs.clone();
+        limbs_vec_mul_limb_in_place(&mut limbs, limb);
+        let n = Natural::from_limbs_asc(&old_limbs) * Natural::from(limb);
+        assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+    });
 }
 
 fn limbs_mul_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
@@ -20220,26 +20472,6 @@ fn mul_properties() {
             assert!(product >= *y);
         }
     });
-
-    test_properties_custom_scale(
-        2_048,
-        pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, Limb)| {
-            let product = x * Natural::from(y);
-            assert_eq!(x * y, product);
-            assert_eq!(y * x, product);
-        },
-    );
-
-    test_properties_custom_scale(
-        2_048,
-        pairs_of_natural_and_unsigned::<Limb>,
-        |&(ref x, y)| {
-            let product = x * Natural::from(y);
-            assert_eq!(x * y, product);
-            assert_eq!(y * x, product);
-        },
-    );
 
     test_properties_custom_scale(2_048, pairs_of_unsigneds::<Limb>, |&(x, y)| {
         assert_eq!(

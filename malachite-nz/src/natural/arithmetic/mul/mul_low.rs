@@ -5,9 +5,9 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use natural::arithmetic::mul::{_limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
-use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use platform::Limb;
 use platform::{
     MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD, MUL_FFT_THRESHOLD,

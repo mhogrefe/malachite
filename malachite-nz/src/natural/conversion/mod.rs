@@ -15,7 +15,7 @@ impl Natural {
         assert!(!src.starts_with('-'));
         self.assign(Limb::ZERO);
         for c in src.chars() {
-            *self *= radix as Limb;
+            *self *= Natural::from(radix as Limb);
             if c >= '0' && c <= '9' {
                 *self += c as Limb - 48;
             }

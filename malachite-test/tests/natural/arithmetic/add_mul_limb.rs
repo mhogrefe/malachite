@@ -325,7 +325,7 @@ fn add_mul_limb_properties() {
             assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
-            assert_eq!(a + b * c, result);
+            assert_eq!(a + b * Natural::from(c), result);
             assert_eq!(a.add_mul(b, &Natural::from(c)), result);
         },
     );
@@ -335,7 +335,7 @@ fn add_mul_limb_properties() {
         |&(ref n, c): &(Natural, Limb)| {
             assert_eq!(n.add_mul(&Natural::ZERO, c), *n);
             assert_eq!(n.add_mul(&Natural::ONE, c), n + c);
-            assert_eq!(Natural::ZERO.add_mul(n, c), n * c);
+            assert_eq!(Natural::ZERO.add_mul(n, c), n * Natural::from(c));
         },
     );
 

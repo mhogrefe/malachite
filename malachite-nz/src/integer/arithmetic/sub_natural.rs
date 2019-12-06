@@ -30,8 +30,10 @@ use platform::Limb;
 ///     assert_eq!((Integer::ZERO - Natural::from(123u32)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(-456) - Natural::from(123u32)).to_string(), "-579");
-///     assert_eq!((Integer::trillion() - Natural::trillion() * 2u32).to_string(),
-///         "-1000000000000");
+///     assert_eq!(
+///         (Integer::trillion() - Natural::trillion() * Natural::from(2u32)).to_string(),
+///         "-1000000000000"
+///     );
 /// }
 /// ```
 impl Sub<Natural> for Integer {
@@ -66,7 +68,7 @@ impl Sub<Natural> for Integer {
 ///     assert_eq!((Integer::ZERO - &Natural::from(123u32)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(-456) - &Natural::from(123u32)).to_string(), "-579");
-///     assert_eq!((Integer::trillion() - &(Natural::trillion() * 2u32)).to_string(),
+///     assert_eq!((Integer::trillion() - &(Natural::trillion() * Natural::from(2u32))).to_string(),
 ///         "-1000000000000");
 /// }
 /// ```
@@ -102,7 +104,7 @@ impl<'a> Sub<&'a Natural> for Integer {
 ///     assert_eq!((&Integer::ZERO - Natural::from(123u32)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(-456) - Natural::from(123u32)).to_string(), "-579");
-///     assert_eq!((&Integer::trillion() - Natural::trillion() * 2u32).to_string(),
+///     assert_eq!((&Integer::trillion() - Natural::trillion() * Natural::from(2u32)).to_string(),
 ///         "-1000000000000");
 /// }
 /// ```
@@ -169,8 +171,10 @@ impl<'a> Sub<Natural> for &'a Integer {
 ///     assert_eq!((&Integer::ZERO - &Natural::from(123u32)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(-456) - &Natural::from(123u32)).to_string(), "-579");
-///     assert_eq!((&Integer::trillion() - &(Natural::trillion() * 2)).to_string(),
-///         "-1000000000000");
+///     assert_eq!(
+///         (&Integer::trillion() - &(Natural::trillion() * Natural::from(2u32))).to_string(),
+///         "-1000000000000"
+///     );
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Integer {
@@ -235,9 +239,9 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Integer {
 /// fn main() {
 ///     let mut x = Integer::ZERO;
 ///     x -= Natural::trillion();
-///     x -= Natural::trillion() * 2;
-///     x -= Natural::trillion() * 3;
-///     x -= Natural::trillion() * 4;
+///     x -= Natural::trillion() * Natural::from(2u32);
+///     x -= Natural::trillion() * Natural::from(3u32);
+///     x -= Natural::trillion() * Natural::from(4u32);
 ///     assert_eq!(x.to_string(), "-10000000000000");
 /// }
 /// ```
@@ -296,9 +300,9 @@ impl SubAssign<Natural> for Integer {
 /// fn main() {
 ///     let mut x = Integer::ZERO;
 ///     x -= &Natural::trillion();
-///     x -= &(Natural::trillion() * 2);
-///     x -= &(Natural::trillion() * 3);
-///     x -= &(Natural::trillion() * 4);
+///     x -= &(Natural::trillion() * Natural::from(2u32));
+///     x -= &(Natural::trillion() * Natural::from(3u32));
+///     x -= &(Natural::trillion() * Natural::from(4u32));
 ///     assert_eq!(x.to_string(), "-10000000000000");
 /// }
 /// ```
@@ -358,7 +362,7 @@ impl<'a> SubAssign<&'a Natural> for Integer {
 ///     assert_eq!((Natural::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Natural::from(123u32) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(456u32) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((Natural::trillion() - Integer::trillion() * 2u32).to_string(),
+///     assert_eq!((Natural::trillion() - Integer::trillion() * Integer::from(2u32)).to_string(),
 ///         "-1000000000000");
 /// }
 /// ```
@@ -392,7 +396,7 @@ impl Sub<Integer> for Natural {
 ///     assert_eq!((Natural::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Natural::from(123u32) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(456u32) - &Integer::from(-123)).to_string(), "579");
-///     assert_eq!((Natural::trillion() - &(Integer::trillion() * 2u32)).to_string(),
+///     assert_eq!((Natural::trillion() - &(Integer::trillion() * Integer::from(2u32))).to_string(),
 ///         "-1000000000000");
 /// }
 /// ```
@@ -426,7 +430,7 @@ impl<'a> Sub<&'a Integer> for Natural {
 ///     assert_eq!((&Natural::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Natural::from(123u32) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((&Natural::trillion() - Integer::trillion() * 2u32).to_string(),
+///     assert_eq!((&Natural::trillion() - Integer::trillion() * Integer::from(2u32)).to_string(),
 ///         "-1000000000000");
 /// }
 /// ```
@@ -459,7 +463,7 @@ impl<'a> Sub<Integer> for &'a Natural {
 ///     assert_eq!((&Natural::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Natural::from(123u32) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32) - &Integer::from(-123)).to_string(), "579");
-///     let x: Integer = &Natural::trillion() - &(Integer::trillion() * 2);
+///     let x: Integer = &Natural::trillion() - &(Integer::trillion() * Integer::from(2u32));
 ///     assert_eq!(x.to_string(), "-1000000000000");
 /// }
 /// ```

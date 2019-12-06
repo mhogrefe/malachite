@@ -217,7 +217,6 @@ pub mod arithmetic {
     pub mod mod_op;
     pub mod mod_power_of_two;
     pub mod mul;
-    pub mod mul_limb;
     pub mod neg;
     pub mod next_power_of_two;
     pub mod parity;

@@ -90,7 +90,7 @@ fn verify_limbs_div_mod_three_limb_by_two_limb(
     let r = Natural::from(r);
     assert_eq!((&n).div_mod(&d), (Natural::from(q), r.clone()));
     assert!(r < d);
-    assert_eq!(q * d + r, n);
+    assert_eq!(Natural::from(q) * d + r, n);
 }
 
 #[cfg(feature = "32_bit_limbs")]

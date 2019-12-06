@@ -10,9 +10,7 @@ use common::test_properties;
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_natural};
 use malachite_test::inputs::natural::naturals;
 
 #[test]
@@ -153,11 +151,5 @@ fn mul_natural_properties() {
         assert_eq!(Integer::ONE * x, *x);
         assert_eq!(x * Integer::NEGATIVE_ONE, -x);
         assert_eq!(Integer::NEGATIVE_ONE * x, -x);
-    });
-
-    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
-        let product = x * Natural::from(y);
-        assert_eq!(x * y, product);
-        assert_eq!(y * x, product);
     });
 }

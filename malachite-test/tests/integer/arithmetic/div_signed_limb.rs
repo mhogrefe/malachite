@@ -281,7 +281,7 @@ fn div_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
 
     assert_eq!(-n / i, -&quotient);
 
-    assert!((n - quotient * i).lt_abs(&i));
+    assert!((n - quotient * Integer::from(i)).lt_abs(&i));
 }
 
 #[test]

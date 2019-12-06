@@ -7,7 +7,7 @@ use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul_limb::{
+use natural::arithmetic::mul::limb::{
     limbs_mul_limb_with_carry_to_out, limbs_slice_mul_limb_with_carry_in_place,
 };
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
@@ -642,7 +642,7 @@ impl Natural {
                 (result, sign)
             }
             _ => {
-                let bc = b * c;
+                let bc = b * Natural::from(c);
                 if *self >= bc {
                     (self - bc, true)
                 } else {
@@ -674,7 +674,7 @@ impl Natural {
             _ => (true, (false, false)),
         };
         if fallback {
-            let bc = b * c;
+            let bc = b * Natural::from(c);
             sign = *self >= bc;
             if sign {
                 self.sub_assign_no_panic(bc);
@@ -713,7 +713,7 @@ impl Natural {
             _ => (true, false),
         };
         if fallback {
-            *self *= c;
+            *self *= Natural::from(c);
             // self is now b * c
             sign = *a >= *self;
             if sign {
@@ -749,7 +749,7 @@ impl Natural {
             _ => (false, true),
         };
         if fallback {
-            let bc = b * c;
+            let bc = b * Natural::from(c);
             sign = *self >= bc;
             if sign {
                 self.sub_assign_no_panic(bc);

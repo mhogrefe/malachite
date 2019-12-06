@@ -88,7 +88,7 @@ fn checked_sub_mul_limb_properties() {
             assert!(result_alt.as_ref().map_or(true, |n| n.is_valid()));
             assert_eq!(result_alt, result);
 
-            assert_eq!(a.checked_sub(b * c), result);
+            assert_eq!(a.checked_sub(b * Natural::from(c)), result);
             assert_eq!(a.checked_sub_mul(b, &Natural::from(c)), result);
         },
     );
@@ -102,7 +102,10 @@ fn checked_sub_mul_limb_properties() {
         |&(ref n, c): &(Natural, Limb)| {
             assert_eq!(n.checked_sub_mul(Natural::ZERO, c).as_ref(), Some(n));
             assert_eq!(n.checked_sub_mul(Natural::ONE, c), n.checked_sub(c));
-            assert_eq!((n * c).checked_sub_mul(n, c), Some(Natural::ZERO));
+            assert_eq!(
+                (n * Natural::from(c)).checked_sub_mul(n, c),
+                Some(Natural::ZERO)
+            );
         },
     );
 

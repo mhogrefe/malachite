@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Shl, Shr};
+use std::ops::{Add, Shl, Shr};
 
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
@@ -60,7 +60,7 @@ pub fn rm_naturals(gm: GenerationMode) -> It<(rug::Integer, Natural)> {
 
 // All `Natural` multiples of 3.
 pub fn naturals_var_1(gm: GenerationMode) -> It<Natural> {
-    Box::new(naturals(gm).map(|n| n * 3 as Limb))
+    Box::new(naturals(gm).map(|n| n * Natural::from(3u32)))
 }
 
 // All pairs of `Natural` multiples of 3, and `3`.
@@ -448,7 +448,7 @@ pub fn nm_pairs_of_natural_and_positive_unsigned<T: PrimitiveUnsigned + Rand>(
 
 // All pairs of `Natural` and positive `Limb` where the `Natural` is divisible by the `Limb`.
 pub fn pairs_of_natural_and_positive_limb_var_1(gm: GenerationMode) -> It<(Natural, Limb)> {
-    Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
+    Box::new(pairs_of_natural_and_positive_unsigned(gm).map(|(n, u)| (n * Natural::from(u), u)))
 }
 
 pub fn nrm_pairs_of_natural_and_positive_limb_var_1(
@@ -471,7 +471,7 @@ pub fn pairs_of_natural_and_positive_limb_var_2(gm: GenerationMode) -> It<(Natur
 // All pairs of `Natural` and `Limb` where the most-significant bit of the `Limb` is set and the
 // `Natural` is divisible by the `Limb`.
 pub fn pairs_of_natural_and_limb_var_3(gm: GenerationMode) -> It<(Natural, Limb)> {
-    Box::new(pairs_of_natural_and_unsigned_var_2(gm).map(|(n, u)| (n * u, u)))
+    Box::new(pairs_of_natural_and_unsigned_var_2(gm).map(|(n, u)| (n * Natural::from(u), u)))
 }
 
 pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned + Rand>(
@@ -506,7 +506,7 @@ pub fn pairs_of_limb_and_positive_natural_var_1(gm: GenerationMode) -> It<(Limb,
 pub fn pairs_of_limb_and_positive_natural_var_2(gm: GenerationMode) -> It<(Limb, Natural)> {
     Box::new(
         pairs_of_unsigned_and_positive_natural::<Limb>(gm)
-            .filter_map(|(u, n)| Limb::checked_from(u * n.clone()).map(|u| (u, n))),
+            .filter_map(|(u, n)| Limb::checked_from(Natural::from(u) * n.clone()).map(|u| (u, n))),
     )
 }
 
@@ -622,7 +622,10 @@ pub fn triples_of_natural_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
 pub fn triples_of_natural_natural_and_limb_var_1(
     gm: GenerationMode,
 ) -> It<(Natural, Natural, Limb)> {
-    Box::new(triples_of_natural_natural_and_unsigned(gm).filter(|&(ref a, ref b, c)| a >= &(b * c)))
+    Box::new(
+        triples_of_natural_natural_and_unsigned(gm)
+            .filter(|&(ref a, ref b, c)| a >= &(b * Natural::from(c))),
+    )
 }
 
 fn log_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
@@ -973,11 +976,11 @@ pub fn triples_of_natural_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Ran
     gm: GenerationMode,
 ) -> It<(Natural, T, T)>
 where
-    Natural: Mul<T, Output = Natural> + Add<T, Output = Natural>,
+    Natural: Add<T, Output = Natural> + From<T>,
 {
     Box::new(
         triples_of_natural_unsigned_and_unsigned(gm)
-            .map(|(n, u, modulus)| (n * modulus + u, u, modulus)),
+            .map(|(n, u, modulus)| (n * Natural::from(modulus) + u, u, modulus)),
     )
 }
 
@@ -1438,12 +1441,12 @@ pub fn triples_of_natural_positive_unsigned_and_rounding_mode_var_1<T: Primitive
     gm: GenerationMode,
 ) -> It<(Natural, T, RoundingMode)>
 where
-    Natural: Mul<T, Output = Natural>,
+    Natural: From<T>,
 {
     Box::new(
         triples_of_natural_positive_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
             if rm == RoundingMode::Exact {
-                (n * u, u, rm)
+                (n * Natural::from(u), u, rm)
             } else {
                 (n, u, rm)
             }
@@ -1480,13 +1483,13 @@ pub fn triples_of_unsigned_positive_natural_and_rounding_mode_var_1<T: Primitive
     gm: GenerationMode,
 ) -> It<(T, Natural, RoundingMode)>
 where
-    T: Mul<Natural, Output = Natural>,
     T: CheckedFrom<Natural>,
+    Natural: From<T>,
 {
     Box::new(
         triples_of_unsigned_positive_natural_and_rounding_mode::<T>(gm).filter_map(|(u, n, rm)| {
             if rm == RoundingMode::Exact {
-                T::checked_from(u * n.clone()).map(|u| (u, n, rm))
+                T::checked_from(Natural::from(u) * n.clone()).map(|u| (u, n, rm))
             } else {
                 Some((u, n, rm))
             }

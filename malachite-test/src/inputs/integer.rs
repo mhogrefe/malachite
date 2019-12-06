@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Shl, Shr};
+use std::ops::{Add, Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::crement::Crementable;
@@ -439,7 +439,7 @@ where
 
 // All triples of `Integer` and positive `Limb` where the `Integer` is divisible by the `T`.
 pub fn pairs_of_integer_and_positive_limb_var_1(gm: GenerationMode) -> It<(Integer, Limb)> {
-    Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * u, u)))
+    Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * Natural::from(u), u)))
 }
 
 pub fn nrm_pairs_of_integer_and_positive_limb_var_1(
@@ -482,20 +482,20 @@ pub fn pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + Rand>
     gm: GenerationMode,
 ) -> It<(Integer, T)>
 where
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-    Integer: Mul<T, Output = Integer>,
 {
-    Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(n, i)| (n * i, i)))
+    Box::new(pairs_of_integer_and_nonzero_signed(gm).map(|(n, i)| (n * Integer::from(i), i)))
 }
 
 pub fn nrm_pairs_of_integer_and_nonzero_signed_limb_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))>
 where
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-    Integer: Mul<T, Output = Integer>,
 {
     Box::new(
         pairs_of_integer_and_nonzero_signed_limb_var_1(gm).map(|(x, y)| {
@@ -568,7 +568,7 @@ pub fn pairs_of_limb_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Limb, 
 pub fn pairs_of_limb_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Limb, Integer)> {
     Box::new(
         pairs_of_unsigned_and_nonzero_integer::<Limb>(gm)
-            .filter_map(|(u, n)| Limb::checked_from(u * (&n).abs()).map(|u| (u, n))),
+            .filter_map(|(u, n)| Limb::checked_from(Natural::from(u) * (&n).abs()).map(|u| (u, n))),
     )
 }
 
@@ -614,8 +614,9 @@ pub fn pairs_of_signed_limb_and_nonzero_integer_var_2(
     gm: GenerationMode,
 ) -> It<(SignedLimb, Integer)> {
     Box::new(
-        pairs_of_signed_and_nonzero_integer::<SignedLimb>(gm)
-            .filter_map(|(i, n)| SignedLimb::checked_from(i * (&n).abs()).map(|i| (i, n))),
+        pairs_of_signed_and_nonzero_integer::<SignedLimb>(gm).filter_map(|(i, n)| {
+            SignedLimb::checked_from(Integer::from(i) * (&n).abs()).map(|i| (i, n))
+        }),
     )
 }
 
@@ -1093,11 +1094,12 @@ pub fn triples_of_integer_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Ran
     gm: GenerationMode,
 ) -> It<(Integer, T, T)>
 where
-    Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
+    Integer: Add<T, Output = Integer>,
+    Natural: From<T>,
 {
     Box::new(
         triples_of_integer_unsigned_and_unsigned(gm)
-            .map(|(n, u, modulus)| (n * modulus + u, u, modulus)),
+            .map(|(n, u, modulus)| (n * Natural::from(modulus) + u, u, modulus)),
     )
 }
 
@@ -1199,13 +1201,13 @@ pub fn triples_of_integer_signed_and_signed_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Integer, T, T)>
 where
-    Integer: Mul<T, Output = Integer> + Add<T, Output = Integer>,
+    Integer: Add<T, Output = Integer> + From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_signed(gm)
-            .map(|(n, i, modulus)| (n * modulus + i, i, modulus)),
+            .map(|(n, i, modulus)| (n * Integer::from(modulus) + i, i, modulus)),
     )
 }
 
@@ -2257,12 +2259,12 @@ pub fn triples_of_integer_positive_unsigned_and_rounding_mode_var_1<T: Primitive
     gm: GenerationMode,
 ) -> It<(Integer, T, RoundingMode)>
 where
-    Integer: Mul<T, Output = Integer>,
+    Natural: From<T>,
 {
     Box::new(
         triples_of_integer_positive_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
             if rm == RoundingMode::Exact {
-                (n * u, u, rm)
+                (n * Natural::from(u), u, rm)
             } else {
                 (n, u, rm)
             }
@@ -2299,13 +2301,13 @@ pub fn triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveU
     gm: GenerationMode,
 ) -> It<(T, Integer, RoundingMode)>
 where
-    T: Mul<Integer, Output = Integer>,
     T: CheckedFrom<Integer>,
+    Integer: From<T>,
 {
     Box::new(
         triples_of_unsigned_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(u, n, rm)| {
             if rm == RoundingMode::Exact {
-                T::checked_from(u * (&n).abs()).map(|u| (u, n, rm))
+                T::checked_from(Integer::from(u) * (&n).abs()).map(|u| (u, n, rm))
             } else {
                 Some((u, n, rm))
             }
@@ -2346,14 +2348,14 @@ pub fn triples_of_integer_nonzero_signed_and_rounding_mode_var_1<T: PrimitiveSig
     gm: GenerationMode,
 ) -> It<(Integer, T, RoundingMode)>
 where
-    Integer: Mul<T, Output = Integer>,
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_nonzero_signed_and_rounding_mode::<T>(gm).map(|(n, i, rm)| {
             if rm == RoundingMode::Exact {
-                (n * i, i, rm)
+                (n * Integer::from(i), i, rm)
             } else {
                 (n, i, rm)
             }
@@ -2394,15 +2396,15 @@ pub fn triples_of_signed_nonzero_integer_and_rounding_mode_var_1<T: PrimitiveSig
     gm: GenerationMode,
 ) -> It<(T, Integer, RoundingMode)>
 where
-    T: Mul<Integer, Output = Integer>,
     T: CheckedFrom<Integer>,
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_signed_nonzero_integer_and_rounding_mode::<T>(gm).filter_map(|(i, n, rm)| {
             if rm == RoundingMode::Exact {
-                T::checked_from(i * (&n).abs()).map(|i| (i, n, rm))
+                T::checked_from(Integer::from(i) * (&n).abs()).map(|i| (i, n, rm))
             } else {
                 Some((i, n, rm))
             }

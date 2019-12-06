@@ -208,7 +208,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, Limb> for &'b Natural {
                 _ => (None, true),
             };
             if fallback {
-                self.checked_sub(b * c)
+                self.checked_sub(b * Natural::from(c))
             } else {
                 result.map(|limbs| {
                     let mut result = Large(limbs);
@@ -247,7 +247,7 @@ impl Natural {
                 _ => (false, true),
             };
             if fallback {
-                self.sub_assign_no_panic(b * c)
+                self.sub_assign_no_panic(b * Natural::from(c))
             } else if borrow {
                 true
             } else {
@@ -273,7 +273,7 @@ impl Natural {
                 _ => (false, true),
             };
             if fallback {
-                self.sub_assign_no_panic(b * c)
+                self.sub_assign_no_panic(b * Natural::from(c))
             } else if borrow {
                 true
             } else {
@@ -301,7 +301,7 @@ impl Natural {
                 _ => (false, true),
             };
             if fallback {
-                *self *= c;
+                *self *= Natural::from(c);
                 self.sub_right_assign_no_panic(a)
             } else if borrow {
                 true

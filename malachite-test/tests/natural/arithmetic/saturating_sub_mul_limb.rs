@@ -106,7 +106,7 @@ fn saturating_sub_mul_limb_properties() {
             assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
-            assert_eq!(a.saturating_sub(b * c), result);
+            assert_eq!(a.saturating_sub(b * Natural::from(c)), result);
             assert_eq!(a.saturating_sub_mul(b, &Natural::from(c)), result);
             assert!(result <= *a);
         },
@@ -122,7 +122,10 @@ fn saturating_sub_mul_limb_properties() {
             assert_eq!(Natural::ZERO.saturating_sub_mul(n, c), Natural::ZERO);
             assert_eq!(n.saturating_sub_mul(Natural::ZERO, c), *n);
             assert_eq!(n.saturating_sub_mul(Natural::ONE, c), n.saturating_sub(c));
-            assert_eq!((n * c).saturating_sub_mul(n, c), Natural::ZERO);
+            assert_eq!(
+                (n * Natural::from(c)).saturating_sub_mul(n, c),
+                Natural::ZERO
+            );
         },
     );
 

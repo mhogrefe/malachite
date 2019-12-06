@@ -25,8 +25,11 @@ use natural::Natural;
 ///     assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)).to_string(), "0");
 ///     assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO).to_string(), "123");
 ///     assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((Natural::trillion() * 3).saturating_sub(Natural::trillion()).to_string(),
-///         "2000000000000");
+///     assert_eq!(
+///         (Natural::trillion() * Natural::from(3u32))
+///             .saturating_sub(Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl SaturatingSub<Natural> for Natural {
@@ -59,8 +62,11 @@ impl SaturatingSub<Natural> for Natural {
 ///     assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)).to_string(), "0");
 ///     assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO).to_string(), "123");
 ///     assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((Natural::trillion() * 3).saturating_sub(&Natural::trillion()).to_string(),
-///         "2000000000000");
+///     assert_eq!(
+///         (Natural::trillion() * Natural::from(3u32))
+///             .saturating_sub(&Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a> SaturatingSub<&'a Natural> for Natural {
@@ -94,8 +100,11 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
 ///     assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)).to_string(),
 ///         "333");
-///     assert_eq!((&(Natural::trillion() * 3)).saturating_sub(Natural::trillion()).to_string(),
-///         "2000000000000");
+///     assert_eq!(
+///         (&(Natural::trillion() * Natural::from(3u32)))
+///             .saturating_sub(Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a> SaturatingSub<Natural> for &'a Natural {
@@ -129,8 +138,11 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
 ///     assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)).to_string(),
 ///         "333");
-///     assert_eq!((&(Natural::trillion() * 3)).saturating_sub(&Natural::trillion()).to_string(),
-///         "2000000000000");
+///     assert_eq!(
+///         (&(Natural::trillion() * Natural::from(3u32)))
+///             .saturating_sub(&Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {

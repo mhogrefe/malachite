@@ -26,6 +26,9 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod, limbs_eq_mod, limbs_eq_mod_limb,
 };
 use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::limb::{
+    limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+};
 use malachite_nz::natural::arithmetic::mul::limbs_mul;
 use malachite_nz::natural::arithmetic::mul::mul_mod::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -42,9 +45,6 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-};
-use malachite_nz::natural::arithmetic::mul_limb::{
-    limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{HalfLimb, Limb, SignedHalfLimb, SignedLimb};

@@ -7,6 +7,7 @@ use malachite_nz::integer::arithmetic::add_mul_limb::{
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left, limbs_overflowing_sub_mul_limb_in_place_right,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -340,7 +341,7 @@ fn benchmark_integer_add_mul_assign_limb_algorithms(
             ),
             (
                 "Integer += Integer * Limb",
-                &mut (|(mut a, b, c)| a += b * c),
+                &mut (|(mut a, b, c)| a += b * Natural::from(c)),
             ),
         ],
     );
@@ -369,7 +370,7 @@ fn benchmark_integer_add_mul_assign_limb_ref_algorithms(
             ),
             (
                 "Integer += &Integer * Limb",
-                &mut (|(mut a, b, c)| a += &b * c),
+                &mut (|(mut a, b, c)| a += &b * Natural::from(c)),
             ),
         ],
     );
@@ -431,7 +432,7 @@ fn benchmark_integer_add_mul_limb_algorithms(gm: GenerationMode, limit: usize, f
             ),
             (
                 "Integer + Integer * Limb",
-                &mut (|(a, b, c)| no_out!(a + b * c)),
+                &mut (|(a, b, c)| no_out!(a + b * Natural::from(c))),
             ),
         ],
     );
@@ -460,7 +461,7 @@ fn benchmark_integer_add_mul_limb_val_ref_algorithms(
             ),
             (
                 "Integer + &Integer * Limb",
-                &mut (|(a, b, c)| no_out!(a + &b * c)),
+                &mut (|(a, b, c)| no_out!(a + &b * Natural::from(c))),
             ),
         ],
     );
@@ -489,7 +490,7 @@ fn benchmark_integer_add_mul_limb_ref_val_algorithms(
             ),
             (
                 "(&Integer) + Integer * Limb",
-                &mut (|(a, b, c)| no_out!(&a + b * c)),
+                &mut (|(a, b, c)| no_out!(&a + b * Natural::from(c))),
             ),
         ],
     );
@@ -518,7 +519,7 @@ fn benchmark_integer_add_mul_limb_ref_ref_algorithms(
             ),
             (
                 "(&Integer) + &Integer * Limb",
-                &mut (|(a, b, c)| no_out!(&a + &b * c)),
+                &mut (|(a, b, c)| no_out!(&a + &b * Natural::from(c))),
             ),
         ],
     );

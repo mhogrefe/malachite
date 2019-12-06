@@ -196,10 +196,8 @@ fn div_limb_properties_helper(n: &Integer, u: Limb) {
         rug_integer_to_integer(&(integer_to_rug_integer(n) / u)),
         quotient
     );
-
     assert_eq!(-n / u, -&quotient);
-
-    assert!((n - quotient * u).lt_abs(&u));
+    assert!((n - quotient * Natural::from(u)).lt_abs(&u));
 }
 
 #[test]

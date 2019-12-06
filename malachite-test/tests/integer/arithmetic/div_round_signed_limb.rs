@@ -796,7 +796,7 @@ fn div_round_signed_limb_properties() {
     test_properties(
         pairs_of_integer_and_nonzero_signed::<SignedLimb>,
         |&(ref n, i)| {
-            let left_multiplied = n * i;
+            let left_multiplied = n * Integer::from(i);
             assert_eq!((&left_multiplied).div_round(i, RoundingMode::Down), *n);
             assert_eq!((&left_multiplied).div_round(i, RoundingMode::Up), *n);
             assert_eq!((&left_multiplied).div_round(i, RoundingMode::Floor), *n);

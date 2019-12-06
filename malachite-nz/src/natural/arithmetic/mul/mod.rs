@@ -6,6 +6,7 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
@@ -19,7 +20,6 @@ use natural::arithmetic::mul::toom::{
     _limbs_mul_same_length_to_out_toom_6h_scratch_len,
     _limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
-use natural::arithmetic::mul_limb::limbs_mul_limb_to_out;
 use natural::Natural::{self, Large, Small};
 use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD,
@@ -606,9 +606,9 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 
     fn mul(self, other: &'a Natural) -> Natural {
         if let Small(y) = *other {
-            self * y
+            self.mul_limb_ref(y)
         } else if let Small(x) = *self {
-            other * x
+            other.mul_limb_ref(x)
         } else {
             match (self, other) {
                 (&Large(ref xs), &Large(ref ys)) => {
@@ -651,9 +651,9 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 impl MulAssign<Natural> for Natural {
     fn mul_assign(&mut self, mut other: Natural) {
         if let Small(y) = other {
-            *self *= y;
+            self.mul_assign_limb(y);
         } else if let Small(x) = *self {
-            other *= x;
+            other.mul_assign_limb(x);
             *self = other;
         } else {
             match (&mut (*self), other) {
@@ -696,9 +696,9 @@ impl MulAssign<Natural> for Natural {
 impl<'a> MulAssign<&'a Natural> for Natural {
     fn mul_assign(&mut self, other: &'a Natural) {
         if let Small(y) = *other {
-            *self *= y;
+            self.mul_assign_limb(y);
         } else if let Small(x) = *self {
-            *self = other * x;
+            *self = other.mul_limb_ref(x);
         } else {
             match (&mut (*self), other) {
                 (&mut Large(ref mut xs), &Large(ref ys)) => {
@@ -712,6 +712,7 @@ impl<'a> MulAssign<&'a Natural> for Natural {
 }
 
 pub mod fft;
+pub mod limb;
 pub mod mul_low;
 pub mod mul_mod;
 pub mod poly_eval;

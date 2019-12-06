@@ -405,7 +405,7 @@ fn sub_mul_limb_properties() {
             assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
-            assert_eq!(a - b * c, result);
+            assert_eq!(a - b * Natural::from(c), result);
             assert_eq!(a.sub_mul(b, &Natural::from(c)), result);
             assert_eq!(a.checked_sub_mul(b, c), Some(result))
         },
@@ -420,7 +420,7 @@ fn sub_mul_limb_properties() {
         |&(ref n, c): &(Natural, Limb)| {
             assert_eq!(n.sub_mul(Natural::ZERO, c), *n);
             assert_eq!(n.sub_mul(Natural::ONE, c), n - c);
-            assert_eq!((n * c).sub_mul(n, c), Natural::ZERO);
+            assert_eq!((n * Natural::from(c)).sub_mul(n, c), Natural::ZERO);
         },
     );
 

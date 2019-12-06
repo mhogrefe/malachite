@@ -173,10 +173,8 @@ fn div_exact_limb_properties_helper(n: &Integer, u: Limb) {
         rug_integer_to_integer(&rug_div_exact_limb(integer_to_rug_integer(n), u)),
         quotient
     );
-
     assert_eq!((-n).div_exact(u), -&quotient);
-
-    assert_eq!(quotient * u, *n);
+    assert_eq!(quotient * Natural::from(u), *n);
 }
 
 #[test]

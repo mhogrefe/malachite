@@ -375,7 +375,7 @@ fn div_limb_properties_helper(n: &Natural, u: Limb) {
         rug_integer_to_natural(&(natural_to_rug_integer(n) / u)),
         quotient
     );
-    assert!(n - quotient * u < u);
+    assert!(n - quotient * Natural::from(u) < u);
 }
 
 #[test]
@@ -419,7 +419,7 @@ fn div_limb_properties() {
             assert_eq!(quotient_alt, quotient);
 
             assert_eq!(u.div_rem(n).0, quotient);
-            assert!(u - quotient * n < *n);
+            assert!(u - Natural::from(quotient) * n < *n);
         },
     );
 

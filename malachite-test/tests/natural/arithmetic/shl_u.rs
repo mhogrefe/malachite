@@ -387,7 +387,7 @@ macro_rules! tests_and_properties {
             #[allow(unknown_lints, identity_op)]
             test_properties(naturals, |n| {
                 assert_eq!(n << $t::ZERO, *n);
-                assert_eq!(n << $t::ONE, n * 2 as Limb);
+                assert_eq!(n << $t::ONE, n * Natural::from(2u32));
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {

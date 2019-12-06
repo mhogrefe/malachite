@@ -3,7 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::mul_limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
+use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::Natural::{self, Large};
 use platform::{DoubleLimb, Limb};
 
@@ -458,7 +458,7 @@ impl<'a> AddMul<Natural, Limb> for &'a Natural {
             _ => true,
         };
         if fallback {
-            self + b * c
+            self + b * Natural::from(c)
         } else {
             b
         }
@@ -512,7 +512,7 @@ impl<'a, 'b> AddMul<&'a Natural, Limb> for &'b Natural {
             (Large(ref a_limbs), Large(ref b_limbs)) => {
                 Large(limbs_add_mul_limb(a_limbs, b_limbs, c))
             }
-            _ => self + b * c,
+            _ => self + b * Natural::from(c),
         }
     }
 }
@@ -523,7 +523,7 @@ impl<'a, 'b> AddMul<&'a Natural, u32> for &'b Natural {
 
     #[inline]
     fn add_mul(self, b: &'a Natural, c: u32) -> Natural {
-        self.add_mul(b, Limb::from(c))
+        self.add_mul(b, &Natural::from(c))
     }
 }
 
@@ -571,7 +571,7 @@ impl AddMulAssign<Natural, Limb> for Natural {
             _ => (true, false),
         };
         if fallback {
-            *self += b * c;
+            *self += b * Natural::from(c);
         } else if right {
             *self = b;
         }
@@ -630,7 +630,7 @@ impl<'a> AddMulAssign<&'a Natural, Limb> for Natural {
             _ => true,
         };
         if fallback {
-            *self += b * c;
+            *self += b * Natural::from(c);
         }
     }
 }

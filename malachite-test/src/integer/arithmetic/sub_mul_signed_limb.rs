@@ -3,6 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -171,7 +172,7 @@ fn benchmark_integer_sub_mul_assign_signed_limb_algorithms(
             ),
             (
                 "Integer -= Integer * SignedLimb",
-                &mut (|(mut a, b, c)| a -= b * c),
+                &mut (|(mut a, b, c)| a -= b * Integer::from(c)),
             ),
         ],
     );
@@ -200,7 +201,7 @@ fn benchmark_integer_sub_mul_assign_signed_limb_ref_algorithms(
             ),
             (
                 "Integer -= &Integer * SignedLimb",
-                &mut (|(mut a, b, c)| a -= &b * c),
+                &mut (|(mut a, b, c)| a -= &b * Integer::from(c)),
             ),
         ],
     );
@@ -266,7 +267,7 @@ fn benchmark_integer_sub_mul_signed_limb_algorithms(
             ),
             (
                 "Integer - Integer * SignedLimb",
-                &mut (|(a, b, c)| no_out!(a - b * c)),
+                &mut (|(a, b, c)| no_out!(a - b * Integer::from(c))),
             ),
         ],
     );
@@ -295,7 +296,7 @@ fn benchmark_integer_sub_mul_signed_limb_val_ref_algorithms(
             ),
             (
                 "Integer - &Integer * SignedLimb",
-                &mut (|(a, b, c)| no_out!(a - &b * c)),
+                &mut (|(a, b, c)| no_out!(a - &b * Integer::from(c))),
             ),
         ],
     );
@@ -324,7 +325,7 @@ fn benchmark_integer_sub_mul_signed_limb_ref_val_algorithms(
             ),
             (
                 "(&Integer) - Integer * SignedLimb",
-                &mut (|(a, b, c)| no_out!(&a - b * c)),
+                &mut (|(a, b, c)| no_out!(&a - b * Integer::from(c))),
             ),
         ],
     );
@@ -353,7 +354,7 @@ fn benchmark_integer_sub_mul_signed_limb_ref_ref_algorithms(
             ),
             (
                 "(&Integer) - &Integer * SignedLimb",
-                &mut (|(a, b, c)| no_out!(&a - &b * c)),
+                &mut (|(a, b, c)| no_out!(&a - &b * Integer::from(c))),
             ),
         ],
     );

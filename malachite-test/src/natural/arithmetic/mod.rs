@@ -29,7 +29,6 @@ pub mod mod_limb;
 pub mod mod_op;
 pub mod mod_power_of_two;
 pub mod mul;
-pub mod mul_limb;
 pub mod neg;
 pub mod next_power_of_two;
 pub mod parity;
@@ -76,7 +75,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_op::register(registry);
     mod_power_of_two::register(registry);
     mul::register(registry);
-    mul_limb::register(registry);
     neg::register(registry);
     next_power_of_two::register(registry);
     parity::register(registry);

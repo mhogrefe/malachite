@@ -921,7 +921,7 @@ fn div_mod_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
 
     assert!(remainder < i.unsigned_abs());
     assert!(remainder == 0 as Limb || (remainder > 0 as Limb) == (i > 0));
-    assert_eq!(quotient * i + remainder, *n);
+    assert_eq!(quotient * Integer::from(i) + remainder, *n);
 
     let (neg_quotient, neg_remainder) = (-n).div_mod(i);
     assert_eq!(n.ceiling_div_mod(i), (-neg_quotient, -neg_remainder));
@@ -1060,7 +1060,7 @@ fn div_rem_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
 
     assert!(remainder.lt_abs(&i));
     assert!(remainder == 0 as Limb || (remainder > 0 as Limb) == (*n > 0 as Limb));
-    assert_eq!(&quotient * i + &remainder, *n);
+    assert_eq!(&quotient * Integer::from(i) + &remainder, *n);
 
     assert_eq!((-n).div_rem(i), (-quotient, -remainder));
 }
@@ -1194,7 +1194,7 @@ fn ceiling_div_mod_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
 
     assert!(remainder.lt_abs(&i));
     assert!(remainder == 0 as Limb || (remainder >= 0 as Limb) != (i > 0));
-    assert_eq!(quotient * i + remainder, *n);
+    assert_eq!(quotient * Integer::from(i) + remainder, *n);
 
     let (neg_quotient, neg_remainder) = (-n).ceiling_div_mod(i);
     assert_eq!(n.div_mod(i), (-neg_quotient, -neg_remainder));

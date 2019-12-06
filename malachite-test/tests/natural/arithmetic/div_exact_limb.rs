@@ -500,7 +500,7 @@ fn div_exact_limb_properties_helper(n: &Natural, u: Limb) {
         quotient
     );
 
-    assert_eq!(quotient * u, *n);
+    assert_eq!(quotient * Natural::from(u), *n);
 }
 
 #[test]
@@ -545,7 +545,7 @@ fn div_exact_limb_properties() {
 
             assert_eq!(u.div_round(n, RoundingMode::Exact), quotient);
 
-            assert_eq!(quotient * n, u);
+            assert_eq!(Natural::from(quotient) * n, u);
         },
     );
 

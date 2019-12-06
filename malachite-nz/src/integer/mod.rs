@@ -176,9 +176,7 @@ pub mod arithmetic {
     pub mod mod_power_of_two;
     pub mod mod_signed_limb;
     pub mod mul;
-    pub mod mul_limb;
     pub mod mul_natural;
-    pub mod mul_signed_limb;
     pub mod neg;
     pub mod parity;
     pub mod shl_i;

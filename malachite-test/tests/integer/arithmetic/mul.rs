@@ -11,10 +11,7 @@ use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::base::pairs_of_signeds;
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_integers,
-    triples_of_integers,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
 
 #[test]
@@ -101,6 +98,10 @@ fn test_mul() {
     test("4294967295", "-4294967295", "-18446744065119617025");
     test("-4294967295", "4294967295", "-18446744065119617025");
     test("-4294967295", "-4294967295", "18446744065119617025");
+    test("18446744073709551615", "2", "36893488147419103230");
+    test("18446744073709551615", "-2", "-36893488147419103230");
+    test("-18446744073709551615", "2", "-36893488147419103230");
+    test("-18446744073709551615", "-2", "36893488147419103230");
 }
 
 #[test]
@@ -162,18 +163,6 @@ fn mul_properties() {
         assert_eq!((x * y) * z, x * (y * z));
         assert_eq!(x * (y + z), x * y + x * z);
         assert_eq!((x + y) * z, x * z + y * z);
-    });
-
-    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
-        let product = x * Integer::from(y);
-        assert_eq!(x * y, product);
-        assert_eq!(y * x, product);
-    });
-
-    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
-        let product = x * Integer::from(y);
-        assert_eq!(x * y, product);
-        assert_eq!(y * x, product);
     });
 
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {

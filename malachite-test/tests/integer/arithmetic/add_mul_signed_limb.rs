@@ -154,7 +154,7 @@ fn add_mul_signed_limb_properties() {
             assert!(result_alt.is_valid());
             assert_eq!(result_alt, result);
 
-            assert_eq!(a + b * c, result);
+            assert_eq!(a + b * Integer::from(c), result);
             assert_eq!(a.add_mul(-b, -c), result);
             assert_eq!((-a).add_mul(-b, c), -&result);
             assert_eq!((-a).add_mul(b, -c), -&result);
@@ -173,9 +173,9 @@ fn add_mul_signed_limb_properties() {
             assert_eq!(n.add_mul(&Integer::ZERO, c), *n);
             assert_eq!(n.add_mul(&Integer::ONE, c), n + c);
             assert_eq!(n.add_mul(&Integer::NEGATIVE_ONE, c), n - c);
-            assert_eq!(Integer::ZERO.add_mul(n, c), n * c);
-            assert_eq!((n * c).add_mul(-n, c), 0 as Limb);
-            assert_eq!((n * c).add_mul(n, -c), 0 as Limb);
+            assert_eq!(Integer::ZERO.add_mul(n, c), n * Integer::from(c));
+            assert_eq!((n * Integer::from(c)).add_mul(-n, c), 0 as Limb);
+            assert_eq!((n * Integer::from(c)).add_mul(n, -c), 0 as Limb);
         },
     );
 

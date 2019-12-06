@@ -28,7 +28,7 @@ use platform::Limb;
 ///     assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((-Integer::trillion() - -Integer::trillion() * 2u32).to_string(),
+///     assert_eq!((-Integer::trillion() - -Integer::trillion() * Integer::from(2u32)).to_string(),
 ///         "1000000000000");
 /// }
 /// ```
@@ -63,8 +63,10 @@ impl Sub<Integer> for Integer {
 ///     assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-///     assert_eq!((-Integer::trillion() - &(-Integer::trillion() * 2u32)).to_string(),
-///         "1000000000000");
+///     assert_eq!(
+///         (-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32))).to_string(),
+///         "1000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Sub<&'a Integer> for Integer {
@@ -98,8 +100,10 @@ impl<'a> Sub<&'a Integer> for Integer {
 ///     assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
-///     assert_eq!((&(-Integer::trillion()) - -Integer::trillion() * 2u32).to_string(),
-///         "1000000000000");
+///     assert_eq!(
+///         (&(-Integer::trillion()) - -Integer::trillion() * Integer::from(2u32)).to_string(),
+///         "1000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Sub<Integer> for &'a Integer {
@@ -131,7 +135,7 @@ impl<'a> Sub<Integer> for &'a Integer {
 ///     assert_eq!((&Integer::ZERO - &Integer::from(123)).to_string(), "-123");
 ///     assert_eq!((&Integer::from(123) - &Integer::ZERO).to_string(), "123");
 ///     assert_eq!((&Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-///     let x: Integer = &-Integer::trillion() - &(-Integer::trillion() * 2);
+///     let x: Integer = &-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32));
 ///     assert_eq!(x.to_string(), "1000000000000");
 /// }
 /// ```
@@ -207,9 +211,9 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 /// fn main() {
 ///     let mut x = Integer::ZERO;
 ///     x -= -Integer::trillion();
-///     x -= Integer::trillion() * 2;
-///     x -= -Integer::trillion() * 3;
-///     x -= Integer::trillion() * 4;
+///     x -= Integer::trillion() * Integer::from(2u32);
+///     x -= -Integer::trillion() * Integer::from(3u32);
+///     x -= Integer::trillion() * Integer::from(4u32);
 ///     assert_eq!(x.to_string(), "-2000000000000");
 /// }
 /// ```
@@ -273,9 +277,9 @@ impl SubAssign<Integer> for Integer {
 /// fn main() {
 ///     let mut x = Integer::ZERO;
 ///     x -= &(-Integer::trillion());
-///     x -= &(Integer::trillion() * 2);
-///     x -= &(-Integer::trillion() * 3);
-///     x -= &(Integer::trillion() * 4);
+///     x -= &(Integer::trillion() * Integer::from(2u32));
+///     x -= &(-Integer::trillion() * Integer::from(3u32));
+///     x -= &(Integer::trillion() * Integer::from(4u32));
 ///     assert_eq!(x.to_string(), "-2000000000000");
 /// }
 /// ```

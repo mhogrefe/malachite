@@ -3,6 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -152,7 +153,7 @@ fn benchmark_natural_checked_sub_mul_limb_algorithms(
             ),
             (
                 "Natural.checked_sub(Natural * Limb)",
-                &mut (|(a, b, c)| no_out!(a.checked_sub(b * c))),
+                &mut (|(a, b, c)| no_out!(a.checked_sub(b * Natural::from(c)))),
             ),
         ],
     );
@@ -181,7 +182,7 @@ fn benchmark_natural_checked_sub_mul_limb_val_ref_algorithms(
             ),
             (
                 "Natural.checked_sub(&Natural * Limb)",
-                &mut (|(a, b, c)| no_out!(a.checked_sub(&b * c))),
+                &mut (|(a, b, c)| no_out!(a.checked_sub(&b * Natural::from(c)))),
             ),
         ],
     );
@@ -210,7 +211,7 @@ fn benchmark_natural_checked_sub_mul_limb_ref_val_algorithms(
             ),
             (
                 "(&Natural).checked_sub(Natural * Limb)",
-                &mut (|(a, b, c)| no_out!((&a).checked_sub(b * c))),
+                &mut (|(a, b, c)| no_out!((&a).checked_sub(b * Natural::from(c)))),
             ),
         ],
     );
@@ -239,7 +240,7 @@ fn benchmark_natural_checked_sub_mul_limb_ref_ref_algorithms(
             ),
             (
                 "(&Natural).checked_sub(&Natural * Limb)",
-                &mut (|(a, b, c)| no_out!((&a).checked_sub(&b * c))),
+                &mut (|(a, b, c)| no_out!((&a).checked_sub(&b * Natural::from(c)))),
             ),
         ],
     );

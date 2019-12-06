@@ -538,7 +538,10 @@ pub(crate) fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
 /// fn main() {
 ///     assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((Natural::trillion() * 3 - Natural::trillion()).to_string(), "2000000000000");
+///     assert_eq!(
+///         (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl Sub<Natural> for Natural {
@@ -570,7 +573,10 @@ impl Sub<Natural> for Natural {
 /// fn main() {
 ///     assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((Natural::trillion() * 3 - &Natural::trillion()).to_string(), "2000000000000");
+///     assert_eq!(
+///         (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Sub<&'a Natural> for Natural {
@@ -602,7 +608,10 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// fn main() {
 ///     assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((&(Natural::trillion() * 3) - Natural::trillion()).to_string(), "2000000000000");
+///     assert_eq!(
+///         (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a> Sub<Natural> for &'a Natural {
@@ -633,8 +642,10 @@ impl<'a> Sub<Natural> for &'a Natural {
 /// fn main() {
 ///     assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
 ///     assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-///     assert_eq!((&(Natural::trillion() * 3) - &Natural::trillion()).to_string(),
-///         "2000000000000");
+///     assert_eq!(
+///         (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
+///         "2000000000000"
+///     );
 /// }
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
@@ -662,11 +673,11 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// let mut x = Natural::trillion() * 10;
+/// let mut x = Natural::trillion() * Natural::from(10u32);
 /// x -= Natural::trillion();
-/// x -= (Natural::trillion() * 2);
-/// x -= (Natural::trillion() * 3);
-/// x -= (Natural::trillion() * 4);
+/// x -= (Natural::trillion() * Natural::from(2u32));
+/// x -= (Natural::trillion() * Natural::from(3u32));
+/// x -= (Natural::trillion() * Natural::from(4u32));
 /// assert_eq!(x.to_string(), "0");
 /// ```
 impl SubAssign<Natural> for Natural {
@@ -692,11 +703,11 @@ impl SubAssign<Natural> for Natural {
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// let mut x = Natural::trillion() * 10;
+/// let mut x = Natural::trillion() * Natural::from(10u32);
 /// x -= &Natural::trillion();
-/// x -= &(Natural::trillion() * 2);
-/// x -= &(Natural::trillion() * 3);
-/// x -= &(Natural::trillion() * 4);
+/// x -= &(Natural::trillion() * Natural::from(2u32));
+/// x -= &(Natural::trillion() * Natural::from(3u32));
+/// x -= &(Natural::trillion() * Natural::from(4u32));
 /// assert_eq!(x.to_string(), "0");
 /// ```
 impl<'a> SubAssign<&'a Natural> for Natural {

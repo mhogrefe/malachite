@@ -28,8 +28,13 @@ use platform::Limb;
 ///     assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(Natural::ZERO)), "Some(123)");
 ///     assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(Natural::from(123u32))),
 ///         "Some(333)");
-///     assert_eq!(format!("{:?}", (Natural::trillion() * 3).checked_sub(Natural::trillion())),
-///         "Some(2000000000000)");
+///     assert_eq!(
+///         format!(
+///             "{:?}",
+///             (Natural::trillion() * Natural::from(3u32)).checked_sub(Natural::trillion())
+///         ),
+///         "Some(2000000000000)"
+///     );
 /// }
 /// ```
 impl CheckedSub<Natural> for Natural {
@@ -67,8 +72,13 @@ impl CheckedSub<Natural> for Natural {
 ///     assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(&Natural::ZERO)), "Some(123)");
 ///     assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(&Natural::from(123u32))),
 ///         "Some(333)");
-///     assert_eq!(format!("{:?}", (Natural::trillion() * 3).checked_sub(&Natural::trillion())),
-///         "Some(2000000000000)");
+///     assert_eq!(
+///         format!(
+///             "{:?}",
+///             (Natural::trillion() * Natural::from(3u32)).checked_sub(&Natural::trillion())
+///         ),
+///         "Some(2000000000000)"
+///     );
 /// }
 /// ```
 impl<'a> CheckedSub<&'a Natural> for Natural {
@@ -107,8 +117,13 @@ impl<'a> CheckedSub<&'a Natural> for Natural {
 ///         "Some(123)");
 ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(Natural::from(123u32))),
 ///         "Some(333)");
-///     assert_eq!(format!("{:?}", (&(Natural::trillion() * 3)).checked_sub(Natural::trillion())),
-///         "Some(2000000000000)");
+///     assert_eq!(
+///         format!(
+///             "{:?}",
+///             (&(Natural::trillion() * Natural::from(3u32))).checked_sub(Natural::trillion())
+///         ),
+///         "Some(2000000000000)"
+///     );
 /// }
 /// ```
 impl<'a> CheckedSub<Natural> for &'a Natural {
@@ -147,8 +162,13 @@ impl<'a> CheckedSub<Natural> for &'a Natural {
 ///         "Some(123)");
 ///     assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(&Natural::from(123u32))),
 ///         "Some(333)");
-///     assert_eq!(format!("{:?}", (&(Natural::trillion() * 3)).checked_sub(&Natural::trillion())),
-///         "Some(2000000000000)");
+///     assert_eq!(
+///         format!(
+///             "{:?}",
+///             (&(Natural::trillion() * Natural::from(3u32))).checked_sub(&Natural::trillion())
+///         ),
+///         "Some(2000000000000)"
+///     );
 /// }
 /// ```
 impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {

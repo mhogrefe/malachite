@@ -8,6 +8,7 @@ use malachite_nz::natural::arithmetic::add_mul_limb::{
     limbs_slice_add_mul_limb_same_length_in_place_right, limbs_vec_add_mul_limb_in_place_either,
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -423,7 +424,7 @@ fn benchmark_natural_add_mul_assign_limb_algorithms(
             ),
             (
                 "Natural += Natural * Limb",
-                &mut (|(mut a, b, c)| a += b * c),
+                &mut (|(mut a, b, c)| a += b * Natural::from(c)),
             ),
         ],
     );
@@ -452,7 +453,7 @@ fn benchmark_natural_add_mul_assign_limb_ref_algorithms(
             ),
             (
                 "Natural += &Natural * Limb",
-                &mut (|(mut a, b, c)| a += &b * c),
+                &mut (|(mut a, b, c)| a += &b * Natural::from(c)),
             ),
         ],
     );
@@ -514,7 +515,7 @@ fn benchmark_natural_add_mul_limb_algorithms(gm: GenerationMode, limit: usize, f
             ),
             (
                 "Natural + Natural * Limb",
-                &mut (|(a, b, c)| no_out!(a + b * c)),
+                &mut (|(a, b, c)| no_out!(a + b * Natural::from(c))),
             ),
         ],
     );
@@ -543,7 +544,7 @@ fn benchmark_natural_add_mul_limb_val_ref_algorithms(
             ),
             (
                 "Natural + &Natural * Limb",
-                &mut (|(a, b, c)| no_out!(a + &b * c)),
+                &mut (|(a, b, c)| no_out!(a + &b * Natural::from(c))),
             ),
         ],
     );
@@ -572,7 +573,7 @@ fn benchmark_natural_add_mul_limb_ref_val_algorithms(
             ),
             (
                 "(&Natural) + Natural * Limb",
-                &mut (|(a, b, c)| no_out!(&a + b * c)),
+                &mut (|(a, b, c)| no_out!(&a + b * Natural::from(c))),
             ),
         ],
     );
@@ -601,7 +602,7 @@ fn benchmark_natural_add_mul_limb_ref_ref_algorithms(
             ),
             (
                 "(&Natural) + &Natural * Limb",
-                &mut (|(a, b, c)| no_out!(&a + &b * c)),
+                &mut (|(a, b, c)| no_out!(&a + &b * Natural::from(c))),
             ),
         ],
     );
