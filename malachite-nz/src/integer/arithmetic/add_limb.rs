@@ -1,9 +1,9 @@
 use std::ops::{Add, AddAssign};
 
-use malachite_base::num::conversion::traits::Assign;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::Integer;
+use natural::Natural;
 use platform::Limb;
 
 /// Adds a `Limb` to an `Integer`, taking the `Integer` by value.
@@ -223,7 +223,7 @@ impl AddAssign<Limb> for Integer {
             return;
         }
         if *self == 0 as Limb {
-            self.assign(other);
+            *self = Integer::from(other);
             return;
         }
         match *self {
@@ -244,7 +244,7 @@ impl AddAssign<Limb> for Integer {
             } => {
                 *sign = true;
                 let small_abs = Limb::checked_from(&*abs).unwrap();
-                abs.assign(other - small_abs);
+                *abs = Natural::from(other - small_abs);
             }
         }
     }

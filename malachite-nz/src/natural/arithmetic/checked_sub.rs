@@ -224,7 +224,7 @@ impl Natural {
         if *other == 0 as Limb {
             false
         } else if self as *const Natural == other as *const Natural {
-            *self = Small(0);
+            *self = Natural::ZERO;
             false
         } else if self.limb_count() < other.limb_count() {
             true
@@ -247,7 +247,7 @@ impl Natural {
     // self = &other - self, return borrow
     pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
         if self as *const Natural == other as *const Natural {
-            *self = Small(0);
+            *self = Natural::ZERO;
             false
         } else if self.limb_count() > other.limb_count() {
             true

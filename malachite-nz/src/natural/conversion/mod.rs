@@ -3,7 +3,6 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::DivAssignMod;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::Assign;
 
 use error::ParseIntegerError;
 use natural::Natural::{self, Large, Small};
@@ -13,7 +12,7 @@ impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
         assert!(!src.starts_with('-'));
-        self.assign(Limb::ZERO);
+        *self = Natural::ZERO;
         for c in src.chars() {
             *self *= Natural::from(radix as Limb);
             if c >= '0' && c <= '9' {
@@ -39,7 +38,7 @@ impl Natural {
 fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     assert!(!to_upper);
     assert!(radix >= 2 && radix <= 36, "radix out of range");
-    if *i == Small(0) {
+    if *i == Natural::ZERO {
         return "0".to_string();
     }
     let mut i_cloned = i.clone();
@@ -114,9 +113,6 @@ impl fmt::Binary for Natural {
     }
 }
 
-pub mod assign;
-pub mod assign_double_limb;
-pub mod assign_limb;
 pub mod double_limb_from_natural;
 pub mod floating_point_from_natural;
 pub mod from_bits;

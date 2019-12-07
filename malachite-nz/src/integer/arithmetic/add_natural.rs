@@ -1,8 +1,6 @@
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
-use malachite_base::num::conversion::traits::Assign;
-
 use integer::Integer;
 use natural::Natural;
 use platform::Limb;
@@ -280,7 +278,7 @@ impl<'a> AddAssign<&'a Natural> for Integer {
         if *other == 0 as Limb {
             return;
         } else if *self == 0 as Limb {
-            self.assign(other);
+            *self = Integer::from(other);
             return;
         }
         let add_strategy = match (&mut (*self), other) {

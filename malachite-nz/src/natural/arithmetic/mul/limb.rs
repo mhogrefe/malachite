@@ -1,5 +1,5 @@
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{Assign, SplitInHalf};
+use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::{Large, Natural, Small};
 use platform::{DoubleLimb, Limb};
@@ -210,14 +210,14 @@ pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 impl Natural {
     pub(crate) fn mul_assign_limb(&mut self, other: Limb) {
         if *self == 0 as Limb || other == 0 {
-            self.assign(Limb::ZERO);
+            *self = Natural::ZERO;
             return;
         }
         if other == 1 {
             return;
         }
         if *self == 1 as Limb {
-            self.assign(other);
+            *self = Natural::from(other);
             return;
         }
         mutate_with_possible_promotion!(self, small, limbs, { small.checked_mul(other) }, {

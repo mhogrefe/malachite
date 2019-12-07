@@ -382,11 +382,10 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let mut scratch;
     let mut ds = &ds[offset..];
     let d_len = ds.len();
-    let n_0 = ns[0];
     let d_0 = ds[0];
     // n must have at least as many low zero bits as d
     let d_mask = (d_0 & d_0.wrapping_neg()).wrapping_sub(1);
-    if n_0 & d_mask != 0 {
+    if ns[0] & d_mask != 0 {
         return false;
     }
     if d_len == 1 {

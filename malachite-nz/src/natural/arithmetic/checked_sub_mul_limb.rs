@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
-use malachite_base::num::conversion::traits::Assign;
 
 use natural::arithmetic::sub_mul_limb::{
     limbs_sub_mul_limb_greater, limbs_sub_mul_limb_greater_in_place_left,
@@ -286,7 +285,7 @@ impl Natural {
     // self = &a - self * c, return borrow
     pub(crate) fn sub_mul_right_assign_limb_no_panic(&mut self, a: &Natural, c: Limb) -> bool {
         if c == 0 || *self == 0 as Limb {
-            self.assign(a);
+            *self = a.clone();
             false
         } else if c == 1 {
             self.sub_right_assign_no_panic(a)

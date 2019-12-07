@@ -1,7 +1,6 @@
 use std::ops::{Add, AddAssign};
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::Assign;
 
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
@@ -363,7 +362,7 @@ impl AddAssign<Limb> for Natural {
             return;
         }
         if *self == 0 as Limb {
-            self.assign(other);
+            *self = Natural::from(other);
             return;
         }
         mutate_with_possible_promotion!(self, small, limbs, { small.checked_add(other) }, {

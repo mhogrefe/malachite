@@ -2,7 +2,6 @@ use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
-use malachite_base::num::conversion::traits::Assign;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
@@ -693,7 +692,7 @@ impl Natural {
     // b = a - b * c, returns sign (true means non-negative). self is b
     fn add_mul_right_assign_limb_neg(&mut self, a: &Natural, c: Limb) -> bool {
         if c == 0 || *self == 0 as Limb {
-            self.assign(a);
+            *self = a.clone();
             return true;
         }
         if c == 1 {

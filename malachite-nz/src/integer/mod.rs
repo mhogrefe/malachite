@@ -4,7 +4,7 @@ use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
-use natural::Natural::{self, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// An integer.
@@ -41,7 +41,7 @@ impl Integer {
 impl Zero for Integer {
     const ZERO: Integer = Integer {
         sign: true,
-        abs: Small(0),
+        abs: Natural::ZERO,
     };
 }
 
@@ -53,7 +53,7 @@ impl Zero for Integer {
 impl One for Integer {
     const ONE: Integer = Integer {
         sign: true,
-        abs: Small(1),
+        abs: Natural::ONE,
     };
 }
 
@@ -65,7 +65,7 @@ impl One for Integer {
 impl Two for Integer {
     const TWO: Integer = Integer {
         sign: true,
-        abs: Small(2),
+        abs: Natural::TWO,
     };
 }
 
@@ -77,7 +77,7 @@ impl Two for Integer {
 impl NegativeOne for Integer {
     const NEGATIVE_ONE: Integer = Integer {
         sign: false,
-        abs: Small(1),
+        abs: Natural::ONE,
     };
 }
 

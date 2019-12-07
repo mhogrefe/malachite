@@ -1682,7 +1682,7 @@ impl DivExactAssign<Natural> for Natural {
             panic!("division by zero");
         } else if other == 1 as Limb {
         } else if *self == 0 as Limb {
-            *self = Small(0);
+            *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
         } else {
@@ -1748,7 +1748,7 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
             panic!("division by zero");
         } else if *other == 1 as Limb {
         } else if *self == 0 as Limb {
-            *self = Small(0);
+            *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
         } else {

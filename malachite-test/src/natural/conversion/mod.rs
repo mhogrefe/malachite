@@ -1,9 +1,6 @@
 use common::DemoBenchRegistry;
 
-#[cfg(feature = "32_bit_limbs")]
-pub mod assign_double_limb;
-pub mod assign_limb;
-pub mod clone_and_assign;
+pub mod clone;
 pub mod double_limb_from_natural;
 pub mod floating_point_from_natural;
 pub mod from_bits;
@@ -17,10 +14,7 @@ pub mod to_bits;
 pub mod to_limbs;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    #[cfg(feature = "32_bit_limbs")]
-    assign_double_limb::register(registry);
-    assign_limb::register(registry);
-    clone_and_assign::register(registry);
+    clone::register(registry);
     double_limb_from_natural::register(registry);
     floating_point_from_natural::register(registry);
     from_bits::register(registry);

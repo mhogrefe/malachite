@@ -1,7 +1,7 @@
 use std::ops::{Sub, SubAssign};
 
-use malachite_base::num::arithmetic::traits::{NegAssign, UnsignedAbs};
-use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
@@ -227,8 +227,7 @@ impl SubAssign<SignedLimb> for Integer {
             return;
         }
         if *self == 0 as Limb {
-            self.assign(other);
-            self.neg_assign();
+            *self = -Integer::from(other);
             return;
         }
         let abs_other = other.unsigned_abs();
@@ -246,7 +245,7 @@ impl SubAssign<SignedLimb> for Integer {
             } => {
                 sign.not_assign();
                 let small_abs = Limb::checked_from(&*abs).unwrap();
-                abs.assign(abs_other - small_abs);
+                *abs = Natural::from(abs_other - small_abs);
             }
         }
     }

@@ -1,11 +1,9 @@
 use std::str::FromStr;
 
-use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
-use rug::Assign as rug_assign;
 
 use common::test_properties;
 use malachite_test::common::{
@@ -32,7 +30,7 @@ fn test_clone() {
 }
 
 #[test]
-fn test_clone_clone_from_and_assign() {
+fn test_clone_and_clone_from() {
     let test = |u, v| {
         // clone_from
         let mut x = Natural::from_str(u).unwrap();
@@ -47,26 +45,6 @@ fn test_clone_clone_from_and_assign() {
         let mut x = rug::Integer::from_str(u).unwrap();
         x.clone_from(&rug::Integer::from_str(v).unwrap());
         assert_eq!(x.to_string(), v);
-
-        // assign Natural by value
-        let mut x = Natural::from_str(u).unwrap();
-        x.assign(Natural::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-        assert!(x.is_valid());
-
-        let mut x = rug::Integer::from_str(u).unwrap();
-        x.assign(rug::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-
-        // assign Natural by reference
-        let mut x = Natural::from_str(u).unwrap();
-        x.assign(&Natural::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-        assert!(x.is_valid());
-
-        let mut x = rug::Integer::from_str(u).unwrap();
-        x.assign(&rug::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
     };
     test("123", "456");
     test("123", "1000000000000");
@@ -75,7 +53,7 @@ fn test_clone_clone_from_and_assign() {
 }
 
 #[test]
-fn clone_clone_from_and_assign_properties() {
+fn clone_and_clone_from_properties() {
     test_properties(naturals, |x| {
         let mut_x = x.clone();
         assert!(mut_x.is_valid());
@@ -108,48 +86,16 @@ fn clone_clone_from_and_assign_properties() {
         let mut rug_x = natural_to_rug_integer(x);
         rug_x.clone_from(&natural_to_rug_integer(y));
         assert_eq!(rug_integer_to_natural(&rug_x), *y);
-
-        let mut mut_x = x.clone();
-        mut_x.assign(y.clone());
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, *y);
-        let mut rug_x = natural_to_rug_integer(x);
-        rug_x.assign(natural_to_rug_integer(y));
-        assert_eq!(rug_integer_to_natural(&rug_x), *y);
-
-        let mut mut_x = x.clone();
-        mut_x.assign(y);
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, *y);
-        let mut rug_x = natural_to_rug_integer(x);
-        rug_x.assign(&natural_to_rug_integer(y));
-        assert_eq!(rug_integer_to_natural(&rug_x), *y);
     });
 
-    test_properties(
-        pairs_of_unsigneds::<Limb>,
-        #[allow(unused_assignments)]
-        |&(u, v)| {
-            let x = Natural::from(u);
-            let y = Natural::from(v);
+    test_properties(pairs_of_unsigneds::<Limb>, |&(u, v)| {
+        let x = Natural::from(u);
+        let y = Natural::from(v);
 
-            let mut mut_u = u;
-            let mut mut_x = x.clone();
-            mut_u.clone_from(&v);
-            mut_x.clone_from(&y);
-            assert_eq!(mut_x, mut_u);
-
-            let mut mut_u = u;
-            let mut mut_x = x.clone();
-            mut_u = v;
-            mut_x.assign(&y);
-            assert_eq!(mut_x, mut_u);
-
-            let mut mut_u = u;
-            let mut mut_x = x.clone();
-            mut_u = v;
-            mut_x.assign(y);
-            assert_eq!(mut_x, mut_u);
-        },
-    );
+        let mut mut_u = u;
+        let mut mut_x = x.clone();
+        mut_u.clone_from(&v);
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, mut_u);
+    });
 }

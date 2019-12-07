@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{Assign, CheckedFrom};
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::Natural::{self, Large, Small};
@@ -479,7 +479,7 @@ impl NegModPowerOfTwoAssign for Natural {
     /// ```
     fn neg_mod_power_of_two_assign(&mut self, other: u64) {
         if other == 0 {
-            self.assign(Limb::ZERO);
+            *self = Natural::ZERO;
             return;
         }
         mutate_with_possible_promotion!(

@@ -27,7 +27,6 @@ pub mod num {
         pub mod constants;
     }
     pub mod conversion {
-        pub mod assign;
         pub mod checked_from;
         pub mod convertible_from;
         pub mod join_halves;

@@ -2,38 +2,12 @@ use std::num::ParseIntError;
 
 use comparison::{Max, Min};
 use num::conversion::traits::{
-    Assign, CheckedFrom, ConvertibleFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
-    WrappingFrom,
+    CheckedFrom, ConvertibleFrom, FromStrRadix, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
     ($t:ty) => {
-        impl Assign<$t> for $t {
-            /// Assigns a mutable reference to a value of the same type.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::Assign;
-            ///
-            /// let mut x = 123u8;
-            /// x.assign(100u8);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = 100i64;
-            /// x.assign(-1i64);
-            /// assert_eq!(x, -1);
-            /// ```
-            #[inline]
-            fn assign(&mut self, rhs: $t) {
-                *self = rhs;
-            }
-        }
-
         impl CheckedFrom<$t> for $t {
             /// Converts a value to the value's type. Since this conversion is always valid and
             /// always leaves the value unchanged, `None` is never returned.
@@ -145,32 +119,6 @@ macro_rules! identity_conversion {
 /// representable by a value of type $b.
 macro_rules! lossless_conversion {
     ($a:ty, $b:ty) => {
-        impl Assign<$a> for $b {
-            /// Assigns a mutable reference to a value of a type whose set of possible values is a
-            /// subset of the set of possible values for the first type.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::Assign;
-            ///
-            /// let mut x = 123u16;
-            /// x.assign(100u8);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = 100i64;
-            /// x.assign(-1i32);
-            /// assert_eq!(x, -1);
-            /// ```
-            #[inline]
-            fn assign(&mut self, rhs: $a) {
-                *self = rhs.into();
-            }
-        }
-
         /// Converts a value to another type. Since this conversion is always lossless and leaves
         /// the value unchanged, `None` is never returned.
         ///

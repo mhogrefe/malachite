@@ -32,7 +32,6 @@ pub mod base {
 
     pub mod num {
         pub mod conversion {
-            pub mod assign;
             pub mod checked_from;
             pub mod convertible_from;
             pub mod overflowing_from;
@@ -148,12 +147,7 @@ pub mod integer {
     }
 
     pub mod conversion {
-        pub mod assign_double_limb;
-        pub mod assign_limb;
-        pub mod assign_natural;
-        pub mod assign_signed_double_limb;
-        pub mod assign_signed_limb;
-        pub mod clone_and_assign;
+        pub mod clone;
         pub mod double_limb_from_integer;
         pub mod floating_point_from_integer;
         pub mod from_double_limb;
@@ -166,7 +160,6 @@ pub mod integer {
         pub mod from_twos_complement_bits;
         pub mod from_twos_complement_limbs;
         pub mod limb_from_integer;
-        pub mod natural_assign_integer;
         pub mod natural_from_integer;
         pub mod serde;
         pub mod signed_double_limb_from_integer;
@@ -266,9 +259,7 @@ pub mod natural {
     }
 
     pub mod conversion {
-        pub mod assign_double_limb;
-        pub mod assign_limb;
-        pub mod clone_and_assign;
+        pub mod clone;
         pub mod double_limb_from_natural;
         pub mod floating_point_from_natural;
         pub mod from_bits;

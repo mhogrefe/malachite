@@ -1,11 +1,9 @@
 use std::str::FromStr;
 
-use malachite_base::num::conversion::traits::Assign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
-use rug::Assign as rug_assign;
 
 use common::test_properties;
 use malachite_test::common::{
@@ -32,7 +30,7 @@ fn test_clone() {
 }
 
 #[test]
-fn test_clone_clone_from_assign() {
+fn test_clone_and_clone_from() {
     let test = |u, v| {
         // clone_from
         let mut x = Integer::from_str(u).unwrap();
@@ -47,26 +45,6 @@ fn test_clone_clone_from_assign() {
         let mut x = rug::Integer::from_str(u).unwrap();
         x.clone_from(&rug::Integer::from_str(v).unwrap());
         assert_eq!(x.to_string(), v);
-
-        // assign Integer by value
-        let mut x = Integer::from_str(u).unwrap();
-        x.assign(Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-        assert!(x.is_valid());
-
-        let mut x = rug::Integer::from_str(u).unwrap();
-        x.assign(rug::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-
-        // assign Integer by reference
-        let mut x = Integer::from_str(u).unwrap();
-        x.assign(&Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
-        assert!(x.is_valid());
-
-        let mut x = rug::Integer::from_str(u).unwrap();
-        x.assign(&rug::Integer::from_str(v).unwrap());
-        assert_eq!(x.to_string(), v);
     };
     test("-123", "456");
     test("-123", "1000000000000");
@@ -75,7 +53,7 @@ fn test_clone_clone_from_assign() {
 }
 
 #[test]
-fn clone_clone_from_and_assign_properties() {
+fn clone_and_clone_from_properties() {
     test_properties(integers, |x| {
         let mut_x = x.clone();
         assert!(mut_x.is_valid());
@@ -101,48 +79,16 @@ fn clone_clone_from_and_assign_properties() {
         let mut rug_x = integer_to_rug_integer(x);
         rug_x.clone_from(&integer_to_rug_integer(y));
         assert_eq!(rug_integer_to_integer(&rug_x), *y);
-
-        let mut mut_x = x.clone();
-        mut_x.assign(y.clone());
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, *y);
-        let mut rug_x = integer_to_rug_integer(x);
-        rug_x.assign(integer_to_rug_integer(y));
-        assert_eq!(rug_integer_to_integer(&rug_x), *y);
-
-        let mut mut_x = x.clone();
-        mut_x.assign(y);
-        assert!(mut_x.is_valid());
-        assert_eq!(mut_x, *y);
-        let mut rug_x = integer_to_rug_integer(x);
-        rug_x.assign(&integer_to_rug_integer(y));
-        assert_eq!(rug_integer_to_integer(&rug_x), *y);
     });
 
-    test_properties(
-        pairs_of_signeds::<SignedLimb>,
-        #[allow(unused_assignments)]
-        |&(i, j)| {
-            let x = Integer::from(i);
-            let y = Integer::from(j);
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(i, j)| {
+        let x = Integer::from(i);
+        let y = Integer::from(j);
 
-            let mut mut_i = i;
-            let mut mut_x = x.clone();
-            mut_i.clone_from(&j);
-            mut_x.clone_from(&y);
-            assert_eq!(mut_x, mut_i);
-
-            let mut mut_i = i;
-            let mut mut_x = x.clone();
-            mut_i = j;
-            mut_x.assign(&y);
-            assert_eq!(mut_x, mut_i);
-
-            let mut mut_i = i;
-            let mut mut_x = x.clone();
-            mut_i = j;
-            mut_x.assign(y);
-            assert_eq!(mut_x, mut_i);
-        },
-    );
+        let mut mut_i = i;
+        let mut mut_x = x.clone();
+        mut_i.clone_from(&j);
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, mut_i);
+    });
 }

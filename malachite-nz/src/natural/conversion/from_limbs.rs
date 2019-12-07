@@ -1,3 +1,5 @@
+use malachite_base::num::basic::traits::Zero;
+
 use natural::{Large, Natural, Small};
 use platform::Limb;
 
@@ -39,7 +41,7 @@ impl Natural {
     pub fn from_limbs_asc(limbs: &[Limb]) -> Natural {
         let significant_length = limbs_significant_length(limbs);
         match significant_length {
-            0 => Small(0),
+            0 => Natural::ZERO,
             1 => Small(limbs[0]),
             _ => Large(limbs[..significant_length].to_vec()),
         }
@@ -99,7 +101,7 @@ impl Natural {
     pub fn from_owned_limbs_asc(mut limbs: Vec<Limb>) -> Natural {
         let significant_length = limbs_significant_length(&limbs);
         match significant_length {
-            0 => Small(0),
+            0 => Natural::ZERO,
             1 => Small(limbs[0]),
             _ => {
                 limbs.truncate(significant_length);

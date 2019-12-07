@@ -109,7 +109,7 @@ impl Two for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Min for Natural {
-    const MIN: Natural = Small(0);
+    const MIN: Natural = Natural::ZERO;
 }
 
 // Implement `Named` for `Natural`.

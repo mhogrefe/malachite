@@ -1,8 +1,6 @@
 use std::mem::swap;
 use std::ops::{Sub, SubAssign};
 
-use malachite_base::num::arithmetic::traits::NegAssign;
-use malachite_base::num::conversion::traits::Assign;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
@@ -250,8 +248,7 @@ impl SubAssign<Natural> for Integer {
         if other == 0 as Limb {
             return;
         } else if *self == 0 as Limb {
-            self.assign(other);
-            self.neg_assign();
+            *self = -other;
             return;
         }
         let add_strategy = match (&mut (*self), &other) {

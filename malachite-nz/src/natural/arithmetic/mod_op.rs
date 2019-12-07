@@ -9,7 +9,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{Assign, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
@@ -1404,7 +1404,7 @@ impl<'a> RemAssign<&'a Natural> for Natural {
         if *other == 0 as Limb {
             panic!("division by zero");
         } else if *other == 1 as Limb {
-            self.assign(0 as Limb);
+            *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
         } else {
             match (&mut *self, other) {

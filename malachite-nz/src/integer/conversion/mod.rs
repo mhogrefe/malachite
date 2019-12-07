@@ -74,12 +74,6 @@ impl FromStr for Integer {
     }
 }
 
-pub mod assign;
-pub mod assign_double_limb;
-pub mod assign_limb;
-pub mod assign_natural;
-pub mod assign_signed_double_limb;
-pub mod assign_signed_limb;
 pub mod double_limb_from_integer;
 pub mod floating_point_from_integer;
 pub mod from_double_limb;
@@ -92,7 +86,6 @@ pub mod from_signed_limb;
 pub mod from_twos_complement_bits;
 pub mod from_twos_complement_limbs;
 pub mod limb_from_integer;
-pub mod natural_assign_integer;
 pub mod natural_from_integer;
 pub mod signed_double_limb_from_integer;
 pub mod signed_limb_from_integer;

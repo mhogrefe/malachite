@@ -12,7 +12,7 @@ path = "src/lib.rs"
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
-rand = "0.3.0"
+rand = "0.4.6"
 
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
