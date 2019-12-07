@@ -7,7 +7,6 @@ use malachite_nz::platform::Limb;
 use common::DemoBenchRegistry;
 
 pub mod and;
-pub mod and_limb;
 pub mod assign_bit;
 pub mod clear_bit;
 pub mod count_ones;
@@ -20,12 +19,10 @@ pub mod index_of_next_true_bit;
 pub mod limb_count;
 pub mod not;
 pub mod or;
-pub mod or_limb;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
-pub mod xor_limb;
 
 pub(crate) fn natural_op_bits(
     bit_fn: &dyn Fn(bool, bool) -> bool,
@@ -64,7 +61,6 @@ pub(crate) fn natural_op_limbs(
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
-    and_limb::register(registry);
     assign_bit::register(registry);
     clear_bit::register(registry);
     count_ones::register(registry);
@@ -77,10 +73,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     limb_count::register(registry);
     not::register(registry);
     or::register(registry);
-    or_limb::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
-    xor_limb::register(registry);
 }

@@ -82,7 +82,7 @@ fn hamming_distance_limb_properties() {
             assert_eq!(natural_hamming_distance_limb_alt_1(n, u), distance);
             assert_eq!(natural_hamming_distance_limb_alt_2(n, u), distance);
             assert_eq!(distance == 0, *n == u);
-            assert_eq!((n ^ u).count_ones(), distance);
+            assert_eq!((n ^ Natural::from(u)).count_ones(), distance);
             assert_eq!(
                 (!n).checked_hamming_distance(&!Natural::from(u)),
                 Some(distance)

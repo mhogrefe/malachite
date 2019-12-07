@@ -3,6 +3,79 @@ use std::ops::{BitOr, BitOrAssign};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the bitwise or of the `Natural` and a `Limb`. `limbs` cannot be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::or::limbs_or_limb;
+///
+/// assert_eq!(limbs_or_limb(&[123, 456], 789), &[895, 456]);
+/// ```
+pub fn limbs_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
+    let mut result = limbs.to_vec();
+    limbs_or_limb_in_place(&mut result, limb);
+    result
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the bitwise or of the `Natural` and a `Limb` to an output slice. The output slice must
+/// be at least as long as the input slice. `in_limbs` cannot be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::or::limbs_or_limb_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// limbs_or_limb_to_out(&mut out, &[123, 456], 789);
+/// assert_eq!(out, &[895, 456, 0]);
+/// ```
+pub fn limbs_or_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+    out[..in_limbs.len()].copy_from_slice(in_limbs);
+    limbs_or_limb_in_place(out, limb);
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the bitwise or of the `Natural` and a `Limb` to the input slice. `limbs` cannot be
+/// empty.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::or::limbs_or_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_or_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[895, 456]);
+/// ```
+pub fn limbs_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
+    limbs[0] |= limb;
+}
+
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the
 /// result is the length of one of the input slices.
@@ -260,6 +333,28 @@ pub fn limbs_or_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool 
     }
 }
 
+impl Natural {
+    #[inline]
+    fn or_limb(mut self, other: Limb) -> Natural {
+        self.or_assign_limb(other);
+        self
+    }
+
+    fn or_limb_ref(&self, other: Limb) -> Natural {
+        match *self {
+            Small(small) => Small(small | other),
+            Large(ref limbs) => Large(limbs_or_limb(limbs, other)),
+        }
+    }
+
+    fn or_assign_limb(&mut self, other: Limb) {
+        match *self {
+            Small(ref mut small) => *small |= other,
+            Large(ref mut limbs) => limbs_or_limb_in_place(limbs, other),
+        }
+    }
+}
+
 /// Takes the bitwise or of two `Natural`s, taking both by value.
 ///
 /// Time: worst case O(n)
@@ -361,8 +456,8 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 
     fn bitor(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, &Small(y)) => x | y,
-            (&Small(x), y) => x | y,
+            (x, &Small(y)) => x.or_limb_ref(y),
+            (&Small(x), y) => y.or_limb_ref(x),
             (&Large(ref xs), &Large(ref ys)) => Large(limbs_or(xs, ys)),
         }
     }
@@ -397,9 +492,9 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 impl BitOrAssign<Natural> for Natural {
     fn bitor_assign(&mut self, other: Natural) {
         if let Small(y) = other {
-            *self |= y;
+            self.or_assign_limb(y);
         } else if let Small(x) = *self {
-            *self = other | x;
+            *self = other.or_limb(x);
         } else if let Large(mut ys) = other {
             if let Large(ref mut xs) = *self {
                 if limbs_or_in_place_either(xs, &mut ys) {
@@ -439,9 +534,9 @@ impl BitOrAssign<Natural> for Natural {
 impl<'a> BitOrAssign<&'a Natural> for Natural {
     fn bitor_assign(&mut self, other: &'a Natural) {
         if let Small(y) = *other {
-            *self |= y;
+            self.or_assign_limb(y);
         } else if let Small(x) = *self {
-            *self = other.clone() | x;
+            *self = other.or_limb_ref(x);
         } else if let Large(ref ys) = *other {
             if let Large(ref mut xs) = *self {
                 limbs_or_in_place_left(xs, ys);

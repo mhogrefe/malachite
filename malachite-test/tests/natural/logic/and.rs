@@ -3,8 +3,8 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::logic::and::{
-    limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
-    limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
+    limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
+    limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
@@ -17,13 +17,29 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigneds,
-    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
+    pairs_of_unsigned_vec_var_1, pairs_of_unsigneds, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4,
 };
-use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
-};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use malachite_test::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_and_limb() {
+    let test = |limbs: &[Limb], limb: Limb, out: Limb| {
+        assert_eq!(limbs_and_limb(limbs, limb), out);
+    };
+    test(&[6, 7], 2, 2);
+    test(&[100, 101, 102], 10, 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_and_limb_fail() {
+    limbs_and_limb(&[], 10);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -236,8 +252,23 @@ fn test_and() {
     test("123", "456", "72");
     test("1000000000000", "123", "0");
     test("123", "1000000000000", "0");
+    test("1000000000001", "123", "1");
+    test("12345678987654321", "987654321", "579887281");
     test("1000000000000", "999999999999", "999999995904");
     test("12345678987654321", "314159265358979", "312331665941633");
+}
+
+#[test]
+fn limbs_and_limb_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                limbs_and_limb(limbs, limb),
+                Natural::from_limbs_asc(limbs) & Natural::from(limb)
+            );
+        },
+    );
 }
 
 #[test]
@@ -402,15 +433,6 @@ fn and_properties() {
         assert!(ones <= u64::from(x.count_ones()));
         assert!(ones <= u64::from(y.count_ones()));
     });
-
-    test_properties(
-        pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, Limb)| {
-            let result = x & Natural::from(y);
-            assert_eq!(x & y, result);
-            assert_eq!(y & x, result);
-        },
-    );
 
     test_properties(naturals, |x| {
         assert_eq!(x & Natural::ZERO, 0 as Limb);

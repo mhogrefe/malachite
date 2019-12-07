@@ -113,7 +113,7 @@ fn checked_hamming_distance_signed_limb_properties() {
                 distance
             );
             assert_eq!(distance == Some(0), *n == i);
-            assert_eq!((n ^ i).checked_count_ones(), distance);
+            assert_eq!((n ^ Integer::from(i)).checked_count_ones(), distance);
             assert_eq!((!n).checked_hamming_distance(&!Integer::from(i)), distance);
         },
     );

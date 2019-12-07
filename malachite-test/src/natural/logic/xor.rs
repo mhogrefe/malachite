@@ -3,15 +3,17 @@ use std::cmp::{max, min};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::xor::{
-    limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_same_length,
+    limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_limb,
+    limbs_xor_limb_in_place, limbs_xor_limb_to_out, limbs_xor_same_length,
     limbs_xor_same_length_in_place_left, limbs_xor_same_length_to_out, limbs_xor_to_out,
 };
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_4,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
+    pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
+    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use natural::logic::{natural_op_bits, natural_op_limbs};
@@ -25,6 +27,9 @@ pub fn natural_xor_alt_2(x: &Natural, y: &Natural) -> Natural {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_xor_limb);
+    register_demo!(registry, demo_limbs_xor_limb_to_out);
+    register_demo!(registry, demo_limbs_xor_limb_in_place);
     register_demo!(registry, demo_limbs_xor_same_length);
     register_demo!(registry, demo_limbs_xor);
     register_demo!(registry, demo_limbs_xor_same_length_to_out);
@@ -38,6 +43,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_xor_val_ref);
     register_demo!(registry, demo_natural_xor_ref_val);
     register_demo!(registry, demo_natural_xor_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_xor_limb);
+    register_bench!(registry, Small, benchmark_limbs_xor_limb_to_out);
+    register_bench!(registry, Small, benchmark_limbs_xor_limb_in_place);
     register_bench!(registry, Small, benchmark_limbs_xor_same_length);
     register_bench!(registry, Small, benchmark_limbs_xor);
     register_bench!(registry, Small, benchmark_limbs_xor_same_length_to_out);
@@ -62,6 +70,43 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_xor_library_comparison);
     register_bench!(registry, Large, benchmark_natural_xor_algorithms);
     register_bench!(registry, Large, benchmark_natural_xor_evaluation_strategy);
+}
+
+fn demo_limbs_xor_limb(gm: GenerationMode, limit: usize) {
+    for (ref limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned(gm).take(limit) {
+        println!(
+            "limbs_xor_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_xor_limb(limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_xor_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_xor_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_xor_limb_to_out(&mut out, {:?}, {}); out = {:?}",
+            out_old, in_limbs, limb, out
+        );
+    }
+}
+
+fn demo_limbs_xor_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_xor_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_xor_limb_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, limb, limbs
+        );
+    }
 }
 
 fn demo_limbs_xor_same_length(gm: GenerationMode, limit: usize) {
@@ -187,6 +232,59 @@ fn demo_limbs_xor_in_place_either(gm: GenerationMode, limit: usize) {
             xs_old, ys_old, right, xs, ys
         );
     }
+}
+
+fn benchmark_limbs_xor_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_xor_limb(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, in_limbs, limb)| {
+                no_out!(limbs_xor_limb_to_out(&mut out, &in_limbs, limb))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb)| no_out!(limbs_xor_limb_in_place(&mut limbs, limb))),
+        )],
+    );
 }
 
 fn benchmark_limbs_xor_same_length(gm: GenerationMode, limit: usize, file_name: &str) {

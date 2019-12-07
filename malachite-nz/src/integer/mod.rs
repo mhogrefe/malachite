@@ -211,9 +211,7 @@ pub mod conversion;
 
 pub mod logic {
     pub mod and;
-    pub mod and_limb;
     pub mod and_natural;
-    pub mod and_signed_limb;
     pub mod bit_access;
     pub mod bit_scan;
     pub mod checked_count_ones;
@@ -224,13 +222,9 @@ pub mod logic {
     pub mod checked_hamming_distance_signed_limb;
     pub mod not;
     pub mod or;
-    pub mod or_limb;
     pub mod or_natural;
-    pub mod or_signed_limb;
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;
-    pub mod xor_limb;
     pub mod xor_natural;
-    pub mod xor_signed_limb;
 }

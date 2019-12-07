@@ -3,13 +3,19 @@ use std::cmp::max;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::or::{
+    limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out, limbs_neg_or_neg_limb,
     limbs_or_neg_neg, limbs_or_neg_neg_in_place_either, limbs_or_neg_neg_to_out,
-    limbs_slice_or_neg_neg_in_place_left, limbs_vec_or_neg_neg_in_place_left,
+    limbs_pos_or_neg_limb, limbs_slice_or_neg_neg_in_place_left,
+    limbs_vec_or_neg_neg_in_place_left,
 };
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_8};
+use inputs::base::{
+    pairs_of_limb_vec_and_limb_var_1, pairs_of_limb_vec_and_positive_limb_var_1,
+    pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_8,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
+};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 use integer::logic::{integer_op_bits, integer_op_limbs};
 
@@ -22,6 +28,11 @@ pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_neg_or_limb);
+    register_demo!(registry, demo_limbs_neg_or_limb_to_out);
+    register_demo!(registry, demo_limbs_neg_or_limb_in_place);
+    register_demo!(registry, demo_limbs_pos_or_neg_limb);
+    register_demo!(registry, demo_limbs_neg_or_neg_limb);
     register_demo!(registry, demo_limbs_or_neg_neg);
     register_demo!(registry, demo_limbs_or_neg_neg_to_out);
     register_demo!(registry, demo_limbs_slice_or_neg_neg_in_place_left);
@@ -33,6 +44,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_or_val_ref);
     register_demo!(registry, demo_integer_or_ref_val);
     register_demo!(registry, demo_integer_or_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_neg_or_limb);
+    register_bench!(registry, Small, benchmark_limbs_neg_or_limb_to_out);
+    register_bench!(registry, Small, benchmark_limbs_neg_or_limb_in_place);
+    register_bench!(registry, Small, benchmark_limbs_pos_or_neg_limb);
+    register_bench!(registry, Small, benchmark_limbs_neg_or_neg_limb);
     register_bench!(registry, Small, benchmark_limbs_or_neg_neg);
     register_bench!(registry, Small, benchmark_limbs_or_neg_neg_to_out);
     register_bench!(
@@ -59,6 +75,66 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_integer_or_library_comparison);
     register_bench!(registry, Large, benchmark_integer_or_algorithms);
     register_bench!(registry, Large, benchmark_integer_or_evaluation_strategy);
+}
+
+fn demo_limbs_neg_or_limb(gm: GenerationMode, limit: usize) {
+    for (ref limbs, limb) in pairs_of_limb_vec_and_limb_var_1(gm).take(limit) {
+        println!(
+            "limbs_neg_or_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_neg_or_limb(limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_neg_or_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_neg_or_limb_to_out(&mut out, {:?}, {}); \
+             out = {:?}",
+            out_old, in_limbs, limb, out
+        );
+    }
+}
+
+fn demo_limbs_neg_or_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_limb_vec_and_limb_var_1(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_neg_or_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_neg_or_limb_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_1(gm).take(limit) {
+        println!(
+            "limbs_pos_or_neg_limb({:?}, {}) = {}",
+            limbs,
+            limb,
+            limbs_pos_or_neg_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_1(gm).take(limit) {
+        println!(
+            "limbs_neg_or_neg_limb({:?}, {}) = {}",
+            limbs,
+            limb,
+            limbs_neg_or_neg_limb(&limbs, limb)
+        );
+    }
 }
 
 fn demo_limbs_or_neg_neg(gm: GenerationMode, limit: usize) {
@@ -166,6 +242,91 @@ fn demo_integer_or_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_integers(gm).take(limit) {
         println!("&{} | &{} = {}", x, y, &x | &y);
     }
+}
+
+fn benchmark_limbs_neg_or_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_neg_or_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_limb_vec_and_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_neg_or_limb(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_neg_or_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, in_limbs, limb)| limbs_neg_or_limb_to_out(&mut out, &in_limbs, limb)),
+        )],
+    );
+}
+
+fn benchmark_limbs_neg_or_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_neg_or_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_limb_vec_and_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb)| limbs_neg_or_limb_in_place(&mut limbs, limb)),
+        )],
+    );
+}
+
+fn benchmark_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_pos_or_neg_limb(&[Limb], SignedLimb)",
+        BenchmarkType::Single,
+        pairs_of_limb_vec_and_positive_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, i)| no_out!(limbs_pos_or_neg_limb(&limbs, i))),
+        )],
+    );
+}
+
+fn benchmark_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_neg_or_neg_limb(&[Limb], SignedLimb)",
+        BenchmarkType::Single,
+        pairs_of_limb_vec_and_positive_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, i)| no_out!(limbs_neg_or_neg_limb(&limbs, i))),
+        )],
+    );
 }
 
 fn benchmark_limbs_or_neg_neg(gm: GenerationMode, limit: usize, file_name: &str) {

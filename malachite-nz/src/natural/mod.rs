@@ -245,7 +245,6 @@ pub mod comparison {
 
 pub mod logic {
     pub mod and;
-    pub mod and_limb;
     pub mod bit_access;
     pub mod bit_scan;
     pub mod count_ones;
@@ -253,11 +252,9 @@ pub mod logic {
     pub mod hamming_distance_limb;
     pub mod not;
     pub mod or;
-    pub mod or_limb;
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;
-    pub mod xor_limb;
 }
 
 pub mod random {

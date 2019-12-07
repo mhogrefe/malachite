@@ -2,9 +2,31 @@ use std::cmp::Ordering;
 use std::ops::{BitAnd, BitAndAssign};
 
 use malachite_base::limbs::limbs_set_zero;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::and::limbs_and_limb;
+///
+/// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
+/// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
+/// ```
+pub fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
+    limbs[0] & limb
+}
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
@@ -281,6 +303,20 @@ pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     }
 }
 
+impl Natural {
+    fn and_limb(self, other: Limb) -> Limb {
+        Limb::wrapping_from(self) & other
+    }
+
+    fn and_limb_ref(&self, other: Limb) -> Limb {
+        Limb::wrapping_from(self) & other
+    }
+
+    fn and_assign_limb(&mut self, other: Limb) {
+        *self = Small(self.and_limb_ref(other));
+    }
+}
+
 /// Takes the bitwise and of two `Natural`s, taking both by value.
 ///
 /// Time: worst case O(n)
@@ -382,8 +418,8 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 
     fn bitand(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, &Small(y)) => Small(x & y),
-            (&Small(x), y) => Small(x & y),
+            (x, &Small(y)) => Small(x.and_limb_ref(y)),
+            (&Small(x), y) => Small(y.and_limb_ref(x)),
             (&Large(ref xs), &Large(ref ys)) => {
                 let mut result = Large(limbs_and(xs, ys));
                 result.trim();
@@ -416,9 +452,9 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 impl BitAndAssign<Natural> for Natural {
     fn bitand_assign(&mut self, other: Natural) {
         if let Small(y) = other {
-            *self &= y;
+            self.and_assign_limb(y);
         } else if let Small(ref mut x) = *self {
-            *x = &other & *x;
+            *x = other.and_limb(*x);
         } else if let Large(mut ys) = other {
             if let Large(ref mut xs) = *self {
                 if limbs_and_in_place_either(xs, &mut ys) {
@@ -453,9 +489,9 @@ impl BitAndAssign<Natural> for Natural {
 impl<'a> BitAndAssign<&'a Natural> for Natural {
     fn bitand_assign(&mut self, other: &'a Natural) {
         if let Small(y) = *other {
-            *self &= y;
+            self.and_assign_limb(y);
         } else if let Small(ref mut x) = *self {
-            *x = other & *x;
+            *x = other.and_limb_ref(*x);
         } else if let Large(ref ys) = *other {
             if let Large(ref mut xs) = *self {
                 limbs_vec_and_in_place_left(xs, ys);

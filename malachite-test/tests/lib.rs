@@ -178,9 +178,7 @@ pub mod integer {
 
     pub mod logic {
         pub mod and;
-        pub mod and_limb;
         pub mod and_natural;
-        pub mod and_signed_limb;
         pub mod assign_bit;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
@@ -195,16 +193,12 @@ pub mod integer {
         pub mod index_of_next_true_bit;
         pub mod not;
         pub mod or;
-        pub mod or_limb;
         pub mod or_natural;
-        pub mod or_signed_limb;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
         pub mod xor;
-        pub mod xor_limb;
         pub mod xor_natural;
-        pub mod xor_signed_limb;
     }
 }
 
@@ -290,7 +284,6 @@ pub mod natural {
 
     pub mod logic {
         pub mod and;
-        pub mod and_limb;
         pub mod assign_bit;
         pub mod clear_bit;
         pub mod count_ones;
@@ -303,12 +296,10 @@ pub mod natural {
         pub mod limb_count;
         pub mod not;
         pub mod or;
-        pub mod or_limb;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
         pub mod xor;
-        pub mod xor_limb;
     }
 
     pub mod random {

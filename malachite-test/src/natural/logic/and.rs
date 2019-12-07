@@ -3,16 +3,16 @@ use std::cmp::{max, min};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::and::{
-    limbs_and, limbs_and_in_place_either, limbs_and_same_length_to_out, limbs_and_to_out,
-    limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
+    limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
+    limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
-    triples_of_unsigned_vec_var_4,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
+    pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 use natural::logic::{natural_op_bits, natural_op_limbs};
@@ -26,6 +26,7 @@ pub fn natural_and_alt_2(x: &Natural, y: &Natural) -> Natural {
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_and_limb);
     register_demo!(registry, demo_limbs_and);
     register_demo!(registry, demo_limbs_and_same_length_to_out);
     register_demo!(registry, demo_limbs_and_to_out);
@@ -39,6 +40,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_and_val_ref);
     register_demo!(registry, demo_natural_and_ref_val);
     register_demo!(registry, demo_natural_and_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_and_limb);
     register_bench!(registry, Small, benchmark_limbs_and);
     register_bench!(registry, Small, benchmark_limbs_and_same_length_to_out);
     register_bench!(registry, Small, benchmark_limbs_and_to_out);
@@ -63,6 +65,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_and_library_comparison);
     register_bench!(registry, Large, benchmark_natural_and_algorithms);
     register_bench!(registry, Large, benchmark_natural_and_evaluation_strategy);
+}
+
+fn demo_limbs_and_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned(gm).take(limit) {
+        println!(
+            "limbs_and_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_and_limb(&limbs, limb)
+        );
+    }
 }
 
 fn demo_limbs_and(gm: GenerationMode, limit: usize) {
@@ -189,6 +202,23 @@ fn demo_natural_and_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         println!("&{} & &{} = {}", x, y, &x & &y);
     }
+}
+
+fn benchmark_limbs_and_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_and_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_and_limb(&limbs, limb))),
+        )],
+    );
 }
 
 fn benchmark_limbs_and(gm: GenerationMode, limit: usize, file_name: &str) {

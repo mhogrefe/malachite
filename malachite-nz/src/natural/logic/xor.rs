@@ -3,6 +3,79 @@ use std::ops::{BitXor, BitXorAssign};
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
 
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the bitwise xor of the `Natural` and a `Limb`. `limbs` cannot be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::xor::limbs_xor_limb;
+///
+/// assert_eq!(limbs_xor_limb(&[123, 456], 789), &[878, 456]);
+/// ```
+pub fn limbs_xor_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
+    let mut result = limbs.to_vec();
+    limbs_xor_limb_in_place(&mut result, limb);
+    result
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the bitwise xor of the `Natural` and a `Limb` to an output slice. The output slice must
+/// be at least as long as the input slice. `in_limbs` cannot be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::xor::limbs_xor_limb_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// limbs_xor_limb_to_out(&mut out, &[123, 456], 789);
+/// assert_eq!(out, &[878, 456, 0]);
+/// ```
+pub fn limbs_xor_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+    out[..in_limbs.len()].copy_from_slice(in_limbs);
+    limbs_xor_limb_in_place(out, limb);
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the bitwise xor of the `Natural` and a `Limb` to the input slice. `limbs` cannot be
+/// empty.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `in_limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::xor::limbs_xor_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_xor_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[878, 456]);
+/// ```
+pub fn limbs_xor_limb_in_place(limbs: &mut [Limb], limb: Limb) {
+    limbs[0] ^= limb;
+}
+
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the
 /// result is the length of one of the input slices.
@@ -260,6 +333,28 @@ pub fn limbs_xor_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool
     }
 }
 
+impl Natural {
+    #[inline]
+    fn xor_limb(mut self, other: Limb) -> Natural {
+        self.xor_assign_limb(other);
+        self
+    }
+
+    fn xor_limb_ref(&self, other: Limb) -> Natural {
+        match *self {
+            Small(small) => Small(small ^ other),
+            Large(ref limbs) => Large(limbs_xor_limb(limbs, other)),
+        }
+    }
+
+    fn xor_assign_limb(&mut self, other: Limb) {
+        match *self {
+            Small(ref mut small) => *small ^= other,
+            Large(ref mut limbs) => limbs_xor_limb_in_place(limbs, other),
+        }
+    }
+}
+
 /// Takes the bitwise xor of two `Natural`s, taking both by value.
 ///
 /// Time: worst case O(n)
@@ -357,8 +452,8 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
 
     fn bitxor(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, &Small(y)) => x ^ y,
-            (&Small(x), y) => x ^ y,
+            (x, &Small(y)) => x.xor_limb_ref(y),
+            (&Small(x), y) => y.xor_limb_ref(x),
             (&Large(ref xs), &Large(ref ys)) => {
                 let mut result = Large(limbs_xor(xs, ys));
                 result.trim();
@@ -397,9 +492,9 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
 impl BitXorAssign<Natural> for Natural {
     fn bitxor_assign(&mut self, other: Natural) {
         if let Small(y) = other {
-            *self ^= y;
+            self.xor_assign_limb(y);
         } else if let Small(x) = *self {
-            *self = other ^ x;
+            *self = other.xor_limb(x);
         } else if let Large(mut ys) = other {
             if let Large(ref mut xs) = *self {
                 if limbs_xor_in_place_either(xs, &mut ys) {
@@ -440,9 +535,9 @@ impl BitXorAssign<Natural> for Natural {
 impl<'a> BitXorAssign<&'a Natural> for Natural {
     fn bitxor_assign(&mut self, other: &'a Natural) {
         if let Small(y) = *other {
-            *self ^= y;
+            self.xor_assign_limb(y);
         } else if let Small(x) = *self {
-            *self = other.clone() ^ x;
+            *self = other.xor_limb_ref(x);
         } else if let Large(ref ys) = *other {
             if let Large(ref mut xs) = *self {
                 limbs_xor_in_place_left(xs, ys);

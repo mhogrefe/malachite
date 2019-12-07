@@ -8,7 +8,9 @@ use malachite_nz::integer::logic::xor_natural::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::{Limb, SignedLimb};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use common::test_properties;
@@ -16,9 +18,7 @@ use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_7};
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_natural};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 
 #[cfg(feature = "32_bit_limbs")]
@@ -389,15 +389,6 @@ fn xor_natural_properties() {
         assert_eq!(!(x ^ !y), result);
         assert_eq!(!(!x ^ y), result);
     });
-
-    test_properties(
-        pairs_of_integer_and_unsigned,
-        |&(ref x, y): &(Integer, Limb)| {
-            let result = x ^ Natural::from(y);
-            assert_eq!(x ^ y, result);
-            assert_eq!(y ^ x, result);
-        },
-    );
 
     test_properties(integers, |x| {
         assert_eq!(x ^ Natural::ZERO, *x);

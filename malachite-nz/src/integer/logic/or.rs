@@ -1,11 +1,188 @@
 use std::cmp::max;
 use std::ops::{BitOr, BitOrAssign};
 
+use malachite_base::comparison::Max;
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 
 use integer::Integer;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, returns the limbs of the bitwise or of the `Integer` and a `Limb`. `limbs` cannot be
+/// empty or only contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// May panic if `limbs` is empty or only contains zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::or::limbs_neg_or_limb;
+///
+/// assert_eq!(limbs_neg_or_limb(&[123, 456], 789), &[107, 456]);
+/// assert_eq!(limbs_neg_or_limb(&[0, 0, 456], 789), &[0xffff_fceb, 0xffff_ffff, 455]);
+/// ```
+pub fn limbs_neg_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
+    if limb == 0 {
+        return limbs.to_vec();
+    }
+    let mut result_limbs = vec![0; limbs.len()];
+    let i = limbs_leading_zero_limbs(limbs);
+    if i == 0 {
+        result_limbs[0] = (limbs[0].wrapping_neg() | limb).wrapping_neg();
+        result_limbs[1..].copy_from_slice(&limbs[1..]);
+    } else {
+        result_limbs[0] = limb.wrapping_neg();
+        for x in result_limbs[1..i].iter_mut() {
+            *x = Limb::MAX;
+        }
+        result_limbs[i] = limbs[i] - 1;
+        result_limbs[i + 1..].copy_from_slice(&limbs[i + 1..]);
+    }
+    result_limbs
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, writes the limbs of the bitwise or of the `Integer` and a `Limb` to an output slice.
+/// The output slice must be at least as long as the input slice. `limbs` cannot be empty or only
+/// contain zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `in_limbs.len()`
+///
+/// # Panics
+/// May panic if `in_limbs` is empty or only contains zeros, or if `out` is shorter than
+/// `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::or::limbs_neg_or_limb_to_out;
+///
+/// let mut limbs = vec![0, 0, 0, 0];
+/// limbs_neg_or_limb_to_out(&mut limbs, &[123, 456], 789);
+/// assert_eq!(limbs, &[107, 456, 0, 0]);
+///
+/// let mut limbs = vec![0, 0, 0, 0];
+/// limbs_neg_or_limb_to_out(&mut limbs, &[0, 0, 456], 789);
+/// assert_eq!(limbs, &[0xffff_fceb, 0xffff_ffff, 455, 0]);
+/// ```
+pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
+    let len = in_limbs.len();
+    assert!(out.len() >= len);
+    if limb == 0 {
+        out[..len].copy_from_slice(in_limbs);
+        return;
+    }
+    let i = limbs_leading_zero_limbs(in_limbs);
+    if i == 0 {
+        out[0] = (in_limbs[0].wrapping_neg() | limb).wrapping_neg();
+        out[1..len].copy_from_slice(&in_limbs[1..]);
+    } else {
+        out[0] = limb.wrapping_neg();
+        for x in out[1..i].iter_mut() {
+            *x = Limb::MAX;
+        }
+        out[i] = in_limbs[i] - 1;
+        out[i + 1..len].copy_from_slice(&in_limbs[i + 1..]);
+    }
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, writes the limbs of the bitwise or of the `Integer`, writes the limbs of the bitwise
+/// or of the `Integer` and a `Limb` to the input slice. `limbs` cannot be empty or only contain
+/// zeros.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// May panic if `limbs` is empty or only contains zeros.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::or::limbs_neg_or_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_neg_or_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[107, 456]);
+///
+/// let mut limbs = vec![0, 0, 456];
+/// limbs_neg_or_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[0xffff_fceb, 0xffff_ffff, 455]);
+/// ```
+pub fn limbs_neg_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
+    if limb == 0 {
+        return;
+    }
+    let i = limbs_leading_zero_limbs(limbs);
+    if i == 0 {
+        limbs[0] = (limbs[0].wrapping_neg() | limb).wrapping_neg();
+    } else {
+        limbs[0] = limb.wrapping_neg();
+        for x in limbs[1..i].iter_mut() {
+            *x = Limb::MAX;
+        }
+        limbs[i] -= 1;
+    }
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
+/// negative of the bitwise or of the `Integer` and a negative number whose lowest limb is given by
+/// `limb` and whose other limbs are full of `true` bits. The slice cannot be empty or only contain
+/// zeros.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::or::limbs_pos_or_neg_limb;
+///
+/// assert_eq!(limbs_pos_or_neg_limb(&[6, 7], 3), 4294967289);
+/// assert_eq!(limbs_pos_or_neg_limb(&[100, 101, 102], 10), 4294967186);
+/// ```
+pub fn limbs_pos_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
+    (limbs[0] | limb).wrapping_neg()
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+/// `Integer`, returns the negative of the bitwise or of the `Integer` and a negative number whose
+/// lowest limb is given by `limb` and whose other limbs are full of `true` bits. The slice cannot
+/// be empty or only contain zeros.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::or::limbs_neg_or_neg_limb;
+///
+/// assert_eq!(limbs_neg_or_neg_limb(&[6, 7], 3), 5);
+/// assert_eq!(limbs_neg_or_neg_limb(&[100, 101, 102], 10), 98);
+/// ```
+pub fn limbs_neg_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
+    (limbs[0].wrapping_neg() | limb).wrapping_neg()
+}
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
 /// `Integer`s, returns the limbs of the bitwise or of the `Integer`s. `xs` and `ys` may not be
@@ -539,6 +716,50 @@ impl<'a> BitOrAssign<&'a Integer> for Integer {
 }
 
 impl Natural {
+    pub(crate) fn or_assign_pos_limb_neg(&mut self, other: Limb) {
+        *self = self.or_pos_limb_neg(other);
+    }
+
+    pub(crate) fn or_pos_limb_neg(&self, other: Limb) -> Natural {
+        Small(match *self {
+            Small(small) => (small | other).wrapping_neg(),
+            Large(ref limbs) => limbs_pos_or_neg_limb(limbs, other),
+        })
+    }
+
+    fn or_assign_neg_limb_neg(&mut self, other: Limb) {
+        *self = self.or_neg_limb_neg(other);
+    }
+
+    fn or_neg_limb_neg(&self, other: Limb) -> Natural {
+        Small(match *self {
+            Small(small) => (small.wrapping_neg() | other).wrapping_neg(),
+            Large(ref limbs) => limbs_neg_or_neg_limb(limbs, other),
+        })
+    }
+
+    pub(crate) fn or_assign_neg_limb_pos(&mut self, other: Limb) {
+        match *self {
+            Small(ref mut small) => {
+                *small = (small.wrapping_neg() | other).wrapping_neg();
+                return;
+            }
+            Large(ref mut limbs) => limbs_neg_or_limb_in_place(limbs, other),
+        }
+        self.trim();
+    }
+
+    pub(crate) fn or_neg_limb_pos(&self, other: Limb) -> Natural {
+        match *self {
+            Small(ref small) => Small((small.wrapping_neg() | other).wrapping_neg()),
+            Large(ref limbs) => {
+                let mut result = Large(limbs_neg_or_limb(limbs, other));
+                result.trim();
+                result
+            }
+        }
+    }
+
     fn or_assign_neg_neg_ref(&mut self, other: &Natural) {
         if let Small(y) = *other {
             self.or_assign_neg_limb_neg(y.wrapping_neg());

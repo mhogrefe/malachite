@@ -3,7 +3,8 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::logic::xor::{
-    limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_same_length,
+    limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_limb,
+    limbs_xor_limb_in_place, limbs_xor_limb_to_out, limbs_xor_same_length,
     limbs_xor_same_length_in_place_left, limbs_xor_same_length_to_out, limbs_xor_to_out,
 };
 use malachite_nz::natural::Natural;
@@ -16,13 +17,74 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigneds,
-    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
+    pairs_of_unsigned_vec_var_1, pairs_of_unsigneds,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_4,
 };
-use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_unsigned, pairs_of_naturals, triples_of_naturals,
-};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use malachite_test::natural::logic::xor::{natural_xor_alt_1, natural_xor_alt_2};
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_xor_limb_and_limbs_xor_limb_in_place() {
+    let test = |limbs: &[Limb], limb: Limb, out: &[Limb]| {
+        assert_eq!(limbs_xor_limb(limbs, limb), out);
+
+        let mut limbs = limbs.to_vec();
+        limbs_xor_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, out);
+    };
+    test(&[6, 7], 2, &[4, 7]);
+    test(&[100, 101, 102], 10, &[110, 101, 102]);
+    test(&[123, 456], 789, &[878, 456]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_limb_fail() {
+    limbs_xor_limb(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_limb_in_place_fail() {
+    limbs_xor_limb_in_place(&mut [], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_xor_limb_to_out() {
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_xor_limb_to_out(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+    };
+    test(&[10, 10, 10, 10], &[6, 7], 2, &[4, 7, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        10,
+        &[110, 101, 102, 10],
+    );
+    test(&[10, 10, 10, 10], &[123, 456], 789, &[878, 456, 10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_limb_to_out_fail_1() {
+    limbs_xor_limb_to_out(&mut [], &[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_limb_to_out_fail_2() {
+    limbs_xor_limb_to_out(&mut [10], &[10, 10], 10);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -222,8 +284,59 @@ fn test_xor() {
     test("123", "456", "435");
     test("1000000000000", "123", "1000000000123");
     test("123", "1000000000000", "1000000000123");
+    test("1000000000001", "123", "1000000000122");
+    test("12345678987654321", "0", "12345678987654321");
+    test("12345678987654321", "456", "12345678987654521");
+    test("12345678987654321", "987654321", "12345678815534080");
     test("1000000000000", "999999999999", "8191");
     test("12345678987654321", "314159265358979", "12035174921130034");
+}
+
+#[test]
+fn limbs_xor_limb_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_xor_limb(limbs, limb)),
+                Natural::from_limbs_asc(limbs) ^ Natural::from(limb)
+            );
+        },
+    );
+}
+
+#[test]
+fn limbs_xor_limb_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            limbs_xor_limb_to_out(&mut out, in_limbs, limb);
+            let len = in_limbs.len();
+            assert_eq!(
+                Natural::from_limbs_asc(&out[..len]),
+                Natural::from_limbs_asc(in_limbs) ^ Natural::from(limb)
+            );
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_xor_limb_in_place_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_xor_limb_in_place(&mut limbs, limb);
+            assert_eq!(
+                Natural::from_limbs_asc(&limbs),
+                Natural::from_limbs_asc(&old_limbs) ^ Natural::from(limb)
+            );
+        },
+    );
 }
 
 fn limbs_xor_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) {
@@ -376,15 +489,6 @@ fn xor_properties() {
         assert_eq!(&result ^ x, *y);
         assert_eq!(&result ^ y, *x);
     });
-
-    test_properties(
-        pairs_of_natural_and_unsigned,
-        |&(ref x, y): &(Natural, Limb)| {
-            let result = x ^ Natural::from(y);
-            assert_eq!(x ^ y, result);
-            assert_eq!(y ^ x, result);
-        },
-    );
 
     test_properties(naturals, |x| {
         assert_eq!(x ^ Natural::ZERO, *x);
