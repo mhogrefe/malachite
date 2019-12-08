@@ -14,7 +14,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,

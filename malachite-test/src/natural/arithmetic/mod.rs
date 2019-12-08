@@ -3,11 +3,9 @@ use common::DemoBenchRegistry;
 pub mod add;
 pub mod add_limb;
 pub mod add_mul;
-pub mod add_mul_limb;
 pub mod checked_sub;
 pub mod checked_sub_limb;
 pub mod checked_sub_mul;
-pub mod checked_sub_mul_limb;
 pub mod div;
 pub mod div_exact;
 pub mod div_exact_limb;
@@ -35,7 +33,6 @@ pub mod parity;
 pub mod saturating_sub;
 pub mod saturating_sub_limb;
 pub mod saturating_sub_mul;
-pub mod saturating_sub_mul_limb;
 pub mod shl_i;
 pub mod shl_u;
 pub mod shr_i;
@@ -43,17 +40,14 @@ pub mod shr_u;
 pub mod sub;
 pub mod sub_limb;
 pub mod sub_mul;
-pub mod sub_mul_limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     add::register(registry);
     add_limb::register(registry);
     add_mul::register(registry);
-    add_mul_limb::register(registry);
     checked_sub::register(registry);
     checked_sub_limb::register(registry);
     checked_sub_mul::register(registry);
-    checked_sub_mul_limb::register(registry);
     div::register(registry);
     div_exact::register(registry);
     div_exact_limb::register(registry);
@@ -81,7 +75,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     saturating_sub::register(registry);
     saturating_sub_limb::register(registry);
     saturating_sub_mul::register(registry);
-    saturating_sub_mul_limb::register(registry);
     shl_i::register(registry);
     shl_u::register(registry);
     shr_i::register(registry);
@@ -89,5 +82,4 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     sub::register(registry);
     sub_limb::register(registry);
     sub_mul::register(registry);
-    sub_mul_limb::register(registry);
 }

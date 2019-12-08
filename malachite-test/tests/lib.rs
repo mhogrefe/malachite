@@ -81,8 +81,6 @@ pub mod integer {
         pub mod add;
         pub mod add_limb;
         pub mod add_mul;
-        pub mod add_mul_limb;
-        pub mod add_mul_signed_limb;
         pub mod add_natural;
         pub mod add_signed_limb;
         pub mod div_exact_limb;
@@ -116,8 +114,6 @@ pub mod integer {
         pub mod sub;
         pub mod sub_limb;
         pub mod sub_mul;
-        pub mod sub_mul_limb;
-        pub mod sub_mul_signed_limb;
         pub mod sub_natural;
         pub mod sub_signed_limb;
     }
@@ -200,11 +196,9 @@ pub mod natural {
         pub mod add;
         pub mod add_limb;
         pub mod add_mul;
-        pub mod add_mul_limb;
         pub mod checked_sub;
         pub mod checked_sub_limb;
         pub mod checked_sub_mul;
-        pub mod checked_sub_mul_limb;
         pub mod div;
         pub mod div_exact;
         pub mod div_exact_limb;
@@ -232,7 +226,6 @@ pub mod natural {
         pub mod saturating_sub;
         pub mod saturating_sub_limb;
         pub mod saturating_sub_mul;
-        pub mod saturating_sub_mul_limb;
         pub mod shl_i;
         pub mod shl_u;
         pub mod shr_i;
@@ -240,7 +233,6 @@ pub mod natural {
         pub mod sub;
         pub mod sub_limb;
         pub mod sub_mul;
-        pub mod sub_mul_limb;
     }
 
     pub mod basic {

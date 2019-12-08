@@ -4,7 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;

@@ -1,6 +1,6 @@
 use malachite_nz::natural::arithmetic::mul::poly_interpolate::_limbs_shl_and_sub_same_length;
 use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
-use malachite_nz::natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
+use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use time::precise_time_ns;
 
 use common::GenerationMode;

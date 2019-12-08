@@ -12,7 +12,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::add_mul_limb::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact_limb::{limbs_div_exact_limb_to_out, limbs_modular_invert_limb};
 use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
@@ -28,7 +28,7 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_to_out_with_overlap,
 };
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
-use natural::arithmetic::sub_mul_limb::limbs_sub_mul_limb_same_length_in_place_left;
+use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural::{self, Large, Small};
 use platform::{

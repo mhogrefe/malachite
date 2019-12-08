@@ -1,116 +1,13 @@
-use std::cmp::Ordering;
-
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 
+use integer::arithmetic::sub_mul::{
+    limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
+    limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
+    limbs_overflowing_sub_mul_limb_in_place_left,
+};
 use integer::Integer;
-use natural::arithmetic::mul::limbs_mul_greater_to_out;
-use natural::arithmetic::sub::{limbs_slice_sub_in_place_right, limbs_sub_in_place_left};
-use natural::comparison::ord::limbs_cmp;
 use natural::Natural::{self, Large, Small};
 use platform::Limb;
-
-/// Given the limbs of three `Natural`s a, b, and c, calculates a - b * c, returning the limbs of
-/// the absolute value and the sign (true means non-negative). All of the input slices should be
-/// non-empty and have no trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(m + n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// # Example
-/// ```
-/// use malachite_nz::integer::arithmetic::add_mul::limbs_overflowing_sub_mul;
-///
-/// assert_eq!(limbs_overflowing_sub_mul(&[123, 456], &[123, 789], &[321, 654]),
-///         (vec![39360, 333255, 516006], false));
-/// assert_eq!(limbs_overflowing_sub_mul(&[123, 456, 789, 987, 654], &[123, 789], &[321, 654]),
-///         (vec![4294927936, 4294634040, 4294452078, 986, 654], true));
-/// ```
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative, and w
-/// is returned instead of overwriting the first input. w_sign is also returned.
-pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<Limb>, bool) {
-    let mut xs = xs.to_vec();
-    let sign = limbs_overflowing_sub_mul_in_place_left(&mut xs, ys, zs);
-    (xs, sign)
-}
-
-/// Given the limbs of three `Natural`s a, b, and c, calculates a - b * c, writing the limbs of the
-/// absolute value to the first (left) slice and returning the sign (true means non-negative). All
-/// of the input slices should be non-empty and have no trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// # Example
-/// ```
-/// use malachite_nz::integer::arithmetic::add_mul::limbs_overflowing_sub_mul_in_place_left;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), false);
-/// assert_eq!(xs, &[39360, 333255, 516006]);
-///
-/// let mut xs = vec![123, 456, 789, 987, 654];
-/// assert_eq!(limbs_overflowing_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), true);
-/// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 986, 654]);
-/// ```
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative, and
-/// w_sign is returned.
-pub fn limbs_overflowing_sub_mul_in_place_left(
-    xs: &mut Vec<Limb>,
-    ys: &[Limb],
-    zs: &[Limb],
-) -> bool {
-    if ys.len() >= zs.len() {
-        limbs_overflowing_sub_mul_greater_in_place_left(xs, ys, zs)
-    } else {
-        limbs_overflowing_sub_mul_greater_in_place_left(xs, zs, ys)
-    }
-}
-
-// zs.len() >= ys.len()
-fn limbs_overflowing_sub_mul_greater_in_place_left(
-    xs: &mut Vec<Limb>,
-    ys: &[Limb],
-    zs: &[Limb],
-) -> bool {
-    let xs_len = xs.len();
-    let product_len = ys.len() + zs.len();
-    let mut product = vec![0; product_len];
-    if limbs_mul_greater_to_out(&mut product, ys, zs) == 0 {
-        product.pop();
-    }
-    assert_ne!(*product.last().unwrap(), 0);
-    if limbs_cmp(xs, &product) == Ordering::Less {
-        if xs_len < product_len {
-            xs.resize(product.len(), 0);
-        }
-        assert!(!limbs_slice_sub_in_place_right(
-            &product,
-            &mut xs[..product.len()],
-            xs_len,
-        ));
-        false
-    } else {
-        assert!(!limbs_sub_in_place_left(xs, &product));
-        !limbs_test_zero(xs)
-    }
-}
 
 /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`, b,
 /// and c by value.
@@ -448,6 +345,109 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
 }
 
 impl Natural {
+    // self - b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
+        if c == 0 || *b == 0 as Limb {
+            return (self.clone(), true);
+        }
+        if c == 1 {
+            return if self >= b {
+                (self - b, true)
+            } else {
+                (b - self, false)
+            };
+        }
+        match (self, b) {
+            (Large(ref a_limbs), Large(ref b_limbs)) => {
+                let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
+                let mut result = Large(limbs);
+                result.trim();
+                (result, sign)
+            }
+            _ => {
+                let bc = b * Natural::from(c);
+                if *self >= bc {
+                    (self - bc, true)
+                } else {
+                    (bc - self, false)
+                }
+            }
+        }
+    }
+
+    // self -= b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
+        if c == 0 || b == 0 as Limb {
+            return true;
+        }
+        if c == 1 {
+            let sign = *self >= b;
+            if sign {
+                self.sub_assign_no_panic(b);
+            } else {
+                self.sub_right_assign_no_panic(&b);
+            }
+            return sign;
+        }
+        let (fallback, (right, mut sign)) = match (&mut *self, &mut b) {
+            (&mut Large(ref mut a_limbs), &mut Large(ref mut b_limbs)) => (
+                false,
+                limbs_overflowing_sub_mul_limb_in_place_either(a_limbs, b_limbs, c),
+            ),
+            _ => (true, (false, false)),
+        };
+        if fallback {
+            let bc = b * Natural::from(c);
+            sign = *self >= bc;
+            if sign {
+                self.sub_assign_no_panic(bc);
+            } else {
+                self.sub_right_assign_no_panic(&bc);
+            }
+        } else if right {
+            b.trim();
+            *self = b;
+        } else {
+            self.trim();
+        }
+        sign
+    }
+
+    // self -= &b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
+        if c == 0 || *b == 0 as Limb {
+            return true;
+        }
+        if c == 1 {
+            let sign = *self >= *b;
+            if sign {
+                self.sub_assign_ref_no_panic(b);
+            } else {
+                self.sub_right_assign_no_panic(b);
+            }
+            return sign;
+        }
+        let (mut sign, fallback) = match (&mut *self, b) {
+            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => (
+                limbs_overflowing_sub_mul_limb_in_place_left(a_limbs, b_limbs, c),
+                false,
+            ),
+            _ => (false, true),
+        };
+        if fallback {
+            let bc = b * Natural::from(c);
+            sign = *self >= bc;
+            if sign {
+                self.sub_assign_no_panic(bc);
+            } else {
+                self.sub_right_assign_no_panic(&bc);
+            }
+        } else {
+            self.trim();
+        }
+        sign
+    }
+
     fn add_mul_assign_neg_large(&mut self, b: &Natural, c: &Natural) -> bool {
         let mut sign = false;
         if let Large(ref b_limbs) = *b {

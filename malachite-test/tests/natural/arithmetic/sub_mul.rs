@@ -2,16 +2,113 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul, SubMul, SubMulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_nz::natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
+use malachite_nz::natural::arithmetic::sub_mul::{
+    limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
+    limbs_sub_mul_limb_greater_in_place_left, limbs_sub_mul_limb_greater_in_place_right,
+    limbs_sub_mul_limb_same_length_in_place_left, limbs_sub_mul_limb_same_length_in_place_right,
+};
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
 use common::test_properties;
-use malachite_test::inputs::base::triples_of_unsigned_vec_var_28;
+use malachite_test::inputs::base::{
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_28,
+};
 use malachite_test::inputs::natural::{
     naturals, pairs_of_naturals, pairs_of_naturals_var_1, triples_of_naturals_var_1,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_mul_limb_greater() {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], limb: Limb, result: &[Limb], borrow| {
+        let o_result = limbs_sub_mul_limb_greater(xs_before, ys_before, limb);
+        if borrow == 0 {
+            assert_eq!(o_result.unwrap(), result);
+        } else {
+            assert!(o_result.is_none());
+        }
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_sub_mul_limb_greater_in_place_left(&mut xs, ys_before, limb),
+            borrow
+        );
+        assert_eq!(xs, result);
+        let mut ys = ys_before.to_vec();
+        assert_eq!(
+            limbs_sub_mul_limb_greater_in_place_right(xs_before, &mut ys, limb),
+            borrow
+        );
+        assert_eq!(ys, result);
+    };
+    test(&[], &[], 4, &[], 0);
+    test(&[123, 456], &[], 4, &[123, 456], 0);
+    test(&[123, 456], &[123], 0, &[123, 456], 0);
+    test(&[123, 456], &[123], 4, &[4294966927, 455], 0);
+    test(&[123, 456], &[123], 0xffff_ffff, &[246, 333], 0);
+    test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 579], 123);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_limb_greater_fail() {
+    limbs_sub_mul_limb_greater(&[10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_limb_greater_in_place_left_fail() {
+    limbs_sub_mul_limb_greater_in_place_left(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_limb_greater_in_place_right_fail() {
+    limbs_sub_mul_limb_greater_in_place_right(&[10], &mut vec![10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_mul_limb_same_length() {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], limb: Limb, result: &[Limb], borrow| {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(
+            limbs_sub_mul_limb_same_length_in_place_left(&mut xs, ys_before, limb),
+            borrow
+        );
+        assert_eq!(xs, result);
+        let mut ys = ys_before.to_vec();
+        assert_eq!(
+            limbs_sub_mul_limb_same_length_in_place_right(xs_before, &mut ys, limb),
+            borrow
+        );
+        assert_eq!(ys, result);
+    };
+    test(&[], &[], 4, &[], 0);
+    test(&[123, 456], &[0, 0], 4, &[123, 456], 0);
+    test(&[123, 456], &[123, 0], 0, &[123, 456], 0);
+    test(&[123, 456], &[123, 0], 4, &[4294966927, 455], 0);
+    test(&[123, 456], &[123, 0], 0xffff_ffff, &[246, 333], 0);
+    test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 579], 123);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_limb_same_length_in_place_left_fail() {
+    limbs_sub_mul_limb_same_length_in_place_left(&mut [10, 10], &[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_mul_limb_same_length_in_place_right_fail() {
+    limbs_sub_mul_limb_same_length_in_place_right(&[10, 10], &mut [10], 10);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -347,6 +444,130 @@ fn sub_mul_ref_ref_ref_fail_2() {
     (&Natural::from_str("1000000000000").unwrap()).sub_mul(
         &Natural::from_str("1000000000000").unwrap(),
         &Natural::from_str("100").unwrap(),
+    );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        |&(ref a, ref b, c)| {
+            assert_eq!(
+                limbs_sub_mul_limb_greater(a, b, c).map(Natural::from_owned_limbs_asc),
+                Natural::from_limbs_asc(a)
+                    .checked_sub_mul(Natural::from_limbs_asc(b), Natural::from(c))
+            );
+        },
+    );
+}
+
+fn limbs_sub_mul_limb_in_place_left_helper(
+    f: &mut dyn FnMut(&mut [Limb], &[Limb], Limb) -> Limb,
+    a: &Vec<Limb>,
+    b: &Vec<Limb>,
+    c: Limb,
+) {
+    let a_old = a;
+    let mut a = a.to_vec();
+    let borrow = f(&mut a, b, c);
+    if borrow == 0 {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(a),
+            Natural::from_limbs_asc(a_old).sub_mul(Natural::from_limbs_asc(b), Natural::from(c))
+        );
+    } else {
+        let mut extended_a = a_old.to_vec();
+        extended_a.push(0);
+        extended_a.push(1);
+        let mut expected_limbs = Natural::from_owned_limbs_asc(extended_a)
+            .sub_mul(Natural::from_limbs_asc(b), Natural::from(c))
+            .into_limbs_asc();
+        assert_eq!(expected_limbs.pop().unwrap(), borrow.wrapping_neg());
+        assert_eq!(a, expected_limbs);
+    }
+}
+
+#[test]
+fn limbs_sub_mul_limb_same_length_in_place_left_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
+        |&(ref a, ref b, c)| {
+            limbs_sub_mul_limb_in_place_left_helper(
+                &mut limbs_sub_mul_limb_same_length_in_place_left,
+                a,
+                b,
+                c,
+            )
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_in_place_left_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        |&(ref a, ref b, c)| {
+            limbs_sub_mul_limb_in_place_left_helper(
+                &mut limbs_sub_mul_limb_greater_in_place_left,
+                a,
+                b,
+                c,
+            )
+        },
+    );
+}
+
+macro_rules! limbs_sub_mul_limb_in_place_right_helper {
+    ($f: ident, $a: ident, $b: ident, $c: ident) => {{
+        let b_old = $b;
+        let mut b = $b.to_vec();
+        let borrow = $f($a, &mut b, $c);
+        if borrow == 0 {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(b),
+                Natural::from_limbs_asc($a)
+                    .sub_mul(Natural::from_limbs_asc(b_old), Natural::from($c))
+            );
+        } else {
+            let mut extended_a = $a.to_vec();
+            extended_a.push(0);
+            extended_a.push(1);
+            let mut expected_limbs = Natural::from_owned_limbs_asc(extended_a)
+                .sub_mul(Natural::from_limbs_asc(b_old), Natural::from($c))
+                .into_limbs_asc();
+            assert_eq!(expected_limbs.pop().unwrap(), borrow.wrapping_neg());
+            assert_eq!(b, expected_limbs);
+        }
+    }};
+}
+
+#[test]
+fn limbs_sub_mul_limb_same_length_in_place_right_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
+        |&(ref a, ref b, c)| {
+            limbs_sub_mul_limb_in_place_right_helper!(
+                limbs_sub_mul_limb_same_length_in_place_right,
+                a,
+                b,
+                c
+            )
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_in_place_right_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7,
+        |&(ref a, ref b, c)| {
+            limbs_sub_mul_limb_in_place_right_helper!(
+                limbs_sub_mul_limb_greater_in_place_right,
+                a,
+                b,
+                c
+            )
+        },
     );
 }
 

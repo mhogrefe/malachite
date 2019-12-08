@@ -1,7 +1,39 @@
-use malachite_base::num::arithmetic::traits::CheckedSubMul;
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 
-use natural::arithmetic::sub_mul::{limbs_sub_mul, limbs_sub_mul_in_place_left};
+use natural::arithmetic::sub_mul::{
+    limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
+    limbs_sub_mul_limb_greater_in_place_left,
+};
 use natural::Natural::{self, Large, Small};
+use platform::Limb;
+
+impl Natural {
+    fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
+        if c == 0 || *b == 0 as Limb {
+            Some(self.clone())
+        } else if c == 1 {
+            self.checked_sub(b)
+        } else if self.limb_count() < b.limb_count() {
+            None
+        } else {
+            let (result, fallback) = match (&self, &b) {
+                (&Large(ref a_limbs), &Large(ref b_limbs)) => {
+                    (limbs_sub_mul_limb_greater(a_limbs, b_limbs, c), false)
+                }
+                _ => (None, true),
+            };
+            if fallback {
+                self.checked_sub(b * Natural::from(c))
+            } else {
+                result.map(|limbs| {
+                    let mut result = Large(limbs);
+                    result.trim();
+                    result
+                })
+            }
+        }
+    }
+}
 
 impl CheckedSubMul<Natural, Natural> for Natural {
     type Output = Natural;
@@ -193,9 +225,9 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// ```
     fn checked_sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         if let Small(small_b) = *b {
-            self.checked_sub_mul(c, small_b)
+            self.checked_sub_mul_limb_ref_ref(c, small_b)
         } else if let Small(small_c) = *c {
-            self.checked_sub_mul(b, small_c)
+            self.checked_sub_mul_limb_ref_ref(b, small_c)
         } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
             None
         } else {
@@ -216,6 +248,58 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
 }
 
 impl Natural {
+    pub(crate) fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
+        if c == 0 || b == 0 as Limb {
+            false
+        } else if c == 1 {
+            self.sub_assign_no_panic(b)
+        } else if self.limb_count() < b.limb_count() {
+            true
+        } else {
+            let (borrow, fallback) = match (&mut *self, &b) {
+                (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => (
+                    limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0,
+                    false,
+                ),
+                _ => (false, true),
+            };
+            if fallback {
+                self.sub_assign_no_panic(b * Natural::from(c))
+            } else if borrow {
+                true
+            } else {
+                self.trim();
+                false
+            }
+        }
+    }
+
+    pub(crate) fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
+        if c == 0 || *b == 0 as Limb {
+            false
+        } else if c == 1 {
+            self.sub_assign_ref_no_panic(b)
+        } else if self.limb_count() < b.limb_count() {
+            true
+        } else {
+            let (borrow, fallback) = match (&mut *self, &b) {
+                (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => (
+                    limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0,
+                    false,
+                ),
+                _ => (false, true),
+            };
+            if fallback {
+                self.sub_assign_no_panic(b * Natural::from(c))
+            } else if borrow {
+                true
+            } else {
+                self.trim();
+                false
+            }
+        }
+    }
+
     fn sub_mul_assign_helper(&mut self, b: &Natural, c: &Natural) -> bool {
         {
             if let Large(ref mut a_limbs) = *self {
