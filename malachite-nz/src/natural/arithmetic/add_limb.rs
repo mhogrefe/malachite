@@ -2,7 +2,8 @@ use std::ops::{Add, AddAssign};
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -229,11 +230,11 @@ impl<'a> Add<Limb> for &'a Natural {
             return self.clone();
         }
         match *self {
-            Small(small) => match small.overflowing_add(other) {
+            Natural(Small(small)) => Natural(match small.overflowing_add(other) {
                 (sum, false) => Small(sum),
                 (sum, true) => Large(vec![sum, 1]),
-            },
-            Large(ref limbs) => Large(limbs_add_limb(limbs, other)),
+            }),
+            Natural(Large(ref limbs)) => Natural(Large(limbs_add_limb(limbs, other))),
         }
     }
 }

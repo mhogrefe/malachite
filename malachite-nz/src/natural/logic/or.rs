@@ -1,6 +1,7 @@
 use std::ops::{BitOr, BitOrAssign};
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -341,16 +342,16 @@ impl Natural {
     }
 
     fn or_limb_ref(&self, other: Limb) -> Natural {
-        match *self {
-            Small(small) => Small(small | other),
-            Large(ref limbs) => Large(limbs_or_limb(limbs, other)),
-        }
+        Natural(match *self {
+            Natural(Small(small)) => Small(small | other),
+            Natural(Large(ref limbs)) => Large(limbs_or_limb(limbs, other)),
+        })
     }
 
     fn or_assign_limb(&mut self, other: Limb) {
         match *self {
-            Small(ref mut small) => *small |= other,
-            Large(ref mut limbs) => limbs_or_limb_in_place(limbs, other),
+            Natural(Small(ref mut small)) => *small |= other,
+            Natural(Large(ref mut limbs)) => limbs_or_limb_in_place(limbs, other),
         }
     }
 }
@@ -456,9 +457,9 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 
     fn bitor(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, &Small(y)) => x.or_limb_ref(y),
-            (&Small(x), y) => y.or_limb_ref(x),
-            (&Large(ref xs), &Large(ref ys)) => Large(limbs_or(xs, ys)),
+            (x, &Natural(Small(y))) => x.or_limb_ref(y),
+            (&Natural(Small(x)), y) => y.or_limb_ref(x),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => Natural(Large(limbs_or(xs, ys))),
         }
     }
 }
@@ -491,12 +492,12 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 /// ```
 impl BitOrAssign<Natural> for Natural {
     fn bitor_assign(&mut self, other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.or_assign_limb(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.or_limb(x);
-        } else if let Large(mut ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(mut ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 if limbs_or_in_place_either(xs, &mut ys) {
                     *xs = ys;
                 }
@@ -533,12 +534,12 @@ impl BitOrAssign<Natural> for Natural {
 /// ```
 impl<'a> BitOrAssign<&'a Natural> for Natural {
     fn bitor_assign(&mut self, other: &'a Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.or_assign_limb(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.or_limb_ref(x);
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_or_in_place_left(xs, ys);
             }
         }

@@ -1,6 +1,7 @@
 use malachite_base::num::basic::traits::Zero;
 
-use natural::{Large, Natural, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 // Returns the length of `limbs`, excluding trailing zeros.
@@ -42,8 +43,8 @@ impl Natural {
         let significant_length = limbs_significant_length(limbs);
         match significant_length {
             0 => Natural::ZERO,
-            1 => Small(limbs[0]),
-            _ => Large(limbs[..significant_length].to_vec()),
+            1 => Natural(Small(limbs[0])),
+            _ => Natural(Large(limbs[..significant_length].to_vec())),
         }
     }
 
@@ -102,10 +103,10 @@ impl Natural {
         let significant_length = limbs_significant_length(&limbs);
         match significant_length {
             0 => Natural::ZERO,
-            1 => Small(limbs[0]),
+            1 => Natural(Small(limbs[0])),
             _ => {
                 limbs.truncate(significant_length);
-                Large(limbs)
+                Natural(Large(limbs))
             }
         }
     }

@@ -1,4 +1,5 @@
-use natural::Natural::{self, Small};
+use natural::InnerNatural::Small;
+use natural::Natural;
 use platform::Limb;
 
 /// Converts a `Limb` to a `Natural`.
@@ -16,7 +17,7 @@ use platform::Limb;
 impl From<Limb> for Natural {
     #[inline]
     fn from(u: Limb) -> Natural {
-        Small(u)
+        Natural(Small(u))
     }
 }
 

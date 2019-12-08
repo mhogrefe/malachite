@@ -1,6 +1,7 @@
 use malachite_base::num::conversion::traits::SplitInHalf;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::DoubleLimb;
 
 /// Converts a `DoubleLimb` to a `Natural`.
@@ -18,10 +19,10 @@ use platform::DoubleLimb;
 impl From<DoubleLimb> for Natural {
     fn from(u: DoubleLimb) -> Natural {
         let (upper, lower) = u.split_in_half();
-        if upper == 0 {
+        Natural(if upper == 0 {
             Small(lower)
         } else {
             Large(vec![lower, upper])
-        }
+        })
     }
 }

@@ -8,7 +8,8 @@ use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_pla
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::arithmetic::mul::limbs_mul_to_out;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 /// Given the limbs of two `Natural`s a and b, and a limb c, returns the limbs of a + b * c. `xs`
@@ -435,8 +436,8 @@ impl Natural {
             return self + b;
         }
         match (self, b) {
-            (Large(ref a_limbs), Large(ref b_limbs)) => {
-                Large(limbs_add_mul_limb(a_limbs, b_limbs, c))
+            (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) => {
+                Natural(Large(limbs_add_mul_limb(a_limbs, b_limbs, c)))
             }
             _ => self + b * Natural::from(c),
         }
@@ -451,7 +452,7 @@ impl Natural {
             return;
         }
         let (fallback, right) = match (&mut *self, &mut b) {
-            (&mut Large(ref mut a_limbs), &mut Large(ref mut b_limbs)) => (
+            (&mut Natural(Large(ref mut a_limbs)), &mut Natural(Large(ref mut b_limbs))) => (
                 false,
                 limbs_vec_add_mul_limb_in_place_either(a_limbs, b_limbs, c),
             ),
@@ -473,7 +474,7 @@ impl Natural {
             return;
         }
         let fallback = match (&mut *self, b) {
-            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => {
+            (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => {
                 limbs_vec_add_mul_limb_in_place_left(a_limbs, b_limbs, c);
                 false
             }
@@ -649,17 +650,17 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        if let Small(small_a) = *self {
+        if let Natural(Small(small_a)) = *self {
             b * c + small_a
-        } else if let Small(small_b) = *b {
+        } else if let Natural(Small(small_b)) = *b {
             self.add_mul_limb_ref_ref(c, small_b)
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_limb_ref_ref(b, small_c)
         } else {
-            if let Large(ref a_limbs) = *self {
-                if let Large(ref b_limbs) = *b {
-                    if let Large(ref c_limbs) = *c {
-                        return Large(limbs_add_mul(a_limbs, b_limbs, c_limbs));
+            if let Natural(Large(ref a_limbs)) = *self {
+                if let Natural(Large(ref b_limbs)) = *b {
+                    if let Natural(Large(ref c_limbs)) = *c {
+                        return Natural(Large(limbs_add_mul(a_limbs, b_limbs, c_limbs)));
                     }
                 }
             }
@@ -698,16 +699,16 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 /// ```
 impl AddMulAssign<Natural, Natural> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: Natural) {
-        if let Small(small_b) = b {
+        if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb(c, small_b);
-        } else if let Small(small_c) = c {
+        } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb(b, small_c);
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
-            if let Large(ref b_limbs) = b {
-                if let Large(ref c_limbs) = c {
+            if let Natural(Large(ref b_limbs)) = b {
+                if let Natural(Large(ref c_limbs)) = c {
                     limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
@@ -745,16 +746,16 @@ impl AddMulAssign<Natural, Natural> for Natural {
 /// ```
 impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: &'a Natural) {
-        if let Small(small_b) = b {
+        if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb_ref(c, small_b);
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb(b, small_c);
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
-            if let Large(ref b_limbs) = b {
-                if let Large(ref c_limbs) = *c {
+            if let Natural(Large(ref b_limbs)) = b {
+                if let Natural(Large(ref c_limbs)) = *c {
                     limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
@@ -792,16 +793,16 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 /// ```
 impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: Natural) {
-        if let Small(small_b) = *b {
+        if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb(c, small_b);
-        } else if let Small(small_c) = c {
+        } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_ref(b, small_c);
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
-            if let Large(ref b_limbs) = *b {
-                if let Large(ref c_limbs) = c {
+            if let Natural(Large(ref b_limbs)) = *b {
+                if let Natural(Large(ref c_limbs)) = c {
                     limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }
@@ -839,16 +840,16 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 /// ```
 impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if let Small(small_b) = *b {
+        if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb_ref(c, small_b);
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_ref(b, small_c);
         } else if *self == 0 as Limb {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
-            if let Large(ref b_limbs) = *b {
-                if let Large(ref c_limbs) = *c {
+            if let Natural(Large(ref b_limbs)) = *b {
+                if let Natural(Large(ref c_limbs)) = *c {
                     limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
                 }
             }

@@ -36,7 +36,8 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     DoubleLimb, Limb, DC_DIV_QR_THRESHOLD, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
@@ -1255,13 +1256,13 @@ impl<'a> Rem<Natural> for &'a Natural {
             self.clone()
         } else {
             let rs = match (self, other) {
-                (x, Small(y)) => {
-                    return Small(x % y);
+                (x, Natural(Small(y))) => {
+                    return Natural(Small(x % y));
                 }
-                (&Large(ref xs), Large(ref ys)) => limbs_mod(xs, ys),
+                (&Natural(Large(ref xs)), Natural(Large(ref ys))) => limbs_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut r = Large(rs);
+            let mut r = Natural(Large(rs));
             r.trim();
             r
         }
@@ -1313,13 +1314,13 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
             self.clone()
         } else {
             let rs = match (self, other) {
-                (x, &Small(y)) => {
-                    return Small(x % y);
+                (x, &Natural(Small(y))) => {
+                    return Natural(Small(x % y));
                 }
-                (&Large(ref xs), &Large(ref ys)) => limbs_mod(xs, ys),
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut r = Large(rs);
+            let mut r = Natural(Large(rs));
             r.trim();
             r
         }
@@ -1408,11 +1409,11 @@ impl<'a> RemAssign<&'a Natural> for Natural {
         } else if self.limb_count() < other.limb_count() {
         } else {
             match (&mut *self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     *x %= y;
                     return;
                 }
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     let mut rs = vec![0; ys.len()];
                     limbs_mod_to_out(&mut rs, xs, ys);
                     swap(&mut rs, xs);

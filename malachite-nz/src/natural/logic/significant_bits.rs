@@ -2,7 +2,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -59,8 +60,8 @@ impl<'a> SignificantBits for &'a Natural {
     /// ```
     fn significant_bits(self) -> u64 {
         match *self {
-            Small(small) => small.significant_bits(),
-            Large(ref limbs) => limbs_significant_bits(limbs),
+            Natural(Small(small)) => small.significant_bits(),
+            Natural(Large(ref limbs)) => limbs_significant_bits(limbs),
         }
     }
 }

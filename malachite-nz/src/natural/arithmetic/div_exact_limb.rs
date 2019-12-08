@@ -10,7 +10,8 @@ use natural::arithmetic::div_limb::{
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out,
 };
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
@@ -510,13 +511,13 @@ impl<'a> DivExact<Limb> for &'a Natural {
             self.clone()
         } else {
             match *self {
-                Small(small) => Small(small / other),
-                Large(ref limbs) => {
-                    let mut quotient = Large(if other == 3 {
+                Natural(Small(small)) => Natural(Small(small / other)),
+                Natural(Large(ref limbs)) => {
+                    let mut quotient = Natural(Large(if other == 3 {
                         limbs_div_exact_3(limbs)
                     } else {
                         limbs_div_exact_limb(limbs, other)
-                    });
+                    }));
                     quotient.trim();
                     quotient
                 }
@@ -574,11 +575,11 @@ impl DivExactAssign<Limb> for Natural {
             panic!("division by zero");
         } else if other != 1 {
             match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     *small /= other;
                     return;
                 }
-                Large(ref mut limbs) => {
+                Natural(Large(ref mut limbs)) => {
                     if other == 3 {
                         limbs_div_exact_3_in_place(limbs)
                     } else {
@@ -632,7 +633,7 @@ impl DivExact<Natural> for Limb {
             0
         } else {
             match other {
-                Small(small) => self / small,
+                Natural(Small(small)) => self / small,
                 _ => unreachable!(),
             }
         }
@@ -682,7 +683,7 @@ impl<'a> DivExact<&'a Natural> for Limb {
             0
         } else {
             match *other {
-                Small(small) => self / small,
+                Natural(Small(small)) => self / small,
                 _ => unreachable!(),
             }
         }
@@ -787,9 +788,9 @@ impl Natural {
             self.clone()
         } else {
             match *self {
-                Small(small) => Small(small / other),
-                Large(ref limbs) => {
-                    let mut quotient = Large(limbs_div_exact_limb(limbs, other));
+                Natural(Small(small)) => Natural(Small(small / other)),
+                Natural(Large(ref limbs)) => {
+                    let mut quotient = Natural(Large(limbs_div_exact_limb(limbs, other)));
                     quotient.trim();
                     quotient
                 }
@@ -802,11 +803,11 @@ impl Natural {
             panic!("division by zero");
         } else if other != 1 {
             match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     *small /= other;
                     return;
                 }
-                Large(ref mut limbs) => limbs_div_exact_limb_in_place(limbs, other),
+                Natural(Large(ref mut limbs)) => limbs_div_exact_limb_in_place(limbs, other),
             }
             self.trim();
         }

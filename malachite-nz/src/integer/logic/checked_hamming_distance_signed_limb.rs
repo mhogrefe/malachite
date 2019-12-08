@@ -3,7 +3,8 @@ use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance
 
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{Limb, SignedLimb};
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -140,8 +141,8 @@ impl<'a> CheckedHammingDistance<&'a Integer> for i32 {
 impl Natural {
     pub(crate) fn hamming_distance_neg_limb(&self, other: Limb) -> u64 {
         match *self {
-            Small(small) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
-            Large(ref limbs) => limbs_hamming_distance_limb_neg(limbs, other),
+            Natural(Small(small)) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
+            Natural(Large(ref limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
         }
     }
 }

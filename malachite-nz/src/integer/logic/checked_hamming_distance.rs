@@ -7,7 +7,8 @@ use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
 use natural::logic::count_ones::limbs_count_ones;
 use natural::logic::hamming_distance::limbs_hamming_distance_same_length;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
@@ -140,9 +141,11 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
 impl Natural {
     fn hamming_distance_neg(&self, other: &Natural) -> u64 {
         match (self, other) {
-            (&Small(x), _) => other.hamming_distance_neg_limb(x),
-            (_, &Small(y)) => self.hamming_distance_neg_limb(y),
-            (&Large(ref xs), &Large(ref ys)) => limbs_hamming_distance_neg(xs, ys),
+            (&Natural(Small(x)), _) => other.hamming_distance_neg_limb(x),
+            (_, &Natural(Small(y))) => self.hamming_distance_neg_limb(y),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                limbs_hamming_distance_neg(xs, ys)
+            }
         }
     }
 }

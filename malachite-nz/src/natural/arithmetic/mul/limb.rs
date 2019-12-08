@@ -1,7 +1,7 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::SplitInHalf;
-
-use natural::{Large, Natural, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -232,8 +232,8 @@ impl Natural {
         if other == 1 {
             return self.clone();
         }
-        match *self {
-            Small(small) => {
+        Natural(match *self {
+            Natural(Small(small)) => {
                 let product = DoubleLimb::from(small) * DoubleLimb::from(other);
                 let (upper, lower) = product.split_in_half();
                 if upper == 0 {
@@ -242,7 +242,7 @@ impl Natural {
                     Large(vec![lower, upper])
                 }
             }
-            Large(ref limbs) => Large(limbs_mul_limb(limbs, other)),
-        }
+            Natural(Large(ref limbs)) => Large(limbs_mul_limb(limbs, other)),
+        })
     }
 }

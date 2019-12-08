@@ -6,7 +6,7 @@ use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 
-use natural::Natural::*;
+use natural::InnerNatural::{Large, Small};
 use platform::Limb;
 
 /// A natural (non-negative) integer.
@@ -17,14 +17,20 @@ use platform::Limb;
 /// On a 64-bit system, a `Natural` takes up 32 bytes of space on the stack.
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-pub enum Natural {
+pub struct Natural(pub(crate) InnerNatural);
+
+/// We want to limit the visibility of the `Small` and `Large` constructors to within this crate. To
+/// do this, we wrap the `InnerNatural` enum in a struct that gets compiled away.
+#[derive(Clone, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+pub(crate) enum InnerNatural {
     Small(Limb),
     Large(Vec<Limb>),
 }
 
 impl Natural {
     fn demote_if_small(&mut self) {
-        let demoted_value = if let Large(ref limbs) = *self {
+        let demoted_value = if let Natural(Large(ref limbs)) = *self {
             match limbs.len() {
                 0 => Some(0),
                 1 => Some(limbs[0]),
@@ -34,15 +40,15 @@ impl Natural {
             None
         };
         if let Some(small) = demoted_value {
-            *self = Small(small);
+            *self = Natural(Small(small));
         }
     }
 
     pub(crate) fn promote_in_place(&mut self) -> &mut Vec<Limb> {
-        if let Small(x) = *self {
-            *self = Large(vec![x]);
+        if let Natural(Small(x)) = *self {
+            *self = Natural(Large(vec![x]));
         }
-        if let Large(ref mut xs) = *self {
+        if let Natural(Large(ref mut xs)) = *self {
             xs
         } else {
             unreachable!();
@@ -50,7 +56,7 @@ impl Natural {
     }
 
     pub(crate) fn trim(&mut self) {
-        if let Large(ref mut limbs) = *self {
+        if let Natural(Large(ref mut limbs)) = *self {
             let trailing_zero_count = limbs_trailing_zero_limbs(limbs);
             if trailing_zero_count != 0 {
                 let len = limbs.len();
@@ -65,8 +71,8 @@ impl Natural {
     /// valid.
     pub fn is_valid(&self) -> bool {
         match *self {
-            Small(_) => true,
-            Large(ref xs) => xs.len() > 1 && *xs.last().unwrap() != 0,
+            Natural(Small(_)) => true,
+            Natural(Large(ref xs)) => xs.len() > 1 && *xs.last().unwrap() != 0,
         }
     }
 
@@ -82,7 +88,7 @@ impl Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Zero for Natural {
-    const ZERO: Natural = Small(0);
+    const ZERO: Natural = Natural(Small(0));
 }
 
 /// The constant 1.
@@ -91,7 +97,7 @@ impl Zero for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl One for Natural {
-    const ONE: Natural = Small(1);
+    const ONE: Natural = Natural(Small(1));
 }
 
 /// The constant 2.
@@ -100,7 +106,7 @@ impl One for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Two for Natural {
-    const TWO: Natural = Small(2);
+    const TWO: Natural = Natural(Small(2));
 }
 
 /// The minimum value of a `Natural`, 0.
@@ -172,16 +178,16 @@ impl Crementable for Natural {
 
 macro_rules! mutate_with_possible_promotion {
     ($n:ident, $small:ident, $large:ident, $process_small:expr, $process_large:expr) => {
-        if let Small(ref mut $small) = *$n {
+        if let Natural(Small(ref mut $small)) = *$n {
             if let Some(small_result) = $process_small {
                 *$small = small_result;
                 return;
             }
         }
-        if let Small(x) = *$n {
-            *$n = Large(vec![x]);
+        if let Natural(Small(x)) = *$n {
+            *$n = Natural(Large(vec![x]));
         }
-        if let Large(ref mut $large) = *$n {
+        if let Natural(Large(ref mut $large)) = *$n {
             $process_large
         }
     };

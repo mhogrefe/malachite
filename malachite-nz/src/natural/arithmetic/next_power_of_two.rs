@@ -3,7 +3,8 @@ use malachite_base::num::arithmetic::traits::{
     NextPowerOfTwo, NextPowerOfTwoAssign, TrueCheckedShl,
 };
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -205,16 +206,16 @@ impl<'a> NextPowerOfTwo for &'a Natural {
     /// }
     /// ```
     fn next_power_of_two(self) -> Natural {
-        match *self {
-            Small(small) => {
+        Natural(match *self {
+            Natural(Small(small)) => {
                 if let Some(result) = small.checked_next_power_of_two() {
                     Small(result)
                 } else {
                     Large(vec![0, 1])
                 }
             }
-            Large(ref limbs) => Large(limbs_next_power_of_two(limbs)),
-        }
+            Natural(Large(ref limbs)) => Large(limbs_next_power_of_two(limbs)),
+        })
     }
 }
 

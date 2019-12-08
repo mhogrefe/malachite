@@ -12,7 +12,8 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::div_mod_limb::limbs_invert_limb;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     DoubleLimb, Limb, MOD_1N_TO_MOD_1_1_THRESHOLD, MOD_1U_TO_MOD_1_1_THRESHOLD, MOD_1_1P_METHOD,
     MOD_1_1_TO_MOD_1_2_THRESHOLD, MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD,
@@ -496,8 +497,8 @@ impl<'a> Rem<Limb> for &'a Natural {
             panic!("division by zero");
         } else {
             match *self {
-                Small(small) => small % other,
-                Large(ref limbs) => limbs_mod_limb(limbs, other),
+                Natural(Small(small)) => small % other,
+                Natural(Large(ref limbs)) => limbs_mod_limb(limbs, other),
             }
         }
     }
@@ -546,13 +547,13 @@ impl RemAssign<Limb> for Natural {
             panic!("division by zero");
         } else {
             let remainder = match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     *small %= other;
                     return;
                 }
-                Large(ref mut limbs) => limbs_mod_limb(limbs, other),
+                Natural(Large(ref mut limbs)) => limbs_mod_limb(limbs, other),
             };
-            *self = Small(remainder);
+            *self = Natural(Small(remainder));
         }
     }
 }
@@ -640,8 +641,8 @@ impl<'a> Rem<&'a Natural> for Limb {
             0
         } else {
             match *other {
-                Small(small) => self % small,
-                Large(_) => self,
+                Natural(Small(small)) => self % small,
+                Natural(Large(_)) => self,
             }
         }
     }
@@ -861,7 +862,7 @@ impl NegModAssign<Limb> for Natural {
     /// ```
     #[inline]
     fn neg_mod_assign(&mut self, other: Limb) {
-        *self = Small((&*self).neg_mod(other));
+        *self = Natural(Small((&*self).neg_mod(other)));
     }
 }
 
@@ -988,8 +989,8 @@ impl Natural {
             0
         } else {
             match *self {
-                Small(small) => small % other,
-                Large(ref limbs) => _limbs_rem_naive(limbs, other),
+                Natural(Small(small)) => small % other,
+                Natural(Large(ref limbs)) => _limbs_rem_naive(limbs, other),
             }
         }
     }

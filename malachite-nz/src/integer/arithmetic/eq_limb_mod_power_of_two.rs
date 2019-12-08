@@ -5,7 +5,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::Integer;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
@@ -135,11 +136,11 @@ impl<'a> EqModPowerOfTwo<&'a Integer> for u32 {
 impl Natural {
     pub(crate) fn eq_mod_power_of_two_neg_limb(&self, other: Limb, pow: u64) -> bool {
         match *self {
-            Small(ref small) => {
+            Natural(Small(ref small)) => {
                 pow <= u64::from(Limb::WIDTH)
                     && small.wrapping_neg().eq_mod_power_of_two(other, pow)
             }
-            Large(ref limbs) => limbs_eq_mod_power_of_two_neg_limb(limbs, other, pow),
+            Natural(Large(ref limbs)) => limbs_eq_mod_power_of_two_neg_limb(limbs, other, pow),
         }
     }
 }

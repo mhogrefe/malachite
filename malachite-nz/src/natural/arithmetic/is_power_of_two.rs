@@ -1,7 +1,8 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
@@ -61,8 +62,8 @@ impl<'a> IsPowerOfTwo for &'a Natural {
     /// ```
     fn is_power_of_two(self) -> bool {
         match *self {
-            Small(small) => small.is_power_of_two(),
-            Large(ref limbs) => limbs_is_power_of_two(limbs),
+            Natural(Small(small)) => small.is_power_of_two(),
+            Natural(Large(ref limbs)) => limbs_is_power_of_two(limbs),
         }
     }
 }

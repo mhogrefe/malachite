@@ -6,7 +6,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::round::RoundingMode;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -305,12 +306,11 @@ impl<'a> DivRound<&'a Natural> for Limb {
             panic!("division by zero");
         } else {
             match *other {
-                Small(small) => self.div_round(small, rm),
-                Large(ref limbs) => {
-                    limbs_limb_div_round_limbs(self, limbs, rm).unwrap_or_else(|| {
+                Natural(Small(small)) => self.div_round(small, rm),
+                Natural(Large(ref limbs)) => limbs_limb_div_round_limbs(self, limbs, rm)
+                    .unwrap_or_else(|| {
                         panic!("Division is not exact: {} / {}", self, other);
-                    })
-                }
+                    }),
             }
         }
     }

@@ -3,7 +3,8 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 impl CheckedFrom<Natural> for Limb {
@@ -64,8 +65,8 @@ impl<'a> CheckedFrom<&'a Natural> for Limb {
     /// ```
     fn checked_from(value: &Natural) -> Option<Limb> {
         match *value {
-            Small(small) => Some(small),
-            Large(_) => None,
+            Natural(Small(small)) => Some(small),
+            Natural(Large(_)) => None,
         }
     }
 }
@@ -136,8 +137,8 @@ impl<'a> WrappingFrom<&'a Natural> for Limb {
     /// ```
     fn wrapping_from(value: &Natural) -> Limb {
         match *value {
-            Small(small) => small,
-            Large(ref limbs) => limbs[0],
+            Natural(Small(small)) => small,
+            Natural(Large(ref limbs)) => limbs[0],
         }
     }
 }
@@ -208,8 +209,8 @@ impl<'a> SaturatingFrom<&'a Natural> for Limb {
     /// ```
     fn saturating_from(value: &Natural) -> Limb {
         match *value {
-            Small(small) => small,
-            Large(_) => Limb::MAX,
+            Natural(Small(small)) => small,
+            Natural(Large(_)) => Limb::MAX,
         }
     }
 }
@@ -281,8 +282,8 @@ impl<'a> OverflowingFrom<&'a Natural> for Limb {
     /// ```
     fn overflowing_from(value: &Natural) -> (Limb, bool) {
         match *value {
-            Small(small) => (small, false),
-            Large(ref limbs) => (limbs[0], true),
+            Natural(Small(small)) => (small, false),
+            Natural(Large(ref limbs)) => (limbs[0], true),
         }
     }
 }
@@ -354,8 +355,8 @@ impl<'a> ConvertibleFrom<&'a Natural> for Limb {
     /// ```
     fn convertible_from(value: &Natural) -> bool {
         match *value {
-            Small(_) => true,
-            Large(_) => false,
+            Natural(Small(_)) => true,
+            Natural(Large(_)) => false,
         }
     }
 }
@@ -365,8 +366,8 @@ impl<'a> ConvertibleFrom<&'a Natural> for u32 {
     #[inline]
     fn convertible_from(value: &Natural) -> bool {
         match *value {
-            Small(small) => u32::convertible_from(small),
-            Large(_) => false,
+            Natural(Small(small)) => u32::convertible_from(small),
+            Natural(Large(_)) => false,
         }
     }
 }

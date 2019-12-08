@@ -3,7 +3,8 @@ use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
@@ -67,8 +68,8 @@ impl<'a> DivisibleByPowerOfTwo for &'a Natural {
     fn divisible_by_power_of_two(self, pow: u64) -> bool {
         match (self, pow) {
             (_, 0) => true,
-            (&Small(small), pow) => small.divisible_by_power_of_two(pow),
-            (&Large(ref limbs), pow) => limbs_divisible_by_power_of_two(limbs, pow),
+            (&Natural(Small(small)), pow) => small.divisible_by_power_of_two(pow),
+            (&Natural(Large(ref limbs)), pow) => limbs_divisible_by_power_of_two(limbs, pow),
         }
     }
 }

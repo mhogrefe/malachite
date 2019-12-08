@@ -41,7 +41,8 @@ use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
     INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
@@ -1707,18 +1708,18 @@ impl<'a> DivMod<Natural> for &'a Natural {
             (Natural::ZERO, self.clone())
         } else {
             let qs = match (self, &mut other) {
-                (x, &mut Small(y)) => {
+                (x, &mut Natural(Small(y))) => {
                     let (q, r) = x.div_mod(y);
-                    return (q, Small(r));
+                    return (q, Natural(Small(r)));
                 }
-                (&Large(ref xs), &mut Large(ref mut ys)) => {
+                (&Natural(Large(ref xs)), &mut Natural(Large(ref mut ys))) => {
                     let (qs, mut rs) = limbs_div_mod(xs, ys);
                     swap(&mut rs, ys);
                     qs
                 }
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
             other.trim();
             (q, other)
@@ -1778,16 +1779,16 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
             (Natural::ZERO, self.clone())
         } else {
             let (qs, rs) = match (self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     let (q, r) = x.div_mod(y);
-                    return (q, Small(r));
+                    return (q, Natural(Small(r)));
                 }
-                (&Large(ref xs), &Large(ref ys)) => limbs_div_mod(xs, ys),
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_div_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
-            let mut r = Large(rs);
+            let mut r = Natural(Large(rs));
             r.trim();
             (q, r)
         }
@@ -1843,10 +1844,10 @@ impl DivAssignMod<Natural> for Natural {
             r
         } else {
             match (&mut *self, &mut other) {
-                (x, &mut Small(y)) => {
-                    return Small(x.div_assign_mod(y));
+                (x, &mut Natural(Small(y))) => {
+                    return Natural(Small(x.div_assign_mod(y)));
                 }
-                (&mut Large(ref mut xs), &mut Large(ref mut ys)) => {
+                (&mut Natural(Large(ref mut xs)), &mut Natural(Large(ref mut ys))) => {
                     let (mut qs, mut rs) = limbs_div_mod(xs, ys);
                     swap(&mut qs, xs);
                     swap(&mut rs, ys);
@@ -1909,10 +1910,10 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
             r
         } else {
             let rs = match (&mut *self, other) {
-                (x, &Small(y)) => {
-                    return Small(x.div_assign_mod(y));
+                (x, &Natural(Small(y))) => {
+                    return Natural(Small(x.div_assign_mod(y)));
                 }
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     let (mut qs, rs) = limbs_div_mod(xs, ys);
                     swap(&mut qs, xs);
                     rs
@@ -1920,7 +1921,7 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
                 _ => unreachable!(),
             };
             self.trim();
-            let mut r = Large(rs);
+            let mut r = Natural(Large(rs));
             r.trim();
             r
         }

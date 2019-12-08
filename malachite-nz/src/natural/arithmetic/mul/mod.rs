@@ -20,7 +20,8 @@ use natural::arithmetic::mul::toom::{
     _limbs_mul_same_length_to_out_toom_6h_scratch_len,
     _limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM32_TO_TOOM43_THRESHOLD,
     MUL_TOOM32_TO_TOOM53_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM42_TO_TOOM53_THRESHOLD,
@@ -605,14 +606,14 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     type Output = Natural;
 
     fn mul(self, other: &'a Natural) -> Natural {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.mul_limb_ref(y)
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             other.mul_limb_ref(x)
         } else {
             match (self, other) {
-                (&Large(ref xs), &Large(ref ys)) => {
-                    let mut product = Large(limbs_mul(xs, ys));
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                    let mut product = Natural(Large(limbs_mul(xs, ys)));
                     product.trim();
                     product
                 }
@@ -650,14 +651,14 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// ```
 impl MulAssign<Natural> for Natural {
     fn mul_assign(&mut self, mut other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.mul_assign_limb(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             other.mul_assign_limb(x);
             *self = other;
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut xs), Large(ref mut ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                     *xs = limbs_mul(xs, ys);
                 }
                 _ => unreachable!(),
@@ -695,13 +696,13 @@ impl MulAssign<Natural> for Natural {
 /// ```
 impl<'a> MulAssign<&'a Natural> for Natural {
     fn mul_assign(&mut self, other: &'a Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.mul_assign_limb(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.mul_limb_ref(x);
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     *xs = limbs_mul(xs, ys);
                 }
                 _ => unreachable!(),

@@ -4,7 +4,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
 use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 impl CheckedSub<Limb> for Natural {
@@ -90,12 +91,12 @@ impl<'a> CheckedSub<Limb> for &'a Natural {
             return Some(self.clone());
         }
         match *self {
-            Small(small) => small.checked_sub(other).map(Small),
-            Large(ref limbs) => {
+            Natural(Small(small)) => small.checked_sub(other).map(|u| Natural(Small(u))),
+            Natural(Large(ref limbs)) => {
                 if *self < other {
                     None
                 } else {
-                    let mut difference = Large(limbs_sub_limb(limbs, other).0);
+                    let mut difference = Natural(Large(limbs_sub_limb(limbs, other).0));
                     difference.trim();
                     Some(difference)
                 }
@@ -207,7 +208,7 @@ impl Natural {
             return false;
         }
         match *self {
-            Small(ref mut small) => {
+            Natural(Small(ref mut small)) => {
                 return match small.checked_sub(other) {
                     Some(difference) => {
                         *small = difference;
@@ -216,7 +217,7 @@ impl Natural {
                     None => true,
                 };
             }
-            Large(ref mut limbs) => {
+            Natural(Large(ref mut limbs)) => {
                 if limbs_sub_limb_in_place(limbs, other) {
                     return true;
                 }

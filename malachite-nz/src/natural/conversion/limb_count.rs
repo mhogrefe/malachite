@@ -1,6 +1,7 @@
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 
 impl Natural {
     /// Returns the number of limbs of a `Natural`. Zero has 0
@@ -26,9 +27,9 @@ impl Natural {
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {
-            Small(0) => 0,
-            Small(_) => 1,
-            Large(ref limbs) => u64::wrapping_from(limbs.len()),
+            Natural(Small(0)) => 0,
+            Natural(Small(_)) => 1,
+            Natural(Large(ref limbs)) => u64::wrapping_from(limbs.len()),
         }
     }
 }

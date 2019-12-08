@@ -34,7 +34,8 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
 };
@@ -1867,17 +1868,17 @@ impl<'a> Div<Natural> for &'a Natural {
             Natural::ZERO
         } else {
             let qs = match (self, &mut other) {
-                (x, &mut Small(y)) => {
+                (x, &mut Natural(Small(y))) => {
                     return x / y;
                 }
-                (&Large(ref xs), &mut Large(ref mut ys)) => {
+                (&Natural(Large(ref xs)), &mut Natural(Large(ref mut ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_to_out_ref_val(&mut qs, xs, ys);
                     qs
                 }
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
             q
         }
@@ -1932,13 +1933,13 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
             Natural::ZERO
         } else {
             let qs = match (self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     return x / y;
                 }
-                (&Large(ref xs), &Large(ref ys)) => limbs_div(xs, ys),
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_div(xs, ys),
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
             q
         }
@@ -1987,11 +1988,11 @@ impl DivAssign<Natural> for Natural {
             *self = Natural::ZERO;
         } else {
             match (&mut *self, other) {
-                (x, Small(y)) => {
+                (x, Natural(Small(y))) => {
                     *x /= y;
                     return;
                 }
-                (&mut Large(ref mut xs), Large(ref mut ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_to_out(&mut qs, xs, ys);
                     swap(&mut qs, xs);
@@ -2045,11 +2046,11 @@ impl<'a> DivAssign<&'a Natural> for Natural {
             *self = Natural::ZERO;
         } else {
             match (&mut *self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     *x /= y;
                     return;
                 }
-                (&mut Large(ref mut xs), Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_to_out_val_ref(&mut qs, xs, ys);
                     swap(&mut qs, xs);

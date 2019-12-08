@@ -1,4 +1,5 @@
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
@@ -48,8 +49,8 @@ impl Natural {
     /// ```
     pub fn count_ones(&self) -> u64 {
         match *self {
-            Small(small) => small.count_ones().into(),
-            Large(ref limbs) => limbs_count_ones(limbs),
+            Natural(Small(small)) => small.count_ones().into(),
+            Natural(Large(ref limbs)) => limbs_count_ones(limbs),
         }
     }
 }

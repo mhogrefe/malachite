@@ -30,7 +30,8 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{
     Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD, MU_BDIV_Q_THRESHOLD,
 };
@@ -1545,17 +1546,17 @@ impl<'a> DivExact<Natural> for &'a Natural {
             panic!("division not exact");
         } else {
             let qs = match (self, &mut other) {
-                (x, &mut Small(y)) => {
+                (x, &mut Natural(Small(y))) => {
                     return x.div_exact(y);
                 }
-                (&Large(ref xs), &mut Large(ref mut ys)) => {
+                (&Natural(Large(ref xs)), &mut Natural(Large(ref mut ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_exact_to_out_ref_val(&mut qs, xs, ys);
                     qs
                 }
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
             q
         }
@@ -1620,17 +1621,17 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
             panic!("division not exact");
         } else {
             let qs = match (self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     return x.div_exact(y);
                 }
-                (&Large(ref xs), &Large(ref ys)) => {
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_exact_to_out_ref_ref(&mut qs, xs, ys);
                     qs
                 }
                 _ => unreachable!(),
             };
-            let mut q = Large(qs);
+            let mut q = Natural(Large(qs));
             q.trim();
             q
         }
@@ -1687,11 +1688,11 @@ impl DivExactAssign<Natural> for Natural {
             panic!("division not exact");
         } else {
             match (&mut *self, other) {
-                (x, Small(y)) => {
+                (x, Natural(Small(y))) => {
                     x.div_exact_assign(y);
                     return;
                 }
-                (&mut Large(ref mut xs), Large(ref mut ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_exact_to_out(&mut qs, xs, ys);
                     swap(&mut qs, xs);
@@ -1753,11 +1754,11 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
             panic!("division not exact");
         } else {
             match (&mut *self, other) {
-                (x, &Small(y)) => {
+                (x, &Natural(Small(y))) => {
                     x.div_exact_assign(y);
                     return;
                 }
-                (&mut Large(ref mut xs), Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                     let mut qs = vec![0; xs.len() - ys.len() + 1];
                     limbs_div_exact_to_out_val_ref(&mut qs, xs, ys);
                     swap(&mut qs, xs);

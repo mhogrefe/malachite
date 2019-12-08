@@ -3,7 +3,8 @@ use std::ops::{Add, AddAssign};
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
@@ -651,9 +652,11 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
             self << 1
         } else {
             match (self, other) {
-                (x, &Small(y)) => x + y,
-                (&Small(x), y) => x + y,
-                (&Large(ref xs), &Large(ref ys)) => Large(limbs_add(xs, ys)),
+                (x, &Natural(Small(y))) => x + y,
+                (&Natural(Small(x)), y) => x + y,
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                    Natural(Large(limbs_add(xs, ys)))
+                }
             }
         }
     }
@@ -686,12 +689,12 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 /// ```
 impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             *self += y;
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other + x;
-        } else if let Large(mut ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(mut ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 if limbs_vec_add_in_place_either(xs, &mut ys) {
                     *xs = ys;
                 }
@@ -729,12 +732,12 @@ impl<'a> AddAssign<&'a Natural> for Natural {
     fn add_assign(&mut self, other: &'a Natural) {
         if self as *const Natural == other as *const Natural {
             *self <<= 1;
-        } else if let Small(y) = *other {
+        } else if let Natural(Small(y)) = *other {
             *self += y;
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.clone() + x;
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_add_in_place_left(xs, ys);
             }
         }

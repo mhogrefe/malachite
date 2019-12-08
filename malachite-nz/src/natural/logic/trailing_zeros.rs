@@ -2,7 +2,8 @@ use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -59,9 +60,9 @@ impl Natural {
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
-            Small(0) => None,
-            Small(small) => Some(small.trailing_zeros().into()),
-            Large(ref limbs) => Some(limbs_trailing_zeros(limbs)),
+            Natural(Small(0)) => None,
+            Natural(Small(small)) => Some(small.trailing_zeros().into()),
+            Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
         }
     }
 }

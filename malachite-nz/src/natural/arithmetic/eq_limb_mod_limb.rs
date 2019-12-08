@@ -5,7 +5,8 @@ use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// divisor must be odd. //TODO test
@@ -143,9 +144,9 @@ impl<'a> EqMod<Limb, Limb> for &'a Natural {
     /// ```
     fn eq_mod(self, other: Limb, modulus: Limb) -> bool {
         match *self {
-            Small(small) => small.eq_mod(other, modulus),
-            Large(_) if modulus == 0 => false,
-            Large(ref limbs) => limbs_eq_limb_mod_limb(limbs, other, modulus),
+            Natural(Small(small)) => small.eq_mod(other, modulus),
+            Natural(Large(_)) if modulus == 0 => false,
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_limb(limbs, other, modulus),
         }
     }
 }
@@ -226,8 +227,8 @@ impl<'a> EqMod<Limb, &'a Natural> for Limb {
     /// ```
     fn eq_mod(self, other: Limb, modulus: &'a Natural) -> bool {
         match *modulus {
-            Small(small) => self.eq_mod(other, small),
-            Large(_) => self == other,
+            Natural(Small(small)) => self.eq_mod(other, small),
+            Natural(Large(_)) => self == other,
         }
     }
 }

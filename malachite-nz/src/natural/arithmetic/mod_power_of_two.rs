@@ -7,7 +7,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -217,9 +218,9 @@ impl<'a> ModPowerOfTwo for &'a Natural {
     /// ```
     fn mod_power_of_two(self, other: u64) -> Natural {
         match *self {
-            Small(ref small) => Small(small.mod_power_of_two(other)),
-            Large(ref limbs) => {
-                let mut result = Large(limbs_mod_power_of_two(limbs, other));
+            Natural(Small(ref small)) => Natural(Small(small.mod_power_of_two(other))),
+            Natural(Large(ref limbs)) => {
+                let mut result = Natural(Large(limbs_mod_power_of_two(limbs, other)));
                 result.trim();
                 result
             }
@@ -257,11 +258,11 @@ impl ModPowerOfTwoAssign for Natural {
     /// ```
     fn mod_power_of_two_assign(&mut self, other: u64) {
         match *self {
-            Small(ref mut small) => {
+            Natural(Small(ref mut small)) => {
                 small.mod_power_of_two_assign(other);
                 return;
             }
-            Large(ref mut limbs) => limbs_mod_power_of_two_in_place(limbs, other),
+            Natural(Large(ref mut limbs)) => limbs_mod_power_of_two_in_place(limbs, other),
         }
         self.trim();
     }
@@ -428,19 +429,20 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
             Natural::ZERO
         } else {
             match *self {
-                Small(small) => {
+                Natural(Small(small)) => {
                     if small == 0 {
                         Natural::ZERO
                     } else if other < u64::from(Limb::WIDTH) {
-                        Small(small.wrapping_neg().mod_power_of_two(other))
+                        Natural(Small(small.wrapping_neg().mod_power_of_two(other)))
                     } else {
-                        let mut result = Large(limbs_neg_mod_power_of_two(&[small], other));
+                        let mut result =
+                            Natural(Large(limbs_neg_mod_power_of_two(&[small], other)));
                         result.trim();
                         result
                     }
                 }
-                Large(ref limbs) => {
-                    let mut result = Large(limbs_neg_mod_power_of_two(limbs, other));
+                Natural(Large(ref limbs)) => {
+                    let mut result = Natural(Large(limbs_neg_mod_power_of_two(limbs, other)));
                     result.trim();
                     result
                 }

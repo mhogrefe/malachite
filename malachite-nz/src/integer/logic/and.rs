@@ -6,7 +6,8 @@ use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
@@ -892,16 +893,16 @@ impl<'a> BitAndAssign<&'a Integer> for Integer {
 impl Natural {
     pub(crate) fn and_assign_pos_limb_neg(&mut self, other: Limb) {
         match *self {
-            Small(ref mut small) => *small &= other,
-            Large(ref mut limbs) => limbs_pos_and_limb_neg_in_place(limbs, other),
+            Natural(Small(ref mut small)) => *small &= other,
+            Natural(Large(ref mut limbs)) => limbs_pos_and_limb_neg_in_place(limbs, other),
         }
     }
 
     pub(crate) fn and_pos_limb_neg(&self, other: Limb) -> Natural {
-        match *self {
-            Small(small) => Small(small & other),
-            Large(ref limbs) => Large(limbs_pos_and_limb_neg(limbs, other)),
-        }
+        Natural(match *self {
+            Natural(Small(small)) => Small(small & other),
+            Natural(Large(ref limbs)) => Large(limbs_pos_and_limb_neg(limbs, other)),
+        })
     }
 
     fn and_assign_neg_limb_neg(&mut self, other: Limb) {
@@ -925,8 +926,8 @@ impl Natural {
     }
 
     fn and_neg_limb_neg(&self, other: Limb) -> Natural {
-        match *self {
-            Small(small) => {
+        Natural(match *self {
+            Natural(Small(small)) => {
                 let result = small.wrapping_neg() & other;
                 if result == 0 {
                     Large(vec![0, 1])
@@ -934,20 +935,20 @@ impl Natural {
                     Small(result.wrapping_neg())
                 }
             }
-            Large(ref limbs) => Large(limbs_neg_and_limb_neg(limbs, other)),
-        }
+            Natural(Large(ref limbs)) => Large(limbs_neg_and_limb_neg(limbs, other)),
+        })
     }
 
     fn and_assign_neg_neg(&mut self, other: Natural) {
-        let new_self_value = if let Small(y) = other {
+        let new_self_value = if let Natural(Small(y)) = other {
             self.and_assign_neg_limb_neg(y.wrapping_neg());
             None
-        } else if let Small(ref mut x) = *self {
+        } else if let Natural(Small(ref mut x)) = *self {
             let mut new_self_value = other.clone();
             new_self_value.and_assign_neg_limb_neg(x.wrapping_neg());
             Some(new_self_value)
-        } else if let Large(mut ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(mut ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 if limbs_vec_and_neg_neg_in_place_either(xs, &mut ys) {
                     *xs = ys;
                 }
@@ -963,15 +964,15 @@ impl Natural {
     }
 
     fn and_assign_neg_neg_ref(&mut self, other: &Natural) {
-        let new_self_value = if let Small(y) = *other {
+        let new_self_value = if let Natural(Small(y)) = *other {
             self.and_assign_neg_limb_neg(y.wrapping_neg());
             None
-        } else if let Small(ref mut x) = *self {
+        } else if let Natural(Small(ref mut x)) = *self {
             let mut new_self_value = other.clone();
             new_self_value.and_assign_neg_limb_neg(x.wrapping_neg());
             Some(new_self_value)
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_and_neg_neg_in_place_left(xs, ys);
             }
             self.trim();
@@ -986,10 +987,10 @@ impl Natural {
 
     fn and_neg_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
-            (_, &Small(y)) => self.and_neg_limb_neg(y.wrapping_neg()),
-            (&Small(x), _) => other.and_neg_limb_neg(x.wrapping_neg()),
-            (&Large(ref xs), &Large(ref ys)) => {
-                let mut result = Large(limbs_and_neg_neg(xs, ys));
+            (_, &Natural(Small(y))) => self.and_neg_limb_neg(y.wrapping_neg()),
+            (&Natural(Small(x)), _) => other.and_neg_limb_neg(x.wrapping_neg()),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let mut result = Natural(Large(limbs_and_neg_neg(xs, ys)));
                 result.trim();
                 result
             }

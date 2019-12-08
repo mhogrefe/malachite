@@ -2,7 +2,8 @@ use std::ops::Index;
 
 use malachite_base::num::conversion::traits::CheckedFrom;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// A double-ended iterator over the limbs of a `Natural`. The forward order is ascending (least-
@@ -57,8 +58,8 @@ impl<'a> Iterator for LimbIterator<'a> {
     fn next(&mut self) -> Option<Limb> {
         if self.some_remaining {
             let limb = match *self.n {
-                Small(small) => small,
-                Large(ref limbs) => limbs[usize::checked_from(self.i).unwrap()],
+                Natural(Small(small)) => small,
+                Natural(Large(ref limbs)) => limbs[usize::checked_from(self.i).unwrap()],
             };
             if self.i == self.j {
                 self.some_remaining = false;
@@ -127,8 +128,8 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     fn next_back(&mut self) -> Option<Limb> {
         if self.some_remaining {
             let limb = match *self.n {
-                Small(small) => small,
-                Large(ref limbs) => limbs[usize::checked_from(self.j).unwrap()],
+                Natural(Small(small)) => small,
+                Natural(Large(ref limbs)) => limbs[usize::checked_from(self.j).unwrap()],
             };
             if self.j == self.i {
                 self.some_remaining = false;
@@ -180,8 +181,8 @@ impl<'a> Index<usize> for LimbIterator<'a> {
             &0
         } else {
             match *self.n {
-                Small(ref small) => small,
-                Large(ref limbs) => limbs.index(index),
+                Natural(Small(ref small)) => small,
+                Natural(Large(ref limbs)) => limbs.index(index),
             }
         }
     }
@@ -220,9 +221,9 @@ impl Natural {
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
         match *self {
-            Small(0) => Vec::new(),
-            Small(small) => vec![small],
-            Large(ref limbs) => limbs.clone(),
+            Natural(Small(0)) => Vec::new(),
+            Natural(Small(small)) => vec![small],
+            Natural(Large(ref limbs)) => limbs.clone(),
         }
     }
 
@@ -258,9 +259,9 @@ impl Natural {
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
         match *self {
-            Small(0) => Vec::new(),
-            Small(small) => vec![small],
-            Large(ref limbs) => limbs.iter().cloned().rev().collect(),
+            Natural(Small(0)) => Vec::new(),
+            Natural(Small(small)) => vec![small],
+            Natural(Large(ref limbs)) => limbs.iter().cloned().rev().collect(),
         }
     }
 
@@ -294,9 +295,9 @@ impl Natural {
     /// ```
     pub fn into_limbs_asc(self) -> Vec<Limb> {
         match self {
-            Small(0) => Vec::new(),
-            Small(small) => vec![small],
-            Large(limbs) => limbs,
+            Natural(Small(0)) => Vec::new(),
+            Natural(Small(small)) => vec![small],
+            Natural(Large(limbs)) => limbs,
         }
     }
 
@@ -332,9 +333,9 @@ impl Natural {
     /// ```
     pub fn into_limbs_desc(self) -> Vec<Limb> {
         match self {
-            Small(0) => Vec::new(),
-            Small(small) => vec![small],
-            Large(mut limbs) => {
+            Natural(Small(0)) => Vec::new(),
+            Natural(Small(small)) => vec![small],
+            Natural(Large(mut limbs)) => {
                 limbs.reverse();
                 limbs
             }

@@ -8,7 +8,8 @@ use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::logic::not::limbs_not_in_place;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 fn limbs_xor_pos_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb {
@@ -794,17 +795,17 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Natural {
 
 impl Natural {
     pub(crate) fn xor_assign_pos_neg(&mut self, mut other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.xor_assign_pos_limb_neg(y.wrapping_neg());
             return;
-        } else if let Small(x) = *self {
-            if let Large(_) = other {
+        } else if let Natural(Small(x)) = *self {
+            if let Natural(Large(_)) = other {
                 *self = other;
                 self.xor_assign_neg_limb_pos(x);
             }
             return;
-        } else if let Large(ref mut ys) = other {
-            let right = if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref mut ys)) = other {
+            let right = if let Natural(Large(ref mut xs)) = *self {
                 limbs_xor_pos_neg_in_place_either(xs, ys)
             } else {
                 unreachable!();
@@ -821,15 +822,15 @@ impl Natural {
     }
 
     pub(crate) fn xor_assign_pos_neg_ref(&mut self, other: &Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.xor_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Small(x) = *self {
-            if let Large(_) = *other {
+        } else if let Natural(Small(x)) = *self {
+            if let Natural(Large(_)) = *other {
                 *self = other.clone();
                 self.xor_assign_neg_limb_pos(x);
             }
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_xor_pos_neg_in_place_left(xs, ys);
             }
             self.trim();
@@ -842,19 +843,19 @@ impl Natural {
     }
 
     pub(crate) fn xor_assign_neg_pos_ref(&mut self, other: &Natural) {
-        let new_self_value = if let Small(x) = *self {
+        let new_self_value = if let Natural(Small(x)) = *self {
             let mut new_self_value = other.clone();
             new_self_value.xor_assign_pos_limb_neg(x.wrapping_neg());
             Some(new_self_value)
-        } else if let Small(y) = *other {
-            if let Large(_) = *self {
+        } else if let Natural(Small(y)) = *other {
+            if let Natural(Large(_)) = *self {
                 self.xor_assign_neg_limb_pos(y);
             } else {
                 unreachable!()
             };
             None
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_xor_pos_neg_in_place_right(ys, xs);
             }
             self.trim();
@@ -869,10 +870,10 @@ impl Natural {
 
     pub(crate) fn xor_pos_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
-            (_, &Small(y)) => self.xor_pos_limb_neg(y.wrapping_neg()),
-            (&Small(x), _) => other.xor_neg_limb_pos(x),
-            (&Large(ref xs), &Large(ref ys)) => {
-                let mut result = Large(limbs_xor_pos_neg(xs, ys));
+            (_, &Natural(Small(y))) => self.xor_pos_limb_neg(y.wrapping_neg()),
+            (&Natural(Small(x)), _) => other.xor_neg_limb_pos(x),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let mut result = Natural(Large(limbs_xor_pos_neg(xs, ys)));
                 result.trim();
                 result
             }

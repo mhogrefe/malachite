@@ -4,7 +4,8 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::DoubleLimb;
 
 impl CheckedFrom<Natural> for DoubleLimb {
@@ -61,11 +62,11 @@ impl<'a> CheckedFrom<&'a Natural> for DoubleLimb {
     /// ```
     fn checked_from(value: &Natural) -> Option<DoubleLimb> {
         match *value {
-            Small(small) => Some(small.into()),
-            Large(ref limbs) if limbs.len() == 2 => {
+            Natural(Small(small)) => Some(small.into()),
+            Natural(Large(ref limbs)) if limbs.len() == 2 => {
                 Some(DoubleLimb::join_halves(limbs[1], limbs[0]))
             }
-            Large(_) => None,
+            Natural(Large(_)) => None,
         }
     }
 }
@@ -124,8 +125,8 @@ impl<'a> WrappingFrom<&'a Natural> for DoubleLimb {
     /// ```
     fn wrapping_from(value: &Natural) -> DoubleLimb {
         match *value {
-            Small(small) => small.into(),
-            Large(ref limbs) => DoubleLimb::join_halves(limbs[1], limbs[0]),
+            Natural(Small(small)) => small.into(),
+            Natural(Large(ref limbs)) => DoubleLimb::join_halves(limbs[1], limbs[0]),
         }
     }
 }
@@ -184,9 +185,11 @@ impl<'a> SaturatingFrom<&'a Natural> for DoubleLimb {
     /// ```
     fn saturating_from(value: &Natural) -> DoubleLimb {
         match *value {
-            Small(small) => small.into(),
-            Large(ref limbs) if limbs.len() == 2 => DoubleLimb::join_halves(limbs[1], limbs[0]),
-            Large(_) => DoubleLimb::MAX,
+            Natural(Small(small)) => small.into(),
+            Natural(Large(ref limbs)) if limbs.len() == 2 => {
+                DoubleLimb::join_halves(limbs[1], limbs[0])
+            }
+            Natural(Large(_)) => DoubleLimb::MAX,
         }
     }
 }
@@ -246,8 +249,8 @@ impl<'a> OverflowingFrom<&'a Natural> for DoubleLimb {
     /// ```
     fn overflowing_from(value: &Natural) -> (DoubleLimb, bool) {
         match *value {
-            Small(small) => (small.into(), false),
-            Large(ref limbs) => (
+            Natural(Small(small)) => (small.into(), false),
+            Natural(Large(ref limbs)) => (
                 DoubleLimb::join_halves(limbs[1], limbs[0]),
                 limbs.len() != 2,
             ),
@@ -309,8 +312,8 @@ impl<'a> ConvertibleFrom<&'a Natural> for DoubleLimb {
     /// ```
     fn convertible_from(value: &Natural) -> bool {
         match *value {
-            Small(_) => true,
-            Large(ref limbs) => limbs.len() == 2,
+            Natural(Small(_)) => true,
+            Natural(Large(ref limbs)) => limbs.len() == 2,
         }
     }
 }

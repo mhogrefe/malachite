@@ -5,7 +5,8 @@ use malachite_base::num::arithmetic::traits::DivAssignMod;
 use malachite_base::num::basic::traits::Zero;
 
 use error::ParseIntegerError;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 impl Natural {
@@ -94,8 +95,8 @@ impl FromStr for Natural {
 impl fmt::Binary for Natural {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Small(small) => write!(f, "{:b}", small),
-            Large(ref limbs) => {
+            Natural(Small(small)) => write!(f, "{:b}", small),
+            Natural(Large(ref limbs)) => {
                 write!(f, "{:b}", limbs.last().unwrap())?;
                 let mut i = limbs.len() - 2;
                 loop {

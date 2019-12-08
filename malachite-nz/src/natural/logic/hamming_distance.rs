@@ -3,7 +3,8 @@ use std::cmp::Ordering;
 use malachite_base::num::logic::traits::HammingDistance;
 
 use natural::logic::count_ones::limbs_count_ones;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
@@ -97,9 +98,9 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// ```
     fn hamming_distance(self, other: &'a Natural) -> u64 {
         match (self, other) {
-            (&Small(x), _) => x.hamming_distance(other),
-            (_, &Small(y)) => self.hamming_distance(y),
-            (&Large(ref xs), &Large(ref ys)) => limbs_hamming_distance(xs, ys),
+            (&Natural(Small(x)), _) => x.hamming_distance(other),
+            (_, &Natural(Small(y))) => self.hamming_distance(y),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_hamming_distance(xs, ys),
         }
     }
 }

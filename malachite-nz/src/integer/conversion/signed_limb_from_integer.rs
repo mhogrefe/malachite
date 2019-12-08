@@ -5,7 +5,8 @@ use malachite_base::num::conversion::traits::{
 };
 
 use integer::Integer;
-use natural::Natural::Small;
+use natural::InnerNatural::Small;
+use natural::Natural;
 use platform::{Limb, SignedLimb};
 
 impl CheckedFrom<Integer> for SignedLimb {
@@ -375,11 +376,11 @@ impl<'a> ConvertibleFrom<&'a Integer> for SignedLimb {
         match *value {
             Integer {
                 sign: true,
-                abs: Small(small),
+                abs: Natural(Small(small)),
             } => !small.get_highest_bit(),
             Integer {
                 sign: false,
-                abs: Small(small),
+                abs: Natural(Small(small)),
             } => !small.get_highest_bit() || small == 1 << (Limb::WIDTH - 1),
             _ => false,
         }
@@ -393,11 +394,11 @@ impl<'a> ConvertibleFrom<&'a Integer> for i32 {
         match *value {
             Integer {
                 sign: true,
-                abs: Small(small),
+                abs: Natural(Small(small)),
             } => i32::convertible_from(small),
             Integer {
                 sign: false,
-                abs: Small(small),
+                abs: Natural(Small(small)),
             } => small.leading_zeros() > u32::WIDTH || small == 1 << (u32::WIDTH - 1),
             _ => false,
         }

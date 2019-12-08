@@ -4,7 +4,8 @@ use std::ops::{BitAnd, BitAndAssign};
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -313,7 +314,7 @@ impl Natural {
     }
 
     fn and_assign_limb(&mut self, other: Limb) {
-        *self = Small(self.and_limb_ref(other));
+        *self = Natural(Small(self.and_limb_ref(other)));
     }
 }
 
@@ -418,10 +419,10 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 
     fn bitand(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, &Small(y)) => Small(x.and_limb_ref(y)),
-            (&Small(x), y) => Small(y.and_limb_ref(x)),
-            (&Large(ref xs), &Large(ref ys)) => {
-                let mut result = Large(limbs_and(xs, ys));
+            (x, &Natural(Small(y))) => Natural(Small(x.and_limb_ref(y))),
+            (&Natural(Small(x)), y) => Natural(Small(y.and_limb_ref(x))),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let mut result = Natural(Large(limbs_and(xs, ys)));
                 result.trim();
                 result
             }
@@ -451,12 +452,12 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 /// ```
 impl BitAndAssign<Natural> for Natural {
     fn bitand_assign(&mut self, other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.and_assign_limb(y);
-        } else if let Small(ref mut x) = *self {
+        } else if let Natural(Small(ref mut x)) = *self {
             *x = other.and_limb(*x);
-        } else if let Large(mut ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(mut ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 if limbs_and_in_place_either(xs, &mut ys) {
                     *xs = ys;
                 }
@@ -488,12 +489,12 @@ impl BitAndAssign<Natural> for Natural {
 /// ```
 impl<'a> BitAndAssign<&'a Natural> for Natural {
     fn bitand_assign(&mut self, other: &'a Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.and_assign_limb(y);
-        } else if let Small(ref mut x) = *self {
+        } else if let Natural(Small(ref mut x)) = *self {
             *x = other.and_limb_ref(*x);
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_and_in_place_left(xs, ys);
             }
             self.trim();

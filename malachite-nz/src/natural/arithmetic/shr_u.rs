@@ -10,7 +10,8 @@ use malachite_base::round::RoundingMode;
 use natural::arithmetic::add_limb::limbs_vec_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_access::limbs_get_bit;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -774,10 +775,11 @@ macro_rules! impl_natural_shr_unsigned {
                     return self.clone();
                 }
                 match *self {
-                    Small(_) if other >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
-                    Small(small) => Small(small >> other),
-                    Large(ref limbs) => {
-                        let mut result = Large(limbs_shr(limbs, u64::checked_from(other).unwrap()));
+                    Natural(Small(_)) if other >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
+                    Natural(Small(small)) => Natural(Small(small >> other)),
+                    Natural(Large(ref limbs)) => {
+                        let mut result =
+                            Natural(Large(limbs_shr(limbs, u64::checked_from(other).unwrap())));
                         result.trim();
                         result
                     }
@@ -810,15 +812,15 @@ macro_rules! impl_natural_shr_unsigned {
                     return;
                 }
                 match *self {
-                    Small(ref mut small) if other >= $t::wrapping_from(Limb::WIDTH) => {
+                    Natural(Small(ref mut small)) if other >= $t::wrapping_from(Limb::WIDTH) => {
                         *small = 0;
                         return;
                     }
-                    Small(ref mut small) => {
+                    Natural(Small(ref mut small)) => {
                         *small >>= other;
                         return;
                     }
-                    Large(ref mut limbs) => {
+                    Natural(Large(ref mut limbs)) => {
                         limbs_vec_shr_in_place(limbs, u64::checked_from(other).unwrap());
                     }
                 }
@@ -933,12 +935,12 @@ macro_rules! impl_natural_shr_unsigned {
                     return self.clone();
                 }
                 match *self {
-                    Small(ref small) => Small(small.shr_round(other, rm)),
-                    Large(ref limbs) => {
+                    Natural(Small(ref small)) => Natural(Small(small.shr_round(other, rm))),
+                    Natural(Large(ref limbs)) => {
                         if let Some(result_limbs) =
                             limbs_shr_round(limbs, u64::checked_from(other).unwrap(), rm)
                         {
-                            let mut result = Large(result_limbs);
+                            let mut result = Natural(Large(result_limbs));
                             result.trim();
                             result
                         } else {
@@ -1012,11 +1014,11 @@ macro_rules! impl_natural_shr_unsigned {
                     return;
                 }
                 match *self {
-                    Small(ref mut small) => {
+                    Natural(Small(ref mut small)) => {
                         small.shr_round_assign(other, rm);
                         return;
                     }
-                    Large(ref mut limbs) => {
+                    Natural(Large(ref mut limbs)) => {
                         if !limbs_vec_shr_round_in_place(
                             limbs,
                             u64::checked_from(other).unwrap(),

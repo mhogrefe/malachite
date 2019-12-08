@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -93,10 +94,10 @@ impl Ord for Natural {
             return Ordering::Equal;
         }
         match (self, other) {
-            (&Small(ref x), &Small(ref y)) => x.cmp(y),
-            (&Small(_), &Large(_)) => Ordering::Less,
-            (&Large(_), &Small(_)) => Ordering::Greater,
-            (&Large(ref xs), &Large(ref ys)) => limbs_cmp(xs, ys),
+            (&Natural(Small(ref x)), &Natural(Small(ref y))) => x.cmp(y),
+            (&Natural(Small(_)), &Natural(Large(_))) => Ordering::Less,
+            (&Natural(Large(_)), &Natural(Small(_))) => Ordering::Greater,
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_cmp(xs, ys),
         }
     }
 }

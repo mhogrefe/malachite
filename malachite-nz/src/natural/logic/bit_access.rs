@@ -2,7 +2,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::BitAccess;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, gets a bit of
@@ -186,8 +187,8 @@ impl BitAccess for Natural {
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match *self {
-            Small(small) => small.get_bit(index),
-            Large(ref limbs) => limbs_get_bit(limbs, index),
+            Natural(Small(small)) => small.get_bit(index),
+            Natural(Large(ref limbs)) => limbs_get_bit(limbs, index),
         }
     }
 
@@ -261,11 +262,11 @@ impl BitAccess for Natural {
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match *self {
-            Small(ref mut small) => {
+            Natural(Small(ref mut small)) => {
                 small.clear_bit(index);
                 return;
             }
-            Large(ref mut limbs) => limbs_clear_bit(limbs, index),
+            Natural(Large(ref mut limbs)) => limbs_clear_bit(limbs, index),
         }
         self.trim();
     }

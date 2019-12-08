@@ -5,7 +5,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 // xs.len() == ys.len()
@@ -101,9 +102,11 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// ```
     fn eq_mod_power_of_two(self, other: &'b Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Small(y)) => self.eq_mod_power_of_two(y, pow),
-            (&Small(x), _) => other.eq_mod_power_of_two(x, pow),
-            (&Large(ref xs), &Large(ref ys)) => limbs_eq_mod_power_of_two(xs, ys, pow),
+            (_, &Natural(Small(y))) => self.eq_mod_power_of_two(y, pow),
+            (&Natural(Small(x)), _) => other.eq_mod_power_of_two(x, pow),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                limbs_eq_mod_power_of_two(xs, ys, pow)
+            }
         }
     }
 }

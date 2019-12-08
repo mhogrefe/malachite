@@ -4,7 +4,8 @@ use malachite_base::limbs::limbs_pad_left;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -284,13 +285,17 @@ macro_rules! impl_natural_shl_unsigned {
                 if other == 0 || *self == 0 as Limb {
                     return self.clone();
                 }
-                match *self {
-                    Small(small) if other <= $t::wrapping_from(small.leading_zeros()) => {
+                Natural(match *self {
+                    Natural(Small(small)) if other <= $t::wrapping_from(small.leading_zeros()) => {
                         Small(small << other)
                     }
-                    Small(small) => Large(limbs_shl(&[small], u64::checked_from(other).unwrap())),
-                    Large(ref limbs) => Large(limbs_shl(limbs, u64::checked_from(other).unwrap())),
-                }
+                    Natural(Small(small)) => {
+                        Large(limbs_shl(&[small], u64::checked_from(other).unwrap()))
+                    }
+                    Natural(Large(ref limbs)) => {
+                        Large(limbs_shl(limbs, u64::checked_from(other).unwrap()))
+                    }
+                })
             }
         }
 

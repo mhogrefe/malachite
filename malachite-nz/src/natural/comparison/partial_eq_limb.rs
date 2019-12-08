@@ -1,4 +1,5 @@
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Determines whether a `Natural` is equal to a `Limb`.
@@ -17,8 +18,8 @@ use platform::Limb;
 impl PartialEq<Limb> for Natural {
     fn eq(&self, other: &Limb) -> bool {
         match *self {
-            Small(x) => x == *other,
-            Large(_) => false,
+            Natural(Small(x)) => x == *other,
+            Natural(Large(_)) => false,
         }
     }
 }
@@ -47,8 +48,8 @@ impl PartialEq<u32> for Natural {
 impl PartialEq<Natural> for Limb {
     fn eq(&self, other: &Natural) -> bool {
         match *other {
-            Small(y) => y == *self,
-            Large(_) => false,
+            Natural(Small(y)) => y == *self,
+            Natural(Large(_)) => false,
         }
     }
 }

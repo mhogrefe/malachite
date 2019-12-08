@@ -8,7 +8,8 @@ use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
 use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
@@ -665,12 +666,12 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Natural {
 
 impl Natural {
     pub(crate) fn or_assign_pos_neg_ref(&mut self, other: &Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.or_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.or_neg_limb_pos(x);
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_or_pos_neg_in_place_left(xs, ys);
             }
             self.trim();
@@ -678,13 +679,13 @@ impl Natural {
     }
 
     pub(crate) fn or_assign_pos_neg(&mut self, other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.or_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other;
             self.or_assign_neg_limb_pos(x);
-        } else if let Large(mut ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(mut ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_or_pos_neg_in_place_right(xs, &mut ys);
                 *xs = ys;
             }
@@ -693,12 +694,12 @@ impl Natural {
     }
 
     pub(crate) fn or_assign_neg_pos_ref(&mut self, other: &Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.or_assign_neg_limb_pos(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other.or_pos_limb_neg(x.wrapping_neg());
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_or_pos_neg_in_place_right(ys, xs);
             }
             self.trim();
@@ -706,13 +707,13 @@ impl Natural {
     }
 
     pub(crate) fn or_assign_neg_pos(&mut self, other: Natural) {
-        if let Small(y) = other {
+        if let Natural(Small(y)) = other {
             self.or_assign_neg_limb_pos(y);
-        } else if let Small(x) = *self {
+        } else if let Natural(Small(x)) = *self {
             *self = other;
             self.or_assign_pos_limb_neg(x.wrapping_neg());
-        } else if let Large(ref ys) = other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_or_pos_neg_in_place_right(ys, xs);
             }
             self.trim();
@@ -721,10 +722,10 @@ impl Natural {
 
     pub(crate) fn or_pos_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
-            (_, &Small(y)) => self.or_pos_limb_neg(y.wrapping_neg()),
-            (&Small(x), _) => other.or_neg_limb_pos(x),
-            (&Large(ref xs), &Large(ref ys)) => {
-                let mut result = Large(limbs_or_pos_neg(xs, ys));
+            (_, &Natural(Small(y))) => self.or_pos_limb_neg(y.wrapping_neg()),
+            (&Natural(Small(x)), _) => other.or_neg_limb_pos(x),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let mut result = Natural(Large(limbs_or_pos_neg(xs, ys)));
                 result.trim();
                 result
             }

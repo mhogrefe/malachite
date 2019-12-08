@@ -5,7 +5,8 @@ use malachite_base::num::logic::traits::BitScan;
 
 use integer::Integer;
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
@@ -200,7 +201,7 @@ impl Natural {
     // self != 0
     fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
         match *self {
-            Small(small) => {
+            Natural(Small(small)) => {
                 if starting_index >= u64::from(Limb::WIDTH) {
                     None
                 } else {
@@ -214,14 +215,14 @@ impl Natural {
                     }
                 }
             }
-            Large(ref limbs) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
+            Natural(Large(ref limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
         }
     }
 
     // self != 0
     fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
         match *self {
-            Small(small) => {
+            Natural(Small(small)) => {
                 if starting_index >= u64::from(Limb::WIDTH) {
                     starting_index
                 } else {
@@ -230,7 +231,7 @@ impl Natural {
                         .into()
                 }
             }
-            Large(ref limbs) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
+            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
         }
     }
 }

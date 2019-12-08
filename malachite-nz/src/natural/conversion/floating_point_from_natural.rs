@@ -14,7 +14,8 @@ use malachite_base::round::RoundingMode;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 macro_rules! float_impls {
@@ -22,8 +23,8 @@ macro_rules! float_impls {
         // Returns whether `n` > `$f::MAX_FINITE`.
         fn $gt_max_finite_float(n: &Natural) -> bool {
             match *n {
-                Small(_) => false,
-                Large(ref limbs) => {
+                Natural(Small(_)) => false,
+                Natural(Large(ref limbs)) => {
                     const MAX_WIDTH: u64 = $f::MAX_EXPONENT as u64 + 1;
                     match limbs_significant_bits(limbs).cmp(&MAX_WIDTH) {
                         Ordering::Less => false,

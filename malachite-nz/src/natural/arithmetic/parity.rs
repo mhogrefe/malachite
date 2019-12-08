@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::Parity;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 
 impl<'a> Parity for &'a Natural {
     /// Determines whether a `Natural` is even.
@@ -28,8 +29,8 @@ impl<'a> Parity for &'a Natural {
     /// ```
     fn even(self) -> bool {
         match self {
-            Small(small) => small.even(),
-            Large(ref limbs) => limbs[0].even(),
+            Natural(Small(small)) => small.even(),
+            Natural(Large(ref limbs)) => limbs[0].even(),
         }
     }
 
@@ -58,8 +59,8 @@ impl<'a> Parity for &'a Natural {
     /// ```
     fn odd(self) -> bool {
         match *self {
-            Small(small) => small.odd(),
-            Large(ref limbs) => limbs[0].odd(),
+            Natural(Small(small)) => small.odd(),
+            Natural(Large(ref limbs)) => limbs[0].odd(),
         }
     }
 }

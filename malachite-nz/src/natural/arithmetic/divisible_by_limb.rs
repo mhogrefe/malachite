@@ -2,7 +2,8 @@ use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo
 
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
@@ -81,10 +82,10 @@ impl<'a> DivisibleBy<Limb> for &'a Natural {
     /// ```
     fn divisible_by(self, other: Limb) -> bool {
         match (self, other) {
-            (&Small(0), _) => true,
+            (&Natural(Small(0)), _) => true,
             (_, 0) => false,
-            (&Small(small), y) => small.divisible_by(y),
-            (&Large(ref limbs), y) => limbs_divisible_by_limb(limbs, y),
+            (&Natural(Small(small)), y) => small.divisible_by(y),
+            (&Natural(Large(ref limbs)), y) => limbs_divisible_by_limb(limbs, y),
         }
     }
 }
@@ -124,9 +125,9 @@ impl<'a> DivisibleBy<&'a Natural> for Limb {
     fn divisible_by(self, other: &'a Natural) -> bool {
         match (self, other) {
             (0, _) => true,
-            (_, Small(0)) => false,
-            (x, &Small(small)) => x.divisible_by(small),
-            (_, &Large(_)) => false,
+            (_, Natural(Small(0))) => false,
+            (x, &Natural(Small(small))) => x.divisible_by(small),
+            (_, &Natural(Large(_))) => false,
         }
     }
 }

@@ -2,7 +2,8 @@ use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
 
 use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_vec_sub_in_place_right};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`
@@ -179,14 +180,14 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
             Some(Natural::ZERO)
         } else {
             match (self, other) {
-                (x, &Small(0)) => Some(x.clone()),
-                (x, &Small(y)) => x.checked_sub(y),
-                (&Small(_), _) => None,
-                (&Large(ref xs), &Large(ref ys)) => {
+                (x, &Natural(Small(0))) => Some(x.clone()),
+                (x, &Natural(Small(y))) => x.checked_sub(y),
+                (&Natural(Small(_)), _) => None,
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                     if self < other {
                         None
                     } else {
-                        let mut difference = Large(limbs_sub(xs, ys).0);
+                        let mut difference = Natural(Large(limbs_sub(xs, ys).0));
                         difference.trim();
                         Some(difference)
                     }
@@ -203,11 +204,11 @@ impl Natural {
             false
         } else if self.limb_count() < other.limb_count() {
             true
-        } else if let Small(y) = other {
+        } else if let Natural(Small(y)) = other {
             self.sub_assign_limb_no_panic(y)
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut xs), Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                     if limbs_sub_in_place_left(xs, ys) {
                         return true;
                     }
@@ -228,11 +229,11 @@ impl Natural {
             false
         } else if self.limb_count() < other.limb_count() {
             true
-        } else if let Small(y) = *other {
+        } else if let Natural(Small(y)) = *other {
             self.sub_assign_limb_no_panic(y)
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     if limbs_sub_in_place_left(xs, ys) {
                         return true;
                     }
@@ -251,7 +252,7 @@ impl Natural {
             false
         } else if self.limb_count() > other.limb_count() {
             true
-        } else if let Small(y) = *self {
+        } else if let Natural(Small(y)) = *self {
             if let Some(result) = other.checked_sub(y) {
                 *self = result;
                 false
@@ -260,7 +261,7 @@ impl Natural {
             }
         } else {
             match (&mut (*self), other) {
-                (&mut Large(ref mut xs), &Large(ref ys)) => {
+                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     if limbs_vec_sub_in_place_right(ys, xs) {
                         return true;
                     }

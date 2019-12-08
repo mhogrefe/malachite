@@ -6,7 +6,8 @@ use integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul_limb_in_place_left,
 };
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`, b,
@@ -358,9 +359,9 @@ impl Natural {
             };
         }
         match (self, b) {
-            (Large(ref a_limbs), Large(ref b_limbs)) => {
+            (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) => {
                 let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
-                let mut result = Large(limbs);
+                let mut result = Natural(Large(limbs));
                 result.trim();
                 (result, sign)
             }
@@ -390,7 +391,7 @@ impl Natural {
             return sign;
         }
         let (fallback, (right, mut sign)) = match (&mut *self, &mut b) {
-            (&mut Large(ref mut a_limbs), &mut Large(ref mut b_limbs)) => (
+            (&mut Natural(Large(ref mut a_limbs)), &mut Natural(Large(ref mut b_limbs))) => (
                 false,
                 limbs_overflowing_sub_mul_limb_in_place_either(a_limbs, b_limbs, c),
             ),
@@ -428,7 +429,7 @@ impl Natural {
             return sign;
         }
         let (mut sign, fallback) = match (&mut *self, b) {
-            (&mut Large(ref mut a_limbs), &Large(ref b_limbs)) => (
+            (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => (
                 limbs_overflowing_sub_mul_limb_in_place_left(a_limbs, b_limbs, c),
                 false,
             ),
@@ -450,8 +451,8 @@ impl Natural {
 
     fn add_mul_assign_neg_large(&mut self, b: &Natural, c: &Natural) -> bool {
         let mut sign = false;
-        if let Large(ref b_limbs) = *b {
-            if let Large(ref c_limbs) = c {
+        if let Natural(Large(ref b_limbs)) = *b {
+            if let Natural(Large(ref c_limbs)) = c {
                 let self_limbs = self.promote_in_place();
                 sign = limbs_overflowing_sub_mul_in_place_left(self_limbs, b_limbs, c_limbs);
             }
@@ -462,18 +463,18 @@ impl Natural {
 
     // self - &b * c, returns sign (true means non-negative)
     pub(crate) fn add_mul_neg(&self, b: &Natural, c: &Natural) -> (Natural, bool) {
-        if let Small(small_b) = *b {
+        if let Natural(Small(small_b)) = *b {
             self.add_mul_limb_neg(c, small_b)
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_limb_neg(b, small_c)
-        } else if let Small(small_a) = *self {
+        } else if let Natural(Small(small_a)) = *self {
             (b * c - small_a, false)
         } else {
-            if let Large(ref a_limbs) = *self {
-                if let Large(ref b_limbs) = *b {
-                    if let Large(ref c_limbs) = *c {
+            if let Natural(Large(ref a_limbs)) = *self {
+                if let Natural(Large(ref b_limbs)) = *b {
+                    if let Natural(Large(ref c_limbs)) = *c {
                         let (limbs, sign) = limbs_overflowing_sub_mul(a_limbs, b_limbs, c_limbs);
-                        let mut result = Large(limbs);
+                        let mut result = Natural(Large(limbs));
                         result.trim();
                         return (result, sign);
                     }
@@ -485,9 +486,9 @@ impl Natural {
 
     // self -= b * c, returns sign (true means non-negative)
     fn add_mul_assign_neg(&mut self, b: Natural, c: Natural) -> bool {
-        if let Small(small_b) = b {
+        if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb_neg(c, small_b)
-        } else if let Small(small_c) = c {
+        } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_neg(b, small_c)
         } else if *self == 0 as Limb {
             *self = b * c;
@@ -499,9 +500,9 @@ impl Natural {
 
     // self -= b * &c, returns sign (true means non-negative)
     fn add_mul_assign_neg_val_ref(&mut self, b: Natural, c: &Natural) -> bool {
-        if let Small(small_b) = b {
+        if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb_neg_ref(c, small_b)
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_neg(b, small_c)
         } else if *self == 0 as Limb {
             *self = b * c;
@@ -513,9 +514,9 @@ impl Natural {
 
     // self -= &b * c, returns sign (true means non-negative)
     fn add_mul_assign_neg_ref_val(&mut self, b: &Natural, c: Natural) -> bool {
-        if let Small(small_b) = *b {
+        if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb_neg(c, small_b)
-        } else if let Small(small_c) = c {
+        } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_neg_ref(b, small_c)
         } else if *self == 0 as Limb {
             *self = b * c;
@@ -527,9 +528,9 @@ impl Natural {
 
     // self -= &b * &c, returns sign (true means non-negative)
     fn add_mul_assign_neg_ref_ref(&mut self, b: &Natural, c: &Natural) -> bool {
-        if let Small(small_b) = *b {
+        if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb_neg_ref(c, small_b)
-        } else if let Small(small_c) = *c {
+        } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_neg_ref(b, small_c)
         } else if *self == 0 as Limb {
             *self = b * c;

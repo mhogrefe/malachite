@@ -1,7 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
@@ -76,8 +77,8 @@ impl Integer {
 impl Natural {
     fn count_zeros_neg(&self) -> u64 {
         match *self {
-            Small(small) => small.wrapping_neg().count_zeros().into(),
-            Large(ref limbs) => limbs_count_zeros_neg(limbs),
+            Natural(Small(small)) => small.wrapping_neg().count_zeros().into(),
+            Natural(Large(ref limbs)) => limbs_count_zeros_neg(limbs),
         }
     }
 }

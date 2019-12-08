@@ -11,7 +11,8 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 /// The highest bit of the input must be set.
@@ -360,13 +361,13 @@ impl<'a> DivMod<Limb> for &'a Natural {
             (self.clone(), 0)
         } else {
             match *self {
-                Small(small) => {
+                Natural(Small(small)) => {
                     let (quotient, remainder) = small.div_rem(other);
-                    (Small(quotient), remainder)
+                    (Natural(Small(quotient)), remainder)
                 }
-                Large(ref limbs) => {
+                Natural(Large(ref limbs)) => {
                     let (quotient_limbs, remainder) = limbs_div_limb_mod(limbs, other);
-                    let mut quotient = Large(quotient_limbs);
+                    let mut quotient = Natural(Large(quotient_limbs));
                     quotient.trim();
                     (quotient, remainder)
                 }
@@ -425,10 +426,10 @@ impl DivAssignMod<Limb> for Natural {
             0
         } else {
             let remainder = match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     return small.div_assign_rem(other);
                 }
-                Large(ref mut limbs) => limbs_div_limb_in_place_mod(limbs, other),
+                Natural(Large(ref mut limbs)) => limbs_div_limb_in_place_mod(limbs, other),
             };
             self.trim();
             remainder
@@ -526,8 +527,8 @@ impl<'a> DivMod<&'a Natural> for Limb {
             (self, 0)
         } else {
             match *other {
-                Small(small) => self.div_rem(small),
-                Large(_) => (0, self),
+                Natural(Small(small)) => self.div_rem(small),
+                Natural(Large(_)) => (0, self),
             }
         }
     }

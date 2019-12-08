@@ -9,7 +9,8 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::{div_mod_by_preinversion, limbs_invert_limb};
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 /// Divide an number by a divisor of B - 1, where B is the limb base.
@@ -354,9 +355,9 @@ impl<'a> Div<Limb> for &'a Natural {
             self.clone()
         } else {
             match *self {
-                Small(small) => Small(small / other),
-                Large(ref limbs) => {
-                    let mut quotient = Large(limbs_div_limb(limbs, other));
+                Natural(Small(small)) => Natural(Small(small / other)),
+                Natural(Large(ref limbs)) => {
+                    let mut quotient = Natural(Large(limbs_div_limb(limbs, other)));
                     quotient.trim();
                     quotient
                 }
@@ -401,11 +402,11 @@ impl DivAssign<Limb> for Natural {
             panic!("division by zero");
         } else if other != 1 {
             match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     *small /= other;
                     return;
                 }
-                Large(ref mut limbs) => limbs_div_limb_in_place(limbs, other),
+                Natural(Large(ref mut limbs)) => limbs_div_limb_in_place(limbs, other),
             }
             self.trim();
         }
@@ -445,8 +446,8 @@ impl Div<Natural> for Limb {
             panic!("division by zero");
         } else {
             match other {
-                Small(small) => self / small,
-                Large(_) => 0,
+                Natural(Small(small)) => self / small,
+                Natural(Large(_)) => 0,
             }
         }
     }
@@ -487,8 +488,8 @@ impl<'a> Div<&'a Natural> for Limb {
             panic!("division by zero");
         } else {
             match *other {
-                Small(small) => self / small,
-                Large(_) => 0,
+                Natural(Small(small)) => self / small,
+                Natural(Large(_)) => 0,
             }
         }
     }
@@ -599,11 +600,11 @@ impl Natural {
             panic!("division by zero");
         } else if other != 1 {
             match *self {
-                Small(ref mut small) => {
+                Natural(Small(ref mut small)) => {
                     *small /= other;
                     return;
                 }
-                Large(ref mut limbs) => _limbs_div_in_place_naive(limbs, other),
+                Natural(Large(ref mut limbs)) => _limbs_div_in_place_naive(limbs, other),
             }
             self.trim();
         }

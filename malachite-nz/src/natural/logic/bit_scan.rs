@@ -4,7 +4,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitScan;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
@@ -144,8 +145,8 @@ impl<'a> BitScan for &'a Natural {
     /// ```
     fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
         match *self {
-            Small(small) => small.index_of_next_false_bit(starting_index),
-            Large(ref limbs) => Some(limbs_index_of_next_false_bit(limbs, starting_index)),
+            Natural(Small(small)) => small.index_of_next_false_bit(starting_index),
+            Natural(Large(ref limbs)) => Some(limbs_index_of_next_false_bit(limbs, starting_index)),
         }
     }
 
@@ -181,8 +182,8 @@ impl<'a> BitScan for &'a Natural {
     /// ```
     fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
         match *self {
-            Small(small) => small.index_of_next_true_bit(starting_index),
-            Large(ref limbs) => limbs_index_of_next_true_bit(limbs, starting_index),
+            Natural(Small(small)) => small.index_of_next_true_bit(starting_index),
+            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit(limbs, starting_index),
         }
     }
 }

@@ -2,7 +2,8 @@ use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 
 use natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use natural::logic::significant_bits::limbs_significant_bits;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -83,8 +84,8 @@ impl<'a> FloorLogTwo for &'a Natural {
     /// ```
     fn floor_log_two(self) -> u64 {
         match *self {
-            Small(small) => small.floor_log_two(),
-            Large(ref limbs) => limbs_floor_log_two(limbs),
+            Natural(Small(small)) => small.floor_log_two(),
+            Natural(Large(ref limbs)) => limbs_floor_log_two(limbs),
         }
     }
 }
@@ -116,8 +117,8 @@ impl<'a> CeilingLogTwo for &'a Natural {
     /// ```
     fn ceiling_log_two(self) -> u64 {
         match *self {
-            Small(small) => small.ceiling_log_two(),
-            Large(ref limbs) => limbs_ceiling_log_two(limbs),
+            Natural(Small(small)) => small.ceiling_log_two(),
+            Natural(Large(ref limbs)) => limbs_ceiling_log_two(limbs),
         }
     }
 }

@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Compares a `Natural` to a `Limb`.
@@ -23,8 +24,8 @@ use platform::Limb;
 impl PartialOrd<Limb> for Natural {
     fn partial_cmp(&self, other: &Limb) -> Option<Ordering> {
         match *self {
-            Small(ref small) => small.partial_cmp(other),
-            Large(_) => Some(Ordering::Greater),
+            Natural(Small(ref small)) => small.partial_cmp(other),
+            Natural(Large(_)) => Some(Ordering::Greater),
         }
     }
 }
@@ -56,8 +57,8 @@ impl PartialOrd<u32> for Natural {
 impl PartialOrd<Natural> for Limb {
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         match *other {
-            Small(ref small) => self.partial_cmp(small),
-            Large(_) => Some(Ordering::Less),
+            Natural(Small(ref small)) => self.partial_cmp(small),
+            Natural(Large(_)) => Some(Ordering::Less),
         }
     }
 }

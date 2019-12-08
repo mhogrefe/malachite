@@ -10,7 +10,8 @@ use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -478,9 +479,9 @@ impl DivisibleBy<Natural> for Natural {
     /// ```
     fn divisible_by(mut self, mut other: Natural) -> bool {
         match (&mut self, &mut other) {
-            (x, &mut Small(y)) => (&*x).divisible_by(y),
-            (&mut Small(x), y) => x.divisible_by(&*y),
-            (Large(ref mut xs), Large(ref mut ys)) => {
+            (x, &mut Natural(Small(y))) => (&*x).divisible_by(y),
+            (&mut Natural(Small(x)), y) => x.divisible_by(&*y),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by(xs, ys)
             }
         }
@@ -521,9 +522,9 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     /// ```
     fn divisible_by(mut self, other: &'a Natural) -> bool {
         match (&mut self, other) {
-            (x, &Small(y)) => (&*x).divisible_by(y),
-            (&mut Small(x), y) => x.divisible_by(y),
-            (Large(ref mut xs), &Large(ref ys)) => {
+            (x, &Natural(Small(y))) => (&*x).divisible_by(y),
+            (&mut Natural(Small(x)), y) => x.divisible_by(y),
+            (Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_val_ref(xs, ys)
             }
         }
@@ -564,9 +565,9 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// ```
     fn divisible_by(self, mut other: Natural) -> bool {
         match (self, &mut other) {
-            (x, &mut Small(y)) => x.divisible_by(y),
-            (&Small(x), y) => x.divisible_by(&*y),
-            (&Large(ref xs), Large(ref mut ys)) => {
+            (x, &mut Natural(Small(y))) => x.divisible_by(y),
+            (&Natural(Small(x)), y) => x.divisible_by(&*y),
+            (&Natural(Large(ref xs)), Natural(Large(ref mut ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_val(xs, ys)
             }
         }
@@ -607,9 +608,9 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     /// ```
     fn divisible_by(self, other: &'b Natural) -> bool {
         match (self, other) {
-            (x, &Small(y)) => x.divisible_by(y),
-            (&Small(x), y) => x.divisible_by(y),
-            (&Large(ref xs), &Large(ref ys)) => {
+            (x, &Natural(Small(y))) => x.divisible_by(y),
+            (&Natural(Small(x)), y) => x.divisible_by(y),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_ref(xs, ys)
             }
         }

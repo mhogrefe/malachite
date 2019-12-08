@@ -1,7 +1,8 @@
 use malachite_base::num::arithmetic::traits::{EqMod, NegMod, UnsignedAbs};
 
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{Limb, SignedLimb};
 
 impl<'a> EqMod<SignedLimb, SignedLimb> for &'a Integer {
@@ -181,8 +182,8 @@ impl Natural {
     fn limb_eq_neg_limb_mod_natural(&self, x: Limb, y: Limb) -> bool {
         *self != 0 as Limb
             && match *self {
-                Small(small) => x % small == y.neg_mod(small),
-                Large(_) => false,
+                Natural(Small(small)) => x % small == y.neg_mod(small),
+                Natural(Large(_)) => false,
             }
     }
 }

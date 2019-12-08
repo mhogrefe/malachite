@@ -4,7 +4,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
@@ -161,9 +162,11 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Integer> for &'a Natural {
 impl Natural {
     pub(crate) fn eq_mod_power_of_two_neg_pos(&self, other: &Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Small(y)) => self.eq_mod_power_of_two_neg_limb(y, pow),
-            (&Small(x), _) => other.eq_mod_power_of_two_neg_limb(x, pow),
-            (&Large(ref xs), &Large(ref ys)) => limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow),
+            (_, &Natural(Small(y))) => self.eq_mod_power_of_two_neg_limb(y, pow),
+            (&Natural(Small(x)), _) => other.eq_mod_power_of_two_neg_limb(x, pow),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow)
+            }
         }
     }
 }

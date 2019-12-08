@@ -7,7 +7,8 @@ use malachite_base::num::logic::traits::BitAccess;
 use integer::Integer;
 use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
@@ -377,15 +378,17 @@ impl Natural {
     // self cannot be zero
     pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
-            Small(small) => index >= u64::from(Limb::WIDTH) || small.wrapping_neg().get_bit(index),
-            Large(ref limbs) => limbs_get_bit_neg(limbs, index),
+            Natural(Small(small)) => {
+                index >= u64::from(Limb::WIDTH) || small.wrapping_neg().get_bit(index)
+            }
+            Natural(Large(ref limbs)) => limbs_get_bit_neg(limbs, index),
         }
     }
 
     // self cannot be zero
     fn set_bit_neg(&mut self, index: u64) {
         match *self {
-            Small(ref mut small) => {
+            Natural(Small(ref mut small)) => {
                 if index < u64::from(Limb::WIDTH) {
                     small.wrapping_neg_assign();
                     small.set_bit(index);
@@ -393,7 +396,7 @@ impl Natural {
                 }
                 return;
             }
-            Large(ref mut limbs) => limbs_set_bit_neg(limbs, index),
+            Natural(Large(ref mut limbs)) => limbs_set_bit_neg(limbs, index),
         }
         self.trim();
     }

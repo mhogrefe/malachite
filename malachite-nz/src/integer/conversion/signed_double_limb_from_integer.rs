@@ -5,7 +5,8 @@ use malachite_base::num::conversion::traits::{
 };
 
 use integer::Integer;
-use natural::Natural::{Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::{DoubleLimb, Limb, SignedDoubleLimb};
 
 impl CheckedFrom<Integer> for SignedDoubleLimb {
@@ -367,10 +368,13 @@ impl<'a> ConvertibleFrom<&'a Integer> for SignedDoubleLimb {
     /// ```
     fn convertible_from(value: &Integer) -> bool {
         match *value {
-            Integer { abs: Small(_), .. } => true,
+            Integer {
+                abs: Natural(Small(_)),
+                ..
+            } => true,
             Integer {
                 sign,
-                abs: Large(ref limbs),
+                abs: Natural(Large(ref limbs)),
             } => {
                 if limbs.len() > 2 {
                     false

@@ -2,7 +2,8 @@ use malachite_base::num::arithmetic::traits::{EqMod, NegMod};
 
 use integer::Integer;
 use natural::arithmetic::eq_limb_mod_limb::limbs_eq_limb_mod_limb;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
@@ -168,8 +169,8 @@ impl Natural {
     pub(crate) fn eq_neg_limb_mod_limb(&self, other: Limb, modulus: Limb) -> bool {
         modulus != 0
             && match *self {
-                Small(small) => small % modulus == other.neg_mod(modulus),
-                Large(ref limbs) => limbs_eq_neg_limb_mod_limb(limbs, other, modulus),
+                Natural(Small(small)) => small % modulus == other.neg_mod(modulus),
+                Natural(Large(ref limbs)) => limbs_eq_neg_limb_mod_limb(limbs, other, modulus),
             }
     }
 }

@@ -3,7 +3,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
@@ -68,8 +69,8 @@ impl<'a> EqModPowerOfTwo<Limb> for &'a Natural {
     /// ```
     fn eq_mod_power_of_two(self, other: Limb, pow: u64) -> bool {
         match *self {
-            Small(small) => small.eq_mod_power_of_two(other, pow),
-            Large(ref limbs) => limbs_eq_limb_mod_power_of_two(limbs, other, pow),
+            Natural(Small(small)) => small.eq_mod_power_of_two(other, pow),
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_power_of_two(limbs, other, pow),
         }
     }
 }
@@ -109,8 +110,8 @@ impl<'a> EqModPowerOfTwo<&'a Natural> for Limb {
     /// ```
     fn eq_mod_power_of_two(self, other: &'a Natural, pow: u64) -> bool {
         match *other {
-            Small(small) => self.eq_mod_power_of_two(small, pow),
-            Large(ref limbs) => limbs_eq_limb_mod_power_of_two(limbs, self, pow),
+            Natural(Small(small)) => self.eq_mod_power_of_two(small, pow),
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_power_of_two(limbs, self, pow),
         }
     }
 }

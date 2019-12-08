@@ -6,7 +6,8 @@ use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
-use natural::Natural::{self, Large, Small};
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 use platform::Limb;
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
@@ -643,14 +644,14 @@ impl<'a> BitAndAssign<&'a Integer> for Natural {
 
 impl Natural {
     pub(crate) fn and_assign_pos_neg(&mut self, other: &Natural) {
-        if let Small(y) = *other {
+        if let Natural(Small(y)) = *other {
             self.and_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Small(ref mut x) = *self {
-            if let Large(ref ys) = *other {
+        } else if let Natural(Small(ref mut x)) = *self {
+            if let Natural(Large(ref ys)) = *other {
                 *x &= ys[0].wrapping_neg();
             }
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_and_pos_neg_in_place_left(xs, ys);
             }
             self.trim();
@@ -663,20 +664,20 @@ impl Natural {
     }
 
     pub(crate) fn and_assign_neg_pos_ref(&mut self, other: &Natural) {
-        let new_self_value = if let Small(x) = *self {
+        let new_self_value = if let Natural(Small(x)) = *self {
             let mut new_self_value = other.clone();
             new_self_value.and_assign_pos_limb_neg(x.wrapping_neg());
             Some(new_self_value)
-        } else if let Small(ref y) = *other {
-            let x = if let Large(ref xs) = *self {
+        } else if let Natural(Small(ref y)) = *other {
+            let x = if let Natural(Large(ref xs)) = *self {
                 xs[0].wrapping_neg() & *y
             } else {
                 unreachable!()
             };
-            *self = Small(x);
+            *self = Natural(Small(x));
             None
-        } else if let Large(ref ys) = *other {
-            if let Large(ref mut xs) = *self {
+        } else if let Natural(Large(ref ys)) = *other {
+            if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_and_pos_neg_in_place_right(ys, xs);
             }
             self.trim();
@@ -691,10 +692,12 @@ impl Natural {
 
     pub(crate) fn and_pos_neg(&self, other: &Natural) -> Natural {
         match (self, other) {
-            (_, &Small(y)) => self.and_pos_limb_neg(y.wrapping_neg()),
-            (&Small(x), &Large(ref ys)) => Small(x & ys[0].wrapping_neg()),
-            (&Large(ref xs), &Large(ref ys)) => {
-                let mut result = Large(limbs_and_pos_neg(xs, ys));
+            (_, &Natural(Small(y))) => self.and_pos_limb_neg(y.wrapping_neg()),
+            (&Natural(Small(x)), &Natural(Large(ref ys))) => {
+                Natural(Small(x & ys[0].wrapping_neg()))
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                let mut result = Natural(Large(limbs_and_pos_neg(xs, ys)));
                 result.trim();
                 result
             }
