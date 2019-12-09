@@ -285,22 +285,6 @@ pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     }
 }
 
-/// Takes the bitwise and of an `Integer` and a `Natural`, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Integer::from(-123) & Natural::from(456u32)).to_string(), "384");
-/// assert_eq!((-Integer::trillion() & (Natural::trillion() + 1u32)).to_string(), "4096");
-/// ```
 impl BitAnd<Natural> for Integer {
     type Output = Natural;
 
@@ -310,23 +294,6 @@ impl BitAnd<Natural> for Integer {
     }
 }
 
-/// Takes the bitwise and of an `Integer` and a `Natural`, taking the `Integer` by value and the
-/// `Natural` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`, m = `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Integer::from(-123) & &Natural::from(456u32)).to_string(), "384");
-/// assert_eq!((-Integer::trillion() & &(Natural::trillion() + 1u32)).to_string(), "4096");
-/// ```
 impl<'a> BitAnd<&'a Natural> for Integer {
     type Output = Natural;
 
@@ -336,23 +303,6 @@ impl<'a> BitAnd<&'a Natural> for Integer {
     }
 }
 
-/// Takes the bitwise and of an `Integer` and a `Natural`, taking the `Integer` by reference and the
-/// `Natural` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Integer::from(-123) & Natural::from(456u32)).to_string(), "384");
-/// assert_eq!((&-Integer::trillion() & (Natural::trillion() + 1u32)).to_string(), "4096");
-/// ```
 impl<'a> BitAnd<Natural> for &'a Integer {
     type Output = Natural;
 
@@ -366,23 +316,6 @@ impl<'a> BitAnd<Natural> for &'a Integer {
     }
 }
 
-/// Takes the bitwise and of an `Integer` and a `Natural`, taking both by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`,
-///     m = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Integer::from(-123) & &Natural::from(456u32)).to_string(), "384");
-/// assert_eq!((&-Integer::trillion() & &(Natural::trillion() + 1u32)).to_string(), "4096");
-/// ```
 impl<'a, 'b> BitAnd<&'a Natural> for &'b Integer {
     type Output = Natural;
 
@@ -469,22 +402,6 @@ impl<'a> BitAndAssign<&'a Natural> for Integer {
     }
 }
 
-/// Takes the bitwise and of a `Natural` and an `Integer`, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(456u32) & Integer::from(-123)).to_string(), "384");
-/// assert_eq!(((Natural::trillion() + 1u32) & -Integer::trillion()).to_string(), "4096");
-/// ```
 impl BitAnd<Integer> for Natural {
     type Output = Natural;
 
@@ -494,23 +411,6 @@ impl BitAnd<Integer> for Natural {
     }
 }
 
-/// Takes the bitwise and of a `Natural` and an `Integer`, taking the `Natural` by value and the
-/// `Integer` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`, m = `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(456u32) & &Integer::from(-123)).to_string(), "384");
-/// assert_eq!(((Natural::trillion() + 1u32) & &-Integer::trillion()).to_string(), "4096");
-/// ```
 impl<'a> BitAnd<&'a Integer> for Natural {
     type Output = Natural;
 
@@ -520,23 +420,6 @@ impl<'a> BitAnd<&'a Integer> for Natural {
     }
 }
 
-/// Takes the bitwise and of a `Natural` and an `Integer`, taking the `Natural` by reference and the
-/// `Integer` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(456u32) & Integer::from(-123)).to_string(), "384");
-/// assert_eq!((&(Natural::trillion() + 1u32) & -Integer::trillion()).to_string(), "4096");
-/// ```
 impl<'a> BitAnd<Integer> for &'a Natural {
     type Output = Natural;
 
@@ -546,23 +429,6 @@ impl<'a> BitAnd<Integer> for &'a Natural {
     }
 }
 
-/// Takes the bitwise and of a `Natural` and an `Integer`, taking both by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`,
-///     m = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::Integer;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(456u32) & &Integer::from(-123)).to_string(), "384");
-/// assert_eq!((&(Natural::trillion() + 1u32) & &-Integer::trillion()).to_string(), "4096");
-/// ```
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Natural {
     type Output = Natural;
 

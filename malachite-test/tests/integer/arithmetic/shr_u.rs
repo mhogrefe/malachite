@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
@@ -1355,7 +1355,7 @@ macro_rules! tests_and_properties {
                 pairs_of_integer_and_small_unsigned_var_2::<$t>,
                 |&(ref n, u)| {
                     let floor = n.shr_round(u, RoundingMode::Floor);
-                    let ceiling = &floor + 1 as Limb;
+                    let ceiling = &floor + Integer::ONE;
                     assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
                     if *n >= 0 as Limb {
                         assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);

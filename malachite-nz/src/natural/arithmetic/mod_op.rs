@@ -12,9 +12,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::limbs_add_limb_to_out;
 use natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_mod_balanced, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
@@ -30,10 +29,10 @@ use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
+    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out,
 };
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};

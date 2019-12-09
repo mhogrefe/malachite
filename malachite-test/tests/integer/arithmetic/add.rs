@@ -11,10 +11,7 @@ use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::base::pairs_of_signeds;
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_integers,
-    triples_of_integers,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
 
 #[test]
@@ -108,15 +105,6 @@ fn add_properties() {
         assert_eq!(sum - y, *x);
     });
 
-    test_properties(
-        pairs_of_integer_and_signed,
-        |&(ref x, y): &(Integer, SignedLimb)| {
-            let sum = x + Integer::from(y);
-            assert_eq!(x + y, sum);
-            assert_eq!(y + x, sum);
-        },
-    );
-
     test_properties(integers, |x| {
         assert_eq!(x + Integer::ZERO, *x);
         assert_eq!(Integer::ZERO + x, *x);
@@ -126,18 +114,6 @@ fn add_properties() {
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {
         assert_eq!((x + y) + z, x + (y + z));
-    });
-
-    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
-        let sum = x + Integer::from(y);
-        assert_eq!(x + y, sum);
-        assert_eq!(y + x, sum);
-    });
-
-    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
-        let sum = x + Integer::from(y);
-        assert_eq!(x + y, sum);
-        assert_eq!(y + x, sum);
     });
 
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {

@@ -254,7 +254,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert!(result < (Natural::ONE << u));
         assert_eq!(result == 0 as Limb, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
-        assert_eq!(n & ((Natural::ONE << u) - 1 as Limb), result);
+        assert_eq!(n & ((Natural::ONE << u) - Natural::ONE), result);
     });
 
     test_properties(
@@ -356,7 +356,7 @@ fn neg_mod_power_of_two_properties() {
     test_properties(pairs_of_natural_and_small_unsigned_var_2, |&(ref n, u)| {
         let m = n.neg_mod_power_of_two(u);
         assert_ne!(m, 0 as Limb);
-        assert_eq!((((n >> u) + 1 as Limb) << u) - &m, *n);
+        assert_eq!((((n >> u) + Natural::ONE) << u) - &m, *n);
         assert_eq!(n.mod_power_of_two(u) + m, Natural::ONE << u);
     });
 

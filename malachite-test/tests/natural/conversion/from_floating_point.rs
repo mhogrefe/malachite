@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 
 use common::test_properties;
 use malachite_test::inputs::base::{
@@ -531,7 +531,7 @@ macro_rules! float_properties {
             test_properties($floats_var_2, |&f| {
                 let n_floor = Natural::rounding_from(f, RoundingMode::Floor);
                 assert!(n_floor.is_valid());
-                let n_ceiling = &n_floor + 1 as Limb;
+                let n_ceiling = &n_floor + Natural::ONE;
                 assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Ceiling));
                 assert_eq!(n_floor, Natural::rounding_from(f, RoundingMode::Down));
                 assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Up));
@@ -542,7 +542,7 @@ macro_rules! float_properties {
 
             test_properties($floats_var_3, |&f| {
                 let floor = Natural::rounding_from(f, RoundingMode::Floor);
-                let ceiling = &floor + 1 as Limb;
+                let ceiling = &floor + Natural::ONE;
                 let nearest = Natural::rounding_from(f, RoundingMode::Nearest);
                 assert_eq!(nearest, if floor.even() { floor } else { ceiling });
             });
@@ -565,14 +565,14 @@ macro_rules! float_properties {
             test_properties($floats_var_2, |&f| {
                 let n_floor = Natural::rounding_from(f, RoundingMode::Floor);
                 assert!(n_floor.is_valid());
-                let n_ceiling = &n_floor + 1 as Limb;
+                let n_ceiling = &n_floor + Natural::ONE;
                 let n_nearest = Natural::from(f);
                 assert!(n_nearest == n_floor || n_nearest == n_ceiling);
             });
 
             test_properties($floats_var_3, |&f| {
                 let floor = Natural::rounding_from(f, RoundingMode::Floor);
-                let ceiling = &floor + 1 as Limb;
+                let ceiling = &floor + Natural::ONE;
                 let nearest = Natural::from(f);
                 assert_eq!(nearest, if floor.even() { floor } else { ceiling });
             });

@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_mod_limb::{div_mod_by_preinversion, limbs_invert_limb};
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::InnerNatural::{Large, Small};

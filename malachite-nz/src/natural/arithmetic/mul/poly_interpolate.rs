@@ -5,10 +5,9 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_same_length_in_place_left,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
@@ -19,11 +18,10 @@ use natural::arithmetic::mul::toom::BIT_CORRECTION;
 use natural::arithmetic::shl_u::limbs_shl_to_out;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
+    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
     limbs_sub_same_length_to_out,
 };
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use platform::{
     Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,

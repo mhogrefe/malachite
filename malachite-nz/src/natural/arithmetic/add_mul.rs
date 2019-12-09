@@ -4,8 +4,9 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
 
-use natural::arithmetic::add::{limbs_add_greater, limbs_slice_add_greater_in_place_left};
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::{
+    limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
+};
 use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::arithmetic::mul::limbs_mul_to_out;
 use natural::InnerNatural::{Large, Small};
@@ -651,7 +652,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
         if let Natural(Small(small_a)) = *self {
-            b * c + small_a
+            (b * c).add_limb(small_a)
         } else if let Natural(Small(small_b)) = *b {
             self.add_mul_limb_ref_ref(c, small_b)
         } else if let Natural(Small(small_c)) = *c {

@@ -478,7 +478,7 @@ fn div_round_limb_properties() {
     // TODO test using Rationals
     test_properties(pairs_of_natural_and_positive_limb_var_2, |&(ref n, u)| {
         let down = n.div_round(u, RoundingMode::Down);
-        let up = &down + 1 as Limb;
+        let up = &down + Natural::ONE;
         assert_eq!(n.div_round(u, RoundingMode::Up), up);
         assert_eq!(n.div_round(u, RoundingMode::Floor), down);
         assert_eq!(n.div_round(u, RoundingMode::Ceiling), up);

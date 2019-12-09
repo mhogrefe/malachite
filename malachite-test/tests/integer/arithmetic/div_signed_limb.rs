@@ -314,7 +314,7 @@ fn div_signed_limb_properties() {
 
             assert_eq!(i / -n, -&quotient);
 
-            assert!((i - quotient * n).lt_abs(n));
+            assert!((Integer::from(i) - quotient * n).lt_abs(n));
         },
     );
 

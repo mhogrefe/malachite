@@ -109,7 +109,7 @@ impl Not for Natural {
     fn not(self) -> Integer {
         Integer {
             sign: false,
-            abs: self + 1 as Limb,
+            abs: self.add_limb(1),
         }
     }
 }
@@ -142,7 +142,7 @@ impl<'a> Not for &'a Natural {
     fn not(self) -> Integer {
         Integer {
             sign: false,
-            abs: self + 1 as Limb,
+            abs: self.add_limb_ref(1),
         }
     }
 }

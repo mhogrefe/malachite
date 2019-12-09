@@ -594,7 +594,7 @@ fn div_mod_limb_properties_helper(n: &Integer, u: Limb) {
     }
 
     assert!(remainder < u);
-    assert_eq!(quotient * Natural::from(u) + remainder, *n);
+    assert_eq!(quotient * Natural::from(u) + Integer::from(remainder), *n);
 
     let (neg_quotient, neg_remainder) = (-n).div_mod(u);
     assert_eq!(
@@ -792,7 +792,7 @@ fn div_rem_limb_properties() {
                 assert_eq!(remainder, u);
             }
             assert!(remainder.lt_abs(n));
-            assert_eq!(&quotient * n + remainder, u);
+            assert_eq!(&quotient * n + Integer::from(remainder), u);
 
             assert_eq!(u.div_rem(-n), (-quotient, remainder));
         },

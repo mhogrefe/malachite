@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
     NegMod,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
@@ -39,11 +39,11 @@ use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 
 fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
     let b = Natural::ONE << Limb::WIDTH;
-    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - 1 as Limb;
+    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - Natural::ONE;
     let x = Natural::from(DoubleLimb::join_halves(hi, lo));
     let expected_result = &b_cubed_minus_1 / &x - &b;
     assert_eq!(result, expected_result);
-    assert!(b_cubed_minus_1 - (result + b) * &x < x);
+    assert!(b_cubed_minus_1 - (Natural::from(result) + b) * &x < x);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1427,7 +1427,7 @@ fn verify_limbs_invert_approx(
     let bits = n << Limb::LOG_WIDTH;
     let product = Natural::ONE << (bits << 1);
     //TODO compare to limbs_invert
-    let mut expected_i = (&product - 1 as Limb) / &d;
+    let mut expected_i = (&product - Natural::ONE) / &d;
     let offset = Natural::ONE << bits;
     expected_i -= &offset;
     let i = Natural::from_limbs_asc(&is_out[..n]);
@@ -1438,10 +1438,10 @@ fn verify_limbs_invert_approx(
     }
     let y = if result_exact {
         assert_eq!(i, expected_i);
-        (i + offset + 1 as Limb) * d
+        (i + offset + Natural::ONE) * d
     } else {
-        assert_eq!(&i + 1 as Limb, expected_i);
-        (i + offset + 2 as Limb) * d
+        assert_eq!(&i + Natural::ONE, expected_i);
+        (i + offset + Natural::TWO) * d
     };
     assert!(x < product);
     assert!(product <= y);
@@ -16581,7 +16581,7 @@ fn ceiling_div_neg_mod_properties() {
         if *n > 1 as Limb {
             assert_eq!(
                 Natural::ONE.ceiling_div_neg_mod(n),
-                (Natural::ONE, n - 1 as Limb)
+                (Natural::ONE, n - Natural::ONE)
             );
         }
     });

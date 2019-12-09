@@ -19965,7 +19965,7 @@ fn limbs_mul_limb_with_carry_to_out_properties() {
             let mut out = out.to_vec();
             let old_out = out.clone();
             let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, in_limbs, limb, carry);
-            let n = Natural::from_limbs_asc(in_limbs) * Natural::from(limb) + carry;
+            let n = Natural::from_limbs_asc(in_limbs) * Natural::from(limb) + Natural::from(carry);
             let len = in_limbs.len();
             let mut limbs = n.into_limbs_asc();
             assert_eq!(carry_out != 0, limbs.len() == len + 1);
@@ -20009,7 +20009,8 @@ fn limbs_slice_mul_limb_with_carry_in_place_properties() {
             let mut limbs = limbs.to_vec();
             let old_limbs = limbs.clone();
             let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
-            let n = Natural::from_limbs_asc(&old_limbs) * Natural::from(limb) + carry;
+            let n =
+                Natural::from_limbs_asc(&old_limbs) * Natural::from(limb) + Natural::from(carry);
             let mut expected_limbs = n.into_limbs_asc();
             assert_eq!(carry_out != 0, expected_limbs.len() == limbs.len() + 1);
             if carry_out != 0 {

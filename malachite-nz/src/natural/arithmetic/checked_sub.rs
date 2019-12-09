@@ -1,10 +1,66 @@
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
 
-use natural::arithmetic::sub::{limbs_sub, limbs_sub_in_place_left, limbs_vec_sub_in_place_right};
+use natural::arithmetic::sub::{
+    limbs_sub, limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
+    limbs_vec_sub_in_place_right,
+};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+
+impl Natural {
+    pub(crate) fn checked_sub_limb(mut self, other: Limb) -> Option<Natural> {
+        if self.sub_assign_limb_no_panic(other) {
+            None
+        } else {
+            Some(self)
+        }
+    }
+
+    pub(crate) fn checked_sub_limb_ref(&self, other: Limb) -> Option<Natural> {
+        if other == 0 {
+            return Some(self.clone());
+        }
+        match *self {
+            Natural(Small(small)) => small.checked_sub(other).map(|u| Natural(Small(u))),
+            Natural(Large(ref limbs)) => {
+                if *self < other {
+                    None
+                } else {
+                    let mut difference = Natural(Large(limbs_sub_limb(limbs, other).0));
+                    difference.trim();
+                    Some(difference)
+                }
+            }
+        }
+    }
+
+    // self -= other, return borrow
+    pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
+        if other == 0 {
+            return false;
+        }
+        match *self {
+            Natural(Small(ref mut small)) => {
+                return match small.checked_sub(other) {
+                    Some(difference) => {
+                        *small = difference;
+                        false
+                    }
+                    None => true,
+                };
+            }
+            Natural(Large(ref mut limbs)) => {
+                if limbs_sub_limb_in_place(limbs, other) {
+                    return true;
+                }
+            }
+        }
+        self.trim();
+        false
+    }
+}
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`
 /// is greater than the first, returns `None`.
@@ -181,7 +237,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
         } else {
             match (self, other) {
                 (x, &Natural(Small(0))) => Some(x.clone()),
-                (x, &Natural(Small(y))) => x.checked_sub(y),
+                (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
                 (&Natural(Small(_)), _) => None,
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                     if self < other {
@@ -253,7 +309,7 @@ impl Natural {
         } else if self.limb_count() > other.limb_count() {
             true
         } else if let Natural(Small(y)) = *self {
-            if let Some(result) = other.checked_sub(y) {
+            if let Some(result) = other.checked_sub_limb_ref(y) {
                 *self = result;
                 false
             } else {

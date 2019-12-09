@@ -230,7 +230,7 @@ fn div_limb_properties() {
 
             assert_eq!(u / -n, -&quotient);
 
-            assert!((u - quotient * n).lt_abs(n));
+            assert!((Integer::from(u) - quotient * n).lt_abs(n));
         },
     );
 

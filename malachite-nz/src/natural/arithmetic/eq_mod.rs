@@ -9,8 +9,10 @@ use natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::mod_op::limbs_mod;
-use natural::arithmetic::sub::{limbs_sub, limbs_sub_same_length_to_out, limbs_sub_to_out};
-use natural::arithmetic::sub_limb::{limbs_sub_limb, limbs_sub_limb_to_out};
+use natural::arithmetic::sub::{
+    limbs_sub, limbs_sub_limb, limbs_sub_limb_to_out, limbs_sub_same_length_to_out,
+    limbs_sub_to_out,
+};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};

@@ -1599,8 +1599,8 @@ fn verify_limbs_div_approx(
     let q = Natural::from_owned_limbs_asc(qs);
     let q_is_one_too_large = q != expected_q;
     if q_is_one_too_large {
-        assert_eq!(q, expected_q + 1 as Limb);
-        assert_eq!((q - 1 as Limb) * &d + expected_r, n);
+        assert_eq!(q, expected_q + Natural::ONE);
+        assert_eq!((q - Natural::ONE) * &d + expected_r, n);
     } else {
         assert_eq!(q * &d + expected_r, n);
     }

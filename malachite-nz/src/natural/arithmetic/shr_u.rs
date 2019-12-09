@@ -7,7 +7,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 
-use natural::arithmetic::add_limb::limbs_vec_add_limb_in_place;
+use natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_access::limbs_get_bit;
 use natural::InnerNatural::{Large, Small};

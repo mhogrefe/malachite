@@ -4,7 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 use integer::Integer;
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::conversion::to_limbs::LimbIterator;
 use natural::logic::not::limbs_not_in_place;
 use natural::Natural;

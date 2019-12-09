@@ -10262,7 +10262,7 @@ fn neg_mod_properties() {
     test_properties(positive_naturals, |n| {
         assert_eq!(n.neg_mod(n), 0 as Limb);
         assert_eq!(Natural::ZERO.neg_mod(n), 0 as Limb);
-        assert_eq!(Natural::ONE.neg_mod(n), n - 1 as Limb);
+        assert_eq!(Natural::ONE.neg_mod(n), n - Natural::ONE);
     });
 
     test_properties(

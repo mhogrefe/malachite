@@ -797,7 +797,7 @@ fn neg_mod_limb_properties() {
             assert_eq!(u.ceiling_div_neg_mod(n).1, remainder);
 
             if u != 0 && u < *n {
-                assert_eq!(remainder, n - u);
+                assert_eq!(remainder, n - Natural::from(u));
             }
             assert!(remainder < *n);
         },

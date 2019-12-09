@@ -434,7 +434,7 @@ fn div_round_properties() {
         pairs_of_natural_and_positive_natural_var_2,
         |&(ref x, ref y)| {
             let down = x.div_round(y, RoundingMode::Down);
-            let up = &down + 1 as Limb;
+            let up = &down + Natural::ONE;
             assert_eq!(x.div_round(y, RoundingMode::Up), up);
             assert_eq!(x.div_round(y, RoundingMode::Floor), down);
             assert_eq!(x.div_round(y, RoundingMode::Ceiling), up);

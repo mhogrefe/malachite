@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 
@@ -127,7 +128,7 @@ fn benchmark_integer_eq_signed_limb_mod_signed_limb_algorithms(
             ),
             (
                 "(Integer - SignedLimb).divisible_by(SignedLimb)",
-                &mut (|(n, i, modulus)| no_out!((n - i).divisible_by(modulus))),
+                &mut (|(n, i, modulus)| no_out!((n - Integer::from(i)).divisible_by(modulus))),
             ),
         ],
     );

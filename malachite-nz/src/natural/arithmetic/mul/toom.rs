@@ -7,10 +7,10 @@ use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
-    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
@@ -35,11 +35,10 @@ use natural::arithmetic::square::{
 };
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::{
     Limb, SignedLimb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,

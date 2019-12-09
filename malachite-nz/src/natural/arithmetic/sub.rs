@@ -3,9 +3,132 @@ use std::ops::{Sub, SubAssign};
 
 use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
 
-use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::Natural;
 use platform::Limb;
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
+/// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb;
+///
+/// assert_eq!(limbs_sub_limb(&[123, 456], 78), (vec![45, 456], false));
+/// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4_294_966_630, 455], false));
+/// assert_eq!(limbs_sub_limb(&[1], 2), (vec![4_294_967_295], true));
+/// ```
+///
+/// This is mpn_sub_1 from gmp.h, where the result is returned.
+pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
+    let len = limbs.len();
+    let mut result_limbs = Vec::with_capacity(len);
+    for i in 0..len {
+        let (difference, overflow) = limbs[i].overflowing_sub(limb);
+        result_limbs.push(difference);
+        if overflow {
+            limb = 1;
+        } else {
+            limb = 0;
+            result_limbs.extend_from_slice(&limbs[i + 1..]);
+            break;
+        }
+    }
+    (result_limbs, limb != 0)
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `Limb` from the `Natural`, writing the `in_limbs.len()` limbs of the result to an output slice.
+/// Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
+/// `Natural`. The output slice must be at least as long as the input slice.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 78), false);
+/// assert_eq!(out, &[45, 456, 0]);
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 789), false);
+/// assert_eq!(out, &[4_294_966_630, 455, 0]);
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
+/// assert_eq!(out, &[4_294_967_295, 0, 0]);
+/// ```
+///
+/// This is mpn_sub_1 from gmp.h.
+pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
+    let len = in_limbs.len();
+    assert!(out.len() >= len);
+    for i in 0..len {
+        let (difference, overflow) = in_limbs[i].overflowing_sub(limb);
+        out[i] = difference;
+        if overflow {
+            limb = 1;
+        } else {
+            limb = 0;
+            let copy_index = i + 1;
+            out[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
+            break;
+        }
+    }
+    limb != 0
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+/// `Limb` from the `Natural` and writes the limbs of the result to the input slice. Returns whether
+/// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 78), false);
+/// assert_eq!(limbs, &[45, 456]);
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 789), false);
+/// assert_eq!(limbs, &[4_294_966_630, 455]);
+///
+/// let mut limbs = vec![1];
+/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 2), true);
+/// assert_eq!(limbs, &[4_294_967_295]);
+/// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
+pub fn limbs_sub_limb_in_place(limbs: &mut [Limb], mut limb: Limb) -> bool {
+    for x in limbs.iter_mut() {
+        if x.overflowing_sub_assign(limb) {
+            limb = 1;
+        } else {
+            return false;
+        }
+    }
+    limb != 0
+}
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let (mut difference, overflow) = x.overflowing_sub(y);
@@ -517,6 +640,25 @@ pub(crate) fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
         "Cannot subtract a number from a smaller number. self: {}, other: {}",
         x, y
     );
+}
+
+impl Natural {
+    pub(crate) fn sub_limb(self, other: Limb) -> Natural {
+        self.checked_sub_limb(other)
+            .expect("Cannot subtract a Limb from a smaller Natural")
+    }
+
+    pub(crate) fn sub_limb_ref(&self, other: Limb) -> Natural {
+        self.checked_sub_limb_ref(other).unwrap_or_else(|| {
+            sub_panic(self, other);
+        })
+    }
+
+    pub(crate) fn sub_assign_limb(&mut self, other: Limb) {
+        if self.sub_assign_limb_no_panic(other) {
+            sub_panic(self, other);
+        }
+    }
 }
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.

@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::One;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 
 use common::test_properties;
 use malachite_test::inputs::base::signeds;
@@ -53,8 +54,8 @@ fn even_properties() {
     test_properties(integers, |x| {
         let even = x.even();
         assert_eq!(!x.odd(), even);
-        assert_eq!((x + 1 as Limb).odd(), even);
-        assert_eq!((x - 1 as Limb).odd(), even);
+        assert_eq!((x + Integer::ONE).odd(), even);
+        assert_eq!((x - Integer::ONE).odd(), even);
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {
@@ -67,8 +68,8 @@ fn odd_properties() {
     test_properties(integers, |x| {
         let odd = x.odd();
         assert_eq!(!x.even(), odd);
-        assert_eq!((x + 1 as Limb).even(), odd);
-        assert_eq!((x - 1 as Limb).even(), odd);
+        assert_eq!((x + Integer::ONE).even(), odd);
+        assert_eq!((x - Integer::ONE).even(), odd);
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {

@@ -328,11 +328,17 @@ impl Natural {
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::Natural;
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
 ///
-/// assert_eq!((Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((Natural::trillion() & (Natural::trillion() - 1)).to_string(),
-///     "999999995904");
+/// fn main() {
+///     use malachite_base::num::basic::traits::One;
+///     use malachite_nz::natural::Natural;
+///
+///     assert_eq!((Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
+///     assert_eq!((Natural::trillion() & (Natural::trillion() - Natural::ONE)).to_string(),
+///         "999999995904");
+/// }
 /// ```
 impl BitAnd<Natural> for Natural {
     type Output = Natural;
@@ -355,11 +361,17 @@ impl BitAnd<Natural> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!((Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((Natural::trillion() & &(Natural::trillion() - 1)).to_string(),
-///     "999999995904");
+/// fn main() {
+///     assert_eq!((Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
+///     assert_eq!((Natural::trillion() & &(Natural::trillion() - Natural::ONE)).to_string(),
+///         "999999995904");
+/// }
 /// ```
 impl<'a> BitAnd<&'a Natural> for Natural {
     type Output = Natural;
@@ -382,11 +394,17 @@ impl<'a> BitAnd<&'a Natural> for Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!((&Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((&Natural::trillion() & (Natural::trillion() - 1)).to_string(),
-///     "999999995904");
+/// fn main() {
+///     assert_eq!((&Natural::from(123u32) & Natural::from(456u32)).to_string(), "72");
+///     assert_eq!((&Natural::trillion() & (Natural::trillion() - Natural::ONE)).to_string(),
+///         "999999995904");
+/// }
 /// ```
 impl<'a> BitAnd<Natural> for &'a Natural {
     type Output = Natural;
@@ -408,11 +426,17 @@ impl<'a> BitAnd<Natural> for &'a Natural {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// assert_eq!((&Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
-/// assert_eq!((&Natural::trillion() & &(Natural::trillion() - 1)).to_string(),
-///     "999999995904");
+/// fn main() {
+///     assert_eq!((&Natural::from(123u32) & &Natural::from(456u32)).to_string(), "72");
+///     assert_eq!((&Natural::trillion() & &(Natural::trillion() - Natural::ONE)).to_string(),
+///         "999999995904");
+/// }
 /// ```
 impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     type Output = Natural;

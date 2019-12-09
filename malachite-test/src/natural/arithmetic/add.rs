@@ -4,20 +4,28 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add, limbs_add_greater, limbs_add_greater_to_out,
-    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_in_place_either, limbs_slice_add_same_length_in_place_left,
-    limbs_vec_add_in_place_either, limbs_vec_add_in_place_left,
+    limbs_add_limb, limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
+use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
+    pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_usize_and_unsigned_vec_var_1, triples_of_unsigned_vec_var_3,
     triples_of_unsigned_vec_var_4, triples_of_unsigned_vec_var_9,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_add_limb);
+    register_demo!(registry, demo_limbs_add_limb_to_out);
+    register_demo!(registry, demo_limbs_slice_add_limb_in_place);
+    register_demo!(registry, demo_limbs_vec_add_limb_in_place);
     register_demo!(registry, demo_limbs_add_greater);
     register_demo!(registry, demo_limbs_add);
     register_demo!(registry, demo_limbs_add_same_length_to_out);
@@ -35,6 +43,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_add_val_ref);
     register_demo!(registry, demo_natural_add_ref_val);
     register_demo!(registry, demo_natural_add_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_add_limb);
+    register_bench!(registry, Small, benchmark_limbs_add_limb_to_out);
+    register_bench!(registry, Small, benchmark_limbs_slice_add_limb_in_place);
+    register_bench!(registry, Small, benchmark_limbs_vec_add_limb_in_place);
     register_bench!(registry, Small, benchmark_limbs_add_greater);
     register_bench!(registry, Small, benchmark_limbs_add);
     register_bench!(registry, Small, benchmark_limbs_add_same_length_to_out);
@@ -66,6 +78,56 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_add_library_comparison);
     register_bench!(registry, Large, benchmark_natural_add_evaluation_strategy);
+}
+
+fn demo_limbs_add_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned(gm).take(limit) {
+        println!(
+            "limbs_add_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_add_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_add_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        let carry = limbs_add_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_add_limb_to_out(&mut out, {:?}, {}) = {}; \
+             out = {:?}",
+            out_old, in_limbs, limb, carry, out
+        );
+    }
+}
+
+fn demo_limbs_slice_add_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned::<Limb>(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        let carry = limbs_slice_add_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_slice_add_limb_in_place(&mut limbs, {}) = {}; limbs = {:?}",
+            limbs_old, limb, carry, limbs
+        );
+    }
+}
+
+fn demo_limbs_vec_add_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_nonempty_unsigned_vec_and_unsigned(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_vec_add_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_vec_add_limb_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, limb, limbs
+        );
+    }
 }
 
 fn demo_limbs_add_greater(gm: GenerationMode, limit: usize) {
@@ -244,6 +306,76 @@ fn demo_natural_add_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         println!("&{} + &{} = {}", x, y, &x + &y);
     }
+}
+
+fn benchmark_limbs_add_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_add_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_add_limb(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_add_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_add_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, in_limbs, limb)| {
+                no_out!(limbs_add_limb_to_out(&mut out, &in_limbs, limb))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_add_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_slice_add_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_unsigned::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb)| no_out!(limbs_slice_add_limb_in_place(&mut limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_vec_add_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_vec_add_limb_in_place(&mut Vec<Limb>, Limb)",
+        BenchmarkType::Single,
+        pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb)| limbs_vec_add_limb_in_place(&mut limbs, limb)),
+        )],
+    );
 }
 
 fn benchmark_limbs_add_greater(gm: GenerationMode, limit: usize, file_name: &str) {

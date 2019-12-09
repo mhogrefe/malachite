@@ -4,14 +4,12 @@ use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
-use natural::arithmetic::add_limb::{
+use natural::arithmetic::add::{
     limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
 };
 use natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_in_place_left, limbs_sub_to_out, limbs_vec_sub_in_place_right,
-};
-use natural::arithmetic::sub_limb::{
-    limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub, limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
+    limbs_sub_limb_to_out, limbs_sub_to_out, limbs_vec_sub_in_place_right,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -725,10 +723,19 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
-/// assert_eq!((-Integer::trillion() ^ -(Integer::trillion() + 1u32)).to_string(), "8191");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+///     assert_eq!(
+///         (-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "8191"
+///     );
+/// }
 /// ```
 impl BitXor<Integer> for Integer {
     type Output = Integer;
@@ -751,10 +758,19 @@ impl BitXor<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
-/// assert_eq!((-Integer::trillion() ^ &-(Integer::trillion() + 1u32)).to_string(), "8191");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+///     assert_eq!(
+///         (-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "8191"
+///     );
+/// }
 /// ```
 impl<'a> BitXor<&'a Integer> for Integer {
     type Output = Integer;
@@ -777,11 +793,20 @@ impl<'a> BitXor<&'a Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
-/// assert_eq!((&-Integer::trillion() ^ -(Integer::trillion() + 1u32)).to_string(), "8191");
+/// fn main() {
+///     assert_eq!((&Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+///     assert_eq!(
+///         (&-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "8191"
+///     );
+/// }
 /// ```
 impl<'a> BitXor<Integer> for &'a Integer {
     type Output = Integer;
@@ -804,11 +829,20 @@ impl<'a> BitXor<Integer> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
-/// assert_eq!((&-Integer::trillion() ^ &-(Integer::trillion() + 1u32)).to_string(), "8191");
+/// fn main() {
+///     assert_eq!((&Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+///     assert_eq!(
+///         (&-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "8191"
+///     );
+/// }
 /// ```
 impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     type Output = Integer;

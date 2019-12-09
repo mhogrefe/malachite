@@ -1,11 +1,163 @@
 use std::ops::{Add, AddAssign};
 
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// limbs of the sum of the `Natural` and a `Limb`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(n)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_add_limb;
+///
+/// assert_eq!(limbs_add_limb(&[123, 456], 789), &[912, 456]);
+/// assert_eq!(limbs_add_limb(&[0xffff_ffff, 5], 2), &[1, 6]);
+/// assert_eq!(limbs_add_limb(&[0xffff_ffff], 2), &[1, 1]);
+/// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is returned.
+pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
+    let len = limbs.len();
+    let mut result_limbs = Vec::with_capacity(len);
+    for i in 0..len {
+        let (sum, overflow) = limbs[i].overflowing_add(limb);
+        result_limbs.push(sum);
+        if overflow {
+            limb = 1;
+        } else {
+            limb = 0;
+            result_limbs.extend_from_slice(&limbs[i + 1..]);
+            break;
+        }
+    }
+    if limb != 0 {
+        result_limbs.push(limb);
+    }
+    result_limbs
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the sum of the `Natural` and a `Limb` to an output slice. The output slice must be at
+/// least as long as the input slice. Returns whether there is a carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `out` is shorter than `in_limbs`.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_add_limb_to_out;
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_add_limb_to_out(&mut out, &[123, 456], 789), false);
+/// assert_eq!(out, &[912, 456, 0]);
+///
+/// let mut out = vec![0, 0, 0];
+/// assert_eq!(limbs_add_limb_to_out(&mut out, &[0xffff_ffff], 2), true);
+/// assert_eq!(out, &[1, 0, 0]);
+/// ```
+///
+/// This is mpn_add_1 from gmp.h.
+pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
+    let len = in_limbs.len();
+    assert!(out.len() >= len);
+    for i in 0..len {
+        let (sum, overflow) = in_limbs[i].overflowing_add(limb);
+        out[i] = sum;
+        if overflow {
+            limb = 1;
+        } else {
+            limb = 0;
+            let copy_index = i + 1;
+            out[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
+            break;
+        }
+    }
+    limb != 0
+}
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the sum of the `Natural` and a `Limb` to the input slice. Returns whether there is a
+/// carry.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut limbs, 789), false);
+/// assert_eq!(limbs, &[912, 456]);
+///
+/// let mut limbs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut limbs, 2), true);
+/// assert_eq!(limbs, &[1]);
+/// ```
+///
+/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
+pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut limb: T) -> bool {
+    for x in limbs.iter_mut() {
+        if x.overflowing_add_assign(limb) {
+            limb = T::ONE;
+        } else {
+            return false;
+        }
+    }
+    limb != T::ZERO
+}
+
+/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+/// writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::add::limbs_vec_add_limb_in_place;
+///
+/// let mut limbs = vec![123, 456];
+/// limbs_vec_add_limb_in_place(&mut limbs, 789);
+/// assert_eq!(limbs, &[912, 456]);
+///
+/// let mut limbs = vec![0xffff_ffff];
+/// limbs_vec_add_limb_in_place(&mut limbs, 2);
+/// assert_eq!(limbs, &[1, 1]);
+/// ```
+///
+/// This is mpz_add_ui from mpz/aors_ui.h where the input is non-negative.
+pub fn limbs_vec_add_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
+    assert!(!limbs.is_empty());
+    if limbs_slice_add_limb_in_place(limbs, limb) {
+        limbs.push(1);
+    }
+}
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let (mut sum, overflow) = x.overflowing_add(y);
@@ -509,6 +661,40 @@ pub fn _limbs_add_same_length_with_carry_in_in_place_left(
     carry
 }
 
+impl Natural {
+    #[inline]
+    pub(crate) fn add_limb(mut self, other: Limb) -> Natural {
+        self.add_assign_limb(other);
+        self
+    }
+
+    pub(crate) fn add_limb_ref(&self, other: Limb) -> Natural {
+        if other == 0 {
+            return self.clone();
+        }
+        Natural(match *self {
+            Natural(Small(small)) => match small.overflowing_add(other) {
+                (sum, false) => Small(sum),
+                (sum, true) => Large(vec![sum, 1]),
+            },
+            Natural(Large(ref limbs)) => Large(limbs_add_limb(limbs, other)),
+        })
+    }
+
+    pub(crate) fn add_assign_limb(&mut self, other: Limb) {
+        if other == 0 {
+            return;
+        }
+        if *self == 0 as Limb {
+            *self = Natural::from(other);
+            return;
+        }
+        mutate_with_possible_promotion!(self, small, limbs, { small.checked_add(other) }, {
+            limbs_vec_add_limb_in_place(limbs, other);
+        });
+    }
+}
+
 /// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.
 ///
 /// Time: worst case O(n)
@@ -652,8 +838,8 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
             self << 1
         } else {
             match (self, other) {
-                (x, &Natural(Small(y))) => x + y,
-                (&Natural(Small(x)), y) => x + y,
+                (x, &Natural(Small(y))) => x.add_limb_ref(y),
+                (&Natural(Small(x)), y) => y.add_limb_ref(x),
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                     Natural(Large(limbs_add(xs, ys)))
                 }
@@ -690,9 +876,9 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 impl AddAssign<Natural> for Natural {
     fn add_assign(&mut self, other: Natural) {
         if let Natural(Small(y)) = other {
-            *self += y;
+            self.add_assign_limb(y);
         } else if let Natural(Small(x)) = *self {
-            *self = other + x;
+            *self = other.add_limb(x);
         } else if let Natural(Large(mut ys)) = other {
             if let Natural(Large(ref mut xs)) = *self {
                 if limbs_vec_add_in_place_either(xs, &mut ys) {
@@ -733,9 +919,9 @@ impl<'a> AddAssign<&'a Natural> for Natural {
         if self as *const Natural == other as *const Natural {
             *self <<= 1;
         } else if let Natural(Small(y)) = *other {
-            *self += y;
+            self.add_assign_limb(y);
         } else if let Natural(Small(x)) = *self {
-            *self = other.clone() + x;
+            *self = other.add_limb_ref(x);
         } else if let Natural(Large(ref ys)) = *other {
             if let Natural(Large(ref mut xs)) = *self {
                 limbs_vec_add_in_place_left(xs, ys);

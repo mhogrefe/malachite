@@ -16,7 +16,7 @@ impl<'a> Parity for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Parity;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -24,7 +24,7 @@ impl<'a> Parity for &'a Natural {
     ///     assert_eq!(Natural::from(123u32).even(), false);
     ///     assert_eq!(Natural::from(0x80u32).even(), true);
     ///     assert_eq!(Natural::trillion().even(), true);
-    ///     assert_eq!((Natural::trillion() + 1).even(), false);
+    ///     assert_eq!((Natural::trillion() + Natural::ONE).even(), false);
     /// }
     /// ```
     fn even(self) -> bool {
@@ -46,7 +46,7 @@ impl<'a> Parity for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Parity;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// fn main() {
@@ -54,7 +54,7 @@ impl<'a> Parity for &'a Natural {
     ///     assert_eq!(Natural::from(123u32).odd(), true);
     ///     assert_eq!(Natural::from(0x80u32).odd(), false);
     ///     assert_eq!(Natural::trillion().odd(), false);
-    ///     assert_eq!((Natural::trillion() + 1).odd(), true);
+    ///     assert_eq!((Natural::trillion() + Natural::ONE).odd(), true);
     /// }
     /// ```
     fn odd(self) -> bool {

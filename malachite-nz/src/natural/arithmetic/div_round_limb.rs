@@ -1,3 +1,4 @@
+use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
@@ -183,13 +184,13 @@ impl<'a> DivRound<Limb> for &'a Natural {
             let (quotient, remainder) = self.div_mod(other);
             match rm {
                 _ if remainder == 0 => quotient,
-                RoundingMode::Up | RoundingMode::Ceiling => quotient + 1 as Limb,
+                RoundingMode::Up | RoundingMode::Ceiling => quotient.add_limb(1),
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
                         || remainder == shifted_other && other.even() && quotient.odd()
                     {
-                        quotient + 1 as Limb
+                        quotient.add_limb(1)
                     } else {
                         quotient
                     }
@@ -393,13 +394,13 @@ impl DivRoundAssign<Limb> for Natural {
             let remainder = self.div_assign_mod(other);
             match rm {
                 _ if remainder == 0 => {}
-                RoundingMode::Up | RoundingMode::Ceiling => *self += 1 as Limb,
+                RoundingMode::Up | RoundingMode::Ceiling => self.increment(),
                 RoundingMode::Nearest => {
                     let shifted_other = other >> 1;
                     if remainder > shifted_other
                         || remainder == shifted_other && other.even() && self.odd()
                     {
-                        *self += 1 as Limb;
+                        self.increment();
                     }
                 }
                 RoundingMode::Exact => {

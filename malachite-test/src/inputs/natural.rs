@@ -1,4 +1,4 @@
-use std::ops::{Add, Shl, Shr};
+use std::ops::{Shl, Shr};
 
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
@@ -976,11 +976,11 @@ pub fn triples_of_natural_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Ran
     gm: GenerationMode,
 ) -> It<(Natural, T, T)>
 where
-    Natural: Add<T, Output = Natural> + From<T>,
+    Natural: From<T>,
 {
     Box::new(
         triples_of_natural_unsigned_and_unsigned(gm)
-            .map(|(n, u, modulus)| (n * Natural::from(modulus) + u, u, modulus)),
+            .map(|(n, u, modulus)| (n * Natural::from(modulus) + Natural::from(u), u, modulus)),
     )
 }
 
@@ -1071,11 +1071,11 @@ pub fn triples_of_natural_unsigned_and_small_unsigned_var_1<
     gm: GenerationMode,
 ) -> It<(Natural, T, U)>
 where
-    Natural: Shl<U, Output = Natural> + Add<T, Output = Natural>,
+    Natural: Shl<U, Output = Natural> + From<T>,
 {
     Box::new(
         triples_of_natural_unsigned_and_small_unsigned(gm)
-            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+            .map(|(n, u, pow)| ((n << pow) + Natural::from(u), u, pow)),
     )
 }
 

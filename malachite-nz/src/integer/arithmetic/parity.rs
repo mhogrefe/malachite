@@ -14,8 +14,8 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::Parity;;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::arithmetic::traits::Parity;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -23,7 +23,7 @@ impl<'a> Parity for &'a Integer {
     ///     assert_eq!(Integer::from(123).even(), false);
     ///     assert_eq!(Integer::from(-0x80).even(), true);
     ///     assert_eq!(Integer::trillion().even(), true);
-    ///     assert_eq!((-Integer::trillion() - 1u32).even(), false);
+    ///     assert_eq!((-Integer::trillion() - Integer::ONE).even(), false);
     /// }
     /// ```
     fn even(self) -> bool {
@@ -44,7 +44,7 @@ impl<'a> Parity for &'a Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Parity;;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// fn main() {
@@ -52,7 +52,7 @@ impl<'a> Parity for &'a Integer {
     ///     assert_eq!(Integer::from(123).odd(), true);
     ///     assert_eq!(Integer::from(-0x80).odd(), false);
     ///     assert_eq!(Integer::trillion().odd(), false);
-    ///     assert_eq!((-Integer::trillion() - 1u32).odd(), true);
+    ///     assert_eq!((-Integer::trillion() - Integer::ONE).odd(), true);
     /// }
     /// ```
     fn odd(self) -> bool {

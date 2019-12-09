@@ -197,7 +197,7 @@ fn eq_limb_mod_limb_properties() {
             assert_eq!(u.eq_mod(n, modulus), equal);
             assert_eq!(*n == u || modulus != 0 && u % modulus == n % modulus, equal);
             assert_eq!(
-                (&(Integer::from(n) - u).unsigned_abs()).divisible_by(modulus),
+                (&(Integer::from(n) - Integer::from(u)).unsigned_abs()).divisible_by(modulus),
                 equal
             );
             assert_eq!(
@@ -263,7 +263,9 @@ fn limb_eq_limb_mod_natural_properties() {
                 equal
             );
             assert_eq!(
-                (Integer::from(u) - v).unsigned_abs().divisible_by(modulus),
+                (Integer::from(u) - Integer::from(v))
+                    .unsigned_abs()
+                    .divisible_by(modulus),
                 equal
             )
         },

@@ -6,8 +6,9 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
-use natural::arithmetic::add::{limbs_add_to_out, limbs_slice_add_same_length_in_place_left};
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::{
+    limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+};
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
@@ -16,10 +17,9 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
+    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::Limb;

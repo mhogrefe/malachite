@@ -179,7 +179,8 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
             (
                 "|Natural - Limb|.divisible_by(Limb)",
                 &mut (|(n, u, modulus)| {
-                    no_out!((&(Integer::from(n) - u).unsigned_abs()).divisible_by(modulus))
+                    no_out!((&(Integer::from(n) - Integer::from(u)).unsigned_abs())
+                        .divisible_by(modulus))
                 }),
             ),
         ],
@@ -249,7 +250,9 @@ fn benchmark_limb_eq_limb_mod_natural_algorithms(
             (
                 "|Limb - Limb|.divisible_by(Natural)",
                 &mut (|(u, v, modulus)| {
-                    no_out!((Integer::from(u) - v).unsigned_abs().divisible_by(modulus))
+                    no_out!((Integer::from(u) - Integer::from(v))
+                        .unsigned_abs()
+                        .divisible_by(modulus))
                 }),
             ),
         ],

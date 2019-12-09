@@ -299,8 +299,8 @@ fn eq_signed_limb_mod_signed_limb_properties() {
                 *n == i || modulus != 0 && n.mod_op(modulus) == i.mod_op(modulus),
                 equal
             );
-            assert_eq!((n - i).divisible_by(modulus), equal);
-            assert_eq!((i - n).divisible_by(modulus), equal);
+            assert_eq!((n - Integer::from(i)).divisible_by(modulus), equal);
+            assert_eq!((Integer::from(i) - n).divisible_by(modulus), equal);
 
             //TODO assert_eq!(n.eq_mod(Integer::from(i), modulus), equal);
 
@@ -317,8 +317,8 @@ fn eq_signed_limb_mod_signed_limb_properties() {
             assert!(n.eq_mod(i, modulus));
             assert!(i.eq_mod(n, modulus));
             assert!(*n == i || modulus != 0 && n.mod_op(modulus) == i.mod_op(modulus));
-            assert!((n - i).divisible_by(modulus));
-            assert!((i - n).divisible_by(modulus));
+            assert!((n - Integer::from(i)).divisible_by(modulus));
+            assert!((Integer::from(i) - n).divisible_by(modulus));
 
             //TODO assert!(n.eq_mod(Integer::from(i), modulus));
 
@@ -336,8 +336,8 @@ fn eq_signed_limb_mod_signed_limb_properties() {
             assert!(!n.eq_mod(i, modulus));
             assert!(!i.eq_mod(n, modulus));
             assert!(*n != i && (modulus == 0 || n.mod_op(modulus) != i.mod_op(modulus)));
-            assert!(!(n - i).divisible_by(modulus));
-            assert!(!(i - n).divisible_by(modulus));
+            assert!(!(n - Integer::from(i)).divisible_by(modulus));
+            assert!(!(Integer::from(i) - n).divisible_by(modulus));
 
             //TODO assert!(!n.eq_mod(Integer::from(i), modulus));
 

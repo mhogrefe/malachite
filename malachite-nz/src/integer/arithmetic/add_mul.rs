@@ -468,7 +468,7 @@ impl Natural {
         } else if let Natural(Small(small_c)) = *c {
             self.add_mul_limb_neg(b, small_c)
         } else if let Natural(Small(small_a)) = *self {
-            (b * c - small_a, false)
+            ((b * c).sub_limb(small_a), false)
         } else {
             if let Natural(Large(ref a_limbs)) = *self {
                 if let Natural(Large(ref b_limbs)) = *b {

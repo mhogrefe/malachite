@@ -7,13 +7,15 @@ use malachite_base::num::arithmetic::traits::{
 };
 
 use integer::Integer;
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::mul::limb::{
     limbs_mul_limb_with_carry_to_out, limbs_slice_mul_limb_with_carry_in_place,
 };
 use natural::arithmetic::mul::limbs_mul_greater_to_out;
-use natural::arithmetic::sub::{limbs_slice_sub_in_place_right, limbs_sub_in_place_left};
-use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
+use natural::arithmetic::sub::{
+    limbs_slice_sub_in_place_right, limbs_sub_in_place_left, limbs_sub_limb_in_place,
+    limbs_sub_limb_to_out,
+};
 use natural::arithmetic::sub_mul::{
     limbs_sub_mul_limb_same_length_in_place_left, limbs_sub_mul_limb_same_length_in_place_right,
 };

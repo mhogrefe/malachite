@@ -8,7 +8,7 @@ use malachite_base::round::RoundingMode;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
 
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 #[cfg(not(feature = "32_bit_limbs"))]
 use natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use natural::Natural;

@@ -419,7 +419,7 @@ fn div_limb_properties() {
             assert_eq!(quotient_alt, quotient);
 
             assert_eq!(u.div_rem(n).0, quotient);
-            assert!(u - Natural::from(quotient) * n < *n);
+            assert!(Natural::from(u) - Natural::from(quotient) * n < *n);
         },
     );
 

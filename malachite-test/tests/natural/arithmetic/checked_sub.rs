@@ -12,7 +12,7 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::pairs_of_unsigneds;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 use malachite_test::natural::arithmetic::checked_sub::checked_sub;
 
 #[test]
@@ -130,14 +130,6 @@ fn checked_sub_properties() {
             assert!(difference <= *x);
             assert_eq!(difference + y, *x);
         }
-    });
-
-    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref x, y)| {
-        let difference = x.checked_sub(Natural::from(y));
-        assert_eq!(x.checked_sub(y), difference);
-
-        let difference = Natural::from(y).checked_sub(x);
-        assert_eq!(CheckedSub::checked_sub(y, x).map(Natural::from), difference);
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {

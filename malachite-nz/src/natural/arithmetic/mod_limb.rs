@@ -908,7 +908,7 @@ impl NegMod<Natural> for Limb {
         if rem == 0 {
             Natural::ZERO
         } else {
-            other - rem
+            other - Natural::from(rem)
         }
     }
 }
@@ -957,7 +957,7 @@ impl<'a> NegMod<&'a Natural> for Limb {
         if rem == 0 {
             Natural::ZERO
         } else {
-            other - rem
+            other - Natural::from(rem)
         }
     }
 }

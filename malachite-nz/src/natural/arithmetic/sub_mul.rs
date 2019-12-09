@@ -7,8 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::mul::limbs_mul;
-use natural::arithmetic::sub::limbs_sub_in_place_left;
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};

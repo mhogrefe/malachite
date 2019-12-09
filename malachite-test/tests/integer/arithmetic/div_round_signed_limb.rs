@@ -837,12 +837,12 @@ fn div_round_signed_limb_properties() {
         |&(ref n, i)| {
             let down = n.div_round(i, RoundingMode::Down);
             let up = if (*n >= 0 as Limb) == (i >= 0) {
-                &down + 1 as Limb
+                &down + Integer::ONE
             } else {
-                &down - 1 as Limb
+                &down - Integer::ONE
             };
             let floor = n.div_round(i, RoundingMode::Floor);
-            let ceiling = &floor + 1 as Limb;
+            let ceiling = &floor + Integer::ONE;
             assert_eq!(n.div_round(i, RoundingMode::Up), up);
             assert_eq!(n.div_round(i, RoundingMode::Ceiling), ceiling);
             let nearest = n.div_round(i, RoundingMode::Nearest);
@@ -894,12 +894,12 @@ fn div_round_signed_limb_properties() {
         |&(i, ref n)| {
             let down = i.div_round(n, RoundingMode::Down);
             let up = if (*n >= 0 as Limb) == (i >= 0) {
-                &down + 1 as Limb
+                &down + Integer::ONE
             } else {
-                &down - 1 as Limb
+                &down - Integer::ONE
             };
             let floor = i.div_round(n, RoundingMode::Floor);
-            let ceiling = &floor + 1 as Limb;
+            let ceiling = &floor + Integer::ONE;
             assert_eq!(i.div_round(n, RoundingMode::Up), up);
             assert_eq!(i.div_round(n, RoundingMode::Ceiling), ceiling);
             let nearest = i.div_round(n, RoundingMode::Nearest);

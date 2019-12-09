@@ -524,10 +524,19 @@ pub fn limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> boo
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
-/// assert_eq!((-Integer::trillion() | -(Integer::trillion() + 1u32)).to_string(), "-999999995905");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
+///     assert_eq!(
+///         (-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-999999995905"
+///     );
+/// }
 /// ```
 impl BitOr<Integer> for Integer {
     type Output = Integer;
@@ -550,11 +559,17 @@ impl BitOr<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-/// assert_eq!((-Integer::trillion() | &-(Integer::trillion() + 1u32)).to_string(),
-///     "-999999995905");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
+///     assert_eq!((-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-999999995905");
+/// }
 /// ```
 impl<'a> BitOr<&'a Integer> for Integer {
     type Output = Integer;
@@ -577,11 +592,17 @@ impl<'a> BitOr<&'a Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((&Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
-/// assert_eq!((&-Integer::trillion() | -(Integer::trillion() + 1u32)).to_string(),
-///     "-999999995905");
+/// fn main() {
+///     assert_eq!((&Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
+///     assert_eq!((&-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-999999995905");
+/// }
 /// ```
 impl<'a> BitOr<Integer> for &'a Integer {
     type Output = Integer;
@@ -604,11 +625,17 @@ impl<'a> BitOr<Integer> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((&Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-/// assert_eq!((&-Integer::trillion() | &-(Integer::trillion() + 1u32)).to_string(),
-///     "-999999995905");
+/// fn main() {
+///     assert_eq!((&Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
+///     assert_eq!((&-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-999999995905");
+/// }
 /// ```
 impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
     type Output = Integer;

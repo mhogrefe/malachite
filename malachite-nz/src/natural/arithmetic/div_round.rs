@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
@@ -11,7 +12,7 @@ use platform::Limb;
 fn div_round_nearest(quotient: Natural, remainder: Natural, denominator: &Natural) -> Natural {
     let compare = (remainder << 1u64).cmp(denominator);
     if compare == Ordering::Greater || compare == Ordering::Equal && quotient.odd() {
-        quotient + 1 as Limb
+        quotient.add_limb(1)
     } else {
         quotient
     }
@@ -20,7 +21,7 @@ fn div_round_nearest(quotient: Natural, remainder: Natural, denominator: &Natura
 fn div_round_assign_nearest(quotient: &mut Natural, remainder: Natural, denominator: &Natural) {
     let compare = (remainder << 1u64).cmp(denominator);
     if compare == Ordering::Greater || compare == Ordering::Equal && quotient.odd() {
-        *quotient += 1 as Limb;
+        quotient.increment();
     }
 }
 
@@ -258,7 +259,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
                 q
             } else {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Up => q + 1 as Limb,
+                    RoundingMode::Ceiling | RoundingMode::Up => q.add_limb(1),
                     RoundingMode::Exact => panic!("Division is not exact"),
                     RoundingMode::Nearest => div_round_nearest(q, r, &other),
                     _ => unreachable!(),
@@ -348,7 +349,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
                 q
             } else {
                 match rm {
-                    RoundingMode::Ceiling | RoundingMode::Up => q + 1 as Limb,
+                    RoundingMode::Ceiling | RoundingMode::Up => q.add_limb(1),
                     RoundingMode::Exact => panic!("Division is not exact: {} / {}", self, other),
                     RoundingMode::Nearest => div_round_nearest(q, r, other),
                     _ => unreachable!(),
@@ -427,7 +428,7 @@ impl DivRoundAssign<Natural> for Natural {
             if r != 0 as Limb {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
-                        *self += 1 as Limb;
+                        self.increment();
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
                     RoundingMode::Nearest => div_round_assign_nearest(self, r, &other),
@@ -507,7 +508,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
             if r != 0 as Limb {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
-                        *self += 1 as Limb;
+                        self.increment();
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
                     RoundingMode::Nearest => div_round_assign_nearest(self, r, other),

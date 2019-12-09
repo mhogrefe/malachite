@@ -2,10 +2,8 @@ use common::DemoBenchRegistry;
 
 pub mod abs;
 pub mod add;
-pub mod add_limb;
 pub mod add_mul;
 pub mod add_natural;
-pub mod add_signed_limb;
 pub mod div_exact_limb;
 pub mod div_exact_signed_limb;
 pub mod div_limb;
@@ -35,18 +33,14 @@ pub mod shl_u;
 pub mod shr_i;
 pub mod shr_u;
 pub mod sub;
-pub mod sub_limb;
 pub mod sub_mul;
 pub mod sub_natural;
-pub mod sub_signed_limb;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
     add::register(registry);
-    add_limb::register(registry);
     add_mul::register(registry);
     add_natural::register(registry);
-    add_signed_limb::register(registry);
     div_exact_limb::register(registry);
     div_exact_signed_limb::register(registry);
     div_limb::register(registry);
@@ -76,8 +70,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shr_i::register(registry);
     shr_u::register(registry);
     sub::register(registry);
-    sub_limb::register(registry);
     sub_mul::register(registry);
     sub_natural::register(registry);
-    sub_signed_limb::register(registry);
 }

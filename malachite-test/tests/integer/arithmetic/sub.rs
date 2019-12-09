@@ -11,9 +11,7 @@ use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_test::inputs::base::pairs_of_signeds;
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_integers,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals_var_1;
 
 #[test]
@@ -107,31 +105,12 @@ fn sub_properties() {
         assert_eq!(x - difference, *y);
     });
 
-    test_properties(
-        pairs_of_integer_and_signed,
-        |&(ref x, y): &(Integer, SignedLimb)| {
-            let difference = x - Integer::from(y);
-            assert_eq!(x - y, difference);
-            assert_eq!(y - x, -difference);
-        },
-    );
-
     #[allow(unknown_lints, eq_op)]
     test_properties(integers, |x| {
         assert_eq!(x - Integer::ZERO, *x);
         assert_eq!(Integer::ZERO - x, -x);
         assert_eq!(x - -x, x << 1);
         assert_eq!(x - x, 0 as Limb)
-    });
-
-    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
-        assert_eq!(x - y, x - Integer::from(y));
-        assert_eq!(y - x, Integer::from(y) - x);
-    });
-
-    test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref x, y)| {
-        assert_eq!(x - y, x - Integer::from(y));
-        assert_eq!(y - x, Integer::from(y) - x);
     });
 
     test_properties(pairs_of_naturals_var_1, |&(ref x, ref y)| {

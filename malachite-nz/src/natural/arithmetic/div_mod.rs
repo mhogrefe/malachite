@@ -2,6 +2,7 @@ use std::cmp::{min, Ordering};
 use std::mem::swap;
 
 use malachite_base::comparison::Max;
+use malachite_base::crement::Crementable;
 use malachite_base::limbs::{limbs_move_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
@@ -13,10 +14,10 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
-    _limbs_add_same_length_with_carry_in_to_out, limbs_add_same_length_to_out,
+    _limbs_add_same_length_with_carry_in_to_out, limbs_add_limb_to_out,
+    limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::arithmetic::div::{
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook_approx,
 };
@@ -33,11 +34,10 @@ use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_in_place_right,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out,
 };
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
@@ -2355,7 +2355,7 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
         if remainder == 0 as Limb {
             (quotient, remainder)
         } else {
-            (quotient + 1 as Limb, other - remainder)
+            (quotient.add_limb(1), other - remainder)
         }
     }
 }
@@ -2407,7 +2407,7 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
         if remainder == 0 as Limb {
             (quotient, remainder)
         } else {
-            (quotient + 1 as Limb, other - remainder)
+            (quotient.add_limb(1), other - remainder)
         }
     }
 }
@@ -2460,7 +2460,7 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
         if remainder == 0 as Limb {
             Natural::ZERO
         } else {
-            *self += 1 as Limb;
+            self.increment();
             other - remainder
         }
     }
@@ -2514,7 +2514,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
         if remainder == 0 as Limb {
             Natural::ZERO
         } else {
-            *self += 1 as Limb;
+            self.increment();
             other - remainder
         }
     }

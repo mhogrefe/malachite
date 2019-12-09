@@ -5,7 +5,7 @@ use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 
 use integer::Integer;
-use natural::arithmetic::add_limb::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
@@ -696,11 +696,17 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((-Integer::trillion() & -(Integer::trillion() + 1u32)).to_string(),
-///     "-1000000004096");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+///     assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-1000000004096");
+/// }
 /// ```
 impl BitAnd<Integer> for Integer {
     type Output = Integer;
@@ -723,11 +729,17 @@ impl BitAnd<Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((-Integer::trillion() & &-(Integer::trillion() + 1u32)).to_string(),
-///     "-1000000004096");
+/// fn main() {
+///     assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+///     assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-1000000004096");
+/// }
 /// ```
 impl<'a> BitAnd<&'a Integer> for Integer {
     type Output = Integer;
@@ -750,12 +762,18 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((&-Integer::trillion() & -(Integer::trillion() + 1u32)).to_string(),
-///     "-1000000004096");
+/// fn main () {
+///     assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+///     assert_eq!((&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-1000000004096");
+/// }
 /// ```
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
@@ -778,12 +796,18 @@ impl<'a> BitAnd<Integer> for &'a Integer {
 ///
 /// # Examples
 /// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + 1u32)).to_string(),
-///     "-1000000004096");
+/// fn main() {
+///     assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+///     assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+///         "-1000000004096");
+/// }
 /// ```
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     type Output = Integer;

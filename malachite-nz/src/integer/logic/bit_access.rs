@@ -5,8 +5,8 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::BitAccess;
 
 use integer::Integer;
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
-use natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use natural::arithmetic::sub::limbs_sub_limb_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

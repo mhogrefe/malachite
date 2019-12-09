@@ -3,6 +3,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::DivAssignMod;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::CheckedFrom;
 
 use error::ParseIntegerError;
 use natural::InnerNatural::{Large, Small};
@@ -15,9 +16,9 @@ impl Natural {
         assert!(!src.starts_with('-'));
         *self = Natural::ZERO;
         for c in src.chars() {
-            *self *= Natural::from(radix as Limb);
+            *self *= Natural::from(Limb::checked_from(radix).unwrap());
             if c >= '0' && c <= '9' {
-                *self += c as Limb - 48;
+                *self += Natural::from(c as Limb - 48);
             }
         }
         Ok(())

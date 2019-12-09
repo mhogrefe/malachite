@@ -1,9 +1,9 @@
 use std::ops::Not;
 
+use malachite_base::crement::Crementable;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
-use platform::Limb;
 
 /// Returns the bitwise complement of an `Integer`, as if it were represented in two's complement,
 /// taking the `Integer` by value.
@@ -71,14 +71,14 @@ impl<'a> Not for &'a Integer {
                 ref abs,
             } => Integer {
                 sign: false,
-                abs: abs + 1 as Limb,
+                abs: abs.add_limb_ref(1),
             },
             Integer {
                 sign: false,
                 ref abs,
             } => Integer {
                 sign: true,
-                abs: abs - 1 as Limb,
+                abs: abs.sub_limb_ref(1),
             },
         }
     }
@@ -120,10 +120,10 @@ impl NotAssign for Integer {
     fn not_assign(&mut self) {
         if self.sign {
             self.sign = false;
-            self.abs += 1 as Limb;
+            self.abs.increment();
         } else {
             self.sign = true;
-            self.abs -= 1 as Limb;
+            self.abs.decrement();
         }
     }
 }

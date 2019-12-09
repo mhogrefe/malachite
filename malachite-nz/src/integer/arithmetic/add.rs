@@ -1,8 +1,44 @@
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
+use malachite_base::num::conversion::traits::CheckedFrom;
+
 use integer::Integer;
+use natural::Natural;
 use platform::Limb;
+
+impl Integer {
+    pub(crate) fn add_assign_limb(&mut self, other: Limb) {
+        if other == 0 {
+            return;
+        }
+        if *self == 0 as Limb {
+            *self = Integer::from(other);
+            return;
+        }
+        match *self {
+            // e.g. 10 + 5; self stays positive
+            Integer {
+                sign: true,
+                ref mut abs,
+            } => abs.add_assign_limb(other),
+            // e.g. -10 + 5; self stays negative
+            Integer {
+                sign: false,
+                ref mut abs,
+            } if *abs > other => abs.sub_assign_limb(other),
+            // e.g. -5 + 10 or -5 + 5; self becomes non-negative
+            Integer {
+                ref mut sign,
+                ref mut abs,
+            } => {
+                *sign = true;
+                let small_abs = Limb::checked_from(&*abs).unwrap();
+                *abs = Natural::from(other - small_abs);
+            }
+        }
+    }
+}
 
 /// Adds an `Integer` to an `Integer`, taking both `Integer`s by value.
 ///

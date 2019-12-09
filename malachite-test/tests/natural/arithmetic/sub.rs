@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
+use malachite_base::crement::Crementable;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -9,10 +10,10 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
-    limbs_sub_in_place_left, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
-    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out,
-    limbs_vec_sub_in_place_right,
+    limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out, limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -25,20 +26,96 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::pairs_of_unsigneds_var_1;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_var_1,
-    pairs_of_unsigned_vec_var_3, quadruples_of_three_unsigned_vecs_and_bool_var_1,
-    triples_of_two_unsigned_vecs_and_bool_var_1,
-    triples_of_unsigned_vec_unsigned_and_small_usize_var_1, triples_of_unsigned_vec_var_3,
+    pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_and_unsigned,
+    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    quadruples_of_three_unsigned_vecs_and_bool_var_1, triples_of_two_unsigned_vecs_and_bool_var_1,
+    triples_of_unsigned_vec_unsigned_and_small_usize_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_3,
     triples_of_unsigned_vec_var_9, vecs_of_unsigned,
 };
-use malachite_test::inputs::natural::{
-    naturals, pairs_of_limb_and_natural_var_1, pairs_of_natural_and_limb_var_1,
-    pairs_of_naturals_var_1,
-};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals_var_1};
 use malachite_test::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_with_overlap_naive,
     limbs_sub_same_length_to_out_with_overlap_naive,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_limb() {
+    let test = |limbs: &[Limb], limb: Limb, out: (Vec<Limb>, bool)| {
+        assert_eq!(limbs_sub_limb(limbs, limb), out);
+    };
+    test(&[], 0, (vec![], false));
+    test(&[1], 2, (vec![4_294_967_295], true));
+    test(&[6, 7], 2, (vec![4, 7], false));
+    test(&[100, 101, 102], 10, (vec![90, 101, 102], false));
+    test(&[123, 456], 78, (vec![45, 456], false));
+    test(&[123, 456], 789, (vec![4_294_966_630, 455], false));
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_limb_to_out() {
+    let test =
+        |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, borrow: bool, out_after: &[Limb]| {
+            let mut out = out_before.to_vec();
+            assert_eq!(limbs_sub_limb_to_out(&mut out, limbs_in, limb), borrow);
+            assert_eq!(out, out_after);
+        };
+    test(&[10, 10, 10, 10], &[], 0, false, &[10, 10, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[1],
+        2,
+        true,
+        &[4_294_967_295, 10, 10, 10],
+    );
+    test(&[10, 10, 10, 10], &[6, 7], 2, false, &[4, 7, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        10,
+        false,
+        &[90, 101, 102, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[123, 456],
+        78,
+        false,
+        &[45, 456, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[123, 456],
+        789,
+        false,
+        &[4_294_966_630, 455, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_sub_limb_to_out_fail() {
+    limbs_sub_limb_to_out(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sub_limb_in_place() {
+    let test = |limbs: &[Limb], limb: Limb, borrow: bool, out: &[Limb]| {
+        let mut limbs = limbs.to_vec();
+        assert_eq!(limbs_sub_limb_in_place(&mut limbs, limb), borrow);
+        assert_eq!(limbs, out);
+    };
+    test(&[], 0, false, &[]);
+    test(&[1], 2, true, &[4_294_967_295]);
+    test(&[6, 7], 2, false, &[4, 7]);
+    test(&[100, 101, 102], 10, false, &[90, 101, 102]);
+    test(&[123, 456], 78, false, &[45, 456]);
+    test(&[123, 456], 789, false, &[4_294_966_630, 455]);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -830,6 +907,76 @@ fn sub_fail_4() {
 }
 
 #[test]
+fn limbs_sub_limb_properties() {
+    test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
+        let (result_limbs, borrow) = limbs_sub_limb(limbs, limb);
+        if borrow {
+            if limbs.is_empty() {
+                assert_ne!(limb, 0);
+                assert!(result_limbs.is_empty());
+            } else {
+                let mut result_limbs = result_limbs;
+                result_limbs.push(Limb::MAX);
+                assert_eq!(
+                    Integer::from_owned_twos_complement_limbs_asc(result_limbs),
+                    Integer::from(Natural::from_limbs_asc(limbs)) - Integer::from(limb)
+                );
+            }
+        } else {
+            assert_eq!(
+                Natural::from_owned_limbs_asc(result_limbs),
+                Natural::from_limbs_asc(limbs) - Natural::from(limb)
+            );
+        }
+    });
+}
+
+#[test]
+fn limbs_sub_limb_to_out_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            if limbs_sub_limb_to_out(&mut out, in_limbs, limb) {
+                let n = Integer::from(Natural::from_limbs_asc(in_limbs)) - Integer::from(limb);
+                let len = in_limbs.len();
+                let mut limbs = n.into_twos_complement_limbs_asc();
+                limbs.resize(len, Limb::MAX);
+                assert_eq!(limbs, &out[..len]);
+                assert_eq!(&out[len..], &old_out[len..]);
+            } else {
+                let n = Natural::from_limbs_asc(in_limbs) - Natural::from(limb);
+                let len = in_limbs.len();
+                let mut limbs = n.into_limbs_asc();
+                limbs.resize(len, 0);
+                assert_eq!(limbs, &out[..len]);
+                assert_eq!(&out[len..], &old_out[len..]);
+            }
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_limb_in_place_properties() {
+    test_properties(pairs_of_unsigned_vec_and_unsigned, |&(ref limbs, limb)| {
+        let mut limbs = limbs.to_vec();
+        let old_limbs = limbs.clone();
+        if limbs_sub_limb_in_place(&mut limbs, limb) {
+            let n = Integer::from(Natural::from_limbs_asc(&old_limbs)) - Integer::from(limb);
+            let mut expected_limbs = n.into_twos_complement_limbs_asc();
+            expected_limbs.resize(limbs.len(), Limb::MAX);
+            assert_eq!(limbs, expected_limbs);
+        } else {
+            let n = Natural::from_limbs_asc(&old_limbs) - Natural::from(limb);
+            let mut expected_limbs = n.into_limbs_asc();
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
+        }
+    });
+}
+
+#[test]
 fn limbs_sub_properties() {
     test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
         let (limbs, borrow) = limbs_sub(xs, ys);
@@ -1016,7 +1163,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
                     - Integer::from(Natural::from_limbs_asc(ys))
                     + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
                 if borrow_in {
-                    n -= 1 as Limb;
+                    n.decrement();
                 }
                 let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
                 limbs.resize(len, Limb::MAX);
@@ -1024,7 +1171,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             } else {
                 let mut n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
                 if borrow_in {
-                    n -= 1 as Limb;
+                    n.decrement();
                 }
                 let mut limbs = n.into_limbs_asc();
                 limbs.resize(len, 0);
@@ -1058,7 +1205,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
             };
             if borrow_in {
-                expected_result -= 1 as Limb;
+                expected_result.decrement();
             }
             assert_eq!(n, expected_result);
         },
@@ -1199,14 +1346,6 @@ fn sub_properties() {
 
         assert!(difference <= *x);
         assert_eq!(difference + y, *x);
-    });
-
-    test_properties(pairs_of_natural_and_limb_var_1, |&(ref x, y)| {
-        assert_eq!(x - y, x - Natural::from(y));
-    });
-
-    test_properties(pairs_of_limb_and_natural_var_1, |&(x, ref y)| {
-        assert_eq!(x - y, Natural::from(x) - y);
     });
 
     test_properties(pairs_of_unsigneds_var_1::<Limb>, |&(x, y)| {

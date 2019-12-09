@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-use malachite_nz::natural::arithmetic::sub_limb::limbs_sub_limb_in_place;
+use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::platform::Limb;
 

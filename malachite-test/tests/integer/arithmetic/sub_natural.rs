@@ -3,16 +3,13 @@ use std::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use rug;
 
 use common::test_properties;
 use malachite_test::common::{
     integer_to_rug_integer, natural_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integer_and_natural, pairs_of_integer_and_unsigned,
-};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_natural};
 use malachite_test::inputs::natural::naturals;
 
 #[test]
@@ -122,10 +119,5 @@ fn sub_natural_properties() {
     test_properties(integers, |x| {
         assert_eq!(x - Natural::ZERO, *x);
         assert_eq!(Natural::ZERO - x, -x);
-    });
-
-    test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref x, y)| {
-        assert_eq!(x - y, x - Natural::from(y));
-        assert_eq!(y - x, Natural::from(y) - x);
     });
 }

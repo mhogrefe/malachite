@@ -747,7 +747,7 @@ fn div_mod_limb_properties_helper(n: &Natural, u: Limb) {
     }
 
     assert!(remainder < u);
-    assert_eq!(quotient * Natural::from(u) + remainder, *n);
+    assert_eq!(quotient * Natural::from(u) + Natural::from(remainder), *n);
 }
 
 #[test]
@@ -819,7 +819,7 @@ fn div_mod_limb_properties() {
                 assert_eq!(remainder, u);
             }
             assert!(remainder < *n);
-            assert_eq!(Natural::from(quotient) * n + remainder, u);
+            assert_eq!(Natural::from(quotient) * n + Natural::from(remainder), u);
         },
     );
 
@@ -884,7 +884,7 @@ fn ceiling_div_neg_mod_limb_properties_helper(n: &Natural, u: Limb) {
     }
 
     assert!(remainder < u);
-    assert_eq!(quotient * Natural::from(u) - remainder, *n);
+    assert_eq!(quotient * Natural::from(u) - Natural::from(remainder), *n);
 }
 
 #[test]
@@ -939,7 +939,7 @@ fn ceiling_div_neg_mod_limb_properties() {
             );
 
             if u != 0 && u < *n {
-                assert_eq!(remainder, n - u);
+                assert_eq!(remainder, n - Natural::from(u));
             }
             assert!(remainder < *n);
             assert_eq!(Natural::from(quotient) * n - remainder, u);

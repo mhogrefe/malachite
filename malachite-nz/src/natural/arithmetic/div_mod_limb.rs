@@ -1,4 +1,5 @@
 use malachite_base::comparison::Max;
+use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSubAssign,
@@ -9,7 +10,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -1049,7 +1050,7 @@ impl<'a> CeilingDivNegMod<Limb> for &'a Natural {
         if remainder == 0 {
             (quotient, 0)
         } else {
-            (quotient + 1 as Limb, other - remainder)
+            (quotient.add_limb(1), other - remainder)
         }
     }
 }
@@ -1102,7 +1103,7 @@ impl CeilingDivAssignNegMod<Limb> for Natural {
         if remainder == 0 {
             0
         } else {
-            *self += 1 as Limb;
+            self.increment();
             other - remainder
         }
     }
@@ -1200,7 +1201,7 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Limb {
         if remainder == 0 {
             (quotient, Natural::ZERO)
         } else {
-            (quotient + 1, other - remainder)
+            (quotient + 1, other - Natural::from(remainder))
         }
     }
 }
@@ -1304,7 +1305,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Limb {
             Natural::ZERO
         } else {
             *self += 1;
-            other - remainder
+            other - Natural::from(remainder)
         }
     }
 }

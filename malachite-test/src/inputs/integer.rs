@@ -1,4 +1,4 @@
-use std::ops::{Add, Shl, Shr};
+use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::crement::Crementable;
@@ -1094,12 +1094,11 @@ pub fn triples_of_integer_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Ran
     gm: GenerationMode,
 ) -> It<(Integer, T, T)>
 where
-    Integer: Add<T, Output = Integer>,
-    Natural: From<T>,
+    Integer: From<T>,
 {
     Box::new(
         triples_of_integer_unsigned_and_unsigned(gm)
-            .map(|(n, u, modulus)| (n * Natural::from(modulus) + u, u, modulus)),
+            .map(|(n, u, modulus)| (n * Integer::from(modulus) + Integer::from(u), u, modulus)),
     )
 }
 
@@ -1201,13 +1200,13 @@ pub fn triples_of_integer_signed_and_signed_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Integer, T, T)>
 where
-    Integer: Add<T, Output = Integer> + From<T>,
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_signed(gm)
-            .map(|(n, i, modulus)| (n * Integer::from(modulus) + i, i, modulus)),
+            .map(|(n, i, modulus)| (n * Integer::from(modulus) + Integer::from(i), i, modulus)),
     )
 }
 
@@ -1323,11 +1322,12 @@ pub fn triples_of_integer_unsigned_and_small_unsigned_var_1<
     gm: GenerationMode,
 ) -> It<(Integer, T, U)>
 where
-    Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
+    Integer: Shl<U, Output = Integer>,
+    Integer: From<T>,
 {
     Box::new(
         triples_of_integer_unsigned_and_small_unsigned(gm)
-            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+            .map(|(n, u, pow)| ((n << pow) + Integer::from(u), u, pow)),
     )
 }
 
@@ -1425,13 +1425,14 @@ pub fn triples_of_integer_signed_and_small_unsigned_var_1<
     gm: GenerationMode,
 ) -> It<(Integer, T, U)>
 where
-    Integer: Shl<U, Output = Integer> + Add<T, Output = Integer>,
+    Integer: Shl<U, Output = Integer>,
+    Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(
         triples_of_integer_signed_and_small_unsigned(gm)
-            .map(|(n, u, pow)| ((n << pow) + u, u, pow)),
+            .map(|(n, u, pow)| ((n << pow) + Integer::from(u), u, pow)),
     )
 }
 

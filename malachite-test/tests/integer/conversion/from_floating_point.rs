@@ -1,4 +1,5 @@
 use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
@@ -639,7 +640,7 @@ macro_rules! float_properties {
             test_properties($floats_var_4, |&f| {
                 let n_floor = Integer::rounding_from(f, RoundingMode::Floor);
                 assert!(n_floor.is_valid());
-                let n_ceiling = &n_floor + 1;
+                let n_ceiling = &n_floor + Integer::ONE;
                 assert_eq!(n_ceiling, Integer::rounding_from(f, RoundingMode::Ceiling));
                 if f >= 0.0 {
                     assert_eq!(n_floor, Integer::rounding_from(f, RoundingMode::Down));
@@ -655,7 +656,7 @@ macro_rules! float_properties {
 
             test_properties($floats_var_5, |&f| {
                 let floor = Integer::rounding_from(f, RoundingMode::Floor);
-                let ceiling = &floor + 1;
+                let ceiling = &floor + Integer::ONE;
                 let nearest = Integer::rounding_from(f, RoundingMode::Nearest);
                 assert_eq!(nearest, if floor.even() { floor } else { ceiling });
             });
@@ -679,14 +680,14 @@ macro_rules! float_properties {
             test_properties($floats_var_4, |&f| {
                 let n_floor = Integer::rounding_from(f, RoundingMode::Floor);
                 assert!(n_floor.is_valid());
-                let n_ceiling = &n_floor + 1;
+                let n_ceiling = &n_floor + Integer::ONE;
                 let n_nearest = Integer::from(f);
                 assert!(n_nearest == n_floor || n_nearest == n_ceiling);
             });
 
             test_properties($floats_var_5, |&f| {
                 let floor = Integer::rounding_from(f, RoundingMode::Floor);
-                let ceiling = &floor + 1;
+                let ceiling = &floor + Integer::ONE;
                 let nearest = Integer::from(f);
                 assert_eq!(nearest, if floor.even() { floor } else { ceiling });
             });

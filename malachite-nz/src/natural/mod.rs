@@ -144,8 +144,9 @@ impl Crementable for Natural {
     ///     assert_eq!(i, 11);
     /// }
     /// ```
+    #[inline]
     fn increment(&mut self) {
-        *self += 1 as Limb;
+        self.add_assign_limb(1);
     }
 
     /// Decrements `self`.
@@ -171,8 +172,9 @@ impl Crementable for Natural {
     ///     assert_eq!(i, 9);
     /// }
     /// ```
+    #[inline]
     fn decrement(&mut self) {
-        *self -= 1 as Limb;
+        self.sub_assign_limb(1);
     }
 }
 
@@ -189,16 +191,16 @@ macro_rules! mutate_with_possible_promotion {
         }
         if let Natural(Large(ref mut $large)) = *$n {
             $process_large
+        } else {
+            unreachable!();
         }
     };
 }
 
 pub mod arithmetic {
     pub mod add;
-    pub mod add_limb;
     pub mod add_mul;
     pub mod checked_sub;
-    pub mod checked_sub_limb;
     pub mod checked_sub_mul;
     pub mod div;
     pub mod div_exact;
@@ -225,7 +227,6 @@ pub mod arithmetic {
     pub mod next_power_of_two;
     pub mod parity;
     pub mod saturating_sub;
-    pub mod saturating_sub_limb;
     pub mod saturating_sub_mul;
     pub mod shl_i;
     pub mod shl_u;
@@ -233,7 +234,6 @@ pub mod arithmetic {
     pub mod shr_u;
     pub mod square;
     pub mod sub;
-    pub mod sub_limb;
     pub mod sub_mul;
 }
 

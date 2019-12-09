@@ -3,24 +3,30 @@ use std::cmp::{max, min};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub::{
-    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
-    limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out, limbs_vec_sub_in_place_right,
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left, limbs_sub_limb,
+    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out,
+    limbs_vec_sub_in_place_right,
 };
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_var_1,
-    pairs_of_unsigned_vec_var_3, triples_of_unsigned_vec_unsigned_and_small_usize_var_1,
-    triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_9,
+    pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_and_unsigned,
+    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_unsigned_and_small_usize_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_3,
+    triples_of_unsigned_vec_var_9,
 };
 use inputs::natural::{
     nrm_pairs_of_naturals_var_1, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_sub_limb);
+    register_demo!(registry, demo_limbs_sub_limb_to_out);
+    register_demo!(registry, demo_limbs_sub_limb_in_place);
     register_demo!(registry, demo_limbs_sub);
     register_demo!(registry, demo_limbs_sub_same_length_to_out);
     register_demo!(registry, demo_limbs_sub_to_out);
@@ -37,6 +43,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_sub_val_ref);
     register_demo!(registry, demo_natural_sub_ref_val);
     register_demo!(registry, demo_natural_sub_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_sub_limb);
+    register_bench!(registry, Small, benchmark_limbs_sub_limb_to_out);
+    register_bench!(registry, Small, benchmark_limbs_sub_limb_in_place);
     register_bench!(registry, Small, benchmark_limbs_sub);
     register_bench!(registry, Small, benchmark_limbs_sub_same_length_to_out);
     register_bench!(registry, Small, benchmark_limbs_sub_to_out);
@@ -75,6 +84,44 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_sub_library_comparison);
     register_bench!(registry, Large, benchmark_natural_sub_evaluation_strategy);
+}
+
+fn demo_limbs_sub_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned(gm).take(limit) {
+        println!(
+            "limbs_sub_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_sub_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_sub_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        let borrow = limbs_sub_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_sub_limb_to_out(&mut out, {:?}, {}) = {}; \
+             out = {:?}",
+            out_old, in_limbs, limb, borrow, out
+        );
+    }
+}
+
+fn demo_limbs_sub_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_unsigned(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        let borrow = limbs_sub_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_sub_limb_in_place(&mut limbs, {}) = {}; limbs = {:?}",
+            limbs_old, limb, borrow, limbs
+        );
+    }
 }
 
 pub fn limbs_sub_same_length_in_place_with_overlap_naive(
@@ -257,6 +304,59 @@ fn demo_natural_sub_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals_var_1(gm).take(limit) {
         println!("&{} - &{} = {}", x, y, &x - &y);
     }
+}
+
+fn benchmark_limbs_sub_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_sub_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_sub_limb(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_sub_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_sub_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, in_limbs, limb)| {
+                no_out!(limbs_sub_limb_to_out(&mut out, &in_limbs, limb))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_sub_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_sub_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, limb)| no_out!(limbs_sub_limb_in_place(&mut limbs, limb))),
+        )],
+    );
 }
 
 fn benchmark_limbs_sub(gm: GenerationMode, limit: usize, file_name: &str) {

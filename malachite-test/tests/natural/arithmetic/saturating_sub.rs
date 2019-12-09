@@ -7,7 +7,7 @@ use malachite_nz::platform::Limb;
 
 use common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigneds;
-use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_unsigned, pairs_of_naturals};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 
 #[test]
 fn test_saturating_sub_natural() {
@@ -101,14 +101,6 @@ fn saturating_sub_properties() {
 
         assert!(difference <= *x);
         assert!(difference + y >= *x);
-    });
-
-    test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref x, y)| {
-        let difference = x.saturating_sub(Natural::from(y));
-        assert_eq!(x.saturating_sub(y), difference);
-
-        let difference = Natural::from(y).saturating_sub(x);
-        assert_eq!(SaturatingSub::saturating_sub(y, x), difference);
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {

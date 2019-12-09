@@ -9,9 +9,9 @@ use malachite_base::num::basic::traits::{One, Zero};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
-    limbs_slice_add_greater_in_place_left, limbs_slice_add_same_length_in_place_left,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
+    limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::add_limb::limbs_slice_add_limb_in_place;
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact_limb::{limbs_div_exact_limb_to_out, limbs_modular_invert_limb};
 use natural::arithmetic::div_mod::MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD;
@@ -23,11 +23,10 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
+    limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
     limbs_sub_same_length_to_out_with_overlap,
 };
-use natural::arithmetic::sub_limb::{limbs_sub_limb_in_place, limbs_sub_limb_to_out};
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};

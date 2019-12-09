@@ -663,7 +663,7 @@ fn ceiling_mod_limb_properties() {
             assert_eq!(u.ceiling_div_mod(n).1, remainder);
 
             if u != 0 && u < *n {
-                assert_eq!(remainder, u - n);
+                assert_eq!(remainder, Integer::from(u) - n);
             }
             assert!(remainder.lt_abs(n));
             assert!(remainder == 0 as Limb || (remainder > 0 as Limb) != (*n > 0 as Limb));

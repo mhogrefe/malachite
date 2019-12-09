@@ -111,8 +111,9 @@ impl Crementable for Integer {
     ///     assert_eq!(i, -4);
     /// }
     /// ```
+    #[inline]
     fn increment(&mut self) {
-        *self += 1;
+        self.add_assign_limb(1);
     }
 
     /// Decrements `self`.
@@ -141,18 +142,17 @@ impl Crementable for Integer {
     ///     assert_eq!(i, -6);
     /// }
     /// ```
+    #[inline]
     fn decrement(&mut self) {
-        *self -= 1 as Limb;
+        self.sub_assign_limb(1);
     }
 }
 
 pub mod arithmetic {
     pub mod abs;
     pub mod add;
-    pub mod add_limb;
     pub mod add_mul;
     pub mod add_natural;
-    pub mod add_signed_limb;
     pub mod div_exact_limb;
     pub mod div_exact_signed_limb;
     pub mod div_limb;
@@ -182,10 +182,8 @@ pub mod arithmetic {
     pub mod shr_i;
     pub mod shr_u;
     pub mod sub;
-    pub mod sub_limb;
     pub mod sub_mul;
     pub mod sub_natural;
-    pub mod sub_signed_limb;
 }
 
 pub mod comparison {
