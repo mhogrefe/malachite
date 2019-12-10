@@ -80,7 +80,6 @@ pub mod integer {
         pub mod abs;
         pub mod add;
         pub mod add_mul;
-        pub mod add_natural;
         pub mod div_exact_limb;
         pub mod div_exact_signed_limb;
         pub mod div_limb;
@@ -102,7 +101,6 @@ pub mod integer {
         pub mod mod_power_of_two;
         pub mod mod_signed_limb;
         pub mod mul;
-        pub mod mul_natural;
         pub mod neg;
         pub mod parity;
         pub mod shl_i;
@@ -111,7 +109,6 @@ pub mod integer {
         pub mod shr_u;
         pub mod sub;
         pub mod sub_mul;
-        pub mod sub_natural;
     }
 
     pub mod basic {
@@ -163,14 +160,10 @@ pub mod integer {
 
     pub mod logic {
         pub mod and;
-        pub mod and_natural;
         pub mod assign_bit;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
         pub mod checked_hamming_distance;
-        pub mod checked_hamming_distance_limb;
-        pub mod checked_hamming_distance_natural;
-        pub mod checked_hamming_distance_signed_limb;
         pub mod clear_bit;
         pub mod flip_bit;
         pub mod get_bit;
@@ -178,12 +171,10 @@ pub mod integer {
         pub mod index_of_next_true_bit;
         pub mod not;
         pub mod or;
-        pub mod or_natural;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod trailing_zeros;
         pub mod xor;
-        pub mod xor_natural;
     }
 }
 
@@ -265,7 +256,6 @@ pub mod natural {
         pub mod flip_bit;
         pub mod get_bit;
         pub mod hamming_distance;
-        pub mod hamming_distance_limb;
         pub mod index_of_next_false_bit;
         pub mod index_of_next_true_bit;
         pub mod limb_count;

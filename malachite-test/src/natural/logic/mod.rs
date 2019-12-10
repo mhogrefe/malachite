@@ -13,7 +13,6 @@ pub mod count_ones;
 pub mod flip_bit;
 pub mod get_bit;
 pub mod hamming_distance;
-pub mod hamming_distance_limb;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod limb_count;
@@ -67,7 +66,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     flip_bit::register(registry);
     get_bit::register(registry);
     hamming_distance::register(registry);
-    hamming_distance_limb::register(registry);
     index_of_next_false_bit::register(registry);
     index_of_next_true_bit::register(registry);
     limb_count::register(registry);

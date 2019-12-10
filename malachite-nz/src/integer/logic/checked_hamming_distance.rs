@@ -11,6 +11,33 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+/// Hamming distance between the negative of that `Natural` (two's complement) and the negative of a
+/// `Limb`. Both have infinitely many implicit leading ones. `limbs` cannot be empty or only contain
+/// zeros; `other_limb` cannot be zero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_limb_neg;
+///
+/// assert_eq!(limbs_hamming_distance_limb_neg(&[2], 2), 0);
+/// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
+/// ```
+pub fn limbs_hamming_distance_limb_neg(limbs: &[Limb], other_limb: Limb) -> u64 {
+    let least_significant_limb = limbs[0].wrapping_neg();
+    limbs_count_zeros_neg(limbs) - u64::from(least_significant_limb.count_zeros())
+        + least_significant_limb.hamming_distance(other_limb.wrapping_neg())
+}
+
 fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
     limbs.iter().map(|limb| u64::from(limb.count_zeros())).sum()
 }
@@ -102,6 +129,25 @@ pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     }
 }
 
+impl Natural {
+    fn hamming_distance_neg_limb(&self, other: Limb) -> u64 {
+        match *self {
+            Natural(Small(small)) => small.wrapping_neg().hamming_distance(other.wrapping_neg()),
+            Natural(Large(ref limbs)) => limbs_hamming_distance_limb_neg(limbs, other),
+        }
+    }
+
+    fn hamming_distance_neg(&self, other: &Natural) -> u64 {
+        match (self, other) {
+            (&Natural(Small(x)), _) => other.hamming_distance_neg_limb(x),
+            (_, &Natural(Small(y))) => self.hamming_distance_neg_limb(y),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                limbs_hamming_distance_neg(xs, ys)
+            }
+        }
+    }
+}
+
 impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     /// Determines the Hamming distance between two `Integer`s. The two `Integer`s have infinitely
     /// many leading zeros or infinitely many leading ones, depending on their signs. If they are
@@ -134,18 +180,6 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
             (true, true) => Some(self.abs.hamming_distance(&other.abs)),
             (false, false) => Some(self.abs.hamming_distance_neg(&other.abs)),
             _ => None,
-        }
-    }
-}
-
-impl Natural {
-    fn hamming_distance_neg(&self, other: &Natural) -> u64 {
-        match (self, other) {
-            (&Natural(Small(x)), _) => other.hamming_distance_neg_limb(x),
-            (_, &Natural(Small(y))) => self.hamming_distance_neg_limb(y),
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                limbs_hamming_distance_neg(xs, ys)
-            }
         }
     }
 }

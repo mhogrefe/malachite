@@ -201,7 +201,7 @@ fn eq_limb_mod_limb_properties() {
                 equal
             );
             assert_eq!(
-                (&(Integer::from(u) - n).unsigned_abs()).divisible_by(modulus),
+                (&(Integer::from(u) - Integer::from(n)).unsigned_abs()).divisible_by(modulus),
                 equal
             );
             #[cfg(feature = "32_bit_limbs")]

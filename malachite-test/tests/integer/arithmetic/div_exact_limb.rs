@@ -174,7 +174,7 @@ fn div_exact_limb_properties_helper(n: &Integer, u: Limb) {
         quotient
     );
     assert_eq!((-n).div_exact(u), -&quotient);
-    assert_eq!(quotient * Natural::from(u), *n);
+    assert_eq!(quotient * Integer::from(u), *n);
 }
 
 #[test]

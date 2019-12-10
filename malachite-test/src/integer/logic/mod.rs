@@ -7,14 +7,10 @@ use malachite_nz::platform::Limb;
 use common::DemoBenchRegistry;
 
 pub mod and;
-pub mod and_natural;
 pub mod assign_bit;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
-pub mod checked_hamming_distance_limb;
-pub mod checked_hamming_distance_natural;
-pub mod checked_hamming_distance_signed_limb;
 pub mod clear_bit;
 pub mod flip_bit;
 pub mod get_bit;
@@ -22,12 +18,10 @@ pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod not;
 pub mod or;
-pub mod or_natural;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
-pub mod xor_natural;
 
 pub(crate) fn integer_op_bits(
     bit_fn: &dyn Fn(bool, bool) -> bool,
@@ -85,14 +79,10 @@ pub(crate) fn integer_op_limbs(
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
-    and_natural::register(registry);
     assign_bit::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);
     checked_hamming_distance::register(registry);
-    checked_hamming_distance_limb::register(registry);
-    checked_hamming_distance_natural::register(registry);
-    checked_hamming_distance_signed_limb::register(registry);
     clear_bit::register(registry);
     flip_bit::register(registry);
     get_bit::register(registry);
@@ -100,10 +90,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     index_of_next_true_bit::register(registry);
     not::register(registry);
     or::register(registry);
-    or_natural::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
-    xor_natural::register(registry);
 }

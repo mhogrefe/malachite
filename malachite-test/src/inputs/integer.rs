@@ -439,7 +439,7 @@ where
 
 // All triples of `Integer` and positive `Limb` where the `Integer` is divisible by the `T`.
 pub fn pairs_of_integer_and_positive_limb_var_1(gm: GenerationMode) -> It<(Integer, Limb)> {
-    Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * Natural::from(u), u)))
+    Box::new(pairs_of_integer_and_positive_unsigned(gm).map(|(n, u)| (n * Integer::from(u), u)))
 }
 
 pub fn nrm_pairs_of_integer_and_positive_limb_var_1(
@@ -568,7 +568,7 @@ pub fn pairs_of_limb_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Limb, 
 pub fn pairs_of_limb_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Limb, Integer)> {
     Box::new(
         pairs_of_unsigned_and_nonzero_integer::<Limb>(gm)
-            .filter_map(|(u, n)| Limb::checked_from(Natural::from(u) * (&n).abs()).map(|u| (u, n))),
+            .filter_map(|(u, n)| Limb::checked_from(Integer::from(u) * (&n).abs()).map(|u| (u, n))),
     )
 }
 
@@ -1712,7 +1712,7 @@ where
 {
     Box::new(
         triples_of_integer_natural_and_small_unsigned(gm)
-            .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+            .map(|(x, y, pow)| ((x << pow) + Integer::from(&y), y, pow)),
     )
 }
 
@@ -2260,12 +2260,12 @@ pub fn triples_of_integer_positive_unsigned_and_rounding_mode_var_1<T: Primitive
     gm: GenerationMode,
 ) -> It<(Integer, T, RoundingMode)>
 where
-    Natural: From<T>,
+    Integer: From<T>,
 {
     Box::new(
         triples_of_integer_positive_unsigned_and_rounding_mode::<T>(gm).map(|(n, u, rm)| {
             if rm == RoundingMode::Exact {
-                (n * Natural::from(u), u, rm)
+                (n * Integer::from(u), u, rm)
             } else {
                 (n, u, rm)
             }

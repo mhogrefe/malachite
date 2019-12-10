@@ -10,7 +10,9 @@ use malachite_nz::integer::logic::xor::{
     limbs_pos_xor_limb_neg_to_out, limbs_slice_neg_xor_limb_in_place,
     limbs_slice_pos_xor_limb_neg_in_place, limbs_vec_neg_xor_limb_in_place,
     limbs_vec_pos_xor_limb_neg_in_place, limbs_xor_neg_neg, limbs_xor_neg_neg_in_place_either,
-    limbs_xor_neg_neg_in_place_left, limbs_xor_neg_neg_to_out,
+    limbs_xor_neg_neg_in_place_left, limbs_xor_neg_neg_to_out, limbs_xor_pos_neg,
+    limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
+    limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -272,6 +274,201 @@ fn limbs_neg_xor_limb_neg_to_out_fail_1() {
 #[should_panic]
 fn limbs_neg_xor_limb_neg_to_out_fail_2() {
     limbs_neg_xor_limb_neg_to_out(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_xor_pos_neg_limbs_xor_pos_neg_in_place_left_and_limbs_xor_pos_neg_in_place_right() {
+    let test = |xs_before, ys_before, out| {
+        assert_eq!(limbs_xor_pos_neg(xs_before, ys_before), out);
+
+        let mut xs = xs_before.to_vec();
+        limbs_xor_pos_neg_in_place_left(&mut xs, ys_before);
+        assert_eq!(xs, out);
+
+        let mut ys = ys_before.to_vec();
+        limbs_xor_pos_neg_in_place_right(xs_before, &mut ys);
+        assert_eq!(ys, out);
+    };
+    test(&[2], &[3], vec![1]);
+    test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 2]);
+    test(&[6, 7], &[1, 2, 3], vec![7, 5, 3]);
+    test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
+    test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
+    test(&[0, 0, 1], &[3], vec![3, 0, 1]);
+    test(&[3], &[0, 0, 1], vec![4_294_967_293, 4_294_967_295, 0]);
+    test(&[0, 3, 3], &[0, 0, 3], vec![0, 4_294_967_293, 1]);
+    test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
+    test(&[0, 3], &[0, 0, 3], vec![0, 4_294_967_293, 2]);
+    test(&[0, 0, 3], &[0, 3], vec![0, 3, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_fail_1() {
+    limbs_xor_pos_neg(&[0, 0, 0], &[3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_fail_2() {
+    limbs_xor_pos_neg(&[3], &[0, 0, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_left_fail_1() {
+    limbs_xor_pos_neg_in_place_left(&mut vec![0, 0, 0], &[3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_left_fail_2() {
+    limbs_xor_pos_neg_in_place_left(&mut vec![3], &[0, 0, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_right_fail_1() {
+    limbs_xor_pos_neg_in_place_right(&[0, 0, 0], &mut vec![3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_right_fail_2() {
+    limbs_xor_pos_neg_in_place_right(&[3], &mut vec![0, 0, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_xor_pos_neg_to_out() {
+    let test = |xs, ys, out_before: &[Limb], out_after| {
+        let mut out = out_before.to_vec();
+        limbs_xor_pos_neg_to_out(&mut out, xs, ys);
+        assert_eq!(out, out_after);
+    };
+    test(&[2], &[3], &[10, 10, 10, 10], vec![1, 10, 10, 10]);
+    test(&[1, 1, 1], &[1, 2, 3], &[10, 10, 10, 10], vec![2, 3, 2, 10]);
+    test(&[6, 7], &[1, 2, 3], &[10, 10, 10, 10], vec![7, 5, 3, 10]);
+    test(&[1, 2, 3], &[6, 7], &[10, 10, 10, 10], vec![5, 5, 3, 10]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        &[10, 10, 10, 10],
+        vec![2, 0, 2, 10],
+    );
+    test(&[0, 0, 1], &[3], &[10, 10, 10, 10], vec![3, 0, 1, 10]);
+    test(
+        &[3],
+        &[0, 0, 1],
+        &[10, 10, 10, 10],
+        vec![4_294_967_293, 4_294_967_295, 0, 10],
+    );
+    test(
+        &[0, 3, 3],
+        &[0, 0, 3],
+        &[10, 10, 10, 10],
+        vec![0, 4_294_967_293, 1, 10],
+    );
+    test(&[0, 0, 3], &[0, 3, 3], &[10, 10, 10, 10], vec![0, 3, 0, 10]);
+    test(
+        &[0, 3],
+        &[0, 0, 3],
+        &[10, 10, 10, 10],
+        vec![0, 4_294_967_293, 2, 10],
+    );
+    test(&[0, 0, 3], &[0, 3], &[10, 10, 10, 10], vec![0, 3, 3, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_to_out_fail_1() {
+    let mut out = vec![10, 10, 10, 10];
+    limbs_xor_pos_neg_to_out(&mut out, &[0, 0, 0], &[3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_to_out_fail_2() {
+    let mut out = vec![10, 10, 10, 10];
+    limbs_xor_pos_neg_to_out(&mut out, &[3], &[0, 0, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_to_out_fail_3() {
+    let mut out = vec![10];
+    limbs_xor_pos_neg_to_out(&mut out, &[6, 7], &[1, 2]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_xor_pos_neg_in_place_either() {
+    let test = |xs_before: &[Limb], ys_before: &[Limb], b, xs_after, ys_after| {
+        let mut xs = xs_before.to_vec();
+        let mut ys = ys_before.to_vec();
+        assert_eq!(limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys), b);
+        assert_eq!(xs, xs_after);
+        assert_eq!(ys, ys_after);
+    };
+    test(&[2], &[3], false, vec![1], vec![3]);
+    test(&[1, 1, 1], &[1, 2, 3], false, vec![2, 3, 2], vec![1, 2, 3]);
+    test(&[1, 2, 3], &[6, 7], false, vec![5, 5, 3], vec![6, 7]);
+    test(&[6, 7], &[1, 2, 3], true, vec![6, 7], vec![7, 5, 3]);
+    test(
+        &[100, 101, 102],
+        &[102, 101, 100],
+        false,
+        vec![2, 0, 2],
+        vec![102, 101, 100],
+    );
+    test(&[0, 0, 1], &[3], false, vec![3, 0, 1], vec![3]);
+    test(
+        &[3],
+        &[0, 0, 1],
+        true,
+        vec![3],
+        vec![4_294_967_293, 4_294_967_295, 0],
+    );
+    test(
+        &[0, 3, 3],
+        &[0, 0, 3],
+        false,
+        vec![0, 4_294_967_293, 1],
+        vec![0, 0, 3],
+    );
+    test(&[0, 0, 3], &[0, 3, 3], false, vec![0, 3, 0], vec![0, 3, 3]);
+    test(
+        &[0, 3],
+        &[0, 0, 3],
+        true,
+        vec![0, 3],
+        vec![0, 4_294_967_293, 2],
+    );
+    test(&[0, 0, 3], &[0, 3], false, vec![0, 3, 3], vec![0, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_either_fail_1() {
+    limbs_xor_pos_neg_in_place_either(&mut vec![0, 0, 0], &mut vec![3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_xor_pos_neg_in_place_either_fail_2() {
+    limbs_xor_pos_neg_in_place_either(&mut vec![3], &mut vec![0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -787,6 +984,77 @@ fn limbs_neg_xor_limb_neg_in_place_properties() {
         let mut expected_limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
         expected_limbs.resize(limbs.len(), 0);
         assert_eq!(mut_limbs, expected_limbs);
+    });
+}
+
+#[test]
+fn limbs_xor_pos_neg_properties() {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
+        assert_eq!(
+            -Natural::from_owned_limbs_asc(limbs_xor_pos_neg(xs, ys)),
+            Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_xor_pos_neg_to_out_properties() {
+    test_properties(triples_of_limb_vec_var_7, |&(ref out, ref xs, ref ys)| {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_xor_pos_neg_to_out(&mut out, xs, ys);
+        let len = max(xs.len(), ys.len());
+        assert_eq!(
+            -Natural::from_limbs_asc(&out[..len]),
+            Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_limbs_asc(ys)
+        );
+        assert_eq!(&out[len..], &out_old[len..]);
+    });
+}
+
+#[test]
+fn limbs_xor_pos_neg_in_place_left_properties() {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        limbs_xor_pos_neg_in_place_left(&mut xs, ys);
+        assert_eq!(
+            -Natural::from_owned_limbs_asc(xs),
+            Integer::from(Natural::from_owned_limbs_asc(xs_old)) ^ -Natural::from_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_xor_pos_neg_in_place_right_properties() {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
+        let mut ys = ys.to_vec();
+        let ys_old = ys.clone();
+        limbs_xor_pos_neg_in_place_right(xs, &mut ys);
+        assert_eq!(
+            -Natural::from_owned_limbs_asc(ys),
+            Integer::from(Natural::from_limbs_asc(xs)) ^ -Natural::from_owned_limbs_asc(ys_old)
+        );
+    });
+}
+
+#[test]
+fn limbs_xor_pos_neg_in_place_either_properties() {
+    test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let mut ys = ys.to_vec();
+        let ys_old = ys.clone();
+        let right = limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys);
+        let expected =
+            Integer::from(Natural::from_limbs_asc(&xs_old)) ^ -Natural::from_limbs_asc(&ys_old);
+        if right {
+            assert_eq!(xs, xs_old);
+            assert_eq!(-Natural::from_owned_limbs_asc(ys), expected);
+        } else {
+            assert_eq!(-Natural::from_owned_limbs_asc(xs), expected);
+            assert_eq!(ys, ys_old);
+        }
     });
 }
 

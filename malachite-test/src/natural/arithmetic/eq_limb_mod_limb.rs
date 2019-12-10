@@ -37,11 +37,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_limb_eq_natural_mod_limb_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_limb_eq_limb_mod_natural_algorithms
     );
 }
@@ -181,41 +176,6 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
                 &mut (|(n, u, modulus)| {
                     no_out!((&(Integer::from(n) - Integer::from(u)).unsigned_abs())
                         .divisible_by(modulus))
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limb_eq_natural_mod_limb_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Limb.eq_mod(&Natural, Limb)",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_natural_and_unsigned::<Limb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            (
-                "Limb.eq_mod(&Natural, Limb)",
-                &mut (|(u, ref n, modulus)| no_out!(u.eq_mod(n, modulus))),
-            ),
-            (
-                "Limb == Natural || Limb != 0 && Limb % Limb == Natural % Limb",
-                &mut (|(u, n, modulus)| {
-                    no_out!(u == n || modulus != 0 && u % modulus == n % modulus)
-                }),
-            ),
-            (
-                "|Limb - Natural|.divisible_by(Limb)",
-                &mut (|(u, n, modulus)| {
-                    no_out!((&(Integer::from(u) - n).unsigned_abs()).divisible_by(modulus))
                 }),
             ),
         ],

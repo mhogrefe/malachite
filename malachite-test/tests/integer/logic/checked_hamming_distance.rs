@@ -2,22 +2,43 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
-use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
+use malachite_nz::integer::logic::checked_hamming_distance::{
+    limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use rug;
 
 use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::pairs_of_unsigned_vec_var_6;
-use malachite_test::inputs::integer::{
-    integers, pairs_of_integers, pairs_of_natural_and_integer, triples_of_natural_integers,
+use malachite_test::inputs::base::{
+    pairs_of_limb_vec_and_positive_limb_var_1, pairs_of_unsigned_vec_var_6,
 };
+use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_natural_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
 use malachite_test::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_hamming_distance_limb_neg() {
+    let test = |limbs, limb, out| {
+        assert_eq!(limbs_hamming_distance_limb_neg(limbs, limb), out);
+    };
+    test(&[2], 2, 0);
+    test(&[1, 1, 1], 1, 2);
+    test(&[1, 1, 1], 2, 3);
+    test(&[1, 2, 3], 3, 4);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_hamming_distance_limb_neg_fail() {
+    limbs_hamming_distance_limb_neg(&[], 5);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -103,6 +124,19 @@ fn test_checked_hamming_distance() {
 }
 
 #[test]
+fn limbs_hamming_distance_limb_neg_properties() {
+    test_properties(
+        pairs_of_limb_vec_and_positive_limb_var_1,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                Some(limbs_hamming_distance_limb_neg(limbs, limb)),
+                (-Natural::from_limbs_asc(limbs)).checked_hamming_distance(&-Natural::from(limb)),
+            );
+        },
+    );
+}
+
+#[test]
 fn limbs_hamming_distance_neg_properties() {
     test_properties(pairs_of_unsigned_vec_var_6, |&(ref xs, ref ys)| {
         assert_eq!(
@@ -168,11 +202,5 @@ fn checked_hamming_distance_properties() {
             Integer::from(x).checked_hamming_distance(&Integer::from(y)),
             Some(x.hamming_distance(y))
         );
-    });
-
-    test_properties(pairs_of_natural_and_integer, |&(ref x, ref y)| {
-        let distance = x.checked_hamming_distance(y);
-        assert_eq!(Integer::from(x).checked_hamming_distance(y), distance);
-        assert_eq!(y.checked_hamming_distance(&Integer::from(x)), distance);
     });
 }

@@ -197,7 +197,7 @@ fn div_limb_properties_helper(n: &Integer, u: Limb) {
         quotient
     );
     assert_eq!(-n / u, -&quotient);
-    assert!((n - quotient * Natural::from(u)).lt_abs(&u));
+    assert!((n - quotient * Integer::from(u)).lt_abs(&u));
 }
 
 #[test]

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
 use malachite_nz::natural::logic::hamming_distance::{
-    limbs_hamming_distance, limbs_hamming_distance_same_length,
+    limbs_hamming_distance, limbs_hamming_distance_limb, limbs_hamming_distance_same_length,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -12,14 +12,32 @@ use rug;
 use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_1,
+    pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
 };
-use malachite_test::inputs::natural::{
-    naturals, pairs_of_naturals, triples_of_natural_natural_and_unsigned, triples_of_naturals,
-};
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 use malachite_test::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_hamming_distance_limb() {
+    let test = |limbs, limb, out| {
+        assert_eq!(limbs_hamming_distance_limb(limbs, limb), out);
+    };
+    test(&[2], 3, 1);
+    test(&[1, 1, 1], 1, 2);
+    test(&[1, 1, 1], 2, 4);
+    test(&[1, 2, 3], 0, 4);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_hamming_distance_limb_fail() {
+    limbs_hamming_distance_limb(&[], 0);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -93,6 +111,19 @@ fn test_hamming_distance() {
     test("1000000000000", "1000000000001", 1);
 }
 
+#[test]
+fn limbs_hamming_distance_limb_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                limbs_hamming_distance_limb(limbs, limb),
+                Natural::from_limbs_asc(limbs).hamming_distance(&Natural::from(limb))
+            );
+        },
+    );
+}
+
 fn limbs_hamming_distance_helper(
     f: &mut dyn FnMut(&[Limb], &[Limb]) -> u64,
     xs: &Vec<Limb>,
@@ -133,13 +164,6 @@ fn hamming_distance_properties() {
         assert_eq!((x ^ y).count_ones(), distance);
         assert_eq!((!x).checked_hamming_distance(&!y), Some(distance));
     });
-
-    test_properties(
-        triples_of_natural_natural_and_unsigned,
-        |&(ref a, ref b, c): &(Natural, Natural, Limb)| {
-            assert!(a.hamming_distance(c) <= a.hamming_distance(b) + b.hamming_distance(c));
-        },
-    );
 
     test_properties(triples_of_naturals, |&(ref a, ref b, ref c)| {
         assert!(a.hamming_distance(c) <= a.hamming_distance(b) + b.hamming_distance(c));

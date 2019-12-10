@@ -380,7 +380,11 @@ fn benchmark_natural_eq_natural_mod_natural_algorithms(
             ),
             (
                 "|Natural - Natural|.divisible_by(Natural)",
-                &mut (|(x, y, m)| no_out!((Integer::from(x) - y).unsigned_abs().divisible_by(m))),
+                &mut (|(x, y, m)| {
+                    no_out!((Integer::from(x) - Integer::from(y))
+                        .unsigned_abs()
+                        .divisible_by(m))
+                }),
             ),
         ],
     );

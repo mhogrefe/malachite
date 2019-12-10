@@ -1092,8 +1092,8 @@ fn limbs_slice_sub_in_place_right_properties() {
             if borrow {
                 assert_eq!(
                     n,
-                    Integer::from(x) - y
-                        + (Natural::ONE << (usize::wrapping_from(Limb::WIDTH) * xs_len))
+                    Integer::from(x) - Integer::from(y)
+                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * xs_len))
                 );
             } else {
                 assert_eq!(n, x - y);
@@ -1227,8 +1227,8 @@ fn limbs_sub_same_length_in_place_with_overlap_properties() {
             if borrow {
                 assert_eq!(
                     n,
-                    Integer::from(x) - y
-                        + (Natural::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+                    Integer::from(x) - Integer::from(y)
+                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
                 );
             } else {
                 assert_eq!(n, x - y);
@@ -1272,7 +1272,8 @@ fn limbs_sub_same_length_to_out_with_overlap_properties() {
         if borrow {
             assert_eq!(
                 n,
-                Integer::from(x) - y + (Natural::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+                Integer::from(x) - Integer::from(y)
+                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
             );
         } else {
             assert_eq!(n, x - y);

@@ -7,6 +7,30 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
+/// Hamming distance between that `Natural` and a `u32`. Both have infinitely many implicit leading
+/// zeros. `limbs` cannot be empty.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if `limbs` is empty.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance_limb;
+///
+/// assert_eq!(limbs_hamming_distance_limb(&[2], 3), 1);
+/// assert_eq!(limbs_hamming_distance_limb(&[1, 1, 1], 1), 2);
+/// ```
+pub fn limbs_hamming_distance_limb(limbs: &[Limb], other_limb: Limb) -> u64 {
+    limbs[0].hamming_distance(other_limb) + limbs_count_ones(&limbs[1..])
+}
+
 /// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
 /// returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
 ///
@@ -69,6 +93,15 @@ pub fn limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     }
 }
 
+impl Natural {
+    fn hamming_distance_limb(&self, other: Limb) -> u64 {
+        match *self {
+            Natural(Small(small)) => small.hamming_distance(other),
+            Natural(Large(ref limbs)) => limbs_hamming_distance_limb(limbs, other),
+        }
+    }
+}
+
 impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// Determines the Hamming distance between two `Natural`s. Both have infinitely many implicit
     /// leading zeros.
@@ -98,8 +131,8 @@ impl<'a, 'b> HammingDistance<&'a Natural> for &'b Natural {
     /// ```
     fn hamming_distance(self, other: &'a Natural) -> u64 {
         match (self, other) {
-            (&Natural(Small(x)), _) => x.hamming_distance(other),
-            (_, &Natural(Small(y))) => self.hamming_distance(y),
+            (&Natural(Small(x)), _) => other.hamming_distance_limb(x),
+            (_, &Natural(Small(y))) => self.hamming_distance_limb(y),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_hamming_distance(xs, ys),
         }
     }

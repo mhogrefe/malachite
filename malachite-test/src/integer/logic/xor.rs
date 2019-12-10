@@ -8,7 +8,9 @@ use malachite_nz::integer::logic::xor::{
     limbs_pos_xor_limb_neg_to_out, limbs_slice_neg_xor_limb_in_place,
     limbs_slice_pos_xor_limb_neg_in_place, limbs_vec_neg_xor_limb_in_place,
     limbs_vec_pos_xor_limb_neg_in_place, limbs_xor_neg_neg, limbs_xor_neg_neg_in_place_either,
-    limbs_xor_neg_neg_in_place_left, limbs_xor_neg_neg_to_out,
+    limbs_xor_neg_neg_in_place_left, limbs_xor_neg_neg_to_out, limbs_xor_pos_neg,
+    limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
+    limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
 };
 use malachite_nz::integer::Integer;
 
@@ -42,6 +44,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_neg_xor_limb_neg);
     register_demo!(registry, demo_limbs_neg_xor_limb_neg_to_out);
     register_demo!(registry, demo_limbs_neg_xor_limb_neg_in_place);
+    register_demo!(registry, demo_limbs_xor_pos_neg);
+    register_demo!(registry, demo_limbs_xor_pos_neg_to_out);
+    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_left);
+    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_right);
+    register_demo!(registry, demo_limbs_xor_pos_neg_in_place_either);
     register_demo!(registry, demo_limbs_xor_neg_neg);
     register_demo!(registry, demo_limbs_xor_neg_neg_to_out);
     register_demo!(registry, demo_limbs_xor_neg_neg_in_place_left);
@@ -71,6 +78,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_neg_xor_limb_neg);
     register_bench!(registry, Small, benchmark_limbs_neg_xor_limb_neg_to_out);
     register_bench!(registry, Small, benchmark_limbs_neg_xor_limb_neg_in_place);
+    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg);
+    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_to_out);
+    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_left);
+    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_right);
+    register_bench!(registry, Small, benchmark_limbs_xor_pos_neg_in_place_either);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg_to_out);
     register_bench!(registry, Small, benchmark_limbs_xor_neg_neg_in_place_left);
@@ -226,6 +238,69 @@ fn demo_limbs_neg_xor_limb_neg_in_place(gm: GenerationMode, limit: usize) {
             "limbs := {:?}; limbs_neg_xor_limb_neg_in_place(&mut limbs, {}); \
              limbs = {:?}",
             limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_xor_pos_neg(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
+        println!(
+            "limbs_xor_pos_neg({:?}, {:?}) = {:?}",
+            xs,
+            ys,
+            limbs_xor_pos_neg(xs, ys)
+        );
+    }
+}
+
+fn demo_limbs_xor_pos_neg_to_out(gm: GenerationMode, limit: usize) {
+    for (ref out, ref xs, ref ys) in triples_of_limb_vec_var_7(gm).take(limit) {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_xor_pos_neg_to_out(&mut out, xs, ys);
+        println!(
+            "out := {:?}; limbs_xor_pos_neg_to_out(&mut out, {:?}, {:?}); \
+             out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
+
+fn demo_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        limbs_xor_pos_neg_in_place_left(&mut xs, ys);
+        println!(
+            "xs := {:?}; limbs_xor_pos_neg_in_place_left(&mut xs, {:?}); xs = {:?}",
+            xs_old, ys, xs
+        );
+    }
+}
+
+fn demo_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
+        let mut ys = ys.to_vec();
+        let ys_old = ys.clone();
+        limbs_xor_pos_neg_in_place_right(xs, &mut ys);
+        println!(
+            "ys := {:?}; limbs_xor_pos_neg_in_place_right({:?}, &mut ys); ys = {:?}",
+            xs, ys_old, ys
+        );
+    }
+}
+
+fn demo_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys) in pairs_of_unsigned_vec_var_6(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let mut ys = ys.to_vec();
+        let ys_old = ys.clone();
+        let b = limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys);
+        println!(
+            "xs := {:?}; ys := {:?}; limbs_xor_pos_neg_in_place_either(&mut xs, &mut ys) = {}; \
+             xs = {:?}; ys = {:?}",
+            xs_old, ys_old, b, xs, ys
         );
     }
 }
@@ -524,6 +599,91 @@ fn benchmark_limbs_neg_xor_limb_neg_in_place(gm: GenerationMode, limit: usize, f
         &mut [(
             "malachite",
             &mut (|(mut limbs, limb)| limbs_neg_xor_limb_neg_in_place(&mut limbs, limb)),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_pos_neg(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_pos_neg(&[Limb], &[Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref ys)| no_out!(limbs_xor_pos_neg(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_pos_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_pos_neg_to_out(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Single,
+        triples_of_limb_vec_var_7(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, ref ys)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut out, ref xs, ref ys)| limbs_xor_pos_neg_to_out(out, xs, ys)),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_pos_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_pos_neg_in_place_left(&mut Vec<Limb>, &[Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref ys)| no_out!(limbs_xor_pos_neg_in_place_left(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_pos_neg_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_pos_neg_in_place_right(&[Limb], &mut Vec<Limb>)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref mut ys)| no_out!(limbs_xor_pos_neg_in_place_right(xs, ys))),
+        )],
+    );
+}
+
+fn benchmark_limbs_xor_pos_neg_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_xor_pos_neg_in_place_either(&mut [Limb], &mut [Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_6(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "malachite",
+            &mut (|(ref mut xs, ref mut ys)| no_out!(limbs_xor_pos_neg_in_place_either(xs, ys))),
         )],
     );
 }

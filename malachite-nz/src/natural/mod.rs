@@ -251,7 +251,6 @@ pub mod logic {
     pub mod bit_scan;
     pub mod count_ones;
     pub mod hamming_distance;
-    pub mod hamming_distance_limb;
     pub mod not;
     pub mod or;
     pub mod significant_bits;
