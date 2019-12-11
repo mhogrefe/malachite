@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
@@ -338,16 +338,10 @@ fn benchmark_natural_div_round_limb_ceiling_algorithms(
         file_name,
         &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
-        &mut [
-            (
-                "standard",
-                &mut (|(x, y)| no_out!(x.div_round(y, RoundingMode::Ceiling))),
-            ),
-            (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).0)),
-            ),
-        ],
+        &mut [(
+            "standard",
+            &mut (|(x, y)| no_out!(x.div_round(y, RoundingMode::Ceiling))),
+        )],
     );
 }
 

@@ -1,8 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
-};
+use malachite_base::num::arithmetic::traits::{Mod, ModAssign, NegMod, NegModAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::natural::arithmetic::mod_limb::{
@@ -643,8 +641,6 @@ fn mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(n.clone().mod_op(u), remainder);
     assert_eq!(n._mod_limb_naive(u), remainder);
 
-    assert_eq!(n.div_mod(u).1, remainder);
-
     #[cfg(feature = "32_bit_limbs")]
     {
         assert_eq!(num_rem_u32(natural_to_biguint(n), u), remainder);
@@ -702,8 +698,6 @@ fn mod_limb_properties() {
             mut_u.mod_assign(n.clone());
             assert_eq!(mut_u, remainder);
 
-            assert_eq!(u.div_mod(n).1, remainder);
-
             if u != 0 && u < *n {
                 assert_eq!(remainder, u);
             }
@@ -754,8 +748,6 @@ fn neg_mod_limb_properties_helper(n: &Natural, u: Limb) {
     assert_eq!(n.neg_mod(u), remainder);
     assert_eq!(n.clone().neg_mod(u), remainder);
 
-    assert_eq!(n.ceiling_div_neg_mod(u).1, remainder);
-
     #[cfg(feature = "32_bit_limbs")]
     assert_eq!(rug_neg_mod_u32(natural_to_rug_integer(n), u), remainder);
     assert!(remainder < u);
@@ -793,8 +785,6 @@ fn neg_mod_limb_properties() {
             let remainder_alt = u.neg_mod(n.clone());
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
-
-            assert_eq!(u.ceiling_div_neg_mod(n).1, remainder);
 
             if u != 0 && u < *n {
                 assert_eq!(remainder, n - Natural::from(u));

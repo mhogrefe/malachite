@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
-use natural::arithmetic::div_mod_limb::limbs_invert_limb;
+use natural::arithmetic::div_mod::limbs_invert_limb;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{

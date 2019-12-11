@@ -7,12 +7,15 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
+    _limbs_div_barrett_large_product, _limbs_div_limb_in_place_mod_alt,
+    _limbs_div_limb_in_place_mod_naive, _limbs_div_limb_to_out_mod_alt,
+    _limbs_div_limb_to_out_mod_naive, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
-    _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_mod,
+    _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_limb_in_place_mod,
+    limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
-    limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
+    limbs_div_mod_to_out, limbs_invert_limb, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
@@ -20,13 +23,14 @@ use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_9, pairs_of_unsigneds_var_2,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_9,
+    pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
     quadruples_of_unsigned_vec_var_2, quadruples_of_unsigned_vec_var_3,
     sextuples_of_four_limb_vecs_and_two_usizes_var_1, sextuples_of_limbs_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
-    triples_of_unsigned_vec_var_40,
+    triples_of_unsigned_vec_var_40, unsigneds_var_1,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -36,6 +40,10 @@ use inputs::natural::{
 // For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_invert_limb);
+    register_demo!(registry, demo_limbs_div_limb_mod);
+    register_demo!(registry, demo_limbs_div_limb_to_out_mod);
+    register_demo!(registry, demo_limbs_div_limb_in_place_mod);
     register_demo!(registry, demo_limbs_two_limb_inverse_helper);
     register_demo!(registry, demo_limbs_div_mod_three_limb_by_two_limb);
     register_demo!(registry, demo_limbs_div_mod_by_two_limb_normalized);
@@ -65,6 +73,18 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_val_ref);
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_ref_val);
     register_demo!(registry, demo_natural_ceiling_div_neg_mod_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_invert_limb);
+    register_bench!(registry, Small, benchmark_limbs_div_limb_mod);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_to_out_mod_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_in_place_mod_algorithms
+    );
     register_bench!(
         registry,
         Small,
@@ -157,6 +177,50 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 pub fn rug_ceiling_div_neg_mod(x: rug::Integer, y: rug::Integer) -> (rug::Integer, rug::Integer) {
     let (quotient, remainder) = x.div_rem_ceil(y);
     (quotient, -remainder)
+}
+
+fn demo_limbs_invert_limb(gm: GenerationMode, limit: usize) {
+    for limb in unsigneds_var_1(gm).take(limit) {
+        println!("limbs_invert_limb({}) = {}", limb, limbs_invert_limb(limb));
+    }
+}
+
+fn demo_limbs_div_limb_mod(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "limbs_div_limb_mod({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_div_limb_mod(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_div_limb_to_out_mod(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        let remainder = limbs_div_limb_to_out_mod(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_div_limb_to_out_mod(&mut out, {:?}, {}) = {}; \
+             out = {:?}",
+            out_old, in_limbs, limb, remainder, out
+        );
+    }
+}
+
+fn demo_limbs_div_limb_in_place_mod(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_div_limb_in_place_mod(&mut limbs, {}) = {}; limbs = {:?}",
+            limbs_old, limb, remainder, limbs
+        );
+    }
 }
 
 fn demo_limbs_two_limb_inverse_helper(gm: GenerationMode, limit: usize) {
@@ -481,6 +545,109 @@ fn demo_natural_ceiling_div_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
             (&x).ceiling_div_neg_mod(&y)
         );
     }
+}
+
+fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_invert_limb(Limb)",
+        BenchmarkType::Single,
+        unsigneds_var_1::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|limb| usize::checked_from(limb.significant_bits()).unwrap()),
+        "limb.significant_bits()",
+        &mut [("malachite", &mut (|limb| no_out!(limbs_invert_limb(limb))))],
+    );
+}
+
+fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_limb_mod(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_div_limb_mod(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_limb_to_out_mod_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_limb_to_out_mod(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(limbs_div_limb_to_out_mod(&mut out, &in_limbs, limb))
+                }),
+            ),
+            (
+                "alt",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(_limbs_div_limb_to_out_mod_alt(&mut out, &in_limbs, limb))
+                }),
+            ),
+            (
+                "naive",
+                &mut (|(mut out, in_limbs, limb)| {
+                    no_out!(_limbs_div_limb_to_out_mod_naive(&mut out, &in_limbs, limb))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_limb_in_place_mod_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_limb_in_place_mod(&mut [Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut limbs, limb)| no_out!(limbs_div_limb_in_place_mod(&mut limbs, limb))),
+            ),
+            (
+                "alt",
+                &mut (|(mut limbs, limb)| {
+                    no_out!(_limbs_div_limb_in_place_mod_alt(&mut limbs, limb))
+                }),
+            ),
+            (
+                "naive",
+                &mut (|(mut limbs, limb)| {
+                    no_out!(_limbs_div_limb_in_place_mod_naive(&mut limbs, limb))
+                }),
+            ),
+        ],
+    );
 }
 
 fn benchmark_limbs_div_mod_by_two_limb_normalized(

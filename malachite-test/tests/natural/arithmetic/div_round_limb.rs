@@ -1,8 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivRound, DivRoundAssign, DivisibleBy,
-};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign, DivisibleBy};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_round_limb::limbs_limb_div_round_limbs;
@@ -468,10 +466,6 @@ fn div_round_limb_properties() {
                     n.div_round(u, RoundingMode::Ceiling)
                 );
             }
-            assert_eq!(
-                n.ceiling_div_neg_mod(u).0,
-                n.div_round(u, RoundingMode::Ceiling)
-            );
         },
     );
 

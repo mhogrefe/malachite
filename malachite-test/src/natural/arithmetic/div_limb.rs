@@ -1,4 +1,3 @@
-use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_limb::{
@@ -387,7 +386,6 @@ fn benchmark_natural_div_limb_algorithms(gm: GenerationMode, limit: usize, file_
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x / y))),
             ("naive", &mut (|(x, y)| no_out!(x._div_limb_naive(y)))),
-            ("using div_rem", &mut (|(x, y)| no_out!(x.div_rem(y).0))),
         ],
     );
 }

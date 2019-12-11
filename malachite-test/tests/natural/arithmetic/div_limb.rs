@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div_limb::{
     _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
@@ -159,10 +158,6 @@ fn test_div_limb() {
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u).unwrap().div_rem(v).0;
-        assert!(q.is_valid());
-        assert_eq!(q.to_string(), quotient);
-
         let q = BigUint::from_str(u).unwrap() / v;
         assert_eq!(q.to_string(), quotient);
 
@@ -229,8 +224,6 @@ fn test_limb_div_natural() {
 
         assert_eq!(u / Natural::from_str(v).unwrap(), quotient);
         assert_eq!(u / &Natural::from_str(v).unwrap(), quotient);
-
-        assert_eq!(u.div_rem(Natural::from_str(v).unwrap()).0, quotient);
     };
     test(0, "1", 0);
     test(0, "123", 0);
@@ -367,8 +360,6 @@ fn div_limb_properties_helper(n: &Natural, u: Limb) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    assert_eq!(n.div_rem(u).0, quotient);
-
     assert_eq!(biguint_to_natural(&(natural_to_biguint(n) / u)), quotient);
     #[cfg(feature = "32_bit_limbs")]
     assert_eq!(
@@ -418,7 +409,6 @@ fn div_limb_properties() {
             let quotient_alt = u / n.clone();
             assert_eq!(quotient_alt, quotient);
 
-            assert_eq!(u.div_rem(n).0, quotient);
             assert!(Natural::from(u) - Natural::from(quotient) * n < *n);
         },
     );

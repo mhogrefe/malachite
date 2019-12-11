@@ -1,6 +1,4 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
-};
+use malachite_base::num::arithmetic::traits::{Mod, ModAssign, NegMod, NegModAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_limb::{
@@ -123,7 +121,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_neg_mod_limb_library_comparison
     );
-    register_bench!(registry, Large, benchmark_natural_neg_mod_limb_algorithms);
     register_bench!(
         registry,
         Large,
@@ -709,7 +706,6 @@ fn benchmark_natural_rem_limb_algorithms(gm: GenerationMode, limit: usize, file_
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x % y))),
             ("naive", &mut (|(x, y)| no_out!(x._mod_limb_naive(y)))),
-            ("using div_mod", &mut (|(x, y)| no_out!(x.div_mod(y).1))),
         ],
     );
 }
@@ -828,26 +824,6 @@ fn benchmark_natural_neg_mod_limb_library_comparison(
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
             ("rug", &mut (|((x, y), _)| no_out!(rug_neg_mod_u32(x, y)))),
-        ],
-    );
-}
-
-fn benchmark_natural_neg_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural.neg_mod(Limb)",
-        BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_unsigned::<Limb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("standard", &mut (|(x, y)| no_out!(x.neg_mod(y)))),
-            (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).1)),
-            ),
         ],
     );
 }

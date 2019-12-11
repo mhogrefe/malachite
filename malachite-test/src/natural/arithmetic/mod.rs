@@ -9,7 +9,6 @@ pub mod div_exact;
 pub mod div_exact_limb;
 pub mod div_limb;
 pub mod div_mod;
-pub mod div_mod_limb;
 pub mod div_round;
 pub mod div_round_limb;
 pub mod divisible_by;
@@ -47,7 +46,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     div_exact_limb::register(registry);
     div_limb::register(registry);
     div_mod::register(registry);
-    div_mod_limb::register(registry);
     div_round::register(registry);
     div_round_limb::register(registry);
     divisible_by::register(registry);

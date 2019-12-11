@@ -9,10 +9,14 @@ use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
+    _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, _limbs_div_mod_barrett,
+    _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
-    _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
+    _limbs_invert_newton_approx, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
+    limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -24,18 +28,202 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_9, pairs_of_unsigneds_var_2,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_9,
+    pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
-    quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1, triples_of_unsigned_vec_var_37,
-    triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
+    quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
+    unsigneds_var_1,
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
-    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
     positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_invert_limb() {
+    let test = |in_limb: Limb, out_limb: Limb| {
+        assert_eq!(limbs_invert_limb(in_limb), out_limb);
+    };
+    test(0x8000_0000, 0xffff_ffff);
+    test(0x8000_0001, 0xffff_fffc);
+    test(0x8000_0002, 0xffff_fff8);
+    test(0x89ab_cdef, 0xdc08_767e);
+    test(0xffff_fffd, 3);
+    test(0xffff_fffe, 2);
+    test(0xffff_ffff, 1);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_limb_mod_and_limbs_div_limb_in_place_mod() {
+    let test = |limbs: &[Limb], limb: Limb, quotient: Vec<Limb>, remainder: Limb| {
+        let (quotient_alt, remainder_alt) = limbs_div_limb_mod(limbs, limb);
+        assert_eq!(quotient_alt, quotient);
+        assert_eq!(remainder_alt, remainder);
+        let old_limbs = limbs;
+
+        let mut limbs = old_limbs.to_vec();
+        assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, limb), remainder);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        assert_eq!(
+            _limbs_div_limb_in_place_mod_alt(&mut limbs, limb),
+            remainder
+        );
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        assert_eq!(
+            _limbs_div_limb_in_place_mod_naive(&mut limbs, limb),
+            remainder
+        );
+        assert_eq!(limbs, quotient);
+    };
+    test(&[0, 0], 2, vec![0, 0], 0);
+    test(&[6, 7], 1, vec![6, 7], 0);
+    test(&[6, 7], 2, vec![2_147_483_651, 3], 0);
+    test(
+        &[100, 101, 102],
+        10,
+        vec![1_288_490_198, 858_993_469, 10],
+        8,
+    );
+    test(&[123, 456], 789, vec![2_482_262_467, 0], 636);
+    test(
+        &[0xffff_ffff, 0xffff_ffff],
+        2,
+        vec![0xffff_ffff, 0x7fff_ffff],
+        1,
+    );
+    test(
+        &[0xffff_ffff, 0xffff_ffff],
+        3,
+        vec![0x5555_5555, 0x5555_5555],
+        0,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_mod_fail_1() {
+    limbs_div_limb_mod(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_mod_fail_2() {
+    limbs_div_limb_mod(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_in_place_mod_fail_1() {
+    limbs_div_limb_in_place_mod(&mut [10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_in_place_mod_fail_2() {
+    limbs_div_limb_in_place_mod(&mut [10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_limb_to_out_mod() {
+    let test = |out_before: &[Limb],
+                limbs_in: &[Limb],
+                limb: Limb,
+                remainder: Limb,
+                out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        assert_eq!(
+            limbs_div_limb_to_out_mod(&mut out, limbs_in, limb),
+            remainder
+        );
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.to_vec();
+        assert_eq!(
+            _limbs_div_limb_to_out_mod_alt(&mut out, limbs_in, limb),
+            remainder
+        );
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.to_vec();
+        assert_eq!(
+            _limbs_div_limb_to_out_mod_naive(&mut out, limbs_in, limb),
+            remainder
+        );
+        assert_eq!(out, out_after);
+    };
+    test(&[10, 10, 10, 10], &[0, 0], 2, 0, &[0, 0, 10, 10]);
+    test(&[10, 10, 10, 10], &[6, 7], 1, 0, &[6, 7, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[6, 7],
+        2,
+        0,
+        &[2_147_483_651, 3, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        10,
+        8,
+        &[1_288_490_198, 858_993_469, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[123, 456],
+        789,
+        636,
+        &[2_482_262_467, 0, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 0xffff_ffff],
+        2,
+        1,
+        &[0xffff_ffff, 0x7fff_ffff, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 0xffff_ffff],
+        3,
+        0,
+        &[0x5555_5555, 0x5555_5555, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_to_out_mod_fail_1() {
+    limbs_div_limb_to_out_mod(&mut [10], &[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_to_out_mod_fail_2() {
+    limbs_div_limb_to_out_mod(&mut [10, 10], &[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_limb_to_out_mod_fail_3() {
+    limbs_div_limb_to_out_mod(&mut [10], &[10, 10], 10);
+}
 
 fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
     let b = Natural::ONE << Limb::WIDTH;
@@ -16219,6 +16407,88 @@ fn ceiling_div_neg_mod_ref_ref_fail() {
 }
 
 #[test]
+fn limbs_invert_limb_properties() {
+    test_properties(unsigneds_var_1, |&limb| {
+        limbs_invert_limb(limb);
+    });
+}
+
+#[test]
+fn limbs_div_limb_mod_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let (quotient_limbs, remainder) = limbs_div_limb_mod(limbs, limb);
+            let (quotient, remainder_alt) =
+                Natural::from_limbs_asc(limbs).div_mod(Natural::from(limb));
+            assert_eq!(Natural::from_owned_limbs_asc(quotient_limbs), quotient);
+            assert_eq!(remainder, remainder_alt);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_limb_to_out_mod_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            let remainder = limbs_div_limb_to_out_mod(&mut out, in_limbs, limb);
+            let (quotient, remainder_alt) =
+                Natural::from_limbs_asc(in_limbs).div_mod(Natural::from(limb));
+            assert_eq!(remainder, remainder_alt);
+            let len = in_limbs.len();
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), quotient);
+            assert_eq!(&out[len..], &old_out[len..]);
+            let final_out = out.clone();
+
+            let mut out = old_out.to_vec();
+            assert_eq!(
+                _limbs_div_limb_to_out_mod_alt(&mut out, in_limbs, limb),
+                remainder
+            );
+            assert_eq!(out, final_out);
+
+            let mut out = old_out.to_vec();
+            assert_eq!(
+                _limbs_div_limb_to_out_mod_naive(&mut out, in_limbs, limb),
+                remainder
+            );
+            assert_eq!(out, final_out);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_limb_in_place_mod_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            let remainder = limbs_div_limb_in_place_mod(&mut limbs, limb);
+            let (quotient, remainder_alt) =
+                Natural::from_limbs_asc(&old_limbs).div_mod(Natural::from(limb));
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), quotient);
+            assert_eq!(remainder, remainder_alt);
+
+            let mut limbs = old_limbs.clone();
+            let remainder_alt = _limbs_div_limb_in_place_mod_alt(&mut limbs, limb);
+            let quotient_alt = Natural::from_owned_limbs_asc(limbs);
+            assert_eq!(quotient, quotient_alt);
+            assert_eq!(remainder, remainder_alt);
+
+            let mut limbs = old_limbs.clone();
+            let remainder_alt = _limbs_div_limb_in_place_mod_naive(&mut limbs, limb);
+            let quotient_alt = Natural::from_owned_limbs_asc(limbs);
+            assert_eq!(quotient, quotient_alt);
+            assert_eq!(remainder, remainder_alt);
+        },
+    );
+}
+
+#[test]
 fn limbs_two_limb_inverse_helper_properties() {
     test_properties(pairs_of_unsigneds_var_2, |&(hi, lo)| {
         let result = limbs_two_limb_inverse_helper(hi, lo);
@@ -16482,25 +16752,6 @@ fn div_mod_properties() {
             assert_eq!(Natural::ONE.div_mod(n), (Natural::ZERO, Natural::ONE));
         }
     });
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned,
-        |&(ref n, u): &(Natural, Limb)| {
-            let (q, r) = n.div_mod(u);
-            assert_eq!(n.div_mod(Natural::from(u)), (q, Natural::from(r)));
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural,
-        |&(u, ref n): &(Limb, Natural)| {
-            let (q, r) = u.div_mod(n);
-            assert_eq!(
-                Natural::from(u).div_mod(n),
-                (Natural::from(q), Natural::from(r))
-            );
-        },
-    );
 }
 
 fn ceiling_div_neg_mod_properties_helper(x: &Natural, y: &Natural) {
@@ -16585,26 +16836,4 @@ fn ceiling_div_neg_mod_properties() {
             );
         }
     });
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned,
-        |&(ref n, u): &(Natural, Limb)| {
-            let (q, r) = n.ceiling_div_neg_mod(u);
-            assert_eq!(
-                n.ceiling_div_neg_mod(Natural::from(u)),
-                (q, Natural::from(r))
-            );
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural,
-        |&(u, ref n): &(Limb, Natural)| {
-            let (q, r) = u.ceiling_div_neg_mod(n);
-            assert_eq!(
-                Natural::from(u).ceiling_div_neg_mod(n),
-                (Natural::from(q), r)
-            );
-        },
-    );
 }

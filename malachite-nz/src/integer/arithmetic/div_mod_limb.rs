@@ -1,9 +1,10 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem,
+    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod,
+    DivRem,
 };
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use integer::Integer;
 use natural::Natural;
@@ -98,10 +99,10 @@ impl<'a> DivMod<Limb> for &'a Integer {
     /// ```
     fn div_mod(self, other: Limb) -> (Integer, Limb) {
         if self.sign {
-            let (quotient, remainder) = (&self.abs).div_mod(other);
+            let (quotient, remainder) = (&self.abs).div_mod_limb_ref(other);
             (Integer::from(quotient), remainder)
         } else {
-            let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod(other);
+            let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod_limb_ref(other);
             (-quotient, remainder)
         }
     }
@@ -157,9 +158,9 @@ impl DivAssignMod<Limb> for Integer {
     /// ```
     fn div_assign_mod(&mut self, other: Limb) -> Limb {
         if self.sign {
-            self.abs.div_assign_mod(other)
+            self.abs.div_assign_mod_limb(other)
         } else {
-            let remainder = self.abs.ceiling_div_assign_neg_mod(other);
+            let remainder = self.abs.ceiling_div_assign_neg_mod_limb(other);
             if self.abs == 0 as Limb {
                 self.sign = true;
             }
@@ -212,11 +213,11 @@ impl DivMod<Integer> for Limb {
     /// ```
     fn div_mod(self, other: Integer) -> (Integer, Integer) {
         if other.sign {
-            let (quotient, remainder) = self.div_mod(other.abs);
+            let (quotient, remainder) = Natural::from(self).div_mod(other.abs);
             (Integer::from(quotient), Integer::from(remainder))
         } else {
-            let (quotient, remainder) = self.ceiling_div_neg_mod(other.abs);
-            (-Natural::from(quotient), -remainder)
+            let (quotient, remainder) = Natural::from(self).ceiling_div_neg_mod(other.abs);
+            (-quotient, -remainder)
         }
     }
 }
@@ -266,11 +267,11 @@ impl<'a> DivMod<&'a Integer> for Limb {
     /// ```
     fn div_mod(self, other: &'a Integer) -> (Integer, Integer) {
         if other.sign {
-            let (quotient, remainder) = self.div_mod(&other.abs);
+            let (quotient, remainder) = Natural::from(self).div_mod(&other.abs);
             (Integer::from(quotient), Integer::from(remainder))
         } else {
-            let (quotient, remainder) = self.ceiling_div_neg_mod(&other.abs);
-            (-Natural::from(quotient), -remainder)
+            let (quotient, remainder) = Natural::from(self).ceiling_div_neg_mod(&other.abs);
+            (-quotient, -remainder)
         }
     }
 }
@@ -373,7 +374,7 @@ impl<'a> DivRem<Limb> for &'a Integer {
     /// }
     /// ```
     fn div_rem(self, other: Limb) -> (Integer, Integer) {
-        let (quotient, remainder) = (&self.abs).div_mod(other);
+        let (quotient, remainder) = (&self.abs).div_mod_limb_ref(other);
         if self.sign {
             (Integer::from(quotient), Integer::from(remainder))
         } else {
@@ -430,7 +431,7 @@ impl DivAssignRem<Limb> for Integer {
     /// }
     /// ```
     fn div_assign_rem(&mut self, other: Limb) -> Integer {
-        let remainder = self.abs.div_assign_mod(other);
+        let remainder = self.abs.div_assign_mod_limb(other);
         if self.sign {
             Integer::from(remainder)
         } else {
@@ -484,12 +485,13 @@ impl DivRem<Integer> for Limb {
     /// }
     /// ```
     fn div_rem(self, other: Integer) -> (Integer, Limb) {
-        let (quotient, remainder) = self.div_mod(other.abs);
+        let (quotient, remainder) = Natural::from(self).div_mod(other.abs);
+        let remainder = Limb::wrapping_from(remainder);
         (
             if other.sign {
                 Integer::from(quotient)
             } else {
-                -Natural::from(quotient)
+                -quotient
             },
             remainder,
         )
@@ -540,12 +542,13 @@ impl<'a> DivRem<&'a Integer> for Limb {
     /// }
     /// ```
     fn div_rem(self, other: &'a Integer) -> (Integer, Limb) {
-        let (quotient, remainder) = self.div_mod(&other.abs);
+        let (quotient, remainder) = Natural::from(self).div_mod(&other.abs);
+        let remainder = Limb::wrapping_from(remainder);
         (
             if other.sign {
                 Integer::from(quotient)
             } else {
-                -Natural::from(quotient)
+                -quotient
             },
             remainder,
         )
@@ -651,9 +654,9 @@ impl<'a> CeilingDivMod<Limb> for &'a Integer {
     /// ```
     fn ceiling_div_mod(self, other: Limb) -> (Integer, Integer) {
         let (quotient, remainder) = if self.sign {
-            (&self.abs).ceiling_div_neg_mod(other)
+            (&self.abs).ceiling_div_neg_mod_limb_ref(other)
         } else {
-            (&self.abs).div_mod(other)
+            (&self.abs).div_mod_limb_ref(other)
         };
         (
             Integer {
@@ -714,9 +717,9 @@ impl CeilingDivAssignMod<Limb> for Integer {
     /// ```
     fn ceiling_div_assign_mod(&mut self, other: Limb) -> Integer {
         let remainder = -Natural::from(if self.sign {
-            self.abs.ceiling_div_assign_neg_mod(other)
+            self.abs.ceiling_div_assign_neg_mod_limb(other)
         } else {
-            self.abs.div_assign_mod(other)
+            self.abs.div_assign_mod_limb(other)
         });
         self.sign |= self.abs == 0 as Limb;
         remainder
@@ -769,11 +772,11 @@ impl CeilingDivMod<Integer> for Limb {
     /// ```
     fn ceiling_div_mod(self, other: Integer) -> (Integer, Integer) {
         if other.sign {
-            let (quotient, remainder) = self.ceiling_div_neg_mod(other.abs);
+            let (quotient, remainder) = Natural::from(self).ceiling_div_neg_mod(other.abs);
             (Integer::from(quotient), -remainder)
         } else {
-            let (quotient, remainder) = self.div_mod(other.abs);
-            (-Natural::from(quotient), Integer::from(remainder))
+            let (quotient, remainder) = Natural::from(self).div_mod(other.abs);
+            (-quotient, Integer::from(remainder))
         }
     }
 }
@@ -825,11 +828,11 @@ impl<'a> CeilingDivMod<&'a Integer> for Limb {
     /// ```
     fn ceiling_div_mod(self, other: &'a Integer) -> (Integer, Integer) {
         if other.sign {
-            let (quotient, remainder) = self.ceiling_div_neg_mod(&other.abs);
+            let (quotient, remainder) = Natural::from(self).ceiling_div_neg_mod(&other.abs);
             (Integer::from(quotient), -remainder)
         } else {
-            let (quotient, remainder) = self.div_mod(&other.abs);
-            (-Natural::from(quotient), Integer::from(remainder))
+            let (quotient, remainder) = Natural::from(self).div_mod(&other.abs);
+            (-quotient, Integer::from(remainder))
         }
     }
 }

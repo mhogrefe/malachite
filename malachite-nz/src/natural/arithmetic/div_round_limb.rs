@@ -1,7 +1,5 @@
 use malachite_base::crement::Crementable;
-use malachite_base::num::arithmetic::traits::{
-    DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
-};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -181,7 +179,7 @@ impl<'a> DivRound<Limb> for &'a Natural {
         if rm == RoundingMode::Down || rm == RoundingMode::Floor {
             self / other
         } else {
-            let (quotient, remainder) = self.div_mod(other);
+            let (quotient, remainder) = self.div_mod_limb_ref(other);
             match rm {
                 _ if remainder == 0 => quotient,
                 RoundingMode::Up | RoundingMode::Ceiling => quotient.add_limb(1),
@@ -391,7 +389,7 @@ impl DivRoundAssign<Limb> for Natural {
         if rm == RoundingMode::Down || rm == RoundingMode::Floor {
             *self /= other;
         } else {
-            let remainder = self.div_assign_mod(other);
+            let remainder = self.div_assign_mod_limb(other);
             match rm {
                 _ if remainder == 0 => {}
                 RoundingMode::Up | RoundingMode::Ceiling => self.increment(),

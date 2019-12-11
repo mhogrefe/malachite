@@ -1,7 +1,6 @@
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::DivAssignMod;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 
@@ -48,7 +47,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     while i_cloned != Natural::ZERO {
         cs.push(
             i_cloned
-                .div_assign_mod(10 as Limb)
+                .div_assign_mod_limb(10)
                 .to_string()
                 .chars()
                 .next()

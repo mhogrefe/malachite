@@ -23,9 +23,6 @@ use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_positive_limb_var_1, pairs_of_integer_and_positive_unsigned,
     pairs_of_unsigned_and_nonzero_integer,
 };
-use malachite_test::inputs::natural::{
-    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
-};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::integer::arithmetic::div_mod_limb::{num_div_mod_u32, rug_div_mod_u32};
 use malachite_test::integer::arithmetic::div_mod_limb::{
@@ -691,28 +688,6 @@ fn div_mod_limb_properties() {
             );
         },
     );
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned::<Limb>,
-        |&(ref n, u)| {
-            let (quotient, remainder) = n.div_mod(u);
-            assert_eq!(
-                (Integer::from(quotient), remainder),
-                Integer::from(n).div_mod(u)
-            );
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural::<Limb>,
-        |&(u, ref n)| {
-            let (quotient, remainder) = u.div_mod(n);
-            assert_eq!(
-                (Integer::from(quotient), Integer::from(remainder)),
-                u.div_mod(Integer::from(n))
-            );
-        },
-    );
 }
 
 fn div_rem_limb_properties_helper(n: &Integer, u: Limb) {
@@ -834,28 +809,6 @@ fn div_rem_limb_properties() {
                 Integer::from(x).div_rem(y)
             );
             assert_eq!((quotient, remainder), x.div_rem(Integer::from(y)));
-        },
-    );
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned::<Limb>,
-        |&(ref n, u)| {
-            let (quotient, remainder) = n.div_rem(u);
-            assert_eq!(
-                (Integer::from(quotient), Integer::from(remainder)),
-                Integer::from(n).div_rem(u)
-            );
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural::<Limb>,
-        |&(u, ref n)| {
-            let (quotient, remainder) = u.div_rem(n);
-            assert_eq!(
-                (Integer::from(quotient), remainder),
-                u.div_rem(Integer::from(n))
-            );
         },
     );
 }
