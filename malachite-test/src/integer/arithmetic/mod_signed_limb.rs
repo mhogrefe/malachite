@@ -1,6 +1,4 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, Mod, ModAssign,
-};
+use malachite_base::num::arithmetic::traits::{CeilingMod, CeilingModAssign, Mod, ModAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedLimb;
@@ -42,11 +40,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_integer_rem_signed_limb_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_integer_rem_signed_limb_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_integer_mod_assign_signed_limb);
@@ -70,11 +63,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_ceiling_mod_signed_limb_library_comparison
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_ceiling_mod_signed_limb_algorithms
     );
     register_bench!(
         registry,
@@ -266,23 +254,6 @@ fn benchmark_integer_rem_signed_limb_library_comparison(
     );
 }
 
-fn benchmark_integer_rem_signed_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer % SignedLimb",
-        BenchmarkType::Algorithms,
-        pairs_of_integer_and_nonzero_signed::<SignedLimb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("standard", &mut (|(x, y)| no_out!(x % y))),
-            ("using div_mod", &mut (|(x, y)| no_out!(x.div_mod(y).1))),
-        ],
-    );
-}
-
 fn benchmark_integer_rem_signed_limb_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -432,30 +403,6 @@ fn benchmark_integer_ceiling_mod_signed_limb_library_comparison(
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x.ceiling_mod(y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.rem_ceil(y)))),
-        ],
-    );
-}
-
-fn benchmark_integer_ceiling_mod_signed_limb_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.ceiling_mod(SignedLimb)",
-        BenchmarkType::Algorithms,
-        pairs_of_integer_and_nonzero_signed::<SignedLimb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("standard", &mut (|(x, y)| no_out!(x.ceiling_mod(y)))),
-            (
-                "using ceiling_div_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_mod(y).1)),
-            ),
         ],
     );
 }

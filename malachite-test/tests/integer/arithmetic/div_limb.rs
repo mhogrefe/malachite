@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
@@ -34,10 +33,6 @@ fn test_div_limb() {
         assert_eq!(q.to_string(), quotient);
 
         let q = &Integer::from_str(u).unwrap() / v;
-        assert!(q.is_valid());
-        assert_eq!(q.to_string(), quotient);
-
-        let q = Integer::from_str(u).unwrap().div_rem(v).0;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
@@ -128,10 +123,6 @@ fn test_limb_div_integer() {
         let q = u / &Integer::from_str(v).unwrap();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
-
-        let q = u.div_rem(Integer::from_str(v).unwrap()).0;
-        assert!(q.is_valid());
-        assert_eq!(q.to_string(), quotient);
     };
     test(0, "1", "0");
     test(0, "123", "0");
@@ -186,8 +177,6 @@ fn div_limb_properties_helper(n: &Integer, u: Limb) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    assert_eq!(n.div_rem(u).0, quotient);
-
     //TODO assert_eq!(n / Natural::from(u), quotient);
 
     assert_eq!(bigint_to_integer(&(integer_to_bigint(n) / u)), quotient);
@@ -225,8 +214,6 @@ fn div_limb_properties() {
             let quotient_alt = u / n.clone();
             assert!(quotient_alt.is_valid());
             assert_eq!(quotient_alt, quotient);
-
-            assert_eq!(u.div_rem(n).0, quotient);
 
             assert_eq!(u / -n, -&quotient);
 

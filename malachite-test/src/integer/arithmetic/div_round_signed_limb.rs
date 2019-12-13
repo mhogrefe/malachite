@@ -1,6 +1,7 @@
-use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_base::round::RoundingMode;
 use malachite_nz::platform::SignedLimb;
 use num::{BigInt, Integer};
@@ -13,7 +14,7 @@ use inputs::integer::nrm_pairs_of_integer_and_nonzero_signed;
 #[cfg(feature = "32_bit_limbs")]
 use inputs::integer::rm_pairs_of_integer_and_nonzero_signed;
 use inputs::integer::{
-    pairs_of_integer_and_nonzero_signed, triples_of_integer_nonzero_signed_and_rounding_mode_var_1,
+    triples_of_integer_nonzero_signed_and_rounding_mode_var_1,
     triples_of_signed_nonzero_integer_and_rounding_mode_var_1,
 };
 
@@ -45,11 +46,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_div_round_signed_limb_ceiling_library_comparison
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_div_round_signed_limb_ceiling_algorithms
     );
     register_bench!(
         registry,
@@ -229,33 +225,6 @@ fn benchmark_integer_div_round_signed_limb_ceiling_library_comparison(
                 &mut (|(_, (x, y))| no_out!(x.div_round(y, RoundingMode::Ceiling))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.div_ceil(y)))),
-        ],
-    );
-}
-
-fn benchmark_integer_div_round_signed_limb_ceiling_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.div_round(SignedLimb, RoundingMode::Ceiling)",
-        BenchmarkType::Algorithms,
-        pairs_of_integer_and_nonzero_signed::<SignedLimb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            (
-                "standard",
-                &mut (|(x, y)| no_out!(x.div_round(y, RoundingMode::Ceiling))),
-            ),
-            (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_mod(y).0)),
-            ),
         ],
     );
 }

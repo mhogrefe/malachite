@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
@@ -15,7 +15,6 @@ use inputs::integer::{
     nrm_pairs_of_integer_and_positive_unsigned, rm_pairs_of_integer_and_positive_unsigned,
 };
 use inputs::integer::{
-    pairs_of_integer_and_positive_unsigned,
     triples_of_integer_positive_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_nonzero_integer_and_rounding_mode_var_1,
 };
@@ -43,11 +42,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_div_round_limb_ceiling_library_comparison
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_div_round_limb_ceiling_algorithms
     );
     register_bench!(
         registry,
@@ -251,33 +245,6 @@ fn benchmark_integer_div_round_limb_ceiling_library_comparison(
                 &mut (|(_, (x, y))| no_out!(x.div_round(y, RoundingMode::Ceiling))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.div_ceil(y)))),
-        ],
-    );
-}
-
-fn benchmark_integer_div_round_limb_ceiling_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Integer.div_round(Limb, RoundingMode::Ceiling)",
-        BenchmarkType::Algorithms,
-        pairs_of_integer_and_positive_unsigned::<Limb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            (
-                "standard",
-                &mut (|(x, y)| no_out!(x.div_round(y, RoundingMode::Ceiling))),
-            ),
-            (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_mod(y).0)),
-            ),
         ],
     );
 }

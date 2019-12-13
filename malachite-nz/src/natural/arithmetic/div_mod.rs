@@ -1858,25 +1858,6 @@ impl Natural {
             remainder
         }
     }
-
-    pub(crate) fn ceiling_div_neg_mod_limb_ref(&self, other: Limb) -> (Natural, Limb) {
-        let (quotient, remainder) = self.div_mod_limb_ref(other);
-        if remainder == 0 {
-            (quotient, 0)
-        } else {
-            (quotient.add_limb(1), other - remainder)
-        }
-    }
-
-    pub(crate) fn ceiling_div_assign_neg_mod_limb(&mut self, other: Limb) -> Limb {
-        let remainder = self.div_assign_mod_limb(other);
-        if remainder == 0 {
-            0
-        } else {
-            self.increment();
-            other - remainder
-        }
-    }
 }
 
 impl DivMod<Natural> for Natural {

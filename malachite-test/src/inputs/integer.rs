@@ -641,6 +641,58 @@ pub fn pairs_of_natural_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+pub fn pairs_of_integer_and_nonzero_integer(gm: GenerationMode) -> It<(Integer, Integer)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_integers(),
+            exhaustive_nonzero_integers(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_nonzero_integers(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+        )),
+    }
+}
+
+pub fn rm_pairs_of_integer_and_nonzero_integer(
+    gm: GenerationMode,
+) -> It<((rug::Integer, rug::Integer), (Integer, Integer))> {
+    Box::new(pairs_of_integer_and_nonzero_integer(gm).map(|(x, y)| {
+        (
+            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+pub fn nrm_pairs_of_integer_and_nonzero_integer(
+    gm: GenerationMode,
+) -> It<(
+    (BigInt, BigInt),
+    (rug::Integer, rug::Integer),
+    (Integer, Integer),
+)> {
+    Box::new(pairs_of_integer_and_nonzero_integer(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), integer_to_bigint(&y)),
+            (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+            (x, y),
+        )
+    }))
+}
+
+// All pairs of `Integer` and nonzero `Integer` where the first `Integer` is divisible by the
+// second.
+pub fn pairs_of_integer_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Integer, Integer)> {
+    Box::new(pairs_of_integer_and_nonzero_integer(gm).map(|(x, y)| (x * &y, y)))
+}
+
 fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Integer, Integer, T)> {

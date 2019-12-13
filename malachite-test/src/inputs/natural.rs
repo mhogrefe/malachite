@@ -559,7 +559,7 @@ pub fn nrm_pairs_of_natural_and_positive_natural(
 // All pairs of `Natural` and positive `Natural` where the first `Natural` is divisible by the
 // second.
 pub fn pairs_of_natural_and_positive_natural_var_1(gm: GenerationMode) -> It<(Natural, Natural)> {
-    Box::new(pairs_of_natural_and_positive_natural(gm).map(|(n, u)| (n * &u, u)))
+    Box::new(pairs_of_natural_and_positive_natural(gm).map(|(x, y)| (x * &y, y)))
 }
 
 pub fn nrm_pairs_of_natural_and_positive_natural_var_1(

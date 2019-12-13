@@ -83,8 +83,7 @@ pub mod integer {
         pub mod div_exact_limb;
         pub mod div_exact_signed_limb;
         pub mod div_limb;
-        pub mod div_mod_limb;
-        pub mod div_mod_signed_limb;
+        pub mod div_mod;
         pub mod div_round_limb;
         pub mod div_round_signed_limb;
         pub mod div_signed_limb;

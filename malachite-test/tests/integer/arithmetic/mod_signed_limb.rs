@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, UnsignedAbs,
+    CeilingMod, CeilingModAssign, Mod, ModAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -587,8 +587,6 @@ fn mod_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    assert_eq!(n.div_mod(i).1, remainder);
-
     //TODO assert_eq!(n.mod_op(Integer::from(u)), remainder);
 
     assert_eq!(
@@ -628,7 +626,6 @@ fn mod_signed_limb_properties() {
         |&(i, ref n): &(SignedLimb, Integer)| {
             let remainder = i.mod_op(n);
             assert_eq!(i.mod_op(n.clone()), remainder);
-            assert_eq!(i.div_mod(n).1, remainder);
 
             if i > 0 && i < *n {
                 assert_eq!(remainder, i.unsigned_abs());
@@ -688,8 +685,6 @@ fn rem_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    assert_eq!(n.div_rem(i).1, remainder);
-
     //TODO assert_eq!(n % Integer::from(u), remainder);
 
     assert_eq!(bigint_to_integer(&(integer_to_bigint(n) % i)), remainder);
@@ -725,8 +720,6 @@ fn rem_signed_limb_properties() {
         |&(i, ref n): &(SignedLimb, Integer)| {
             let remainder = i % n;
             assert_eq!(i % n.clone(), remainder);
-
-            assert_eq!(i.div_rem(n).1, remainder);
 
             if i > 0 && i.lt_abs(n) {
                 assert_eq!(remainder, i);
@@ -787,8 +780,6 @@ fn ceiling_mod_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    assert_eq!(n.ceiling_div_mod(i).1, remainder);
-
     //TODO assert_eq!(n.ceiling_mod(Integer::from(u)), remainder);
 
     #[cfg(feature = "32_bit_limbs")]
@@ -827,8 +818,6 @@ fn ceiling_mod_signed_limb_properties() {
             let remainder_alt = i.ceiling_mod(n.clone());
             assert!(remainder_alt.is_valid());
             assert_eq!(remainder_alt, remainder);
-
-            assert_eq!(i.ceiling_div_mod(n).1, remainder);
 
             assert!(remainder.lt_abs(n));
             assert!(remainder == 0 as Limb || (remainder >= 0 as Limb) != (*n > 0 as Limb));

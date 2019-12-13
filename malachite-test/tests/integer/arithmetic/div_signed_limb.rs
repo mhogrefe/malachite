@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
@@ -32,10 +31,6 @@ fn test_div_signed_limb() {
         assert_eq!(q.to_string(), quotient);
 
         let q = &Integer::from_str(i).unwrap() / j;
-        assert!(q.is_valid());
-        assert_eq!(q.to_string(), quotient);
-
-        let q = Integer::from_str(i).unwrap().div_rem(j).0;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
@@ -189,10 +184,6 @@ fn test_signed_limb_div_integer() {
         let q = i / &Integer::from_str(j).unwrap();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
-
-        let q = i.div_rem(Integer::from_str(j).unwrap()).0;
-        assert!(q.is_valid());
-        assert_eq!(q.to_string(), quotient);
     };
     test(0, "1", "0");
     test(0, "123", "0");
@@ -266,8 +257,6 @@ fn div_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    assert_eq!(n.div_rem(i).0, quotient);
-
     //TODO assert_eq!(n / Integer::from(i), quotient);
 
     assert_eq!(bigint_to_integer(&(integer_to_bigint(n) / i)), quotient);
@@ -309,8 +298,6 @@ fn div_signed_limb_properties() {
             let quotient_alt = i / n.clone();
             assert!(quotient_alt.is_valid());
             assert_eq!(quotient_alt, quotient);
-
-            assert_eq!(i.div_rem(n).0, quotient);
 
             assert_eq!(i / -n, -&quotient);
 

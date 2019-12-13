@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::round::RoundingMode;
@@ -824,10 +824,6 @@ fn div_round_signed_limb_properties() {
                     n.div_round(i, RoundingMode::Ceiling)
                 );
             }
-            assert_eq!(
-                n.ceiling_div_mod(i).0,
-                n.div_round(i, RoundingMode::Ceiling),
-            );
         },
     );
 

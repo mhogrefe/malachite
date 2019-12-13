@@ -37,7 +37,7 @@ use malachite_test::inputs::base::{
     unsigneds_var_1,
 };
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
+    naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
     positive_naturals,
 };
 use malachite_test::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
@@ -16312,15 +16312,15 @@ fn test_ceiling_div_neg_mod() {
         "704498996588",
     );
     test(
-        "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
-         00",
+        "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+         0",
         "1234567890987654321234567890987654321",
         "810000006723000055638900467181273922269593923137018655",
         "454912836989613466895606299668358255",
     );
     test(
-        "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
-         00",
+        "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+         0",
         "316049380092839506236049380092839506176",
         "3164062526261718967339454949926851258865601262253980",
         "278232688309211835744673381771890580480",
@@ -16744,8 +16744,11 @@ fn div_mod_properties() {
         },
     );
 
-    test_properties(positive_naturals, |n| {
+    test_properties(naturals, |n| {
         assert_eq!(n.div_mod(Natural::ONE), (n.clone(), Natural::ZERO));
+    });
+
+    test_properties(positive_naturals, |n| {
         assert_eq!(n.div_mod(n), (Natural::ONE, Natural::ZERO));
         assert_eq!(Natural::ZERO.div_mod(n), (Natural::ZERO, Natural::ZERO));
         if *n > 1 as Limb {
@@ -16819,11 +16822,14 @@ fn ceiling_div_neg_mod_properties() {
         },
     );
 
-    test_properties(positive_naturals, |n| {
+    test_properties(naturals, |n| {
         assert_eq!(
             n.ceiling_div_neg_mod(Natural::ONE),
             (n.clone(), Natural::ZERO)
         );
+    });
+
+    test_properties(positive_naturals, |n| {
         assert_eq!(n.ceiling_div_neg_mod(n), (Natural::ONE, Natural::ZERO));
         assert_eq!(
             Natural::ZERO.ceiling_div_neg_mod(n),
