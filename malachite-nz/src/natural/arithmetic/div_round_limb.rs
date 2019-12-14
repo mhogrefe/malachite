@@ -177,7 +177,7 @@ impl<'a> DivRound<Limb> for &'a Natural {
     /// ```
     fn div_round(self, other: Limb, rm: RoundingMode) -> Natural {
         if rm == RoundingMode::Down || rm == RoundingMode::Floor {
-            self / other
+            self / Natural::from(other)
         } else {
             let (quotient, remainder) = self.div_mod_limb_ref(other);
             match rm {
@@ -387,7 +387,7 @@ impl DivRoundAssign<Limb> for Natural {
     /// ```
     fn div_round_assign(&mut self, other: Limb, rm: RoundingMode) {
         if rm == RoundingMode::Down || rm == RoundingMode::Floor {
-            *self /= other;
+            *self /= Natural::from(other);
         } else {
             let remainder = self.div_assign_mod_limb(other);
             match rm {

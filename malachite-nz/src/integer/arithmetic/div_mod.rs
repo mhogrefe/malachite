@@ -153,12 +153,19 @@ impl<'a> DivMod<Integer> for &'a Integer {
     fn div_mod(self, other: Integer) -> (Integer, Integer) {
         let (quotient, remainder) = if self.sign == other.sign {
             let (quotient, remainder) = (&self.abs).div_mod(other.abs);
-            (Integer::from(quotient), Integer::from(remainder))
+            (Integer::from(quotient), remainder)
         } else {
             let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod(other.abs);
-            (-quotient, Integer::from(remainder))
+            (-quotient, remainder)
         };
-        (quotient, if other.sign { remainder } else { -remainder })
+        (
+            quotient,
+            if other.sign {
+                Integer::from(remainder)
+            } else {
+                -remainder
+            },
+        )
     }
 }
 
@@ -214,12 +221,19 @@ impl<'a, 'b> DivMod<&'b Integer> for &'a Integer {
     fn div_mod(self, other: &'b Integer) -> (Integer, Integer) {
         let (quotient, remainder) = if self.sign == other.sign {
             let (quotient, remainder) = (&self.abs).div_mod(&other.abs);
-            (Integer::from(quotient), Integer::from(remainder))
+            (Integer::from(quotient), remainder)
         } else {
             let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod(&other.abs);
-            (-quotient, Integer::from(remainder))
+            (-quotient, remainder)
         };
-        (quotient, if other.sign { remainder } else { -remainder })
+        (
+            quotient,
+            if other.sign {
+                Integer::from(remainder)
+            } else {
+                -remainder
+            },
+        )
     }
 }
 
@@ -874,12 +888,19 @@ impl<'a> CeilingDivMod<Integer> for &'a Integer {
     fn ceiling_div_mod(self, other: Integer) -> (Integer, Integer) {
         let (quotient, remainder) = if self.sign == other.sign {
             let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod(other.abs);
-            (Integer::from(quotient), Integer::from(remainder))
+            (Integer::from(quotient), remainder)
         } else {
             let (quotient, remainder) = (&self.abs).div_mod(other.abs);
-            (-quotient, Integer::from(remainder))
+            (-quotient, remainder)
         };
-        (quotient, if other.sign { -remainder } else { remainder })
+        (
+            quotient,
+            if other.sign {
+                -remainder
+            } else {
+                Integer::from(remainder)
+            },
+        )
     }
 }
 
@@ -938,12 +959,19 @@ impl<'a, 'b> CeilingDivMod<&'b Integer> for &'a Integer {
     fn ceiling_div_mod(self, other: &'b Integer) -> (Integer, Integer) {
         let (quotient, remainder) = if self.sign == other.sign {
             let (quotient, remainder) = (&self.abs).ceiling_div_neg_mod(&other.abs);
-            (Integer::from(quotient), Integer::from(remainder))
+            (Integer::from(quotient), remainder)
         } else {
             let (quotient, remainder) = (&self.abs).div_mod(&other.abs);
-            (-quotient, Integer::from(remainder))
+            (-quotient, remainder)
         };
-        (quotient, if other.sign { -remainder } else { remainder })
+        (
+            quotient,
+            if other.sign {
+                -remainder
+            } else {
+                Integer::from(remainder)
+            },
+        )
     }
 }
 

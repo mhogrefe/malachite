@@ -6,9 +6,12 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    _limbs_div_to_out_balanced, _limbs_div_to_out_unbalanced, limbs_div, limbs_div_to_out,
-    limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val, limbs_div_to_out_val_ref,
+    _limbs_div_divide_and_conquer_approx, _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
+    _limbs_div_schoolbook, _limbs_div_schoolbook_approx, _limbs_div_to_out_balanced,
+    _limbs_div_to_out_unbalanced, limbs_div, limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
+    limbs_div_limb_to_out, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
+    limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
@@ -17,8 +20,12 @@ use malachite_nz::natural::arithmetic::div_mod::{
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_9, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_9,
+    quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3,
+    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_2,
+    triples_of_limb_vec_limb_and_limb_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_var_41, triples_of_unsigned_vec_var_42, triples_of_unsigned_vec_var_43,
     triples_of_unsigned_vec_var_44,
 };
@@ -27,6 +34,17 @@ use inputs::natural::{
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_div_limb);
+    register_demo!(registry, demo_limbs_div_limb_to_out);
+    register_demo!(registry, demo_limbs_div_limb_in_place);
+    register_demo!(
+        registry,
+        demo_limbs_div_divisor_of_limb_max_with_carry_to_out
+    );
+    register_demo!(
+        registry,
+        demo_limbs_div_divisor_of_limb_max_with_carry_in_place
+    );
     register_demo!(registry, demo_limbs_div_schoolbook);
     register_demo!(registry, demo_limbs_div_divide_and_conquer);
     register_demo!(registry, demo_limbs_div_barrett);
@@ -44,6 +62,23 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_div_val_ref);
     register_demo!(registry, demo_natural_div_ref_val);
     register_demo!(registry, demo_natural_div_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_div_limb);
+    register_bench!(registry, Small, benchmark_limbs_div_limb_to_out_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_limb_in_place_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_divisor_of_limb_max_with_carry_in_place
+    );
     register_bench!(registry, Small, benchmark_limbs_div_schoolbook_algorithms);
     register_bench!(
         registry,
@@ -90,6 +125,72 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_div_library_comparison);
     register_bench!(registry, Large, benchmark_natural_div_algorithms);
     register_bench!(registry, Large, benchmark_natural_div_evaluation_strategy);
+}
+
+fn demo_limbs_div_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "limbs_div_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_div_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_div_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_div_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_div_limb_to_out(&mut out, {:?}, {}); out = {:?}",
+            out_old, in_limbs, limb, out
+        );
+    }
+}
+
+fn demo_limbs_div_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_div_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_div_limb_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_div_divisor_of_limb_max_with_carry_to_out(gm: GenerationMode, limit: usize) {
+    for (out, xs, divisor, carry) in
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        let carry_out =
+            limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, &xs, divisor, carry);
+        println!(
+            "out := {:?}; limbs_div_divisor_of_limb_max_with_carry_to_out(&mut out, {:?}, {}, {}) \
+             = {}; out = {:?}",
+            out_old, xs, divisor, carry, carry_out, out
+        );
+    }
+}
+
+fn demo_limbs_div_divisor_of_limb_max_with_carry_in_place(gm: GenerationMode, limit: usize) {
+    for (xs, divisor, carry) in triples_of_limb_vec_limb_and_limb_var_1(gm).take(limit) {
+        let mut xs = xs.to_vec();
+        let xs_old = xs.clone();
+        let carry_out = limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, divisor, carry);
+        println!(
+            "xs := {:?}; limbs_div_divisor_of_limb_max_with_carry_in_place(&mut xs, {}, {}) = {}; \
+             xs = {:?}",
+            xs_old, divisor, carry, carry_out, xs
+        );
+    }
 }
 
 fn demo_limbs_div_schoolbook(gm: GenerationMode, limit: usize) {
@@ -278,6 +379,121 @@ fn demo_natural_div_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_natural_and_positive_natural(gm).take(limit) {
         println!("&{} / &{} = {}", x, y, &x / &y);
     }
+}
+
+fn benchmark_limbs_div_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_limb(&[Limb], Limb)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(limbs, limb)| no_out!(limbs_div_limb(&limbs, limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_limb_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut out, in_limbs, limb)| limbs_div_limb_to_out(&mut out, &in_limbs, limb)),
+            ),
+            (
+                "alt",
+                &mut (|(mut out, in_limbs, limb)| {
+                    _limbs_div_limb_to_out_alt(&mut out, &in_limbs, limb)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_limb_in_place_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "standard",
+                &mut (|(mut limbs, limb)| limbs_div_limb_in_place(&mut limbs, limb)),
+            ),
+            (
+                "alt",
+                &mut (|(mut limbs, limb)| _limbs_div_limb_in_place_alt(&mut limbs, limb)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_divisor_of_limb_max_with_carry_to_out(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_divisor_of_limb_max_with_carry_to_out(&mut [Limb], &[Limb], Limb, Limb)",
+        BenchmarkType::Single,
+        quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs, _, _)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut out, xs, divisor, carry)| {
+                no_out!(limbs_div_divisor_of_limb_max_with_carry_to_out(
+                    &mut out, &xs, divisor, carry
+                ))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_divisor_of_limb_max_with_carry_in_place(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_divisor_of_limb_max_with_carry_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_limb_vec_limb_and_limb_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _, _)| xs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(mut xs, divisor, carry)| {
+                no_out!(limbs_div_divisor_of_limb_max_with_carry_in_place(
+                    &mut xs, divisor, carry
+                ))
+            }),
+        )],
+    );
 }
 
 fn benchmark_limbs_div_schoolbook_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {

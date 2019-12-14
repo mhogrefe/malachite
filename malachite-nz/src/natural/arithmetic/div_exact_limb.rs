@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::SplitInHalf;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-use natural::arithmetic::div_limb::{
+use natural::arithmetic::div::{
     limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out,
 };

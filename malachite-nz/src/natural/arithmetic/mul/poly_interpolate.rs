@@ -9,10 +9,10 @@ use natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::div::limbs_div_divisor_of_limb_max_with_carry_in_place;
 use natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place,
 };
-use natural::arithmetic::div_limb::limbs_div_divisor_of_limb_max_with_carry_in_place;
 use natural::arithmetic::mul::poly_eval::_limbs_shl_and_add_same_length_in_place_left;
 use natural::arithmetic::mul::toom::BIT_CORRECTION;
 use natural::arithmetic::shl_u::limbs_shl_to_out;

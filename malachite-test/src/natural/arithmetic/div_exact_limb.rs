@@ -6,6 +6,7 @@ use malachite_nz::natural::arithmetic::div_exact_limb::{
     limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
     limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_modular_invert_limb,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug;
 
@@ -52,11 +53,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_exact_assign_limb_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_natural_div_exact_assign_3_algorithms
     );
     register_bench!(
@@ -64,7 +60,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_div_exact_limb_library_comparison
     );
-    register_bench!(registry, Large, benchmark_natural_div_exact_limb_algorithms);
     register_bench!(
         registry,
         Large,
@@ -75,16 +70,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_div_exact_limb_evaluation_strategy
     );
-    register_bench!(registry, Large, benchmark_limb_div_exact_natural_algorithms);
     register_bench!(
         registry,
         Large,
         benchmark_limb_div_exact_natural_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limb_div_exact_assign_natural_algorithms
     );
     register_bench!(
         registry,
@@ -380,31 +369,6 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
     );
 }
 
-fn benchmark_natural_div_exact_assign_limb_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Natural.div_exact_assign(Limb)",
-        BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_limb_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("ordinary division", &mut (|(mut x, y)| x /= y)),
-            ("exact division", &mut (|(mut x, y)| x.div_exact_assign(y))),
-            (
-                "exact division no special case 3",
-                &mut (|(mut x, y)| x._div_exact_assign_no_special_case_3(y)),
-            ),
-        ],
-    );
-}
-
 fn benchmark_natural_div_exact_assign_3_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -420,7 +384,10 @@ fn benchmark_natural_div_exact_assign_3_algorithms(
         &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
-            ("ordinary division", &mut (|mut x| x /= 3 as Limb)),
+            (
+                "ordinary division",
+                &mut (|mut x| x /= Natural::from(3 as Limb)),
+            ),
             (
                 "exact division",
                 &mut (|mut x| x.div_exact_assign(3 as Limb)),
@@ -458,30 +425,6 @@ fn benchmark_natural_div_exact_limb_library_comparison(
     );
 }
 
-fn benchmark_natural_div_exact_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural.div_exact(Limb)",
-        BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_limb_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("ordinary division", &mut (|(ref x, y)| no_out!(x / y))),
-            (
-                "exact division",
-                &mut (|(ref x, y)| no_out!(x.div_exact(y))),
-            ),
-            (
-                "exact division no special case 3",
-                &mut (|(ref x, y)| no_out!(x._div_exact_no_special_case_3(y))),
-            ),
-        ],
-    );
-}
-
 fn benchmark_natural_div_exact_ref_3_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.div_exact(3)",
@@ -493,7 +436,10 @@ fn benchmark_natural_div_exact_ref_3_algorithms(gm: GenerationMode, limit: usize
         &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
-            ("ordinary division", &mut (|x| no_out!(x / 3 as Limb))),
+            (
+                "ordinary division",
+                &mut (|x| no_out!(x / Natural::from(3 as Limb))),
+            ),
             ("exact division", &mut (|x| no_out!(x.div_exact(3 as Limb)))),
             (
                 "exact division no special case 3",
@@ -530,23 +476,6 @@ fn benchmark_natural_div_exact_limb_evaluation_strategy(
     );
 }
 
-fn benchmark_limb_div_exact_natural_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Limb.div_exact(Natural)",
-        BenchmarkType::Algorithms,
-        pairs_of_limb_and_positive_natural_var_2(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("ordinary division", &mut (|(x, y)| no_out!(x / y))),
-            ("exact division", &mut (|(x, y)| no_out!(x.div_exact(y)))),
-        ],
-    );
-}
-
 fn benchmark_limb_div_exact_natural_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -570,27 +499,6 @@ fn benchmark_limb_div_exact_natural_evaluation_strategy(
                 "Limb.div_exact(&Natural)",
                 &mut (|(x, y)| no_out!(x.div_exact(&y))),
             ),
-        ],
-    );
-}
-
-fn benchmark_limb_div_exact_assign_natural_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Limb.div_exact_assign(Natural)",
-        BenchmarkType::Algorithms,
-        pairs_of_limb_and_positive_natural_var_2(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            ("ordinary division", &mut (|(mut x, y)| x /= y)),
-            ("exact division", &mut (|(mut x, y)| x.div_exact_assign(y))),
         ],
     );
 }
