@@ -7,8 +7,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
 use natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
-use natural::arithmetic::mod_limb::limbs_mod_limb;
 use natural::arithmetic::mod_op::limbs_mod;
+use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::sub::{
     limbs_sub, limbs_sub_limb, limbs_sub_limb_to_out, limbs_sub_same_length_to_out,
     limbs_sub_to_out,

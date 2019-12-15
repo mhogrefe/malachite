@@ -8,7 +8,7 @@ use natural::arithmetic::div_exact::{
 };
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
-use natural::arithmetic::mod_limb::limbs_mod_limb;
+use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

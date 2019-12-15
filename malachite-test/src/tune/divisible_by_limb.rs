@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;

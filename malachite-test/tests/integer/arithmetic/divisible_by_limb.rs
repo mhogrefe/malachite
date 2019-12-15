@@ -27,7 +27,6 @@ fn test_divisible_by_limb() {
     let test = |u, v: Limb, divisible| {
         let n = Integer::from_str(u).unwrap();
         assert_eq!(n.divisible_by(v), divisible);
-        assert_eq!(n == 0 as Limb || v != 0 && n % v == 0 as Limb, divisible);
 
         assert_eq!(
             num_divisible_by_limb(BigInt::from_str(u).unwrap(), v),
@@ -90,7 +89,6 @@ fn test_limb_divisible_by_integer() {
     let test = |u: Limb, v, divisible| {
         let n = Integer::from_str(v).unwrap();
         assert_eq!(u.divisible_by(&n), divisible);
-        assert_eq!(u == 0 || n != 0 as Limb && u % n == 0, divisible);
     };
     test(0, "0", true);
     test(1, "0", false);
@@ -123,7 +121,6 @@ fn test_limb_divisible_by_integer() {
 
 fn divisible_by_limb_properties_helper(n: &Integer, u: Limb) {
     let divisible = n.divisible_by(u);
-    assert_eq!(*n == 0 as Limb || u != 0 && n % u == 0 as Limb, divisible);
 
     //TODO assert_eq!(n.divisible_by(Integer::from(u)), remainder);
 
@@ -147,7 +144,6 @@ fn divisible_by_limb_properties() {
         pairs_of_integer_and_positive_limb_var_1,
         |&(ref n, u): &(Integer, Limb)| {
             assert!(n.divisible_by(u));
-            assert!(*n == 0 as Limb || u != 0 && n % u == 0 as Limb);
 
             //TODO assert!(n.divisible_by(Integer::from(u));
 
@@ -161,7 +157,6 @@ fn divisible_by_limb_properties() {
         pairs_of_integer_and_positive_limb_var_2,
         |&(ref n, u): &(Integer, Limb)| {
             assert!(!n.divisible_by(u));
-            assert!(*n != 0 as Limb && (u == 0 || n % u != 0 as Limb));
 
             //TODO assert!(n.divisible_by(Integer::from(u));
 
@@ -175,7 +170,6 @@ fn divisible_by_limb_properties() {
         pairs_of_unsigned_and_integer,
         |&(u, ref n): &(Limb, Integer)| {
             let divisible = u.divisible_by(n);
-            assert_eq!(u == 0 || *n != 0 as Limb && u % n == 0, divisible);
             assert_eq!(u.divisible_by(&-n), divisible);
         },
     );

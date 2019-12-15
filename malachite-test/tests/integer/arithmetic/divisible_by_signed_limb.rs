@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
 
@@ -24,7 +24,6 @@ fn test_divisible_by_signed_limb() {
     let test = |i, j: SignedLimb, divisible| {
         let n = Integer::from_str(i).unwrap();
         assert_eq!(n.divisible_by(j), divisible);
-        assert_eq!(n == 0 as Limb || j != 0 && n % j == 0 as Limb, divisible);
 
         assert_eq!(
             num_divisible_by_signed_limb(BigInt::from_str(i).unwrap(), j),
@@ -133,7 +132,6 @@ fn test_signed_limb_divisible_by_integer() {
     let test = |i: SignedLimb, j, divisible| {
         let n = Integer::from_str(j).unwrap();
         assert_eq!(i.divisible_by(&n), divisible);
-        assert_eq!(i == 0 || n != 0 as Limb && i % n == 0 as Limb, divisible);
     };
     test(0, "0", true);
     test(1, "0", false);
@@ -192,7 +190,6 @@ fn test_signed_limb_divisible_by_integer() {
 
 fn divisible_by_signed_limb_properties_helper(n: &Integer, i: SignedLimb) {
     let divisible = n.divisible_by(i);
-    assert_eq!(*n == 0 as Limb || i != 0 && n % i == 0 as Limb, divisible);
 
     //TODO assert_eq!(n.divisible_by(Integer::from(u)), remainder);
 
@@ -222,7 +219,6 @@ fn divisible_by_signed_limb_properties() {
         pairs_of_integer_and_nonzero_signed_limb_var_1,
         |&(ref n, i): &(Integer, SignedLimb)| {
             assert!(n.divisible_by(i));
-            assert!(*n == 0 as Limb || i != 0 && n % i == 0 as Limb);
 
             //TODO assert!(n.divisible_by(Integer::from(u));
 
@@ -235,7 +231,6 @@ fn divisible_by_signed_limb_properties() {
         pairs_of_integer_and_nonzero_signed_limb_var_2,
         |&(ref n, i): &(Integer, SignedLimb)| {
             assert!(!n.divisible_by(i));
-            assert!(*n != 0 as Limb && (i == 0 || n % i != 0 as Limb));
 
             //TODO assert!(n.divisible_by(Integer::from(u));
 
@@ -248,7 +243,6 @@ fn divisible_by_signed_limb_properties() {
         pairs_of_signed_and_integer,
         |&(i, ref n): &(SignedLimb, Integer)| {
             let divisible = i.divisible_by(n);
-            assert_eq!(i == 0 || *n != 0 as Limb && i % n == 0 as Limb, divisible);
             assert_eq!(i.divisible_by(&-n), divisible);
         },
     );

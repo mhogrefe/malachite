@@ -5,7 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -166,12 +166,6 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
                 &mut (|(n, u, modulus)| no_out!((&n).eq_mod(u, modulus))),
             ),
             (
-                "Natural == Limb || Limb != 0 && Natural % Limb == Limb % Limb",
-                &mut (|(n, u, modulus)| {
-                    no_out!(n == u || modulus != 0 && n % modulus == u % modulus)
-                }),
-            ),
-            (
                 "|Natural - Limb|.divisible_by(Limb)",
                 &mut (|(n, u, modulus)| {
                     no_out!((&(Integer::from(n) - Integer::from(u)).unsigned_abs())
@@ -200,12 +194,6 @@ fn benchmark_limb_eq_limb_mod_natural_algorithms(
             (
                 "Limb.eq_mod(Limb, &Natural)",
                 &mut (|(u, v, ref modulus)| no_out!(u.eq_mod(v, modulus))),
-            ),
-            (
-                "Limb == Limb || Natural != 0 && Limb % &Natural == Limb % &Natural",
-                &mut (|(u, v, modulus)| {
-                    no_out!(u == v || modulus != 0 as Limb && u % &modulus == v % &modulus)
-                }),
             ),
             (
                 "|Limb - Limb|.divisible_by(Natural)",

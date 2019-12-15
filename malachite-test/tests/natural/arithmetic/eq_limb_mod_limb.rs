@@ -7,7 +7,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
@@ -195,7 +195,6 @@ fn eq_limb_mod_limb_properties() {
         |&(ref n, u, modulus): &(Natural, Limb, Limb)| {
             let equal = n.eq_mod(u, modulus);
             assert_eq!(u.eq_mod(n, modulus), equal);
-            assert_eq!(*n == u || modulus != 0 && u % modulus == n % modulus, equal);
             assert_eq!(
                 (&(Integer::from(n) - Integer::from(u)).unsigned_abs()).divisible_by(modulus),
                 equal
@@ -224,7 +223,6 @@ fn eq_limb_mod_limb_properties() {
         |&(ref n, u, modulus): &(Natural, Limb, Limb)| {
             assert!(!n.eq_mod(u, modulus));
             assert!(!u.eq_mod(n, modulus));
-            assert!(*n != u && (modulus == 0 || n % modulus != u % modulus));
             #[cfg(feature = "32_bit_limbs")]
             assert!(!natural_to_rug_integer(n).is_congruent_u(u, modulus));
         },
@@ -258,10 +256,6 @@ fn limb_eq_limb_mod_natural_properties() {
         |&(u, v, ref modulus): &(Limb, Limb, Natural)| {
             let equal = u.eq_mod(v, modulus);
             assert_eq!(v.eq_mod(u, modulus), equal);
-            assert_eq!(
-                u == v || *modulus != 0 as Limb && u % modulus == v % modulus,
-                equal
-            );
             assert_eq!(
                 (Integer::from(u) - Integer::from(v))
                     .unsigned_abs()

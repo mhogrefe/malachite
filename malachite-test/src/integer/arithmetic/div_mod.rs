@@ -414,7 +414,7 @@ fn benchmark_integer_div_rem_algorithms(gm: GenerationMode, limit: usize, file_n
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_rem(y)))),
-            //TODO ("using / and %", &mut (|(x, y)| no_out!((&x / &y, x % y)))),
+            ("using / and %", &mut (|(x, y)| no_out!((&x / &y, x % y)))),
         ],
     );
 }

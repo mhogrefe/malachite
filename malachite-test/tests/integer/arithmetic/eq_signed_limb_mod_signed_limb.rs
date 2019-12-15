@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use common::test_properties;
@@ -295,10 +295,6 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             let equal = n.eq_mod(i, modulus);
             assert_eq!(i.eq_mod(n, modulus), equal);
-            assert_eq!(
-                *n == i || modulus != 0 && n.mod_op(modulus) == i.mod_op(modulus),
-                equal
-            );
             assert_eq!((n - Integer::from(i)).divisible_by(modulus), equal);
             assert_eq!((Integer::from(i) - n).divisible_by(modulus), equal);
 
@@ -316,7 +312,6 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             assert!(n.eq_mod(i, modulus));
             assert!(i.eq_mod(n, modulus));
-            assert!(*n == i || modulus != 0 && n.mod_op(modulus) == i.mod_op(modulus));
             assert!((n - Integer::from(i)).divisible_by(modulus));
             assert!((Integer::from(i) - n).divisible_by(modulus));
 
@@ -335,7 +330,6 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             assert!(!n.eq_mod(i, modulus));
             assert!(!i.eq_mod(n, modulus));
-            assert!(*n != i && (modulus == 0 || n.mod_op(modulus) != i.mod_op(modulus)));
             assert!(!(n - Integer::from(i)).divisible_by(modulus));
             assert!(!(Integer::from(i) - n).divisible_by(modulus));
 
@@ -375,10 +369,6 @@ fn signed_limb_eq_signed_limb_mod_integer_properties() {
         |&(i, j, ref modulus): &(SignedLimb, SignedLimb, Integer)| {
             let equal = i.eq_mod(j, modulus);
             assert_eq!(j.eq_mod(i, modulus), equal);
-            assert_eq!(
-                i == j || *modulus != 0 as Limb && i.mod_op(modulus) == j.mod_op(modulus),
-                equal
-            );
 
             //TODO assert_eq!(Integer::from(i).eq_mod(j, modulus), equal);
         },

@@ -167,9 +167,8 @@ pub mod arithmetic {
     pub mod eq_natural_mod_power_of_two;
     pub mod eq_signed_limb_mod_power_of_two;
     pub mod eq_signed_limb_mod_signed_limb;
-    pub mod mod_limb;
+    pub mod mod_op;
     pub mod mod_power_of_two;
-    pub mod mod_signed_limb;
     pub mod mul;
     pub mod neg;
     pub mod parity;

@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{DivMod, Mod, ModAssign, NegMod, NegModAssign};
+use malachite_base::num::arithmetic::traits::{
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
+};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div_mod::{
@@ -6,14 +8,26 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb_normalized, limbs_div_mod_to_out,
 };
 use malachite_nz::natural::arithmetic::mod_op::{
-    _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod,
-    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
+    _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
+    _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3, _limbs_mod_limb_any_leading_zeros,
+    _limbs_mod_limb_any_leading_zeros_1, _limbs_mod_limb_any_leading_zeros_2,
+    _limbs_mod_limb_at_least_1_leading_zero, _limbs_mod_limb_at_least_2_leading_zeros,
+    _limbs_mod_limb_small_normalized, _limbs_mod_limb_small_normalized_large,
+    _limbs_mod_limb_small_small, _limbs_mod_limb_small_unnormalized,
+    _limbs_mod_limb_small_unnormalized_large, _limbs_mod_schoolbook, limbs_mod,
+    limbs_mod_by_two_limb_normalized, limbs_mod_limb, limbs_mod_three_limb_by_two_limb,
+    limbs_mod_to_out,
 };
 use num::Integer;
 use rug::ops::RemRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
+    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_3, pairs_of_unsigned_vec_and_unsigned_var_1,
     pairs_of_unsigned_vec_var_10, pairs_of_unsigned_vec_var_9,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
@@ -29,6 +43,13 @@ use inputs::natural::{
 // For `Natural`s, `mod` is equivalent to `rem`.
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_mod_limb);
+    register_demo!(registry, demo_limbs_mod_limb_small_normalized);
+    register_demo!(registry, demo_limbs_mod_limb_small_unnormalized);
+    register_demo!(registry, demo_limbs_mod_limb_any_leading_zeros_1);
+    register_demo!(registry, demo_limbs_mod_limb_any_leading_zeros_2);
+    register_demo!(registry, demo_limbs_mod_limb_at_least_1_leading_zero);
+    register_demo!(registry, demo_limbs_mod_limb_at_least_2_leading_zeros);
     register_demo!(registry, demo_limbs_mod_three_limb_by_two_limb);
     register_demo!(registry, demo_limbs_mod_by_two_limb_normalized);
     register_demo!(registry, demo_limbs_mod_schoolbook);
@@ -54,6 +75,37 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_neg_mod_val_ref);
     register_demo!(registry, demo_natural_neg_mod_ref_val);
     register_demo!(registry, demo_natural_neg_mod_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_mod_limb_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_small_normalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_small_unnormalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms
+    );
     register_bench!(
         registry,
         Large,
@@ -93,13 +145,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_neg_mod_library_comparison
     );
-    //TODO
-    /*
-    register_bench!(
-        registry,
-        Large,
-        benchmark_natural_ceiling_div_neg_mod_limb_algorithms
-    );*/
+    register_bench!(registry, Large, benchmark_natural_neg_mod_algorithms);
     register_bench!(
         registry,
         Large,
@@ -109,6 +155,89 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {
     -x.rem_ceil(y)
+}
+
+fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "limbs_mod_limb({:?}, {}) = {}",
+            limbs,
+            divisor,
+            limbs_mod_limb(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_small_normalized(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm).take(limit) {
+        println!(
+            "_limbs_mod_limb_small_normalized({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_small_normalized(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_small_unnormalized(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "_limbs_mod_limb_small_unnormalized({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_small_unnormalized(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_any_leading_zeros_1(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "_limbs_mod_limb_any_leading_zeros_1({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_any_leading_zeros_1(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_any_leading_zeros_2(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "_limbs_mod_limb_any_leading_zeros_2({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_any_leading_zeros_2(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_at_least_1_leading_zero(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "_limbs_mod_limb_at_least_1_leading_zero({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor)
+        );
+    }
+}
+
+fn demo_limbs_mod_limb_at_least_2_leading_zeros(gm: GenerationMode, limit: usize) {
+    for (limbs, divisor) in
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm).take(limit)
+    {
+        println!(
+            "_limbs_mod_limb_at_least_2_leading_zeros({:?}, {}) = {}",
+            limbs,
+            divisor,
+            _limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor)
+        );
+    }
 }
 
 fn demo_limbs_mod_three_limb_by_two_limb(gm: GenerationMode, limit: usize) {
@@ -326,6 +455,279 @@ fn demo_natural_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_natural_and_positive_natural(gm).take(limit) {
         println!("(&{}).neg_mod(&{}) = {}", x, y, (&x).neg_mod(&y));
     }
+}
+
+fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_mod_limb(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "alt 1",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_1(&limbs, divisor))),
+            ),
+            (
+                "alt 2",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_2(&limbs, divisor))),
+            ),
+            (
+                "alt 3",
+                &mut (|(limbs, divisor)| no_out!(_limbs_mod_limb_alt_3(&limbs, divisor))),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros_1",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros_1(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros_2",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros_2(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_small_normalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_small_normalized(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len() - 1),
+        "limbs.len() - 1",
+        &mut [
+            (
+                "small",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder >= divisor {
+                        remainder -= divisor;
+                    }
+                    len -= 1;
+                    if len == 0 {
+                        return;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_small(&limbs, divisor, remainder);
+                }),
+            ),
+            (
+                "large",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder >= divisor {
+                        remainder -= divisor;
+                    }
+                    len -= 1;
+                    if len == 0 {
+                        return;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_normalized_large(&limbs, divisor, remainder);
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_small_unnormalized(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, divisor)| {
+            if *limbs.last().unwrap() < divisor {
+                limbs.len() - 1
+            } else {
+                limbs.len()
+            }
+        }),
+        "adjusted limbs.len()",
+        &mut [
+            (
+                "small",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder < divisor {
+                        len -= 1;
+                        if len == 0 {
+                            return;
+                        }
+                    } else {
+                        remainder = 0;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_small(limbs, divisor, remainder);
+                }),
+            ),
+            (
+                "large",
+                &mut (|(limbs, divisor)| {
+                    let mut len = limbs.len();
+                    let mut remainder = limbs[len - 1];
+                    if remainder < divisor {
+                        len -= 1;
+                        if len == 0 {
+                            return;
+                        }
+                    } else {
+                        remainder = 0;
+                    }
+                    let limbs = &limbs[..len];
+                    _limbs_mod_limb_small_unnormalized_large(limbs, divisor, remainder);
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from normalized",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_mod_limb_small_normalized",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_small_normalized(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from unnormalized",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_mod_limb_small_unnormalized",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_small_unnormalized(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_mod_limb_any_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_any_leading_zeros(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_at_least_1_leading_zero",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_mod_limb_at_least_2_leading_zeros(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "malachite",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
+                }),
+            ),
+            (
+                "_limbs_mod_limb_at_least_2_leading_zeros",
+                &mut (|(limbs, divisor)| {
+                    no_out!(_limbs_mod_limb_at_least_2_leading_zeros(&limbs, divisor))
+                }),
+            ),
+        ],
+    );
 }
 
 fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
@@ -686,15 +1088,9 @@ fn benchmark_natural_neg_mod_library_comparison(gm: GenerationMode, limit: usize
     );
 }
 
-//TODO
-/*
-fn benchmark_natural_ceiling_div_neg_mod_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_neg_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "Natural.ceiling_div_neg_mod(Natural)",
+        "Natural.neg_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
         gm.name(),
@@ -703,20 +1099,14 @@ fn benchmark_natural_ceiling_div_neg_mod_algorithms(
         &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
         "n.significant_bits()",
         &mut [
+            ("standard", &mut (|(x, y)| no_out!(x.neg_mod(y)))),
             (
-                "standard",
-                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y))),
-            ),
-            (
-                "using div_round and %",
-                &mut (|(x, y)| {
-                    let remainder = (&x).neg_mod(y);
-                    (x.div_round(y, RoundingMode::Ceiling), remainder);
-                }),
+                "using ceiling_div_neg_mod",
+                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).1)),
             ),
         ],
     );
-}*/
+}
 
 fn benchmark_natural_neg_mod_evaluation_strategy(
     gm: GenerationMode,

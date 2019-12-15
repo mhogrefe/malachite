@@ -565,12 +565,12 @@ fn test_div_rem() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO let (q, r) = (
-        //TODO     Integer::from_str(u).unwrap() / Integer::from_str(v).unwrap(),
-        //TODO     Integer::from_str(u).unwrap() % Integer::from_str(v).unwrap(),
-        //TODO );
-        //TODO assert_eq!(q.to_string(), quotient);
-        //TODO assert_eq!(r.to_string(), remainder);
+        let (q, r) = (
+            Integer::from_str(u).unwrap() / Integer::from_str(v).unwrap(),
+            Integer::from_str(u).unwrap() % Integer::from_str(v).unwrap(),
+        );
+        assert_eq!(q.to_string(), quotient);
+        assert_eq!(r.to_string(), remainder);
     };
     test("0", "1", "0", "0");
     test("0", "123", "0", "0");
@@ -1623,13 +1623,9 @@ fn div_rem_properties_helper(x: &Integer, y: &Integer) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (x / y, x % y);
-    //TODO assert_eq!(quotient_alt, quotient);
-    //TODO assert_eq!(remainder_alt, remainder);
-
-    let (num_quotient, num_remainder) = integer_to_bigint(x).div_rem(&integer_to_bigint(y));
-    assert_eq!(bigint_to_integer(&num_quotient), quotient);
-    assert_eq!(bigint_to_integer(&num_remainder), remainder);
+    let (quotient_alt, remainder_alt) = (x / y, x % y);
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     let (num_quotient, num_remainder) = integer_to_bigint(x).div_rem(&integer_to_bigint(y));
     assert_eq!(bigint_to_integer(&num_quotient), quotient);

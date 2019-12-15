@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
-use natural::arithmetic::mod_limb::limbs_mod_limb;
+use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};

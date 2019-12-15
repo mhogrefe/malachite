@@ -1,5 +1,5 @@
 use malachite_bench::tune::{compare_two, ComparisonResult};
-use malachite_nz::natural::arithmetic::mod_limb::{
+use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_limb_any_leading_zeros_1, _limbs_mod_limb_any_leading_zeros_2,
 };
 use malachite_nz::platform::Limb;

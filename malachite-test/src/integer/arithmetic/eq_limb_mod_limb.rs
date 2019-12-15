@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::arithmetic::eq_limb_mod_limb::limbs_eq_neg_limb_mod_limb;
@@ -30,16 +30,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_integer_eq_limb_mod_limb_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limb_eq_integer_mod_limb_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limb_eq_limb_mod_integer_algorithms
     );
 }
 
@@ -154,74 +144,8 @@ fn benchmark_integer_eq_limb_mod_limb_algorithms(
                 &mut (|(n, u, modulus)| no_out!(n.eq_mod(u, modulus))),
             ),
             (
-                "Integer == Limb || Limb != 0 && Integer.mod(Limb) == Limb.mod(Limb)",
-                &mut (|(n, u, modulus)| {
-                    no_out!(n == u || modulus != 0 && n.mod_op(modulus) == u.mod_op(modulus))
-                }),
-            ),
-            (
                 "(Integer - Limb).divisible_by(Limb)",
                 &mut (|(n, u, modulus)| no_out!((n - Integer::from(u)).divisible_by(modulus))),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limb_eq_integer_mod_limb_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Limb.eq_mod(&Integer, Limb)",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_integer_and_unsigned::<Limb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            (
-                "Limb.eq_mod(&Integer, Limb)",
-                &mut (|(u, ref n, modulus)| no_out!(u.eq_mod(n, modulus))),
-            ),
-            (
-                "Limb == Integer || Limb != 0 && Limb.mod_op(Limb) == Integer.mod_op(Limb)",
-                &mut (|(n, u, modulus)| {
-                    no_out!(u == n || modulus != 0 && u.mod_op(modulus) == n.mod_op(modulus))
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limb_eq_limb_mod_integer_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        "Limb.eq_mod(Limb, &Integer)",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_unsigned_and_integer::<Limb>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
-        "n.significant_bits()",
-        &mut [
-            (
-                "Limb.eq_mod(Limb, &Integer)",
-                &mut (|(u, v, ref modulus)| no_out!(u.eq_mod(v, modulus))),
-            ),
-            (
-                "Limb == Limb || Integer != 0 && Limb.mod_op(&Integer) == Limb.mod_op(&Integer)",
-                &mut (|(u, v, modulus)| {
-                    no_out!(
-                        u == v || modulus != 0 as Limb && u.mod_op(&modulus) == v.mod_op(&modulus)
-                    )
-                }),
             ),
         ],
     );

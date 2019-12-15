@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::divisible_by_limb::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by_limb,
 };
-use malachite_nz::natural::arithmetic::mod_limb::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;
@@ -56,7 +56,6 @@ fn test_divisible_by_limb() {
     let test = |u, v: Limb, divisible| {
         let n = Natural::from_str(u).unwrap();
         assert_eq!((&n).divisible_by(v), divisible);
-        assert_eq!(n == 0 as Limb || v != 0 && n % v == 0, divisible);
 
         assert_eq!(
             num_divisible_by_limb(BigUint::from_str(u).unwrap(), v),
@@ -98,7 +97,6 @@ fn test_limb_divisible_by_natural() {
     let test = |u: Limb, v, divisible| {
         let n = Natural::from_str(v).unwrap();
         assert_eq!(u.divisible_by(&n), divisible);
-        assert_eq!(u == 0 || n != 0 as Limb && u % n == 0, divisible);
     };
     test(0, "0", true);
     test(1, "0", false);
@@ -134,7 +132,6 @@ fn limbs_divisible_by_limb_properties() {
 
 fn divisible_by_limb_properties_helper(n: &Natural, u: Limb) {
     let divisible = n.divisible_by(u);
-    assert_eq!(*n == 0 as Limb || u != 0 && n % u == 0, divisible);
     assert_eq!(n.divisible_by(Natural::from(u)), divisible);
     assert_eq!(num_divisible_by_limb(natural_to_biguint(n), u), divisible);
     #[cfg(feature = "32_bit_limbs")]
@@ -161,7 +158,6 @@ fn divisible_by_limb_properties() {
         pairs_of_natural_and_positive_limb_var_1,
         |&(ref n, u): &(Natural, Limb)| {
             assert!(n.divisible_by(u));
-            assert!(*n == 0 as Limb || u != 0 && n % u == 0);
             assert!(n.divisible_by(Natural::from(u)));
             assert!(num_divisible_by_limb(natural_to_biguint(n), u));
             #[cfg(feature = "32_bit_limbs")]
@@ -173,7 +169,6 @@ fn divisible_by_limb_properties() {
         pairs_of_natural_and_positive_limb_var_2,
         |&(ref n, u): &(Natural, Limb)| {
             assert!(!n.divisible_by(u));
-            assert!(*n != 0 as Limb && (u == 0 || n % u != 0));
             assert!(!n.divisible_by(Natural::from(u)));
             assert!(!num_divisible_by_limb(natural_to_biguint(n), u));
             #[cfg(feature = "32_bit_limbs")]
@@ -184,8 +179,7 @@ fn divisible_by_limb_properties() {
     test_properties(
         pairs_of_unsigned_and_natural,
         |&(u, ref n): &(Limb, Natural)| {
-            let divisible = u.divisible_by(n);
-            assert_eq!(u == 0 || *n != 0 as Limb && u % n == 0, divisible);
+            u.divisible_by(n);
         },
     );
 

@@ -9,8 +9,13 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett_scratch_len, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mod_op::{
-    _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod,
-    limbs_mod_by_two_limb_normalized, limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
+    _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
+    _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
+    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
+    _limbs_mod_limb_small_unnormalized, _limbs_mod_schoolbook, limbs_mod,
+    limbs_mod_by_two_limb_normalized, limbs_mod_limb, limbs_mod_three_limb_by_two_limb,
+    limbs_mod_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -23,17 +28,269 @@ use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_10, pairs_of_unsigned_vec_var_9,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
-    sextuples_of_limbs_var_1, triples_of_two_unsigned_vecs_and_unsigned_var_1,
-    triples_of_unsigned_vec_var_45,
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
+    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_10,
+    pairs_of_unsigned_vec_var_9, quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
+    quadruples_of_unsigned_vec_var_1, sextuples_of_limbs_var_1,
+    triples_of_two_unsigned_vecs_and_unsigned_var_1, triples_of_unsigned_vec_var_45,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
-    pairs_of_natural_and_positive_unsigned, pairs_of_unsigned_and_positive_natural,
     positive_naturals, triples_of_natural_natural_and_positive_natural,
 };
 use malachite_test::natural::arithmetic::mod_op::rug_neg_mod;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_limb() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(limbs_mod_limb(limbs, divisor), remainder);
+        assert_eq!(
+            _limbs_mod_limb_any_leading_zeros_1(limbs, divisor),
+            remainder
+        );
+        assert_eq!(
+            _limbs_mod_limb_any_leading_zeros_2(limbs, divisor),
+            remainder
+        );
+        assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
+        assert_eq!(_limbs_mod_limb_alt_3(limbs, divisor), remainder);
+    };
+    test(&[0, 0], 2, 0);
+    // shift != 0 in _limbs_mod_limb_any_leading_zeros_1
+    // r_hi < b in _limbs_mod_limb_any_leading_zeros_1
+    // n == 2 in _limbs_mod_limb_any_leading_zeros_1
+    // !divisor.get_highest_bit() in _limbs_mod_limb_alt_2
+    // !divisor.get_highest_bit() && len < MOD_1U_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
+    test(&[6, 7], 1, 0);
+    test(&[6, 7], 2, 0);
+    // n > 2 in _limbs_mod_limb_any_leading_zeros_1
+    // !divisor.get_highest_bit() &&
+    //      MOD_1U_TO_MOD_1_1_THRESHOLD <= len < MOD_1_1_TO_MOD_1_2_THRESHOLD
+    //      in _limbs_mod_limb_alt_2
+    test(&[100, 101, 102], 10, 8);
+    test(&[123, 456], 789, 636);
+    test(&[0, 0], 0xa000_0000, 0);
+    // shift == 0 in _limbs_mod_limb_any_leading_zeros_1
+    // divisor.get_highest_bit() in _limbs_mod_limb_alt_2
+    // divisor.get_highest_bit() && len < MOD_1N_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
+    test(&[6, 7], 0x8000_0000, 6);
+    test(&[6, 7], 0xa000_0000, 536870918);
+    // divisor.get_highest_bit() && len >= MOD_1N_TO_MOD_1_1_THRESHOLD in _limbs_mod_limb_alt_2
+    test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
+    // r_hi >= b in _limbs_mod_limb_any_leading_zeros_1
+    test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
+    test(&[100, 101, 102], 0xffff_ffff, 303);
+    test(&[1, 2, 3, 4], 6, 1);
+    // !divisor.get_highest_bit() && len >= MOD_1_1_TO_MOD_1_2_THRESHOLD &&
+    //      (len < MOD_1_2_TO_MOD_1_4_THRESHOLD || divisor & HIGHEST_TWO_BITS_MASK != 0)
+    //      in _limbs_mod_limb_alt_2
+    test(
+        &[
+            3713432036, 2475243626, 3960734766, 244755020, 3760002601, 301563516, 2499010086,
+            1451814771, 1299826235, 3628218184, 2565364972, 3729936002,
+        ],
+        565832495,
+        295492150,
+    );
+    // !divisor.get_highest_bit() && len >= MOD_1_2_TO_MOD_1_4_THRESHOLD &&
+    //      divisor & HIGHEST_TWO_BITS_MASK == 0
+    //      in _limbs_mod_limb_alt_2
+    test(
+        &[
+            540286473, 1475101238, 1863380542, 2517905739, 81646271, 3172818884, 2759300635,
+            852345965, 3647245071, 3875987988, 4229899590, 4100778302, 1641902155, 1289745333,
+            3414845068, 119899697, 2175381145, 2490291811, 3047506964, 1815484255, 3379971995,
+            1695675424, 1418284338,
+        ],
+        436775226,
+        165213921,
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mod_limb_fail_1() {
+    limbs_mod_limb(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mod_limb_fail_2() {
+    limbs_mod_limb(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_any_leading_zeros_1_fail_1() {
+    _limbs_mod_limb_any_leading_zeros_1(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_any_leading_zeros_1_fail_2() {
+    _limbs_mod_limb_any_leading_zeros_1(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_any_leading_zeros_2_fail_1() {
+    _limbs_mod_limb_any_leading_zeros_2(&[10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_any_leading_zeros_2_fail_2() {
+    _limbs_mod_limb_any_leading_zeros_2(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_limb_small_normalized() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(_limbs_mod_limb_small_normalized(limbs, divisor), remainder);
+    };
+    test(&[0x8000_0123], 0x8000_0000, 0x123);
+    test(&[0, 0], 0xa000_0000, 0);
+    test(&[6, 7], 0x8000_0000, 6);
+    test(&[6, 7], 0xa000_0000, 536870918);
+    test(&[100, 101, 102], 0xabcd_dcba, 2152689614);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xffff_ffff, 0);
+    test(&[0xffff_ffff, 0xffff_ffff], 0xa000_0000, 1610612735);
+    test(&[100, 101, 102], 0xffff_ffff, 303);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_small_normalized_fail_1() {
+    _limbs_mod_limb_small_normalized(&[], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_small_normalized_fail_2() {
+    _limbs_mod_limb_small_normalized(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_limb_small_unnormalized() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(
+            _limbs_mod_limb_small_unnormalized(limbs, divisor),
+            remainder
+        );
+        assert_eq!(
+            _limbs_mod_limb_at_least_1_leading_zero(limbs, divisor),
+            remainder
+        );
+    };
+    test(&[0, 0], 2, 0);
+    test(&[0], 2, 0);
+    // remainder >= divisor in _limbs_mod_limb_small_unnormalized
+    // len.odd() in _limbs_mod_limb_at_least_1_leading_zero
+    // len == 1 in _limbs_mod_limb_at_least_1_leading_zero
+    test(&[6], 2, 0);
+    test(&[6], 4, 2);
+    // len.even() in _limbs_mod_limb_at_least_1_leading_zero
+    // len < 4 in _limbs_mod_limb_at_least_1_leading_zero
+    test(&[6, 7], 1, 0);
+    test(&[6, 7], 2, 0);
+    // len.odd() && len != 1 in _limbs_mod_limb_at_least_1_leading_zero
+    test(&[100, 101, 102], 10, 8);
+    // remainder < divisor in _limbs_mod_limb_small_unnormalized
+    test(&[123, 456], 789, 636);
+    test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    // len >= 4 in _limbs_mod_limb_at_least_1_leading_zero
+    test(&[1, 2, 3, 4, 5], 6, 3);
+    test(&[1, 2, 3, 4], 6, 1);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_small_unnormalized_fail_1() {
+    _limbs_mod_limb_small_unnormalized(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_small_unnormalized_fail_2() {
+    _limbs_mod_limb_small_unnormalized(&[10, 10], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_at_least_1_leading_zero_fail_1() {
+    _limbs_mod_limb_at_least_1_leading_zero(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_at_least_1_leading_zero_fail_2() {
+    _limbs_mod_limb_at_least_1_leading_zero(&[10, 10], 0xffff_ffff);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_limb_at_least_2_leading_zeros() {
+    let test = |limbs: &[Limb], divisor: Limb, remainder: Limb| {
+        assert_eq!(
+            _limbs_mod_limb_at_least_2_leading_zeros(limbs, divisor),
+            remainder
+        );
+    };
+    test(&[0, 0], 2, 0);
+    test(&[0], 2, 0);
+    // len === 1 mod 4
+    // len < 4
+    test(&[6], 2, 0);
+    test(&[6], 4, 2);
+    // len === 2 mod 4
+    test(&[6, 7], 1, 0);
+    test(&[6, 7], 2, 0);
+    // len === 3 mod 4
+    test(&[100, 101, 102], 10, 8);
+    test(&[123, 456], 789, 636);
+    test(&[0xffff_ffff, 0xffff_ffff], 2, 1);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, 0);
+    // len === 0 mod 4
+    test(&[1, 2, 3, 4], 6, 1);
+    // len >= 4
+    test(&[1, 2, 3, 4, 5], 6, 3);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_at_least_2_leading_zeros_fail_1() {
+    _limbs_mod_limb_at_least_2_leading_zeros(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn _limbs_mod_limb_at_least_2_leading_zeros_fail_2() {
+    _limbs_mod_limb_at_least_2_leading_zeros(&[10, 10], 0x7fff_ffff);
+}
 
 fn verify_limbs_mod_three_limb_by_two_limb(
     n_2: Limb,
@@ -9996,6 +10253,92 @@ fn neg_mod_ref_ref_fail() {
 }
 
 #[test]
+fn limbs_mod_limb_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, divisor)| {
+            let remainder = limbs_mod_limb(limbs, divisor);
+            assert_eq!(
+                Natural::from_limbs_asc(limbs) % Natural::from(divisor),
+                remainder
+            );
+            assert_eq!(
+                _limbs_mod_limb_any_leading_zeros_1(limbs, divisor),
+                remainder
+            );
+            assert_eq!(
+                _limbs_mod_limb_any_leading_zeros_2(limbs, divisor),
+                remainder
+            );
+            assert_eq!(_limbs_mod_limb_alt_1(limbs, divisor), remainder);
+            assert_eq!(_limbs_mod_limb_alt_2(limbs, divisor), remainder);
+            assert_eq!(_limbs_mod_limb_alt_3(limbs, divisor), remainder);
+        },
+    );
+}
+
+#[test]
+fn _limbs_mod_limb_small_normalized_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+        |&(ref limbs, divisor)| {
+            let remainder = _limbs_mod_limb_small_normalized(limbs, divisor);
+            assert_eq!(
+                remainder,
+                Natural::from_limbs_asc(limbs) % Natural::from(divisor)
+            );
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % divisor);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
+            }
+        },
+    );
+}
+
+#[test]
+fn _limbs_mod_limb_small_unnormalized_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, divisor)| {
+            let remainder = _limbs_mod_limb_small_unnormalized(limbs, divisor);
+            assert_eq!(
+                remainder,
+                _limbs_mod_limb_at_least_1_leading_zero(limbs, divisor)
+            );
+            assert_eq!(
+                remainder,
+                Natural::from_limbs_asc(limbs) % Natural::from(divisor)
+            );
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % divisor);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
+            }
+        },
+    );
+}
+
+#[test]
+fn _limbs_mod_limb_at_least_2_leading_zeros_properties() {
+    test_properties(
+        pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
+        |&(ref limbs, divisor)| {
+            let remainder = _limbs_mod_limb_at_least_2_leading_zeros(limbs, divisor);
+            assert_eq!(
+                remainder,
+                Natural::from_limbs_asc(limbs) % Natural::from(divisor)
+            );
+            if limbs.len() == 1 {
+                assert_eq!(remainder, limbs[0] % divisor);
+            } else {
+                assert_eq!(remainder, limbs_mod_limb(limbs, divisor));
+            }
+        },
+    );
+}
+
+#[test]
 fn limbs_mod_three_limb_by_two_limb_properties() {
     test_properties(
         sextuples_of_limbs_var_1,
@@ -10185,20 +10528,6 @@ fn mod_properties() {
             assert_eq!(x * y % z, (x % z) * (y % z) % z);
         },
     );
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned,
-        |&(ref n, u): &(Natural, Limb)| {
-            assert_eq!(n % u, n % Natural::from(u));
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural,
-        |&(u, ref n): &(Limb, Natural)| {
-            assert_eq!(u % n, Natural::from(u) % n);
-        },
-    );
 }
 
 fn neg_mod_properties_helper(x: &Natural, y: &Natural) {
@@ -10229,12 +10558,8 @@ fn neg_mod_properties_helper(x: &Natural, y: &Natural) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO
-    /*
-    let (quotient_alt, remainder_alt) = (x.div_round(y, RoundingMode::Ceiling), x.neg_mod(y));
-    assert_eq!(quotient_alt, quotient);
+    let remainder_alt = x.neg_mod(y);
     assert_eq!(remainder_alt, remainder);
-    */
 
     let rug_remainder = rug_neg_mod(natural_to_rug_integer(x), natural_to_rug_integer(y));
     assert_eq!(rug_integer_to_natural(&rug_remainder), remainder);
@@ -10270,20 +10595,6 @@ fn neg_mod_properties() {
         |&(ref x, ref y, ref z)| {
             assert_eq!((x + y).neg_mod(z), (x % z + y % z).neg_mod(z));
             assert_eq!((x * y).neg_mod(z), ((x % z) * (y % z)).neg_mod(z));
-        },
-    );
-
-    test_properties(
-        pairs_of_natural_and_positive_unsigned,
-        |&(ref n, u): &(Natural, Limb)| {
-            assert_eq!(n.neg_mod(u), n.neg_mod(Natural::from(u)));
-        },
-    );
-
-    test_properties(
-        pairs_of_unsigned_and_positive_natural,
-        |&(u, ref n): &(Limb, Natural)| {
-            assert_eq!(u.neg_mod(n), Natural::from(u).neg_mod(n));
         },
     );
 }
