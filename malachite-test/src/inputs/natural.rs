@@ -1079,17 +1079,6 @@ where
     )
 }
 
-// All triples of `Natural`, `Limb`, and small `T`, where `T` is unsigned and the `Natural` is not
-// equal to the `Limb` mod 2 to the power of the `T`.
-pub fn triples_of_natural_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Natural, Limb, T)> {
-    Box::new(
-        triples_of_natural_unsigned_and_small_unsigned::<Limb, T>(gm)
-            .filter(|&(ref n, u, pow)| !n.eq_mod_power_of_two(u, pow.checked_into().unwrap())),
-    )
-}
-
 pub fn triples_of_natural_small_u64_and_bool(gm: GenerationMode) -> It<(Natural, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -1292,7 +1281,7 @@ fn triples_of_natural_positive_natural_and_rounding_mode(
     }
 }
 
-// All triples of `Natural`, positive `Nagtural`, and `RoundingMode`, where if the `RoundingMode` is
+// All triples of `Natural`, positive `Natural`, and `RoundingMode`, where if the `RoundingMode` is
 // `RoundingMode::Exact`, the first `Natural` is divisible by the second.
 pub fn triples_of_natural_positive_natural_and_rounding_mode_var_1(
     gm: GenerationMode,

@@ -1,17 +1,24 @@
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
+use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
+    limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
+use inputs::base::{
+    triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+};
 use inputs::natural::{
     rm_triples_of_natural_natural_and_small_unsigned, triples_of_natural_natural_and_small_unsigned,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_eq_limb_mod_power_of_two);
     register_demo!(registry, demo_limbs_eq_mod_power_of_two);
     register_demo!(registry, demo_natural_eq_mod_power_of_two);
+    register_bench!(registry, Small, benchmark_limbs_eq_limb_mod_power_of_two);
     register_bench!(registry, Small, benchmark_limbs_eq_mod_power_of_two);
     register_bench!(
         registry,
@@ -23,6 +30,20 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_eq_mod_power_of_two_algorithms
     );
+}
+
+fn demo_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize) {
+    for (limbs, limb, pow) in
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_eq_limb_mod_power_of_two({:?}, {}, {}) = {:?}",
+            limbs,
+            limb,
+            pow,
+            limbs_eq_limb_mod_power_of_two(&limbs, limb, pow)
+        );
+    }
 }
 
 fn demo_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
@@ -49,6 +70,25 @@ fn demo_natural_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
             x.eq_mod_power_of_two(y, pow)
         );
     }
+}
+
+fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_eq_limb_mod_power_of_two(&[Limb], u64)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref limbs, limb, pow)| {
+                no_out!(limbs_eq_limb_mod_power_of_two(limbs, limb, pow))
+            }),
+        )],
+    );
 }
 
 fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {

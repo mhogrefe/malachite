@@ -1,78 +1,59 @@
-use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
+use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
-use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use num::Integer;
 use rug::ops::DivRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1;
-use inputs::natural::{
-    nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
-    rm_pairs_of_natural_and_positive_natural,
-    triples_of_natural_positive_natural_and_rounding_mode_var_1,
+use inputs::integer::{
+    nrm_pairs_of_integer_and_nonzero_integer, pairs_of_integer_and_nonzero_integer,
+    rm_pairs_of_integer_and_nonzero_integer,
+    triples_of_integer_nonzero_integer_and_rounding_mode_var_1,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_limb_div_round_limbs);
-    register_demo!(registry, demo_natural_div_round_assign);
-    register_demo!(registry, demo_natural_div_round_assign_ref);
-    register_demo!(registry, demo_natural_div_round);
-    register_demo!(registry, demo_natural_div_round_val_ref);
-    register_demo!(registry, demo_natural_div_round_ref_val);
-    register_demo!(registry, demo_natural_div_round_ref_ref);
-    register_bench!(registry, Small, benchmark_limbs_limb_div_round_limbs);
-    register_bench!(registry, Large, benchmark_natural_div_round_assign);
+    register_demo!(registry, demo_integer_div_round_assign);
+    register_demo!(registry, demo_integer_div_round_assign_ref);
+    register_demo!(registry, demo_integer_div_round);
+    register_demo!(registry, demo_integer_div_round_val_ref);
+    register_demo!(registry, demo_integer_div_round_ref_val);
+    register_demo!(registry, demo_integer_div_round_ref_ref);
+    register_bench!(registry, Large, benchmark_integer_div_round_assign);
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_down_library_comparison
+        benchmark_integer_div_round_down_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_floor_library_comparison
+        benchmark_integer_div_round_floor_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_ceiling_library_comparison
+        benchmark_integer_div_round_ceiling_library_comparison
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_ceiling_algorithms
+        benchmark_integer_div_round_ceiling_algorithms
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_evaluation_strategy
+        benchmark_integer_div_round_evaluation_strategy
     );
     register_bench!(
         registry,
         Large,
-        benchmark_natural_div_round_assign_evaluation_strategy
+        benchmark_integer_div_round_assign_evaluation_strategy
     );
 }
 
-fn demo_limbs_limb_div_round_limbs(gm: GenerationMode, limit: usize) {
-    for (limb, limbs, rm) in
-        triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1(gm).take(limit)
-    {
-        println!(
-            "limbs_limb_div_round_limbs({}, {:?}, {}) = {:?}",
-            limb,
-            limbs,
-            rm,
-            limbs_limb_div_round_limbs(limb, &limbs, rm)
-        );
-    }
-}
-
-fn demo_natural_div_round_assign(gm: GenerationMode, limit: usize) {
-    for (mut x, y, rm) in
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit)
+fn demo_integer_div_round_assign(gm: GenerationMode, limit: usize) {
+    for (mut x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit)
     {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -84,9 +65,8 @@ fn demo_natural_div_round_assign(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_div_round_assign_ref(gm: GenerationMode, limit: usize) {
-    for (mut x, y, rm) in
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit)
+fn demo_integer_div_round_assign_ref(gm: GenerationMode, limit: usize) {
+    for (mut x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit)
     {
         let x_old = x.clone();
         x.div_round_assign(&y, rm);
@@ -97,8 +77,8 @@ fn demo_natural_div_round_assign_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_div_round(gm: GenerationMode, limit: usize) {
-    for (x, y, rm) in triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit) {
+fn demo_integer_div_round(gm: GenerationMode, limit: usize) {
+    for (x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
@@ -111,8 +91,8 @@ fn demo_natural_div_round(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_div_round_val_ref(gm: GenerationMode, limit: usize) {
-    for (x, y, rm) in triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit) {
+fn demo_integer_div_round_val_ref(gm: GenerationMode, limit: usize) {
+    for (x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit) {
         let x_old = x.clone();
         println!(
             "{}.div_round(&{}, {}) = {}",
@@ -124,8 +104,8 @@ fn demo_natural_div_round_val_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_div_round_ref_val(gm: GenerationMode, limit: usize) {
-    for (x, y, rm) in triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit) {
+fn demo_integer_div_round_ref_val(gm: GenerationMode, limit: usize) {
+    for (x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit) {
         let y_old = y.clone();
         println!(
             "(&{}).div_round({}, {}) = {}",
@@ -137,8 +117,8 @@ fn demo_natural_div_round_ref_val(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_div_round_ref_ref(gm: GenerationMode, limit: usize) {
-    for (x, y, rm) in triples_of_natural_positive_natural_and_rounding_mode_var_1(gm).take(limit) {
+fn demo_integer_div_round_ref_ref(gm: GenerationMode, limit: usize) {
+    for (x, y, rm) in triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm).take(limit) {
         println!(
             "(&{}).div_round(&{}, {}) = {}",
             x,
@@ -149,28 +129,11 @@ fn demo_natural_div_round_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_limb_div_round_limbs(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_integer_div_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_limb_div_round_limbs(Limb, &[Limb], RoundingMode)",
+        "Integer.div_round_assign(Integer, RoundingMode)",
         BenchmarkType::Single,
-        triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref limbs, _)| limbs.len()),
-        "limbs.len()",
-        &mut [(
-            "malachite",
-            &mut (|(limb, limbs, rm)| no_out!(limbs_limb_div_round_limbs(limb, &limbs, rm))),
-        )],
-    );
-}
-
-fn benchmark_natural_div_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural.div_round_assign(Natural, RoundingMode)",
-        BenchmarkType::Single,
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),
+        triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -183,15 +146,15 @@ fn benchmark_natural_div_round_assign(gm: GenerationMode, limit: usize, file_nam
     );
 }
 
-fn benchmark_natural_div_round_down_library_comparison(
+fn benchmark_integer_div_round_down_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round(Natural, RoundingMode::Down)",
+        "Integer.div_round(Integer, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_positive_natural(gm),
+        rm_pairs_of_integer_and_nonzero_integer(gm),
         gm.name(),
         limit,
         file_name,
@@ -207,15 +170,15 @@ fn benchmark_natural_div_round_down_library_comparison(
     );
 }
 
-fn benchmark_natural_div_round_floor_library_comparison(
+fn benchmark_integer_div_round_floor_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round(Natural, RoundingMode::Floor)",
+        "Integer.div_round(Integer, RoundingMode::Floor)",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_natural_and_positive_natural(gm),
+        nrm_pairs_of_integer_and_nonzero_integer(gm),
         gm.name(),
         limit,
         file_name,
@@ -232,15 +195,15 @@ fn benchmark_natural_div_round_floor_library_comparison(
     );
 }
 
-fn benchmark_natural_div_round_ceiling_library_comparison(
+fn benchmark_integer_div_round_ceiling_library_comparison(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round(Natural, RoundingMode::Ceiling)",
+        "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_natural_and_positive_natural(gm),
+        rm_pairs_of_integer_and_nonzero_integer(gm),
         gm.name(),
         limit,
         file_name,
@@ -256,15 +219,15 @@ fn benchmark_natural_div_round_ceiling_library_comparison(
     );
 }
 
-fn benchmark_natural_div_round_ceiling_algorithms(
+fn benchmark_integer_div_round_ceiling_algorithms(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round(Natural, RoundingMode::Ceiling)",
+        "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
-        pairs_of_natural_and_positive_natural(gm),
+        pairs_of_integer_and_nonzero_integer(gm),
         gm.name(),
         limit,
         file_name,
@@ -276,22 +239,22 @@ fn benchmark_natural_div_round_ceiling_algorithms(
                 &mut (|(x, y)| no_out!(x.div_round(y, RoundingMode::Ceiling))),
             ),
             (
-                "using ceiling_div_neg_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_neg_mod(y).0)),
+                "using ceiling_div_mod",
+                &mut (|(x, y)| no_out!(x.ceiling_div_mod(y).0)),
             ),
         ],
     );
 }
 
-fn benchmark_natural_div_round_evaluation_strategy(
+fn benchmark_integer_div_round_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round(Natural, RoundingMode)",
+        "Integer.div_round(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),
+        triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -299,34 +262,34 @@ fn benchmark_natural_div_round_evaluation_strategy(
         "x.significant_bits()",
         &mut [
             (
-                "Natural.div_round(Natural, RoundingMode)",
+                "Integer.div_round(Integer, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!(x.div_round(y, rm))),
             ),
             (
-                "Natural.div_round(&Natural, RoundingMode)",
+                "Integer.div_round(&Integer, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!(x.div_round(&y, rm))),
             ),
             (
-                "(&Natural).div_round(Natural, RoundingMode)",
+                "(&Integer).div_round(Integer, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!((&x).div_round(y, rm))),
             ),
             (
-                "(&Natural).div_round(&Natural, RoundingMode)",
+                "(&Integer).div_round(&Integer, RoundingMode)",
                 &mut (|(x, y, rm)| no_out!((&x).div_round(&y, rm))),
             ),
         ],
     );
 }
 
-fn benchmark_natural_div_round_assign_evaluation_strategy(
+fn benchmark_integer_div_round_assign_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.div_round_assign(Natural, RoundingMode)",
+        "Integer.div_round_assign(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),
+        triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -334,11 +297,11 @@ fn benchmark_natural_div_round_assign_evaluation_strategy(
         "x.significant_bits()",
         &mut [
             (
-                "Natural.div_round_assign(Natural, RoundingMode)",
+                "Integer.div_round_assign(Integer, RoundingMode)",
                 &mut (|(mut x, y, rm)| x.div_round_assign(y, rm)),
             ),
             (
-                "Natural.div_round_assign(&Natural, RoundingMode)",
+                "Integer.div_round_assign(&Integer, RoundingMode)",
                 &mut (|(mut x, y, rm)| x.div_round_assign(&y, rm)),
             ),
         ],

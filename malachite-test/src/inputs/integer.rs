@@ -3,7 +3,7 @@ use std::ops::{Shl, Shr};
 use itertools::Itertools;
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -691,6 +691,16 @@ pub fn nrm_pairs_of_integer_and_nonzero_integer(
 // second.
 pub fn pairs_of_integer_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Integer, Integer)> {
     Box::new(pairs_of_integer_and_nonzero_integer(gm).map(|(x, y)| (x * &y, y)))
+}
+
+// All pairs of `Integer` and positive `Integer`, where the first `Integer` is not divisible by the
+// second.
+//TODO use Integer divisible_by
+pub fn pairs_of_integer_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Integer, Integer)> {
+    Box::new(
+        pairs_of_integer_and_nonzero_integer(gm)
+            .filter(|(x, y)| !x.unsigned_abs().divisible_by(y.unsigned_abs())),
+    )
 }
 
 fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger + Rand>(
@@ -1383,17 +1393,6 @@ where
     )
 }
 
-// All triples of `Integer`, `Limb`, and small `T`, where `T` is unsigned and the `Integer` is not
-// equal to the `Limb` mod 2 to the power of the `T`.
-pub fn triples_of_integer_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Integer, Limb, T)> {
-    Box::new(
-        triples_of_integer_unsigned_and_small_unsigned::<Limb, T>(gm)
-            .filter(|&(ref n, u, pow)| !n.eq_mod_power_of_two(u, pow.checked_into().unwrap())),
-    )
-}
-
 pub fn triples_of_unsigned_integer_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -1485,17 +1484,6 @@ where
     Box::new(
         triples_of_integer_signed_and_small_unsigned(gm)
             .map(|(n, u, pow)| ((n << pow) + Integer::from(u), u, pow)),
-    )
-}
-
-// All triples of `Integer`, `SignedLimb`, and small `T`, where `U` is unsigned and the `Integer` is
-// not equal to the `SignedLimb` mod 2 to the power of the `T`.
-pub fn triples_of_integer_signed_limb_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Integer, SignedLimb, T)> {
-    Box::new(
-        triples_of_integer_signed_and_small_unsigned::<SignedLimb, T>(gm)
-            .filter(|&(ref n, i, pow)| !n.eq_mod_power_of_two(i, pow.checked_into().unwrap())),
     )
 }
 
@@ -1765,17 +1753,6 @@ where
     Box::new(
         triples_of_integer_natural_and_small_unsigned(gm)
             .map(|(x, y, pow)| ((x << pow) + Integer::from(&y), y, pow)),
-    )
-}
-
-// All triples of `Integer`, `Natural`, and small `T`, where `T` is unsigned and the `Integer`s are
-// not equal mod 2 to the power of the `T`.
-pub fn triples_of_integer_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Integer, Natural, T)> {
-    Box::new(
-        triples_of_integer_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.checked_into().unwrap())),
     )
 }
 
@@ -2460,6 +2437,45 @@ where
                 T::checked_from(Integer::from(i) * (&n).abs()).map(|i| (i, n, rm))
             } else {
                 Some((i, n, rm))
+            }
+        }),
+    )
+}
+
+fn triples_of_integer_nonzero_integer_and_rounding_mode(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_integers(), exhaustive_nonzero_integers()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_nonzero_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `Integer`, positive `Integer`, and `RoundingMode`, where if the `RoundingMode` is
+// `RoundingMode::Exact`, the first `Integer` is divisible by the second.
+pub fn triples_of_integer_nonzero_integer_and_rounding_mode_var_1(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        triples_of_integer_nonzero_integer_and_rounding_mode(gm).map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
             }
         }),
     )

@@ -37,7 +37,7 @@ fn test_div_exact_limb() {
 
         let q = Integer::from_str(u)
             .unwrap()
-            .div_round(v, RoundingMode::Exact);
+            .div_round(Integer::from(v), RoundingMode::Exact);
         assert_eq!(q.to_string(), quotient);
 
         let q = rug_div_exact_limb(rug::Integer::from_str(u).unwrap(), v);
@@ -163,7 +163,7 @@ fn div_exact_limb_properties_helper(n: &Integer, u: Limb) {
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
-    let quotient_alt = n.div_round(u, RoundingMode::Exact);
+    let quotient_alt = n.div_round(Integer::from(u), RoundingMode::Exact);
     assert!(quotient_alt.is_valid());
     assert_eq!(quotient_alt, quotient);
 
@@ -196,7 +196,7 @@ fn div_exact_limb_properties() {
             assert!(quotient_alt.is_valid());
             assert_eq!(quotient_alt, quotient);
 
-            assert_eq!(u.div_round(n, RoundingMode::Exact), quotient);
+            assert_eq!(Integer::from(u).div_round(n, RoundingMode::Exact), quotient);
 
             assert_eq!(u.div_exact(-n), -&quotient);
 

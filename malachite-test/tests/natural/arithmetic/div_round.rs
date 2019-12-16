@@ -16,8 +16,6 @@ use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_2,
     pairs_of_natural_and_rounding_mode, pairs_of_positive_natural_and_rounding_mode,
     triples_of_natural_positive_natural_and_rounding_mode_var_1,
-    triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
-    triples_of_unsigned_positive_natural_and_rounding_mode_var_1,
 };
 
 #[test]
@@ -103,6 +101,7 @@ fn test_div_round() {
     test("0", "123", RoundingMode::Up, "0");
     test("0", "123", RoundingMode::Ceiling, "0");
     test("0", "123", RoundingMode::Nearest, "0");
+    test("0", "123", RoundingMode::Exact, "0");
 
     test("1", "1", RoundingMode::Down, "1");
     test("1", "1", RoundingMode::Floor, "1");
@@ -452,20 +451,6 @@ fn div_round_properties() {
         |&(ref x, rm)| {
             assert_eq!(Natural::ZERO.div_round(x, rm), 0 as Limb);
             assert_eq!(x.div_round(x, rm), 1 as Limb);
-        },
-    );
-
-    test_properties(
-        triples_of_natural_positive_unsigned_and_rounding_mode_var_1,
-        |&(ref n, u, rm): &(Natural, Limb, RoundingMode)| {
-            assert_eq!(n.div_round(u, rm), n.div_round(Natural::from(u), rm));
-        },
-    );
-
-    test_properties(
-        triples_of_unsigned_positive_natural_and_rounding_mode_var_1,
-        |&(u, ref n, rm): &(Limb, Natural, RoundingMode)| {
-            assert_eq!(u.div_round(n, rm), Natural::from(u).div_round(n, rm));
         },
     );
 }

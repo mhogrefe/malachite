@@ -207,12 +207,10 @@ pub mod arithmetic {
     pub mod div_exact_limb;
     pub mod div_mod;
     pub mod div_round;
-    pub mod div_round_limb;
     pub mod divisible_by;
     pub mod divisible_by_limb;
     pub mod divisible_by_power_of_two;
     pub mod eq_limb_mod_limb;
-    pub mod eq_limb_mod_power_of_two;
     pub mod eq_mod;
     pub mod eq_mod_power_of_two;
     pub mod is_power_of_two;

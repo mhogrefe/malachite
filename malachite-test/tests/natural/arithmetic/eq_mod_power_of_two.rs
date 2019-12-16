@@ -5,13 +5,18 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
+use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
+    limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
+};
 use malachite_nz::natural::Natural;
 use rug;
 
 use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
-use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1;
+use malachite_test::inputs::base::{
+    triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+    triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, pairs_of_naturals,
     quadruples_of_natural_natural_natural_and_small_unsigned,
@@ -19,6 +24,19 @@ use malachite_test::inputs::natural::{
     triples_of_natural_natural_and_small_unsigned_var_1,
     triples_of_natural_natural_and_small_unsigned_var_2,
 };
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_eq_limb_mod_power_of_two() {
+    let test = |limbs, limb, pow, out| {
+        assert_eq!(limbs_eq_limb_mod_power_of_two(limbs, limb, pow), out);
+    };
+    test(&[0b1111011, 0b111001000], 0b101011, 4, true);
+    test(&[0b1111011, 0b111001000], 0b101011, 5, false);
+    test(&[0b1111011, 0b111001000], 0b1111011, 35, true);
+    test(&[0b1111011, 0b111001000], 0b1111011, 36, false);
+    test(&[0b1111011, 0b111001000], 0b1111011, 100, false);
+}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -81,6 +99,19 @@ fn test_eq_mod_power_of_two() {
     test("4294967295", "4294967295", 32, true);
     test("281474976710672", "844424930131984", 49, true);
     test("281474976710672", "844424930131984", 50, false);
+}
+
+#[test]
+fn limbs_eq_limb_mod_power_of_two_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+        |&(ref limbs, limb, pow)| {
+            assert_eq!(
+                limbs_eq_limb_mod_power_of_two(limbs, limb, pow),
+                Natural::from_limbs_asc(limbs).eq_mod_power_of_two(&Natural::from(limb), pow)
+            );
+        },
+    );
 }
 
 #[test]

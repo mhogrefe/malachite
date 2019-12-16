@@ -1,10 +1,12 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    DivRound, Mod,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use num::{BigInt, Integer as NumInteger};
 use rug;
@@ -75,13 +77,16 @@ fn test_div_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO let (q, r) = (
-        //TODO     Integer::from_str(u).unwrap()
-        //TODO          .div_round(Integer::from_str(v).unwrap(), RoundingMode::Floor),
-        //TODO     Integer::from_str(u).unwrap().mod_op(Integer::from_str(v).unwrap()),
-        //TODO );
-        //TODO assert_eq!(q.to_string(), quotient);
-        //TODO assert_eq!(r.to_string(), remainder);
+        let (q, r) = (
+            Integer::from_str(u)
+                .unwrap()
+                .div_round(Integer::from_str(v).unwrap(), RoundingMode::Floor),
+            Integer::from_str(u)
+                .unwrap()
+                .mod_op(Integer::from_str(v).unwrap()),
+        );
+        assert_eq!(q.to_string(), quotient);
+        assert_eq!(r.to_string(), remainder);
     };
     test("0", "1", "0", "0");
     test("0", "123", "0", "0");
@@ -1040,14 +1045,14 @@ fn test_ceiling_div_mod() {
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
 
-        //TODO let (q, r) = (
-        //TODO     Integer::from_str(u)
-        //TODO         .unwrap()
-        //TODO         .div_round(Integer::from_str(v).unwrap(), RoundingMode::Ceiling),
-        //TODO     -Integer::from_str(u)
-        //TODO         .unwrap()
-        //TODO         .neg_mod(Integer::from_str(v).unwrap()),
-        //TODO );
+        let (q, r) = (
+            Integer::from_str(u)
+                .unwrap()
+                .div_round(Integer::from_str(v).unwrap(), RoundingMode::Ceiling),
+            Integer::from_str(u)
+                .unwrap()
+                .ceiling_mod(Integer::from_str(v).unwrap()),
+        );
         assert_eq!(q.to_string(), quotient);
         assert_eq!(r.to_string(), remainder);
     };
@@ -1517,9 +1522,9 @@ fn div_mod_properties_helper(x: &Integer, y: &Integer) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) = (x.div_round(y, RoundingMode::Floor, x.mod_op(y));
-    //TODO assert_eq!(quotient_alt, quotient);
-    //TODO assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (x.div_round(y, RoundingMode::Floor), x.mod_op(y));
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     let (num_quotient, num_remainder) = integer_to_bigint(x).div_mod_floor(&integer_to_bigint(y));
     assert_eq!(bigint_to_integer(&num_quotient), quotient);
@@ -1727,10 +1732,9 @@ fn ceiling_div_mod_properties_helper(x: &Integer, y: &Integer) {
     assert!(remainder_alt.is_valid());
     assert_eq!(remainder_alt, remainder);
 
-    //TODO let (quotient_alt, remainder_alt) =
-    //TODO  (x.div_round(y, RoundingMode::Ceiling), -x.neg_mod(y));
-    //TODO assert_eq!(quotient_alt, quotient);
-    //TODO assert_eq!(remainder_alt, remainder);
+    let (quotient_alt, remainder_alt) = (x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y));
+    assert_eq!(quotient_alt, quotient);
+    assert_eq!(remainder_alt, remainder);
 
     let (rug_quotient, rug_remainder) =
         integer_to_rug_integer(x).div_rem_ceil(integer_to_rug_integer(y));

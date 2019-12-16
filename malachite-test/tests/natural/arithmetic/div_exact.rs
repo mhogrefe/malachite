@@ -40,7 +40,7 @@ fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
     let i = Natural::from_limbs_asc(is);
     let pow = u64::wrapping_from(ds.len()) << Limb::LOG_WIDTH;
-    assert!((d * i).eq_mod_power_of_two(1 as Limb, pow));
+    assert!((d * i).eq_mod_power_of_two(&Natural::ONE, pow));
 }
 
 #[cfg(feature = "32_bit_limbs")]

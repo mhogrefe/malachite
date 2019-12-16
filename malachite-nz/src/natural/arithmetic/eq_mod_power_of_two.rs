@@ -9,6 +9,41 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
+/// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
+/// the `pow` least-significant bits of the `Natural` and the limb are equal.
+///
+/// This function assumes that `limbs` has length at least 2 and the last (most significant) limb is
+/// nonzero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
+///
+/// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b101011, 4), true);
+/// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b101011, 5), false);
+/// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 35), true);
+/// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 36), false);
+/// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 100), false);
+/// ```
+pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> bool {
+    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    if i >= limbs.len() {
+        false
+    } else if i == 0 {
+        limbs[0].eq_mod_power_of_two(limb, pow)
+    } else {
+        limbs[0] == limb
+            && limbs_divisible_by_power_of_two(&limbs[1..], pow - u64::from(Limb::WIDTH))
+    }
+}
+
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
@@ -73,6 +108,15 @@ pub fn limbs_eq_mod_power_of_two(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     }
 }
 
+impl Natural {
+    fn eq_mod_power_of_two_limb(&self, other: Limb, pow: u64) -> bool {
+        match *self {
+            Natural(Small(small)) => small.eq_mod_power_of_two(other, pow),
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_power_of_two(limbs, other, pow),
+        }
+    }
+}
+
 impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// Returns whether two `Natural`s are equivalent mod two to the power of `pow`; that is,
     /// whether their `pow` least-significant bits are equal.
@@ -102,8 +146,8 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// ```
     fn eq_mod_power_of_two(self, other: &'b Natural, pow: u64) -> bool {
         match (self, other) {
-            (_, &Natural(Small(y))) => self.eq_mod_power_of_two(y, pow),
-            (&Natural(Small(x)), _) => other.eq_mod_power_of_two(x, pow),
+            (_, &Natural(Small(y))) => self.eq_mod_power_of_two_limb(y, pow),
+            (&Natural(Small(x)), _) => other.eq_mod_power_of_two_limb(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                 limbs_eq_mod_power_of_two(xs, ys, pow)
             }

@@ -1,8 +1,10 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
+    DivRound, Mod,
 };
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::round::RoundingMode;
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -314,10 +316,10 @@ fn benchmark_integer_div_mod_algorithms(gm: GenerationMode, limit: usize, file_n
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.div_mod(y)))),
-            //TODO (
-            //TODO  "using / and %",
-            //TODO  &mut (|(x, y)| no_out!((&x.div_round(&y, RoundingMode::Floor), x.mod_op(y)))
-            //TODO ),
+            (
+                "using div_round and mod_op",
+                &mut (|(x, y)| no_out!(((&x).div_round(&y, RoundingMode::Floor), x.mod_op(y)))),
+            ),
         ],
     );
 }
@@ -517,12 +519,12 @@ fn benchmark_integer_ceiling_div_mod_algorithms(gm: GenerationMode, limit: usize
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.ceiling_div_mod(y)))),
-            //TODO (
-            //TODO     "using div_round and %",
-            //TODO     &mut (|(x, y)| {
-            //TODO         ((&x).div_round(&y, RoundingMode::Ceiling), -x.neg_mod(y));
-            //TODO     }),
-            //TODO ),
+            (
+                "using div_round and ceiling_mod",
+                &mut (|(x, y)| {
+                    ((&x).div_round(&y, RoundingMode::Ceiling), x.ceiling_mod(y));
+                }),
+            ),
         ],
     );
 }

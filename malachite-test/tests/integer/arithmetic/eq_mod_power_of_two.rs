@@ -1,30 +1,162 @@
 use std::str::FromStr;
 
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
 };
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
+    limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
+};
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
+use malachite_nz::platform::SignedLimb;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
 
 use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
-use malachite_test::inputs::base::triples_of_signed_signed_and_small_unsigned;
+use malachite_test::inputs::base::{
+    triples_of_signed_signed_and_small_unsigned,
+    triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+    triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, pairs_of_integers,
     quadruples_of_integer_integer_integer_and_small_unsigned,
     triples_of_integer_integer_and_small_unsigned,
     triples_of_integer_integer_and_small_unsigned_var_1,
     triples_of_integer_integer_and_small_unsigned_var_2,
-    triples_of_integer_natural_and_small_unsigned, triples_of_integer_signed_and_small_unsigned,
-    triples_of_integer_unsigned_and_small_unsigned,
 };
 use malachite_test::inputs::natural::triples_of_natural_natural_and_small_unsigned;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_eq_mod_power_of_two_neg_limb() {
+    let test = |limbs, limb, pow, out| {
+        assert_eq!(limbs_eq_mod_power_of_two_neg_limb(limbs, limb, pow), out);
+    };
+    let width = u64::from(Limb::WIDTH);
+    test(&[1, 1], 3, 0, true);
+    test(&[1, 1], 3, 1, true);
+    test(&[1, 1], 3, 2, true);
+    test(&[1, 1], 3, 3, false);
+    test(&[1, 1], Limb::MAX, 0, true);
+    test(&[1, 1], Limb::MAX, 1, true);
+    test(&[1, 1], Limb::MAX, width, true);
+    test(&[1, 1], Limb::MAX, width + 1, true);
+    test(&[1, 2], Limb::MAX, width + 1, false);
+    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, width + 1, true);
+    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 2 * width, true);
+    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 3 * width - 1, true);
+    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 3 * width, false);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_eq_mod_power_of_two_neg_pos() {
+    let test = |xs, ys, pow, out| {
+        assert_eq!(limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow), out);
+    };
+    test(&[0b111_1011, 0b1_1100_1000], &[0b1_0101], 4, true);
+    test(&[0b111_1011, 0b1_1100_1000], &[0b1_0101], 5, false);
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        35,
+        true,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        36,
+        false,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1111],
+        100,
+        false,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1_0111],
+        37,
+        true,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1_0111],
+        38,
+        false,
+    );
+    test(
+        &[0b111_1011, 0b1_1100_1000],
+        &[0b1111_1111_1111_1111_1111_1111_1000_0101, 0b1_0111],
+        100,
+        false,
+    );
+
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        64,
+        true,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x0000_0000, 0xedcb_edcb],
+        64,
+        false,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        65,
+        false,
+    );
+    test(
+        &[0xabcd_abcd, 0x1234_1234],
+        &[0x5432_5433, 0xedcb_edcb],
+        128,
+        false,
+    );
+    test(&[0, 0, 0x1234_1234], &[0, 0, 0x1234_edcc], 80, true);
+
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        64,
+        true,
+    );
+    test(
+        &[0x0000_0000, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        64,
+        false,
+    );
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        65,
+        false,
+    );
+    test(
+        &[0x5432_5433, 0xedcb_edcb],
+        &[0xabcd_abcd, 0x1234_1234],
+        128,
+        false,
+    );
+    test(&[0, 0, 0x1234_edcc], &[0, 0, 0x1234_1234], 80, true);
+}
 
 #[test]
 fn test_eq_mod_power_of_two() {
@@ -116,6 +248,33 @@ fn test_eq_mod_power_of_two() {
 }
 
 #[test]
+fn limbs_eq_mod_power_of_two_neg_limb_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+        |&(ref limbs, limb, pow)| {
+            assert_eq!(
+                limbs_eq_mod_power_of_two_neg_limb(limbs, limb, pow),
+                (-Natural::from_limbs_asc(limbs)).eq_mod_power_of_two(&Integer::from(limb), pow)
+            );
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_mod_power_of_two_neg_pos_properties() {
+    test_properties(
+        triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+        |&(ref xs, ref ys, pow)| {
+            assert_eq!(
+                limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow),
+                (-Natural::from_limbs_asc(xs))
+                    .eq_mod_power_of_two(&Integer::from(Natural::from_limbs_asc(ys)), pow)
+            );
+        },
+    );
+}
+
+#[test]
 fn eq_mod_power_of_two_properties() {
     test_properties(
         triples_of_integer_integer_and_small_unsigned,
@@ -187,24 +346,6 @@ fn eq_mod_power_of_two_properties() {
     });
 
     test_properties(
-        triples_of_integer_unsigned_and_small_unsigned::<Limb, u64>,
-        |&(ref x, y, pow)| {
-            let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
-            assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
-            assert_eq!(y.eq_mod_power_of_two(x, pow), equal);
-        },
-    );
-
-    test_properties(
-        triples_of_integer_signed_and_small_unsigned::<SignedLimb, u64>,
-        |&(ref x, y, pow)| {
-            let equal = x.eq_mod_power_of_two(&Integer::from(y), pow);
-            assert_eq!(x.eq_mod_power_of_two(y, pow), equal);
-            assert_eq!(y.eq_mod_power_of_two(x, pow), equal);
-        },
-    );
-
-    test_properties(
         triples_of_natural_natural_and_small_unsigned,
         |&(ref x, ref y, pow)| {
             assert_eq!(
@@ -220,16 +361,6 @@ fn eq_mod_power_of_two_properties() {
             assert_eq!(
                 x.eq_mod_power_of_two(y, pow),
                 Integer::from(x).eq_mod_power_of_two(&Integer::from(y), pow),
-            );
-        },
-    );
-
-    test_properties(
-        triples_of_integer_natural_and_small_unsigned,
-        |&(ref x, ref y, pow)| {
-            assert_eq!(
-                x.eq_mod_power_of_two(&Integer::from(y), pow),
-                x.eq_mod_power_of_two(y, pow)
             );
         },
     );

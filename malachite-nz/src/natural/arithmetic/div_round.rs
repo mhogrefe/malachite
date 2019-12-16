@@ -4,10 +4,79 @@ use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::round::RoundingMode;
 
 use natural::Natural;
 use platform::Limb;
+
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+/// quotient limbs of a `Limb` divided by the `Natural` and rounded according to a specified
+/// `RoundingMode`. The limb slice must have at least two elements and cannot have any trailing
+/// zeros.
+///
+/// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the
+/// division would be nonzero.
+///
+/// Note that this function may only return `None`, `Some(0)`, or `Some(1)` because of the
+/// restrictions placed on the input slice.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// extern crate malachite_base;
+/// extern crate malachite_nz;
+///
+/// use malachite_base::round::RoundingMode;
+/// use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
+/// use malachite_nz::natural::Natural;
+///
+/// fn main() {
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Down), Some(0));
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Floor), Some(0));
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Up), Some(1));
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Ceiling), Some(1));
+///     assert_eq!(limbs_limb_div_round_limbs(0, &[123, 456], RoundingMode::Exact), Some(0));
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Exact), None);
+///     assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Nearest), Some(0));
+///     assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[123, 1], RoundingMode::Nearest),
+///         Some(1));
+///     assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_ffff, 1],
+///         RoundingMode::Nearest), Some(0));
+///
+///     assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_fffe, 1],
+///         RoundingMode::Nearest), Some(0));
+///
+///     assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_fffd, 1],
+///         RoundingMode::Nearest), Some(1));
+/// }
+/// ```
+pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) -> Option<Limb> {
+    if limb == 0 {
+        Some(0)
+    } else {
+        match rm {
+            RoundingMode::Down | RoundingMode::Floor => Some(0),
+            RoundingMode::Up | RoundingMode::Ceiling => Some(1),
+            RoundingMode::Exact => None,
+            // 1 if 2 * limb > Natural::from_limbs_asc(limbs); otherwise, 0
+            RoundingMode::Nearest => Some(
+                if limbs.len() == 2
+                    && limbs[1] == 1
+                    && limb.get_highest_bit()
+                    && (limb << 1) > limbs[0]
+                {
+                    1
+                } else {
+                    0
+                },
+            ),
+        }
+    }
+}
 
 fn div_round_nearest(quotient: Natural, remainder: Natural, denominator: &Natural) -> Natural {
     let compare = (remainder << 1u64).cmp(denominator);

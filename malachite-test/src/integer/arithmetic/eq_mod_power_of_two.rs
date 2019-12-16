@@ -3,14 +3,29 @@ use std::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
+    limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
+use inputs::base::{
+    triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
+    triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
+};
 use inputs::integer::{
     rm_triples_of_integer_integer_and_small_unsigned, triples_of_integer_integer_and_small_unsigned,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_eq_mod_power_of_two_neg_limb);
+    register_demo!(registry, demo_limbs_eq_mod_power_of_two_neg_pos);
     register_demo!(registry, demo_integer_eq_mod_power_of_two);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_eq_mod_power_of_two_neg_limb
+    );
+    register_bench!(registry, Small, benchmark_limbs_eq_mod_power_of_two_neg_pos);
     register_bench!(
         registry,
         Large,
@@ -23,6 +38,34 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
 }
 
+fn demo_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb, pow) in
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2(gm).take(limit)
+    {
+        println!(
+            "limbs_eq_mod_power_of_two_neg_limb({:?}, {}, {}) = {:?}",
+            limbs,
+            limb,
+            pow,
+            limbs_eq_mod_power_of_two_neg_limb(&limbs, limb, pow)
+        );
+    }
+}
+
+fn demo_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize) {
+    for (ref xs, ref ys, pow) in
+        triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_eq_mod_power_of_two_neg_pos({:?}, {:?}, {}) = {:?}",
+            xs,
+            ys,
+            pow,
+            limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow)
+        );
+    }
+}
+
 fn demo_integer_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (ref x, ref y, pow) in triples_of_integer_integer_and_small_unsigned(gm).take(limit) {
         println!(
@@ -33,6 +76,42 @@ fn demo_integer_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
             x.eq_mod_power_of_two(y, pow)
         );
     }
+}
+
+fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_eq_mod_power_of_two_neg_limb(&[Limb], u64)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _, _)| limbs.len()),
+        "limbs.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref limbs, limb, pow)| {
+                no_out!(limbs_eq_mod_power_of_two_neg_limb(limbs, limb, pow))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_eq_mod_power_of_two_neg_pos(&[u32], &[u32], u64)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys, pow)| min(usize::checked_from(pow).unwrap(), max(xs.len(), ys.len()))),
+        "min(pow, max(xs.len(), ys.len()))",
+        &mut [(
+            "malachite",
+            &mut (|(ref xs, ref ys, pow)| no_out!(limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow))),
+        )],
+    );
 }
 
 fn benchmark_integer_eq_mod_power_of_two_library_comparison(
