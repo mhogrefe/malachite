@@ -1,9 +1,9 @@
 use malachite_bench::tune::{compare_two, ComparisonResult};
+use malachite_nz::natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use malachite_nz::natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
     _limbs_modular_div_mod_divide_and_conquer,
 };
-use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;

@@ -9,32 +9,284 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_modular_div, _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
-    _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
-    _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
-    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len,
-    _limbs_modular_div_schoolbook, _limbs_modular_div_scratch_len, limbs_div_exact,
-    limbs_div_exact_to_out, limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val,
-    limbs_div_exact_to_out_val_ref, limbs_modular_invert, limbs_modular_invert_scratch_len,
+    self, _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt,
+    _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
+    _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
+    _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
+    _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
+    _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
+    _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len, _limbs_modular_div_schoolbook,
+    _limbs_modular_div_scratch_len, limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place,
+    limbs_div_exact_3_to_out, limbs_div_exact_limb, limbs_div_exact_limb_in_place,
+    limbs_div_exact_limb_to_out, limbs_div_exact_to_out, limbs_div_exact_to_out_ref_ref,
+    limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref, limbs_modular_invert,
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_12, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
+    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_unsigned_vec_var_12,
+    pairs_of_unsigned_vec_var_8, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_6, quadruples_of_unsigned_vec_var_4,
-    triples_of_unsigned_vec_var_50, triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53,
+    triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_unsigned_vec_var_50,
+    triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53, vecs_of_unsigned_var_5,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_limb_and_positive_natural_var_2, pairs_of_natural_and_positive_limb_var_1,
-    pairs_of_natural_and_positive_natural_var_1, positive_naturals,
+    naturals, pairs_of_natural_and_positive_natural_var_1, positive_naturals,
 };
+
+#[test]
+fn test_invert_limb_table() {
+    div_exact::test_invert_limb_table();
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_modular_invert_limb() {
+    let test = |limb, inverse| {
+        assert_eq!(limbs_modular_invert_limb(limb), inverse);
+    };
+    test(1, 1);
+    test(3, 2_863_311_531);
+    test(5, 3_435_973_837);
+    test(7, 3_067_833_783);
+    test(123, 3_945_782_963);
+    test(1_000_000_001, 2_211_001_857);
+    test(2_147_483_647, 2_147_483_647);
+    test(2_863_311_531, 3);
+    test(4_294_967_295, 4_294_967_295);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_invert_limb_fail_1() {
+    limbs_modular_invert_limb(0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_modular_invert_limb_fail_2() {
+    limbs_modular_invert_limb(2);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_exact_limb_and_limbs_div_exact_limb_in_place() {
+    let test = |limbs: &[Limb], limb: Limb, quotient: &[Limb]| {
+        let limbs_old = limbs;
+        assert_eq!(limbs_div_exact_limb(limbs_old, limb), quotient);
+
+        let mut limbs = limbs_old.to_vec();
+        limbs_div_exact_limb_in_place(&mut limbs, limb);
+        assert_eq!(limbs, quotient);
+
+        assert_eq!(
+            _limbs_div_exact_limb_no_special_3(limbs_old, limb),
+            quotient
+        );
+
+        let mut limbs = limbs_old.to_vec();
+        _limbs_div_exact_limb_in_place_no_special_3(&mut limbs, limb);
+        assert_eq!(limbs, quotient);
+    };
+    test(&[0], 2, &[0]);
+    test(&[6], 2, &[3]);
+    test(&[0, 0], 2, &[0, 0]);
+    test(&[6, 7], 1, &[6, 7]);
+    test(&[6, 7], 2, &[2_147_483_651, 3]);
+    test(&[92, 101, 102], 10, &[1_288_490_198, 858_993_469, 10]);
+    test(&[4_294_966_783, 455], 789, &[2_482_262_467, 0]);
+    test(&[0xffff_fffe, 0xffff_ffff], 2, &[0xffff_ffff, 0x7fff_ffff]);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, &[0x5555_5555, 0x5555_5555]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_fail_1() {
+    limbs_div_exact_limb(&[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_fail_2() {
+    limbs_div_exact_limb(&[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_in_place_fail_1() {
+    limbs_div_exact_limb_in_place(&mut [], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_in_place_fail_2() {
+    limbs_div_exact_limb_in_place(&mut [10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_exact_limb_to_out() {
+    let test = |out_before: &[Limb], limbs_in: &[Limb], limb: Limb, out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_div_exact_limb_to_out(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.to_vec();
+        _limbs_div_exact_limb_to_out_no_special_3(&mut out, limbs_in, limb);
+        assert_eq!(out, out_after);
+    };
+    test(&[10, 10, 10, 10], &[0], 2, &[0, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[6], 2, &[3, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[0, 0], 2, &[0, 0, 10, 10]);
+    test(&[10, 10, 10, 10], &[6, 7], 1, &[6, 7, 10, 10]);
+    test(&[10, 10, 10, 10], &[6, 7], 2, &[2_147_483_651, 3, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[92, 101, 102],
+        10,
+        &[1_288_490_198, 858_993_469, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[4_294_966_783, 455],
+        789,
+        &[2_482_262_467, 0, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_fffe, 0xffff_ffff],
+        2,
+        &[0xffff_ffff, 0x7fff_ffff, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 0xffff_ffff],
+        3,
+        &[0x5555_5555, 0x5555_5555, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_to_out_fail_1() {
+    limbs_div_exact_limb_to_out(&mut [10, 10], &[], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_to_out_fail_2() {
+    limbs_div_exact_limb_to_out(&mut [10, 10], &[10, 10], 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_limb_to_out_fail_3() {
+    limbs_div_exact_limb_to_out(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_exact_3_and_limbs_div_exact_3_in_place() {
+    let test = |limbs: &[Limb], quotient: &[Limb]| {
+        let old_limbs = limbs;
+        assert_eq!(limbs_div_exact_3(limbs), quotient);
+
+        assert_eq!(limbs_div_exact_limb(limbs, 3), quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        limbs_div_exact_3_in_place(&mut limbs);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        _limbs_div_exact_3_in_place_alt(&mut limbs);
+        assert_eq!(limbs, quotient);
+
+        let mut limbs = old_limbs.to_vec();
+        limbs_div_exact_limb_in_place(&mut limbs, 3);
+        assert_eq!(limbs, quotient);
+    };
+    test(&[0], &[0]);
+    test(&[6], &[2]);
+    test(&[0, 0], &[0, 0]);
+    test(&[8, 7], &[1_431_655_768, 2]);
+    test(&[100, 101, 102], &[2_863_311_564, 33, 34]);
+    test(&[0xffff_ffff, 0xffff_ffff], &[0x5555_5555, 0x5555_5555]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_3_fail() {
+    limbs_div_exact_3(&[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_3_in_place_fail() {
+    limbs_div_exact_3_in_place(&mut []);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_exact_3_to_out() {
+    let test = |out_before: &[Limb], limbs_in: &[Limb], out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_div_exact_3_to_out(&mut out, limbs_in);
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.to_vec();
+        _limbs_div_exact_3_to_out_alt(&mut out, limbs_in);
+        assert_eq!(out, out_after);
+
+        let mut out = out_before.to_vec();
+        limbs_div_exact_limb_to_out(&mut out, limbs_in, 3);
+        assert_eq!(out, out_after);
+    };
+    test(&[10, 10, 10, 10], &[0], &[0, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[6], &[2, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[0, 0], &[0, 0, 10, 10]);
+    test(&[10, 10, 10, 10], &[8, 7], &[1_431_655_768, 2, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        &[100, 101, 102],
+        &[2_863_311_564, 33, 34, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        &[0xffff_ffff, 0xffff_ffff],
+        &[0x5555_5555, 0x5555_5555, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_3_to_out_fail_1() {
+    limbs_div_exact_3_to_out(&mut [10, 10], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_exact_3_to_out_fail_2() {
+    limbs_div_exact_3_to_out(&mut [10], &[10, 10]);
+}
 
 fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
@@ -7659,6 +7911,136 @@ fn div_exact_ref_ref_fail() {
 }
 
 #[test]
+fn limbs_modular_invert_limb_properties() {
+    test_properties(odd_limbs, |&limb| {
+        let inverse = limbs_modular_invert_limb(limb);
+        assert_eq!(limb.wrapping_mul(inverse), 1);
+        assert_eq!(limbs_modular_invert_limb(inverse), limb);
+    });
+}
+
+#[test]
+fn limbs_div_exact_limb_properties() {
+    test_properties(
+        pairs_of_limb_vec_and_positive_limb_var_2,
+        |&(ref limbs, limb)| {
+            let expected_result = Natural::from_limbs_asc(limbs).div_exact(Natural::from(limb));
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, limb)),
+                expected_result
+            );
+            assert_eq!(
+                Natural::from_owned_limbs_asc(_limbs_div_exact_limb_no_special_3(limbs, limb)),
+                expected_result
+            );
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_limb_to_out_properties() {
+    test_properties(
+        triples_of_limb_vec_limb_vec_and_positive_limb_var_2,
+        |&(ref out, ref in_limbs, limb)| {
+            let mut out = out.to_vec();
+            let old_out = out.clone();
+            limbs_div_exact_limb_to_out(&mut out, in_limbs, limb);
+            let len = in_limbs.len();
+            let expected_result = Natural::from_limbs_asc(in_limbs).div_exact(Natural::from(limb));
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
+            assert_eq!(&out[len..], &old_out[len..]);
+
+            let mut out = old_out.to_vec();
+            _limbs_div_exact_limb_to_out_no_special_3(&mut out, in_limbs, limb);
+            let len = in_limbs.len();
+            let expected_result = Natural::from_limbs_asc(in_limbs).div_exact(Natural::from(limb));
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_limb_in_place_properties() {
+    test_properties(
+        pairs_of_limb_vec_and_positive_limb_var_2,
+        |&(ref limbs, limb)| {
+            let old_limbs = limbs;
+            let mut limbs = old_limbs.to_vec();
+            limbs_div_exact_limb_in_place(&mut limbs, limb);
+            let expected_result =
+                Natural::from_limbs_asc(&old_limbs).div_exact(Natural::from(limb));
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), expected_result);
+
+            let mut limbs = old_limbs.to_vec();
+            _limbs_div_exact_limb_in_place_no_special_3(&mut limbs, limb);
+            let expected_result =
+                Natural::from_limbs_asc(&old_limbs).div_exact(Natural::from(limb));
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), expected_result);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_3_properties() {
+    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+        let quotient_limbs = Natural::from_owned_limbs_asc(limbs_div_exact_3(limbs));
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, 3)),
+            quotient_limbs,
+        );
+        assert_eq!(
+            Natural::from_limbs_asc(limbs).div_exact(Natural::from(3u32)),
+            quotient_limbs
+        );
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_to_out_properties() {
+    test_properties(pairs_of_unsigned_vec_var_8, |&(ref out, ref in_limbs)| {
+        let mut out = out.to_vec();
+        let old_out = out.clone();
+        limbs_div_exact_3_to_out(&mut out, in_limbs);
+        let len = in_limbs.len();
+        assert_eq!(
+            Natural::from_limbs_asc(&out[..len]),
+            Natural::from_limbs_asc(in_limbs).div_exact(Natural::from(3u32))
+        );
+        assert_eq!(&out[len..], &old_out[len..]);
+
+        let mut out_alt = old_out.clone();
+        limbs_div_exact_limb_to_out(&mut out_alt, in_limbs, 3);
+        assert_eq!(out_alt, out);
+
+        let mut out_alt = old_out.clone();
+        _limbs_div_exact_3_to_out_alt(&mut out_alt, in_limbs);
+        assert_eq!(out_alt, out);
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_in_place_properties() {
+    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+        let old_limbs = limbs;
+        let mut limbs = old_limbs.to_vec();
+        limbs_div_exact_3_in_place(&mut limbs);
+        assert_eq!(
+            Natural::from_limbs_asc(&limbs),
+            Natural::from_limbs_asc(&old_limbs).div_exact(Natural::from(3u32))
+        );
+
+        let mut limbs_alt = old_limbs.to_vec();
+        limbs_div_exact_limb_in_place(&mut limbs_alt, 3);
+        assert_eq!(limbs_alt, limbs);
+
+        let mut limbs_alt = old_limbs.to_vec();
+        _limbs_div_exact_3_in_place_alt(&mut limbs_alt);
+        assert_eq!(limbs_alt, limbs);
+    });
+}
+
+#[test]
 fn limbs_modular_invert_properties() {
     test_properties_custom_scale(512, pairs_of_unsigned_vec_var_12, |&(ref is, ref ds)| {
         let mut is = is.to_vec();
@@ -7860,20 +8242,6 @@ fn div_exact_properties() {
             );
 
             assert_eq!(quotient * y, *x);
-        },
-    );
-
-    test_properties(
-        pairs_of_natural_and_positive_limb_var_1,
-        |&(ref n, u): &(Natural, Limb)| {
-            assert_eq!(n.div_exact(u), n.div_exact(Natural::from(u)));
-        },
-    );
-
-    test_properties(
-        pairs_of_limb_and_positive_natural_var_2,
-        |&(u, ref n): &(Limb, Natural)| {
-            assert_eq!(u.div_exact(n), Natural::from(u).div_exact(n));
         },
     );
 

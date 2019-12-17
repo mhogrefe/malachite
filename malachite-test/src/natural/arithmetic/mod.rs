@@ -6,7 +6,6 @@ pub mod checked_sub;
 pub mod checked_sub_mul;
 pub mod div;
 pub mod div_exact;
-pub mod div_exact_limb;
 pub mod div_mod;
 pub mod div_round;
 pub mod divisible_by;
@@ -39,7 +38,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     checked_sub_mul::register(registry);
     div::register(registry);
     div_exact::register(registry);
-    div_exact_limb::register(registry);
     div_mod::register(registry);
     div_round::register(registry);
     divisible_by::register(registry);

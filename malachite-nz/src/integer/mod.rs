@@ -153,8 +153,7 @@ pub mod arithmetic {
     pub mod add;
     pub mod add_mul;
     pub mod div;
-    pub mod div_exact_limb;
-    pub mod div_exact_signed_limb;
+    pub mod div_exact;
     pub mod div_mod;
     pub mod div_round;
     pub mod divisible_by_limb;

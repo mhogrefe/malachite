@@ -2,11 +2,11 @@ use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
+use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
     _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
 };
-use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};

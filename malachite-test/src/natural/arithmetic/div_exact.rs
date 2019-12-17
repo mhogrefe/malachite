@@ -1,35 +1,49 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::arithmetic::div::{limbs_div, limbs_div_to_out};
-use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_modular_div, _limbs_modular_div_barrett, _limbs_modular_div_barrett_scratch_len,
-    _limbs_modular_div_divide_and_conquer, _limbs_modular_div_mod_barrett,
-    _limbs_modular_div_mod_barrett_scratch_len, _limbs_modular_div_mod_divide_and_conquer,
-    _limbs_modular_div_mod_schoolbook, _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len,
-    _limbs_modular_div_schoolbook, _limbs_modular_div_scratch_len, _limbs_modular_invert_small,
-    limbs_div_exact, limbs_div_exact_to_out, limbs_div_exact_to_out_ref_ref,
-    limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref, limbs_modular_invert,
-    limbs_modular_invert_scratch_len,
+use malachite_nz::natural::arithmetic::div::{
+    limbs_div, limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out, limbs_div_to_out,
 };
-use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use malachite_nz::natural::arithmetic::div_exact::{
+    _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt,
+    _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
+    _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
+    _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
+    _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
+    _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
+    _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len, _limbs_modular_div_schoolbook,
+    _limbs_modular_div_scratch_len, _limbs_modular_invert_small, limbs_div_exact,
+    limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
+    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_div_exact_to_out,
+    limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
+    limbs_modular_invert, limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_var_12, pairs_of_unsigned_vec_var_16,
+    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_unsigned_vec_var_12,
+    pairs_of_unsigned_vec_var_16, pairs_of_unsigned_vec_var_8,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_6,
     quadruples_of_three_unsigned_vecs_and_unsigned_var_7, quadruples_of_unsigned_vec_var_4,
-    quadruples_of_unsigned_vec_var_5, triples_of_unsigned_vec_var_50,
-    triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53, triples_of_unsigned_vec_var_54,
+    quadruples_of_unsigned_vec_var_5, triples_of_limb_vec_limb_vec_and_positive_limb_var_2,
+    triples_of_unsigned_vec_var_50, triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53,
+    triples_of_unsigned_vec_var_54, vecs_of_unsigned_var_5,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural_var_1, pairs_of_natural_and_positive_natural_var_1,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_modular_invert_limb);
+    register_demo!(registry, demo_limbs_div_exact_limb);
+    register_demo!(registry, demo_limbs_div_exact_limb_to_out);
+    register_demo!(registry, demo_limbs_div_exact_limb_in_place);
+    register_demo!(registry, demo_limbs_div_exact_3);
+    register_demo!(registry, demo_limbs_div_exact_3_to_out);
+    register_demo!(registry, demo_limbs_div_exact_3_in_place);
     register_demo!(registry, demo_limbs_modular_invert);
     register_demo!(registry, demo_limbs_modular_div_mod_schoolbook);
     register_demo!(registry, demo_limbs_modular_div_mod_divide_and_conquer);
@@ -50,6 +64,29 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_div_exact_val_ref);
     register_demo!(registry, demo_natural_div_exact_ref_val);
     register_demo!(registry, demo_natural_div_exact_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_modular_invert_limb);
+    register_bench!(registry, Small, benchmark_limbs_div_exact_limb_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_limb_to_out_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_limb_in_place_algorithms
+    );
+    register_bench!(registry, Small, benchmark_limbs_div_exact_3_algorithms);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_3_to_out_algorithms
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_div_exact_3_in_place_algorithms
+    );
     register_bench!(registry, Small, benchmark_limbs_modular_invert_algorithms);
     register_bench!(registry, Small, benchmark_limbs_modular_div_mod_schoolbook);
     register_bench!(
@@ -106,6 +143,89 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_natural_div_exact_evaluation_strategy
     );
+}
+
+fn demo_limbs_modular_invert_limb(gm: GenerationMode, limit: usize) {
+    for limb in odd_limbs(gm).take(limit) {
+        println!(
+            "limbs_modular_invert_limb({}) = {}",
+            limb,
+            limbs_modular_invert_limb(limb)
+        );
+    }
+}
+
+fn demo_limbs_div_exact_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_2(gm).take(limit) {
+        println!(
+            "limbs_div_exact_limb({:?}, {}) = {:?}",
+            limbs,
+            limb,
+            limbs_div_exact_limb(&limbs, limb)
+        );
+    }
+}
+
+fn demo_limbs_div_exact_limb_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs, limb) in
+        triples_of_limb_vec_limb_vec_and_positive_limb_var_2(gm).take(limit)
+    {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_div_exact_limb_to_out(&mut out, &in_limbs, limb);
+        println!(
+            "out := {:?}; limbs_exact_div_limb_to_out(&mut out, {:?}, {}); \
+             out = {:?}",
+            out_old, in_limbs, limb, out
+        );
+    }
+}
+
+fn demo_limbs_div_exact_limb_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_2(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_div_exact_limb_in_place(&mut limbs, limb);
+        println!(
+            "limbs := {:?}; limbs_div_exact_limb_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, limb, limbs
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_5(gm).take(limit) {
+        println!(
+            "limbs_div_exact_3({:?}) = {:?}",
+            limbs,
+            limbs_div_exact_3(&limbs)
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
+    for (out, in_limbs) in pairs_of_unsigned_vec_var_8(gm).take(limit) {
+        let mut out = out.to_vec();
+        let out_old = out.clone();
+        limbs_div_exact_3_to_out(&mut out, &in_limbs);
+        println!(
+            "out := {:?}; limbs_exact_div_3_to_out(&mut out, {:?}); \
+             out = {:?}",
+            out_old, in_limbs, out
+        );
+    }
+}
+
+fn demo_limbs_div_exact_3_in_place(gm: GenerationMode, limit: usize) {
+    for limbs in vecs_of_unsigned_var_5(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_div_exact_3_in_place(&mut limbs);
+        println!(
+            "limbs := {:?}; limbs_div_exact_3_in_place(&mut limbs); limbs = {:?}",
+            limbs_old, limbs
+        );
+    }
 }
 
 fn demo_limbs_modular_invert(gm: GenerationMode, limit: usize) {
@@ -336,6 +456,189 @@ fn demo_natural_div_exact_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_natural_and_positive_natural_var_1(gm).take(limit) {
         println!("(&{}).div_exact(&{}) = {}", x, y, (&x).div_exact(&y));
     }
+}
+
+fn benchmark_limbs_modular_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_modular_invert_limb(Limb)",
+        BenchmarkType::Single,
+        odd_limbs(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|limb| usize::checked_from(limb.significant_bits()).unwrap()),
+        "limb.significant_bits()",
+        &mut [(
+            "malachite",
+            &mut (|limb| no_out!(limbs_modular_invert_limb(limb))),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_exact_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_exact_limb(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_limb_vec_and_positive_limb_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "div_exact",
+                &mut (|(limbs, limb)| no_out!(limbs_div_exact_limb(&limbs, limb))),
+            ),
+            (
+                "div",
+                &mut (|(limbs, limb)| no_out!(limbs_div_limb(&limbs, limb))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_limb_to_out_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_to_out(&mut [Limb], &[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        triples_of_limb_vec_limb_vec_and_positive_limb_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs, _)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "div_exact",
+                &mut (|(mut out, in_limbs, limb)| {
+                    limbs_div_exact_limb_to_out(&mut out, &in_limbs, limb)
+                }),
+            ),
+            (
+                "div",
+                &mut (|(mut out, in_limbs, limb)| limbs_div_limb_to_out(&mut out, &in_limbs, limb)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_limb_in_place_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_in_place(&mut [Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_limb_vec_and_positive_limb_var_2(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "div_exact",
+                &mut (|(mut limbs, limb)| limbs_div_exact_limb_in_place(&mut limbs, limb)),
+            ),
+            (
+                "div",
+                &mut (|(mut limbs, limb)| limbs_div_limb_in_place(&mut limbs, limb)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_3_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_div_exact_3(&[Limb])",
+        BenchmarkType::Algorithms,
+        vecs_of_unsigned_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref limbs| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "limbs_div_exact_3",
+                &mut (|ref limbs| no_out!(limbs_div_exact_3(limbs))),
+            ),
+            (
+                "_limbs_div_exact_limb_no_special_3",
+                &mut (|ref limbs| no_out!(_limbs_div_exact_limb_no_special_3(limbs, 3))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_3_to_out_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_to_out(&mut [Limb], 3)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_var_8(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref in_limbs)| in_limbs.len()),
+        "in_limbs.len()",
+        &mut [
+            (
+                "_limbs_div_exact_limb_to_out_no_special_3",
+                &mut (|(mut out, in_limbs)| {
+                    _limbs_div_exact_limb_to_out_no_special_3(&mut out, &in_limbs, 3)
+                }),
+            ),
+            (
+                "limbs_div_exact_3_to_out",
+                &mut (|(mut out, in_limbs)| limbs_div_exact_3_to_out(&mut out, &in_limbs)),
+            ),
+            (
+                "_limbs_div_exact_3_to_out_alt",
+                &mut (|(mut out, in_limbs)| _limbs_div_exact_3_to_out_alt(&mut out, &in_limbs)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_div_exact_3_in_place_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_div_exact_limb_in_place(&mut [Limb], 3)",
+        BenchmarkType::Algorithms,
+        vecs_of_unsigned_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|ref limbs| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "_limbs_div_exact_limb_in_place_no_special_3",
+                &mut (|mut limbs| _limbs_div_exact_limb_in_place_no_special_3(&mut limbs, 3)),
+            ),
+            (
+                "limbs_div_exact_3_in_place",
+                &mut (|mut limbs| limbs_div_exact_3_in_place(&mut limbs)),
+            ),
+            (
+                "_limbs_div_exact_3_in_place_alt",
+                &mut (|mut limbs| _limbs_div_exact_3_in_place_alt(&mut limbs)),
+            ),
+        ],
+    );
 }
 
 fn benchmark_limbs_modular_invert_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {

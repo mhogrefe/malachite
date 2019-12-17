@@ -693,6 +693,24 @@ pub fn pairs_of_integer_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Int
     Box::new(pairs_of_integer_and_nonzero_integer(gm).map(|(x, y)| (x * &y, y)))
 }
 
+pub fn nrm_pairs_of_integer_and_nonzero_integer_var_1(
+    gm: GenerationMode,
+) -> It<(
+    (BigInt, BigInt),
+    (rug::Integer, rug::Integer),
+    (Integer, Integer),
+)> {
+    Box::new(
+        pairs_of_integer_and_nonzero_integer_var_1(gm).map(|(x, y)| {
+            (
+                (integer_to_bigint(&x), integer_to_bigint(&y)),
+                (integer_to_rug_integer(&x), integer_to_rug_integer(&y)),
+                (x, y),
+            )
+        }),
+    )
+}
+
 // All pairs of `Integer` and positive `Integer`, where the first `Integer` is not divisible by the
 // second.
 //TODO use Integer divisible_by

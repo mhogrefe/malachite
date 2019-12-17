@@ -21,6 +21,7 @@ impl NotAssign for bool {
     /// b.not_assign();
     /// assert_eq!(b, false);
     /// ```
+    #[inline]
     fn not_assign(&mut self) {
         *self = !*self
     }

@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::SplitInHalf;
 
-use natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

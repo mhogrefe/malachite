@@ -16,8 +16,9 @@ use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::natural::arithmetic::add::{
     limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
-use malachite_nz::natural::arithmetic::div_exact::limbs_modular_invert_scratch_len;
-use malachite_nz::natural::arithmetic::div_exact_limb::limbs_modular_invert_limb;
+use malachite_nz::natural::arithmetic::div_exact::{
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
     limbs_two_limb_inverse_helper,
