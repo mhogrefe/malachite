@@ -295,8 +295,14 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             let equal = n.eq_mod(i, modulus);
             assert_eq!(i.eq_mod(n, modulus), equal);
-            assert_eq!((n - Integer::from(i)).divisible_by(modulus), equal);
-            assert_eq!((Integer::from(i) - n).divisible_by(modulus), equal);
+            assert_eq!(
+                (n - Integer::from(i)).divisible_by(Integer::from(modulus)),
+                equal
+            );
+            assert_eq!(
+                (Integer::from(i) - n).divisible_by(Integer::from(modulus)),
+                equal
+            );
 
             //TODO assert_eq!(n.eq_mod(Integer::from(i), modulus), equal);
 
@@ -312,8 +318,8 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             assert!(n.eq_mod(i, modulus));
             assert!(i.eq_mod(n, modulus));
-            assert!((n - Integer::from(i)).divisible_by(modulus));
-            assert!((Integer::from(i) - n).divisible_by(modulus));
+            assert!((n - Integer::from(i)).divisible_by(Integer::from(modulus)));
+            assert!((Integer::from(i) - n).divisible_by(Integer::from(modulus)));
 
             //TODO assert!(n.eq_mod(Integer::from(i), modulus));
 
@@ -330,8 +336,8 @@ fn eq_signed_limb_mod_signed_limb_properties() {
         |&(ref n, i, modulus): &(Integer, SignedLimb, SignedLimb)| {
             assert!(!n.eq_mod(i, modulus));
             assert!(!i.eq_mod(n, modulus));
-            assert!(!(n - Integer::from(i)).divisible_by(modulus));
-            assert!(!(Integer::from(i) - n).divisible_by(modulus));
+            assert!(!(n - Integer::from(i)).divisible_by(Integer::from(modulus)));
+            assert!(!(Integer::from(i) - n).divisible_by(Integer::from(modulus)));
 
             //TODO assert!(!n.eq_mod(Integer::from(i), modulus));
 
@@ -346,15 +352,27 @@ fn eq_signed_limb_mod_signed_limb_properties() {
     test_properties(pairs_of_integer_and_signed, |&(ref n, i)| {
         assert!(n.eq_mod(i, 1 as SignedLimb));
         assert!(i.eq_mod(n, 1 as SignedLimb));
-        assert_eq!(n.eq_mod(0 as SignedLimb, i), n.divisible_by(i));
-        assert_eq!((0 as SignedLimb).eq_mod(n, i), n.divisible_by(i));
+        assert_eq!(
+            n.eq_mod(0 as SignedLimb, i),
+            n.divisible_by(Integer::from(i))
+        );
+        assert_eq!(
+            (0 as SignedLimb).eq_mod(n, i),
+            n.divisible_by(Integer::from(i))
+        );
     });
 
     test_properties(pairs_of_signeds::<SignedLimb>, |&(i, modulus)| {
         assert!(Integer::from(i).eq_mod(i, modulus));
         assert!(i.eq_mod(&Integer::from(i), modulus));
-        assert_eq!(Integer::ZERO.eq_mod(i, modulus), i.divisible_by(modulus));
-        assert_eq!(i.eq_mod(&Integer::ZERO, modulus), i.divisible_by(modulus));
+        assert_eq!(
+            Integer::ZERO.eq_mod(i, modulus),
+            Integer::from(i).divisible_by(Integer::from(modulus))
+        );
+        assert_eq!(
+            i.eq_mod(&Integer::ZERO, modulus),
+            Integer::from(i).divisible_by(Integer::from(modulus))
+        );
     });
 
     test_properties(triples_of_signeds::<SignedLimb>, |&(n, i, modulus)| {
@@ -375,8 +393,8 @@ fn signed_limb_eq_signed_limb_mod_integer_properties() {
     );
 
     test_properties(pairs_of_integer_and_signed::<SignedLimb>, |&(ref n, i)| {
-        assert_eq!(i.eq_mod(0, n), i.divisible_by(n));
-        assert_eq!(0.eq_mod(i, n), i.divisible_by(n));
+        assert_eq!(i.eq_mod(0, n), Integer::from(i).divisible_by(n));
+        assert_eq!(0.eq_mod(i, n), Integer::from(i).divisible_by(n));
         assert!(i.eq_mod(i, n));
     });
 

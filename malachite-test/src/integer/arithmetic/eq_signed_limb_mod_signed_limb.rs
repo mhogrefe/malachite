@@ -111,7 +111,9 @@ fn benchmark_integer_eq_signed_limb_mod_signed_limb_algorithms(
             ),
             (
                 "(Integer - SignedLimb).divisible_by(SignedLimb)",
-                &mut (|(n, i, modulus)| no_out!((n - Integer::from(i)).divisible_by(modulus))),
+                &mut (|(n, i, modulus)| {
+                    no_out!((n - Integer::from(i)).divisible_by(Integer::from(modulus)))
+                }),
             ),
         ],
     );

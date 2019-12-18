@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{DivisibleBy, Parity};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -41,7 +41,7 @@ fn test_odd() {
 fn even_properties() {
     test_properties(naturals, |x| {
         let even = x.even();
-        assert_eq!(x.divisible_by(2 as Limb), even);
+        assert_eq!(x.divisible_by(Natural::TWO), even);
         assert_eq!(!x.odd(), even);
         assert_eq!((x + Natural::ONE).odd(), even);
     });
@@ -55,7 +55,7 @@ fn even_properties() {
 fn odd_properties() {
     test_properties(naturals, |x| {
         let odd = x.odd();
-        assert_eq!(!x.divisible_by(2 as Limb), odd);
+        assert_eq!(!x.divisible_by(Natural::TWO), odd);
         assert_eq!(!x.even(), odd);
         assert_eq!((x + Natural::ONE).even(), odd);
     });

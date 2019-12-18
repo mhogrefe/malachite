@@ -4,18 +4,22 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::divisible_by::{
-    limbs_divisible_by, limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val,
-    limbs_divisible_by_val_ref,
+    _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
+    limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
-use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
+use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use num::{BigUint, Integer, Zero as NumZero};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec_var_13, pairs_of_unsigned_vec_var_14};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
+    pairs_of_unsigned_vec_var_14,
+};
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_divisible_by_limb);
     register_demo!(registry, demo_limbs_divisible_by);
     register_demo!(registry, demo_limbs_divisible_by_val_ref);
     register_demo!(registry, demo_limbs_divisible_by_ref_val);
@@ -24,6 +28,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_divisible_by_val_ref);
     register_demo!(registry, demo_natural_divisible_by_ref_val);
     register_demo!(registry, demo_natural_divisible_by_ref_ref);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_divisible_by_limb_algorithms
+    );
     register_bench!(registry, Small, benchmark_limbs_divisible_by_algorithms);
     register_bench!(
         registry,
@@ -45,6 +54,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 pub fn num_divisible_by(x: BigUint, y: BigUint) -> bool {
     x == BigUint::zero() || y != BigUint::zero() && x.is_multiple_of(&y)
+}
+
+fn demo_limbs_divisible_by_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm).take(limit) {
+        println!(
+            "limbs_divisible_by_limb({:?}, {}) = {}",
+            limbs,
+            limb,
+            limbs_divisible_by_limb(&limbs, limb)
+        );
+    }
 }
 
 fn demo_limbs_divisible_by(gm: GenerationMode, limit: usize) {
@@ -137,6 +157,33 @@ fn demo_natural_divisible_by_ref_ref(gm: GenerationMode, limit: usize) {
             println!("{} is not divisible by {}", x, y);
         }
     }
+}
+
+fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_divisible_by_limb(&[Limb], Limb)",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "limbs_divisible_by_limb",
+                &mut (|(ref limbs, limb)| no_out!(limbs_divisible_by_limb(limbs, limb))),
+            ),
+            (
+                "divisibility using limbs_mod_limb",
+                &mut (|(ref limbs, limb)| no_out!(limbs_mod_limb(limbs, limb) == 0)),
+            ),
+            (
+                "_combined_limbs_divisible_by_limb",
+                &mut (|(ref limbs, limb)| no_out!(_combined_limbs_divisible_by_limb(limbs, limb))),
+            ),
+        ],
+    );
 }
 
 fn benchmark_limbs_divisible_by_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {

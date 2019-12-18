@@ -3,7 +3,7 @@ use std::ops::{Shl, Shr};
 use itertools::Itertools;
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, UnsignedAbs,
+    Abs, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -456,7 +456,10 @@ pub fn nrm_pairs_of_integer_and_positive_limb_var_1(
 
 // All pairs of `Integer` and positive `Limb`, where the `Integer` is not divisible by the `Limb`.
 pub fn pairs_of_integer_and_positive_limb_var_2(gm: GenerationMode) -> It<(Integer, Limb)> {
-    Box::new(pairs_of_integer_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(u)))
+    Box::new(
+        pairs_of_integer_and_positive_unsigned(gm)
+            .filter(|&(ref n, i)| !n.divisible_by(Integer::from(i))),
+    )
 }
 
 pub fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
@@ -513,7 +516,10 @@ where
 pub fn pairs_of_integer_and_nonzero_signed_limb_var_2(
     gm: GenerationMode,
 ) -> It<(Integer, SignedLimb)> {
-    Box::new(pairs_of_integer_and_nonzero_signed(gm).filter(|&(ref n, i)| !n.divisible_by(i)))
+    Box::new(
+        pairs_of_integer_and_nonzero_signed(gm)
+            .filter(|&(ref n, i)| !n.divisible_by(Integer::from(i))),
+    )
 }
 
 pub fn nrm_pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
@@ -560,7 +566,8 @@ pub fn pairs_of_unsigned_and_nonzero_integer<T: PrimitiveUnsigned + Rand>(
 // All pairs of `Limb` and positive `Integer` where the `Limb` is not divisible by the `Integer`.
 pub fn pairs_of_limb_and_nonzero_integer_var_1(gm: GenerationMode) -> It<(Limb, Integer)> {
     Box::new(
-        pairs_of_unsigned_and_nonzero_integer::<Limb>(gm).filter(|&(u, ref n)| !u.divisible_by(n)),
+        pairs_of_unsigned_and_nonzero_integer::<Limb>(gm)
+            .filter(|&(i, ref n)| !Integer::from(i).divisible_by(n)),
     )
 }
 
@@ -604,7 +611,7 @@ pub fn pairs_of_signed_limb_and_nonzero_integer_var_1(
 ) -> It<(SignedLimb, Integer)> {
     Box::new(
         pairs_of_signed_and_nonzero_integer::<SignedLimb>(gm)
-            .filter(|&(i, ref n)| !i.divisible_by(n)),
+            .filter(|&(i, ref n)| !Integer::from(i).divisible_by(n)),
     )
 }
 
@@ -713,12 +720,8 @@ pub fn nrm_pairs_of_integer_and_nonzero_integer_var_1(
 
 // All pairs of `Integer` and positive `Integer`, where the first `Integer` is not divisible by the
 // second.
-//TODO use Integer divisible_by
 pub fn pairs_of_integer_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Integer, Integer)> {
-    Box::new(
-        pairs_of_integer_and_nonzero_integer(gm)
-            .filter(|(x, y)| !x.unsigned_abs().divisible_by(y.unsigned_abs())),
-    )
+    Box::new(pairs_of_integer_and_nonzero_integer(gm).filter(|(x, y)| !x.divisible_by(y)))
 }
 
 fn random_triples_of_integer_integer_and_primitive<T: PrimitiveInteger + Rand>(

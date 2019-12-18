@@ -6,6 +6,7 @@ use malachite_nz::natural::arithmetic::eq_limb_mod_limb::{
     _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_limb,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -169,7 +170,7 @@ fn benchmark_natural_eq_limb_mod_limb_algorithms(
                 "|Natural - Limb|.divisible_by(Limb)",
                 &mut (|(n, u, modulus)| {
                     no_out!((&(Integer::from(n) - Integer::from(u)).unsigned_abs())
-                        .divisible_by(modulus))
+                        .divisible_by(Natural::from(modulus)))
                 }),
             ),
         ],

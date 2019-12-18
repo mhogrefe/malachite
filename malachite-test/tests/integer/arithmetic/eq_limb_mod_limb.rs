@@ -162,8 +162,14 @@ fn eq_limb_mod_limb_properties() {
         |&(ref n, u, modulus): &(Integer, Limb, Limb)| {
             let equal = n.eq_mod(u, modulus);
             assert_eq!(u.eq_mod(n, modulus), equal);
-            assert_eq!((n - Integer::from(u)).divisible_by(modulus), equal);
-            assert_eq!((Integer::from(u) - n).divisible_by(modulus), equal);
+            assert_eq!(
+                (n - Integer::from(u)).divisible_by(Integer::from(modulus)),
+                equal
+            );
+            assert_eq!(
+                (Integer::from(u) - n).divisible_by(Integer::from(modulus)),
+                equal
+            );
 
             //TODO assert_eq!(n.eq_mod(Integer::from(u), modulus), equal);
 
@@ -177,8 +183,8 @@ fn eq_limb_mod_limb_properties() {
         |&(ref n, u, modulus): &(Integer, Limb, Limb)| {
             assert!(n.eq_mod(u, modulus));
             assert!(u.eq_mod(n, modulus));
-            assert!((n - Integer::from(u)).divisible_by(modulus));
-            assert!((Integer::from(u) - n).divisible_by(modulus));
+            assert!((n - Integer::from(u)).divisible_by(Integer::from(modulus)));
+            assert!((Integer::from(u) - n).divisible_by(Integer::from(modulus)));
 
             //TODO assert!(n.eq_mod(Integer::from(u), modulus));
 
@@ -192,8 +198,8 @@ fn eq_limb_mod_limb_properties() {
         |&(ref n, u, modulus): &(Integer, Limb, Limb)| {
             assert!(!n.eq_mod(u, modulus));
             assert!(!u.eq_mod(n, modulus));
-            assert!(!(n - Integer::from(u)).divisible_by(modulus));
-            assert!(!(Integer::from(u) - n).divisible_by(modulus));
+            assert!(!(n - Integer::from(u)).divisible_by(Integer::from(modulus)));
+            assert!(!(Integer::from(u) - n).divisible_by(Integer::from(modulus)));
 
             //TODO assert!(!n.eq_mod(Integer::from(u), modulus));
 
@@ -205,8 +211,8 @@ fn eq_limb_mod_limb_properties() {
     test_properties(pairs_of_integer_and_unsigned, |&(ref n, u)| {
         assert!(n.eq_mod(u, 1 as Limb));
         assert!(u.eq_mod(n, 1 as Limb));
-        assert_eq!(n.eq_mod(0 as Limb, u), n.divisible_by(u));
-        assert_eq!((0 as Limb).eq_mod(n, u), n.divisible_by(u));
+        assert_eq!(n.eq_mod(0 as Limb, u), n.divisible_by(Integer::from(u)));
+        assert_eq!((0 as Limb).eq_mod(n, u), n.divisible_by(Integer::from(u)));
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(u, modulus)| {
@@ -241,8 +247,8 @@ fn limb_eq_limb_mod_integer_properties() {
     );
 
     test_properties(pairs_of_integer_and_unsigned::<Limb>, |&(ref n, u)| {
-        assert_eq!(u.eq_mod(0, n), u.divisible_by(n));
-        assert_eq!(0.eq_mod(u, n), u.divisible_by(n));
+        assert_eq!(u.eq_mod(0, n), Integer::from(u).divisible_by(n));
+        assert_eq!(0.eq_mod(u, n), Integer::from(u).divisible_by(n));
         assert!(u.eq_mod(u, n));
     });
 

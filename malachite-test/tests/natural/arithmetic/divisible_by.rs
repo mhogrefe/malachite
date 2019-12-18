@@ -4,10 +4,10 @@ use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::divisible_by::{
-    limbs_divisible_by, limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val,
-    limbs_divisible_by_val_ref,
+    _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
+    limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
-use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
+use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;
@@ -15,13 +15,39 @@ use num::BigUint;
 use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_var_13, pairs_of_unsigned_vec_var_14, pairs_of_unsigned_vec_var_15,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
+    pairs_of_unsigned_vec_var_14, pairs_of_unsigned_vec_var_15,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural_var_1,
     pairs_of_natural_and_positive_natural_var_2, pairs_of_naturals, positive_naturals,
 };
 use malachite_test::natural::arithmetic::divisible_by::num_divisible_by;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_divisible_by_limb() {
+    let test = |limbs: &[Limb], limb: Limb, divisible: bool| {
+        assert_eq!(limbs_divisible_by_limb(limbs, limb), divisible);
+        assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible);
+        assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible);
+    };
+    test(&[0, 0], 2, true);
+    test(&[6, 7], 1, true);
+    test(&[6, 7], 2, true);
+    test(&[100, 101, 102], 10, false);
+    test(&[123, 456], 789, false);
+    test(&[369, 1368], 3, true);
+    test(&[0xffff_ffff, 0xffff_ffff], 2, false);
+    test(&[0xffff_ffff, 0xffff_ffff], 3, true);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_divisible_by_limb_fail() {
+    limbs_divisible_by_limb(&[10], 10);
+}
 
 fn verify_limbs_divisible_by(ns: &[Limb], ds: &[Limb], divisible: bool) {
     assert_eq!(
@@ -883,6 +909,23 @@ fn test_divisible_by() {
         186307133288106956593939073729500658176632828099788",
         false
     );
+    test("1", "94815577610368829905234938913859", false)
+}
+
+#[test]
+fn limbs_divisible_by_limb_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+        |&(ref limbs, limb)| {
+            let divisible = limbs_divisible_by_limb(limbs, limb);
+            assert_eq!(
+                (&Natural::from_limbs_asc(limbs)).divisible_by(Natural::from(limb)),
+                divisible
+            );
+            assert_eq!(limbs_mod_limb(limbs, limb) == 0, divisible);
+            assert_eq!(_combined_limbs_divisible_by_limb(limbs, limb), divisible);
+        },
+    );
 }
 
 #[test]
@@ -934,7 +977,7 @@ fn divisible_by_properties() {
 
         assert_eq!(
             *x == Natural::ZERO || *y != Natural::ZERO && x % y == Natural::ZERO,
-            divisible
+            divisible,
         );
         assert_eq!(
             num_divisible_by(natural_to_biguint(x), natural_to_biguint(y)),

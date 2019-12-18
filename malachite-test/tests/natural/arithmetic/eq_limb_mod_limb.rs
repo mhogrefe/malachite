@@ -196,11 +196,13 @@ fn eq_limb_mod_limb_properties() {
             let equal = n.eq_mod(u, modulus);
             assert_eq!(u.eq_mod(n, modulus), equal);
             assert_eq!(
-                (&(Integer::from(n) - Integer::from(u)).unsigned_abs()).divisible_by(modulus),
+                (&(Integer::from(n) - Integer::from(u)).unsigned_abs())
+                    .divisible_by(Natural::from(modulus)),
                 equal
             );
             assert_eq!(
-                (&(Integer::from(u) - Integer::from(n)).unsigned_abs()).divisible_by(modulus),
+                (&(Integer::from(u) - Integer::from(n)).unsigned_abs())
+                    .divisible_by(Natural::from(modulus)),
                 equal
             );
             #[cfg(feature = "32_bit_limbs")]
@@ -231,8 +233,8 @@ fn eq_limb_mod_limb_properties() {
     test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref n, u)| {
         assert!(n.eq_mod(u, 1));
         assert!(u.eq_mod(n, 1));
-        assert_eq!(n.eq_mod(0, u), n.divisible_by(u));
-        assert_eq!(0.eq_mod(n, u), n.divisible_by(u));
+        assert_eq!(n.eq_mod(0, u), n.divisible_by(Natural::from(u)));
+        assert_eq!(0.eq_mod(n, u), n.divisible_by(Natural::from(u)));
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(u, modulus)| {
@@ -266,8 +268,8 @@ fn limb_eq_limb_mod_natural_properties() {
     );
 
     test_properties(pairs_of_natural_and_unsigned::<Limb>, |&(ref n, u)| {
-        assert_eq!(u.eq_mod(0, n), u.divisible_by(n));
-        assert_eq!(0.eq_mod(u, n), u.divisible_by(n));
+        assert_eq!(u.eq_mod(0, n), Natural::from(u).divisible_by(n));
+        assert_eq!(0.eq_mod(u, n), Natural::from(u).divisible_by(n));
         assert!(u.eq_mod(u, n));
     });
 

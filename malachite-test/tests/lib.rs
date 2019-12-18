@@ -84,9 +84,8 @@ pub mod integer {
         pub mod div_exact;
         pub mod div_mod;
         pub mod div_round;
-        pub mod divisible_by_limb;
+        pub mod divisible_by;
         pub mod divisible_by_power_of_two;
-        pub mod divisible_by_signed_limb;
         pub mod eq_limb_mod_limb;
         pub mod eq_mod_power_of_two;
         pub mod eq_signed_limb_mod_signed_limb;
@@ -181,7 +180,6 @@ pub mod natural {
         pub mod div_mod;
         pub mod div_round;
         pub mod divisible_by;
-        pub mod divisible_by_limb;
         pub mod divisible_by_power_of_two;
         pub mod eq_limb_mod_limb;
         pub mod eq_mod;

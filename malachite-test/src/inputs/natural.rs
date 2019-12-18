@@ -465,7 +465,10 @@ pub fn nrm_pairs_of_natural_and_positive_limb_var_1(
 
 // All pairs of `Natural` and positive `Limb`, where the `Natural` is not divisible by the `Limb`.
 pub fn pairs_of_natural_and_positive_limb_var_2(gm: GenerationMode) -> It<(Natural, Limb)> {
-    Box::new(pairs_of_natural_and_positive_unsigned(gm).filter(|&(ref n, u)| !n.divisible_by(u)))
+    Box::new(
+        pairs_of_natural_and_positive_unsigned(gm)
+            .filter(|&(ref n, u)| !n.divisible_by(Natural::from(u))),
+    )
 }
 
 // All pairs of `Natural` and `Limb` where the most-significant bit of the `Limb` is set and the
@@ -498,7 +501,8 @@ pub fn pairs_of_unsigned_and_positive_natural<T: PrimitiveUnsigned + Rand>(
 // All pairs of `Limb` and positive `Natural` where the `Limb` is not divisible by the `Natural`.
 pub fn pairs_of_limb_and_positive_natural_var_1(gm: GenerationMode) -> It<(Limb, Natural)> {
     Box::new(
-        pairs_of_unsigned_and_positive_natural::<Limb>(gm).filter(|&(u, ref n)| !u.divisible_by(n)),
+        pairs_of_unsigned_and_positive_natural::<Limb>(gm)
+            .filter(|&(u, ref n)| !Natural::from(u).divisible_by(n)),
     )
 }
 

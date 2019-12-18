@@ -4,8 +4,7 @@ use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
-use natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
-use natural::arithmetic::divisible_by_limb::limbs_divisible_by_limb;
+use natural::arithmetic::divisible_by::{limbs_divisible_by_limb, limbs_divisible_by_val_ref};
 use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_op::limbs_mod;
 use natural::arithmetic::mod_op::limbs_mod_limb;

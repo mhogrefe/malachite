@@ -1,5 +1,5 @@
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
-use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use natural::arithmetic::div_exact::limbs_modular_invert_limb;
@@ -13,6 +13,52 @@ use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
+
+/// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
+///
+/// limbs.len() must be greater than 1; divisor must be nonzero.
+///
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative.
+#[allow(clippy::absurd_extreme_comparisons)]
+pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
+    if limbs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_divisible_by_limb(limbs, divisor)
+    } else {
+        limbs_mod_limb(limbs, divisor) == 0
+    }
+}
+
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
+/// whether that `Natural` is divisible by a given limb.
+///
+/// This function assumes that `limbs` has at least two elements and that `limb` is nonzero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
+///
+/// assert_eq!(limbs_divisible_by_limb(&[333, 333], 3), true);
+/// assert_eq!(limbs_divisible_by_limb(&[332, 333], 3), false);
+/// ```
+///
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative and the ABOVE_THRESHOLD
+/// branch is excluded.
+pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
+    assert!(limbs.len() > 1);
+    if divisor.even() {
+        let twos = divisor.trailing_zeros();
+        limbs[0].divisible_by_power_of_two(twos.into())
+            && limbs_mod_exact_odd_limb(limbs, divisor >> twos, 0) == 0
+    } else {
+        limbs_mod_exact_odd_limb(limbs, divisor, 0) == 0
+    }
+}
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
 /// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
@@ -445,6 +491,27 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     limbs_test_zero(rs)
 }
 
+impl Natural {
+    fn divisible_by_limb(&self, other: Limb) -> bool {
+        match (self, other) {
+            (&Natural(Small(0)), _) => true,
+            (_, 0) => false,
+            (&Natural(Small(small)), y) => small.divisible_by(y),
+            (&Natural(Large(ref limbs)), y) => limbs_divisible_by_limb(limbs, y),
+        }
+    }
+
+    // Tests whether other is divisible by self
+    fn limb_divisible_by_natural(&self, other: Limb) -> bool {
+        match (other, self) {
+            (0, _) => true,
+            (_, Natural(Small(0))) => false,
+            (x, &Natural(Small(small))) => x.divisible_by(small),
+            (_, &Natural(Large(_))) => false,
+        }
+    }
+}
+
 impl DivisibleBy<Natural> for Natural {
     /// Returns whether a `Natural` is divisible by another `Natural`; in other words, whether the
     /// first `Natural` is a multiple of the second. This means that zero is divisible by any
@@ -479,8 +546,8 @@ impl DivisibleBy<Natural> for Natural {
     /// ```
     fn divisible_by(mut self, mut other: Natural) -> bool {
         match (&mut self, &mut other) {
-            (x, &mut Natural(Small(y))) => (&*x).divisible_by(y),
-            (&mut Natural(Small(x)), y) => x.divisible_by(&*y),
+            (x, &mut Natural(Small(y))) => x.divisible_by_limb(y),
+            (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
             (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by(xs, ys)
             }
@@ -522,8 +589,8 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     /// ```
     fn divisible_by(mut self, other: &'a Natural) -> bool {
         match (&mut self, other) {
-            (x, &Natural(Small(y))) => (&*x).divisible_by(y),
-            (&mut Natural(Small(x)), y) => x.divisible_by(y),
+            (x, &Natural(Small(y))) => x.divisible_by_limb(y),
+            (&mut Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
             (Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_val_ref(xs, ys)
             }
@@ -565,8 +632,8 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// ```
     fn divisible_by(self, mut other: Natural) -> bool {
         match (self, &mut other) {
-            (x, &mut Natural(Small(y))) => x.divisible_by(y),
-            (&Natural(Small(x)), y) => x.divisible_by(&*y),
+            (x, &mut Natural(Small(y))) => x.divisible_by_limb(y),
+            (&Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
             (&Natural(Large(ref xs)), Natural(Large(ref mut ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_val(xs, ys)
             }
@@ -608,8 +675,8 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     /// ```
     fn divisible_by(self, other: &'b Natural) -> bool {
         match (self, other) {
-            (x, &Natural(Small(y))) => x.divisible_by(y),
-            (&Natural(Small(x)), y) => x.divisible_by(y),
+            (x, &Natural(Small(y))) => x.divisible_by_limb(y),
+            (&Natural(Small(x)), y) => y.limb_divisible_by_natural(x),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
                 xs.len() >= ys.len() && limbs_divisible_by_ref_ref(xs, ys)
             }

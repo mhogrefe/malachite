@@ -145,7 +145,9 @@ fn benchmark_integer_eq_limb_mod_limb_algorithms(
             ),
             (
                 "(Integer - Limb).divisible_by(Limb)",
-                &mut (|(n, u, modulus)| no_out!((n - Integer::from(u)).divisible_by(modulus))),
+                &mut (|(n, u, modulus)| {
+                    no_out!((n - Integer::from(u)).divisible_by(Integer::from(modulus)))
+                }),
             ),
         ],
     );
