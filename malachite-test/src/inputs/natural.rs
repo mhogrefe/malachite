@@ -197,6 +197,18 @@ pub fn triples_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural, Na
     Box::new(triples_of_naturals(gm).filter(|&(ref a, ref b, ref c)| a >= &(b * c)))
 }
 
+// All triples of `Natural`s, where `T` is unsigned and the first `Natural` is equal to the second
+// mod the third.
+pub fn triples_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
+    Box::new(triples_of_naturals(gm).map(|(x, y, modulus)| (x * &modulus + &y, y, modulus)))
+}
+
+// All triples of `Natural`s, where and the first `Natural` is not equal to the second mod the
+// third.
+pub fn triples_of_naturals_var_3(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
+    Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref modulus)| !x.eq_mod(y, modulus)))
+}
+
 pub fn triples_of_natural_natural_and_positive_natural(
     gm: GenerationMode,
 ) -> It<(Natural, Natural, Natural)> {
