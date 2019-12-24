@@ -1872,17 +1872,15 @@ impl DivExact<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)).to_string(), "123");
+    /// // 123 * 456 = 56088
+    /// assert_eq!(Natural::from(56088u32).div_exact(Natural::from(456u32)).to_string(), "123");
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         Natural::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
-    ///         "123456789000"
-    ///     );
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     Natural::from_str("121932631112635269000000").unwrap()
+    ///         .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
+    ///     "123456789000"
+    /// );
     /// ```
     #[inline]
     fn div_exact(mut self, other: Natural) -> Natural {
@@ -1921,20 +1919,18 @@ impl<'a> DivExact<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     assert_eq!(
-    ///         Natural::from(56088u32).div_exact(&Natural::from(456u32)).to_string(),
-    ///         "123"
-    ///     );
+    /// // 123 * 456 = 56088
+    /// assert_eq!(
+    ///     Natural::from(56088u32).div_exact(&Natural::from(456u32)).to_string(),
+    ///     "123"
+    /// );
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         Natural::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
-    ///         "123456789000"
-    ///     );
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     Natural::from_str("121932631112635269000000").unwrap()
+    ///         .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
+    ///     "123456789000"
+    /// );
     /// ```
     #[inline]
     fn div_exact(mut self, other: &'a Natural) -> Natural {
@@ -1973,20 +1969,18 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     assert_eq!(
-    ///         (&Natural::from(56088u32)).div_exact(Natural::from(456u32)).to_string(),
-    ///         "123"
-    ///     );
+    /// // 123 * 456 = 56088
+    /// assert_eq!(
+    ///     (&Natural::from(56088u32)).div_exact(Natural::from(456u32)).to_string(),
+    ///     "123"
+    /// );
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         (&Natural::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
-    ///         "123456789000"
-    ///     );
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     (&Natural::from_str("121932631112635269000000").unwrap())
+    ///         .div_exact(Natural::from_str("987654321000").unwrap()).to_string(),
+    ///     "123456789000"
+    /// );
     /// ```
     fn div_exact(self, mut other: Natural) -> Natural {
         if other == 0 as Limb {
@@ -2046,20 +2040,18 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     assert_eq!(
-    ///         (&Natural::from(56088u32)).div_exact(&Natural::from(456u32)).to_string(),
-    ///         "123"
-    ///     );
+    /// // 123 * 456 = 56088
+    /// assert_eq!(
+    ///     (&Natural::from(56088u32)).div_exact(&Natural::from(456u32)).to_string(),
+    ///     "123"
+    /// );
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         (&Natural::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
-    ///         "123456789000"
-    ///     );
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     (&Natural::from_str("121932631112635269000000").unwrap())
+    ///         .div_exact(&Natural::from_str("987654321000").unwrap()).to_string(),
+    ///     "123456789000"
+    /// );
     /// ```
     fn div_exact(self, other: &'b Natural) -> Natural {
         if *other == 0 as Limb {
@@ -2119,17 +2111,15 @@ impl DivExactAssign<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     let mut x = Natural::from(56088u32);
-    ///     x.div_exact_assign(Natural::from(456u32));
-    ///     assert_eq!(x.to_string(), "123");
+    /// // 123 * 456 = 56088
+    /// let mut x = Natural::from(56088u32);
+    /// x.div_exact_assign(Natural::from(456u32));
+    /// assert_eq!(x.to_string(), "123");
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     let mut x = Natural::from_str("121932631112635269000000").unwrap();
-    ///     x.div_exact_assign(Natural::from_str("987654321000").unwrap());
-    ///     assert_eq!(x.to_string(), "123456789000");
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// let mut x = Natural::from_str("121932631112635269000000").unwrap();
+    /// x.div_exact_assign(Natural::from_str("987654321000").unwrap());
+    /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: Natural) {
         if other == 0 as Limb {
@@ -2185,17 +2175,15 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 123 * 456 = 56088
-    ///     let mut x = Natural::from(56088u32);
-    ///     x.div_exact_assign(&Natural::from(456u32));
-    ///     assert_eq!(x.to_string(), "123");
+    /// // 123 * 456 = 56088
+    /// let mut x = Natural::from(56088u32);
+    /// x.div_exact_assign(&Natural::from(456u32));
+    /// assert_eq!(x.to_string(), "123");
     ///
-    ///     // 123456789000 * 987654321000 = 121932631112635269000000
-    ///     let mut x = Natural::from_str("121932631112635269000000").unwrap();
-    ///     x.div_exact_assign(&Natural::from_str("987654321000").unwrap());
-    ///     assert_eq!(x.to_string(), "123456789000");
-    /// }
+    /// // 123456789000 * 987654321000 = 121932631112635269000000
+    /// let mut x = Natural::from_str("121932631112635269000000").unwrap();
+    /// x.div_exact_assign(&Natural::from_str("987654321000").unwrap());
+    /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: &'a Natural) {
         if *other == 0 as Limb {

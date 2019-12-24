@@ -1,15 +1,17 @@
 use std::cmp::Ordering;
 
 use malachite_base::limbs::limbs_trailing_zero_limbs;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, WrappingAddAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::SplitInHalf;
 
+use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
 };
-use natural::arithmetic::eq_limb_mod_limb::limbs_mod_exact_odd_limb;
-use natural::arithmetic::mod_op::limbs_mod;
-use natural::arithmetic::mod_op::limbs_mod_limb;
+use natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use natural::arithmetic::sub::{
     limbs_sub, limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
@@ -18,7 +20,108 @@ use natural::arithmetic::sub::{
 use natural::comparison::ord::limbs_cmp;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+
+/// divisor must be odd. //TODO test
+///
+/// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
+pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
+    let len = limbs.len();
+    if len == 1 {
+        let limb = limbs[0];
+        return if limb > carry {
+            let result = (limb - carry) % divisor;
+            if result == 0 {
+                0
+            } else {
+                divisor - result
+            }
+        } else {
+            (carry - limb) % divisor
+        };
+    }
+    let inverse = limbs_modular_invert_limb(divisor);
+    let divisor_double = DoubleLimb::from(divisor);
+    let last_index = len - 1;
+    for &limb in &limbs[..last_index] {
+        let (difference, small_carry) = limb.overflowing_sub(carry);
+        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * divisor_double).upper_half();
+        if small_carry {
+            carry.wrapping_add_assign(1);
+        }
+    }
+    let last = limbs[last_index];
+    if last <= divisor {
+        if carry >= last {
+            carry - last
+        } else {
+            carry.wrapping_add(divisor - last)
+        }
+    } else {
+        let (difference, small_carry) = last.overflowing_sub(carry);
+        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * divisor_double).upper_half();
+        if small_carry {
+            carry.wrapping_add_assign(1);
+        }
+        carry
+    }
+}
+
+/// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
+///
+/// limbs.len() must be greater than 1; modulus must be nonzero.
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative.
+pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+    if limbs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_mod_limb(limbs, modulus) == limb % modulus
+    } else {
+        limbs_eq_limb_mod_limb(limbs, limb, modulus)
+    }
+}
+
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
+/// whether that `Natural` is equal to a limb mod a given `Limb` modulus.
+///
+/// This function assumes that `modulus` is nonzero, `limbs` has at least two elements, and the last
+/// element of `limbs` is nonzero.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `limbs.len()`
+///
+/// # Panics
+/// Panics if the length of `limbs` is less than 2 or `modulus` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
+///
+/// assert_eq!(limbs_eq_limb_mod_limb(&[6, 7], 3, 2), false);
+/// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1_238, 10), true);
+/// ```
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is positive and the ABOVE_THRESHOLD branch
+/// is excluded.
+pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+    assert_ne!(modulus, 0);
+    assert!(limbs.len() > 1);
+    let remainder = if modulus.even() {
+        let twos = modulus.trailing_zeros();
+        if !limbs[0]
+            .wrapping_sub(limb)
+            .divisible_by_power_of_two(twos.into())
+        {
+            return false;
+        }
+        limbs_mod_exact_odd_limb(limbs, modulus >> twos, limb)
+    } else {
+        limbs_mod_exact_odd_limb(limbs, modulus, limb)
+    };
+    remainder == 0 || remainder == modulus
+}
 
 #[allow(clippy::absurd_extreme_comparisons)]
 fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bool> {
@@ -410,11 +513,11 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
     assert_ne!(*modulus.last().unwrap(), 0);
     if xs == ys {
         Some(true)
-    } else if m_len > x_len {
-        // x < m, y < m, and x != y, so x != y mod m
-        Some(false)
-    } else if !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros())) {
-        // Check xs == ys mod low zero bits of m_0. This helps the y_len == 1 special cases below.
+    } else if m_len > x_len
+        || !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+    {
+        // Either: x < m, y < m, and x != y, so x != y mod m
+        // Or: xs != ys mod low zero bits of m_0
         Some(false)
     } else {
         None
@@ -733,6 +836,16 @@ pub fn _limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool
     difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
 }
 
+impl Natural {
+    fn eq_mod_limb(&self, other: Limb, modulus: Limb) -> bool {
+        match *self {
+            Natural(Small(small)) => small.eq_mod(other, modulus),
+            Natural(Large(_)) if modulus == 0 => false,
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_limb(limbs, other, modulus),
+        }
+    }
+}
+
 impl EqMod<Natural, Natural> for Natural {
     /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
     /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
@@ -780,8 +893,8 @@ impl EqMod<Natural, Natural> for Natural {
             (x, y, Natural(Small(0))) => x == y,
             (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (ref x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (ref x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_val_ref(xs, ys, modulus)
@@ -848,8 +961,8 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
             (x, y, &Natural(Small(0))) => x == y,
             (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (ref x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (ref x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
             (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_val_ref(xs, ys, modulus)
@@ -914,8 +1027,8 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
             (x, y, Natural(Small(0))) => x == *y,
             (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (ref x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (ref x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
             (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_val_ref(xs, ys, modulus)
@@ -982,8 +1095,8 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
             (x, y, &Natural(Small(0))) => x == *y,
             (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (ref x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (ref x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
             (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_val_ref(xs, ys, modulus)
@@ -1048,8 +1161,8 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
             (x, y, Natural(Small(0))) => *x == y,
             (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (&Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (&Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
             (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_ref_val(xs, ys, modulus)
@@ -1116,8 +1229,8 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
             (x, y, &Natural(Small(0))) => *x == y,
             (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (&Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (&Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
             (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_ref_val(xs, ys, modulus)
@@ -1182,8 +1295,8 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
             (x, y, Natural(Small(0))) => x == y,
             (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
             (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_ref_ref(xs, ys, modulus)
@@ -1248,8 +1361,8 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
             (x, y, &Natural(Small(0))) => x == y,
             (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
-            (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod(y, modulus),
-            (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod(x, modulus),
+            (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
+            (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
             (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_ref_ref(xs, ys, modulus)

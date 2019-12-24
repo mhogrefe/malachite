@@ -133,16 +133,13 @@ impl Crementable for Natural {
     /// # Example
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use malachite_base::crement::Crementable;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     let mut i = Natural::from(10u32);
-    ///     i.increment();
-    ///     assert_eq!(i, 11);
-    /// }
+    /// let mut i = Natural::from(10u32);
+    /// i.increment();
+    /// assert_eq!(i, 11);
     /// ```
     #[inline]
     fn increment(&mut self) {
@@ -166,11 +163,9 @@ impl Crementable for Natural {
     /// use malachite_base::crement::Crementable;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     let mut i = Natural::from(10u32);
-    ///     i.decrement();
-    ///     assert_eq!(i, 9);
-    /// }
+    /// let mut i = Natural::from(10u32);
+    /// i.decrement();
+    /// assert_eq!(i, 9);
     /// ```
     #[inline]
     fn decrement(&mut self) {
@@ -208,7 +203,6 @@ pub mod arithmetic {
     pub mod div_round;
     pub mod divisible_by;
     pub mod divisible_by_power_of_two;
-    pub mod eq_limb_mod_limb;
     pub mod eq_mod;
     pub mod eq_mod_power_of_two;
     pub mod is_power_of_two;

@@ -6,23 +6,26 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
-    _limbs_eq_limb_mod_naive_1, _limbs_eq_limb_mod_naive_2, _limbs_eq_mod_limb_naive_1,
-    _limbs_eq_mod_limb_naive_2, _limbs_eq_mod_naive_1, _limbs_eq_mod_naive_2, limbs_eq_limb_mod,
-    limbs_eq_limb_mod_ref_ref, limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref,
-    limbs_eq_mod_limb_ref_ref, limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref,
-    limbs_eq_mod_ref_ref_ref, limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref,
-    limbs_eq_mod_ref_val_val,
+    _combined_limbs_eq_limb_mod_limb, _limbs_eq_limb_mod_naive_1, _limbs_eq_limb_mod_naive_2,
+    _limbs_eq_mod_limb_naive_1, _limbs_eq_mod_limb_naive_2, _limbs_eq_mod_naive_1,
+    _limbs_eq_mod_naive_2, limbs_eq_limb_mod, limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref,
+    limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref, limbs_eq_mod_ref_ref_ref,
+    limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
 };
+use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
+    triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
 };
 use inputs::natural::{rm_triples_of_naturals, triples_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_eq_limb_mod_limb);
     register_demo!(registry, demo_limbs_eq_limb_mod);
     register_demo!(registry, demo_limbs_eq_limb_mod_val_ref);
     register_demo!(registry, demo_limbs_eq_limb_mod_ref_val);
@@ -34,14 +37,15 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_mod_ref_val_ref);
     register_demo!(registry, demo_limbs_eq_mod_ref_ref_val);
     register_demo!(registry, demo_limbs_eq_mod_ref_ref_ref);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_val_val_ref);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_val_ref_val);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_val_ref_ref);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_ref_val_val);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_ref_val_ref);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_ref_ref_val);
-    register_demo!(registry, demo_natural_eq_natural_mod_natural_ref_ref_ref);
+    register_demo!(registry, demo_natural_eq_mod);
+    register_demo!(registry, demo_natural_eq_mod_val_val_ref);
+    register_demo!(registry, demo_natural_eq_mod_val_ref_val);
+    register_demo!(registry, demo_natural_eq_mod_val_ref_ref);
+    register_demo!(registry, demo_natural_eq_mod_ref_val_val);
+    register_demo!(registry, demo_natural_eq_mod_ref_val_ref);
+    register_demo!(registry, demo_natural_eq_mod_ref_ref_val);
+    register_demo!(registry, demo_natural_eq_mod_ref_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_eq_limb_mod_limb_algorithms);
     register_bench!(
         registry,
         Small,
@@ -59,18 +63,24 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_eq_natural_mod_evaluation_strategy
+        benchmark_natural_eq_mod_evaluation_strategy
     );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_natural_eq_natural_mod_natural_library_comparison
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_natural_eq_natural_mod_natural_algorithms
-    );
+    register_bench!(registry, Large, benchmark_natural_eq_mod_library_comparison);
+    register_bench!(registry, Large, benchmark_natural_eq_mod_algorithms);
+}
+
+fn demo_limbs_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
+    for (limbs, limb, modulus) in
+        triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_eq_limb_mod_limb({:?}, {}, {}) = {}",
+            limbs,
+            limb,
+            modulus,
+            limbs_eq_limb_mod_limb(&limbs, limb, modulus)
+        );
+    }
 }
 
 fn demo_limbs_eq_limb_mod(gm: GenerationMode, limit: usize) {
@@ -227,7 +237,7 @@ fn demo_limbs_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_eq_natural_mod_natural(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -240,7 +250,7 @@ fn demo_natural_eq_natural_mod_natural(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_val_val_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_val_val_ref(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
@@ -252,7 +262,7 @@ fn demo_natural_eq_natural_mod_natural_val_val_ref(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_val_ref_val(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_val_ref_val(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         let m_old = m.clone();
@@ -264,7 +274,7 @@ fn demo_natural_eq_natural_mod_natural_val_ref_val(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_val_ref_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_val_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let x_old = x.clone();
         if x.eq_mod(&y, &m) {
@@ -275,7 +285,7 @@ fn demo_natural_eq_natural_mod_natural_val_ref_ref(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_ref_val_val(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_ref_val_val(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let y_old = y.clone();
         let m_old = m.clone();
@@ -287,7 +297,7 @@ fn demo_natural_eq_natural_mod_natural_ref_val_val(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_ref_val_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_ref_val_ref(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let y_old = y.clone();
         if (&x).eq_mod(y, &m) {
@@ -298,7 +308,7 @@ fn demo_natural_eq_natural_mod_natural_ref_val_ref(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_ref_ref_val(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_ref_ref_val(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         let m_old = m.clone();
         if (&x).eq_mod(&y, m) {
@@ -309,7 +319,7 @@ fn demo_natural_eq_natural_mod_natural_ref_ref_val(gm: GenerationMode, limit: us
     }
 }
 
-fn demo_natural_eq_natural_mod_natural_ref_ref_ref(gm: GenerationMode, limit: usize) {
+fn demo_natural_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y, m) in triples_of_naturals(gm).take(limit) {
         if (&x).eq_mod(&y, &m) {
             println!("&{} is equal to &{} mod &{}", x, y, m);
@@ -317,6 +327,39 @@ fn demo_natural_eq_natural_mod_natural_ref_ref_ref(gm: GenerationMode, limit: us
             println!("&{} is not equal to &{} mod &{}", x, y, m);
         }
     }
+}
+
+fn benchmark_limbs_eq_limb_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_eq_limb_mod_limb(&mut [Limb], Limb, Limb)",
+        BenchmarkType::Algorithms,
+        triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm.with_scale(512)),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref limbs, _, _)| limbs.len()),
+        "limbs.len()",
+        &mut [
+            (
+                "limbs_eq_limb_mod_limb",
+                &mut (|(ref limbs, limb, modulus)| {
+                    no_out!(limbs_eq_limb_mod_limb(limbs, limb, modulus))
+                }),
+            ),
+            (
+                "limbs_mod_limb",
+                &mut (|(ref limbs, limb, modulus)| {
+                    no_out!(limbs_mod_limb(limbs, modulus) == limb % modulus)
+                }),
+            ),
+            (
+                "_combined_limbs_eq_limb_mod_limb",
+                &mut (|(ref limbs, limb, modulus)| {
+                    no_out!(_combined_limbs_eq_limb_mod_limb(limbs, limb, modulus))
+                }),
+            ),
+        ],
+    );
 }
 
 fn benchmark_limbs_eq_limb_mod_evaluation_strategy(
@@ -537,11 +580,7 @@ fn benchmark_limbs_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name
     );
 }
 
-fn benchmark_natural_eq_natural_mod_evaluation_strategy(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
@@ -590,11 +629,7 @@ fn benchmark_natural_eq_natural_mod_evaluation_strategy(
     );
 }
 
-fn benchmark_natural_eq_natural_mod_natural_library_comparison(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_eq_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::LibraryComparison,
@@ -616,11 +651,7 @@ fn benchmark_natural_eq_natural_mod_natural_library_comparison(
     );
 }
 
-fn benchmark_natural_eq_natural_mod_natural_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
+fn benchmark_natural_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::Algorithms,

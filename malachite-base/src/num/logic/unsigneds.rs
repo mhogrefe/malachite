@@ -15,10 +15,8 @@ macro_rules! impl_logic_traits {
             /// ```
             /// use malachite_base::num::logic::traits::SignificantBits;
             ///
-            /// fn main() {
-            ///     assert_eq!(0u8.significant_bits(), 0);
-            ///     assert_eq!(100u64.significant_bits(), 7);
-            /// }
+            /// assert_eq!(0u8.significant_bits(), 0);
+            /// assert_eq!(100u64.significant_bits(), 7);
             /// ```
             #[inline]
             fn significant_bits(self) -> u64 {

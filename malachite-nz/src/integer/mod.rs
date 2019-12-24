@@ -158,9 +158,8 @@ pub mod arithmetic {
     pub mod div_round;
     pub mod divisible_by;
     pub mod divisible_by_power_of_two;
-    pub mod eq_limb_mod_limb;
+    pub mod eq_mod;
     pub mod eq_mod_power_of_two;
-    pub mod eq_signed_limb_mod_signed_limb;
     pub mod mod_op;
     pub mod mod_power_of_two;
     pub mod mul;

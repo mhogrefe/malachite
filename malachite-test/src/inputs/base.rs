@@ -23,9 +23,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
     limbs_two_limb_inverse_helper,
 };
-use malachite_nz::natural::arithmetic::eq_limb_mod_limb::limbs_eq_limb_mod_limb;
 use malachite_nz::natural::arithmetic::eq_mod::{
-    limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref, limbs_eq_mod_ref_ref_ref,
+    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_ref_ref_ref,
 };
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limb::{

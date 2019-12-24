@@ -7,9 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, CheckedInto, ConvertibleFrom, RoundingFrom,
-};
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
@@ -197,14 +195,12 @@ pub fn triples_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural, Na
     Box::new(triples_of_naturals(gm).filter(|&(ref a, ref b, ref c)| a >= &(b * c)))
 }
 
-// All triples of `Natural`s, where `T` is unsigned and the first `Natural` is equal to the second
-// mod the third.
+// All triples of `Natural`s, where the first `Natural` is equal to the second mod the third.
 pub fn triples_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
     Box::new(triples_of_naturals(gm).map(|(x, y, modulus)| (x * &modulus + &y, y, modulus)))
 }
 
-// All triples of `Natural`s, where and the first `Natural` is not equal to the second mod the
-// third.
+// All triples of `Natural`s, where the first `Natural` is not equal to the second mod the third.
 pub fn triples_of_naturals_var_3(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
     Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref modulus)| !x.eq_mod(y, modulus)))
 }
@@ -997,18 +993,6 @@ where
     Box::new(
         triples_of_natural_unsigned_and_unsigned(gm)
             .map(|(n, u, modulus)| (n * Natural::from(modulus) + Natural::from(u), u, modulus)),
-    )
-}
-
-// All triples of `Natural`, `Limb`, `Limb`, where and the `Natural` is not equal to the first
-// `Limb` mod the second `Limb`.
-pub fn triples_of_natural_limb_and_limb_var_2(gm: GenerationMode) -> It<(Natural, Limb, Limb)> {
-    Box::new(
-        triples_of_natural_unsigned_and_unsigned::<Limb>(gm).filter(|&(ref n, u, modulus)| {
-            let u: Limb = u.checked_into().unwrap();
-            let modulus: Limb = modulus.checked_into().unwrap();
-            !n.eq_mod(u, modulus)
-        }),
     )
 }
 

@@ -1886,20 +1886,18 @@ impl DivMod<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).div_mod(Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).div_mod(Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .div_mod(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .div_mod(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_mod(mut self, other: Natural) -> (Natural, Natural) {
@@ -1935,20 +1933,18 @@ impl<'a> DivMod<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).div_mod(&Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).div_mod(&Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .div_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .div_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_mod(mut self, other: &'a Natural) -> (Natural, Natural) {
@@ -1983,20 +1979,18 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).div_mod(Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).div_mod(Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .div_mod(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .div_mod(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
         if other == 0 as Limb {
@@ -2052,20 +2046,18 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).div_mod(&Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).div_mod(&Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .div_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .div_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     fn div_mod(self, other: &'b Natural) -> (Natural, Natural) {
         if *other == 0 as Limb {
@@ -2119,18 +2111,16 @@ impl DivAssignMod<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.div_assign_mod(Natural::from(10u32)).to_string(), "3");
-    ///     assert_eq!(x.to_string(), "2");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_mod(Natural::from(10u32)).to_string(), "3");
+    /// assert_eq!(x.to_string(), "2");
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(x.div_assign_mod(Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///         "530068894399");
-    ///     assert_eq!(x.to_string(), "810000006723");
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(x.div_assign_mod(Natural::from_str("1234567890987").unwrap()).to_string(),
+    ///     "530068894399");
+    /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
         if other == 0 as Limb {
@@ -2185,18 +2175,16 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.div_assign_mod(&Natural::from(10u32)).to_string(), "3");
-    ///     assert_eq!(x.to_string(), "2");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_mod(&Natural::from(10u32)).to_string(), "3");
+    /// assert_eq!(x.to_string(), "2");
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(x.div_assign_mod(&Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///         "530068894399");
-    ///     assert_eq!(x.to_string(), "810000006723");
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(x.div_assign_mod(&Natural::from_str("1234567890987").unwrap()).to_string(),
+    ///     "530068894399");
+    /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, other: &'a Natural) -> Natural {
         if *other == 0 as Limb {
@@ -2254,20 +2242,18 @@ impl DivRem<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).div_rem(Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).div_rem(Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .div_rem(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .div_rem(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_rem(self, other: Natural) -> (Natural, Natural) {
@@ -2302,20 +2288,18 @@ impl<'a> DivRem<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).div_rem(&Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).div_rem(&Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .div_rem(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .div_rem(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_rem(self, other: &'a Natural) -> (Natural, Natural) {
@@ -2350,20 +2334,18 @@ impl<'a> DivRem<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).div_rem(Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).div_rem(Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .div_rem(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .div_rem(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_rem(self, other: Natural) -> (Natural, Natural) {
@@ -2398,20 +2380,18 @@ impl<'a, 'b> DivRem<&'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).div_rem(&Natural::from(10u32))),
-    ///         "(2, 3)"
-    ///     );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).div_rem(&Natural::from(10u32))),
+    ///     "(2, 3)"
+    /// );
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .div_rem(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006723, 530068894399)"
-    ///     );
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .div_rem(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006723, 530068894399)"
+    /// );
     /// ```
     #[inline]
     fn div_rem(self, other: &'b Natural) -> (Natural, Natural) {
@@ -2445,18 +2425,16 @@ impl DivAssignRem<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.div_assign_rem(Natural::from(10u32)).to_string(), "3");
-    ///     assert_eq!(x.to_string(), "2");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_rem(Natural::from(10u32)).to_string(), "3");
+    /// assert_eq!(x.to_string(), "2");
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(x.div_assign_rem(Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///         "530068894399");
-    ///     assert_eq!(x.to_string(), "810000006723");
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(x.div_assign_rem(Natural::from_str("1234567890987").unwrap()).to_string(),
+    ///     "530068894399");
+    /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: Natural) -> Natural {
@@ -2490,18 +2468,16 @@ impl<'a> DivAssignRem<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.div_assign_rem(&Natural::from(10u32)).to_string(), "3");
-    ///     assert_eq!(x.to_string(), "2");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_rem(&Natural::from(10u32)).to_string(), "3");
+    /// assert_eq!(x.to_string(), "2");
     ///
-    ///     // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(x.div_assign_rem(&Natural::from_str("1234567890987").unwrap()).to_string(),
-    ///         "530068894399");
-    ///     assert_eq!(x.to_string(), "810000006723");
-    /// }
+    /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(x.div_assign_rem(&Natural::from_str("1234567890987").unwrap()).to_string(),
+    ///     "530068894399");
+    /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: &'a Natural) -> Natural {
@@ -2536,20 +2512,18 @@ impl CeilingDivNegMod<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32))),
-    ///         "(3, 7)"
-    ///     );
+    /// // 3 * 10 - 7 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///     "(3, 7)"
+    /// );
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006724, 704498996588)"
-    ///     );
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006724, 704498996588)"
+    /// );
     /// ```
     #[inline]
     fn ceiling_div_neg_mod(mut self, other: Natural) -> (Natural, Natural) {
@@ -2585,20 +2559,18 @@ impl<'a> CeilingDivNegMod<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32))),
-    ///         "(3, 7)"
-    ///     );
+    /// // 3 * 10 - 7 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", Natural::from(23u32).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///     "(3, 7)"
+    /// );
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
-    ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006724, 704498996588)"
-    ///     );
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", Natural::from_str("1000000000000000000000000").unwrap()
+    ///          .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006724, 704498996588)"
+    /// );
     /// ```
     #[inline]
     fn ceiling_div_neg_mod(mut self, other: &'a Natural) -> (Natural, Natural) {
@@ -2634,20 +2606,18 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32))),
-    ///         "(3, 7)"
-    ///     );
+    /// // 3 * 10 - 7 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(Natural::from(10u32))),
+    ///     "(3, 7)"
+    /// );
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006724, 704498996588)"
-    ///     );
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .ceiling_div_neg_mod(Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006724, 704498996588)"
+    /// );
     /// ```
     fn ceiling_div_neg_mod(self, other: Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(&other);
@@ -2686,20 +2656,18 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     assert_eq!(
-    ///         format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32))),
-    ///         "(3, 7)"
-    ///     );
+    /// // 3 * 10 - 7 = 23
+    /// assert_eq!(
+    ///     format!("{:?}", (&Natural::from(23u32)).ceiling_div_neg_mod(&Natural::from(10u32))),
+    ///     "(3, 7)"
+    /// );
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     assert_eq!(
-    ///          format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
-    ///              .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
-    ///          "(810000006724, 704498996588)"
-    ///     );
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// assert_eq!(
+    ///      format!("{:?}", (&Natural::from_str("1000000000000000000000000").unwrap())
+    ///          .ceiling_div_neg_mod(&Natural::from_str("1234567890987").unwrap())),
+    ///      "(810000006724, 704498996588)"
+    /// );
     /// ```
     fn ceiling_div_neg_mod(self, other: &'b Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(other);
@@ -2737,22 +2705,20 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)).to_string(), "7");
-    ///     assert_eq!(x.to_string(), "3");
+    /// // 3 * 10 - 7 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.ceiling_div_assign_neg_mod(Natural::from(10u32)).to_string(), "7");
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(
-    ///         x.ceiling_div_assign_neg_mod(
-    ///             Natural::from_str("1234567890987").unwrap()
-    ///         ).to_string(),
-    ///         "704498996588",
-    ///     );
-    ///     assert_eq!(x.to_string(), "810000006724");
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(
+    ///     x.ceiling_div_assign_neg_mod(
+    ///         Natural::from_str("1234567890987").unwrap()
+    ///     ).to_string(),
+    ///     "704498996588",
+    /// );
+    /// assert_eq!(x.to_string(), "810000006724");
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
         let remainder = self.div_assign_mod(&other);
@@ -2791,22 +2757,20 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // 3 * 10 - 7 = 23
-    ///     let mut x = Natural::from(23u32);
-    ///     assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)).to_string(), "7");
-    ///     assert_eq!(x.to_string(), "3");
+    /// // 3 * 10 - 7 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.ceiling_div_assign_neg_mod(&Natural::from(10u32)).to_string(), "7");
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
-    ///     let mut x = Natural::from_str("1000000000000000000000000").unwrap();
-    ///     assert_eq!(
-    ///         x.ceiling_div_assign_neg_mod(
-    ///             &Natural::from_str("1234567890987").unwrap()
-    ///         ).to_string(),
-    ///         "704498996588",
-    ///     );
-    ///     assert_eq!(x.to_string(), "810000006724");
-    /// }
+    /// // 810000006724 * 1234567890987 - 704498996588 = 1000000000000000000000000
+    /// let mut x = Natural::from_str("1000000000000000000000000").unwrap();
+    /// assert_eq!(
+    ///     x.ceiling_div_assign_neg_mod(
+    ///         &Natural::from_str("1234567890987").unwrap()
+    ///     ).to_string(),
+    ///     "704498996588",
+    /// );
+    /// assert_eq!(x.to_string(), "810000006724");
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &'a Natural) -> Natural {
         let remainder = self.div_assign_mod(other);

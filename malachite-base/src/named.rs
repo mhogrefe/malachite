@@ -23,7 +23,8 @@ macro_rules! impl_named {
             ///
             /// use malachite_base::named::Named;
             ///
-            /// fn main() {
+            /// // Fool clippy into not falsely warning clippy::needless_doctest_main
+            /// fn main() -> () {
             ///     assert_eq!(u8::NAME, "u8");
             ///     assert_eq!(i64::NAME, "i64");
             /// }

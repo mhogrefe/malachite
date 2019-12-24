@@ -433,15 +433,13 @@ macro_rules! impl_basic_traits {
             /// ```
             /// use malachite_base::crement::Crementable;
             ///
-            /// fn main() {
-            ///     let mut i = 10;
-            ///     i.increment();
-            ///     assert_eq!(i, 11);
+            /// let mut i = 10;
+            /// i.increment();
+            /// assert_eq!(i, 11);
             ///
-            ///     let mut i = -5;
-            ///     i.increment();
-            ///     assert_eq!(i, -4);
-            /// }
+            /// let mut i = -5;
+            /// i.increment();
+            /// assert_eq!(i, -4);
             /// ```
             #[inline]
             fn increment(&mut self) {
@@ -463,15 +461,13 @@ macro_rules! impl_basic_traits {
             /// ```
             /// use malachite_base::crement::Crementable;
             ///
-            /// fn main() {
-            ///     let mut i = 10;
-            ///     i.decrement();
-            ///     assert_eq!(i, 9);
+            /// let mut i = 10;
+            /// i.decrement();
+            /// assert_eq!(i, 9);
             ///
-            ///     let mut i = -5;
-            ///     i.decrement();
-            ///     assert_eq!(i, -6);
-            /// }
+            /// let mut i = -5;
+            /// i.decrement();
+            /// assert_eq!(i, -6);
             /// ```
             #[inline]
             fn decrement(&mut self) {

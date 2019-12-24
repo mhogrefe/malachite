@@ -167,6 +167,74 @@ pub fn triples_of_natural_integers(gm: GenerationMode) -> It<(Integer, Integer, 
     }
 }
 
+pub fn triples_of_integer_integer_and_natural(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_integers(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
+pub fn rm_triples_of_integer_integer_and_natural(
+    gm: GenerationMode,
+) -> Box<
+    dyn Iterator<
+        Item = (
+            (rug::Integer, rug::Integer, rug::Integer),
+            (Integer, Integer, Natural),
+        ),
+    >,
+> {
+    Box::new(triples_of_integer_integer_and_natural(gm).map(|(x, y, z)| {
+        (
+            (
+                integer_to_rug_integer(&x),
+                integer_to_rug_integer(&y),
+                natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+// All triples of `Integer`, `Integer`, and `Natural`, where the first `Integer` is equal to the
+// second mod the `Natural`.
+pub fn triples_of_integer_integer_and_natural_var_1(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        triples_of_integer_integer_and_natural(gm)
+            .map(|(x, y, modulus)| (x * Integer::from(&modulus) + &y, y, modulus)),
+    )
+}
+
+// All triples of `Integer`, `Integer`, and `Natural`, where the first `Integer` is not equal to the
+// second mod the `Natural`.
+pub fn triples_of_integer_integer_and_natural_var_2(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        triples_of_integer_integer_and_natural(gm)
+            .filter(|&(ref x, ref y, ref modulus)| !x.eq_mod(y, modulus)),
+    )
+}
+
 fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Integer, T)> {
@@ -1185,20 +1253,6 @@ where
     )
 }
 
-// All triples of `Integer`, `T`, `T`, where `T` is unsigned and the `Integer` is not equal to the
-// first `T` mod the second `T`.
-pub fn triples_of_integer_unsigned_and_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Integer, T, T)> {
-    Box::new(
-        triples_of_integer_unsigned_and_unsigned::<T>(gm).filter(|&(ref n, u, modulus)| {
-            let u: Limb = u.checked_into().unwrap();
-            let modulus: Limb = modulus.checked_into().unwrap();
-            !n.eq_mod(u, modulus)
-        }),
-    )
-}
-
 pub fn triples_of_unsigned_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, Integer)> {
@@ -1290,24 +1344,6 @@ where
     Box::new(
         triples_of_integer_signed_and_signed(gm)
             .map(|(n, i, modulus)| (n * Integer::from(modulus) + Integer::from(i), i, modulus)),
-    )
-}
-
-// All triples of `Integer`, `T`, `T`, where `T` is signed and the `Integer` is not equal to the
-// first `T` mod the second `T`.
-pub fn triples_of_integer_signed_and_signed_var_2<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Integer, T, T)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(
-        triples_of_integer_signed_and_signed::<T>(gm).filter(|&(ref n, i, modulus)| {
-            let i: SignedLimb = i.checked_into().unwrap();
-            let modulus: SignedLimb = modulus.checked_into().unwrap();
-            !n.eq_mod(i, modulus)
-        }),
     )
 }
 

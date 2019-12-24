@@ -59,10 +59,8 @@ macro_rules! impl_arithmetic_traits {
             /// ```
             /// use malachite_base::num::arithmetic::traits::FloorLogTwo;
             ///
-            /// fn main() {
-            ///     assert_eq!(1u8.floor_log_two(), 0);
-            ///     assert_eq!(100u64.floor_log_two(), 6);
-            /// }
+            /// assert_eq!(1u8.floor_log_two(), 0);
+            /// assert_eq!(100u64.floor_log_two(), 6);
             /// ```
             #[inline]
             fn floor_log_two(self) -> u64 {
@@ -88,10 +86,8 @@ macro_rules! impl_arithmetic_traits {
             /// ```
             /// use malachite_base::num::arithmetic::traits::CeilingLogTwo;
             ///
-            /// fn main() {
-            ///     assert_eq!(1u8.ceiling_log_two(), 0);
-            ///     assert_eq!(100u64.ceiling_log_two(), 7);
-            /// }
+            /// assert_eq!(1u8.ceiling_log_two(), 0);
+            /// assert_eq!(100u64.ceiling_log_two(), 7);
             /// ```
             #[inline]
             fn ceiling_log_two(self) -> u64 {

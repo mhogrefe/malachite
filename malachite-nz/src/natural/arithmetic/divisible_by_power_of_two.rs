@@ -57,13 +57,11 @@ impl<'a> DivisibleByPowerOfTwo for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.divisible_by_power_of_two(100), true);
-    ///     assert_eq!(Natural::from(100u32).divisible_by_power_of_two(2), true);
-    ///     assert_eq!(Natural::from(100u32).divisible_by_power_of_two(3), false);
-    ///     assert_eq!(Natural::trillion().divisible_by_power_of_two(12), true);
-    ///     assert_eq!(Natural::trillion().divisible_by_power_of_two(13), false);
-    /// }
+    /// assert_eq!(Natural::ZERO.divisible_by_power_of_two(100), true);
+    /// assert_eq!(Natural::from(100u32).divisible_by_power_of_two(2), true);
+    /// assert_eq!(Natural::from(100u32).divisible_by_power_of_two(3), false);
+    /// assert_eq!(Natural::trillion().divisible_by_power_of_two(12), true);
+    /// assert_eq!(Natural::trillion().divisible_by_power_of_two(13), false);
     /// ```
     fn divisible_by_power_of_two(self, pow: u64) -> bool {
         match (self, pow) {

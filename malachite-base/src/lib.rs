@@ -1,4 +1,3 @@
-#[allow(clippy::needless_doctest_main)] //TODO fix!!
 pub mod bools;
 pub mod chars;
 pub mod comparison;

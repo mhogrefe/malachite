@@ -505,11 +505,9 @@ impl Natural {
 /// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
-///     assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
-///         Natural::trillion()).to_string(), "65537000000000000");
-/// }
+/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
+/// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+///     Natural::trillion()).to_string(), "65537000000000000");
 /// ```
 impl<'a> AddMul<Natural, Natural> for Natural {
     type Output = Natural;
@@ -539,11 +537,9 @@ impl<'a> AddMul<Natural, Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
-///         &Natural::trillion()).to_string(), "65537000000000000");
-/// }
+/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
+/// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+///     &Natural::trillion()).to_string(), "65537000000000000");
 /// ```
 impl<'a> AddMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
@@ -573,11 +569,9 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
-///     assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
-///         Natural::trillion()).to_string(), "65537000000000000");
-/// }
+/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
+/// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+///     Natural::trillion()).to_string(), "65537000000000000");
 /// ```
 impl<'a> AddMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
@@ -607,11 +601,9 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
-///         &Natural::trillion()).to_string(), "65537000000000000");
-/// }
+/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
+/// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+///     &Natural::trillion()).to_string(), "65537000000000000");
 /// ```
 impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
@@ -641,11 +633,9 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMul;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-///     assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
-///         &Natural::trillion()).to_string(), "65537000000000000");
-/// }
+/// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
+/// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
+///     &Natural::trillion()).to_string(), "65537000000000000");
 /// ```
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
@@ -688,15 +678,13 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
 /// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(10u32);
-///     x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
-///     assert_eq!(x, 22);
+/// let mut x = Natural::from(10u32);
+/// x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
+/// assert_eq!(x, 22);
 ///
-///     let mut x = Natural::trillion();
-///     x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
-///     assert_eq!(x.to_string(), "65537000000000000");
-/// }
+/// let mut x = Natural::trillion();
+/// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
+/// assert_eq!(x.to_string(), "65537000000000000");
 /// ```
 impl AddMulAssign<Natural, Natural> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: Natural) {
@@ -735,15 +723,13 @@ impl AddMulAssign<Natural, Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(10u32);
-///     x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
-///     assert_eq!(x, 22);
+/// let mut x = Natural::from(10u32);
+/// x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
+/// assert_eq!(x, 22);
 ///
-///     let mut x = Natural::trillion();
-///     x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
-///     assert_eq!(x.to_string(), "65537000000000000");
-/// }
+/// let mut x = Natural::trillion();
+/// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
+/// assert_eq!(x.to_string(), "65537000000000000");
 /// ```
 impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     fn add_mul_assign(&mut self, b: Natural, c: &'a Natural) {
@@ -782,15 +768,13 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(10u32);
-///     x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
-///     assert_eq!(x, 22);
+/// let mut x = Natural::from(10u32);
+/// x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
+/// assert_eq!(x, 22);
 ///
-///     let mut x = Natural::trillion();
-///     x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
-///     assert_eq!(x.to_string(), "65537000000000000");
-/// }
+/// let mut x = Natural::trillion();
+/// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
+/// assert_eq!(x.to_string(), "65537000000000000");
 /// ```
 impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: Natural) {
@@ -829,15 +813,13 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
 /// use malachite_base::num::arithmetic::traits::AddMulAssign;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(10u32);
-///     x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
-///     assert_eq!(x, 22);
+/// let mut x = Natural::from(10u32);
+/// x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
+/// assert_eq!(x, 22);
 ///
-///     let mut x = Natural::trillion();
-///     x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
-///     assert_eq!(x.to_string(), "65537000000000000");
-/// }
+/// let mut x = Natural::trillion();
+/// x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
+/// assert_eq!(x.to_string(), "65537000000000000");
 /// ```
 impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     fn add_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
