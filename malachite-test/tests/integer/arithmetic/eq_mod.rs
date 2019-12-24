@@ -8,7 +8,7 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_test::inputs::base::triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1;
 use malachite_test::inputs::integer::{

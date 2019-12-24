@@ -347,7 +347,7 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
 
 impl Natural {
     // self - b * c, returns sign (true means non-negative)
-    pub(crate) fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
+    fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
         if c == 0 || *b == 0 as Limb {
             return (self.clone(), true);
         }
@@ -377,7 +377,7 @@ impl Natural {
     }
 
     // self -= b * c, returns sign (true means non-negative)
-    pub(crate) fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
+    fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
         if c == 0 || b == 0 as Limb {
             return true;
         }
@@ -415,7 +415,7 @@ impl Natural {
     }
 
     // self -= &b * c, returns sign (true means non-negative)
-    pub(crate) fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
+    fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
         if c == 0 || *b == 0 as Limb {
             return true;
         }

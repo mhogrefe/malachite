@@ -50,12 +50,7 @@ use platform::{
 /// Additional memory: O(1)
 ///
 /// This is udiv_qrnnd_preinv from gmp-impl.h, but not computing the quotient.
-pub(crate) fn mod_by_preinversion(
-    n_high: Limb,
-    n_low: Limb,
-    divisor: Limb,
-    divisor_inverse: Limb,
-) -> Limb {
+fn mod_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse: Limb) -> Limb {
     let (quotient_high, quotient_low) = (DoubleLimb::from(n_high)
         * DoubleLimb::from(divisor_inverse))
     .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))

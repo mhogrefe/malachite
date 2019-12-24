@@ -9,7 +9,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut qs, mut ns, ds, _): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
             let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);

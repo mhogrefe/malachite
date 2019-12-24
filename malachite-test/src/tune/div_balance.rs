@@ -9,7 +9,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::triples_of_unsigned_vec_var_44;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut qs, mut ns, mut ds): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             _limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds);

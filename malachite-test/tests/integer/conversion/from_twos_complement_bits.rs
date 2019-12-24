@@ -1,7 +1,7 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
 
 #[test]

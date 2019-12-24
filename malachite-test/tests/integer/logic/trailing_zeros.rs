@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::nonzero_signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::logic::trailing_zeros::integer_trailing_zeros_alt;

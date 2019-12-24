@@ -10,7 +10,7 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
@@ -18,7 +18,7 @@ use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_slice_clear_bit_neg() {
+fn test_limbs_slice_clear_bit_neg() {
     let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_slice_clear_bit_neg(&mut mut_limbs, index);
@@ -49,7 +49,7 @@ fn limbs_slice_clear_bit_fail_2() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_vec_clear_bit_neg() {
+fn test_limbs_vec_clear_bit_neg() {
     let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_vec_clear_bit_neg(&mut mut_limbs, index);

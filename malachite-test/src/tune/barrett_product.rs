@@ -6,7 +6,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::sextuples_of_four_limb_vecs_and_two_usizes_var_1;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut scratch, ds, qs, _, _, _): (
             Vec<Limb>,

@@ -21,9 +21,9 @@ use malachite_nz::platform::SignedLimb;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
 
-use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::integer_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_signed_signed_and_small_unsigned,
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,

@@ -6,7 +6,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
@@ -48,7 +48,7 @@ fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i64, min: i64) {
 }
 
 #[test]
-pub fn test_significant_bits() {
+fn test_significant_bits() {
     significant_bits_helper_unsigned::<u8>(u8::MAX.into());
     significant_bits_helper_unsigned::<u16>(u16::MAX.into());
     significant_bits_helper_unsigned::<u32>(u32::MAX.into());

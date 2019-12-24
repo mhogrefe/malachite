@@ -23,11 +23,7 @@ pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
 
-pub(crate) fn natural_op_bits(
-    bit_fn: &dyn Fn(bool, bool) -> bool,
-    x: &Natural,
-    y: &Natural,
-) -> Natural {
+fn natural_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Natural, y: &Natural) -> Natural {
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
         if x.significant_bits() >= y.significant_bits() {
             Box::new(x.bits().zip(y.bits().chain(repeat(false))))
@@ -41,11 +37,7 @@ pub(crate) fn natural_op_bits(
     Natural::from_bits_asc(&and_bits)
 }
 
-pub(crate) fn natural_op_limbs(
-    limb_fn: &dyn Fn(Limb, Limb) -> Limb,
-    x: &Natural,
-    y: &Natural,
-) -> Natural {
+fn natural_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Natural, y: &Natural) -> Natural {
     let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> = if x.limb_count() >= y.limb_count() {
         Box::new(x.limbs().zip(y.limbs().chain(repeat(0))))
     } else {

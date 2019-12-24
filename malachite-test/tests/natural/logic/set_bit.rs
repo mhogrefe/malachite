@@ -9,7 +9,7 @@ use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -21,7 +21,7 @@ use malachite_test::natural::logic::set_bit::num_set_bit;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_slice_set_bit() {
+fn test_limbs_slice_set_bit() {
     let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_slice_set_bit(&mut mut_limbs, index);
@@ -43,7 +43,7 @@ fn limbs_slice_set_bit_fail() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_vec_set_bit() {
+fn test_limbs_vec_set_bit() {
     let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_vec_set_bit(&mut mut_limbs, index);

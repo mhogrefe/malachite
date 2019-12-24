@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::positive_unsigneds;
 
 fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
@@ -24,7 +24,7 @@ fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
 }
 
 #[test]
-pub fn test_floor_log_two() {
+fn test_floor_log_two() {
     floor_log_two_helper_unsigned::<u8>(u8::MAX.into());
     floor_log_two_helper_unsigned::<u16>(u16::MAX.into());
     floor_log_two_helper_unsigned::<u32>(u32::MAX.into());
@@ -62,7 +62,7 @@ fn ceiling_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
 }
 
 #[test]
-pub fn test_ceiling_log_two() {
+fn test_ceiling_log_two() {
     ceiling_log_two_helper_unsigned::<u8>(u8::MAX.into());
     ceiling_log_two_helper_unsigned::<u16>(u16::MAX.into());
     ceiling_log_two_helper_unsigned::<u32>(u32::MAX.into());

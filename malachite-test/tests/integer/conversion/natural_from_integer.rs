@@ -5,7 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::integers;
 
 #[test]

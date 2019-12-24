@@ -11,7 +11,7 @@ use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
@@ -20,7 +20,7 @@ use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_clear_bit() {
+fn test_limbs_clear_bit() {
     let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_clear_bit(&mut mut_limbs, index);

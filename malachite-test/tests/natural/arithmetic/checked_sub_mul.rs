@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 
 #[test]

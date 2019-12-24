@@ -11,8 +11,8 @@ use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
 use malachite_nz::natural::Natural;
 use rug;
 
-use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,

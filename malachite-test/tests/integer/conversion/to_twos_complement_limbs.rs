@@ -12,7 +12,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::{test_properties, test_properties_no_special};
+use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{small_unsigneds, vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_vec_of_bool_var_1,
@@ -21,7 +21,7 @@ use malachite_test::integer::conversion::to_twos_complement_limbs::*;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_twos_complement() {
+fn test_limbs_twos_complement() {
     let test = |limbs: &[Limb], out: &[Limb]| {
         assert_eq!(limbs_twos_complement(limbs), out);
     };
@@ -31,7 +31,7 @@ pub fn test_limbs_twos_complement() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
+fn test_limbs_maybe_sign_extend_non_negative_in_place() {
     let test = |limbs: &[Limb], out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_maybe_sign_extend_non_negative_in_place(&mut mut_limbs);
@@ -44,7 +44,7 @@ pub fn test_limbs_maybe_sign_extend_non_negative_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_twos_complement_in_place() {
+fn test_limbs_twos_complement_in_place() {
     let test = |limbs: &[Limb], out: &[Limb], carry: bool| {
         let mut mut_limbs = limbs.to_vec();
         assert_eq!(limbs_twos_complement_in_place(&mut mut_limbs), carry);
@@ -66,7 +66,7 @@ pub fn test_limbs_twos_complement_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
+fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
     let test = |limbs: &[Limb], out: &[Limb]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_limbs);

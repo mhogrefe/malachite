@@ -6,7 +6,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned, unsigneds,
 };
@@ -53,7 +53,7 @@ fn get_bit_helper_signed<T: PrimitiveSigned>() {
 }
 
 #[test]
-pub fn test_get_bit() {
+fn test_get_bit() {
     get_bit_helper_unsigned::<u8>();
     get_bit_helper_unsigned::<u16>();
     get_bit_helper_unsigned::<u32>();

@@ -13,7 +13,7 @@ use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;

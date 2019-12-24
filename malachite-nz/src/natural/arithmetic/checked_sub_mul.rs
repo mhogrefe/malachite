@@ -239,7 +239,7 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
 }
 
 impl Natural {
-    pub(crate) fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
+    fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
         if c == 0 || b == 0 as Limb {
             false
         } else if c == 1 {
@@ -265,7 +265,7 @@ impl Natural {
         }
     }
 
-    pub(crate) fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
+    fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
         if c == 0 || *b == 0 as Limb {
             false
         } else if c == 1 {

@@ -23,10 +23,10 @@ use num::{BigUint, Integer};
 use rug;
 use rug::ops::RemRounding;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,

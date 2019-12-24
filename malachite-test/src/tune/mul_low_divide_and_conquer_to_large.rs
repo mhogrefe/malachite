@@ -8,7 +8,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::triples_of_unsigned_vec_var_52;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut out, xs, ys): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             let mut scratch =

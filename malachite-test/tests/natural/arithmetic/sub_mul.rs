@@ -10,7 +10,7 @@ use malachite_nz::natural::arithmetic::sub_mul::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_28,

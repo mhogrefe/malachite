@@ -5,7 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     negative_signeds, nonempty_vecs_of_unsigned, vecs_of_unsigned_var_3,
 };

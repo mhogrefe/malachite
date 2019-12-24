@@ -8,7 +8,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::quadruples_of_unsigned_vec_var_3;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut qs, mut rs, ns, ds): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];

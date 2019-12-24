@@ -7,7 +7,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(limbs, divisor): (Vec<Limb>, Limb)| {
             no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))

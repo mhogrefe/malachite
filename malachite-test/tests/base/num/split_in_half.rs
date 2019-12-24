@@ -4,7 +4,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 
 fn split_in_half_helper<T: JoinHalves + PrimitiveUnsigned + SplitInHalf + Rand>() {

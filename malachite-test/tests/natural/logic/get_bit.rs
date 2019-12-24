@@ -9,7 +9,7 @@ use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
@@ -19,7 +19,7 @@ use malachite_test::natural::logic::get_bit::num_get_bit;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_get_bit() {
+fn test_limbs_get_bit() {
     let test = |limbs: &[Limb], index: u64, out: bool| {
         assert_eq!(limbs_get_bit(limbs, index), out);
     };
@@ -37,7 +37,7 @@ pub fn test_limbs_get_bit() {
 }
 
 #[test]
-pub fn test_get_bit() {
+fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(Natural::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(num_get_bit(&BigUint::from_str(n).unwrap(), index), out);

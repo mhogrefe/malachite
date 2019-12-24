@@ -4,7 +4,7 @@ use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 
 #[test]

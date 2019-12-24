@@ -1,6 +1,6 @@
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[test]

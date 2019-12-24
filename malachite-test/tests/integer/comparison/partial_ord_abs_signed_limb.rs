@@ -6,7 +6,7 @@ use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_signed, triples_of_integer_signed_and_integer,

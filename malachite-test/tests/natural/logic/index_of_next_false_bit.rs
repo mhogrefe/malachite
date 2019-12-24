@@ -10,8 +10,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug;
 
-use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
 };

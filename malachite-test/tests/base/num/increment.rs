@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{signeds_no_max, unsigneds_no_max};
 
 fn increment_helper_unsigned<T: PrimitiveUnsigned>() {
@@ -36,7 +36,7 @@ fn increment_helper_signed<T: PrimitiveSigned>() {
 }
 
 #[test]
-pub fn test_increment() {
+fn test_increment() {
     increment_helper_unsigned::<u8>();
     increment_helper_unsigned::<u16>();
     increment_helper_unsigned::<u32>();

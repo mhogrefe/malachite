@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::{
     integers, nonzero_integers, pairs_of_integer_and_nonzero_integer_var_1,

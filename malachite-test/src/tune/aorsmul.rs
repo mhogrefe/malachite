@@ -6,7 +6,7 @@ use time::precise_time_ns;
 use common::GenerationMode;
 use inputs::base::pairs_of_unsigned_vec_var_1;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let mut aorsmul_faster_2aorslsh_vote = 0;
     let mut aorsmul_faster_3aorslsh_vote = 0;
     let mut aorsmul_faster_aors_aorslsh_vote = 0;

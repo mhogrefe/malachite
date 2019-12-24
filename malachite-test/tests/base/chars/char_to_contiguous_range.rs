@@ -1,6 +1,8 @@
 use malachite_base::chars::{char_to_contiguous_range, contiguous_range_to_char, NUMBER_OF_CHARS};
 
-use common::{test_properties_no_limit_exhaustive_no_special, test_properties_no_special};
+use malachite_test::common::{
+    test_properties_no_limit_exhaustive_no_special, test_properties_no_special,
+};
 use malachite_test::inputs::base::{chars, pairs_of_chars};
 
 #[test]

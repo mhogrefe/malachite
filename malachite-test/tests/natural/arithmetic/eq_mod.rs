@@ -16,8 +16,8 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
 use malachite_test::common::natural_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_limb_vec_limb_and_positive_limb_var_3,
     triples_of_limb_vec_limb_and_positive_limb_var_4,

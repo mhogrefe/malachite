@@ -1,4 +1,4 @@
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::hash::hash;
 use malachite_test::inputs::integer::integers;
 

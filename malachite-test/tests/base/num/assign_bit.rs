@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_signed_unsigned_width_range_and_bool_var_1,
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
@@ -58,7 +58,7 @@ fn assign_bit_helper_signed<T: PrimitiveSigned>() {
 }
 
 #[test]
-pub fn test_assign_bit() {
+fn test_assign_bit() {
     assign_bit_helper_unsigned::<u8>();
     assign_bit_helper_unsigned::<u16>();
     assign_bit_helper_unsigned::<u32>();

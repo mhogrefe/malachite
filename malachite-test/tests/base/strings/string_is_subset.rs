@@ -1,6 +1,6 @@
 use malachite_base::strings::{string_is_subset, string_nub, string_sort};
 
-use common::test_properties_no_special;
+use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::pairs_of_strings;
 
 #[test]

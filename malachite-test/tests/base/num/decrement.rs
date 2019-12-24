@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{positive_unsigneds, signeds_no_min};
 
 fn decrement_helper_unsigned<T: PrimitiveUnsigned>() {
@@ -36,7 +36,7 @@ fn decrement_helper_signed<T: PrimitiveSigned>() {
 }
 
 #[test]
-pub fn test_decrement() {
+fn test_decrement() {
     decrement_helper_unsigned::<u8>();
     decrement_helper_unsigned::<u16>();
     decrement_helper_unsigned::<u32>();

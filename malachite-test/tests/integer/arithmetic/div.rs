@@ -7,10 +7,10 @@ use malachite_nz::integer::Integer;
 use num::BigInt;
 use rug;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::integer::{
     integers, nonzero_integers, pairs_of_integer_and_nonzero_integer,
     pairs_of_integer_and_nonzero_integer_var_1,

@@ -1,6 +1,6 @@
 use malachite_base::crement::Crementable;
 
-use common::test_properties_no_limit_exhaustive_no_special;
+use malachite_test::common::test_properties_no_limit_exhaustive_no_special;
 use malachite_test::inputs::base::chars_not_max;
 
 #[test]

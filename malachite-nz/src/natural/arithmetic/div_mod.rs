@@ -1821,7 +1821,7 @@ pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &
 }
 
 impl Natural {
-    pub(crate) fn div_mod_limb_ref(&self, other: Limb) -> (Natural, Limb) {
+    fn div_mod_limb_ref(&self, other: Limb) -> (Natural, Limb) {
         if other == 0 {
             panic!("division by zero");
         } else if other == 1 {

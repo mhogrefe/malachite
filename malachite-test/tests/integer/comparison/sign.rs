@@ -7,7 +7,7 @@ use malachite_nz::platform::{Limb, SignedLimb};
 use num::BigInt;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::comparison::sign::num_sign;

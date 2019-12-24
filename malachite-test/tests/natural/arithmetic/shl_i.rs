@@ -7,7 +7,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
 use malachite_test::inputs::natural::{

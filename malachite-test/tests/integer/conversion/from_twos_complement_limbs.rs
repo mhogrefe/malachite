@@ -7,7 +7,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 #[cfg(feature = "32_bit_limbs")]

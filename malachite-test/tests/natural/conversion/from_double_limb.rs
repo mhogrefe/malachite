@@ -6,9 +6,9 @@ use malachite_nz::platform::DoubleLimb;
 use num::BigUint;
 
 #[cfg(feature = "32_bit_limbs")]
-use common::test_properties;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::biguint_to_natural;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_test::common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::inputs::base::unsigneds;
 

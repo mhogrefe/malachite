@@ -9,7 +9,7 @@ use malachite_nz::platform::Limb;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-use common::test_properties_no_special;
+use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
 
 #[test]

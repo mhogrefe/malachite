@@ -348,7 +348,7 @@ pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) ->
     borrow
 }
 
-pub(crate) fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
+fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);
 }
 

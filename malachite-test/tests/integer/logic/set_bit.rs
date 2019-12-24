@@ -10,13 +10,13 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_set_bit_neg() {
+fn test_limbs_set_bit_neg() {
     let test = |limbs: &[u32], index: u64, out: &[u32]| {
         let mut mut_limbs = limbs.to_vec();
         limbs_set_bit_neg(&mut mut_limbs, index);

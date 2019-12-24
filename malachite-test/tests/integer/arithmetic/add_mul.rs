@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 
 #[test]

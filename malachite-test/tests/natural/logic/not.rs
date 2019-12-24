@@ -5,14 +5,14 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_3, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_not_and_limbs_not_in_place() {
+fn test_limbs_not_and_limbs_not_in_place() {
     let test = |limbs_in: &[Limb], out: &[Limb]| {
         assert_eq!(limbs_not(limbs_in), out);
 
@@ -27,7 +27,7 @@ pub fn test_limbs_not_and_limbs_not_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_not_to_out() {
+fn test_limbs_not_to_out() {
     let test = |limbs_in: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         let mut mut_out = out_before.to_vec();
         limbs_not_to_out(&mut mut_out, limbs_in);

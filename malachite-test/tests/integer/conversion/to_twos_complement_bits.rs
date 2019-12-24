@@ -7,14 +7,14 @@ use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
-use common::{test_properties, test_properties_no_special};
+use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_u64, pairs_of_integer_and_vec_of_bool_var_2,
 };
 
 #[test]
-pub fn test_bits_to_twos_complement_bits_non_negative() {
+fn test_bits_to_twos_complement_bits_non_negative() {
     let test = |bits: &[bool], out_bits: &[bool]| {
         let mut mut_bits = bits.to_vec();
         bits_to_twos_complement_bits_non_negative(&mut mut_bits);
@@ -26,7 +26,7 @@ pub fn test_bits_to_twos_complement_bits_non_negative() {
 }
 
 #[test]
-pub fn test_bits_slice_to_twos_complement_bits_negative() {
+fn test_bits_slice_to_twos_complement_bits_negative() {
     let test = |bits: &[bool], out_bits: &[bool], carry: bool| {
         let mut mut_bits = bits.to_vec();
         assert_eq!(
@@ -41,7 +41,7 @@ pub fn test_bits_slice_to_twos_complement_bits_negative() {
 }
 
 #[test]
-pub fn test_bits_vec_to_twos_complement_bits_negative() {
+fn test_bits_vec_to_twos_complement_bits_negative() {
     let test = |bits: &[bool], out_bits: &[bool]| {
         let mut mut_bits = bits.to_vec();
         bits_vec_to_twos_complement_bits_negative(&mut mut_bits);

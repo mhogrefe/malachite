@@ -11,10 +11,10 @@ use malachite_nz::platform::Limb;
 use num::BigInt;
 use rug;
 
-use common::{test_properties, test_properties_no_special};
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::small_unsigneds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;

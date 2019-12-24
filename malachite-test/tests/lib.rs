@@ -6,8 +6,6 @@ extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
 
-pub mod common;
-
 pub mod base {
     pub mod bools {
         pub mod not_assign;

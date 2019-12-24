@@ -12,7 +12,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,

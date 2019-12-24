@@ -7,7 +7,7 @@ use malachite_nz::platform::{Limb, DC_DIVAPPR_Q_THRESHOLD};
 use common::GenerationMode;
 use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut qs, mut ns, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
             _limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);

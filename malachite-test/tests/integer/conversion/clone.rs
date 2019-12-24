@@ -5,7 +5,7 @@ use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };

@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::natural_signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::integer::logic::checked_count_ones::{

@@ -4,7 +4,7 @@ use malachite_base::crement::Crementable;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::signeds_no_min;
 use malachite_test::inputs::integer::integers;
 use malachite_test::inputs::natural::positive_naturals;

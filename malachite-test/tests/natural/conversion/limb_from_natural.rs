@@ -12,9 +12,9 @@ use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
 
-use common::test_properties;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_test::common::natural_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 
 #[test]

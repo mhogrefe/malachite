@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::round::RoundingMode;
 
-use common::test_properties_no_special;
+use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::{strings, strings_var_1};
 
 #[test]

@@ -11,7 +11,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_var_29,

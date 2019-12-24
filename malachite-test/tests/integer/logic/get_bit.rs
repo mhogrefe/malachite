@@ -9,8 +9,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 
-use common::test_properties;
 use malachite_test::common::integer_to_rug_integer;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
@@ -18,7 +18,7 @@ use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_sma
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-pub fn test_limbs_get_bit_neg() {
+fn test_limbs_get_bit_neg() {
     let test = |limbs: &[Limb], index: u64, out: bool| {
         assert_eq!(limbs_get_bit_neg(limbs, index), out);
     };
@@ -42,7 +42,7 @@ pub fn test_limbs_get_bit_neg() {
 }
 
 #[test]
-pub fn test_get_bit() {
+fn test_get_bit() {
     let test = |n, index, out| {
         assert_eq!(Integer::from_str(n).unwrap().get_bit(index), out);
         assert_eq!(

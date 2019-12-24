@@ -7,7 +7,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_7;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut is, mut scratch, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
             let n = ds.len();

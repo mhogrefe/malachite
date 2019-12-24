@@ -7,7 +7,7 @@ use malachite_base::num::conversion::traits::{
 };
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn overflowing_from_properties_helper_unsigned<T: PrimitiveUnsigned + Rand, U: Debug + Eq>()

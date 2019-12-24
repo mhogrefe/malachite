@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::{One, Two};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 

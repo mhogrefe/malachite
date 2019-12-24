@@ -25,8 +25,8 @@ use malachite_nz::natural::arithmetic::div_exact::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_unsigned_vec_var_12,
     pairs_of_unsigned_vec_var_8, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,

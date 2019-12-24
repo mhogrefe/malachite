@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{OverflowingFrom, WrappingFrom};
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn wrapping_from_properties_helper_unsigned<T: PrimitiveUnsigned + Rand, U: Debug + Eq>()

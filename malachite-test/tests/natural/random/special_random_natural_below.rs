@@ -6,7 +6,7 @@ use malachite_nz::natural::Natural;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::positive_naturals;
 
 #[test]

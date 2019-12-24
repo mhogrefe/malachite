@@ -20,10 +20,10 @@ use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3,

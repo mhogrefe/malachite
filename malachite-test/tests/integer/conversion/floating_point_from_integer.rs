@@ -7,7 +7,7 @@ use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::{
     integers, integers_exactly_equal_to_f32, integers_exactly_equal_to_f64,
     integers_not_exactly_equal_to_f32, integers_not_exactly_equal_to_f64, integers_var_1_f32,

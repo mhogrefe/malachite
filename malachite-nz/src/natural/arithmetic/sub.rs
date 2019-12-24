@@ -635,7 +635,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_right(
     borrow
 }
 
-pub(crate) fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
+fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
     panic!(
         "Cannot subtract a number from a smaller number. self: {}, other: {}",
         x, y

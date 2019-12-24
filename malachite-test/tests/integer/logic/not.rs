@@ -5,7 +5,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;

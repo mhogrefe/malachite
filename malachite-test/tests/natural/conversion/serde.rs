@@ -6,7 +6,7 @@ use std::str::FromStr;
 use malachite_base::strings::string_is_subset;
 use malachite_nz::natural::Natural;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 
 //TODO just use a simple hex string (or base64)

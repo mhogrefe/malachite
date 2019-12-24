@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 

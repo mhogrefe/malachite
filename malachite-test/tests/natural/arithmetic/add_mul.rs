@@ -12,7 +12,7 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_27,

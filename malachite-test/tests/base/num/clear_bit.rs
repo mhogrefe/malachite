@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use rand::Rand;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
 };
@@ -48,7 +48,7 @@ fn clear_bit_helper_signed<T: PrimitiveSigned>() {
 }
 
 #[test]
-pub fn test_clear_bit() {
+fn test_clear_bit() {
     clear_bit_helper_unsigned::<u8>();
     clear_bit_helper_unsigned::<u16>();
     clear_bit_helper_unsigned::<u32>();

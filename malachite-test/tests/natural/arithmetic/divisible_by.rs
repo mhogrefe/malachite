@@ -12,8 +12,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::BigUint;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
     pairs_of_unsigned_vec_var_14, pairs_of_unsigned_vec_var_15,

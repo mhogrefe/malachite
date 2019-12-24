@@ -5,7 +5,7 @@ use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::count_ones::{

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_ordering_and_vec_of_unsigned_var_1;
 
 #[cfg(feature = "32_bit_limbs")]

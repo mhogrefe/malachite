@@ -10,7 +10,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::DoubleLimb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 
 #[test]

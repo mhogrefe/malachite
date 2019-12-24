@@ -8,7 +8,7 @@ use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::{
     naturals, naturals_exactly_equal_to_f32, naturals_exactly_equal_to_f64,
     naturals_not_exactly_equal_to_f32, naturals_not_exactly_equal_to_f64, naturals_var_2_f32,

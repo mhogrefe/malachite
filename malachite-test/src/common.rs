@@ -1,4 +1,6 @@
+use std::cmp::Ordering;
 use std::collections::BTreeMap;
+use std::fmt::Debug;
 use std::fs;
 use std::str::FromStr;
 
@@ -7,6 +9,9 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::{BigInt, BigUint};
 use rug;
+
+pub const SMALL_LIMIT: usize = 1_000;
+pub const LARGE_LIMIT: usize = 10_000;
 
 pub fn biguint_to_natural(n: &BigUint) -> Natural {
     Natural::from_str(n.to_string().as_ref()).unwrap()
@@ -88,7 +93,7 @@ pub struct DemoBenchRegistry {
 }
 
 impl DemoBenchRegistry {
-    pub fn register_demo(&mut self, name: &'static str, f: DemoFn) {
+    pub(crate) fn register_demo(&mut self, name: &'static str, f: DemoFn) {
         assert!(
             self.demo_map.insert(name, f).is_none(),
             "Duplicate demo with name {}",
@@ -100,7 +105,7 @@ impl DemoBenchRegistry {
         self.demo_map.get(name)
     }
 
-    pub fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
+    pub(crate) fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
         f(GenerationMode::Exhaustive, 0, "validation");
         assert!(
             self.bench_map.insert(name, (scale_type, f)).is_none(),
@@ -113,7 +118,7 @@ impl DemoBenchRegistry {
         self.bench_map.get(name)
     }
 
-    pub fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
+    pub(crate) fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
         assert!(
             self.no_special_demo_map.insert(name, f).is_none(),
             "Duplicate demo with name {}",
@@ -125,7 +130,7 @@ impl DemoBenchRegistry {
         self.no_special_demo_map.get(name)
     }
 
-    pub fn register_no_special_bench(
+    pub(crate) fn register_no_special_bench(
         &mut self,
         scale_type: ScaleType,
         name: &'static str,
@@ -201,7 +206,7 @@ pub enum NoSpecialGenerationMode {
 }
 
 impl NoSpecialGenerationMode {
-    pub fn name(self) -> &'static str {
+    pub(crate) fn name(self) -> &'static str {
         match self {
             NoSpecialGenerationMode::Exhaustive => "exhaustive",
             NoSpecialGenerationMode::Random(_) => "random",
@@ -217,7 +222,7 @@ pub enum GenerationMode {
 }
 
 impl GenerationMode {
-    pub fn name(self) -> &'static str {
+    pub(crate) fn name(self) -> &'static str {
         match self {
             GenerationMode::Exhaustive => "exhaustive",
             GenerationMode::Random(_) => "random",
@@ -225,7 +230,7 @@ impl GenerationMode {
         }
     }
 
-    pub fn with_scale(self, scale: u32) -> GenerationMode {
+    pub(crate) fn with_scale(self, scale: u32) -> GenerationMode {
         match self {
             GenerationMode::Exhaustive => GenerationMode::Exhaustive,
             GenerationMode::Random(_) => GenerationMode::Random(scale),
@@ -243,7 +248,7 @@ pub enum BenchmarkType {
 }
 
 #[allow(too_many_arguments)]
-pub fn m_run_benchmark<'a, I: Iterator>(
+pub(crate) fn m_run_benchmark<'a, I: Iterator>(
     title: &'a str,
     benchmark_type: BenchmarkType,
     generator: I,
@@ -302,4 +307,115 @@ macro_rules! no_out {
     ($e:expr) => {{
         $e;
     }};
+}
+
+pub fn test_eq_helper<T: Debug + Eq + FromStr>(strings: &[&str])
+where
+    T::Err: Debug,
+{
+    let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    for (i, x) in xs.iter().enumerate() {
+        for (j, y) in ys.iter().enumerate() {
+            assert_eq!(i == j, x == y);
+        }
+    }
+}
+
+pub fn test_cmp_helper<T: Debug + FromStr + Ord>(strings: &[&str])
+where
+    T::Err: Debug,
+{
+    let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    for (i, x) in xs.iter().enumerate() {
+        for (j, y) in ys.iter().enumerate() {
+            assert_eq!(i.cmp(&j), x.cmp(y));
+        }
+    }
+}
+
+pub fn test_custom_cmp_helper<T: Debug + FromStr + Ord, F: FnMut(&T, &T) -> Ordering>(
+    strings: &[&str],
+    mut compare: F,
+) where
+    T::Err: Debug,
+{
+    let xs: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    let ys: Vec<T> = strings.iter().map(|s| s.parse().unwrap()).collect();
+    for (i, x) in xs.iter().enumerate() {
+        for (j, y) in ys.iter().enumerate() {
+            assert_eq!(i.cmp(&j), compare(x, y));
+        }
+    }
+}
+
+pub fn test_properties<T, G: Fn(GenerationMode) -> Box<dyn Iterator<Item = T>>, F: FnMut(&T)>(
+    gen: G,
+    mut test: F,
+) {
+    for &gm in &[
+        GenerationMode::Exhaustive,
+        GenerationMode::Random(32),
+        GenerationMode::SpecialRandom(32),
+    ] {
+        for x in gen(gm).take(LARGE_LIMIT) {
+            test(&x);
+        }
+    }
+}
+
+pub fn test_properties_no_special<
+    T,
+    G: Fn(NoSpecialGenerationMode) -> Box<dyn Iterator<Item = T>>,
+    F: FnMut(&T),
+>(
+    gen: G,
+    mut test: F,
+) {
+    for &gm in &[
+        NoSpecialGenerationMode::Exhaustive,
+        NoSpecialGenerationMode::Random(32),
+    ] {
+        for x in gen(gm).take(LARGE_LIMIT) {
+            test(&x);
+        }
+    }
+}
+
+pub fn test_properties_custom_scale<
+    T,
+    G: Fn(GenerationMode) -> Box<dyn Iterator<Item = T>>,
+    F: FnMut(&T),
+>(
+    scale: u32,
+    gen: G,
+    mut test: F,
+) {
+    for &gm in &[
+        GenerationMode::Exhaustive,
+        GenerationMode::Random(scale),
+        GenerationMode::SpecialRandom(scale),
+    ] {
+        for x in gen(gm).take(LARGE_LIMIT) {
+            test(&x);
+        }
+    }
+}
+
+pub fn test_properties_no_limit_exhaustive_no_special<
+    T,
+    G: Fn(NoSpecialGenerationMode) -> Box<dyn Iterator<Item = T>>,
+    F: FnMut(&T),
+>(
+    gen: G,
+    mut test: F,
+) {
+    for x in gen(NoSpecialGenerationMode::Exhaustive) {
+        test(&x);
+    }
+
+    for x in gen(NoSpecialGenerationMode::Random(32)).take(LARGE_LIMIT) {
+        test(&x);
+    }
 }

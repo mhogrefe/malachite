@@ -45,10 +45,10 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 use num::BigUint;
 use rug;
 
-use common::{test_properties, test_properties_custom_scale};
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
     pairs_of_unsigneds, quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,

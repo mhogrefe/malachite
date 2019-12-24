@@ -7,7 +7,7 @@ use malachite_nz::platform::Limb;
 use common::GenerationMode;
 use inputs::base::triples_of_unsigned_vec_var_39;
 
-pub fn tune() -> Vec<String> {
+pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
         &mut (|(mut is, ds, mut scratch): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             _limbs_invert_basecase_approx(&mut is, &ds, &mut scratch);

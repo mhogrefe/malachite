@@ -6,7 +6,7 @@ use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_3};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;

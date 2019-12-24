@@ -16,7 +16,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_limb_var_1, pairs_of_limb_vec_and_positive_limb_var_1, pairs_of_signeds,

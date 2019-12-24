@@ -6,7 +6,7 @@ use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::pairs_of_unsigneds;
 use malachite_test::inputs::natural::{

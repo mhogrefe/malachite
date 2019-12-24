@@ -23,11 +23,7 @@ pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod xor;
 
-pub(crate) fn integer_op_bits(
-    bit_fn: &dyn Fn(bool, bool) -> bool,
-    x: &Integer,
-    y: &Integer,
-) -> Integer {
+fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer) -> Integer {
     let x_negative = *x < 0 as Limb;
     let y_negative = *y < 0 as Limb;
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
@@ -50,11 +46,7 @@ pub(crate) fn integer_op_bits(
     Integer::from_twos_complement_bits_asc(&and_bits)
 }
 
-pub(crate) fn integer_op_limbs(
-    limb_fn: &dyn Fn(Limb, Limb) -> Limb,
-    x: &Integer,
-    y: &Integer,
-) -> Integer {
+fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integer) -> Integer {
     let x_extension = if *x < 0 as Limb { Limb::MAX } else { 0 };
     let y_extension = if *y < 0 as Limb { Limb::MAX } else { 0 };
     let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =

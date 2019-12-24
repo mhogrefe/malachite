@@ -8,7 +8,7 @@ use malachite_nz::platform::Limb;
 use num::{BigUint, Integer};
 use rug::ops::DivRounding;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };

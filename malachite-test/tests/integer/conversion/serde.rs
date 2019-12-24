@@ -6,7 +6,7 @@ use std::str::FromStr;
 use malachite_base::strings::string_is_subset;
 use malachite_nz::integer::Integer;
 
-use common::test_properties;
+use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::integers;
 
 #[test]
