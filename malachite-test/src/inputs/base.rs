@@ -4,7 +4,7 @@ use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::limbs::limbs_test_zero;
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{EqMod, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, Wrap
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::add::{
     limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
@@ -48,6 +49,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_left;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
@@ -2303,6 +2305,60 @@ pub fn triples_of_unsigned_vec_var_57(gm: GenerationMode) -> It<(Vec<Limb>, Vec<
     Box::new(
         triples_of_unsigned_vec_var_55::<Limb>(gm)
             .filter(|(xs, ys, modulus)| !limbs_eq_mod_ref_ref_ref(&*xs, &*ys, &*modulus)),
+    )
+}
+
+//TODO remove next 3!
+pub fn triples_of_unsigned_vec_var_58<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(1, exhaustive_unsigned())
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples_from_single(
+            random_vecs_min_length(&EXAMPLE_SEED, scale, 1, &(|seed| random(seed)))
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples_from_single(
+            special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 1)
+                .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        )),
+    }
+}
+
+pub fn triples_of_unsigned_vec_var_59(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        triples_of_unsigned_vec_var_58(gm).filter_map(|(xs, ys, modulus)| {
+            let mut product_limbs = if xs.is_empty() {
+                Vec::new()
+            } else {
+                limbs_mul(&xs, &modulus)
+            };
+            if product_limbs.last() == Some(&0) {
+                product_limbs.pop();
+            }
+            if product_limbs.len() < ys.len()
+                || limbs_sub_in_place_left(&mut product_limbs, &ys)
+                || *product_limbs.last().unwrap() == 0
+            {
+                None
+            } else {
+                Some((product_limbs, ys, modulus))
+            }
+        }),
+    )
+}
+
+pub fn triples_of_unsigned_vec_var_60(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        triples_of_unsigned_vec_var_58::<Limb>(gm).filter(|(xs, ys, modulus)| {
+            !Integer::from(Natural::from_limbs_asc(xs)).eq_mod(
+                -Natural::from_limbs_asc(ys),
+                Natural::from_limbs_asc(modulus),
+            )
+        }),
     )
 }
 
