@@ -3,9 +3,12 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 use integer::Integer;
 use natural::arithmetic::add::{limbs_add, limbs_add_limb};
-use natural::arithmetic::divisible_by::{limbs_divisible_by_limb, limbs_divisible_by_val_ref};
+use natural::arithmetic::divisible_by::{
+    limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
+};
 use natural::arithmetic::eq_mod::{limbs_eq_limb_mod_limb, limbs_mod_exact_odd_limb};
 use natural::arithmetic::mod_op::limbs_mod_limb;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
@@ -80,8 +83,77 @@ pub fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, modulus: &[Limb]) -> boo
     }
 }
 
+fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bool> {
+    let m_len = modulus.len();
+    let x_len = xs.len();
+    assert!(m_len > 1);
+    assert!(x_len > 1);
+    assert_ne!(y, 0);
+    assert_ne!(*xs.last().unwrap(), 0);
+    assert_ne!(*modulus.last().unwrap(), 0);
+    let m_0 = modulus[0];
+    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
+    let twos = m_0.trailing_zeros();
+    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos)) {
+        return Some(false);
+    }
+    // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is even
+    // (would involve borrow if x_0, y_0 != 0).
+    if m_len == 2 && m_0 != 0 {
+        let m_1 = modulus[1];
+        if m_1 < 1 << twos {
+            let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
+            let y = quick_neg_mod(y, m_0);
+            return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
+                //TODO else untested!
+                limbs_mod_limb(xs, m_0) == if y < m_0 { y } else { y % m_0 }
+            } else {
+                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
+                r == 0 || r == m_0
+            });
+        }
+    }
+    None
+}
+
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
-/// three numbers x, y, and m, determines whether x === -y mod m.
+/// three numbers x, y, and m, determines whether x === -y mod m. The second input slice is
+/// immutable.
+///
+/// This function assumes that each of the two input slices have at least two elements, their last
+/// elements are nonzero, and `y` is nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
+/// slices is zero, or if `y` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod_ref;
+///
+/// assert_eq!(limbs_pos_eq_neg_limb_mod_ref(&[2, 2], 2, &[2, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_limb_mod_ref(&[0, 1], 1, &[1, 0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, a and d are
+/// longer than one limb, and c is one limb long.
+pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
+    if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, modulus) {
+        return equal;
+    }
+    // calculate |x - y|. Different signs, add
+    let mut scratch = limbs_add_limb(xs, y);
+    scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
+}
+
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
+/// three numbers x, y, and m, determines whether x === -y mod m. The second input slice is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -100,45 +172,19 @@ pub fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, modulus: &[Limb]) -> boo
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod;
 ///
-/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[2, 2], 2, &[2, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[0, 1], 1, &[1, 0, 1]), false);
+/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[2, 2], 2, &mut [2, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[0, 1], 1, &mut [1, 0, 1]), false);
 /// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, a and d are
 /// longer than one limb, and c is one limb long.
-pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
-    let m_len = modulus.len();
-    let x_len = xs.len();
-    assert!(m_len > 1);
-    assert!(x_len > 1);
-    assert_ne!(y, 0);
-    assert_ne!(*xs.last().unwrap(), 0);
-    assert_ne!(*modulus.last().unwrap(), 0);
-    let m_0 = modulus[0];
-    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    let twos = m_0.trailing_zeros();
-    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos)) {
-        return false;
-    }
-    // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is even
-    // (would involve borrow if x_0, y_0 != 0).
-    if m_len == 2 && m_0 != 0 {
-        let m_1 = modulus[1];
-        if m_1 < 1 << twos {
-            let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
-            let y = quick_neg_mod(y, m_0);
-            return if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-                //TODO else untested!
-                limbs_mod_limb(xs, m_0) == if y < m_0 { y } else { y % m_0 }
-            } else {
-                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
-                r == 0 || r == m_0
-            };
-        }
+pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, modulus) {
+        return equal;
     }
     // calculate |x - y|. Different signs, add
     let mut scratch = limbs_add_limb(xs, y);
-    scratch.len() >= m_len && limbs_divisible_by_val_ref(&mut scratch, modulus)
+    scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
 }
 
 /// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
@@ -147,11 +193,11 @@ pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `modulus` is nonzero.
 ///
-/// Time: Worst case O(n * log(n) * log(log(n)))
+/// Time: worst case O(n)
 ///
-/// Additional memory: Worst case O(n * log(n))
+/// Additional memory: worst case O(n)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = max(`xs.len()`, `ys.len`)
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
@@ -193,8 +239,72 @@ fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
     limbs_divisible_by_limb(&limbs_add(xs, ys), modulus)
 }
 
+fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<bool> {
+    assert!(modulus.len() > 1);
+    assert!(xs.len() > 1);
+    assert!(ys.len() > 1);
+    assert_ne!(*xs.last().unwrap(), 0);
+    assert_ne!(*ys.last().unwrap(), 0);
+    assert_ne!(*modulus.last().unwrap(), 0);
+    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
+    if !xs[0]
+        .wrapping_neg()
+        .eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+    {
+        Some(false)
+    } else {
+        None
+    }
+}
+
 /// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
-/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`.
+/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
+/// second input slice is immutable.
+///
+/// This function assumes that each of the three input slices have at least two elements, and their
+/// last elements are nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// of the slices is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_ref;
+///
+/// assert_eq!(limbs_pos_eq_neg_mod_ref(&[0, 0, 1], &[0, 1], &[1, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_mod_ref(&[1, 2], &[3, 4], &[0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, and each is
+/// longer than one limb.
+pub fn limbs_pos_eq_neg_mod_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+    if xs.len() >= ys.len() {
+        limbs_pos_eq_neg_mod_greater_ref(xs, ys, modulus)
+    } else {
+        limbs_pos_eq_neg_mod_greater_ref(ys, xs, modulus)
+    }
+}
+
+// xs.len() >= ys.len()
+fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+    if let Some(equal) = limbs_pos_eq_neg_mod_greater_helper(xs, ys, modulus) {
+        return equal;
+    }
+    // calculate |x - y|. Different signs, add
+    let mut scratch = limbs_add(xs, ys);
+    scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
+}
+
+/// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
+/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
+/// second input slice is mutable.
 ///
 /// This function assumes that each of the three input slices have at least two elements, and their
 /// last elements are nonzero.
@@ -213,13 +323,13 @@ fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod;
 ///
-/// assert_eq!(limbs_pos_eq_neg_mod(&[0, 0, 1], &[0, 1], &[1, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_mod(&[1, 2], &[3, 4], &[0, 1]), false);
+/// assert_eq!(limbs_pos_eq_neg_mod(&[0, 0, 1], &[0, 1], &mut [1, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_mod(&[1, 2], &[3, 4], &mut [0, 1]), false);
 /// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, and each is
 /// longer than one limb.
-pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater(xs, ys, modulus)
     } else {
@@ -228,67 +338,72 @@ pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool 
 }
 
 // xs.len() >= ys.len()
-fn limbs_pos_eq_neg_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
-    let m_len = modulus.len();
-    let x_len = xs.len();
-    let y_len = ys.len();
-    assert!(m_len > 1);
-    assert!(x_len > 1);
-    assert!(y_len > 1);
-    assert_ne!(*xs.last().unwrap(), 0);
-    assert_ne!(*ys.last().unwrap(), 0);
-    assert_ne!(*modulus.last().unwrap(), 0);
-    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    if !xs[0]
-        .wrapping_neg()
-        .eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
-    {
-        return false;
+fn limbs_pos_eq_neg_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_pos_eq_neg_mod_greater_helper(xs, ys, modulus) {
+        return equal;
     }
     // calculate |x - y|. Different signs, add
     let mut scratch = limbs_add(xs, ys);
-    scratch.len() >= m_len && limbs_divisible_by_val_ref(&mut scratch, modulus)
+    scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
 }
 
 impl Natural {
-    fn pos_eq_neg_mod(self, other: Natural, modulus: Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
+    fn eq_neg_limb_mod_limb(&self, other: Limb, modulus: Limb) -> bool {
+        modulus != 0
+            && match *self {
+                Natural(Small(small)) => small % modulus == other.neg_mod(modulus),
+                Natural(Large(ref limbs)) => limbs_eq_neg_limb_mod_limb(limbs, other, modulus),
+            }
     }
 
-    fn pos_eq_neg_mod_val_val_ref(self, other: Natural, modulus: &Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
+    fn pos_eq_neg_mod(&self, other: &Natural, modulus: Natural) -> bool {
+        match (self, other, modulus) {
+            (_, _, Natural(Small(0))) => false,
+            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
+            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_neg_limb_mod_limb(y, modulus),
+            (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_neg_limb_mod_limb(x, modulus),
+            (&Natural(Small(x)), &Natural(Small(y)), Natural(Large(ref modulus))) => {
+                limbs_pos_limb_eq_neg_limb_mod(x, y, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
+                limbs_pos_eq_neg_mod_limb(xs, ys, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Small(y)), Natural(Large(ref mut modulus))) => {
+                limbs_pos_eq_neg_limb_mod(xs, y, modulus)
+            }
+            (&Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut modulus))) => {
+                limbs_pos_eq_neg_limb_mod(ys, x, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Large(ref mut modulus))) => {
+                limbs_pos_eq_neg_mod(xs, ys, modulus)
+            }
+        }
     }
 
-    fn pos_eq_neg_mod_val_ref_val(self, other: &Natural, modulus: Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
-    }
-
-    fn pos_eq_neg_mod_val_ref_ref(self, other: &Natural, modulus: &Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
-    }
-
-    fn pos_eq_neg_mod_ref_val_val(&self, other: Natural, modulus: Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
-    }
-
-    fn pos_eq_neg_mod_ref_val_ref(&self, other: Natural, modulus: &Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
-    }
-
-    fn pos_eq_neg_mod_ref_ref_val(&self, other: &Natural, modulus: Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
-    }
-
-    fn pos_eq_neg_mod_ref_ref_ref(&self, other: &Natural, modulus: &Natural) -> bool {
-        //TODO
-        (Integer::from(self) + Integer::from(other)).divisible_by(Integer::from(modulus))
+    fn pos_eq_neg_mod_ref(&self, other: &Natural, modulus: &Natural) -> bool {
+        match (self, other, modulus) {
+            (_, _, &Natural(Small(0))) => false,
+            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
+            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_neg_limb_mod_limb(y, modulus),
+            (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_neg_limb_mod_limb(x, modulus),
+            (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref modulus))) => {
+                limbs_pos_limb_eq_neg_limb_mod(x, y, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(modulus))) => {
+                limbs_pos_eq_neg_mod_limb(xs, ys, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref modulus))) => {
+                limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus)
+            }
+            (&Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
+                limbs_pos_eq_neg_limb_mod_ref(ys, x, modulus)
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
+                limbs_pos_eq_neg_mod_ref(xs, ys, modulus)
+            }
+        }
     }
 }
 
@@ -337,7 +452,7 @@ impl EqMod<Integer, Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, modulus)
         } else {
-            self.abs.pos_eq_neg_mod(other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod(&other.abs, modulus)
         }
     }
 }
@@ -387,7 +502,7 @@ impl<'a> EqMod<Integer, &'a Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(other.abs, modulus)
         } else {
-            self.abs.pos_eq_neg_mod_val_val_ref(other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod_ref(&other.abs, modulus)
         }
     }
 }
@@ -437,7 +552,7 @@ impl<'a> EqMod<&'a Integer, Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, modulus)
         } else {
-            self.abs.pos_eq_neg_mod_val_ref_val(&other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod(&other.abs, modulus)
         }
     }
 }
@@ -487,7 +602,7 @@ impl<'a, 'b> EqMod<&'a Integer, &'b Natural> for Integer {
         if self.sign == other.sign {
             self.abs.eq_mod(&other.abs, modulus)
         } else {
-            self.abs.pos_eq_neg_mod_val_ref_ref(&other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod_ref(&other.abs, modulus)
         }
     }
 }
@@ -537,7 +652,7 @@ impl<'a> EqMod<Integer, Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(other.abs, modulus)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref_val_val(other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod(&other.abs, modulus)
         }
     }
 }
@@ -587,7 +702,7 @@ impl<'a, 'b> EqMod<Integer, &'b Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(other.abs, modulus)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref_val_ref(other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod_ref(&other.abs, modulus)
         }
     }
 }
@@ -637,7 +752,7 @@ impl<'a, 'b> EqMod<&'b Integer, Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, modulus)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref_ref_val(&other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod(&other.abs, modulus)
         }
     }
 }
@@ -687,7 +802,7 @@ impl<'a, 'b, 'c> EqMod<&'b Integer, &'c Natural> for &'a Integer {
         if self.sign == other.sign {
             (&self.abs).eq_mod(&other.abs, modulus)
         } else {
-            (&self.abs).pos_eq_neg_mod_ref_ref_ref(&other.abs, modulus)
+            (&self.abs).pos_eq_neg_mod_ref(&other.abs, modulus)
         }
     }
 }

@@ -341,11 +341,11 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<b
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `modulus` is nonzero.
 ///
-/// Time: Worst case O(n * log(n) * log(log(n)))
+/// Time: worst case O(n)
 ///
-/// Additional memory: Worst case O(n * log(n))
+/// Additional memory: worst case O(n)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = max(`xs.len()`, `ys.len`)
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
@@ -397,11 +397,11 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `modulus` is nonzero.
 ///
-/// Time: Worst case O(n * log(n) * log(log(n)))
+/// Time: worst case O(n)
 ///
-/// Additional memory: Worst case O(n * log(n))
+/// Additional memory: worst case O(n)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = max(`xs.len()`, `ys.len`)
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
@@ -456,11 +456,11 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `modulus` is nonzero. Both input slices are immutable.
 ///
-/// Time: Worst case O(n * log(n) * log(log(n)))
+/// Time: worst case O(n)
 ///
-/// Additional memory: Worst case O(n * log(n))
+/// Additional memory: worst case O(1)
 ///
-/// where n = max(`xs.len()`, `ys.len()`)
+/// where n = max(`xs.len()`, `ys.len`)
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices

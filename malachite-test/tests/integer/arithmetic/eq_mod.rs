@@ -3,8 +3,9 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::arithmetic::eq_mod::{
-    limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_mod,
-    limbs_pos_eq_neg_mod_limb, limbs_pos_limb_eq_neg_limb_mod,
+    limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
+    limbs_pos_eq_neg_mod, limbs_pos_eq_neg_mod_limb, limbs_pos_eq_neg_mod_ref,
+    limbs_pos_limb_eq_neg_limb_mod,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -84,7 +85,9 @@ fn test_limbs_pos_limb_eq_neg_limb_mod() {
 #[test]
 fn test_limbs_pos_eq_neg_limb_mod() {
     let test = |xs: &[Limb], y: Limb, modulus: &[Limb], equal: bool| {
-        assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, modulus), equal);
+        let mut mut_modulus = modulus.to_vec();
+        assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus), equal);
+        assert_eq!(limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus), equal);
         let x = Integer::from(Natural::from_limbs_asc(xs));
         let y = -Natural::from(y);
         let modulus = Natural::from_limbs_asc(modulus);
@@ -124,35 +127,70 @@ fn test_limbs_pos_eq_neg_limb_mod() {
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_limb_mod_fail_1() {
-    limbs_pos_eq_neg_limb_mod(&[1], 1, &[0, 1]);
+    limbs_pos_eq_neg_limb_mod(&[1], 1, &mut [0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_limb_mod_fail_2() {
-    limbs_pos_eq_neg_limb_mod(&[1, 1], 1, &[1]);
+    limbs_pos_eq_neg_limb_mod(&[1, 1], 1, &mut [1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_limb_mod_fail_3() {
-    limbs_pos_eq_neg_limb_mod(&[1, 0], 1, &[0, 1]);
+    limbs_pos_eq_neg_limb_mod(&[1, 0], 1, &mut [0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_limb_mod_fail_4() {
-    limbs_pos_eq_neg_limb_mod(&[1, 1], 0, &[0, 1]);
+    limbs_pos_eq_neg_limb_mod(&[1, 1], 0, &mut [0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_limb_mod_fail_5() {
-    limbs_pos_eq_neg_limb_mod(&[1, 1], 1, &[1, 0]);
+    limbs_pos_eq_neg_limb_mod(&[1, 1], 1, &mut [1, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_limb_mod_ref_fail_1() {
+    limbs_pos_eq_neg_limb_mod_ref(&[1], 1, &[0, 1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_limb_mod_ref_fail_2() {
+    limbs_pos_eq_neg_limb_mod_ref(&[1, 1], 1, &[1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_limb_mod_ref_fail_3() {
+    limbs_pos_eq_neg_limb_mod_ref(&[1, 0], 1, &[0, 1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_limb_mod_ref_fail_4() {
+    limbs_pos_eq_neg_limb_mod_ref(&[1, 1], 0, &[0, 1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_limb_mod_ref_fail_5() {
+    limbs_pos_eq_neg_limb_mod_ref(&[1, 1], 1, &[1, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -220,7 +258,9 @@ fn limbs_pos_eq_neg_mod_limb_fail_5() {
 #[test]
 fn test_limbs_pos_eq_neg_mod() {
     let test = |xs: &[Limb], ys: &[Limb], modulus: &[Limb], equal: bool| {
-        assert_eq!(limbs_pos_eq_neg_mod(xs, ys, modulus), equal);
+        let mut mut_modulus = modulus.to_vec();
+        assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_modulus), equal);
+        assert_eq!(limbs_pos_eq_neg_mod_ref(xs, ys, modulus), equal);
         let x = Integer::from(Natural::from_limbs_asc(xs));
         let y = -Natural::from_limbs_asc(ys);
         let modulus = Natural::from_limbs_asc(modulus);
@@ -258,42 +298,84 @@ fn test_limbs_pos_eq_neg_mod() {
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_1() {
-    limbs_pos_eq_neg_mod(&[1], &[1, 0, 3], &[0, 7]);
+    limbs_pos_eq_neg_mod(&[1], &[1, 0, 3], &mut [0, 7]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_2() {
-    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1], &[0, 7]);
+    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1], &mut [0, 7]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_3() {
-    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 3], &[7]);
+    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 3], &mut [7]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_4() {
-    limbs_pos_eq_neg_mod(&[1, 1, 0], &[1, 0, 3], &[0, 7]);
+    limbs_pos_eq_neg_mod(&[1, 1, 0], &[1, 0, 3], &mut [0, 7]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_5() {
-    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 0], &[0, 7]);
+    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 0], &mut [0, 7]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pos_eq_neg_mod_fail_6() {
-    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 3], &[7, 0]);
+    limbs_pos_eq_neg_mod(&[1, 1, 1], &[1, 0, 3], &mut [7, 0]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_1() {
+    limbs_pos_eq_neg_mod_ref(&[1], &[1, 0, 3], &[0, 7]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_2() {
+    limbs_pos_eq_neg_mod_ref(&[1, 1, 1], &[1], &[0, 7]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_3() {
+    limbs_pos_eq_neg_mod_ref(&[1, 1, 1], &[1, 0, 3], &[7]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_4() {
+    limbs_pos_eq_neg_mod_ref(&[1, 1, 0], &[1, 0, 3], &[0, 7]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_5() {
+    limbs_pos_eq_neg_mod_ref(&[1, 1, 1], &[1, 0, 0], &[0, 7]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_pos_eq_neg_mod_ref_fail_6() {
+    limbs_pos_eq_neg_mod_ref(&[1, 1, 1], &[1, 0, 3], &[7, 0]);
 }
 
 #[test]
@@ -528,7 +610,9 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
         |&(ref xs, y, ref modulus)| {
-            let equal = limbs_pos_eq_neg_limb_mod(xs, y, modulus);
+            let equal = limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus);
+            let mut mut_modulus = modulus.clone();
+            assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus), equal);
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
             let modulus = Natural::from_limbs_asc(modulus);
@@ -546,7 +630,9 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
     test_properties(
         triples_of_limb_vec_limb_and_limb_vec_var_4,
         |&(ref xs, y, ref modulus)| {
-            assert!(limbs_pos_eq_neg_limb_mod(xs, y, modulus));
+            assert!(limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus));
+            let mut mut_modulus = modulus.clone();
+            assert!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
             let modulus = Natural::from_limbs_asc(modulus);
@@ -563,7 +649,9 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
     test_properties(
         triples_of_limb_vec_limb_and_limb_vec_var_5,
         |&(ref xs, y, ref modulus)| {
-            assert!(!limbs_pos_eq_neg_limb_mod(xs, y, modulus));
+            assert!(!limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus));
+            let mut mut_modulus = modulus.clone();
+            assert!(!limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
             let modulus = Natural::from_limbs_asc(modulus);
@@ -638,7 +726,9 @@ fn limbs_pos_eq_neg_mod_properties() {
     test_properties(
         triples_of_unsigned_vec_var_55,
         |&(ref xs, ref ys, ref modulus)| {
-            let equal = limbs_pos_eq_neg_mod(xs, ys, modulus);
+            let equal = limbs_pos_eq_neg_mod_ref(xs, ys, modulus);
+            let mut mut_modulus = modulus.clone();
+            assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_modulus), equal);
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
             let modulus = Natural::from_limbs_asc(modulus);
@@ -656,7 +746,9 @@ fn limbs_pos_eq_neg_mod_properties() {
     test_properties(
         triples_of_limb_vec_var_58,
         |&(ref xs, ref ys, ref modulus)| {
-            assert!(limbs_pos_eq_neg_mod(xs, ys, modulus));
+            assert!(limbs_pos_eq_neg_mod_ref(xs, ys, modulus));
+            let mut mut_modulus = modulus.clone();
+            assert!(limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_modulus));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
             let modulus = Natural::from_limbs_asc(modulus);
@@ -673,7 +765,9 @@ fn limbs_pos_eq_neg_mod_properties() {
     test_properties(
         triples_of_limb_vec_var_59,
         |&(ref xs, ref ys, ref modulus)| {
-            assert!(!limbs_pos_eq_neg_mod(xs, ys, modulus));
+            assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, modulus));
+            let mut mut_modulus = modulus.clone();
+            assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_modulus));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
             let modulus = Natural::from_limbs_asc(modulus);

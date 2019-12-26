@@ -5,8 +5,9 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::arithmetic::eq_mod::{
-    limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_mod,
-    limbs_pos_eq_neg_mod_limb, limbs_pos_limb_eq_neg_limb_mod,
+    limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
+    limbs_pos_eq_neg_mod, limbs_pos_eq_neg_mod_limb, limbs_pos_eq_neg_mod_ref,
+    limbs_pos_limb_eq_neg_limb_mod,
 };
 use malachite_nz::integer::Integer;
 
@@ -25,8 +26,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_neg_limb_mod_limb);
     register_demo!(registry, demo_limbs_pos_limb_eq_neg_limb_mod);
     register_demo!(registry, demo_limbs_pos_eq_neg_limb_mod);
+    register_demo!(registry, demo_limbs_pos_eq_neg_limb_mod_ref);
     register_demo!(registry, demo_limbs_pos_eq_neg_mod_limb);
     register_demo!(registry, demo_limbs_pos_eq_neg_mod);
+    register_demo!(registry, demo_limbs_pos_eq_neg_mod_ref);
     register_demo!(registry, demo_integer_eq_mod);
     register_demo!(registry, demo_integer_eq_mod_val_val_ref);
     register_demo!(registry, demo_integer_eq_mod_val_ref_val);
@@ -36,6 +39,18 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_eq_mod_ref_ref_val);
     register_demo!(registry, demo_integer_eq_mod_ref_ref_ref);
     register_bench!(registry, Small, benchmark_limbs_eq_neg_limb_mod_limb);
+    register_bench!(registry, Small, benchmark_limbs_pos_limb_eq_neg_limb_mod);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy
+    );
+    register_bench!(registry, Small, benchmark_limbs_pos_eq_neg_mod_limb);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_pos_eq_neg_mod_evaluation_strategy
+    );
     register_bench!(
         registry,
         Large,
@@ -72,14 +87,29 @@ fn demo_limbs_pos_limb_eq_neg_limb_mod(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_pos_eq_neg_limb_mod(gm: GenerationMode, limit: usize) {
-    for (xs, y, modulus) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
+    for (xs, y, mut modulus) in
+        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
     {
+        let old_modulus = modulus.clone();
         println!(
             "limbs_pos_eq_neg_limb_mod({:?}, {}, {:?}) = {}",
             xs,
             y,
+            old_modulus,
+            limbs_pos_eq_neg_limb_mod(&xs, y, &mut modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_eq_neg_limb_mod_ref(gm: GenerationMode, limit: usize) {
+    for (xs, y, modulus) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_pos_eq_neg_limb_mod_ref({:?}, {}, {:?}) = {}",
+            xs,
+            y,
             modulus,
-            limbs_pos_eq_neg_limb_mod(&xs, y, &modulus)
+            limbs_pos_eq_neg_limb_mod_ref(&xs, y, &modulus)
         );
     }
 }
@@ -98,13 +128,26 @@ fn demo_limbs_pos_eq_neg_mod_limb(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_pos_eq_neg_mod(gm: GenerationMode, limit: usize) {
-    for (xs, ys, modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+    for (xs, ys, mut modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+        let old_modulus = modulus.clone();
         println!(
             "limbs_pos_eq_neg_mod({:?}, {:?}, {:?}) = {}",
             xs,
             ys,
+            old_modulus,
+            limbs_pos_eq_neg_mod(&xs, &ys, &mut modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_eq_neg_mod_ref(gm: GenerationMode, limit: usize) {
+    for (xs, ys, modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+        println!(
+            "limbs_pos_eq_neg_mod_ref({:?}, {:?}, {:?}) = {}",
+            xs,
+            ys,
             modulus,
-            limbs_pos_eq_neg_mod(&xs, &ys, &modulus)
+            limbs_pos_eq_neg_mod_ref(&xs, &ys, &modulus)
         );
     }
 }
@@ -217,6 +260,102 @@ fn benchmark_limbs_eq_neg_limb_mod_limb(gm: GenerationMode, limit: usize, file_n
                 no_out!(limbs_eq_neg_limb_mod_limb(limbs, limb, modulus))
             }),
         )],
+    );
+}
+
+fn benchmark_limbs_pos_limb_eq_neg_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_pos_limb_eq_neg_limb_mod(Limb, Limb, &[Limb])",
+        BenchmarkType::Single,
+        triples_of_unsigned_unsigned_and_unsigned_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, ref modulus)| modulus.len()),
+        "modulus.len()",
+        &mut [(
+            "limbs_pos_limb_eq_neg_limb_mod",
+            &mut (|(x, y, ref modulus)| no_out!(limbs_pos_limb_eq_neg_limb_mod(x, y, modulus))),
+        )],
+    );
+}
+
+fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_eq_mod_limb(&[Limb], Limb, &[Limb])",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, _, _)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "limbs_pos_eq_neg_limb_mod",
+                &mut (|(ref xs, y, ref mut modulus)| {
+                    no_out!(limbs_pos_eq_neg_limb_mod(xs, y, modulus))
+                }),
+            ),
+            (
+                "limbs_pos_eq_neg_limb_mod_ref",
+                &mut (|(ref xs, y, ref modulus)| {
+                    no_out!(limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus))
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_pos_eq_neg_mod_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "limbs_pos_eq_neg_mod_limb(&[Limb], &[Limb], Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys, _)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [(
+            "limbs_pos_eq_neg_mod_limb",
+            &mut (|(ref x, ref y, modulus)| no_out!(limbs_pos_eq_neg_mod_limb(x, y, modulus))),
+        )],
+    );
+}
+
+fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_eq_mod_limb(&[Limb], &[Limb], &[Limb])",
+        BenchmarkType::EvaluationStrategy,
+        triples_of_unsigned_vec_var_55(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref xs, ref ys, _)| max(xs.len(), ys.len())),
+        "max(xs.len(), ys.len())",
+        &mut [
+            (
+                "limbs_pos_eq_neg_mod",
+                &mut (|(ref xs, ref y, ref mut modulus)| {
+                    no_out!(limbs_pos_eq_neg_mod(xs, y, modulus))
+                }),
+            ),
+            (
+                "limbs_pos_eq_neg_mod_ref",
+                &mut (|(ref xs, ref y, ref modulus)| {
+                    no_out!(limbs_pos_eq_neg_mod_ref(xs, y, modulus))
+                }),
+            ),
+        ],
     );
 }
 
