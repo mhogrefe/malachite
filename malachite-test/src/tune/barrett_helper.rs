@@ -6,7 +6,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::quadruples_of_unsigned_vec_var_3;
+use inputs::base::quadruples_of_limb_vec_var_3;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -32,7 +32,7 @@ pub(crate) fn tune() -> Vec<String> {
                 &mut scratch
             ))
         }),
-        quadruples_of_unsigned_vec_var_3(GenerationMode::Random(2_048)),
+        quadruples_of_limb_vec_var_3(GenerationMode::Random(2_048)),
         10000,
         &(|&(_, _, ref ns, ref ds)| (ds.len() << 1).saturating_sub(ns.len())),
     );

@@ -19,16 +19,13 @@ use malachite_nz::platform::Limb;
 use malachite_test::common::natural_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
+    triples_of_limb_vec_limb_and_limb_vec_var_2, triples_of_limb_vec_limb_and_limb_vec_var_3,
     triples_of_limb_vec_limb_and_positive_limb_var_3,
-    triples_of_limb_vec_limb_and_positive_limb_var_4,
-    triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
+    triples_of_limb_vec_limb_and_positive_limb_var_4, triples_of_limb_vec_limb_vec_and_limb_var_10,
+    triples_of_limb_vec_limb_vec_and_limb_var_9, triples_of_limb_vec_var_56,
+    triples_of_limb_vec_var_57, triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
-    triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2,
-    triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_3,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_10,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_9, triples_of_unsigned_vec_var_55,
-    triples_of_unsigned_vec_var_56, triples_of_unsigned_vec_var_57,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
 };
 use malachite_test::inputs::natural::{
     pairs_of_naturals, triples_of_naturals, triples_of_naturals_var_2, triples_of_naturals_var_3,
@@ -776,7 +773,7 @@ fn limbs_eq_limb_mod_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_2,
+        triples_of_limb_vec_limb_and_limb_vec_var_2,
         |&(ref xs, y, ref modulus)| {
             assert!(Natural::from_limbs_asc(xs)
                 .eq_mod(Natural::from(y), Natural::from_limbs_asc(modulus)));
@@ -787,7 +784,7 @@ fn limbs_eq_limb_mod_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_3,
+        triples_of_limb_vec_limb_and_limb_vec_var_3,
         |&(ref xs, y, ref modulus)| {
             assert!(!Natural::from_limbs_asc(xs)
                 .eq_mod(Natural::from(y), Natural::from_limbs_asc(modulus)));
@@ -799,7 +796,7 @@ fn limbs_eq_limb_mod_properties() {
 }
 
 #[test]
-fn limbs_eq_mod_limb_ref_ref_properties() {
+fn limbs_eq_mod_limb_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8,
         |&(ref xs, ref ys, modulus)| {
@@ -819,7 +816,7 @@ fn limbs_eq_mod_limb_ref_ref_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_9,
+        triples_of_limb_vec_limb_vec_and_limb_var_9,
         |&(ref xs, ref ys, modulus)| {
             assert!(Natural::from_limbs_asc(xs)
                 .eq_mod(Natural::from_limbs_asc(ys), Natural::from(modulus)));
@@ -830,7 +827,7 @@ fn limbs_eq_mod_limb_ref_ref_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_10,
+        triples_of_limb_vec_limb_vec_and_limb_var_10,
         |&(ref xs, ref ys, modulus)| {
             assert!(!Natural::from_limbs_asc(xs)
                 .eq_mod(Natural::from_limbs_asc(ys), Natural::from(modulus)));
@@ -870,7 +867,7 @@ fn limbs_eq_mod_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_var_56,
+        triples_of_limb_vec_var_56,
         |&(ref xs, ref ys, ref modulus)| {
             assert!(Natural::from_limbs_asc(xs).eq_mod(
                 Natural::from_limbs_asc(ys),
@@ -883,7 +880,7 @@ fn limbs_eq_mod_properties() {
     );
 
     test_properties(
-        triples_of_unsigned_vec_var_57,
+        triples_of_limb_vec_var_57,
         |&(ref xs, ref ys, ref modulus)| {
             assert!(!Natural::from_limbs_asc(xs).eq_mod(
                 Natural::from_limbs_asc(ys),

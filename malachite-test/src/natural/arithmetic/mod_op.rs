@@ -23,17 +23,15 @@ use rug::ops::RemRounding;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_limb_vec_var_9, pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_unsigned_vec_and_positive_unsigned_var_3, pairs_of_unsigned_vec_and_unsigned_var_1,
-    pairs_of_unsigned_vec_var_10, pairs_of_unsigned_vec_var_9,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
-    quadruples_of_unsigned_vec_var_2, sextuples_of_limbs_var_1,
-    triples_of_two_unsigned_vecs_and_unsigned_var_1, triples_of_unsigned_vec_var_37,
-    triples_of_unsigned_vec_var_45,
+    pairs_of_unsigned_vec_var_10, quadruples_of_limb_vec_var_1, quadruples_of_limb_vec_var_2,
+    quadruples_of_three_limb_vecs_and_limb_var_1, quadruples_of_three_limb_vecs_and_limb_var_2,
+    sextuples_of_limbs_var_1, triples_of_limb_vec_var_45, triples_of_two_limb_vecs_and_limb_var_1,
+    triples_of_unsigned_vec_var_37,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -267,7 +265,7 @@ fn demo_limbs_mod_by_two_limb_normalized(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_mod_schoolbook(gm: GenerationMode, limit: usize) {
-    for (mut ns, ds, inverse) in triples_of_two_unsigned_vecs_and_unsigned_var_1(gm).take(limit) {
+    for (mut ns, ds, inverse) in triples_of_two_limb_vecs_and_limb_var_1(gm).take(limit) {
         let old_ns = ns.clone();
         _limbs_mod_schoolbook(&mut ns, &ds, inverse);
         println!(
@@ -279,7 +277,7 @@ fn demo_limbs_mod_schoolbook(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
     for (mut qs, mut ns, ds, inverse) in
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).take(limit)
+        quadruples_of_three_limb_vecs_and_limb_var_2(gm).take(limit)
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
@@ -293,7 +291,7 @@ fn demo_limbs_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_mod_barrett(gm: GenerationMode, limit: usize) {
-    for (mut qs, mut rs, ns, ds) in quadruples_of_unsigned_vec_var_1(gm).take(limit) {
+    for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_1(gm).take(limit) {
         let old_qs = qs.clone();
         let old_rs = rs.clone();
         let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
@@ -306,13 +304,13 @@ fn demo_limbs_mod_barrett(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_mod(gm: GenerationMode, limit: usize) {
-    for (ns, ds) in pairs_of_unsigned_vec_var_9(gm).take(limit) {
+    for (ns, ds) in pairs_of_limb_vec_var_9(gm).take(limit) {
         println!("limbs_mod({:?}, {:?}) = {:?}", ns, ds, limbs_mod(&ns, &ds));
     }
 }
 
 fn demo_limbs_mod_to_out(gm: GenerationMode, limit: usize) {
-    for (mut rs, ns, ds) in triples_of_unsigned_vec_var_45(gm).take(limit) {
+    for (mut rs, ns, ds) in triples_of_limb_vec_var_45(gm).take(limit) {
         let old_rs = rs.clone();
         limbs_mod_to_out(&mut rs, &ns, &ds);
         println!(
@@ -763,7 +761,7 @@ fn benchmark_limbs_mod_schoolbook_algorithms(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "_limbs_mod_schoolbook(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
+        quadruples_of_three_limb_vecs_and_limb_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -792,7 +790,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
     m_run_benchmark(
         "_limbs_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(512)),
+        quadruples_of_three_limb_vecs_and_limb_var_2(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
@@ -825,7 +823,7 @@ fn benchmark_limbs_mod_barrett_algorithms(gm: GenerationMode, limit: usize, file
     m_run_benchmark(
         "_limbs_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_unsigned_vec_var_1(gm),
+        quadruples_of_limb_vec_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -856,7 +854,7 @@ fn benchmark_limbs_mod(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_var_9(gm),
+        pairs_of_limb_vec_var_9(gm),
         gm.name(),
         limit,
         file_name,
@@ -870,7 +868,7 @@ fn benchmark_limbs_mod_to_out_algorithms(gm: GenerationMode, limit: usize, file_
     m_run_benchmark(
         "limbs_mod_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        quadruples_of_unsigned_vec_var_2(gm),
+        quadruples_of_limb_vec_var_2(gm),
         gm.name(),
         limit,
         file_name,

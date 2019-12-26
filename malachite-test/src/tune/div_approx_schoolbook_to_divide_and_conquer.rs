@@ -5,7 +5,7 @@ use malachite_nz::natural::arithmetic::div::{
 use malachite_nz::platform::{Limb, DC_DIVAPPR_Q_THRESHOLD};
 
 use common::GenerationMode;
-use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
+use inputs::base::quadruples_of_three_limb_vecs_and_limb_var_2;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -15,7 +15,7 @@ pub(crate) fn tune() -> Vec<String> {
         &mut (|(mut qs, mut ns, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
             _limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
         }),
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(GenerationMode::Random(1_024)),
+        quadruples_of_three_limb_vecs_and_limb_var_2(GenerationMode::Random(1_024)),
         10000,
         &(|&(_, _, ref ds, _)| ds.len()),
     );

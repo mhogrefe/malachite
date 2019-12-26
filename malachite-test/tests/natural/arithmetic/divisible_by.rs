@@ -15,8 +15,8 @@ use num::BigUint;
 use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
+    pairs_of_limb_vec_var_14, pairs_of_limb_vec_var_15,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
-    pairs_of_unsigned_vec_var_14, pairs_of_unsigned_vec_var_15,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural_var_1,
@@ -946,7 +946,7 @@ fn limbs_divisible_by_properties() {
         verify_limbs_divisible_by(ns, ds, divisible);
     });
 
-    test_properties_custom_scale(512, pairs_of_unsigned_vec_var_15, |&(ref ns, ref ds)| {
+    test_properties_custom_scale(512, pairs_of_limb_vec_var_15, |&(ref ns, ref ds)| {
         let mut mut_ns = ns.to_vec();
         let mut mut_ds = ds.to_vec();
         assert!(limbs_divisible_by(&mut mut_ns, &mut mut_ds));
@@ -961,7 +961,7 @@ fn limbs_divisible_by_properties() {
         verify_limbs_divisible_by(ns, ds, true);
     });
 
-    test_properties_custom_scale(512, pairs_of_unsigned_vec_var_14, |&(ref ns, ref ds)| {
+    test_properties_custom_scale(512, pairs_of_limb_vec_var_14, |&(ref ns, ref ds)| {
         let divisible = limbs_divisible_by_ref_ref(ns, ds);
         assert_eq!(limbs_test_zero(&limbs_mod(ns, ds)), divisible);
     });

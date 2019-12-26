@@ -23,22 +23,26 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// divisor must be odd. //TODO test
+pub fn limbs_limb_mod_exact_odd_limb(limb: Limb, divisor: Limb, carry: Limb) -> Limb {
+    if limb > carry {
+        let result = (limb - carry) % divisor;
+        if result == 0 {
+            0
+        } else {
+            divisor - result
+        }
+    } else {
+        (carry - limb) % divisor
+    }
+}
+
+/// divisor must be odd. //TODO test
 ///
 /// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
-pub(crate) fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
+pub fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
     let len = limbs.len();
     if len == 1 {
-        let limb = limbs[0];
-        return if limb > carry {
-            let result = (limb - carry) % divisor;
-            if result == 0 {
-                0
-            } else {
-                divisor - result
-            }
-        } else {
-            (carry - limb) % divisor
-        };
+        return limbs_limb_mod_exact_odd_limb(limbs[0], divisor, carry);
     }
     let inverse = limbs_modular_invert_limb(divisor);
     let divisor_double = DoubleLimb::from(divisor);

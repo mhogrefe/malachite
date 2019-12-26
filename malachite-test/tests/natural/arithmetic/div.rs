@@ -27,10 +27,10 @@ use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     quadruples_of_limb_vec_limb_vec_limb_and_limb_var_3,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, triples_of_limb_vec_limb_and_limb_var_1,
+    quadruples_of_three_limb_vecs_and_limb_var_1, quadruples_of_three_limb_vecs_and_limb_var_2,
+    triples_of_limb_vec_limb_and_limb_var_1, triples_of_limb_vec_var_41,
+    triples_of_limb_vec_var_42, triples_of_limb_vec_var_43,
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
-    triples_of_unsigned_vec_var_41, triples_of_unsigned_vec_var_42, triples_of_unsigned_vec_var_43,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -10965,7 +10965,7 @@ fn limbs_div_divisor_of_limb_max_with_carry_in_place_properties() {
 #[test]
 fn limbs_div_schoolbook_properties() {
     test_properties(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+        quadruples_of_three_limb_vecs_and_limb_var_1,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
@@ -10978,7 +10978,7 @@ fn limbs_div_schoolbook_properties() {
 #[test]
 fn limbs_div_divide_and_conquer_properties() {
     test_properties(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
+        quadruples_of_three_limb_vecs_and_limb_var_2,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
@@ -10992,7 +10992,7 @@ fn limbs_div_divide_and_conquer_properties() {
 fn limbs_div_barrett_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_42,
+        triples_of_limb_vec_var_42,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
@@ -11005,7 +11005,7 @@ fn limbs_div_barrett_properties() {
 #[test]
 fn limbs_div_schoolbook_approx_properties() {
     test_properties(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
+        quadruples_of_three_limb_vecs_and_limb_var_1,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
@@ -11019,7 +11019,7 @@ fn limbs_div_schoolbook_approx_properties() {
 fn limbs_div_divide_and_conquer_approx_properties() {
     test_properties_custom_scale(
         128,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
+        quadruples_of_three_limb_vecs_and_limb_var_2,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
@@ -11033,7 +11033,7 @@ fn limbs_div_divide_and_conquer_approx_properties() {
 fn limbs_div_barrett_approx_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_41,
+        triples_of_limb_vec_var_41,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
@@ -11047,7 +11047,7 @@ fn limbs_div_barrett_approx_properties() {
 fn limbs_div_to_out_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_43,
+        triples_of_limb_vec_var_43,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             limbs_div_to_out_ref_ref(&mut qs, ns, ds);

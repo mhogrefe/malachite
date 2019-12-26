@@ -19,8 +19,9 @@ use rug;
 use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_limb_vec_and_limb_var_1, pairs_of_limb_vec_and_positive_limb_var_1, pairs_of_signeds,
-    pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_6, triples_of_limb_vec_var_8,
+    pairs_of_signeds, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_vec_and_unsigned_var_2, pairs_of_unsigned_vec_var_6,
+    triples_of_limb_vec_var_6, triples_of_limb_vec_var_8,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
@@ -612,12 +613,15 @@ fn test_or() {
 
 #[test]
 fn limbs_neg_or_limb_properties() {
-    test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        assert_eq!(
-            -Natural::from_owned_limbs_asc(limbs_neg_or_limb(limbs, limb)),
-            -Natural::from_limbs_asc(limbs) | Integer::from(limb)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_unsigned_var_2,
+        |&(ref limbs, limb)| {
+            assert_eq!(
+                -Natural::from_owned_limbs_asc(limbs_neg_or_limb(limbs, limb)),
+                -Natural::from_limbs_asc(limbs) | Integer::from(limb)
+            );
+        },
+    );
 }
 
 #[test]
@@ -640,21 +644,24 @@ fn limbs_neg_or_limb_to_out_properties() {
 
 #[test]
 fn limbs_neg_or_limb_in_place_properties() {
-    test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_neg_or_limb_in_place(&mut limbs, limb);
-        assert_eq!(
-            -Natural::from_limbs_asc(&limbs),
-            -Natural::from_limbs_asc(&old_limbs) | Integer::from(limb)
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_unsigned_var_2,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_neg_or_limb_in_place(&mut limbs, limb);
+            assert_eq!(
+                -Natural::from_limbs_asc(&limbs),
+                -Natural::from_limbs_asc(&old_limbs) | Integer::from(limb)
+            );
+        },
+    );
 }
 
 #[test]
 fn limbs_pos_or_neg_limb_properties() {
     test_properties(
-        pairs_of_limb_vec_and_positive_limb_var_1,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, u)| {
             assert_eq!(
                 limbs_pos_or_neg_limb(limbs, u),
@@ -668,7 +675,7 @@ fn limbs_pos_or_neg_limb_properties() {
 #[test]
 fn limbs_neg_or_neg_limb_properties() {
     test_properties(
-        pairs_of_limb_vec_and_positive_limb_var_1,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_1,
         |&(ref limbs, u)| {
             assert_eq!(
                 limbs_neg_or_neg_limb(limbs, u),

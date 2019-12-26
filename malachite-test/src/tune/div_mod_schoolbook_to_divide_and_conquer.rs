@@ -7,7 +7,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
+use inputs::base::quadruples_of_three_limb_vecs_and_limb_var_2;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -17,7 +17,7 @@ pub(crate) fn tune() -> Vec<String> {
         &mut (|(mut qs, mut ns, ds, inverse): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)| {
             _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         }),
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(GenerationMode::Random(512)),
+        quadruples_of_three_limb_vecs_and_limb_var_2(GenerationMode::Random(512)),
         10000,
         &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
     );

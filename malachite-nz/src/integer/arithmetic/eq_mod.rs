@@ -1,11 +1,9 @@
-use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, NegMod, Parity};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo, NegMod};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 
 use integer::Integer;
-use natural::arithmetic::add::limbs_add_to_out;
-use natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
+use natural::arithmetic::add::{limbs_add, limbs_add_limb};
+use natural::arithmetic::divisible_by::{limbs_divisible_by_limb, limbs_divisible_by_val_ref};
 use natural::arithmetic::eq_mod::{limbs_eq_limb_mod_limb, limbs_mod_exact_odd_limb};
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::Natural;
@@ -39,106 +37,217 @@ pub fn limbs_eq_neg_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> 
     limbs_eq_limb_mod_limb(limbs, limb.neg_mod(modulus), modulus)
 }
 
-/// Set r to -n mod d. n >= d is allowed. Can give r > d.
+/// Set r to -n mod d. n >= d is allowed. Can give r > d. d cannot equal 0.
 ///
 /// This is NEG_MOD from gmp-impl.h, where r is returned.
 fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
-    assert_ne!(d, 0);
     if n <= d {
-        // small a is reasonably likely
         d - n
     } else {
-        let twos = d.leading_zeros();
-        let dnorm = d << twos;
-        (if n <= dnorm { dnorm } else { dnorm << 1 }).wrapping_sub(n)
+        let d = d << d.leading_zeros();
+        (if n <= d { d } else { d << 1 }).wrapping_sub(n)
     }
 }
 
-pub fn limbs_pos_eq_mod_neg(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
-    if xs.len() >= ys.len() {
-        limbs_pos_eq_mod_neg_greater(xs, ys, modulus)
-    } else {
-        limbs_pos_eq_mod_neg_greater(ys, xs, modulus)
+/// Interpreting two limbs `x` and `y` and slice of `Limb`s `modulus` as three numbers x, y, and m,
+/// determines whether x === -y mod m.
+///
+/// This function assumes that the input slice has at least two elements, its last element is
+/// nonzero, and `x` and `y` are nonzero.
+///
+/// Time: Worst case O(1)
+///
+/// Additional memory: Worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_limb_eq_neg_limb_mod;
+///
+/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(0xffff_ffff, 0xffff_ffff, &[0xffff_fffe, 1]), true);
+/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(1, 1, &[1, 0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, a and d are
+/// one limb long, and c is longer than one limb.
+pub fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, modulus: &[Limb]) -> bool {
+    // We are checking whether x === -y mod m; that is, whether x + y = k * m for some k in Z. But
+    // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
+    // while the highest possible value of x + y is 2<sup>Limb::WIDTH + 1</sup> - 2, so we have
+    // x + y < 2 * m. This means that k can only be 1, so we're actually checking whether x + y = m.
+    modulus.len() == 2 && modulus[1] == 1 && {
+        let (sum, overflow) = x.overflowing_add(y);
+        overflow && sum == modulus[0]
     }
 }
 
-// ap.len() >= cp.len(), neg case, sign < 0, sign == true, {ap, cp, dp}.len() > 0
-// This is mpz_congruent_p from mpz/cong.c.
-fn limbs_pos_eq_mod_neg_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
+/// three numbers x, y, and m, determines whether x === -y mod m.
+///
+/// This function assumes that each of the two input slices have at least two elements, their last
+/// elements are nonzero, and `y` is nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
+/// slices is zero, or if `y` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod;
+///
+/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[2, 2], 2, &[2, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[0, 1], 1, &[1, 0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, a and d are
+/// longer than one limb, and c is one limb long.
+pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     let m_len = modulus.len();
-    let mut x_len = xs.len();
+    let x_len = xs.len();
+    assert!(m_len > 1);
+    assert!(x_len > 1);
+    assert_ne!(y, 0);
+    assert_ne!(*xs.last().unwrap(), 0);
+    assert_ne!(*modulus.last().unwrap(), 0);
+    let m_0 = modulus[0];
+    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
+    let twos = m_0.trailing_zeros();
+    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos)) {
+        return false;
+    }
+    // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is even
+    // (would involve borrow if x_0, y_0 != 0).
+    if m_len == 2 && m_0 != 0 {
+        let m_1 = modulus[1];
+        if m_1 < 1 << twos {
+            let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
+            let y = quick_neg_mod(y, m_0);
+            return if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
+                //TODO else untested!
+                limbs_mod_limb(xs, m_0) == if y < m_0 { y } else { y % m_0 }
+            } else {
+                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
+                r == 0 || r == m_0
+            };
+        }
+    }
+    // calculate |x - y|. Different signs, add
+    let mut scratch = limbs_add_limb(xs, y);
+    scratch.len() >= m_len && limbs_divisible_by_val_ref(&mut scratch, modulus)
+}
+
+/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
+/// m, determines whether x === -y mod m.
+///
+/// This function assumes that each of the two input slices have at least two elements, their last
+/// elements are nonzero, and `modulus` is nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
+/// is zero, or if `modulus` is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_limb;
+///
+/// assert_eq!(limbs_pos_eq_neg_mod_limb(&[0, 1], &[6, 1], 2), true);
+/// assert_eq!(limbs_pos_eq_neg_mod_limb(&[0, 1], &[7, 1], 2), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, a and c are
+/// longer than one limb, and m is one limb long.
+pub fn limbs_pos_eq_neg_mod_limb(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+    if xs.len() >= ys.len() {
+        limbs_pos_eq_mod_neg_limb_greater(xs, ys, modulus)
+    } else {
+        limbs_pos_eq_mod_neg_limb_greater(ys, xs, modulus)
+    }
+}
+
+// xs.len() >= ys.len()
+fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+    assert!(xs.len() > 1);
+    assert!(ys.len() > 1);
+    assert_ne!(*xs.last().unwrap(), 0);
+    assert_ne!(*ys.last().unwrap(), 0);
+    assert_ne!(modulus, 0);
+    // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
+    if !xs[0]
+        .wrapping_neg()
+        .eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros()))
+    {
+        return false;
+    }
+    // calculate |x - y|. Different signs, add
+    limbs_divisible_by_limb(&limbs_add(xs, ys), modulus)
+}
+
+/// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
+/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`.
+///
+/// This function assumes that each of the three input slices have at least two elements, and their
+/// last elements are nonzero.
+///
+/// Time: Worst case O(n * log(n) * log(log(n)))
+///
+/// Additional memory: Worst case O(n * log(n))
+///
+/// where n = max(`xs.len()`, `ys.len()`)
+///
+/// # Panics
+/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// of the slices is zero.
+///
+/// # Example
+/// ```
+/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod;
+///
+/// assert_eq!(limbs_pos_eq_neg_mod(&[0, 0, 1], &[0, 1], &[1, 1]), true);
+/// assert_eq!(limbs_pos_eq_neg_mod(&[1, 2], &[3, 4], &[0, 1]), false);
+/// ```
+///
+/// This is mpz_congruent_p from mpz/cong.c, where a and d are positive, c is negative, and each is
+/// longer than one limb.
+pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+    if xs.len() >= ys.len() {
+        limbs_pos_eq_neg_mod_greater(xs, ys, modulus)
+    } else {
+        limbs_pos_eq_neg_mod_greater(ys, xs, modulus)
+    }
+}
+
+// xs.len() >= ys.len()
+fn limbs_pos_eq_neg_mod_greater(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+    let m_len = modulus.len();
+    let x_len = xs.len();
     let y_len = ys.len();
-    assert_ne!(m_len, 0);
-    assert_ne!(x_len, 0);
-    assert_ne!(y_len, 0);
+    assert!(m_len > 1);
+    assert!(x_len > 1);
+    assert!(y_len > 1);
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(*ys.last().unwrap(), 0);
     assert_ne!(*modulus.last().unwrap(), 0);
-    let x_0 = xs[0].wrapping_neg();
-    let mut y_0 = ys[0];
-    let mut m_0 = modulus[0];
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    let dmask = if m_0 == 0 {
-        Limb::MAX
-    } else {
-        (Limb::ONE << m_0.trailing_zeros()).wrapping_sub(1)
-    };
-    if x_0.wrapping_sub(y_0) & dmask != 0 {
+    if !xs[0]
+        .wrapping_neg()
+        .eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+    {
         return false;
     }
-    if y_len == 1 {
-        if m_len == 1 {
-            y_0 = quick_neg_mod(y_0, m_0);
-            if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-                let r = limbs_mod_limb(xs, m_0);
-                if y_0 < m_0 {
-                    return r == y_0;
-                } else {
-                    return r == y_0 % m_0;
-                }
-            }
-            if m_0.even() {
-                // Strip low zero bits to get odd modulus required by `limbs_mod_exact_odd_limb`. If
-                // modulus == e * 2<sup>n</sup> then x == y mod modulus if and only if both
-                // x == y mod e and x == y mod 2<sup>n</sup>, the latter having been done above.
-                let twos = m_0.trailing_zeros();
-                m_0 >>= twos;
-            }
-            let r = limbs_mod_exact_odd_limb(xs, m_0, y_0);
-            return r == 0 || r == m_0;
-        }
-        // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is
-        // even (would involve borrow if x_0, y_0 != 0).
-        if m_len == 2 && m_0 != 0 {
-            let m_1 = modulus[1];
-            if m_1 <= dmask {
-                let twos = m_0.trailing_zeros();
-                m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
-                y_0 = quick_neg_mod(y_0, m_0);
-                if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-                    let r = limbs_mod_limb(xs, m_0);
-                    if y_0 < m_0 {
-                        return r == y_0;
-                    } else {
-                        //TODO untested!
-                        return r == y_0 % m_0;
-                    }
-                }
-                let r = limbs_mod_exact_odd_limb(xs, m_0, y_0);
-                return r == 0 || r == m_0;
-            }
-        }
-    }
-    let mut xp = vec![0; x_len + 1];
     // calculate |x - y|. Different signs, add
-    let carry = limbs_add_to_out(&mut xp, xs, ys);
-    if carry {
-        xp[x_len] = 1;
-        x_len += 1;
-    } else {
-        xp[x_len] = 0;
-    }
-    x_len >= m_len && limbs_divisible_by_val_ref(&mut xp[..x_len], modulus)
+    let mut scratch = limbs_add(xs, ys);
+    scratch.len() >= m_len && limbs_divisible_by_val_ref(&mut scratch, modulus)
 }
 
 impl Natural {

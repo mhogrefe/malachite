@@ -13,7 +13,9 @@ use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_limb_vec_and_positive_limb_var_1, pairs_of_unsigned_vec_var_6};
+use inputs::base::{
+    pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_var_6,
+};
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
@@ -91,7 +93,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize) {
-    for (ref limbs, limb) in pairs_of_limb_vec_and_positive_limb_var_1(gm).take(limit) {
+    for (ref limbs, limb) in pairs_of_unsigned_vec_and_positive_unsigned_var_2(gm).take(limit) {
         println!(
             "limbs_hamming_distance_limb_neg({:?}, {}) = {}",
             limbs,
@@ -127,7 +129,7 @@ fn benchmark_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize, f
     m_run_benchmark(
         "limbs_hamming_distance_limb_neg(&[Limb], Limb)",
         BenchmarkType::Single,
-        pairs_of_limb_vec_and_positive_limb_var_1(gm),
+        pairs_of_unsigned_vec_and_positive_unsigned_var_2(gm),
         gm.name(),
         limit,
         file_name,

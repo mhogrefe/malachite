@@ -5,7 +5,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_39;
+use inputs::base::triples_of_limb_vec_var_39;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -15,7 +15,7 @@ pub(crate) fn tune() -> Vec<String> {
         &mut (|(mut is, ds, mut scratch): (Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
             _limbs_invert_newton_approx(&mut is, &ds, &mut scratch);
         }),
-        triples_of_unsigned_vec_var_39(GenerationMode::Random(2_048)),
+        triples_of_limb_vec_var_39(GenerationMode::Random(2_048)),
         10000,
         &(|&(_, ref ds, _)| ds.len()),
     );

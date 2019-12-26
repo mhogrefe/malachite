@@ -4,17 +4,29 @@ use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::integer::arithmetic::eq_mod::limbs_eq_neg_limb_mod_limb;
+use malachite_nz::integer::arithmetic::eq_mod::{
+    limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_mod,
+    limbs_pos_eq_neg_mod_limb, limbs_pos_limb_eq_neg_limb_mod,
+};
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1;
+use inputs::base::{
+    triples_of_unsigned_unsigned_and_unsigned_vec_var_1,
+    triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
+};
 use inputs::integer::{
     rm_triples_of_integer_integer_and_natural, triples_of_integer_integer_and_natural,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_eq_neg_limb_mod_limb);
+    register_demo!(registry, demo_limbs_pos_limb_eq_neg_limb_mod);
+    register_demo!(registry, demo_limbs_pos_eq_neg_limb_mod);
+    register_demo!(registry, demo_limbs_pos_eq_neg_mod_limb);
+    register_demo!(registry, demo_limbs_pos_eq_neg_mod);
     register_demo!(registry, demo_integer_eq_mod);
     register_demo!(registry, demo_integer_eq_mod_val_val_ref);
     register_demo!(registry, demo_integer_eq_mod_val_ref_val);
@@ -43,6 +55,56 @@ fn demo_limbs_eq_neg_limb_mod_limb(gm: GenerationMode, limit: usize) {
             limb,
             modulus,
             limbs_eq_neg_limb_mod_limb(&limbs, limb, modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_limb_eq_neg_limb_mod(gm: GenerationMode, limit: usize) {
+    for (x, y, modulus) in triples_of_unsigned_unsigned_and_unsigned_vec_var_1(gm).take(limit) {
+        println!(
+            "limbs_pos_limb_eq_neg_limb_mod({}, {}, {:?}) = {}",
+            x,
+            y,
+            modulus,
+            limbs_pos_limb_eq_neg_limb_mod(x, y, &modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_eq_neg_limb_mod(gm: GenerationMode, limit: usize) {
+    for (xs, y, modulus) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
+    {
+        println!(
+            "limbs_pos_eq_neg_limb_mod({:?}, {}, {:?}) = {}",
+            xs,
+            y,
+            modulus,
+            limbs_pos_eq_neg_limb_mod(&xs, y, &modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_eq_neg_mod_limb(gm: GenerationMode, limit: usize) {
+    for (xs, ys, modulus) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit)
+    {
+        println!(
+            "limbs_pos_eq_neg_mod_limb({:?}, {:?}, {}) = {}",
+            xs,
+            ys,
+            modulus,
+            limbs_pos_eq_neg_mod_limb(&xs, &ys, modulus)
+        );
+    }
+}
+
+fn demo_limbs_pos_eq_neg_mod(gm: GenerationMode, limit: usize) {
+    for (xs, ys, modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+        println!(
+            "limbs_pos_eq_neg_mod({:?}, {:?}, {:?}) = {}",
+            xs,
+            ys,
+            modulus,
+            limbs_pos_eq_neg_mod(&xs, &ys, &modulus)
         );
     }
 }

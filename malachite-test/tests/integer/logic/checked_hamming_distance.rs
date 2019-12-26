@@ -12,7 +12,7 @@ use rug;
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_limb_vec_and_positive_limb_var_1, pairs_of_unsigned_vec_var_6,
+    pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_var_6,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_natural_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
@@ -126,7 +126,7 @@ fn test_checked_hamming_distance() {
 #[test]
 fn limbs_hamming_distance_limb_neg_properties() {
     test_properties(
-        pairs_of_limb_vec_and_positive_limb_var_1,
+        pairs_of_unsigned_vec_and_positive_unsigned_var_2,
         |&(ref limbs, limb)| {
             assert_eq!(
                 Some(limbs_hamming_distance_limb_neg(limbs, limb)),

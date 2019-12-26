@@ -8,7 +8,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_40;
+use inputs::base::triples_of_limb_vec_var_40;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -34,7 +34,7 @@ pub(crate) fn tune() -> Vec<String> {
             _limbs_div_mod_barrett(&mut qs, &mut rs, &ns[..q_len_2], &ds[..q_len], &mut scratch);
             ns[..q_len].copy_from_slice(&rs[..q_len]);
         }),
-        triples_of_unsigned_vec_var_40(GenerationMode::Random(4_096)),
+        triples_of_limb_vec_var_40(GenerationMode::Random(4_096)),
         10000,
         &(|&(_, ref ns, ref ds)| ns.len() - ds.len()),
     );

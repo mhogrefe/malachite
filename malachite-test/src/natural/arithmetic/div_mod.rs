@@ -23,14 +23,13 @@ use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_9,
-    pairs_of_unsigneds_var_2, quadruples_of_three_unsigned_vecs_and_unsigned_var_1,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_2, quadruples_of_unsigned_vec_var_1,
-    quadruples_of_unsigned_vec_var_2, quadruples_of_unsigned_vec_var_3,
-    sextuples_of_four_limb_vecs_and_two_usizes_var_1, sextuples_of_limbs_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
-    triples_of_unsigned_vec_var_37, triples_of_unsigned_vec_var_38, triples_of_unsigned_vec_var_39,
-    triples_of_unsigned_vec_var_40, unsigneds_var_1,
+    pairs_of_limb_vec_var_9, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigneds_var_2, quadruples_of_limb_vec_var_1, quadruples_of_limb_vec_var_2,
+    quadruples_of_limb_vec_var_3, quadruples_of_three_limb_vecs_and_limb_var_1,
+    quadruples_of_three_limb_vecs_and_limb_var_2, sextuples_of_four_limb_vecs_and_two_usizes_var_1,
+    sextuples_of_limbs_var_1, triples_of_limb_vec_var_38, triples_of_limb_vec_var_39,
+    triples_of_limb_vec_var_40, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_var_37, unsigneds_var_1,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -265,7 +264,7 @@ fn demo_limbs_div_mod_by_two_limb_normalized(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
     for (mut qs, mut ns, ds, inverse) in
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm).take(limit)
+        quadruples_of_three_limb_vecs_and_limb_var_1(gm).take(limit)
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
@@ -280,7 +279,7 @@ fn demo_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
 
 fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
     for (mut qs, mut ns, ds, inverse) in
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm).take(limit)
+        quadruples_of_three_limb_vecs_and_limb_var_2(gm).take(limit)
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
@@ -295,7 +294,7 @@ fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize) {
-    for (mut is, ds, mut scratch) in triples_of_unsigned_vec_var_38(gm).take(limit) {
+    for (mut is, ds, mut scratch) in triples_of_limb_vec_var_38(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
         let result_definitely_exact = _limbs_invert_basecase_approx(&mut is, &ds, &mut scratch);
@@ -309,7 +308,7 @@ fn demo_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_invert_newton_approx(gm: GenerationMode, limit: usize) {
-    for (mut is, ds, mut scratch) in triples_of_unsigned_vec_var_39(gm).take(limit) {
+    for (mut is, ds, mut scratch) in triples_of_limb_vec_var_39(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
         let result_definitely_exact = _limbs_invert_newton_approx(&mut is, &ds, &mut scratch);
@@ -323,7 +322,7 @@ fn demo_limbs_invert_newton_approx(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_invert_approx(gm: GenerationMode, limit: usize) {
-    for (mut is, ds, mut scratch) in triples_of_unsigned_vec_var_38(gm).take(limit) {
+    for (mut is, ds, mut scratch) in triples_of_limb_vec_var_38(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
         let result_definitely_exact = _limbs_invert_approx(&mut is, &ds, &mut scratch);
@@ -337,7 +336,7 @@ fn demo_limbs_invert_approx(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_mod_barrett(gm: GenerationMode, limit: usize) {
-    for (mut qs, mut rs, ns, ds) in quadruples_of_unsigned_vec_var_1(gm).take(limit) {
+    for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_1(gm).take(limit) {
         let old_qs = qs.clone();
         let old_rs = rs.clone();
         let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
@@ -351,7 +350,7 @@ fn demo_limbs_div_mod_barrett(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_mod(gm: GenerationMode, limit: usize) {
-    for (ns, ds) in pairs_of_unsigned_vec_var_9(gm).take(limit) {
+    for (ns, ds) in pairs_of_limb_vec_var_9(gm).take(limit) {
         println!(
             "limbs_div_mod({:?}, {:?}) = {:?}",
             ns,
@@ -362,7 +361,7 @@ fn demo_limbs_div_mod(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_mod_to_out(gm: GenerationMode, limit: usize) {
-    for (mut qs, mut rs, ns, ds) in quadruples_of_unsigned_vec_var_2(gm).take(limit) {
+    for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_2(gm).take(limit) {
         let old_qs = qs.clone();
         let old_rs = rs.clone();
         limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds);
@@ -677,7 +676,7 @@ fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_nam
     m_run_benchmark(
         "_limbs_div_mod_schoolbook(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_1(gm),
+        quadruples_of_three_limb_vecs_and_limb_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -700,7 +699,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
     m_run_benchmark(
         "_limbs_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(gm.with_scale(512)),
+        quadruples_of_three_limb_vecs_and_limb_var_2(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,
@@ -729,7 +728,7 @@ fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file
     m_run_benchmark(
         "_limbs_invert_basecase_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_var_38(gm),
+        triples_of_limb_vec_var_38(gm),
         gm.name(),
         limit,
         file_name,
@@ -752,7 +751,7 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
     m_run_benchmark(
         "_limbs_invert_newton_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_39(gm.with_scale(2_048)),
+        triples_of_limb_vec_var_39(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
@@ -779,7 +778,7 @@ fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, fi
     m_run_benchmark(
         "_limbs_invert_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_38(gm.with_scale(2_048)),
+        triples_of_limb_vec_var_38(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
@@ -806,7 +805,7 @@ fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: 
     m_run_benchmark(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Single,
-        quadruples_of_unsigned_vec_var_1(gm),
+        quadruples_of_limb_vec_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -836,7 +835,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
     m_run_benchmark(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_40(gm.with_scale(4_096)),
+        triples_of_limb_vec_var_40(gm.with_scale(4_096)),
         gm.name(),
         limit,
         file_name,
@@ -928,7 +927,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
     m_run_benchmark(
         "_limbs_div_mod_barrett_helper(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        quadruples_of_unsigned_vec_var_3(gm.with_scale(2_048)),
+        quadruples_of_limb_vec_var_3(gm.with_scale(2_048)),
         gm.name(),
         limit,
         file_name,
@@ -973,7 +972,7 @@ fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "limbs_div_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_var_9(gm),
+        pairs_of_limb_vec_var_9(gm),
         gm.name(),
         limit,
         file_name,
@@ -990,7 +989,7 @@ fn benchmark_limbs_div_mod_to_out(gm: GenerationMode, limit: usize, file_name: &
     m_run_benchmark(
         "limbs_div_mod_to_out(&mut [Limb], &mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
-        quadruples_of_unsigned_vec_var_2(gm),
+        quadruples_of_limb_vec_var_2(gm),
         gm.name(),
         limit,
         file_name,

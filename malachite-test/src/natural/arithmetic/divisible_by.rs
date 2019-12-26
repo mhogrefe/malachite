@@ -13,8 +13,8 @@ use num::{BigUint, Integer, Zero as NumZero};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
-    pairs_of_unsigned_vec_var_14,
+    pairs_of_limb_vec_var_14, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_unsigned_vec_var_13,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 
@@ -190,7 +190,7 @@ fn benchmark_limbs_divisible_by_algorithms(gm: GenerationMode, limit: usize, fil
     m_run_benchmark(
         "limbs_divisible_by(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
-        pairs_of_unsigned_vec_var_14(gm.with_scale(512)),
+        pairs_of_limb_vec_var_14(gm.with_scale(512)),
         gm.name(),
         limit,
         file_name,

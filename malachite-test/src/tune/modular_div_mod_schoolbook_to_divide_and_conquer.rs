@@ -5,7 +5,7 @@ use malachite_nz::natural::arithmetic::div_exact::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_5;
+use inputs::base::quadruples_of_three_limb_vecs_and_limb_var_5;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -19,7 +19,7 @@ pub(crate) fn tune() -> Vec<String> {
                 &mut qs, &mut ns, &ds, inverse
             ))
         }),
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_5(GenerationMode::Random(512)),
+        quadruples_of_three_limb_vecs_and_limb_var_5(GenerationMode::Random(512)),
         10000,
         &(|&(_, _, ref ds, _)| ds.len()),
     );

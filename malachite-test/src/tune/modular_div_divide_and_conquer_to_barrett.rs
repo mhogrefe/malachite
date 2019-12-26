@@ -7,7 +7,7 @@ use malachite_nz::natural::arithmetic::div_exact::{
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_50;
+use inputs::base::triples_of_limb_vec_var_50;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -19,7 +19,7 @@ pub(crate) fn tune() -> Vec<String> {
             let mut scratch = vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
             _limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
         }),
-        triples_of_unsigned_vec_var_50(GenerationMode::Random(2_048)),
+        triples_of_limb_vec_var_50(GenerationMode::Random(2_048)),
         10000,
         &(|&(_, ref ns, _)| ns.len()),
     );

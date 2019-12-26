@@ -28,13 +28,12 @@ use malachite_test::common::{
 };
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
-    pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
+    pairs_of_limb_vec_var_9, pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_10,
-    pairs_of_unsigned_vec_var_9, quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
-    quadruples_of_unsigned_vec_var_1, sextuples_of_limbs_var_1,
-    triples_of_two_unsigned_vecs_and_unsigned_var_1, triples_of_unsigned_vec_var_45,
+    quadruples_of_limb_vec_var_1, quadruples_of_three_limb_vecs_and_limb_var_2,
+    sextuples_of_limbs_var_1, triples_of_limb_vec_var_45, triples_of_two_limb_vecs_and_limb_var_1,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_1,
@@ -10360,7 +10359,7 @@ fn limbs_mod_by_two_limb_normalized_properties() {
 #[test]
 fn limbs_mod_schoolbook_properties() {
     test_properties(
-        triples_of_two_unsigned_vecs_and_unsigned_var_1,
+        triples_of_two_limb_vecs_and_limb_var_1,
         |(ref ns_in, ref ds, inverse)| {
             let mut ns = ns_in.clone();
             _limbs_mod_schoolbook(&mut ns, ds, *inverse);
@@ -10373,7 +10372,7 @@ fn limbs_mod_schoolbook_properties() {
 fn limbs_mod_divide_and_conquer_properties() {
     test_properties_custom_scale(
         128,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2,
+        quadruples_of_three_limb_vecs_and_limb_var_2,
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
@@ -10387,7 +10386,7 @@ fn limbs_mod_divide_and_conquer_properties() {
 fn limbs_mod_barrett_properties() {
     test_properties_custom_scale(
         512,
-        quadruples_of_unsigned_vec_var_1,
+        quadruples_of_limb_vec_var_1,
         |(ref qs_in, ref rs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut rs = rs_in.clone();
@@ -10400,7 +10399,7 @@ fn limbs_mod_barrett_properties() {
 
 #[test]
 fn limbs_mod_properties() {
-    test_properties_custom_scale(512, pairs_of_unsigned_vec_var_9, |(ref ns, ref ds)| {
+    test_properties_custom_scale(512, pairs_of_limb_vec_var_9, |(ref ns, ref ds)| {
         verify_limbs_mod_3(ns, ds, &limbs_mod(ns, ds));
     });
 }
@@ -10409,7 +10408,7 @@ fn limbs_mod_properties() {
 fn limbs_mod_to_out_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_45,
+        triples_of_limb_vec_var_45,
         |(ref rs_in, ref ns, ref ds)| {
             let mut rs = rs_in.clone();
             limbs_mod_to_out(&mut rs, ns, ds);

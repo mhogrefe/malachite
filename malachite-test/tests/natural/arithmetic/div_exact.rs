@@ -28,13 +28,12 @@ use malachite_nz::platform::Limb;
 use malachite_test::common::{natural_to_rug_integer, rug_integer_to_natural};
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
-    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_unsigned_vec_var_12,
-    pairs_of_unsigned_vec_var_8, quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
-    quadruples_of_three_unsigned_vecs_and_unsigned_var_6, quadruples_of_unsigned_vec_var_4,
-    triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_unsigned_vec_var_50,
-    triples_of_unsigned_vec_var_51, triples_of_unsigned_vec_var_53, vecs_of_unsigned_var_5,
+    odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_8,
+    pairs_of_unsigned_vec_var_12, quadruples_of_limb_vec_var_4,
+    quadruples_of_three_limb_vecs_and_limb_var_3, quadruples_of_three_limb_vecs_and_limb_var_4,
+    quadruples_of_three_limb_vecs_and_limb_var_5, quadruples_of_three_limb_vecs_and_limb_var_6,
+    triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_limb_vec_var_50,
+    triples_of_limb_vec_var_51, triples_of_limb_vec_var_53, vecs_of_limb_var_5,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural_var_1, positive_naturals,
@@ -7983,7 +7982,7 @@ fn limbs_div_exact_limb_in_place_properties() {
 
 #[test]
 fn limbs_div_exact_3_properties() {
-    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+    test_properties(vecs_of_limb_var_5, |ref limbs| {
         let quotient_limbs = Natural::from_owned_limbs_asc(limbs_div_exact_3(limbs));
         assert_eq!(
             Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, 3)),
@@ -7998,7 +7997,7 @@ fn limbs_div_exact_3_properties() {
 
 #[test]
 fn limbs_div_exact_3_to_out_properties() {
-    test_properties(pairs_of_unsigned_vec_var_8, |&(ref out, ref in_limbs)| {
+    test_properties(pairs_of_limb_vec_var_8, |&(ref out, ref in_limbs)| {
         let mut out = out.to_vec();
         let old_out = out.clone();
         limbs_div_exact_3_to_out(&mut out, in_limbs);
@@ -8021,7 +8020,7 @@ fn limbs_div_exact_3_to_out_properties() {
 
 #[test]
 fn limbs_div_exact_3_in_place_properties() {
-    test_properties(vecs_of_unsigned_var_5, |ref limbs| {
+    test_properties(vecs_of_limb_var_5, |ref limbs| {
         let old_limbs = limbs;
         let mut limbs = old_limbs.to_vec();
         limbs_div_exact_3_in_place(&mut limbs);
@@ -8054,7 +8053,7 @@ fn limbs_modular_invert_properties() {
 #[test]
 fn limbs_modular_div_mod_schoolbook_properties() {
     test_properties(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_4,
+        quadruples_of_three_limb_vecs_and_limb_var_4,
         |&(ref qs, ref ns, ref ds, inverse)| {
             let ns_old = ns;
             let mut qs = qs.to_vec();
@@ -8070,7 +8069,7 @@ fn limbs_modular_div_mod_schoolbook_properties() {
 fn limbs_modular_div_mod_divide_and_conquer_properties() {
     test_properties_custom_scale(
         128,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_5,
+        quadruples_of_three_limb_vecs_and_limb_var_5,
         |&(ref qs, ref ns, ref ds, inverse)| {
             let ns_old = ns;
             let mut qs = qs.to_vec();
@@ -8086,7 +8085,7 @@ fn limbs_modular_div_mod_divide_and_conquer_properties() {
 fn limbs_modular_div_mod_barrett_properties() {
     test_properties_custom_scale(
         512,
-        quadruples_of_unsigned_vec_var_4,
+        quadruples_of_limb_vec_var_4,
         |&(ref qs, ref rs, ref ns, ref ds)| {
             let mut qs = qs.to_vec();
             let mut rs = rs.to_vec();
@@ -8102,7 +8101,7 @@ fn limbs_modular_div_mod_barrett_properties() {
 #[test]
 fn limbs_modular_div_schoolbook_properties() {
     test_properties(
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_3,
+        quadruples_of_three_limb_vecs_and_limb_var_3,
         |&(ref qs, ref ns, ref ds, inverse)| {
             let ns_old = ns;
             let mut qs = qs.to_vec();
@@ -8117,7 +8116,7 @@ fn limbs_modular_div_schoolbook_properties() {
 fn limbs_modular_div_divide_and_conquer_properties() {
     test_properties_custom_scale(
         512,
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_6,
+        quadruples_of_three_limb_vecs_and_limb_var_6,
         |&(ref qs, ref ns, ref ds, inverse)| {
             let ns_old = ns;
             let mut qs = qs.to_vec();
@@ -8132,7 +8131,7 @@ fn limbs_modular_div_divide_and_conquer_properties() {
 fn limbs_modular_div_barrett_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_50,
+        triples_of_limb_vec_var_50,
         |&(ref qs, ref ns, ref ds)| {
             let mut qs = qs.to_vec();
             let mut scratch = vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
@@ -8146,7 +8145,7 @@ fn limbs_modular_div_barrett_properties() {
 fn limbs_modular_div_properties() {
     test_properties_custom_scale(
         512,
-        triples_of_unsigned_vec_var_51,
+        triples_of_limb_vec_var_51,
         |&(ref qs, ref ns, ref ds)| {
             let qs_old = qs;
             let mut qs = qs_old.to_vec();
@@ -8167,37 +8166,34 @@ fn limbs_modular_div_properties() {
 
 #[test]
 fn limbs_div_exact_properties() {
-    test_properties(
-        triples_of_unsigned_vec_var_53,
-        |&(ref qs, ref ns, ref ds)| {
-            let qs_old = qs;
-            let mut qs = qs_old.to_vec();
-            let mut mut_ns = ns.to_vec();
-            let mut mut_ds = ds.to_vec();
-            limbs_div_exact_to_out(&mut qs, &mut mut_ns, &mut mut_ds);
-            let result = qs;
+    test_properties(triples_of_limb_vec_var_53, |&(ref qs, ref ns, ref ds)| {
+        let qs_old = qs;
+        let mut qs = qs_old.to_vec();
+        let mut mut_ns = ns.to_vec();
+        let mut mut_ds = ds.to_vec();
+        limbs_div_exact_to_out(&mut qs, &mut mut_ns, &mut mut_ds);
+        let result = qs;
 
-            let mut qs = qs_old.to_vec();
-            let mut mut_ns = ns.to_vec();
-            limbs_div_exact_to_out_val_ref(&mut qs, &mut mut_ns, ds);
-            assert_eq!(qs, result);
+        let mut qs = qs_old.to_vec();
+        let mut mut_ns = ns.to_vec();
+        limbs_div_exact_to_out_val_ref(&mut qs, &mut mut_ns, ds);
+        assert_eq!(qs, result);
 
-            let mut qs = qs_old.to_vec();
-            let mut mut_ds = ds.to_vec();
-            limbs_div_exact_to_out_ref_val(&mut qs, ns, &mut mut_ds);
-            assert_eq!(qs, result);
+        let mut qs = qs_old.to_vec();
+        let mut mut_ds = ds.to_vec();
+        limbs_div_exact_to_out_ref_val(&mut qs, ns, &mut mut_ds);
+        assert_eq!(qs, result);
 
-            let mut qs = qs_old.to_vec();
-            limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
-            assert_eq!(qs, result);
+        let mut qs = qs_old.to_vec();
+        limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
+        assert_eq!(qs, result);
 
-            let q_len = ns.len() - ds.len() + 1;
-            let qs = limbs_div_exact(ns, ds);
-            assert_eq!(qs, &result[..q_len]);
+        let q_len = ns.len() - ds.len() + 1;
+        let qs = limbs_div_exact(ns, ds);
+        assert_eq!(qs, &result[..q_len]);
 
-            verify_limbs_div_exact(ns, ds, &qs[..q_len]);
-        },
-    );
+        verify_limbs_div_exact(ns, ds, &qs[..q_len]);
+    });
 }
 
 #[test]

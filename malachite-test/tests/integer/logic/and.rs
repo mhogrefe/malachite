@@ -22,9 +22,9 @@ use rug;
 use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
-    pairs_of_limb_vec_and_limb_var_1, pairs_of_nonempty_unsigned_vec_and_unsigned,
-    pairs_of_signeds, pairs_of_unsigned_vec_var_6, pairs_of_unsigned_vec_var_7,
-    triples_of_limb_vec_var_5, triples_of_limb_vec_var_7,
+    pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_signeds,
+    pairs_of_unsigned_vec_and_unsigned_var_2, pairs_of_unsigned_vec_var_6,
+    pairs_of_unsigned_vec_var_7, triples_of_limb_vec_var_5, triples_of_limb_vec_var_7,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
@@ -860,15 +860,18 @@ fn limbs_pos_and_limb_neg_in_place_properties() {
 
 #[test]
 fn limbs_neg_and_limb_neg_properties() {
-    test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        let out = limbs_neg_and_limb_neg(limbs, limb);
-        let n = -Natural::from_limbs_asc(limbs)
-            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(out),
-            Natural::checked_from(-n).unwrap()
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_unsigned_var_2,
+        |&(ref limbs, limb)| {
+            let out = limbs_neg_and_limb_neg(limbs, limb);
+            let n = -Natural::from_limbs_asc(limbs)
+                & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(out),
+                Natural::checked_from(-n).unwrap()
+            );
+        },
+    );
 }
 
 #[test]
@@ -893,30 +896,36 @@ fn limbs_neg_and_limb_neg_to_out_properties() {
 
 #[test]
 fn limbs_slice_neg_and_limb_neg_in_place_properties() {
-    test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        let mut limbs = limbs.to_vec();
-        let old_limbs = limbs.clone();
-        limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb);
-        let n = -Natural::from_limbs_asc(&old_limbs)
-            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-        let mut expected_limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
-        expected_limbs.resize(limbs.len(), 0);
-        assert_eq!(limbs, expected_limbs);
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_unsigned_var_2,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            let old_limbs = limbs.clone();
+            limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb);
+            let n = -Natural::from_limbs_asc(&old_limbs)
+                & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
+            let mut expected_limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
+            expected_limbs.resize(limbs.len(), 0);
+            assert_eq!(limbs, expected_limbs);
+        },
+    );
 }
 
 #[test]
 fn limbs_vec_neg_and_limb_neg_in_place_properties() {
-    test_properties(pairs_of_limb_vec_and_limb_var_1, |&(ref limbs, limb)| {
-        let mut limbs = limbs.to_vec();
-        limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
-        let n = -Natural::from_limbs_asc(&limbs)
-            & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-        assert_eq!(
-            Natural::from_owned_limbs_asc(limbs),
-            Natural::checked_from(-n).unwrap()
-        );
-    });
+    test_properties(
+        pairs_of_unsigned_vec_and_unsigned_var_2,
+        |&(ref limbs, limb)| {
+            let mut limbs = limbs.to_vec();
+            limbs_vec_neg_and_limb_neg_in_place(&mut limbs, limb);
+            let n = -Natural::from_limbs_asc(&limbs)
+                & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(limbs),
+                Natural::checked_from(-n).unwrap()
+            );
+        },
+    );
 }
 
 #[test]

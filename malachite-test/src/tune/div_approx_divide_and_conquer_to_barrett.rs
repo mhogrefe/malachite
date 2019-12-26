@@ -7,7 +7,7 @@ use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::platform::Limb;
 
 use common::GenerationMode;
-use inputs::base::quadruples_of_three_unsigned_vecs_and_unsigned_var_2;
+use inputs::base::quadruples_of_three_limb_vecs_and_limb_var_2;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(
@@ -19,7 +19,7 @@ pub(crate) fn tune() -> Vec<String> {
             let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
             _limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch);
         }),
-        quadruples_of_three_unsigned_vecs_and_unsigned_var_2(GenerationMode::Random(2_048)),
+        quadruples_of_three_limb_vecs_and_limb_var_2(GenerationMode::Random(2_048)),
         10000,
         &(|&(_, ref ns, ref ds, _)| ns.len() - ds.len()),
     );
