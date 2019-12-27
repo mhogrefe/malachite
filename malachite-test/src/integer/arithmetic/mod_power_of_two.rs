@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     RemPowerOfTwo, RemPowerOfTwoAssign,
 };
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::pairs_of_integer_and_small_unsigned;
@@ -151,7 +151,7 @@ fn benchmark_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",
@@ -172,7 +172,7 @@ fn benchmark_integer_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [
             (
@@ -195,7 +195,7 @@ fn benchmark_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",
@@ -216,7 +216,7 @@ fn benchmark_integer_rem_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [
             (
@@ -243,7 +243,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_assign(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",
@@ -264,7 +264,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [
             (

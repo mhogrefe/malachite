@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{DivisibleByPowerOfTwo, ShlRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
@@ -72,7 +72,7 @@ macro_rules! float_impls {
                     let value_negative = value < 0.0;
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
                     let n = Natural::from(mantissa).shl_round(
-                        i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1,
+                        i32::exact_from(exponent) + $f::MIN_EXPONENT - 1,
                         if value_negative { -rm } else { rm },
                     );
                     if value_negative && n != 0 as Limb {
@@ -170,7 +170,7 @@ macro_rules! float_impls {
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
-                    let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
+                    let exponent = i32::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     if exponent >= 0
                         || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
                     {
@@ -226,7 +226,7 @@ macro_rules! float_impls {
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
                     mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
-                    let exponent = i32::checked_from(exponent).unwrap() + $f::MIN_EXPONENT - 1;
+                    let exponent = i32::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     exponent >= 0
                         || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
                 }

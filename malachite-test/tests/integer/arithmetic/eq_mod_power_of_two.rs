@@ -9,7 +9,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
     limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
 };
@@ -169,10 +169,9 @@ fn test_eq_mod_power_of_two() {
         );
         #[cfg(feature = "32_bit_limbs")]
         assert_eq!(
-            rug::Integer::from_str(x).unwrap().is_congruent_2pow(
-                &rug::Integer::from_str(y).unwrap(),
-                Limb::checked_from(pow).unwrap(),
-            ),
+            rug::Integer::from_str(x)
+                .unwrap()
+                .is_congruent_2pow(&rug::Integer::from_str(y).unwrap(), Limb::exact_from(pow),),
             out
         );
     };
@@ -282,10 +281,8 @@ fn eq_mod_power_of_two_properties() {
             let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
             #[cfg(feature = "32_bit_limbs")]
             assert_eq!(
-                integer_to_rug_integer(x).is_congruent_2pow(
-                    &integer_to_rug_integer(y),
-                    Limb::checked_from(pow).unwrap(),
-                ),
+                integer_to_rug_integer(x)
+                    .is_congruent_2pow(&integer_to_rug_integer(y), Limb::exact_from(pow),),
                 eq_mod_power_of_two
             );
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
@@ -302,7 +299,7 @@ fn eq_mod_power_of_two_properties() {
             assert!(x.eq_mod_power_of_two(y, pow));
             #[cfg(feature = "32_bit_limbs")]
             assert!(integer_to_rug_integer(x)
-                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::exact_from(pow)));
             assert!(y.eq_mod_power_of_two(x, pow));
             assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },
@@ -314,7 +311,7 @@ fn eq_mod_power_of_two_properties() {
             assert!(!x.eq_mod_power_of_two(y, pow));
             #[cfg(feature = "32_bit_limbs")]
             assert!(!integer_to_rug_integer(x)
-                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&integer_to_rug_integer(y), Limb::exact_from(pow)));
             assert!(!y.eq_mod_power_of_two(x, pow));
             assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },

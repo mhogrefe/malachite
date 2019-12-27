@@ -4,7 +4,7 @@ use std::str::FromStr;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -113,7 +113,7 @@ fn to_limbs_desc_properties() {
 #[test]
 fn limbs_properties() {
     test_properties(naturals, |n| {
-        let limb_count = usize::checked_from(n.limb_count()).unwrap();
+        let limb_count = usize::exact_from(n.limb_count());
         assert_eq!(n.limbs().size_hint(), (limb_count, Some(limb_count)));
     });
 
@@ -138,7 +138,7 @@ fn limbs_properties() {
     );
 
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, u)| {
-        if u < usize::checked_from(n.limb_count()).unwrap() {
+        if u < usize::exact_from(n.limb_count()) {
             assert_eq!(n.limbs()[u], n.to_limbs_asc()[u]);
         } else {
             assert_eq!(n.limbs()[u], 0);

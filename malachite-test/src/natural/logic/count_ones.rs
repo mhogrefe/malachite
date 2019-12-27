@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
@@ -63,7 +63,7 @@ fn benchmark_natural_count_ones_algorithms(gm: GenerationMode, limit: usize, fil
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.count_ones()))),

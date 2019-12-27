@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::BigInt;
@@ -34,7 +34,7 @@ fn benchmark_integer_from_signed_limb_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&i| usize::checked_from(i.significant_bits()).unwrap()),
+        &(|&i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
             ("malachite", &mut (|i| no_out!(Integer::from(i)))),

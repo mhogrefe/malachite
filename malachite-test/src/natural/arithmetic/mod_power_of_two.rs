@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign,
 };
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_mod_power_of_two_in_place, limbs_neg_mod_power_of_two,
     limbs_neg_mod_power_of_two_in_place,
@@ -214,7 +214,7 @@ fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|&(_, pow)| usize::checked_from(pow).unwrap()),
+        &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
             "malachite",
@@ -231,7 +231,7 @@ fn benchmark_limbs_mod_power_of_two_in_place(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, pow)| usize::checked_from(pow).unwrap()),
+        &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
             "malachite",
@@ -248,7 +248,7 @@ fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_n
         gm.name(),
         limit,
         file_name,
-        &(|&(_, pow)| usize::checked_from(pow).unwrap()),
+        &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
             "malachite",
@@ -269,7 +269,7 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, pow)| usize::checked_from(pow).unwrap()),
+        &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
             "malachite",
@@ -286,7 +286,7 @@ fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
             "malachite",
@@ -307,7 +307,7 @@ fn benchmark_natural_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [
             (
@@ -330,7 +330,7 @@ fn benchmark_natural_rem_power_of_two_assign(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
             "malachite",
@@ -351,7 +351,7 @@ fn benchmark_natural_rem_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [
             (
@@ -378,7 +378,7 @@ fn benchmark_natural_neg_mod_power_of_two_assign(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
             "malachite",
@@ -399,7 +399,7 @@ fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [
             (

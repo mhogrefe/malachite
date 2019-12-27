@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -73,7 +73,7 @@ fn benchmark_integer_to_sign_and_limbs_asc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -100,7 +100,7 @@ fn benchmark_integer_to_sign_and_limbs_desc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

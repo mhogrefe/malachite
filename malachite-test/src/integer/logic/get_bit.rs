@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::platform::Limb;
@@ -62,7 +62,7 @@ fn benchmark_integer_get_bit_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, index))| usize::checked_from(index).unwrap()),
+        &(|&(_, (_, index))| usize::exact_from(index)),
         "index",
         &mut [
             (
@@ -71,7 +71,7 @@ fn benchmark_integer_get_bit_library_comparison(gm: GenerationMode, limit: usize
             ),
             (
                 "rug",
-                &mut (|((n, index), _)| no_out!(n.get_bit(u32::checked_from(index).unwrap()))),
+                &mut (|((n, index), _)| no_out!(n.get_bit(u32::exact_from(index)))),
             ),
         ],
     );

@@ -14,7 +14,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{CheckedFrom, CheckedInto};
+use num::conversion::traits::{ExactFrom, ExactInto};
 
 //TODO docs
 pub trait PrimitiveFloat:
@@ -102,14 +102,14 @@ pub trait PrimitiveFloat:
     fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
         let bits = self.to_bits();
         let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH.into());
-        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).checked_into().unwrap();
+        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
         let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into());
         (mantissa, exponent)
     }
 
     fn adjusted_exponent(self) -> u32 {
         let bits = self.to_bits();
-        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).checked_into().unwrap();
+        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
         exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into())
     }
 
@@ -118,14 +118,12 @@ pub trait PrimitiveFloat:
         exponent: u32,
     ) -> Self {
         Self::from_bits(
-            (Self::UnsignedOfEqualWidth::checked_from(exponent).unwrap() << Self::MANTISSA_WIDTH)
-                + mantissa,
+            (Self::UnsignedOfEqualWidth::exact_from(exponent) << Self::MANTISSA_WIDTH) + mantissa,
         )
     }
 
     fn exponent(self) -> i32 {
-        i32::checked_from(self.adjusted_exponent()).unwrap()
-            - i32::checked_from(Self::MAX_EXPONENT).unwrap()
+        i32::exact_from(self.adjusted_exponent()) - i32::exact_from(Self::MAX_EXPONENT)
     }
 }
 

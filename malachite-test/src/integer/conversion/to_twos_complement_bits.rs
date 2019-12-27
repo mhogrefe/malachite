@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::platform::Limb;
@@ -209,7 +209,7 @@ fn benchmark_integer_to_twos_complement_bits_asc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -237,7 +237,7 @@ fn benchmark_integer_to_twos_complement_bits_desc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -264,7 +264,7 @@ fn benchmark_integer_twos_complement_bits_get_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -275,7 +275,7 @@ fn benchmark_integer_twos_complement_bits_get_algorithms(
                 "Integer.into_twos_complement_bits_asc()[u]",
                 &mut (|(n, u)| {
                     let bits = n.to_twos_complement_bits_asc();
-                    let u = usize::checked_from(u).unwrap();
+                    let u = usize::exact_from(u);
                     if u >= bits.len() {
                         n < 0 as Limb
                     } else {

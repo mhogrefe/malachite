@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use num::bigint::Sign as NumSign;
 use num::BigInt;
@@ -40,7 +40,7 @@ fn benchmark_integer_sign_library_comparison(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.sign()))),

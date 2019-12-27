@@ -1,6 +1,6 @@
 use std::iter::repeat;
 
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::natural::Natural;
@@ -15,7 +15,7 @@ pub fn natural_index_of_next_false_bit_alt(n: &Natural, u: u64) -> Option<u64> {
         .bits()
         .chain(repeat(false))
         .enumerate()
-        .skip(usize::checked_from(u).unwrap())
+        .skip(usize::exact_from(u))
     {
         if !bit {
             return Some(u64::wrapping_from(i));
@@ -86,7 +86,7 @@ fn benchmark_natural_index_of_next_false_bit_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

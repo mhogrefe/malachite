@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
@@ -588,9 +588,7 @@ fn benchmark_natural_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, _)| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
-        }),
+        &(|&(ref x, ref y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
@@ -638,7 +636,7 @@ fn benchmark_natural_eq_mod_library_comparison(gm: GenerationMode, limit: usize,
         limit,
         file_name,
         &(|&(_, (ref x, ref y, _))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
@@ -659,9 +657,7 @@ fn benchmark_natural_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, _)| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
-        }),
+        &(|&(ref x, ref y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (

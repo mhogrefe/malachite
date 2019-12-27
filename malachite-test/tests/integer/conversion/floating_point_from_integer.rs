@@ -2,7 +2,9 @@ use std::str::FromStr;
 
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::Parity;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
+};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -1010,8 +1012,8 @@ macro_rules! float_properties {
             });
 
             test_properties($integers_exactly_equal_to_float, |n| {
-                let f = $f::checked_from(n).unwrap();
-                assert_eq!($f::checked_from(n.clone()).unwrap(), f);
+                let f = $f::exact_from(n);
+                assert_eq!($f::exact_from(n.clone()), f);
                 assert_eq!(f, $f::rounding_from(n, RoundingMode::Exact));
                 assert_eq!(Integer::rounding_from(f, RoundingMode::Exact), *n);
             });

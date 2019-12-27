@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
@@ -220,9 +220,7 @@ fn signed_limb_wrapping_from_integer_properties() {
         assert_eq!(result.wrapping_neg(), SignedLimb::wrapping_from(&-x));
         assert_eq!(
             result,
-            SignedLimb::wrapping_from(
-                Limb::checked_from(&x.mod_power_of_two(Limb::WIDTH.into())).unwrap()
-            )
+            SignedLimb::wrapping_from(Limb::exact_from(&x.mod_power_of_two(Limb::WIDTH.into())))
         );
         assert_eq!(result, SignedLimb::overflowing_from(x).0);
     });

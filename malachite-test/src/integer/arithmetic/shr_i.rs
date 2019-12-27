@@ -1,6 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{
@@ -203,7 +203,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                &(|&(_, other)| usize::exact_from(other.unsigned_abs())),
                 "|other|",
                 &mut [
                     (
@@ -230,7 +230,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
                 "|other|",
                 &mut [(
                     "malachite",
@@ -251,7 +251,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other.unsigned_abs()).unwrap()),
+                &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
                 "|other|",
                 &mut [
                     (
@@ -340,7 +340,7 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other.unsigned_abs()).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
@@ -357,7 +357,7 @@ fn benchmark_integer_shr_i32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other.unsigned_abs()).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),

@@ -4,7 +4,7 @@ use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
@@ -157,7 +157,7 @@ fn limb_wrapping_from_natural_properties() {
         assert_eq!(natural_to_rug_integer(x).to_u32_wrapping(), result);
         assert_eq!(
             result,
-            Limb::checked_from((&x).mod_power_of_two(Limb::WIDTH.into())).unwrap()
+            Limb::exact_from((&x).mod_power_of_two(Limb::WIDTH.into()))
         );
         assert_eq!(result, Limb::overflowing_from(x).0);
     });

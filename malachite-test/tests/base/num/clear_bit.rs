@@ -13,9 +13,9 @@ use malachite_test::inputs::base::{
 
 fn clear_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
-        let mut n = T::checked_from(n).unwrap();
+        let mut n = T::exact_from(n);
         n.clear_bit(index);
-        assert_eq!(n, T::checked_from(out).unwrap());
+        assert_eq!(n, T::exact_from(out));
     };
 
     test(0, 10, 0);
@@ -34,9 +34,9 @@ fn clear_bit_helper_signed<T: PrimitiveSigned>() {
     clear_bit_helper_unsigned::<T>();
 
     let test = |n: i64, index, out: i64| {
-        let mut n = T::checked_from(n).unwrap();
+        let mut n = T::exact_from(n);
         n.clear_bit(index);
-        assert_eq!(n, T::checked_from(out).unwrap());
+        assert_eq!(n, T::exact_from(out));
     };
 
     test(-1, 5, -33);

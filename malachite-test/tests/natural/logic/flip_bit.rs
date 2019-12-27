@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::Natural;
 use rug;
@@ -19,7 +19,7 @@ fn test_flip_bit() {
         assert!(n.is_valid());
 
         let mut n = rug::Integer::from_str(u).unwrap();
-        n.toggle_bit(u32::checked_from(index).unwrap());
+        n.toggle_bit(u32::exact_from(index));
         assert_eq!(n.to_string(), out);
     };
     test("0", 10, "1024");
@@ -44,7 +44,7 @@ fn flip_bit_properties() {
         assert_ne!(result, *n);
 
         let mut rug_n = natural_to_rug_integer(n);
-        rug_n.toggle_bit(u32::checked_from(index).unwrap());
+        rug_n.toggle_bit(u32::exact_from(index));
         assert_eq!(rug_integer_to_natural(&rug_n), result);
 
         let mut mut_result = result.clone();

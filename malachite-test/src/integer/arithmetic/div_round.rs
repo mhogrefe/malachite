@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundAssign};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
 use num::Integer;
@@ -137,7 +137,7 @@ fn benchmark_integer_div_round_assign(gm: GenerationMode, limit: usize, file_nam
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [(
             "malachite",
@@ -158,7 +158,7 @@ fn benchmark_integer_div_round_down_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -182,7 +182,7 @@ fn benchmark_integer_div_round_floor_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, _))| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(_, _, (ref x, _))| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -207,7 +207,7 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, _))| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(_, (ref x, _))| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -231,7 +231,7 @@ fn benchmark_integer_div_round_ceiling_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -258,7 +258,7 @@ fn benchmark_integer_div_round_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -293,7 +293,7 @@ fn benchmark_integer_div_round_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (

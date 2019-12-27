@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::logic::or::{
     limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out, limbs_neg_or_neg_limb,
     limbs_or_neg_neg, limbs_or_neg_neg_in_place_either, limbs_or_neg_neg_to_out, limbs_or_pos_neg,
@@ -717,11 +717,10 @@ fn limbs_slice_or_pos_neg_in_place_left_properties() {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
         if limbs_slice_or_pos_neg_in_place_left(&mut xs, ys) {
-            let mut result_limbs = Natural::checked_from(
+            let mut result_limbs = Natural::exact_from(
                 -(Integer::from(Natural::from_owned_limbs_asc(xs_old))
                     | -Natural::from_limbs_asc(ys)),
             )
-            .unwrap()
             .to_limbs_asc();
             result_limbs.resize(xs.len(), 0);
             assert_eq!(result_limbs, xs);
@@ -778,8 +777,7 @@ fn limbs_or_neg_neg_to_out_properties() {
         limbs_or_neg_neg_to_out(&mut xs, ys, zs);
         let len = min(ys.len(), zs.len());
         let result =
-            Natural::checked_from(-(-Natural::from_limbs_asc(ys) | -Natural::from_limbs_asc(zs)))
-                .unwrap();
+            Natural::exact_from(-(-Natural::from_limbs_asc(ys) | -Natural::from_limbs_asc(zs)));
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(&xs[..len], expected_limbs.as_slice());

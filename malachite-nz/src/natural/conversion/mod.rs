@@ -2,7 +2,7 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use error::ParseIntegerError;
 use natural::InnerNatural::{Large, Small};
@@ -15,7 +15,7 @@ impl Natural {
         assert!(!src.starts_with('-'));
         *self = Natural::ZERO;
         for c in src.chars() {
-            *self *= Natural::from(Limb::checked_from(radix).unwrap());
+            *self *= Natural::from(Limb::exact_from(radix));
             if c >= '0' && c <= '9' {
                 *self += Natural::from(c as Limb - 48);
             }

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use malachite_base::named::Named;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -300,7 +300,7 @@ fn benchmark_wrapping_from_unsigned<T: PrimitiveUnsigned + Rand, U: Named>(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(U::wrapping_from(n))))],
     );
@@ -322,7 +322,7 @@ fn benchmark_wrapping_from_signed<T: PrimitiveSigned + Rand, U: Named>(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(U::wrapping_from(n))))],
     );

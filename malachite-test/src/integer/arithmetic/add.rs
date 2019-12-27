@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -84,7 +84,7 @@ fn benchmark_integer_add_assign_library_comparison(
         limit,
         file_name,
         &(|&(_, (ref x, ref y))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
@@ -106,9 +106,7 @@ fn benchmark_integer_add_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
-        }),
+        &(|&(ref x, ref y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("Integer += Integer", &mut (|(mut x, y)| no_out!(x += y))),
@@ -126,7 +124,7 @@ fn benchmark_integer_add_library_comparison(gm: GenerationMode, limit: usize, fi
         limit,
         file_name,
         &(|&(_, _, (ref x, ref y))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
@@ -145,9 +143,7 @@ fn benchmark_integer_add_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
-        }),
+        &(|&(ref x, ref y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             ("Integer + Integer", &mut (|(x, y)| no_out!(x + y))),

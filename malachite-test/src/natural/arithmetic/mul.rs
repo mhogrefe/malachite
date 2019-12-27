@@ -1,5 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
@@ -1896,9 +1896,7 @@ fn benchmark_natural_mul_assign_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref x, ref y))| {
-            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
-        }),
+        &(|&(_, (ref x, ref y))| usize::exact_from(x.significant_bits() + y.significant_bits())),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x *= y)),
@@ -1919,9 +1917,7 @@ fn benchmark_natural_mul_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| {
-            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
-        }),
+        &(|&(ref x, ref y)| usize::exact_from(x.significant_bits() + y.significant_bits())),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("Natural *= Natural", &mut (|(mut x, y)| no_out!(x *= y))),
@@ -1938,9 +1934,7 @@ fn benchmark_natural_mul_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, ref y))| {
-            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
-        }),
+        &(|&(_, _, (ref x, ref y))| usize::exact_from(x.significant_bits() + y.significant_bits())),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x * y))),
@@ -1958,9 +1952,7 @@ fn benchmark_natural_mul_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y)| {
-            usize::checked_from(x.significant_bits() + y.significant_bits()).unwrap()
-        }),
+        &(|&(ref x, ref y)| usize::exact_from(x.significant_bits() + y.significant_bits())),
         "x.significant_bits() + y.significant_bits()",
         &mut [
             ("Natural * Natural", &mut (|(x, y)| no_out!(x * y))),

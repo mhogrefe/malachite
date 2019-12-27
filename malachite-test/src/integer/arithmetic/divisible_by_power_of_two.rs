@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -43,7 +43,7 @@ fn benchmark_integer_divisible_by_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -53,7 +53,7 @@ fn benchmark_integer_divisible_by_power_of_two_library_comparison(
             (
                 "rug",
                 &mut (|((n, pow), _)| {
-                    n.is_divisible_2pow(u32::checked_from(pow).unwrap());
+                    n.is_divisible_2pow(u32::exact_from(pow));
                 }),
             ),
         ],
@@ -72,7 +72,7 @@ fn benchmark_integer_divisible_by_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

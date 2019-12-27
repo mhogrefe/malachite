@@ -13,7 +13,7 @@ use malachite_test::inputs::base::{
 
 fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out| {
-        assert_eq!(T::checked_from(n).unwrap().get_bit(index), out);
+        assert_eq!(T::exact_from(n).get_bit(index), out);
     };
 
     test(0, 0, false);
@@ -31,7 +31,7 @@ fn get_bit_helper_signed<T: PrimitiveSigned>() {
     get_bit_helper_unsigned::<T>();
 
     let test = |n: i64, index, out| {
-        assert_eq!(T::checked_from(n).unwrap().get_bit(index), out);
+        assert_eq!(T::exact_from(n).get_bit(index), out);
     };
 
     test(-123, 0, true);

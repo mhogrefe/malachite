@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::shr_u::{
     limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
@@ -638,11 +638,11 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
+                    if let Some(shift) = v.checked_add($t::exact_from(Limb::WIDTH)) {
                         assert_eq!(Natural::from(u) >> shift, 0 as Limb);
                     }
 
-                    if v < $t::checked_from(Limb::WIDTH).unwrap() {
+                    if v < $t::exact_from(Limb::WIDTH) {
                         assert_eq!(u >> v, Natural::from(u) >> v);
                     }
                 },
@@ -1315,7 +1315,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_positive_unsigned_and_small_unsigned::<Limb, $t>,
                 |&(u, v)| {
-                    if let Some(shift) = v.checked_add($t::checked_from(Limb::WIDTH).unwrap()) {
+                    if let Some(shift) = v.checked_add($t::exact_from(Limb::WIDTH)) {
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down),
                             0 as Limb);
                         assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor),
@@ -1432,10 +1432,10 @@ tests_and_properties!(
         let n = rug::Integer::from_str(u).unwrap() >> v;
         assert_eq!(n.to_string(), out);
 
-        let n = BigUint::from_str(u).unwrap() >> usize::checked_from(v).unwrap();
+        let n = BigUint::from_str(u).unwrap() >> usize::exact_from(v);
         assert_eq!(n.to_string(), out);
 
-        let n = &BigUint::from_str(u).unwrap() >> usize::checked_from(v).unwrap();
+        let n = &BigUint::from_str(u).unwrap() >> usize::exact_from(v);
         assert_eq!(n.to_string(), out);
     },
     n,
@@ -1446,11 +1446,11 @@ tests_and_properties!(
         assert_eq!(rug_integer_to_natural(&rug_n), shifted);
 
         assert_eq!(
-            biguint_to_natural(&(&natural_to_biguint(n) >> usize::checked_from(u).unwrap())),
+            biguint_to_natural(&(&natural_to_biguint(n) >> usize::exact_from(u))),
             shifted
         );
         assert_eq!(
-            biguint_to_natural(&(natural_to_biguint(n) >> usize::checked_from(u).unwrap())),
+            biguint_to_natural(&(natural_to_biguint(n) >> usize::exact_from(u))),
             shifted
         );
         assert_eq!(

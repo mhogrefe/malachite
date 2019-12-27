@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
 
@@ -43,7 +43,7 @@ fn benchmark_integer_partial_cmp_abs_limb(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
@@ -57,7 +57,7 @@ fn benchmark_limb_partial_cmp_abs_integer(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );

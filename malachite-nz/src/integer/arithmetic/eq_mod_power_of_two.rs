@@ -1,7 +1,7 @@
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use integer::Integer;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
@@ -38,7 +38,7 @@ pub fn limbs_eq_mod_power_of_two_neg_limb(limbs: &[Limb], limb: Limb, pow: u64) 
     if limb == 0 {
         return limbs_divisible_by_power_of_two(limbs, pow);
     }
-    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= limbs.len() {
         false
     } else if i == 0 {
@@ -52,7 +52,7 @@ pub fn limbs_eq_mod_power_of_two_neg_limb(limbs: &[Limb], limb: Limb, pow: u64) 
 
 fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
-    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let small_pow = pow & u64::from(Limb::WIDTH_MASK);
     if i > xs_len || i == xs_len && small_pow != 0 {
         false

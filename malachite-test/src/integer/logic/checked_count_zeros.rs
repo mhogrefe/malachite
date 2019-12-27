@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
@@ -86,7 +86,7 @@ fn benchmark_integer_checked_count_zeros_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.checked_count_zeros()))),

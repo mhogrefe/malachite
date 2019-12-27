@@ -1,5 +1,7 @@
 use malachite_base::named::Named;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
+};
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -152,7 +154,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+                &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
                 "n.significant_bits()",
                 &mut [
                     (
@@ -175,7 +177,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+                &(|ref n| usize::exact_from(n.significant_bits())),
                 "n.significant_bits()",
                 &mut [
                     (
@@ -202,7 +204,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+                &(|ref n| usize::exact_from(n.significant_bits())),
                 "n.significant_bits()",
                 &mut [
                     (
@@ -229,7 +231,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+                &(|ref n| usize::exact_from(n.significant_bits())),
                 "n.significant_bits()",
                 &mut [
                     (

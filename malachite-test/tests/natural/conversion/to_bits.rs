@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -190,7 +190,7 @@ fn to_bits_desc_properties() {
 #[test]
 fn bits_properties() {
     test_properties(naturals, |n| {
-        let significant_bits = usize::checked_from(n.significant_bits()).unwrap();
+        let significant_bits = usize::exact_from(n.significant_bits());
         assert_eq!(
             n.bits().size_hint(),
             (significant_bits, Some(significant_bits))
@@ -219,10 +219,7 @@ fn bits_properties() {
 
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, u)| {
         if u < n.significant_bits() {
-            assert_eq!(
-                n.bits()[u],
-                n.to_bits_asc()[usize::checked_from(u).unwrap()]
-            );
+            assert_eq!(n.bits()[u], n.to_bits_asc()[usize::exact_from(u)]);
         } else {
             assert_eq!(n.bits()[u], false);
         }

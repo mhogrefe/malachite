@@ -1,7 +1,7 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::divisible_by::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
@@ -252,7 +252,7 @@ fn benchmark_natural_divisible_by_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.divisible_by(y)))),
@@ -278,7 +278,7 @@ fn benchmark_natural_divisible_by_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -313,7 +313,7 @@ fn benchmark_natural_divisible_by_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, _))| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(_, _, (ref x, _))| usize::exact_from(x.significant_bits())),
         "y.significant_bits()",
         &mut [
             (

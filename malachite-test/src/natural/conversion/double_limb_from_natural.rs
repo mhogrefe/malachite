@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::DoubleLimb;
@@ -190,7 +190,7 @@ fn benchmark_double_limb_checked_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -217,7 +217,7 @@ fn benchmark_double_limb_checked_from_natural_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(DoubleLimb::checked_from(n)))),
@@ -248,7 +248,7 @@ fn benchmark_double_limb_wrapping_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -275,7 +275,7 @@ fn benchmark_double_limb_wrapping_from_natural_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(DoubleLimb::wrapping_from(n)))),
@@ -301,7 +301,7 @@ fn benchmark_double_limb_saturating_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -328,7 +328,7 @@ fn benchmark_double_limb_overflowing_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -355,7 +355,7 @@ fn benchmark_double_limb_overflowing_from_natural_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -387,7 +387,7 @@ fn benchmark_double_limb_convertible_from_natural_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -414,7 +414,7 @@ fn benchmark_double_limb_convertible_from_natural_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

@@ -1,7 +1,7 @@
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -171,7 +171,7 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
                 }
             } else {
                 if limb != 0 {
-                    self.first_nonzero_index = Some(usize::checked_from(previous_i).unwrap());
+                    self.first_nonzero_index = Some(usize::exact_from(previous_i));
                 }
                 limb.wrapping_neg()
             }

@@ -1,7 +1,7 @@
 use std::cmp::min;
 
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 
@@ -56,7 +56,7 @@ fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, pow)| min(usize::checked_from(pow).unwrap(), limbs.len())),
+        &(|&(ref limbs, pow)| min(usize::exact_from(pow), limbs.len())),
         "min(pow, limbs.len())",
         &mut [(
             "malachite",
@@ -77,7 +77,7 @@ fn benchmark_natural_divisible_by_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -87,7 +87,7 @@ fn benchmark_natural_divisible_by_power_of_two_library_comparison(
             (
                 "rug",
                 &mut (|((n, pow), _)| {
-                    n.is_divisible_2pow(u32::checked_from(pow).unwrap());
+                    n.is_divisible_2pow(u32::exact_from(pow));
                 }),
             ),
         ],
@@ -106,7 +106,7 @@ fn benchmark_natural_divisible_by_power_of_two_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, pow)| usize::checked_from(min(pow, n.significant_bits())).unwrap()),
+        &(|&(ref n, pow)| usize::exact_from(min(pow, n.significant_bits()))),
         "min(pow, n.significant_bits())",
         &mut [
             (

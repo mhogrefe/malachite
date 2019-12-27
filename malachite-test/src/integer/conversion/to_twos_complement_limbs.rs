@@ -1,6 +1,6 @@
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
@@ -304,7 +304,7 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -336,7 +336,7 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -367,7 +367,7 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

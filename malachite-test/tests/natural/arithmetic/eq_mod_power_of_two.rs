@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, EqModPowerOfTwo, ModPowerOfTwo,
 };
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
     limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
 };
@@ -79,10 +79,9 @@ fn test_eq_mod_power_of_two() {
             out
         );
         assert_eq!(
-            rug::Integer::from_str(x).unwrap().is_congruent_2pow(
-                &rug::Integer::from_str(y).unwrap(),
-                u32::checked_from(pow).unwrap(),
-            ),
+            rug::Integer::from_str(x)
+                .unwrap()
+                .is_congruent_2pow(&rug::Integer::from_str(y).unwrap(), u32::exact_from(pow),),
             out
         );
     };
@@ -135,7 +134,7 @@ fn eq_mod_power_of_two_properties() {
             let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
             assert_eq!(
                 natural_to_rug_integer(x)
-                    .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()),
+                    .is_congruent_2pow(&natural_to_rug_integer(y), u32::exact_from(pow)),
                 eq_mod_power_of_two
             );
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
@@ -151,7 +150,7 @@ fn eq_mod_power_of_two_properties() {
         |&(ref x, ref y, pow)| {
             assert!(x.eq_mod_power_of_two(y, pow));
             assert!(natural_to_rug_integer(x)
-                .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&natural_to_rug_integer(y), u32::exact_from(pow)));
             assert!(y.eq_mod_power_of_two(x, pow));
             assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },
@@ -162,7 +161,7 @@ fn eq_mod_power_of_two_properties() {
         |&(ref x, ref y, pow)| {
             assert!(!x.eq_mod_power_of_two(y, pow));
             assert!(!natural_to_rug_integer(x)
-                .is_congruent_2pow(&natural_to_rug_integer(y), u32::checked_from(pow).unwrap()));
+                .is_congruent_2pow(&natural_to_rug_integer(y), u32::exact_from(pow)));
             assert!(!y.eq_mod_power_of_two(x, pow));
             assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
         },

@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -38,7 +38,7 @@ fn benchmark_natural_assign_bit_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, index, _))| usize::checked_from(index).unwrap()),
+        &(|&(_, (_, index, _))| usize::exact_from(index)),
         "index",
         &mut [
             (
@@ -47,9 +47,7 @@ fn benchmark_natural_assign_bit_library_comparison(
             ),
             (
                 "rug",
-                &mut (|((mut n, index, bit), _)| {
-                    no_out!(n.set_bit(u32::checked_from(index).unwrap(), bit))
-                }),
+                &mut (|((mut n, index, bit), _)| no_out!(n.set_bit(u32::exact_from(index), bit))),
             ),
         ],
     );

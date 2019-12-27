@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
+};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -702,7 +704,7 @@ macro_rules! float_properties {
             });
 
             test_properties($floats_exactly_equal_to_integer, |&f| {
-                let n = Integer::checked_from(f).unwrap();
+                let n = Integer::exact_from(f);
                 assert!(n.is_valid());
                 assert_eq!(n, Integer::rounding_from(f, RoundingMode::Exact));
                 assert_eq!($f::rounding_from(n, RoundingMode::Exact), f);

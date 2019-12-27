@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -59,7 +59,7 @@ impl<'a> Iterator for LimbIterator<'a> {
         if self.some_remaining {
             let limb = match *self.n {
                 Natural(Small(small)) => small,
-                Natural(Large(ref limbs)) => limbs[usize::checked_from(self.i).unwrap()],
+                Natural(Large(ref limbs)) => limbs[usize::exact_from(self.i)],
             };
             if self.i == self.j {
                 self.some_remaining = false;
@@ -129,7 +129,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
         if self.some_remaining {
             let limb = match *self.n {
                 Natural(Small(small)) => small,
-                Natural(Large(ref limbs)) => limbs[usize::checked_from(self.j).unwrap()],
+                Natural(Large(ref limbs)) => limbs[usize::exact_from(self.j)],
             };
             if self.j == self.i {
                 self.some_remaining = false;
@@ -378,7 +378,7 @@ impl Natural {
         let limb_count = self.limb_count();
         LimbIterator {
             n: self,
-            limb_count: usize::checked_from(limb_count).unwrap(),
+            limb_count: usize::exact_from(limb_count),
             some_remaining: limb_count != 0,
             i: 0,
             j: limb_count.saturating_sub(1),

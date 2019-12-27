@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::SignedDoubleLimb;
@@ -199,7 +199,7 @@ fn benchmark_signed_double_limb_checked_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -226,7 +226,7 @@ fn benchmark_signed_double_limb_checked_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -260,7 +260,7 @@ fn benchmark_signed_double_limb_wrapping_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -287,7 +287,7 @@ fn benchmark_signed_double_limb_wrapping_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -316,7 +316,7 @@ fn benchmark_signed_double_limb_saturating_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -343,7 +343,7 @@ fn benchmark_signed_double_limb_overflowing_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -370,7 +370,7 @@ fn benchmark_signed_double_limb_overflowing_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -402,7 +402,7 @@ fn benchmark_signed_double_limb_convertible_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -429,7 +429,7 @@ fn benchmark_signed_double_limb_convertible_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

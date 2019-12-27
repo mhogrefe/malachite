@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -39,7 +39,7 @@ fn benchmark_integer_clone_library_comparison(gm: GenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(n.clone()))),
@@ -62,7 +62,7 @@ fn benchmark_integer_clone_from_library_comparison(
         limit,
         file_name,
         &(|&(_, _, (ref x, ref y))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [

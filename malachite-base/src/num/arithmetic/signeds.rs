@@ -6,7 +6,7 @@ use num::arithmetic::traits::{
     OverflowingAbs, Sign, TrueCheckedShl, TrueCheckedShr, UnsignedAbs, WrappingAbs,
 };
 use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::{CheckedFrom, WrappingFrom};
+use num::conversion::traits::{ExactFrom, WrappingFrom};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -82,19 +82,19 @@ macro_rules! impl_arithmetic_traits {
             fn div_mod(self, other: $t) -> ($t, $t) {
                 let (quotient, remainder) = if (self >= 0) == (other >= 0) {
                     let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    ($t::checked_from(quotient).unwrap(), remainder)
+                    ($t::exact_from(quotient), remainder)
                 } else {
                     let (quotient, remainder) = self
                         .unsigned_abs()
                         .ceiling_div_neg_mod(other.unsigned_abs());
-                    (-$t::checked_from(quotient).unwrap(), remainder)
+                    (-$t::exact_from(quotient), remainder)
                 };
                 (
                     quotient,
                     if other >= 0 {
-                        $t::checked_from(remainder).unwrap()
+                        $t::exact_from(remainder)
                     } else {
-                        -$t::checked_from(remainder).unwrap()
+                        -$t::exact_from(remainder)
                     },
                 )
             }
@@ -122,9 +122,9 @@ macro_rules! impl_arithmetic_traits {
                     self.unsigned_abs().neg_mod(other.unsigned_abs())
                 };
                 if other >= 0 {
-                    $t::checked_from(remainder).unwrap()
+                    $t::exact_from(remainder)
                 } else {
-                    -$t::checked_from(remainder).unwrap()
+                    -$t::exact_from(remainder)
                 }
             }
         }
@@ -139,17 +139,17 @@ macro_rules! impl_arithmetic_traits {
                     let (quotient, remainder) = self
                         .unsigned_abs()
                         .ceiling_div_neg_mod(other.unsigned_abs());
-                    ($t::checked_from(quotient).unwrap(), remainder)
+                    ($t::exact_from(quotient), remainder)
                 } else {
                     let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    (-$t::checked_from(quotient).unwrap(), remainder)
+                    (-$t::exact_from(quotient), remainder)
                 };
                 (
                     quotient,
                     if other >= 0 {
-                        -$t::checked_from(remainder).unwrap()
+                        -$t::exact_from(remainder)
                     } else {
-                        $t::checked_from(remainder).unwrap()
+                        $t::exact_from(remainder)
                     },
                 )
             }
@@ -177,9 +177,9 @@ macro_rules! impl_arithmetic_traits {
                     self.unsigned_abs().mod_op(other.unsigned_abs())
                 };
                 if other >= 0 {
-                    -$t::checked_from(remainder).unwrap()
+                    -$t::exact_from(remainder)
                 } else {
-                    $t::checked_from(remainder).unwrap()
+                    $t::exact_from(remainder)
                 }
             }
         }
@@ -208,9 +208,9 @@ macro_rules! impl_arithmetic_traits {
                     self.unsigned_abs().div_round(other.unsigned_abs(), -rm)
                 };
                 if result_sign {
-                    $t::checked_from(abs).unwrap()
+                    $t::exact_from(abs)
                 } else {
-                    -$t::checked_from(abs).unwrap()
+                    -$t::exact_from(abs)
                 }
             }
         }

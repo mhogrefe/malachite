@@ -1,7 +1,7 @@
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitScan;
 
 use natural::InnerNatural::{Large, Small};
@@ -33,7 +33,7 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
 pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64 {
-    let starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
+    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= limbs.len() {
         return starting_index;
     }
@@ -88,7 +88,7 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
 pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Option<u64> {
-    let starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
+    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= limbs.len() {
         return None;
     }

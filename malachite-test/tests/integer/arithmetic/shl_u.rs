@@ -4,7 +4,7 @@ use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{Abs, IsPowerOfTwo};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -134,9 +134,7 @@ macro_rules! tests_and_properties {
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
                 assert_eq!(Integer::ZERO << u, 0 as Limb);
-                assert!(Natural::checked_from(Integer::ONE << u)
-                    .unwrap()
-                    .is_power_of_two());
+                assert!(Natural::exact_from(Integer::ONE << u).is_power_of_two());
             });
 
             test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {
@@ -184,10 +182,10 @@ tests_and_properties!(
         let n = rug::Integer::from_str(u).unwrap() << v;
         assert_eq!(n.to_string(), out);
 
-        let n = BigInt::from_str(u).unwrap() << usize::checked_from(v).unwrap();
+        let n = BigInt::from_str(u).unwrap() << usize::exact_from(v);
         assert_eq!(n.to_string(), out);
 
-        let n = &BigInt::from_str(u).unwrap() << usize::checked_from(v).unwrap();
+        let n = &BigInt::from_str(u).unwrap() << usize::exact_from(v);
         assert_eq!(n.to_string(), out);
     },
     n,
@@ -198,11 +196,11 @@ tests_and_properties!(
         assert_eq!(rug_integer_to_integer(&rug_n), shifted);
 
         assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(n) << usize::checked_from(u).unwrap())),
+            bigint_to_integer(&(&integer_to_bigint(n) << usize::exact_from(u))),
             shifted
         );
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(n) << usize::checked_from(u).unwrap())),
+            bigint_to_integer(&(integer_to_bigint(n) << usize::exact_from(u))),
             shifted
         );
 

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -57,7 +57,7 @@ fn benchmark_unsigned_decrement<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&n| usize::exact_from(n.significant_bits())),
         "index",
         &mut [("malachite", &mut (|mut n| n.decrement()))],
     );
@@ -78,7 +78,7 @@ fn benchmark_signed_decrement<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&n| usize::exact_from(n.significant_bits())),
         "index",
         &mut [("malachite", &mut (|mut n| n.decrement()))],
     );

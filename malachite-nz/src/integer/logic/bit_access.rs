@@ -1,7 +1,7 @@
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 
 use integer::Integer;
@@ -37,7 +37,7 @@ use platform::Limb;
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, where d is negative.
 pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
-    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
+    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if limb_index >= limbs.len() {
         // We're indexing into the infinite suffix of 1s
         true
@@ -76,7 +76,7 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
 ///
 /// This is mpz_setbit from mpz/setbit.c, where d is negative.
 pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
-    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
+    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if limb_index >= limbs.len() {
         return;
     }
@@ -142,7 +142,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 /// This is mpz_clrbit from mpz/clrbit.c, where d is negative and bit_idx small enough that no
 /// additional memory needs to be given to d.
 pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
-    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
+    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
@@ -177,7 +177,7 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, where d is negative.
 pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
-    let limb_index = usize::checked_from(index >> Limb::LOG_WIDTH).unwrap();
+    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {

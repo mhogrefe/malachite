@@ -5,7 +5,7 @@ use malachite_base::crement::Crementable;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
@@ -1008,7 +1008,7 @@ fn limbs_sub_to_out_helper(
         let n = Integer::from(Natural::from_limbs_asc(xs))
             - Integer::from(Natural::from_limbs_asc(ys))
             + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
-        Natural::checked_from(n).unwrap().into_limbs_asc()
+        Natural::exact_from(n).into_limbs_asc()
     } else {
         let n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
         n.into_limbs_asc()
@@ -1165,7 +1165,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
                 if borrow_in {
                     n.decrement();
                 }
-                let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
+                let mut limbs = Natural::exact_from(n).into_limbs_asc();
                 limbs.resize(len, Limb::MAX);
                 limbs
             } else {
@@ -1195,12 +1195,11 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in);
             let n = Natural::from_owned_limbs_asc(xs);
             let mut expected_result = if borrow {
-                Natural::checked_from(
+                Natural::exact_from(
                     Integer::from(Natural::from_owned_limbs_asc(xs_old))
                         - Integer::from(Natural::from_limbs_asc(ys))
                         + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len)),
                 )
-                .unwrap()
             } else {
                 Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
             };

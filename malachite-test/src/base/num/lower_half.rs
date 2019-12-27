@@ -1,5 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use rand::Rand;
 
@@ -40,7 +40,7 @@ fn benchmark_unsigned_lower_half<T: PrimitiveUnsigned + Rand + SplitInHalf>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.lower_half())))],
     );

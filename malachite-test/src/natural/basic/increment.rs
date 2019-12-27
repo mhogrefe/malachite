@@ -1,5 +1,5 @@
 use malachite_base::crement::Crementable;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -26,7 +26,7 @@ fn benchmark_natural_increment(gm: GenerationMode, limit: usize, file_name: &str
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|mut n| n.increment()))],
     );

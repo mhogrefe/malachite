@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use num::{BigInt, BigUint};
 
@@ -36,7 +36,7 @@ fn benchmark_natural_neg_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(-n))),
@@ -54,7 +54,7 @@ fn benchmark_natural_neg_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("-Natural", &mut (|n| no_out!(-n))),

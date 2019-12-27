@@ -4,7 +4,7 @@ use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
@@ -42,7 +42,7 @@ use platform::Limb;
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, where the result is returned.
 pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
@@ -84,7 +84,7 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and the result
 /// is returned.
 pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         vec![1]
     } else {
@@ -102,7 +102,7 @@ pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 }
 
 fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
@@ -391,7 +391,7 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
 /// This is mpn_rshift from mpn/generic/rshift.c, where rp == up and if cnt is sufficiently large,
 /// limbs are removed from rp.
 pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
@@ -464,7 +464,7 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and w == u.
 pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         limbs.truncate(1);
         limbs[0] = 1;
@@ -482,7 +482,7 @@ pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 }
 
 fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap();
+    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
@@ -778,8 +778,7 @@ macro_rules! impl_natural_shr_unsigned {
                     Natural(Small(_)) if other >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
                     Natural(Small(small)) => Natural(Small(small >> other)),
                     Natural(Large(ref limbs)) => {
-                        let mut result =
-                            Natural(Large(limbs_shr(limbs, u64::checked_from(other).unwrap())));
+                        let mut result = Natural(Large(limbs_shr(limbs, u64::exact_from(other))));
                         result.trim();
                         result
                     }
@@ -821,7 +820,7 @@ macro_rules! impl_natural_shr_unsigned {
                         return;
                     }
                     Natural(Large(ref mut limbs)) => {
-                        limbs_vec_shr_in_place(limbs, u64::checked_from(other).unwrap());
+                        limbs_vec_shr_in_place(limbs, u64::exact_from(other));
                     }
                 }
                 self.trim();
@@ -938,7 +937,7 @@ macro_rules! impl_natural_shr_unsigned {
                     Natural(Small(ref small)) => Natural(Small(small.shr_round(other, rm))),
                     Natural(Large(ref limbs)) => {
                         if let Some(result_limbs) =
-                            limbs_shr_round(limbs, u64::checked_from(other).unwrap(), rm)
+                            limbs_shr_round(limbs, u64::exact_from(other), rm)
                         {
                             let mut result = Natural(Large(result_limbs));
                             result.trim();
@@ -1019,11 +1018,7 @@ macro_rules! impl_natural_shr_unsigned {
                         return;
                     }
                     Natural(Large(ref mut limbs)) => {
-                        if !limbs_vec_shr_round_in_place(
-                            limbs,
-                            u64::checked_from(other).unwrap(),
-                            rm,
-                        ) {
+                        if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(other), rm) {
                             panic!("Right shift is not exact.");
                         }
                     }

@@ -8,7 +8,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{CheckedFrom, SplitInHalf};
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -68,7 +68,7 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
 /// ```
 pub fn test_invert_limb_table() {
     for (i, &inverse) in INVERT_LIMB_TABLE.iter().enumerate() {
-        let value = (u8::checked_from(i).unwrap() << 1) + 1;
+        let value = (u8::exact_from(i) << 1) + 1;
         let product = value.wrapping_mul(inverse);
         assert_eq!(
             product, 1,
@@ -101,7 +101,7 @@ pub fn test_invert_limb_table() {
 pub fn limbs_modular_invert_limb(limb: Limb) -> Limb {
     assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
-    let mut inverse: Limb = INVERT_LIMB_TABLE[usize::checked_from(index).unwrap()].into();
+    let mut inverse: Limb = INVERT_LIMB_TABLE[usize::exact_from(index)].into();
     inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
     inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
     if !cfg!(feature = "32_bit_limbs") {

@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::platform::Limb;
@@ -197,7 +197,7 @@ fn benchmark_limb_checked_from_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(Limb::checked_from(&n)))),
@@ -218,7 +218,7 @@ fn benchmark_limb_checked_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -245,7 +245,7 @@ fn benchmark_limb_checked_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(Limb::checked_from(n)))),
@@ -277,7 +277,7 @@ fn benchmark_limb_wrapping_from_integer_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -301,7 +301,7 @@ fn benchmark_limb_wrapping_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -328,7 +328,7 @@ fn benchmark_limb_wrapping_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(Limb::wrapping_from(n)))),
@@ -354,7 +354,7 @@ fn benchmark_limb_saturating_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -381,7 +381,7 @@ fn benchmark_limb_overflowing_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -408,7 +408,7 @@ fn benchmark_limb_overflowing_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|ref n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(Limb::overflowing_from(n)))),
@@ -432,7 +432,7 @@ fn benchmark_limb_convertible_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -459,7 +459,7 @@ fn benchmark_limb_convertible_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(Limb::convertible_from(n)))),

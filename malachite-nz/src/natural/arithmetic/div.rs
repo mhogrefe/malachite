@@ -8,7 +8,7 @@ use malachite_base::limbs::{limbs_move_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{DivRem, WrappingAddAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{CheckedFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
@@ -495,7 +495,7 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
     };
     let (ns_last, ns_init) = ns[..offset].split_last_mut().unwrap();
     assert_eq!(*ns_last, n_1);
-    if flag && n_1 < Limb::checked_from(d_len).unwrap() {
+    if flag && n_1 < Limb::exact_from(d_len) {
         let qs = &mut qs[offset - d_len..];
         let qs = &mut qs[..q_len];
         // The quotient may be too large if the remainder is small. Recompute for above ignored
@@ -1034,7 +1034,7 @@ pub fn _limbs_div_divide_and_conquer_approx(
                     let ns = &mut ns[1..d_len + 1];
                     highest_q = limbs_cmp_same_length(ns, ds) >= Ordering::Equal;
                     if highest_q {
-                        assert!(!limbs_sub_same_length_in_place_left(ns, ds,));
+                        assert!(!limbs_sub_same_length_in_place_left(ns, ds));
                     }
                 }
                 // A single iteration of schoolbook: One 3/2 division, followed by the bignum update
@@ -1050,7 +1050,7 @@ pub fn _limbs_div_divide_and_conquer_approx(
                     // TODO This branch is untested!
                     q = Limb::MAX;
                     assert_eq!(
-                        limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..d_len], ds, q,),
+                        limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..d_len], ds, q),
                         n_2
                     );
                 } else {

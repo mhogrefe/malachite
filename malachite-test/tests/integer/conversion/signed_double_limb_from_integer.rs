@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
@@ -344,9 +344,9 @@ fn signed_double_limb_wrapping_from_integer_properties() {
         assert_eq!(result.wrapping_neg(), SignedDoubleLimb::wrapping_from(&-x));
         assert_eq!(
             result,
-            SignedDoubleLimb::wrapping_from(
-                DoubleLimb::checked_from(&x.mod_power_of_two(DoubleLimb::WIDTH.into())).unwrap()
-            )
+            SignedDoubleLimb::wrapping_from(DoubleLimb::exact_from(
+                &x.mod_power_of_two(DoubleLimb::WIDTH.into())
+            ))
         );
         assert_eq!(result, SignedDoubleLimb::overflowing_from(x).0);
     });

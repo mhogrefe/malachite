@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -35,15 +35,13 @@ fn benchmark_integer_flip_bit_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, index))| usize::checked_from(max(n.significant_bits(), index)).unwrap()),
+        &(|&(_, (ref n, index))| usize::exact_from(max(n.significant_bits(), index))),
         "max(n.significant_bits(), index)",
         &mut [
             ("malachite", &mut (|(_, (mut n, index))| n.flip_bit(index))),
             (
                 "rug",
-                &mut (|((mut n, index), _)| {
-                    no_out!(n.toggle_bit(u32::checked_from(index).unwrap()))
-                }),
+                &mut (|((mut n, index), _)| no_out!(n.toggle_bit(u32::exact_from(index)))),
             ),
         ],
     );

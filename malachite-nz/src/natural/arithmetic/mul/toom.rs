@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     EqModPowerOfTwo, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
@@ -685,15 +685,9 @@ pub fn _limbs_mul_greater_to_out_toom_32(
 
         if hi < 0 {
             // TODO This branch is untested!
-            assert!(!limbs_sub_limb_in_place(
-                out_hi,
-                Limb::checked_from(-hi).unwrap(),
-            ));
+            assert!(!limbs_sub_limb_in_place(out_hi, Limb::exact_from(-hi)));
         } else {
-            assert!(!limbs_slice_add_limb_in_place(
-                out_hi,
-                Limb::checked_from(hi).unwrap(),
-            ));
+            assert!(!limbs_slice_add_limb_in_place(out_hi, Limb::exact_from(hi)));
         }
     } else {
         assert_eq!(hi, 0);
@@ -3069,8 +3063,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         // xs.len() < 18 / 17 * ys.len()
         n = 1 + (xs_len - 1) / 6;
         half = false;
-        s = isize::checked_from(xs_len).unwrap() - (5 * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (5 * n) as isize;
+        s = isize::exact_from(xs_len) - (5 * n) as isize;
+        t = isize::exact_from(ys_len) - (5 * n) as isize;
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len()
@@ -3104,24 +3098,24 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
+        s = isize::exact_from(xs_len) - (p * n) as isize;
+        t = isize::exact_from(ys_len) - (q * n) as isize;
         if half {
             // Recover from-badly chosen splitting
             if s < 1 {
-                s += isize::checked_from(n).unwrap();
+                s += isize::exact_from(n);
                 half = false;
             } else if t < 1 {
-                t += isize::checked_from(n).unwrap();
+                t += isize::exact_from(n);
                 half = false;
             }
         }
     }
     let limit = 12 * n + 6;
     0 < s
-        && s <= isize::checked_from(n).unwrap()
+        && s <= isize::exact_from(n)
         && 0 < t
-        && t <= isize::checked_from(n).unwrap()
+        && t <= isize::exact_from(n)
         && (half || s + t > 3)
         && n > 2
         && limit <= _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)
@@ -3184,13 +3178,12 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
-    let itch = (isize::checked_from(n).unwrap() - _limbs_mul_toom_6h_min_threshold() as isize) * 2
-        + isize::checked_from(max(
+    let itch = (isize::exact_from(n) - _limbs_mul_toom_6h_min_threshold() as isize) * 2
+        + isize::exact_from(max(
             _limbs_mul_toom_6h_min_threshold() * 2 + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_greater_to_out_toom_44_scratch_len(_limbs_mul_toom_6h_min_threshold()),
-        ))
-        .unwrap();
-    usize::checked_from(itch).unwrap()
+        ));
+    usize::exact_from(itch)
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -3257,8 +3250,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p = 5;
         q = 5;
         half = false;
-        s = isize::checked_from(xs_len).unwrap() - (5 * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (5 * n) as isize;
+        s = isize::exact_from(xs_len) - (5 * n) as isize;
+        t = isize::exact_from(ys_len) - (5 * n) as isize;
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len(), half
@@ -3292,30 +3285,30 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p -= 1;
         q -= 1;
 
-        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
+        s = isize::exact_from(xs_len) - (p * n) as isize;
+        t = isize::exact_from(ys_len) - (q * n) as isize;
 
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
         if half {
             // Recover from badly-chosen splitting
             if s < 1 {
                 p -= 1;
-                s += isize::checked_from(n).unwrap();
+                s += isize::exact_from(n);
                 half = false;
             } else if t < 1 {
                 q -= 1;
-                t += isize::checked_from(n).unwrap();
+                t += isize::exact_from(n);
                 half = false;
             }
         }
     }
 
-    assert!(0 < s && s <= isize::checked_from(n).unwrap());
-    assert!(0 < t && t <= isize::checked_from(n).unwrap());
+    assert!(0 < s && s <= isize::exact_from(n));
+    assert!(0 < t && t <= isize::exact_from(n));
     assert!(half || s + t > 3);
     assert!(n > 2);
-    let s = usize::checked_from(s).unwrap();
-    let t = usize::checked_from(t).unwrap();
+    let s = usize::exact_from(s);
+    let t = usize::exact_from(t);
     let m = n + 1;
     let r = 2 * n + 1;
 
@@ -3476,8 +3469,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         // This is the slowest variation
         half = false;
         n = 1 + ((xs_len - 1) >> 3);
-        s = isize::checked_from(xs_len).unwrap() - 7 * isize::checked_from(n).unwrap();
-        t = isize::checked_from(ys_len).unwrap() - 7 * isize::checked_from(n).unwrap();
+        s = isize::exact_from(xs_len) - 7 * isize::exact_from(n);
+        t = isize::exact_from(ys_len) - 7 * isize::exact_from(n);
     } else {
         if xs_len * 13 < 16 * ys_len {
             // xs_len < 16 / 13 * ys_len, half
@@ -3531,25 +3524,25 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
+        s = isize::exact_from(xs_len) - (p * n) as isize;
+        t = isize::exact_from(ys_len) - (q * n) as isize;
 
         if half {
             // Recover from badly chosen splitting
             if s < 1 {
-                s += isize::checked_from(n).unwrap();
+                s += isize::exact_from(n);
                 half = false;
             } else if t < 1 {
-                t += isize::checked_from(n).unwrap();
+                t += isize::exact_from(n);
                 half = false;
             }
         }
     }
     let limit = 15 * n + 6;
     0 < s
-        && s <= isize::checked_from(n).unwrap()
+        && s <= isize::exact_from(n)
         && 0 < t
-        && t <= isize::checked_from(n).unwrap()
+        && t <= isize::exact_from(n)
         && (half || s + t > 3)
         && n > 2
         && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)
@@ -3617,15 +3610,14 @@ fn _limbs_mul_toom_8h_min_threshold() -> usize {
 
 // This is mpn_toom8_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
-    let itch = ((isize::checked_from(n).unwrap() * 15) >> 3)
+    let itch = ((isize::exact_from(n) * 15) >> 3)
         - ((_limbs_mul_toom_8h_min_threshold() as isize * 15) >> 3)
-        + isize::checked_from(max(
+        + isize::exact_from(max(
             ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3)
                 + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_same_length_to_out_toom_6h_scratch_len(_limbs_mul_toom_8h_min_threshold()),
-        ))
-        .unwrap();
-    usize::checked_from(itch).unwrap()
+        ));
+    usize::exact_from(itch)
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -3699,8 +3691,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         n = 1 + ((xs_len - 1) >> 3);
         p = 7;
         q = 7;
-        s = isize::checked_from(xs_len).unwrap() - 7 * isize::checked_from(n).unwrap();
-        t = isize::checked_from(ys_len).unwrap() - 7 * isize::checked_from(n).unwrap();
+        s = isize::exact_from(xs_len) - 7 * isize::exact_from(n);
+        t = isize::exact_from(ys_len) - 7 * isize::exact_from(n);
     } else {
         if xs_len * 13 < 16 * ys_len {
             // xs_len < 16 / 13 * ys_len, half
@@ -3754,29 +3746,29 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         p -= 1;
         q -= 1;
 
-        s = isize::checked_from(xs_len).unwrap() - (p * n) as isize;
-        t = isize::checked_from(ys_len).unwrap() - (q * n) as isize;
+        s = isize::exact_from(xs_len) - (p * n) as isize;
+        t = isize::exact_from(ys_len) - (q * n) as isize;
 
         if half {
             // Recover from badly chosen splitting
             if s < 1 {
                 p -= 1;
-                s += isize::checked_from(n).unwrap();
+                s += isize::exact_from(n);
                 half = false;
             } else if t < 1 {
                 q -= 1;
-                t += isize::checked_from(n).unwrap();
+                t += isize::exact_from(n);
                 half = false;
             }
         }
     }
 
-    assert!(0 < s && s <= isize::checked_from(n).unwrap());
-    assert!(0 < t && t <= isize::checked_from(n).unwrap());
+    assert!(0 < s && s <= isize::exact_from(n));
+    assert!(0 < t && t <= isize::exact_from(n));
     assert!(half || s + t > 3);
     assert!(n > 2);
-    let s = usize::checked_from(s).unwrap();
-    let t = usize::checked_from(t).unwrap();
+    let s = usize::exact_from(s);
+    let t = usize::exact_from(t);
     let m = n + 1;
     let r = 3 * n + 1;
 

@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -517,7 +517,7 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     let mut last_k = fft_table[0].k;
     for entry in &fft_table[1..] {
         let threshold = entry.n << last_k;
-        if n <= usize::checked_from(threshold).unwrap() {
+        if n <= usize::exact_from(threshold) {
             break;
         }
         last_k = entry.k;
@@ -581,7 +581,7 @@ fn _limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<
 ///
 /// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
-    a << k.saturating_sub(usize::checked_from(a.trailing_zeros()).unwrap())
+    a << k.saturating_sub(usize::exact_from(a.trailing_zeros()))
 }
 
 /// Given xs with xs[n] <= 1, reduce it modulo 2<sup>n * Limb::WIDTH</sup> + 1, by subtracting that
@@ -1332,7 +1332,7 @@ pub fn _limbs_mul_fft_internal(
             carry += 1;
         }
         // scratch = (i + 1) * 2 ^ (2 * M)
-        let i_plus_one = Limb::checked_from(i).unwrap() + 1;
+        let i_plus_one = Limb::exact_from(i) + 1;
         if 2 * a < width {
             scratch_lo[2 * a] = i_plus_one;
         } else {

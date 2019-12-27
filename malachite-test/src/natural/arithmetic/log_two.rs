@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 
@@ -92,7 +92,7 @@ fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: 
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
@@ -106,7 +106,7 @@ fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_name
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );

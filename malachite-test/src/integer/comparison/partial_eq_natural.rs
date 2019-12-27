@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -57,7 +57,7 @@ fn benchmark_integer_partial_eq_natural_library_comparison(
         limit,
         file_name,
         &(|&(_, (ref x, ref y))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
@@ -80,7 +80,7 @@ fn benchmark_natural_partial_eq_integer_library_comparison(
         limit,
         file_name,
         &(|&(_, (ref x, ref y))| {
-            usize::checked_from(max(x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [

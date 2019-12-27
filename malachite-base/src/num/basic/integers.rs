@@ -26,8 +26,8 @@ use num::arithmetic::traits::{
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
-    CheckedFrom, CheckedInto, OverflowingFrom, OverflowingInto, SaturatingFrom, SaturatingInto,
-    WrappingFrom, WrappingInto,
+    CheckedFrom, CheckedInto, ExactFrom, ExactInto, OverflowingFrom, OverflowingInto,
+    SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitScan, CountOnes, CountZeros, Endian, HammingDistance, LeadingZeros, NotAssign,
@@ -102,6 +102,30 @@ pub trait PrimitiveInteger:
     + Eq
     + EqMod<Self, Self>
     + EqModPowerOfTwo<Self>
+    + ExactFrom<u8>
+    + ExactFrom<u16>
+    + ExactFrom<u32>
+    + ExactFrom<u64>
+    + ExactFrom<u128>
+    + ExactFrom<usize>
+    + ExactFrom<i8>
+    + ExactFrom<i16>
+    + ExactFrom<i32>
+    + ExactFrom<i64>
+    + ExactFrom<i128>
+    + ExactFrom<isize>
+    + ExactInto<u8>
+    + ExactInto<u16>
+    + ExactInto<u32>
+    + ExactInto<u64>
+    + ExactInto<u128>
+    + ExactInto<usize>
+    + ExactInto<i8>
+    + ExactInto<i16>
+    + ExactInto<i32>
+    + ExactInto<i64>
+    + ExactInto<i128>
+    + ExactInto<isize>
     + FromStr
     + HammingDistance<Self>
     + Hash

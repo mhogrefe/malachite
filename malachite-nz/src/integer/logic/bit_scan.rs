@@ -1,6 +1,6 @@
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitScan;
 
 use integer::Integer;
@@ -39,7 +39,7 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
     let n = limbs.len();
     let i = limbs_leading_zero_limbs(limbs);
     assert!(i < n);
-    let starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
+    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {
         return None;
     }
@@ -95,7 +95,7 @@ pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64)
     let n = limbs.len();
     let i = limbs_leading_zero_limbs(limbs);
     assert!(i < n);
-    let mut starting_limb_index = usize::checked_from(starting_index >> Limb::LOG_WIDTH).unwrap();
+    let mut starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {
         return starting_index;
     }

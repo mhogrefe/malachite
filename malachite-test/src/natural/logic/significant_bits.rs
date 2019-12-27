@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 
@@ -54,7 +54,7 @@ fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_nam
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

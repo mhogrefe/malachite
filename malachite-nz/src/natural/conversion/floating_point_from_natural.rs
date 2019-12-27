@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
 };
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
@@ -92,11 +92,9 @@ macro_rules! float_impls {
                     };
                 }
                 let mut exponent = value.floor_log_two();
-                let shift = i32::checked_from(exponent).unwrap()
-                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
+                let shift = i32::exact_from(exponent) - i32::exact_from($f::MANTISSA_WIDTH);
                 value.shr_round_assign(shift, rm);
-                let mut mantissa =
-                    <$f as PrimitiveFloat>::UnsignedOfEqualWidth::checked_from(value).unwrap();
+                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(value);
                 if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
                     exponent += 1;
                     mantissa >>= 1;
@@ -159,12 +157,10 @@ macro_rules! float_impls {
                     };
                 }
                 let mut exponent = value.floor_log_two();
-                let shift = i32::checked_from(exponent).unwrap()
-                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
-                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::checked_from(
+                let shift = i32::exact_from(exponent) - i32::exact_from($f::MANTISSA_WIDTH);
+                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(
                     value.shr_round(shift, rm),
-                )
-                .unwrap();
+                );
                 if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
                     exponent += 1;
                     mantissa >>= 1;
@@ -270,8 +266,7 @@ macro_rules! float_impls {
                     return None;
                 }
                 let exponent = value.floor_log_two();
-                let shift = i32::checked_from(exponent).unwrap()
-                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
+                let shift = i32::exact_from(exponent) - i32::exact_from($f::MANTISSA_WIDTH);
                 if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
                     return None;
                 }
@@ -319,8 +314,7 @@ macro_rules! float_impls {
                     return None;
                 }
                 let exponent = value.floor_log_two();
-                let shift = i32::checked_from(exponent).unwrap()
-                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
+                let shift = i32::exact_from(exponent) - i32::exact_from($f::MANTISSA_WIDTH);
                 if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
                     return None;
                 }
@@ -397,8 +391,8 @@ macro_rules! float_impls {
                 if $gt_max_finite_float(&value) {
                     return false;
                 }
-                let shift = i32::checked_from(value.floor_log_two()).unwrap()
-                    - i32::checked_from($f::MANTISSA_WIDTH).unwrap();
+                let shift =
+                    i32::exact_from(value.floor_log_two()) - i32::exact_from($f::MANTISSA_WIDTH);
                 shift < 0 || value.divisible_by_power_of_two(u64::wrapping_from(shift))
             }
         }

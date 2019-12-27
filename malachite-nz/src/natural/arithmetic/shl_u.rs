@@ -2,7 +2,7 @@ use std::ops::{Shl, ShlAssign};
 
 use malachite_base::limbs::limbs_pad_left;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -30,7 +30,7 @@ use platform::Limb;
 /// This is mpn_lshift from mpn/generic/lshift.c, where the result is returned.
 pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
-    let mut shifted_limbs = vec![0; usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()];
+    let mut shifted_limbs = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
     if small_bits == 0 {
         shifted_limbs.extend_from_slice(limbs);
     } else {
@@ -162,11 +162,7 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     } else {
         limbs_slice_shl_in_place(limbs, small_bits)
     };
-    limbs_pad_left(
-        limbs,
-        usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
-        0,
-    );
+    limbs_pad_left(limbs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
     if remaining_bits != 0 {
         limbs.push(remaining_bits);
     }
@@ -289,12 +285,8 @@ macro_rules! impl_natural_shl_unsigned {
                     Natural(Small(small)) if other <= $t::wrapping_from(small.leading_zeros()) => {
                         Small(small << other)
                     }
-                    Natural(Small(small)) => {
-                        Large(limbs_shl(&[small], u64::checked_from(other).unwrap()))
-                    }
-                    Natural(Large(ref limbs)) => {
-                        Large(limbs_shl(limbs, u64::checked_from(other).unwrap()))
-                    }
+                    Natural(Small(small)) => Large(limbs_shl(&[small], u64::exact_from(other))),
+                    Natural(Large(ref limbs)) => Large(limbs_shl(limbs, u64::exact_from(other))),
                 })
             }
         }
@@ -342,7 +334,7 @@ macro_rules! impl_natural_shl_unsigned {
                         }
                     },
                     {
-                        limbs_vec_shl_in_place(limbs, u64::checked_from(other).unwrap());
+                        limbs_vec_shl_in_place(limbs, u64::exact_from(other));
                     }
                 );
             }

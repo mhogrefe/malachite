@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use num::{BigUint, One, Zero};
@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 pub fn num_get_bit(x: &BigUint, index: u64) -> bool {
-    x & (BigUint::one() << usize::checked_from(index).unwrap()) != BigUint::zero()
+    x & (BigUint::one() << usize::exact_from(index)) != BigUint::zero()
 }
 
 fn demo_limbs_get_bit(gm: GenerationMode, limit: usize) {
@@ -66,7 +66,7 @@ fn benchmark_natural_get_bit_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (_, index))| usize::checked_from(index).unwrap()),
+        &(|&(_, _, (_, index))| usize::exact_from(index)),
         "index",
         &mut [
             (
@@ -79,7 +79,7 @@ fn benchmark_natural_get_bit_library_comparison(gm: GenerationMode, limit: usize
             ),
             (
                 "rug",
-                &mut (|(_, (n, index), _)| no_out!(n.get_bit(u32::checked_from(index).unwrap()))),
+                &mut (|(_, (n, index), _)| no_out!(n.get_bit(u32::exact_from(index)))),
             ),
         ],
     );

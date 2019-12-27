@@ -3,7 +3,7 @@ use std::ops::{Sub, SubAssign};
 
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
@@ -36,7 +36,7 @@ impl Integer {
                 ref mut abs,
             } => {
                 *sign = false;
-                let small_abs = Limb::checked_from(&*abs).unwrap();
+                let small_abs = Limb::exact_from(&*abs);
                 *abs = Natural::from(other - small_abs);
             }
         }

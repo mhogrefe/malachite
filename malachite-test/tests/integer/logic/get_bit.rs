@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
@@ -48,7 +48,7 @@ fn test_get_bit() {
         assert_eq!(
             rug::Integer::from_str(n)
                 .unwrap()
-                .get_bit(u32::checked_from(index).unwrap()),
+                .get_bit(u32::exact_from(index)),
             out
         );
     };
@@ -99,7 +99,7 @@ fn get_bit_properties() {
     test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
         let bit = n.get_bit(index);
         assert_eq!(
-            integer_to_rug_integer(n).get_bit(u32::checked_from(index).unwrap()),
+            integer_to_rug_integer(n).get_bit(u32::exact_from(index)),
             bit
         );
 

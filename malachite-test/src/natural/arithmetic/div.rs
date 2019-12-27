@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::DivMod;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
@@ -846,7 +846,7 @@ fn benchmark_natural_div_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("Natural /= Natural", &mut (|(mut x, y)| x /= y)),
@@ -863,7 +863,7 @@ fn benchmark_natural_div_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref n, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, (x, y))| no_out!(x / y))),
@@ -881,7 +881,7 @@ fn benchmark_natural_div_algorithms(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x / y))),
@@ -898,7 +898,7 @@ fn benchmark_natural_div_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("Natural / Natural", &mut (|(x, y)| no_out!(x / y))),

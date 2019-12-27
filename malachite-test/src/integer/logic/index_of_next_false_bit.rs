@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 use malachite_nz::integer::Integer;
@@ -19,7 +19,7 @@ pub fn integer_index_of_next_false_bit_alt(n: &Integer, u: u64) -> Option<u64> {
         for (i, bit) in n
             .twos_complement_bits()
             .enumerate()
-            .skip(usize::checked_from(u).unwrap())
+            .skip(usize::exact_from(u))
         {
             if !bit {
                 return Some(u64::wrapping_from(i));
@@ -91,7 +91,7 @@ fn benchmark_integer_index_of_next_false_bit_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, _)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (

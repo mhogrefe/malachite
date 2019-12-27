@@ -707,9 +707,7 @@ pub fn triples_of_unsigned_unsigned_width_range_and_bool_var_1<
             &(|seed| random(seed)),
         )),
     };
-    Box::new(
-        unfiltered.filter(|&(_, index, bit)| !bit || index < U::checked_from(T::WIDTH).unwrap()),
-    )
+    Box::new(unfiltered.filter(|&(_, index, bit)| !bit || index < U::exact_from(T::WIDTH)))
 }
 
 // All triples of signed `T`, `U`, and `bool`, where `T` is signed, `U` is unsigned, and `U` is
@@ -742,9 +740,10 @@ where
             &(|seed| random(seed)),
         )),
     };
-    Box::new(unfiltered.filter(|&(n, index, bit)| {
-        index < U::checked_from(T::WIDTH).unwrap() || bit == (n < T::ZERO)
-    }))
+    Box::new(
+        unfiltered
+            .filter(|&(n, index, bit)| index < U::exact_from(T::WIDTH) || bit == (n < T::ZERO)),
+    )
 }
 
 pub fn pairs_of_negative_signed_not_min_and_small_unsigned<
@@ -4372,7 +4371,7 @@ where
 {
     Box::new(
         triples_of_unsigned_small_unsigned_and_rounding_mode(gm).filter_map(|(n, u, rm)| {
-            if n != T::ZERO && u >= U::checked_from(T::WIDTH).unwrap() {
+            if n != T::ZERO && u >= U::exact_from(T::WIDTH) {
                 None
             } else if rm == RoundingMode::Exact {
                 let shifted = n << u;
@@ -4434,7 +4433,7 @@ where
 {
     Box::new(
         triples_of_signed_small_unsigned_and_rounding_mode(gm).filter_map(|(n, u, rm)| {
-            if n != T::ZERO && u >= U::checked_from(T::WIDTH).unwrap() {
+            if n != T::ZERO && u >= U::exact_from(T::WIDTH) {
                 None
             } else if rm == RoundingMode::Exact {
                 let shifted = n << u;

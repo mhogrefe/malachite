@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::add_mul::{
     limbs_add_mul, limbs_add_mul_in_place_left, limbs_add_mul_limb,
@@ -496,12 +496,11 @@ fn benchmark_limbs_add_mul_in_place_left(gm: GenerationMode, limit: usize, file_
 }
 
 fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
-    usize::checked_from(max!(
+    usize::exact_from(max!(
         t.0.significant_bits(),
         t.1.significant_bits(),
         t.2.significant_bits()
     ))
-    .unwrap()
 }
 
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \

@@ -1,5 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -48,7 +48,7 @@ fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&n| usize::exact_from(n.significant_bits())),
         "index",
         &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
@@ -66,7 +66,7 @@ fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&n| usize::exact_from(n.significant_bits())),
         "index",
         &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );

@@ -6,7 +6,7 @@ use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -342,7 +342,7 @@ fn twos_complement_limbs_properties() {
     );
 
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
-        if u < usize::checked_from(n.unsigned_abs_ref().limb_count()).unwrap() {
+        if u < usize::exact_from(n.unsigned_abs_ref().limb_count()) {
             assert_eq!(
                 n.twos_complement_limbs().get(u),
                 n.to_twos_complement_limbs_asc()[u]

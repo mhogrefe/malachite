@@ -416,7 +416,7 @@ pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Natural, T)> {
     Box::new(
         pairs_of_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.checked_into().unwrap())),
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
 }
 
@@ -612,7 +612,7 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 ) -> It<(Natural, Natural, T)> {
     Box::new(
         triples_of_natural_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.checked_into().unwrap())),
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.exact_into())),
     )
 }
 

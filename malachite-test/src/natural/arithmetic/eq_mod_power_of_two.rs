@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
     limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
@@ -99,7 +99,7 @@ fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, pow)| min!(usize::checked_from(pow).unwrap(), xs.len(), ys.len())),
+        &(|&(ref xs, ref ys, pow)| min!(usize::exact_from(pow), xs.len(), ys.len())),
         "min(pow, xs.len(), ys.len())",
         &mut [(
             "malachite",
@@ -120,7 +120,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (ref n, _, _))| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, (ref n, _, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -130,7 +130,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
             (
                 "rug",
                 &mut (|((ref n, ref u, pow), _)| {
-                    no_out!(n.is_congruent_2pow(u, u32::checked_from(pow).unwrap()))
+                    no_out!(n.is_congruent_2pow(u, u32::exact_from(pow)))
                 }),
             ),
         ],
@@ -150,7 +150,7 @@ fn benchmark_natural_eq_mod_power_of_two_algorithms(
         limit,
         file_name,
         &(|&(ref x, ref y, pow)| {
-            usize::checked_from(min!(pow, x.significant_bits(), y.significant_bits())).unwrap()
+            usize::exact_from(min!(pow, x.significant_bits(), y.significant_bits()))
         }),
         "min(pow, x.significant_bits(), y.significant_bits())",
         &mut [

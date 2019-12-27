@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::NegAssign;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -42,7 +42,7 @@ fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &st
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [("malachite", &mut (|mut n| n.neg_assign()))],
     );
@@ -56,7 +56,7 @@ fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, _, n)| no_out!(-n))),
@@ -74,7 +74,7 @@ fn benchmark_integer_neg_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("-Integer", &mut (|n| no_out!(-n))),

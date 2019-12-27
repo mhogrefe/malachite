@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_nz::natural::arithmetic::shr_u::{
     limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
     limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
@@ -394,7 +394,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| usize::checked_from(other).unwrap()),
+                &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [
                     (
@@ -421,7 +421,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
+                &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
                 &mut [(
                     "malachite",
@@ -442,7 +442,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other, _)| usize::checked_from(other).unwrap()),
+                &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
                 &mut [
                     (
@@ -530,8 +530,7 @@ fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref limbs, bits)| {
             usize::wrapping_from(max(
                 1,
-                isize::checked_from(limbs.len()).unwrap()
-                    - isize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+                isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
@@ -553,8 +552,7 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
         &(|&(ref limbs, bits)| {
             usize::wrapping_from(max(
                 1,
-                isize::checked_from(limbs.len()).unwrap()
-                    - isize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+                isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
@@ -576,8 +574,7 @@ fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_n
         &(|&(ref limbs, bits)| {
             usize::wrapping_from(max(
                 1,
-                isize::checked_from(limbs.len()).unwrap()
-                    - isize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+                isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
@@ -599,8 +596,7 @@ fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) 
         &(|&(ref limbs, bits)| {
             usize::wrapping_from(max(
                 1,
-                isize::checked_from(limbs.len()).unwrap()
-                    - isize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+                isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
@@ -622,8 +618,7 @@ fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) 
         &(|&(ref limbs, bits, _)| {
             usize::wrapping_from(max(
                 1,
-                isize::checked_from(limbs.len()).unwrap()
-                    - isize::checked_from(bits >> Limb::LOG_WIDTH).unwrap(),
+                isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
@@ -676,7 +671,7 @@ fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -693,7 +688,7 @@ fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -714,7 +709,7 @@ fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -731,7 +726,7 @@ fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -748,9 +743,7 @@ fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits, _)| {
-            limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()
-        }),
+        &(|&(ref limbs, bits, _)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -773,7 +766,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
@@ -790,7 +783,7 @@ fn benchmark_natural_shr_u32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),

@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 
@@ -115,7 +115,7 @@ fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(!n))),
@@ -132,7 +132,7 @@ fn benchmark_natural_not_evaluation_strategy(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("-Natural", &mut (|n| no_out!(!n))),

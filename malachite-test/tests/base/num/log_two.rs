@@ -10,7 +10,7 @@ use malachite_test::inputs::base::positive_unsigneds;
 
 fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     let test = |n, out| {
-        assert_eq!(T::checked_from(n).unwrap().floor_log_two(), out);
+        assert_eq!(T::exact_from(n).floor_log_two(), out);
     };
 
     test(1, 0);
@@ -48,7 +48,7 @@ floor_log_two_fail!(u64, floor_log_two_u64_fail);
 
 fn ceiling_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     let test = |n, out| {
-        assert_eq!(T::checked_from(n).unwrap().ceiling_log_two(), out);
+        assert_eq!(T::exact_from(n).ceiling_log_two(), out);
     };
 
     test(1, 0);

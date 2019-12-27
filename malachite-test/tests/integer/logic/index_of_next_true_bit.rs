@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitScan};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
@@ -55,7 +55,7 @@ fn test_index_of_next_true_bit() {
         assert_eq!(
             rug::Integer::from_str(n)
                 .unwrap()
-                .find_one(u32::checked_from(u).unwrap())
+                .find_one(u32::exact_from(u))
                 .map(|u| u64::from(u)),
             out
         );
@@ -109,7 +109,7 @@ fn index_of_next_true_bit_properties() {
         assert_eq!(result, integer_index_of_next_true_bit_alt(n, u));
         assert_eq!(
             integer_to_rug_integer(n)
-                .find_one(u32::checked_from(u).unwrap())
+                .find_one(u32::exact_from(u))
                 .map(|u| u64::from(u)),
             result
         );

@@ -29,6 +29,7 @@ pub mod num {
     pub mod conversion {
         pub mod checked_from;
         pub mod convertible_from;
+        pub mod exact_from;
         pub mod join_halves;
         pub mod lower_half;
         pub mod overflowing_from;

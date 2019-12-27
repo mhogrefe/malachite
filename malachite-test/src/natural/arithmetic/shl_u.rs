@@ -1,6 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::shl_u::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,
@@ -193,7 +193,7 @@ macro_rules! demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(_, other)| usize::checked_from(other).unwrap()),
+                &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [
                     (
@@ -253,7 +253,7 @@ fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len() + bits / Limb::WIDTH",
         &mut [(
             "malachite",
@@ -304,7 +304,7 @@ fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name:
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, bits)| limbs.len() + usize::checked_from(bits >> Limb::LOG_WIDTH).unwrap()),
+        &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
             "malachite",
@@ -325,7 +325,7 @@ fn benchmark_natural_shl_assign_u32_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
             ("malachite", &mut (|(_, (mut x, y))| x <<= y)),
@@ -342,7 +342,7 @@ fn benchmark_natural_shl_u32_library_comparison(gm: GenerationMode, limit: usize
         gm.name(),
         limit,
         file_name,
-        &(|&(_, (_, other))| usize::checked_from(other).unwrap()),
+        &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
             ("malachite", &mut (|(_, (x, y))| no_out!(x << y))),

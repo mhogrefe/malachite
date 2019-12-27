@@ -1,4 +1,6 @@
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
+};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
@@ -117,7 +119,7 @@ fn benchmark_natural_checked_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -144,7 +146,7 @@ fn benchmark_natural_saturating_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -171,7 +173,7 @@ fn benchmark_natural_convertible_from_integer_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             (
@@ -198,7 +200,7 @@ fn benchmark_natural_convertible_from_integer_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("standard", &mut (|n| no_out!(Natural::convertible_from(n)))),

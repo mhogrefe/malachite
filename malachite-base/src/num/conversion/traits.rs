@@ -25,6 +25,40 @@ where
     }
 }
 
+/// This trait defines a conversion from another type. If the conversion fails, the function panics.
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `CheckedFrom` is implemented.
+pub trait ExactFrom<T>: Sized {
+    fn exact_from(value: T) -> Self;
+}
+
+/// This trait defines a conversion to another type. If the conversion fails, the function panics.
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `ExactFrom` is implemented.
+pub trait ExactInto<T> {
+    fn exact_into(self) -> T;
+}
+
+impl<T, U> ExactFrom<T> for U
+where
+    U: CheckedFrom<T>,
+{
+    #[inline]
+    fn exact_from(value: T) -> U {
+        U::checked_from(value).unwrap()
+    }
+}
+
+impl<T, U> ExactInto<U> for T
+where
+    U: ExactFrom<T>,
+{
+    #[inline]
+    fn exact_into(self) -> U {
+        U::exact_from(self)
+    }
+}
+
 /// This trait defines a conversion from another type, where if the conversion is not exact the
 /// result can wrap around. If `WrappingFrom` is implemented, it usually makes sense to implement
 /// `OverflowingFrom` as well.

@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::InnerNatural::{Large, Small};
@@ -33,7 +33,7 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 100), false);
 /// ```
 pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> bool {
-    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= limbs.len() {
         false
     } else if i == 0 {
@@ -46,7 +46,7 @@ pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> b
 
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let len = xs.len();
     if i >= len {
         xs == ys
@@ -57,7 +57,7 @@ fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> 
 
 // xs.len() > ys.len()
 fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
-    let i = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     let ys_len = ys.len();
     if i >= xs_len {

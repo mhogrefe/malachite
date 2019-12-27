@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
@@ -433,12 +433,11 @@ fn benchmark_limbs_sub_mul_in_place_left(gm: GenerationMode, limit: usize, file_
 }
 
 fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
-    usize::checked_from(max!(
+    usize::exact_from(max!(
         t.0.significant_bits(),
         t.1.significant_bits(),
         t.2.significant_bits()
     ))
-    .unwrap()
 }
 
 const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \

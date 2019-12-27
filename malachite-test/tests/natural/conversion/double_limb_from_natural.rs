@@ -4,7 +4,7 @@ use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
@@ -183,7 +183,7 @@ fn double_limb_wrapping_from_natural_properties() {
         let result = DoubleLimb::wrapping_from(x);
         assert_eq!(DoubleLimb::wrapping_from(x.clone()), result);
         assert_eq!(
-            DoubleLimb::checked_from((&x).mod_power_of_two(DoubleLimb::WIDTH.into())).unwrap(),
+            DoubleLimb::exact_from((&x).mod_power_of_two(DoubleLimb::WIDTH.into())),
             result,
         );
         assert_eq!(result, DoubleLimb::overflowing_from(x).0);

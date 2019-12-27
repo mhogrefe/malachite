@@ -1,7 +1,7 @@
 use std::mem::swap;
 use std::ops::{Add, AddAssign};
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use integer::Integer;
 use natural::Natural;
@@ -33,7 +33,7 @@ impl Integer {
                 ref mut abs,
             } => {
                 *sign = true;
-                let small_abs = Limb::checked_from(&*abs).unwrap();
+                let small_abs = Limb::exact_from(&*abs);
                 *abs = Natural::from(other - small_abs);
             }
         }

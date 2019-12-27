@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, WrappingFrom,
+    ConvertibleFrom, ExactFrom, OverflowingFrom, WrappingFrom,
 };
 use rand::Rand;
 
@@ -12,7 +12,7 @@ use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn overflowing_from_properties_helper_unsigned<T: PrimitiveUnsigned + Rand, U: Debug + Eq>()
 where
-    U: ConvertibleFrom<T> + CheckedFrom<T> + OverflowingFrom<T> + WrappingFrom<T>,
+    U: ConvertibleFrom<T> + ExactFrom<T> + OverflowingFrom<T> + WrappingFrom<T>,
 {
     test_properties(unsigneds, |&u| {
         let result = U::overflowing_from(u);
@@ -24,7 +24,7 @@ fn overflowing_from_properties_helper_signed<T: PrimitiveSigned + Rand, U: Debug
 where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-    U: ConvertibleFrom<T> + CheckedFrom<T> + WrappingFrom<T> + OverflowingFrom<T>,
+    U: ConvertibleFrom<T> + ExactFrom<T> + WrappingFrom<T> + OverflowingFrom<T>,
 {
     test_properties(signeds, |&i| {
         let result = U::overflowing_from(i);

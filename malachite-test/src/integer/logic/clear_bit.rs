@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
@@ -62,7 +62,7 @@ fn benchmark_limbs_slice_clear_bit_neg(gm: GenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",
@@ -79,7 +79,7 @@ fn benchmark_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize, file_name
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",
@@ -96,7 +96,7 @@ fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: &str
         gm.name(),
         limit,
         file_name,
-        &(|&(ref n, index)| usize::checked_from(max(n.significant_bits(), index)).unwrap()),
+        &(|&(ref n, index)| usize::exact_from(max(n.significant_bits(), index))),
         "max(n.significant_bits(), index)",
         &mut [("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
     );

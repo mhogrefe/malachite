@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::logic::and::{
     limbs_and_neg_neg, limbs_and_neg_neg_to_out, limbs_and_pos_neg,
     limbs_and_pos_neg_in_place_left, limbs_and_pos_neg_to_out, limbs_neg_and_limb_neg,
@@ -814,10 +814,7 @@ fn limbs_pos_and_limb_neg_properties() {
             let out = limbs_pos_and_limb_neg(limbs, limb);
             let n = Integer::from(Natural::from_limbs_asc(limbs))
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-            assert_eq!(
-                Natural::from_owned_limbs_asc(out),
-                Natural::checked_from(n).unwrap()
-            );
+            assert_eq!(Natural::from_owned_limbs_asc(out), Natural::exact_from(n));
         },
     );
 }
@@ -833,7 +830,7 @@ fn limbs_pos_and_limb_neg_to_out_properties() {
             let n = Integer::from(Natural::from_limbs_asc(in_limbs))
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             let len = in_limbs.len();
-            let mut limbs = Natural::checked_from(n).unwrap().into_limbs_asc();
+            let mut limbs = Natural::exact_from(n).into_limbs_asc();
             limbs.resize(len, 0);
             assert_eq!(limbs, &out[..len]);
             assert_eq!(&out[len..], &old_out[len..]);
@@ -850,10 +847,7 @@ fn limbs_pos_and_limb_neg_in_place_properties() {
             limbs_pos_and_limb_neg_in_place(&mut limbs, limb);
             let n = Integer::from(Natural::from_limbs_asc(&limbs))
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-            assert_eq!(
-                Natural::from_owned_limbs_asc(limbs),
-                Natural::checked_from(n).unwrap()
-            );
+            assert_eq!(Natural::from_owned_limbs_asc(limbs), Natural::exact_from(n));
         },
     );
 }
@@ -866,10 +860,7 @@ fn limbs_neg_and_limb_neg_properties() {
             let out = limbs_neg_and_limb_neg(limbs, limb);
             let n = -Natural::from_limbs_asc(limbs)
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-            assert_eq!(
-                Natural::from_owned_limbs_asc(out),
-                Natural::checked_from(-n).unwrap()
-            );
+            assert_eq!(Natural::from_owned_limbs_asc(out), Natural::exact_from(-n));
         },
     );
 }
@@ -885,7 +876,7 @@ fn limbs_neg_and_limb_neg_to_out_properties() {
             let n = -Natural::from_limbs_asc(in_limbs)
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             let len = in_limbs.len();
-            let mut limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
+            let mut limbs = Natural::exact_from(-n).into_limbs_asc();
             assert_eq!(carry, limbs.len() == len + 1);
             limbs.resize(len, 0);
             assert_eq!(limbs, &out[..len]);
@@ -904,7 +895,7 @@ fn limbs_slice_neg_and_limb_neg_in_place_properties() {
             limbs_slice_neg_and_limb_neg_in_place(&mut limbs, limb);
             let n = -Natural::from_limbs_asc(&old_limbs)
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
-            let mut expected_limbs = Natural::checked_from(-n).unwrap().into_limbs_asc();
+            let mut expected_limbs = Natural::exact_from(-n).into_limbs_asc();
             expected_limbs.resize(limbs.len(), 0);
             assert_eq!(limbs, expected_limbs);
         },
@@ -922,7 +913,7 @@ fn limbs_vec_neg_and_limb_neg_in_place_properties() {
                 & Integer::from_owned_twos_complement_limbs_asc(vec![limb, Limb::MAX]);
             assert_eq!(
                 Natural::from_owned_limbs_asc(limbs),
-                Natural::checked_from(-n).unwrap()
+                Natural::exact_from(-n)
             );
         },
     );
@@ -974,7 +965,7 @@ fn limbs_slice_and_pos_neg_in_place_right_properties() {
         limbs_slice_and_pos_neg_in_place_right(xs, &mut ys);
         let result =
             Integer::from(Natural::from_limbs_asc(xs)) & -Natural::from_owned_limbs_asc(ys_old);
-        let mut expected_limbs = Natural::checked_from(result).unwrap().into_limbs_asc();
+        let mut expected_limbs = Natural::exact_from(result).into_limbs_asc();
         let len = min(xs.len(), ys.len());
         expected_limbs.resize(len, 0);
         assert_eq!(&ys[..len], expected_limbs.as_slice());
@@ -989,7 +980,7 @@ fn limbs_vec_and_pos_neg_in_place_right_properties() {
         limbs_vec_and_pos_neg_in_place_right(xs, &mut ys);
         let result =
             Integer::from(Natural::from_limbs_asc(xs)) & -Natural::from_owned_limbs_asc(ys_old);
-        let mut expected_limbs = Natural::checked_from(result).unwrap().into_limbs_asc();
+        let mut expected_limbs = Natural::exact_from(result).into_limbs_asc();
         expected_limbs.resize(xs.len(), 0);
         ys.resize(xs.len(), 0);
         assert_eq!(ys, expected_limbs);
@@ -1014,8 +1005,7 @@ fn limbs_and_neg_neg_to_out_properties() {
         let b = limbs_and_neg_neg_to_out(&mut xs, ys, zs);
         let len = max(ys.len(), zs.len());
         let result =
-            Natural::checked_from(-(-Natural::from_limbs_asc(ys) & -Natural::from_limbs_asc(zs)))
-                .unwrap();
+            Natural::exact_from(-(-Natural::from_limbs_asc(ys) & -Natural::from_limbs_asc(zs)));
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(b, Natural::from_limbs_asc(&expected_limbs) == result);
@@ -1031,10 +1021,9 @@ fn limbs_slice_and_neg_neg_in_place_left_properties() {
         let xs_old = xs.clone();
         let b = limbs_slice_and_neg_neg_in_place_left(&mut xs, ys);
         let len = xs_old.len();
-        let result = Natural::checked_from(
+        let result = Natural::exact_from(
             -(-Natural::from_owned_limbs_asc(xs_old) & -Natural::from_limbs_asc(ys)),
-        )
-        .unwrap();
+        );
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(b, Natural::from_limbs_asc(&expected_limbs) == result);
@@ -1064,10 +1053,9 @@ fn limbs_slice_and_neg_neg_in_place_either_properties() {
         let ys_old = ys.clone();
         let (right, b) = limbs_slice_and_neg_neg_in_place_either(&mut xs, &mut ys);
         let len = max(xs_old.len(), ys_old.len());
-        let result = Natural::checked_from(
+        let result = Natural::exact_from(
             -(-Natural::from_limbs_asc(&xs_old) & -Natural::from_limbs_asc(&ys_old)),
-        )
-        .unwrap();
+        );
         let mut expected_limbs = result.to_limbs_asc();
         expected_limbs.resize(len, 0);
         assert_eq!(b, Natural::from_limbs_asc(&expected_limbs) == result);

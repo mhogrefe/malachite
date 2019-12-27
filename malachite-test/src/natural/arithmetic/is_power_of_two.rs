@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 
@@ -67,7 +67,7 @@ fn benchmark_natural_is_power_of_two_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, ref n)| usize::checked_from(n.significant_bits()).unwrap()),
+        &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
             ("malachite", &mut (|(_, n)| no_out!(n.is_power_of_two()))),

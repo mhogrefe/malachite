@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
@@ -194,7 +194,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_signed_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, j)| {
-                    if let Some(sum) = j.checked_add($t::checked_from(SignedLimb::WIDTH).unwrap()) {
+                    if let Some(sum) = j.checked_add($t::exact_from(SignedLimb::WIDTH)) {
                         let shifted = Integer::from(i) >> sum;
                         if i >= 0 {
                             assert_eq!(shifted, 0 as Limb);
@@ -203,7 +203,7 @@ macro_rules! tests_and_properties {
                         }
                     }
 
-                    if j < $t::checked_from(SignedLimb::WIDTH).unwrap() {
+                    if j < $t::exact_from(SignedLimb::WIDTH) {
                         assert_eq!(i >> j, Integer::from(i) >> j);
                     }
                 },
@@ -1372,7 +1372,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_positive_signed_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::checked_from(Limb::WIDTH - 1).unwrap()) {
+                    if let Some(sum) = u.checked_add($t::exact_from(Limb::WIDTH - 1)) {
                         assert_eq!(
                             Integer::from(i).shr_round(sum, RoundingMode::Down),
                             0 as Limb
@@ -1399,7 +1399,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 pairs_of_negative_signed_not_min_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
-                    if let Some(sum) = u.checked_add($t::checked_from(Limb::WIDTH - 1).unwrap()) {
+                    if let Some(sum) = u.checked_add($t::exact_from(Limb::WIDTH - 1)) {
                         assert_eq!(
                             Integer::from(i).shr_round(sum, RoundingMode::Down),
                             0 as Limb
@@ -1444,7 +1444,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 triples_of_signed_small_unsigned_and_rounding_mode_var_1::<SignedLimb, $t>,
                 |&(n, u, rm)| {
-                    if u < $t::checked_from(SignedLimb::WIDTH).unwrap() {
+                    if u < $t::exact_from(SignedLimb::WIDTH) {
                         assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
                     }
                 },
@@ -1546,11 +1546,11 @@ tests_and_properties!(
         );
 
         assert_eq!(
-            bigint_to_integer(&(&integer_to_bigint(n) >> usize::checked_from(u).unwrap())),
+            bigint_to_integer(&(&integer_to_bigint(n) >> usize::exact_from(u))),
             shifted
         );
         assert_eq!(
-            bigint_to_integer(&(integer_to_bigint(n) >> usize::checked_from(u).unwrap())),
+            bigint_to_integer(&(integer_to_bigint(n) >> usize::exact_from(u))),
             shifted
         );
     }

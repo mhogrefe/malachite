@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::round::RoundingMode;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
@@ -54,7 +54,7 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     let remainder_bits = bits.mod_power_of_two(u64::from(T::LOG_WIDTH));
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
     // Initialize the value to all binary 1s; later we'll remove chunks to create blocks of 0s.
-    let mut limbs = vec![T::MAX; usize::checked_from(limb_count).unwrap()];
+    let mut limbs = vec![T::MAX; usize::exact_from(limb_count)];
     // max_chunk_size may be as low as max(1, bits / 4) or as high as bits. The actual chunk size
     // will be between 1 and max_chunk_size, inclusive.
     let max_chunk_size = max(1, bits / (rng.gen_range(0, 4) + 1));
@@ -67,12 +67,11 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
         if i == 0 {
             break;
         }
-        limbs[usize::checked_from(i >> T::LOG_WIDTH).unwrap()]
-            .clear_bit(i & u64::from(T::WIDTH_MASK));
+        limbs[usize::exact_from(i >> T::LOG_WIDTH)].clear_bit(i & u64::from(T::WIDTH_MASK));
         chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
-            &mut limbs[usize::checked_from(i >> T::LOG_WIDTH).unwrap()..],
+            &mut limbs[usize::exact_from(i >> T::LOG_WIDTH)..],
             T::ONE << (i & u64::from(T::WIDTH_MASK)),
         );
         if i == 0 {

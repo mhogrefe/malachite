@@ -2,7 +2,7 @@ use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -243,7 +243,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
                 }
-                anp = half_n + usize::checked_from(*scratch_2.last_mut().unwrap()).unwrap();
+                anp = half_n + usize::exact_from(*scratch_2.last_mut().unwrap());
                 if !bp1_is_ys_0 {
                     let scratch_3 = &mut scratch_3[..m];
                     let (ys_0, ys_1) = ys.split_at(half_n);
@@ -252,7 +252,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                     if carry {
                         assert!(!limbs_slice_add_limb_in_place(scratch_3, 1));
                     }
-                    bnp = half_n + usize::checked_from(*scratch_3.last_mut().unwrap()).unwrap();
+                    bnp = half_n + usize::exact_from(*scratch_3.last_mut().unwrap());
                 }
             }
 

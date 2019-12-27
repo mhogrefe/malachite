@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 
 use integer::Integer;
@@ -151,7 +151,7 @@ impl<'a> Iterator for NegativeBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let significant_bits = usize::checked_from(self.bits.significant_bits).unwrap();
+        let significant_bits = usize::exact_from(self.bits.significant_bits);
         (significant_bits, Some(significant_bits))
     }
 }

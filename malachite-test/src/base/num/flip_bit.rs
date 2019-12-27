@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -57,7 +57,7 @@ fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );
@@ -78,7 +78,7 @@ fn benchmark_signed_flip_bit<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, index)| usize::checked_from(index).unwrap()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );

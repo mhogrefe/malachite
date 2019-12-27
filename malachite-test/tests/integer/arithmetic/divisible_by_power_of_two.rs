@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 use rug;
@@ -26,7 +26,7 @@ fn test_divisible_by_power_of_two() {
         assert_eq!(
             rug::Integer::from_str(n)
                 .unwrap()
-                .is_divisible_2pow(u32::checked_from(pow).unwrap()),
+                .is_divisible_2pow(u32::exact_from(pow)),
             out
         );
     };
@@ -70,7 +70,7 @@ fn divisible_by_power_of_two_properties() {
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref x, pow)| {
         let divisible = x.divisible_by_power_of_two(pow);
         assert_eq!(
-            integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()),
+            integer_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)),
             divisible
         );
         if *x != 0 as Limb {
@@ -85,7 +85,7 @@ fn divisible_by_power_of_two_properties() {
         pairs_of_integer_and_small_unsigned_var_1,
         |&(ref x, pow)| {
             assert!(x.divisible_by_power_of_two(pow));
-            assert!(integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
+            assert!(integer_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)));
             if *x != 0 as Limb {
                 assert!(x.trailing_zeros().unwrap() >= pow);
             }
@@ -98,7 +98,7 @@ fn divisible_by_power_of_two_properties() {
         pairs_of_integer_and_small_unsigned_var_2,
         |&(ref x, pow)| {
             assert!(!x.divisible_by_power_of_two(pow));
-            assert!(!integer_to_rug_integer(x).is_divisible_2pow(u32::checked_from(pow).unwrap()));
+            assert!(!integer_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)));
             if *x != 0 as Limb {
                 assert!(x.trailing_zeros().unwrap() < pow);
             }

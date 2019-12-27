@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -36,7 +36,7 @@ pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     }
     let result_limb_count = pow >> Limb::LOG_WIDTH;
     let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
-    let result_limb_count = usize::checked_from(result_limb_count).unwrap();
+    let result_limb_count = usize::exact_from(result_limb_count);
     if result_limb_count >= limbs.len() {
         return limbs.to_vec();
     }
@@ -83,7 +83,7 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
-    let new_limb_count = usize::checked_from(new_limb_count).unwrap();
+    let new_limb_count = usize::exact_from(new_limb_count);
     if new_limb_count > limbs.len() {
         return;
     }
@@ -146,7 +146,7 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is negative and res == in. `limbs` are
 /// the limbs of -in.
 pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
-    let mut new_limb_count = usize::checked_from(pow >> Limb::LOG_WIDTH).unwrap();
+    let mut new_limb_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
     if leftover_bits != 0 {
         new_limb_count += 1;

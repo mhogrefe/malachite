@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use num::{BigInt, Integer as NumInteger, Zero as NumZero};
@@ -82,7 +82,7 @@ fn benchmark_integer_divisible_by_algorithms(gm: GenerationMode, limit: usize, f
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.divisible_by(y)))),
@@ -108,7 +108,7 @@ fn benchmark_integer_divisible_by_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, _)| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(ref x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
         &mut [
             (
@@ -143,7 +143,7 @@ fn benchmark_integer_divisible_by_library_comparison(
         gm.name(),
         limit,
         file_name,
-        &(|&(_, _, (ref x, _))| usize::checked_from(x.significant_bits()).unwrap()),
+        &(|&(_, _, (ref x, _))| usize::exact_from(x.significant_bits())),
         "y.significant_bits()",
         &mut [
             (

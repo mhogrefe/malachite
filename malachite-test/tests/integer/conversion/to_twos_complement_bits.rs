@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
 use malachite_nz::integer::Integer;
@@ -419,7 +419,7 @@ fn twos_complement_bits_properties() {
         if u < n.significant_bits() {
             assert_eq!(
                 n.twos_complement_bits()[u],
-                n.to_twos_complement_bits_asc()[usize::checked_from(u).unwrap()]
+                n.to_twos_complement_bits_asc()[usize::exact_from(u)]
             );
         } else {
             assert_eq!(n.twos_complement_bits()[u], *n < 0 as Limb);
