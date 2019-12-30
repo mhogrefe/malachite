@@ -83,6 +83,7 @@ pub fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, modulus: &[Limb]) -> boo
     }
 }
 
+#[allow(clippy::absurd_extreme_comparisons)]
 fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bool> {
     let m_len = modulus.len();
     let x_len = xs.len();

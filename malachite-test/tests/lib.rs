@@ -32,8 +32,14 @@ pub mod base {
         pub mod conversion {
             pub mod checked_from;
             pub mod convertible_from;
+            pub mod from_other_type_slice;
+            pub mod join_halves;
+            pub mod lower_half;
             pub mod overflowing_from;
             pub mod saturating_from;
+            pub mod split_in_half;
+            pub mod upper_half;
+            pub mod vec_from_other_type_slice;
             pub mod wrapping_from;
         }
 
@@ -47,13 +53,9 @@ pub mod base {
         pub mod flip_bit;
         pub mod get_bit;
         pub mod increment;
-        pub mod join_halves;
         pub mod log_two;
-        pub mod lower_half;
         pub mod set_bit;
         pub mod significant_bits;
-        pub mod split_in_half;
-        pub mod upper_half;
     }
 
     pub mod rounding_modes {

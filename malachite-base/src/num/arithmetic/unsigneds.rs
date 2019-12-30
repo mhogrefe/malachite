@@ -1,8 +1,9 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedNextPowerOfTwo, DivAssignMod,
     DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModPowerOfTwo,
-    ModPowerOfTwoAssign, NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
-    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
+    NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
+    ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
@@ -126,6 +127,22 @@ macro_rules! impl_arithmetic_traits {
                 if *self != 0 && pow < $t::WIDTH.into() {
                     *self &= (1 << pow) - 1;
                 }
+            }
+        }
+
+        impl NegModPowerOfTwo for $t {
+            type Output = $t;
+
+            #[inline]
+            fn neg_mod_power_of_two(self, pow: u64) -> $t {
+                self.wrapping_neg().mod_power_of_two(pow)
+            }
+        }
+
+        impl NegModPowerOfTwoAssign for $t {
+            #[inline]
+            fn neg_mod_power_of_two_assign(&mut self, pow: u64) {
+                *self = self.neg_mod_power_of_two(pow)
             }
         }
 

@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
-use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::round::RoundingMode;
 use rand::{Rand, Rng};
 
@@ -101,21 +101,7 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
         Natural::ZERO
     } else {
-        Natural::from_owned_limbs_asc(_transform_32_to_64_bit_limbs(&limbs_random_up_to_bits(
-            rng, bits,
-        )))
+        let limbs: Vec<u32> = limbs_random_up_to_bits(rng, bits);
+        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&limbs))
     }
-}
-
-#[cfg(not(feature = "32_bit_limbs"))]
-pub fn _transform_32_to_64_bit_limbs(limbs: &[u32]) -> Vec<u64> {
-    let mut result_limbs = Vec::with_capacity(limbs.len() << 1);
-    let mut iter = limbs.chunks_exact(2);
-    for chunk in &mut iter {
-        result_limbs.push(u64::join_halves(chunk[1], chunk[0]));
-    }
-    if let Some(&last) = iter.remainder().first() {
-        result_limbs.push(u64::from(last));
-    }
-    result_limbs
 }

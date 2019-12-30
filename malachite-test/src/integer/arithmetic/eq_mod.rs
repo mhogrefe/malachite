@@ -453,11 +453,9 @@ fn benchmark_integer_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_na
                 }),
             ),
             (
-                "|Integer - Integer|.divisible_by(Natural)",
+                "(Integer - Integer).divisible_by(Natural)",
                 &mut (|(x, y, m)| {
-                    no_out!((Integer::from(x) - Integer::from(y))
-                        .unsigned_abs()
-                        .divisible_by(m))
+                    no_out!((Integer::from(x) - Integer::from(y)).divisible_by(Integer::from(m)))
                 }),
             ),
         ],

@@ -7,14 +7,10 @@ pub mod decrement;
 pub mod flip_bit;
 pub mod get_bit;
 pub mod increment;
-pub mod join_halves;
 pub mod log_two;
 pub mod logic;
-pub mod lower_half;
 pub mod set_bit;
 pub mod significant_bits;
-pub mod split_in_half;
-pub mod upper_half;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     assign_bit::register(registry);
@@ -24,12 +20,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     flip_bit::register(registry);
     get_bit::register(registry);
     increment::register(registry);
-    join_halves::register(registry);
     logic::register(registry);
     log_two::register(registry);
-    lower_half::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
-    split_in_half::register(registry);
-    upper_half::register(registry);
 }

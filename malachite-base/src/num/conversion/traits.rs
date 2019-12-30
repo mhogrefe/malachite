@@ -214,9 +214,12 @@ pub trait SplitInHalf: HasHalf {
     }
 }
 
-//TODO doc and test
-pub trait FromU32Slice: Sized {
-    fn from_u32_slice(slice: &[u32]) -> Self;
+/// Converts a slice of one type of value to a single value of another type.
+pub trait FromOtherTypeSlice<T: Sized> {
+    fn from_other_type_slice(slice: &[T]) -> Self;
+}
 
-    fn copy_from_u32_slice(out_slice: &mut [Self], in_slice: &[u32]);
+/// Converts a slice of one type of value to a `Vec` of another type.
+pub trait VecFromOtherTypeSlice<T: Sized>: Sized {
+    fn vec_from_other_type_slice(slice: &[T]) -> Vec<Self>;
 }

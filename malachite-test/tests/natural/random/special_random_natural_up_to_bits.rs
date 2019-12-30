@@ -1,6 +1,6 @@
-use malachite_base::num::logic::traits::SignificantBits;
 #[cfg(not(feature = "32_bit_limbs"))]
-use malachite_nz::natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
+use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::random::special_random_natural_up_to_bits::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -74,11 +74,9 @@ fn limbs_special_random_up_to_bits_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     test_properties_no_special(small_positive_unsigneds, |&bits| {
         let mut cloned_rng = rng.clone();
-        #[cfg(feature = "32_bit_limbs")]
-        let random_limbs = limbs_special_random_up_to_bits(&mut rng, bits);
+        let random_limbs: Vec<u32> = limbs_special_random_up_to_bits(&mut rng, bits);
         #[cfg(not(feature = "32_bit_limbs"))]
-        let random_limbs =
-            _transform_32_to_64_bit_limbs(&limbs_special_random_up_to_bits(&mut rng, bits));
+        let random_limbs = Limb::vec_from_other_type_slice(&random_limbs);
         assert_eq!(
             Natural::from_owned_limbs_asc(random_limbs),
             special_random_natural_up_to_bits(&mut cloned_rng, bits)

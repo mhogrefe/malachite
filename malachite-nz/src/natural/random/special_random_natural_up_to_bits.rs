@@ -4,13 +4,13 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, SaturatingSubAssign
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::round::RoundingMode;
 use rand::distributions::{IndependentSample, Range};
 use rand::Rng;
 
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
-#[cfg(not(feature = "32_bit_limbs"))]
-use natural::random::random_natural_up_to_bits::_transform_32_to_64_bit_limbs;
 use natural::Natural;
 
 /// Returns a slice of `T`s representing a random `Natural` with up to `bits` bits; equivalently,
@@ -128,8 +128,7 @@ pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natu
     if bits == 0 {
         Natural::ZERO
     } else {
-        Natural::from_owned_limbs_asc(_transform_32_to_64_bit_limbs(
-            &limbs_special_random_up_to_bits(rng, bits),
-        ))
+        let limbs: Vec<u32> = limbs_special_random_up_to_bits(rng, bits);
+        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&limbs))
     }
 }

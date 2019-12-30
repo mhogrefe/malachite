@@ -1,11 +1,12 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedNextPowerOfTwo, FloorLogTwo,
-    IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NextPowerOfTwo,
-    NextPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
+    IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
+    RemPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::FromU32Slice;
+use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherTypeSlice};
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
@@ -15,17 +16,30 @@ pub trait PrimitiveUnsigned:
     + CheckedNextPowerOfTwo<Output = Self>
     + FloorLogTwo
     + From<u8>
-    + FromU32Slice
+    + FromOtherTypeSlice<u8>
+    + FromOtherTypeSlice<u16>
+    + FromOtherTypeSlice<u32>
+    + FromOtherTypeSlice<u64>
+    + FromOtherTypeSlice<u128>
+    + FromOtherTypeSlice<usize>
     + IsPowerOfTwo
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
     + NegMod
     + NegModAssign
+    + NegModPowerOfTwo<Output = Self>
+    + NegModPowerOfTwoAssign
     + NextPowerOfTwo<Output = Self>
     + NextPowerOfTwoAssign
     + PrimitiveInteger
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
+    + VecFromOtherTypeSlice<u8>
+    + VecFromOtherTypeSlice<u16>
+    + VecFromOtherTypeSlice<u32>
+    + VecFromOtherTypeSlice<u64>
+    + VecFromOtherTypeSlice<u128>
+    + VecFromOtherTypeSlice<usize>
 {
     type SignedOfEqualWidth: PrimitiveSigned;
 }
