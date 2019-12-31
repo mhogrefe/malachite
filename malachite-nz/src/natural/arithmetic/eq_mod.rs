@@ -1197,26 +1197,24 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         (&Natural::from(123u32)).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 Natural::from_str("2000000987654").unwrap(),
-    ///                 &Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 Natural::from_str("2000000987655").unwrap(),
-    ///                 &Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         false
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     (&Natural::from(123u32)).eq_mod(Natural::from(223u32), &Natural::from(100u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             Natural::from_str("2000000987654").unwrap(),
+    ///             &Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             Natural::from_str("2000000987655").unwrap(),
+    ///             &Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     false
+    /// );
     /// ```
     fn eq_mod(self, other: Natural, modulus: &'b Natural) -> bool {
         match (self, other, modulus) {
@@ -1263,26 +1261,24 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 &Natural::from_str("2000000987654").unwrap(),
-    ///                 Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 &Natural::from_str("2000000987655").unwrap(),
-    ///                 Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         false
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), Natural::from(100u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             &Natural::from_str("2000000987654").unwrap(),
+    ///             Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             &Natural::from_str("2000000987655").unwrap(),
+    ///             Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     false
+    /// );
     /// ```
     fn eq_mod(self, other: &'b Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
@@ -1329,26 +1325,24 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 &Natural::from_str("2000000987654").unwrap(),
-    ///                 &Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         true
-    ///     );
-    ///     assert_eq!(
-    ///         (&Natural::from_str("1000000987654").unwrap()).eq_mod(
-    ///                 &Natural::from_str("2000000987655").unwrap(),
-    ///                 &Natural::from_str("1000000000000").unwrap()
-    ///         ),
-    ///         false
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     (&Natural::from(123u32)).eq_mod(&Natural::from(223u32), &Natural::from(100u32)),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             &Natural::from_str("2000000987654").unwrap(),
+    ///             &Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from_str("1000000987654").unwrap()).eq_mod(
+    ///             &Natural::from_str("2000000987655").unwrap(),
+    ///             &Natural::from_str("1000000000000").unwrap()
+    ///     ),
+    ///     false
+    /// );
     /// ```
     fn eq_mod(self, other: &'b Natural, modulus: &'c Natural) -> bool {
         match (self, other, modulus) {

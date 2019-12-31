@@ -76,13 +76,10 @@ impl FromStr for Integer {
 
 pub mod double_limb_from_integer;
 pub mod floating_point_from_integer;
-pub mod from_double_limb;
 pub mod from_floating_point;
-pub mod from_limb;
 pub mod from_natural;
+pub mod from_primitive_integer;
 pub mod from_sign_and_limbs;
-pub mod from_signed_double_limb;
-pub mod from_signed_limb;
 pub mod from_twos_complement_bits;
 pub mod from_twos_complement_limbs;
 pub mod limb_from_integer;

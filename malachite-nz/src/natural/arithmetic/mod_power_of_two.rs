@@ -176,13 +176,11 @@ impl ModPowerOfTwo for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!(Natural::from(260u32).mod_power_of_two(8).to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!(Natural::from(260u32).mod_power_of_two(8).to_string(), "4");
     ///
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     assert_eq!(Natural::from(1611u32).mod_power_of_two(4).to_string(), "11");
-    /// }
+    /// // 100 * 2^4 + 11 = 1611
+    /// assert_eq!(Natural::from(1611u32).mod_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
     fn mod_power_of_two(mut self, other: u64) -> Natural {
@@ -209,12 +207,10 @@ impl<'a> ModPowerOfTwo for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!((&Natural::from(260u32)).mod_power_of_two(8).to_string(), "4");
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     assert_eq!((&Natural::from(1611u32)).mod_power_of_two(4).to_string(), "11");
-    /// }
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!((&Natural::from(260u32)).mod_power_of_two(8).to_string(), "4");
+    /// // 100 * 2^4 + 11 = 1611
+    /// assert_eq!((&Natural::from(1611u32)).mod_power_of_two(4).to_string(), "11");
     /// ```
     fn mod_power_of_two(self, other: u64) -> Natural {
         match *self {
@@ -244,17 +240,15 @@ impl ModPowerOfTwoAssign for Natural {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     let mut x = Natural::from(260u32);
-    ///     x.mod_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// let mut x = Natural::from(260u32);
+    /// x.mod_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "4");
     ///
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     let mut x = Natural::from(1611u32);
-    ///     x.mod_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "11");
-    /// }
+    /// // 100 * 2^4 + 11 = 1611
+    /// let mut x = Natural::from(1611u32);
+    /// x.mod_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "11");
     /// ```
     fn mod_power_of_two_assign(&mut self, other: u64) {
         match *self {
@@ -286,13 +280,11 @@ impl RemPowerOfTwo for Natural {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!(Natural::from(260u32).rem_power_of_two(8).to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!(Natural::from(260u32).rem_power_of_two(8).to_string(), "4");
     ///
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     assert_eq!(Natural::from(1611u32).rem_power_of_two(4).to_string(), "11");
-    /// }
+    /// // 100 * 2^4 + 11 = 1611
+    /// assert_eq!(Natural::from(1611u32).rem_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
     fn rem_power_of_two(self, other: u64) -> Natural {
@@ -318,12 +310,10 @@ impl<'a> RemPowerOfTwo for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!((&Natural::from(260u32)).rem_power_of_two(8).to_string(), "4");
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     assert_eq!((&Natural::from(1611u32)).rem_power_of_two(4).to_string(), "11");
-    /// }
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!((&Natural::from(260u32)).rem_power_of_two(8).to_string(), "4");
+    /// // 100 * 2^4 + 11 = 1611
+    /// assert_eq!((&Natural::from(1611u32)).rem_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
     fn rem_power_of_two(self, other: u64) -> Natural {
@@ -346,17 +336,15 @@ impl RemPowerOfTwoAssign for Natural {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     let mut x = Natural::from(260u32);
-    ///     x.rem_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// let mut x = Natural::from(260u32);
+    /// x.rem_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "4");
     ///
-    ///     // 100 * 2^4 + 11 = 1611
-    ///     let mut x = Natural::from(1611u32);
-    ///     x.rem_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "11");
-    /// }
+    /// // 100 * 2^4 + 11 = 1611
+    /// let mut x = Natural::from(1611u32);
+    /// x.rem_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "11");
     /// ```
     #[inline]
     fn rem_power_of_two_assign(&mut self, other: u64) {
@@ -383,13 +371,11 @@ impl NegModPowerOfTwo for Natural {
     /// use malachite_base::num::arithmetic::traits::NegModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 - 252 = 260
-    ///     assert_eq!(Natural::from(260u32).neg_mod_power_of_two(8).to_string(), "252");
+    /// // 2 * 2^8 - 252 = 260
+    /// assert_eq!(Natural::from(260u32).neg_mod_power_of_two(8).to_string(), "252");
     ///
-    ///     // 101 * 2^4 - 5 = 1611
-    ///     assert_eq!(Natural::from(1611u32).neg_mod_power_of_two(4).to_string(), "5");
-    /// }
+    /// // 101 * 2^4 - 5 = 1611
+    /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_two(4).to_string(), "5");
     /// ```
     #[inline]
     fn neg_mod_power_of_two(mut self, other: u64) -> Natural {
@@ -417,12 +403,10 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::NegModPowerOfTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 - 252 = 260
-    ///     assert_eq!((&Natural::from(260u32)).neg_mod_power_of_two(8).to_string(), "252");
-    ///     // 101 * 2^4 - 5 = 1611
-    ///     assert_eq!((&Natural::from(1611u32)).neg_mod_power_of_two(4).to_string(), "5");
-    /// }
+    /// // 2 * 2^8 - 252 = 260
+    /// assert_eq!((&Natural::from(260u32)).neg_mod_power_of_two(8).to_string(), "252");
+    /// // 101 * 2^4 - 5 = 1611
+    /// assert_eq!((&Natural::from(1611u32)).neg_mod_power_of_two(4).to_string(), "5");
     /// ```
     fn neg_mod_power_of_two(self, other: u64) -> Natural {
         if other == 0 {
@@ -467,17 +451,15 @@ impl NegModPowerOfTwoAssign for Natural {
     /// use malachite_base::num::arithmetic::traits::NegModPowerOfTwoAssign;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 - 252 = 260
-    ///     let mut x = Natural::from(260u32);
-    ///     x.neg_mod_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "252");
+    /// // 2 * 2^8 - 252 = 260
+    /// let mut x = Natural::from(260u32);
+    /// x.neg_mod_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "252");
     ///
-    ///     // 101 * 2^4 - 5 = 1611
-    ///     let mut x = Natural::from(1611u32);
-    ///     x.neg_mod_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "5");
-    /// }
+    /// // 101 * 2^4 - 5 = 1611
+    /// let mut x = Natural::from(1611u32);
+    /// x.neg_mod_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "5");
     /// ```
     fn neg_mod_power_of_two_assign(&mut self, other: u64) {
         if other == 0 {

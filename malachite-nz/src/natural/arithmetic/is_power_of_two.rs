@@ -52,13 +52,11 @@ impl<'a> IsPowerOfTwo for &'a Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.is_power_of_two(), false);
-    ///     assert_eq!(Natural::from(123u32).is_power_of_two(), false);
-    ///     assert_eq!(Natural::from(0x80u32).is_power_of_two(), true);
-    ///     assert_eq!(Natural::trillion().is_power_of_two(), false);
-    ///     assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
-    /// }
+    /// assert_eq!(Natural::ZERO.is_power_of_two(), false);
+    /// assert_eq!(Natural::from(123u32).is_power_of_two(), false);
+    /// assert_eq!(Natural::from(0x80u32).is_power_of_two(), true);
+    /// assert_eq!(Natural::trillion().is_power_of_two(), false);
+    /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
     /// ```
     fn is_power_of_two(self) -> bool {
         match *self {

@@ -5,7 +5,7 @@ use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromOtherTypeSlice, JoinHalves, OverflowingFrom,
-    SaturatingFrom, SplitInHalf, VecFromOtherTypeSlice, WrappingFrom,
+    SaturatingFrom, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice, WrappingFrom,
 };
 
 #[test]
@@ -385,4 +385,17 @@ pub fn test_vec_from_other_type_slice() {
         &[0xcdab, 0x01ef, 0x4523, 0x8967],
         vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89],
     );
+}
+
+#[test]
+pub fn test_vec_from_other_type() {
+    fn test<T: Debug + Eq, U: Debug + Eq>(value: T, vec: Vec<U>)
+    where
+        U: VecFromOtherType<T>,
+    {
+        assert_eq!(U::vec_from_other_type(value), vec);
+    };
+    test::<u32, u32>(123, vec![123]);
+    test::<u8, u16>(0xab, vec![0xab]);
+    test::<u16, u8>(0xcdab, vec![0xab, 0xcd]);
 }

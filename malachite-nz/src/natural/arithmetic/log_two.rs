@@ -77,10 +77,8 @@ impl<'a> FloorLogTwo for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::FloorLogTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::from(3u32).floor_log_two(), 1);
-    ///     assert_eq!(Natural::from(100u32).floor_log_two(), 6);
-    /// }
+    /// assert_eq!(Natural::from(3u32).floor_log_two(), 1);
+    /// assert_eq!(Natural::from(100u32).floor_log_two(), 6);
     /// ```
     fn floor_log_two(self) -> u64 {
         match *self {
@@ -110,10 +108,8 @@ impl<'a> CeilingLogTwo for &'a Natural {
     /// use malachite_base::num::arithmetic::traits::CeilingLogTwo;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::from(3u32).ceiling_log_two(), 2);
-    ///     assert_eq!(Natural::from(100u32).ceiling_log_two(), 7);
-    /// }
+    /// assert_eq!(Natural::from(3u32).ceiling_log_two(), 2);
+    /// assert_eq!(Natural::from(100u32).ceiling_log_two(), 7);
     /// ```
     fn ceiling_log_two(self) -> u64 {
         match *self {

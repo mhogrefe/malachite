@@ -487,13 +487,11 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((Natural::ONE * Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-///     assert_eq!((Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-///     assert_eq!((Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((Natural::ONE * Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) * Natural::ZERO).to_string(), "0");
+/// assert_eq!((Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
+/// assert_eq!((Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl Mul<Natural> for Natural {
     type Output = Natural;
@@ -523,13 +521,11 @@ impl Mul<Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-///     assert_eq!((Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-///     assert_eq!((Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((Natural::ONE * &Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
+/// assert_eq!((Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
+/// assert_eq!((Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a> Mul<&'a Natural> for Natural {
     type Output = Natural;
@@ -559,13 +555,11 @@ impl<'a> Mul<&'a Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::ONE * Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((&Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-///     assert_eq!((&Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-///     assert_eq!((&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((&Natural::ONE * Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((&Natural::from(123u32) * Natural::ZERO).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
+/// assert_eq!((&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a> Mul<Natural> for &'a Natural {
     type Output = Natural;
@@ -594,13 +588,11 @@ impl<'a> Mul<Natural> for &'a Natural {
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-///     assert_eq!((&Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-///     assert_eq!((&Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-///     assert_eq!((&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((&Natural::ONE * &Natural::from(123u32)).to_string(), "123");
+/// assert_eq!((&Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
+/// assert_eq!((&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     type Output = Natural;
@@ -640,14 +632,12 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     let mut x = Natural::ONE;
-///     x *= Natural::from_str("1000").unwrap();
-///     x *= Natural::from_str("2000").unwrap();
-///     x *= Natural::from_str("3000").unwrap();
-///     x *= Natural::from_str("4000").unwrap();
-///     assert_eq!(x.to_string(), "24000000000000");
-/// }
+/// let mut x = Natural::ONE;
+/// x *= Natural::from_str("1000").unwrap();
+/// x *= Natural::from_str("2000").unwrap();
+/// x *= Natural::from_str("3000").unwrap();
+/// x *= Natural::from_str("4000").unwrap();
+/// assert_eq!(x.to_string(), "24000000000000");
 /// ```
 impl MulAssign<Natural> for Natural {
     fn mul_assign(&mut self, mut other: Natural) {
@@ -685,14 +675,12 @@ impl MulAssign<Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     let mut x = Natural::ONE;
-///     x *= &Natural::from_str("1000").unwrap();
-///     x *= &Natural::from_str("2000").unwrap();
-///     x *= &Natural::from_str("3000").unwrap();
-///     x *= &Natural::from_str("4000").unwrap();
-///     assert_eq!(x.to_string(), "24000000000000");
-/// }
+/// let mut x = Natural::ONE;
+/// x *= &Natural::from_str("1000").unwrap();
+/// x *= &Natural::from_str("2000").unwrap();
+/// x *= &Natural::from_str("3000").unwrap();
+/// x *= &Natural::from_str("4000").unwrap();
+/// assert_eq!(x.to_string(), "24000000000000");
 /// ```
 impl<'a> MulAssign<&'a Natural> for Natural {
     fn mul_assign(&mut self, other: &'a Natural) {

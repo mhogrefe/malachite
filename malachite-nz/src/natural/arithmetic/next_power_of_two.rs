@@ -165,11 +165,9 @@ impl NextPowerOfTwo for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.next_power_of_two().to_string(), "1");
-    ///     assert_eq!(Natural::from(123u32).next_power_of_two().to_string(), "128");
-    ///     assert_eq!(Natural::trillion().next_power_of_two().to_string(), "1099511627776");
-    /// }
+    /// assert_eq!(Natural::ZERO.next_power_of_two().to_string(), "1");
+    /// assert_eq!(Natural::from(123u32).next_power_of_two().to_string(), "128");
+    /// assert_eq!(Natural::trillion().next_power_of_two().to_string(), "1099511627776");
     /// ```
     #[inline]
     fn next_power_of_two(mut self) -> Natural {
@@ -199,11 +197,9 @@ impl<'a> NextPowerOfTwo for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Natural::ZERO).next_power_of_two().to_string(), "1");
-    ///     assert_eq!((&Natural::from(123u32)).next_power_of_two().to_string(), "128");
-    ///     assert_eq!((&Natural::trillion()).next_power_of_two().to_string(), "1099511627776");
-    /// }
+    /// assert_eq!((&Natural::ZERO).next_power_of_two().to_string(), "1");
+    /// assert_eq!((&Natural::from(123u32)).next_power_of_two().to_string(), "128");
+    /// assert_eq!((&Natural::trillion()).next_power_of_two().to_string(), "1099511627776");
     /// ```
     fn next_power_of_two(self) -> Natural {
         Natural(match *self {
@@ -235,19 +231,17 @@ impl NextPowerOfTwoAssign for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     let mut x = Natural::ZERO;
-    ///     x.next_power_of_two_assign();
-    ///     assert_eq!(x.to_string(), "1");
+    /// let mut x = Natural::ZERO;
+    /// x.next_power_of_two_assign();
+    /// assert_eq!(x.to_string(), "1");
     ///
-    ///     let mut x = Natural::from(123u32);
-    ///     x.next_power_of_two_assign();
-    ///     assert_eq!(x.to_string(), "128");
+    /// let mut x = Natural::from(123u32);
+    /// x.next_power_of_two_assign();
+    /// assert_eq!(x.to_string(), "128");
     ///
-    ///     let mut x = Natural::trillion();
-    ///     x.next_power_of_two_assign();
-    ///     assert_eq!(x.to_string(), "1099511627776");
-    /// }
+    /// let mut x = Natural::trillion();
+    /// x.next_power_of_two_assign();
+    /// assert_eq!(x.to_string(), "1099511627776");
     /// ```
     fn next_power_of_two_assign(&mut self) {
         mutate_with_possible_promotion!(

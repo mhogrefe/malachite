@@ -223,3 +223,8 @@ pub trait FromOtherTypeSlice<T: Sized> {
 pub trait VecFromOtherTypeSlice<T: Sized>: Sized {
     fn vec_from_other_type_slice(slice: &[T]) -> Vec<Self>;
 }
+
+/// Converts a slice of one type of value to a `Vec` of another type.
+pub trait VecFromOtherType<T>: Sized {
+    fn vec_from_other_type(value: T) -> Vec<Self>;
+}

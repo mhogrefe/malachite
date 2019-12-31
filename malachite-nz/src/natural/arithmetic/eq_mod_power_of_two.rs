@@ -136,13 +136,15 @@ impl<'a, 'b> EqModPowerOfTwo<&'b Natural> for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Natural::ZERO).eq_mod_power_of_two(&Natural::from(256u32), 8), true);
-    ///     assert_eq!((&Natural::from(0b1101u32)).eq_mod_power_of_two(&Natural::from(0b10101u32),
-    ///         3), true);
-    ///     assert_eq!((&Natural::from(0b1101u32)).eq_mod_power_of_two(&Natural::from(0b10101u32),
-    ///         4), false);
-    /// }
+    /// assert_eq!((&Natural::ZERO).eq_mod_power_of_two(&Natural::from(256u32), 8), true);
+    /// assert_eq!(
+    ///     (&Natural::from(0b1101u32)).eq_mod_power_of_two(&Natural::from(0b10101u32), 3),
+    ///     true
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(0b1101u32)).eq_mod_power_of_two(&Natural::from(0b10101u32), 4),
+    ///     false
+    /// );
     /// ```
     fn eq_mod_power_of_two(self, other: &'b Natural, pow: u64) -> bool {
         match (self, other) {

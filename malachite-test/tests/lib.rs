@@ -39,6 +39,7 @@ pub mod base {
             pub mod saturating_from;
             pub mod split_in_half;
             pub mod upper_half;
+            pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
             pub mod wrapping_from;
         }
@@ -129,13 +130,10 @@ pub mod integer {
         pub mod clone;
         pub mod double_limb_from_integer;
         pub mod floating_point_from_integer;
-        pub mod from_double_limb;
         pub mod from_floating_point;
-        pub mod from_limb;
         pub mod from_natural;
+        pub mod from_primitive_integer;
         pub mod from_sign_and_limbs;
-        pub mod from_signed_double_limb;
-        pub mod from_signed_limb;
         pub mod from_twos_complement_bits;
         pub mod from_twos_complement_limbs;
         pub mod limb_from_integer;
@@ -220,10 +218,9 @@ pub mod natural {
         pub mod double_limb_from_natural;
         pub mod floating_point_from_natural;
         pub mod from_bits;
-        pub mod from_double_limb;
         pub mod from_floating_point;
-        pub mod from_limb;
         pub mod from_limbs;
+        pub mod from_primitive_integer;
         pub mod limb_from_natural;
         pub mod serde;
         pub mod to_bits;

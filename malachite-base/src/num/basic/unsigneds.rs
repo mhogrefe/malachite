@@ -6,7 +6,7 @@ use num::arithmetic::traits::{
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherTypeSlice};
+use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice};
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
@@ -34,6 +34,12 @@ pub trait PrimitiveUnsigned:
     + PrimitiveInteger
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
+    + VecFromOtherType<u8>
+    + VecFromOtherType<u16>
+    + VecFromOtherType<u32>
+    + VecFromOtherType<u64>
+    + VecFromOtherType<u128>
+    + VecFromOtherType<usize>
     + VecFromOtherTypeSlice<u8>
     + VecFromOtherTypeSlice<u16>
     + VecFromOtherTypeSlice<u32>

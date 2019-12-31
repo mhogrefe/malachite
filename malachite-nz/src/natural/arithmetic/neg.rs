@@ -18,10 +18,8 @@ use platform::Limb;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((-Natural::ZERO).to_string(), "0");
-///     assert_eq!((-Natural::from(123u32)).to_string(), "-123");
-/// }
+/// assert_eq!((-Natural::ZERO).to_string(), "0");
+/// assert_eq!((-Natural::from(123u32)).to_string(), "-123");
 /// ```
 impl Neg for Natural {
     type Output = Integer;
@@ -58,10 +56,8 @@ impl Neg for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((-&Natural::ZERO).to_string(), "0");
-///     assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
-/// }
+/// assert_eq!((-&Natural::ZERO).to_string(), "0");
+/// assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
 /// ```
 impl<'a> Neg for &'a Natural {
     type Output = Integer;

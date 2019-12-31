@@ -9,6 +9,7 @@ pub mod overflowing_from;
 pub mod saturating_from;
 pub mod split_in_half;
 pub mod upper_half;
+pub mod vec_from_other_type;
 pub mod vec_from_other_type_slice;
 pub mod wrapping_from;
 
@@ -22,6 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     saturating_from::register(registry);
     split_in_half::register(registry);
     upper_half::register(registry);
+    vec_from_other_type::register(registry);
     vec_from_other_type_slice::register(registry);
     wrapping_from::register(registry);
 }
