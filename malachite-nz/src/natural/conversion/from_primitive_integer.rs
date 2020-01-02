@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, SaturatingFrom, VecFromOtherType};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, SaturatingFrom, VecFromOtherType,
+};
 
 use natural::InnerNatural::Small;
 use natural::Natural;
@@ -105,6 +107,30 @@ macro_rules! impl_signed {
                 } else {
                     None
                 }
+            }
+        }
+
+        impl ConvertibleFrom<$t> for Natural {
+            /// Determines whether a value of signed primitive integer type can be converted to a
+            /// `Natural`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            ///
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
+            /// use malachite_nz::natural::Natural;
+            ///
+            /// assert_eq!(Natural::convertible_from(123i32), true);
+            /// assert_eq!(Natural::convertible_from(-123i32), false);
+            /// ```
+            #[inline]
+            fn convertible_from(i: $t) -> bool {
+                i >= 0
             }
         }
 

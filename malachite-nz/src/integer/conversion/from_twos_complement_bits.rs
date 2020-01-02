@@ -58,7 +58,7 @@ impl Integer {
         if bits.is_empty() {
             Integer::ZERO
         } else if !bits.last().unwrap() {
-            Natural::from_bits_asc(bits).into()
+            Integer::from(Natural::from_bits_asc(bits))
         } else {
             let limbs = limbs_asc_from_negative_twos_complement_bits_asc(bits);
             -Natural::from_owned_limbs_asc(limbs)
@@ -94,7 +94,7 @@ impl Integer {
         if bits.is_empty() {
             Integer::ZERO
         } else if !bits[0] {
-            Natural::from_bits_desc(bits).into()
+            Integer::from(Natural::from_bits_desc(bits))
         } else {
             let limbs = limbs_asc_from_negative_twos_complement_bits_desc(bits);
             -Natural::from_owned_limbs_asc(limbs)

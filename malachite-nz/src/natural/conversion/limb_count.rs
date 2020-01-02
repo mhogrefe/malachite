@@ -19,11 +19,9 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.limb_count(), 0);
-    ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
-    ///     assert_eq!(Natural::trillion().limb_count(), 2);
-    /// }
+    /// assert_eq!(Natural::ZERO.limb_count(), 0);
+    /// assert_eq!(Natural::from(123u32).limb_count(), 1);
+    /// assert_eq!(Natural::trillion().limb_count(), 2);
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {

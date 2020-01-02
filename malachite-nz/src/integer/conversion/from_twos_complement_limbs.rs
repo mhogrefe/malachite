@@ -43,7 +43,7 @@ impl Integer {
         if limbs.is_empty() {
             Integer::ZERO
         } else if !limbs.last().unwrap().get_highest_bit() {
-            Natural::from_limbs_asc(limbs).into()
+            Integer::from(Natural::from_limbs_asc(limbs))
         } else {
             -Natural::from_owned_limbs_asc(limbs_twos_complement(limbs))
         }
@@ -121,7 +121,7 @@ impl Integer {
         if limbs.is_empty() {
             Integer::ZERO
         } else if !limbs.last().unwrap().get_highest_bit() {
-            Natural::from_owned_limbs_asc(limbs).into()
+            Integer::from(Natural::from_owned_limbs_asc(limbs))
         } else {
             assert!(!limbs_twos_complement_in_place(&mut limbs));
             -Natural::from_owned_limbs_asc(limbs)

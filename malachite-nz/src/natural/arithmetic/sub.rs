@@ -677,14 +677,12 @@ impl Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-///     assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+/// assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl Sub<Natural> for Natural {
     type Output = Natural;
@@ -712,14 +710,12 @@ impl Sub<Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-///     assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+/// assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a> Sub<&'a Natural> for Natural {
     type Output = Natural;
@@ -747,14 +743,12 @@ impl<'a> Sub<&'a Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-///     assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+/// assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a> Sub<Natural> for &'a Natural {
     type Output = Natural;
@@ -781,14 +775,12 @@ impl<'a> Sub<Natural> for &'a Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-///     assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+/// assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Natural;

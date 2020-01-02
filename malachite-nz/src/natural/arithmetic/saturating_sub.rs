@@ -21,16 +21,14 @@ use natural::Natural;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)).to_string(), "0");
-///     assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO).to_string(), "123");
-///     assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (Natural::trillion() * Natural::from(3u32))
-///             .saturating_sub(Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!(Natural::ZERO.saturating_sub(Natural::from(123u32)).to_string(), "0");
+/// assert_eq!(Natural::from(123u32).saturating_sub(Natural::ZERO).to_string(), "123");
+/// assert_eq!(Natural::from(456u32).saturating_sub(Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (Natural::trillion() * Natural::from(3u32))
+///         .saturating_sub(Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl SaturatingSub<Natural> for Natural {
     type Output = Natural;
@@ -58,16 +56,14 @@ impl SaturatingSub<Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)).to_string(), "0");
-///     assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO).to_string(), "123");
-///     assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)).to_string(), "333");
-///     assert_eq!(
-///         (Natural::trillion() * Natural::from(3u32))
-///             .saturating_sub(&Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!(Natural::ZERO.saturating_sub(&Natural::from(123u32)).to_string(), "0");
+/// assert_eq!(Natural::from(123u32).saturating_sub(&Natural::ZERO).to_string(), "123");
+/// assert_eq!(Natural::from(456u32).saturating_sub(&Natural::from(123u32)).to_string(), "333");
+/// assert_eq!(
+///     (Natural::trillion() * Natural::from(3u32))
+///         .saturating_sub(&Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a> SaturatingSub<&'a Natural> for Natural {
     type Output = Natural;
@@ -95,17 +91,15 @@ impl<'a> SaturatingSub<&'a Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::ZERO).saturating_sub(Natural::from(123u32)).to_string(), "0");
-///     assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO).to_string(), "123");
-///     assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)).to_string(),
-///         "333");
-///     assert_eq!(
-///         (&(Natural::trillion() * Natural::from(3u32)))
-///             .saturating_sub(Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((&Natural::ZERO).saturating_sub(Natural::from(123u32)).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32)).saturating_sub(Natural::ZERO).to_string(), "123");
+/// assert_eq!((&Natural::from(456u32)).saturating_sub(Natural::from(123u32)).to_string(),
+///     "333");
+/// assert_eq!(
+///     (&(Natural::trillion() * Natural::from(3u32)))
+///         .saturating_sub(Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a> SaturatingSub<Natural> for &'a Natural {
     type Output = Natural;
@@ -133,17 +127,15 @@ impl<'a> SaturatingSub<Natural> for &'a Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::ZERO).saturating_sub(&Natural::from(123u32)).to_string(), "0");
-///     assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO).to_string(), "123");
-///     assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)).to_string(),
-///         "333");
-///     assert_eq!(
-///         (&(Natural::trillion() * Natural::from(3u32)))
-///             .saturating_sub(&Natural::trillion()).to_string(),
-///         "2000000000000"
-///     );
-/// }
+/// assert_eq!((&Natural::ZERO).saturating_sub(&Natural::from(123u32)).to_string(), "0");
+/// assert_eq!((&Natural::from(123u32)).saturating_sub(&Natural::ZERO).to_string(), "123");
+/// assert_eq!((&Natural::from(456u32)).saturating_sub(&Natural::from(123u32)).to_string(),
+///     "333");
+/// assert_eq!(
+///     (&(Natural::trillion() * Natural::from(3u32)))
+///         .saturating_sub(&Natural::trillion()).to_string(),
+///     "2000000000000"
+/// );
 /// ```
 impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
     type Output = Natural;
@@ -174,23 +166,21 @@ impl<'a, 'b> SaturatingSub<&'a Natural> for &'b Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(Natural::from(123u32));
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(Natural::from(123u32));
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(Natural::ZERO);
-///     assert_eq!(x.to_string(), "123");
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(Natural::ZERO);
+/// assert_eq!(x.to_string(), "123");
 ///
-///     let mut x = Natural::from(456u32);
-///     x.saturating_sub_assign(Natural::from(123u32));
-///     assert_eq!(x.to_string(), "333");
+/// let mut x = Natural::from(456u32);
+/// x.saturating_sub_assign(Natural::from(123u32));
+/// assert_eq!(x.to_string(), "333");
 ///
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(Natural::from(456u32));
-///     assert_eq!(x.to_string(), "0");
-/// }
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(Natural::from(456u32));
+/// assert_eq!(x.to_string(), "0");
 /// ```
 impl SaturatingSubAssign<Natural> for Natural {
     fn saturating_sub_assign(&mut self, other: Natural) {
@@ -221,23 +211,21 @@ impl SaturatingSubAssign<Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(&Natural::from(123u32));
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(&Natural::from(123u32));
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(&Natural::ZERO);
-///     assert_eq!(x.to_string(), "123");
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(&Natural::ZERO);
+/// assert_eq!(x.to_string(), "123");
 ///
-///     let mut x = Natural::from(456u32);
-///     x.saturating_sub_assign(&Natural::from(123u32));
-///     assert_eq!(x.to_string(), "333");
+/// let mut x = Natural::from(456u32);
+/// x.saturating_sub_assign(&Natural::from(123u32));
+/// assert_eq!(x.to_string(), "333");
 ///
-///     let mut x = Natural::from(123u32);
-///     x.saturating_sub_assign(&Natural::from(456u32));
-///     assert_eq!(x.to_string(), "0");
-/// }
+/// let mut x = Natural::from(123u32);
+/// x.saturating_sub_assign(&Natural::from(456u32));
+/// assert_eq!(x.to_string(), "0");
 /// ```
 impl<'a> SaturatingSubAssign<&'a Natural> for Natural {
     fn saturating_sub_assign(&mut self, other: &'a Natural) {

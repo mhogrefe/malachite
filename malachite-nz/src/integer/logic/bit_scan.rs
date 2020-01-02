@@ -205,9 +205,8 @@ impl Natural {
                 if starting_index >= u64::from(Limb::WIDTH) {
                     None
                 } else {
-                    let index = ((small - 1) & !((1 << starting_index) - 1))
-                        .trailing_zeros()
-                        .into();
+                    let index =
+                        u64::from(((small - 1) & !((1 << starting_index) - 1)).trailing_zeros());
                     if index == u64::from(Limb::WIDTH) {
                         None
                     } else {
@@ -226,9 +225,7 @@ impl Natural {
                 if starting_index >= u64::from(Limb::WIDTH) {
                     starting_index
                 } else {
-                    (!((small - 1) | ((1 << starting_index) - 1)))
-                        .trailing_zeros()
-                        .into()
+                    u64::from((!((small - 1) | ((1 << starting_index) - 1))).trailing_zeros())
                 }
             }
             Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),

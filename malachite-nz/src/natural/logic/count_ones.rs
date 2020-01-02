@@ -49,7 +49,7 @@ impl Natural {
     /// ```
     pub fn count_ones(&self) -> u64 {
         match *self {
-            Natural(Small(small)) => small.count_ones().into(),
+            Natural(Small(small)) => u64::from(small.count_ones()),
             Natural(Large(ref limbs)) => limbs_count_ones(limbs),
         }
     }

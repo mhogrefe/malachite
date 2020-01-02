@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 
-use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::OrdAbs;
 
 macro_rules! impl_comparison_traits {
@@ -8,15 +7,15 @@ macro_rules! impl_comparison_traits {
         impl OrdAbs for $t {
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
-                self.unsigned_abs().cmp(&other.unsigned_abs())
+                self.cmp(other)
             }
         }
     };
 }
 
-impl_comparison_traits!(i8);
-impl_comparison_traits!(i16);
-impl_comparison_traits!(i32);
-impl_comparison_traits!(i64);
-impl_comparison_traits!(i128);
-impl_comparison_traits!(isize);
+impl_comparison_traits!(u8);
+impl_comparison_traits!(u16);
+impl_comparison_traits!(u32);
+impl_comparison_traits!(u64);
+impl_comparison_traits!(u128);
+impl_comparison_traits!(usize);

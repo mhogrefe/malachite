@@ -47,21 +47,19 @@ impl<'a> Iterator for BitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.bits().next(), None);
+    /// assert_eq!(Natural::ZERO.bits().next(), None);
     ///
-    ///     // 105 = 1101001b
-    ///     let n = Natural::from(105u32);
-    ///     let mut bits = n.bits();
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), None);
-    /// }
+    /// // 105 = 1101001b
+    /// let n = Natural::from(105u32);
+    /// let mut bits = n.bits();
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), None);
     /// ```
     fn next(&mut self) -> Option<bool> {
         if self.some_remaining {
@@ -102,10 +100,8 @@ impl<'a> Iterator for BitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.bits().size_hint(), (0, Some(0)));
-    ///     assert_eq!(Natural::from(105u32).bits().size_hint(), (7, Some(7)));
-    /// }
+    /// assert_eq!(Natural::ZERO.bits().size_hint(), (0, Some(0)));
+    /// assert_eq!(Natural::from(105u32).bits().size_hint(), (7, Some(7)));
     /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         let significant_bits = usize::exact_from(self.significant_bits);
@@ -129,21 +125,19 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.bits().next_back(), None);
+    /// assert_eq!(Natural::ZERO.bits().next_back(), None);
     ///
-    ///     // 105 = 1101001b
-    ///     let n = Natural::from(105u32);
-    ///     let mut bits = n.bits();
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), None);
-    /// }
+    /// // 105 = 1101001b
+    /// let n = Natural::from(105u32);
+    /// let mut bits = n.bits();
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), None);
     /// ```
     fn next_back(&mut self) -> Option<bool> {
         if self.some_remaining {
@@ -193,22 +187,20 @@ impl<'a> Index<u64> for BitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.bits()[0], false);
+    /// assert_eq!(Natural::ZERO.bits()[0], false);
     ///
-    ///     // 105 = 1101001b
-    ///     let n = Natural::from(105u32);
-    ///     let bits = n.bits();
-    ///     assert_eq!(bits[0], true);
-    ///     assert_eq!(bits[1], false);
-    ///     assert_eq!(bits[2], false);
-    ///     assert_eq!(bits[3], true);
-    ///     assert_eq!(bits[4], false);
-    ///     assert_eq!(bits[5], true);
-    ///     assert_eq!(bits[6], true);
-    ///     assert_eq!(bits[7], false);
-    ///     assert_eq!(bits[100], false);
-    /// }
+    /// // 105 = 1101001b
+    /// let n = Natural::from(105u32);
+    /// let bits = n.bits();
+    /// assert_eq!(bits[0], true);
+    /// assert_eq!(bits[1], false);
+    /// assert_eq!(bits[2], false);
+    /// assert_eq!(bits[3], true);
+    /// assert_eq!(bits[4], false);
+    /// assert_eq!(bits[5], true);
+    /// assert_eq!(bits[6], true);
+    /// assert_eq!(bits[7], false);
+    /// assert_eq!(bits[100], false);
     /// ```
     fn index(&self, index: u64) -> &bool {
         if self.limbs.n.get_bit(index) {
@@ -237,12 +229,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.to_bits_asc().is_empty());
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Natural::from(105u32).to_bits_asc(),
-    ///         vec![true, false, false, true, false, true, true]);
-    /// }
+    /// assert!(Natural::ZERO.to_bits_asc().is_empty());
+    /// // 105 = 1101001b
+    /// assert_eq!(Natural::from(105u32).to_bits_asc(),
+    ///     vec![true, false, false, true, false, true, true]);
     /// ```
     pub fn to_bits_asc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
@@ -253,7 +243,7 @@ impl Natural {
         let last_index = usize::exact_from(self.limb_count()) - 1;
         let mut last = limbs[last_index];
         for limb in limbs.take(last_index) {
-            for i in 0..Limb::WIDTH.into() {
+            for i in 0..u64::from(Limb::WIDTH) {
                 bits.push(limb.get_bit(i));
             }
         }
@@ -281,12 +271,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.to_bits_desc().is_empty());
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Natural::from(105u32).to_bits_desc(),
-    ///         vec![true, true, false, true, false, false, true]);
-    /// }
+    /// assert!(Natural::ZERO.to_bits_desc().is_empty());
+    /// // 105 = 1101001b
+    /// assert_eq!(Natural::from(105u32).to_bits_desc(),
+    ///     vec![true, true, false, true, false, false, true]);
     /// ```
     pub fn to_bits_desc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
@@ -331,17 +319,15 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.bits().next().is_none());
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Natural::from(105u32).bits().collect::<Vec<bool>>(),
-    ///         vec![true, false, false, true, false, true, true]);
+    /// assert!(Natural::ZERO.bits().next().is_none());
+    /// // 105 = 1101001b
+    /// assert_eq!(Natural::from(105u32).bits().collect::<Vec<bool>>(),
+    ///     vec![true, false, false, true, false, true, true]);
     ///
-    ///     assert!(Natural::ZERO.bits().next_back().is_none());
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Natural::from(105u32).bits().rev().collect::<Vec<bool>>(),
-    ///         vec![true, true, false, true, false, false, true]);
-    /// }
+    /// assert!(Natural::ZERO.bits().next_back().is_none());
+    /// // 105 = 1101001b
+    /// assert_eq!(Natural::from(105u32).bits().rev().collect::<Vec<bool>>(),
+    ///     vec![true, true, false, true, false, false, true]);
     /// ```
     pub fn bits(&self) -> BitIterator {
         let significant_bits = self.significant_bits();

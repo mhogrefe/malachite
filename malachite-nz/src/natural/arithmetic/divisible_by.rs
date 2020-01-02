@@ -53,7 +53,7 @@ pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     assert!(limbs.len() > 1);
     if divisor.even() {
         let twos = divisor.trailing_zeros();
-        limbs[0].divisible_by_power_of_two(twos.into())
+        limbs[0].divisible_by_power_of_two(u64::from(twos))
             && limbs_mod_exact_odd_limb(limbs, divisor >> twos, 0) == 0
     } else {
         limbs_mod_exact_odd_limb(limbs, divisor, 0) == 0

@@ -61,7 +61,7 @@ impl Natural {
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
             Natural(Small(0)) => None,
-            Natural(Small(small)) => Some(small.trailing_zeros().into()),
+            Natural(Small(small)) => Some(u64::from(small.trailing_zeros())),
             Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
         }
     }

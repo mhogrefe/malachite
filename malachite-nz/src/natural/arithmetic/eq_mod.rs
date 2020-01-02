@@ -116,7 +116,7 @@ pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool
         let twos = modulus.trailing_zeros();
         if !limbs[0]
             .wrapping_sub(limb)
-            .divisible_by_power_of_two(twos.into())
+            .divisible_by_power_of_two(u64::from(twos))
         {
             return false;
         }

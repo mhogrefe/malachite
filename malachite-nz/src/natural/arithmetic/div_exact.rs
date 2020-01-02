@@ -101,7 +101,7 @@ pub fn test_invert_limb_table() {
 pub fn limbs_modular_invert_limb(limb: Limb) -> Limb {
     assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
-    let mut inverse: Limb = INVERT_LIMB_TABLE[usize::exact_from(index)].into();
+    let mut inverse = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
     inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
     inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
     if !cfg!(feature = "32_bit_limbs") {

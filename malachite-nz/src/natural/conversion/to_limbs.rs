@@ -44,16 +44,14 @@ impl<'a> Iterator for LimbIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.limbs().next(), None);
+    /// assert_eq!(Natural::ZERO.limbs().next(), None);
     ///
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
-    ///     let mut limbs = trillion.limbs();
-    ///     assert_eq!(limbs.next(), Some(3567587328));
-    ///     assert_eq!(limbs.next(), Some(232));
-    ///     assert_eq!(limbs.next(), None);
-    /// }
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// let trillion = Natural::trillion();
+    /// let mut limbs = trillion.limbs();
+    /// assert_eq!(limbs.next(), Some(3567587328));
+    /// assert_eq!(limbs.next(), Some(232));
+    /// assert_eq!(limbs.next(), None);
     /// ```
     fn next(&mut self) -> Option<Limb> {
         if self.some_remaining {
@@ -88,10 +86,8 @@ impl<'a> Iterator for LimbIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.limbs().size_hint(), (0, Some(0)));
-    ///     assert_eq!(Natural::trillion().limbs().size_hint(), (2, Some(2)));
-    /// }
+    /// assert_eq!(Natural::ZERO.limbs().size_hint(), (0, Some(0)));
+    /// assert_eq!(Natural::trillion().limbs().size_hint(), (2, Some(2)));
     /// ```
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.limb_count, Some(self.limb_count))
@@ -114,16 +110,14 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.limbs().next_back(), None);
+    /// assert_eq!(Natural::ZERO.limbs().next_back(), None);
     ///
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
-    ///     let mut limbs = trillion.limbs();
-    ///     assert_eq!(limbs.next_back(), Some(232));
-    ///     assert_eq!(limbs.next_back(), Some(3567587328));
-    ///     assert_eq!(limbs.next_back(), None);
-    /// }
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// let trillion = Natural::trillion();
+    /// let mut limbs = trillion.limbs();
+    /// assert_eq!(limbs.next_back(), Some(232));
+    /// assert_eq!(limbs.next_back(), Some(3567587328));
+    /// assert_eq!(limbs.next_back(), None);
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
         if self.some_remaining {
@@ -164,17 +158,15 @@ impl<'a> Index<usize> for LimbIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.limbs()[0], 0);
+    /// assert_eq!(Natural::ZERO.limbs()[0], 0);
     ///
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     let trillion = Natural::trillion();
-    ///     let limbs = trillion.limbs();
-    ///     assert_eq!(limbs[0], 3567587328);
-    ///     assert_eq!(limbs[1], 232);
-    ///     assert_eq!(limbs[2], 0);
-    ///     assert_eq!(limbs[100], 0);
-    /// }
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// let trillion = Natural::trillion();
+    /// let limbs = trillion.limbs();
+    /// assert_eq!(limbs[0], 3567587328);
+    /// assert_eq!(limbs[1], 232);
+    /// assert_eq!(limbs[2], 0);
+    /// assert_eq!(limbs[100], 0);
     /// ```
     fn index(&self, index: usize) -> &Limb {
         if index >= self.limb_count {
@@ -212,12 +204,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.to_limbs_asc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_asc(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_asc(), &[3567587328, 232]);
-    /// }
+    /// assert!(Natural::ZERO.to_limbs_asc().is_empty());
+    /// assert_eq!(Natural::from(123u32).to_limbs_asc(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().to_limbs_asc(), &[3567587328, 232]);
     /// ```
     pub fn to_limbs_asc(&self) -> Vec<Limb> {
         match *self {
@@ -250,12 +240,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.to_limbs_desc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).to_limbs_desc(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().to_limbs_desc(), &[232, 3567587328]);
-    /// }
+    /// assert!(Natural::ZERO.to_limbs_desc().is_empty());
+    /// assert_eq!(Natural::from(123u32).to_limbs_desc(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().to_limbs_desc(), &[232, 3567587328]);
     /// ```
     pub fn to_limbs_desc(&self) -> Vec<Limb> {
         match *self {
@@ -286,12 +274,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.into_limbs_asc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).into_limbs_asc(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_asc(), &[3567587328, 232]);
-    /// }
+    /// assert!(Natural::ZERO.into_limbs_asc().is_empty());
+    /// assert_eq!(Natural::from(123u32).into_limbs_asc(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().into_limbs_asc(), &[3567587328, 232]);
     /// ```
     pub fn into_limbs_asc(self) -> Vec<Limb> {
         match self {
@@ -324,12 +310,10 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.into_limbs_desc().is_empty());
-    ///     assert_eq!(Natural::from(123u32).into_limbs_desc(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().into_limbs_desc(), &[232, 3567587328]);
-    /// }
+    /// assert!(Natural::ZERO.into_limbs_desc().is_empty());
+    /// assert_eq!(Natural::from(123u32).into_limbs_desc(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().into_limbs_desc(), &[232, 3567587328]);
     /// ```
     pub fn into_limbs_desc(self) -> Vec<Limb> {
         match self {
@@ -361,18 +345,16 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert!(Natural::ZERO.limbs().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(), &[3567587328, 232]);
+    /// assert!(Natural::ZERO.limbs().next().is_none());
+    /// assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(), &[3567587328, 232]);
     ///
-    ///     assert!(Natural::ZERO.limbs().rev().next().is_none());
-    ///     assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), &[123]);
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Natural::trillion().limbs().rev().collect::<Vec<u32>>(),
-    ///         &[232, 3567587328]);
-    /// }
+    /// assert!(Natural::ZERO.limbs().rev().next().is_none());
+    /// assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), &[123]);
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Natural::trillion().limbs().rev().collect::<Vec<u32>>(),
+    ///     &[232, 3567587328]);
     /// ```
     pub fn limbs(&self) -> LimbIterator {
         let limb_count = self.limb_count();

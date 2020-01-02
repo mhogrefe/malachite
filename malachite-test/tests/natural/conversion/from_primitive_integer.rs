@@ -1,6 +1,8 @@
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
+};
 use malachite_nz::natural::Natural;
 use num::BigUint;
 use rug;
@@ -66,6 +68,18 @@ fn test_saturating_from_i32() {
 }
 
 #[test]
+fn test_convertible_from_i32() {
+    let test = |i: i32, out| {
+        assert_eq!(Natural::convertible_from(i), out);
+    };
+    test(0, true);
+    test(123, true);
+    test(-123, false);
+    test(i32::MAX, true);
+    test(i32::MIN, false);
+}
+
+#[test]
 fn test_checked_from_i64() {
     let test = |i: i64, out| {
         let on = Natural::checked_from(i);
@@ -93,12 +107,25 @@ fn test_saturating_from_i64() {
     test(i64::MIN, "0");
 }
 
+#[test]
+fn test_convertible_from_i64() {
+    let test = |i: i64, out| {
+        assert_eq!(Natural::convertible_from(i), out);
+    };
+    test(0, true);
+    test(123, true);
+    test(-123, false);
+    test(i64::MAX, true);
+    test(i64::MIN, false);
+}
+
 macro_rules! unsigned_properties {
     ($t: ident) => {
         test_properties(unsigneds::<$t>, |&u| {
             let n = Natural::from(u);
             assert!(n.is_valid());
-            //TODO assert_eq!($u::checked_from(&n), Some(u));
+            assert_eq!($t::exact_from(&n), u);
+            assert_eq!(Natural::from(u128::exact_from(u)), n);
         });
     };
 }
@@ -109,10 +136,13 @@ macro_rules! signed_properties {
             let on = Natural::checked_from(i);
             assert!(on.as_ref().map_or(true, |n| n.is_valid()));
             assert_eq!(on.is_some(), i >= 0);
+            assert_eq!(Natural::convertible_from(i), i >= 0);
             let n = Natural::saturating_from(i);
             assert!(n.is_valid());
             if let Some(x) = on.as_ref() {
                 assert_eq!(*x, n);
+                assert_eq!($t::exact_from(x), i);
+                assert_eq!(Natural::exact_from(i128::exact_from(i)), n);
             } else {
                 assert_eq!(n, Natural::ZERO);
             }
@@ -121,7 +151,7 @@ macro_rules! signed_properties {
 }
 
 #[test]
-fn from_limb_properties() {
+fn from_primitive_integer_properties() {
     test_properties(unsigneds::<u32>, |&u| {
         let n = Natural::from(u);
         assert_eq!(biguint_to_natural(&BigUint::from(u)), n);

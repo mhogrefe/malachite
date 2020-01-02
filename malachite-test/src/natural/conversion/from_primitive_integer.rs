@@ -1,6 +1,8 @@
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
+};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use num::BigUint;
@@ -26,6 +28,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_saturating_from_i32);
     register_demo!(registry, demo_natural_saturating_from_i64);
     register_demo!(registry, demo_natural_saturating_from_isize);
+    register_demo!(registry, demo_natural_convertible_from_i8);
+    register_demo!(registry, demo_natural_convertible_from_i16);
+    register_demo!(registry, demo_natural_convertible_from_i32);
+    register_demo!(registry, demo_natural_convertible_from_i64);
+    register_demo!(registry, demo_natural_convertible_from_isize);
     register_bench!(registry, None, benchmark_natural_from_u8);
     register_bench!(registry, None, benchmark_natural_from_u16);
     register_bench!(registry, None, benchmark_natural_from_u32);
@@ -41,6 +48,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_natural_saturating_from_i32);
     register_bench!(registry, None, benchmark_natural_saturating_from_i64);
     register_bench!(registry, None, benchmark_natural_saturating_from_isize);
+    register_bench!(registry, None, benchmark_natural_convertible_from_i8);
+    register_bench!(registry, None, benchmark_natural_convertible_from_i16);
+    register_bench!(registry, None, benchmark_natural_convertible_from_i32);
+    register_bench!(registry, None, benchmark_natural_convertible_from_i64);
+    register_bench!(registry, None, benchmark_natural_convertible_from_isize);
     register_bench!(
         registry,
         None,
@@ -99,8 +111,10 @@ macro_rules! demo_and_bench_signed {
         $t:ident,
         $checked_from_demo_name:ident,
         $saturating_from_demo_name:ident,
+        $convertible_from_demo_name:ident,
         $checked_from_bench_name:ident,
-        $saturating_from_bench_name:ident
+        $saturating_from_bench_name:ident,
+        $convertible_from_bench_name:ident
     ) => {
         fn $checked_from_demo_name(gm: GenerationMode, limit: usize) {
             for i in signeds::<$t>(gm).take(limit) {
@@ -118,6 +132,20 @@ macro_rules! demo_and_bench_signed {
                     "Natural::saturating_from({}) = {}",
                     i,
                     Natural::saturating_from(i)
+                );
+            }
+        }
+
+        fn $convertible_from_demo_name(gm: GenerationMode, limit: usize) {
+            for i in signeds::<$t>(gm).take(limit) {
+                println!(
+                    "{} is {}convertible to a Limb",
+                    i,
+                    if Natural::convertible_from(i) {
+                        ""
+                    } else {
+                        "not "
+                    },
                 );
             }
         }
@@ -149,6 +177,23 @@ macro_rules! demo_and_bench_signed {
                 &mut [("malachite", &mut (|i| no_out!(Natural::saturating_from(i))))],
             );
         }
+
+        fn $convertible_from_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+            m_run_benchmark(
+                &format!("Natural::convertible_from({})", $t::NAME),
+                BenchmarkType::Single,
+                signeds::<$t>(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|i| usize::exact_from(i.significant_bits())),
+                "i.significant_bits()",
+                &mut [(
+                    "malachite",
+                    &mut (|i| no_out!(Natural::convertible_from(i))),
+                )],
+            );
+        }
     };
 }
 
@@ -162,36 +207,46 @@ demo_and_bench_signed!(
     i8,
     demo_natural_checked_from_i8,
     demo_natural_saturating_from_i8,
+    demo_natural_convertible_from_i8,
     benchmark_natural_checked_from_i8,
-    benchmark_natural_saturating_from_i8
+    benchmark_natural_saturating_from_i8,
+    benchmark_natural_convertible_from_i8
 );
 demo_and_bench_signed!(
     i16,
     demo_natural_checked_from_i16,
     demo_natural_saturating_from_i16,
+    demo_natural_convertible_from_i16,
     benchmark_natural_checked_from_i16,
-    benchmark_natural_saturating_from_i16
+    benchmark_natural_saturating_from_i16,
+    benchmark_natural_convertible_from_i16
 );
 demo_and_bench_signed!(
     i32,
     demo_natural_checked_from_i32,
     demo_natural_saturating_from_i32,
+    demo_natural_convertible_from_i32,
     benchmark_natural_checked_from_i32,
-    benchmark_natural_saturating_from_i32
+    benchmark_natural_saturating_from_i32,
+    benchmark_natural_convertible_from_i32
 );
 demo_and_bench_signed!(
     i64,
     demo_natural_checked_from_i64,
     demo_natural_saturating_from_i64,
+    demo_natural_convertible_from_i64,
     benchmark_natural_checked_from_i64,
-    benchmark_natural_saturating_from_i64
+    benchmark_natural_saturating_from_i64,
+    benchmark_natural_convertible_from_i64
 );
 demo_and_bench_signed!(
     isize,
     demo_natural_checked_from_isize,
     demo_natural_saturating_from_isize,
+    demo_natural_convertible_from_isize,
     benchmark_natural_checked_from_isize,
-    benchmark_natural_saturating_from_isize
+    benchmark_natural_saturating_from_isize,
+    benchmark_natural_convertible_from_isize
 );
 
 fn benchmark_natural_from_u32_library_comparison(

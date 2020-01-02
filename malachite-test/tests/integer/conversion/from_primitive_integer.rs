@@ -1,11 +1,13 @@
 use malachite_base::comparison::{Max, Min};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use num::BigInt;
 use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::common::{bigint_to_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{signeds, unsigneds};
+use malachite_test::inputs::base::{natural_signeds, signeds, unsigneds};
 
 #[test]
 fn test_from_u32() {
@@ -68,21 +70,26 @@ fn test_from_i64() {
 }
 
 macro_rules! unsigned_properties {
-    ($t: ident) => {
-        test_properties(unsigneds::<$t>, |&u| {
+    ($u: ident) => {
+        test_properties(unsigneds::<$u>, |&u| {
             let n = Integer::from(u);
             assert!(n.is_valid());
-            //TODO assert_eq!($u::checked_from(&n), Some(u));
+            //TODO assert_eq!($u::exact_from(&n), u);
+            assert_eq!(Integer::from(Natural::from(u)), n);
         });
     };
 }
 
 macro_rules! signed_properties {
-    ($t: ident) => {
-        test_properties(signeds::<$t>, |&i| {
+    ($s: ident) => {
+        test_properties(signeds::<$s>, |&i| {
             let n = Integer::from(i);
             assert!(n.is_valid());
-            //TODO assert_eq!($i::checked_from(&n), Some(u));
+            //TODO assert_eq!($s::exact_from(&n), i);
+        });
+
+        test_properties(natural_signeds::<$s>, |&i| {
+            assert_eq!(Integer::from(Natural::exact_from(i)), Integer::from(i));
         });
     };
 }

@@ -77,7 +77,7 @@ impl Integer {
 impl Natural {
     fn count_zeros_neg(&self) -> u64 {
         match *self {
-            Natural(Small(small)) => small.wrapping_neg().count_zeros().into(),
+            Natural(Small(small)) => u64::from(small.wrapping_neg().count_zeros()),
             Natural(Large(ref limbs)) => limbs_count_zeros_neg(limbs),
         }
     }

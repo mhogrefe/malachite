@@ -215,13 +215,12 @@ pub mod natural {
 
     pub mod conversion {
         pub mod clone;
-        pub mod double_limb_from_natural;
         pub mod floating_point_from_natural;
         pub mod from_bits;
         pub mod from_floating_point;
         pub mod from_limbs;
         pub mod from_primitive_integer;
-        pub mod limb_from_natural;
+        pub mod primitive_integer_from_natural;
         pub mod serde;
         pub mod to_bits;
         pub mod to_limbs;
