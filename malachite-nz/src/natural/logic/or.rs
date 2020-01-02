@@ -372,11 +372,9 @@ impl Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-///     assert_eq!((Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-///         "1000000004095");
-/// }
+/// assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
+/// assert_eq!((Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
+///     "1000000004095");
 /// ```
 impl BitOr<Natural> for Natural {
     type Output = Natural;
@@ -405,11 +403,9 @@ impl BitOr<Natural> for Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-///     assert_eq!((Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-///         "1000000004095");
-/// }
+/// assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
+/// assert_eq!((Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
+///     "1000000004095");
 /// ```
 impl<'a> BitOr<&'a Natural> for Natural {
     type Output = Natural;
@@ -438,11 +434,9 @@ impl<'a> BitOr<&'a Natural> for Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-///     assert_eq!((&Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-///         "1000000004095");
-/// }
+/// assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
+/// assert_eq!((&Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
+///     "1000000004095");
 /// ```
 impl<'a> BitOr<Natural> for &'a Natural {
     type Output = Natural;
@@ -470,11 +464,9 @@ impl<'a> BitOr<Natural> for &'a Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-///     assert_eq!((&Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-///         "1000000004095");
-/// }
+/// assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
+/// assert_eq!((&Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
+///     "1000000004095");
 /// ```
 impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     type Output = Natural;
@@ -505,14 +497,12 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::ZERO;
-///     x |= Natural::from(0x0000_000fu32);
-///     x |= Natural::from(0x0000_0f00u32);
-///     x |= Natural::from(0x000f_0000u32);
-///     x |= Natural::from(0x0f00_0000u32);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Natural::ZERO;
+/// x |= Natural::from(0x0000_000fu32);
+/// x |= Natural::from(0x0000_0f00u32);
+/// x |= Natural::from(0x000f_0000u32);
+/// x |= Natural::from(0x0f00_0000u32);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl BitOrAssign<Natural> for Natural {
     fn bitor_assign(&mut self, other: Natural) {
@@ -547,14 +537,12 @@ impl BitOrAssign<Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::ZERO;
-///     x |= &Natural::from(0x0000_000fu32);
-///     x |= &Natural::from(0x0000_0f00u32);
-///     x |= &Natural::from(0x000f_0000u32);
-///     x |= &Natural::from(0x0f00_0000u32);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Natural::ZERO;
+/// x |= &Natural::from(0x0000_000fu32);
+/// x |= &Natural::from(0x0000_0f00u32);
+/// x |= &Natural::from(0x000f_0000u32);
+/// x |= &Natural::from(0x0f00_0000u32);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl<'a> BitOrAssign<&'a Natural> for Natural {
     fn bitor_assign(&mut self, other: &'a Natural) {

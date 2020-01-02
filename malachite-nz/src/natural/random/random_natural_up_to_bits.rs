@@ -32,14 +32,12 @@ use natural::Natural;
 /// use malachite_nz::natural::random::random_natural_up_to_bits::limbs_random_up_to_bits;
 /// use rand::{SeedableRng, StdRng};
 ///
-/// fn main() {
-///     let seed: &[_] = &[1, 2, 3, 4];
-///     let mut rng: StdRng = SeedableRng::from_seed(seed);
-///     assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 4), &[2]);
-///     assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 10), &[205]);
-///     assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 100),
-///         &[1930352495, 1261517434, 2051352252, 14]);
-/// }
+/// let seed: &[_] = &[1, 2, 3, 4];
+/// let mut rng: StdRng = SeedableRng::from_seed(seed);
+/// assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 4), &[2]);
+/// assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 10), &[205]);
+/// assert_eq!(limbs_random_up_to_bits::<u32, _>(&mut rng, 100),
+///     &[1930352495, 1261517434, 2051352252, 14]);
 /// ```
 pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
     rng: &mut R,

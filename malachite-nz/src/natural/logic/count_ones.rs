@@ -39,13 +39,11 @@ impl Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.count_ones(), 0);
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Natural::from(105u32).count_ones(), 4);
-    ///     // 10^12 = 1110100011010100101001010001000000000000b
-    ///     assert_eq!(Natural::trillion().count_ones(), 13);
-    /// }
+    /// assert_eq!(Natural::ZERO.count_ones(), 0);
+    /// // 105 = 1101001b
+    /// assert_eq!(Natural::from(105u32).count_ones(), 4);
+    /// // 10^12 = 1110100011010100101001010001000000000000b
+    /// assert_eq!(Natural::trillion().count_ones(), 13);
     /// ```
     pub fn count_ones(&self) -> u64 {
         match *self {

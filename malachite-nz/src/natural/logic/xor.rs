@@ -372,13 +372,8 @@ impl Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
-///     assert_eq!(
-///         (Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(),
-///         "8191"
-///     );
-/// }
+/// assert_eq!((Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
+/// assert_eq!((Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(), "8191");
 /// ```
 impl BitXor<Natural> for Natural {
     type Output = Natural;
@@ -407,13 +402,8 @@ impl BitXor<Natural> for Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
-///     assert_eq!(
-///         (Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(),
-///         "8191"
-///     );
-/// }
+/// assert_eq!((Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
+/// assert_eq!((Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(), "8191");
 /// ```
 impl<'a> BitXor<&'a Natural> for Natural {
     type Output = Natural;
@@ -442,13 +432,8 @@ impl<'a> BitXor<&'a Natural> for Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
-///     assert_eq!(
-///         (&Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(),
-///         "8191"
-///     );
-/// }
+/// assert_eq!((&Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
+/// assert_eq!((&Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(), "8191");
 /// ```
 impl<'a> BitXor<Natural> for &'a Natural {
     type Output = Natural;
@@ -476,13 +461,8 @@ impl<'a> BitXor<Natural> for &'a Natural {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((&Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
-///     assert_eq!(
-///         (&Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(),
-///         "8191"
-///     );
-/// }
+/// assert_eq!((&Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
+/// assert_eq!((&Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(), "8191");
 /// ```
 impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
     type Output = Natural;
@@ -517,14 +497,12 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::ZERO;
-///     x ^= Natural::from(0x0000_000fu32);
-///     x ^= Natural::from(0x0000_0f00u32);
-///     x ^= Natural::from(0x000f_0000u32);
-///     x ^= Natural::from(0x0f00_0000u32);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Natural::ZERO;
+/// x ^= Natural::from(0x0000_000fu32);
+/// x ^= Natural::from(0x0000_0f00u32);
+/// x ^= Natural::from(0x000f_0000u32);
+/// x ^= Natural::from(0x0f00_0000u32);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl BitXorAssign<Natural> for Natural {
     fn bitxor_assign(&mut self, other: Natural) {
@@ -560,14 +538,12 @@ impl BitXorAssign<Natural> for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::ZERO;
-///     x |= Natural::from(0x0000_000fu32);
-///     x |= Natural::from(0x0000_0f00u32);
-///     x |= Natural::from(0x000f_0000u32);
-///     x |= Natural::from(0x0f00_0000u32);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Natural::ZERO;
+/// x |= Natural::from(0x0000_000fu32);
+/// x |= Natural::from(0x0000_0f00u32);
+/// x |= Natural::from(0x000f_0000u32);
+/// x |= Natural::from(0x0f00_0000u32);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl<'a> BitXorAssign<&'a Natural> for Natural {
     fn bitxor_assign(&mut self, other: &'a Natural) {

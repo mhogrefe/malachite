@@ -53,10 +53,8 @@ impl<'a> SignificantBits for &'a Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::ZERO.significant_bits(), 0);
-    ///     assert_eq!(Natural::from(100u32).significant_bits(), 7);
-    /// }
+    /// assert_eq!(Natural::ZERO.significant_bits(), 0);
+    /// assert_eq!(Natural::from(100u32).significant_bits(), 7);
     /// ```
     fn significant_bits(self) -> u64 {
         match *self {

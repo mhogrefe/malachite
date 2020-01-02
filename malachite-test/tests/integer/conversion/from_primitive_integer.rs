@@ -74,8 +74,9 @@ macro_rules! unsigned_properties {
         test_properties(unsigneds::<$u>, |&u| {
             let n = Integer::from(u);
             assert!(n.is_valid());
-            //TODO assert_eq!($u::exact_from(&n), u);
+            assert_eq!($u::exact_from(&n), u);
             assert_eq!(Integer::from(Natural::from(u)), n);
+            assert_eq!(Integer::from(u128::exact_from(u)), n);
         });
     };
 }
@@ -85,7 +86,8 @@ macro_rules! signed_properties {
         test_properties(signeds::<$s>, |&i| {
             let n = Integer::from(i);
             assert!(n.is_valid());
-            //TODO assert_eq!($s::exact_from(&n), i);
+            assert_eq!($s::exact_from(&n), i);
+            assert_eq!(Integer::from(i128::exact_from(i)), n);
         });
 
         test_properties(natural_signeds::<$s>, |&i| {
@@ -95,7 +97,7 @@ macro_rules! signed_properties {
 }
 
 #[test]
-fn from_limb_properties() {
+fn from_primitive_integer_properties() {
     test_properties(unsigneds::<u32>, |&u| {
         let n = Integer::from(u);
         assert_eq!(bigint_to_integer(&BigInt::from(u)), n);

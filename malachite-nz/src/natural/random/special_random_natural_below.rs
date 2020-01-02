@@ -27,18 +27,16 @@ use platform::Limb;
 /// use malachite_nz::natural::random::special_random_natural_below::special_random_natural_below;
 /// use rand::{SeedableRng, StdRng};
 ///
-/// fn main() {
-///     let seed: &[_] = &[1, 2, 3, 4];
-///     let mut rng: StdRng = SeedableRng::from_seed(seed);
-///     assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(10u32))),
-///         "101");
-///     assert_eq!(
-///         format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(1_000_000u32))),
-///         "1110001111000001111"
-///     );
-///     assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::trillion())),
-///         "11111110000111111111100011111111000");
-/// }
+/// let seed: &[_] = &[1, 2, 3, 4];
+/// let mut rng: StdRng = SeedableRng::from_seed(seed);
+/// assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(10u32))),
+///     "101");
+/// assert_eq!(
+///     format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(1_000_000u32))),
+///     "1110001111000001111"
+/// );
+/// assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::trillion())),
+///     "11111110000111111111100011111111000");
 /// ```
 pub fn special_random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
     assert_ne!(*n, 0 as Limb, "Cannot generate a Natural below 0");

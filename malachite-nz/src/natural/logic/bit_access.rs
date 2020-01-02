@@ -139,23 +139,21 @@ pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     let mut x = Natural::ZERO;
-///     x.assign_bit(2, true);
-///     x.assign_bit(5, true);
-///     x.assign_bit(6, true);
-///     assert_eq!(x.to_string(), "100");
-///     x.assign_bit(2, false);
-///     x.assign_bit(5, false);
-///     x.assign_bit(6, false);
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Natural::ZERO;
+/// x.assign_bit(2, true);
+/// x.assign_bit(5, true);
+/// x.assign_bit(6, true);
+/// assert_eq!(x.to_string(), "100");
+/// x.assign_bit(2, false);
+/// x.assign_bit(5, false);
+/// x.assign_bit(6, false);
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Natural::ZERO;
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "1024");
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "0");
-/// }
+/// let mut x = Natural::ZERO;
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "1024");
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "0");
 /// ```
 impl BitAccess for Natural {
     /// Determines whether the `index`th bit of a `Natural`, or the coefficient of
@@ -173,13 +171,11 @@ impl BitAccess for Natural {
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::from(123u32).get_bit(2), false);
-    ///     assert_eq!(Natural::from(123u32).get_bit(3), true);
-    ///     assert_eq!(Natural::from(123u32).get_bit(100), false);
-    ///     assert_eq!(Natural::trillion().get_bit(12), true);
-    ///     assert_eq!(Natural::trillion().get_bit(100), false);
-    /// }
+    /// assert_eq!(Natural::from(123u32).get_bit(2), false);
+    /// assert_eq!(Natural::from(123u32).get_bit(3), true);
+    /// assert_eq!(Natural::from(123u32).get_bit(100), false);
+    /// assert_eq!(Natural::trillion().get_bit(12), true);
+    /// assert_eq!(Natural::trillion().get_bit(100), false);
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match *self {
@@ -204,13 +200,11 @@ impl BitAccess for Natural {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     let mut x = Natural::ZERO;
-    ///     x.set_bit(2);
-    ///     x.set_bit(5);
-    ///     x.set_bit(6);
-    ///     assert_eq!(x.to_string(), "100");
-    /// }
+    /// let mut x = Natural::ZERO;
+    /// x.set_bit(2);
+    /// x.set_bit(5);
+    /// x.set_bit(6);
+    /// assert_eq!(x.to_string(), "100");
     /// ```
     fn set_bit(&mut self, index: u64) {
         mutate_with_possible_promotion!(
@@ -247,14 +241,12 @@ impl BitAccess for Natural {
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     let mut x = Natural::from(0x7fu32);
-    ///     x.clear_bit(0);
-    ///     x.clear_bit(1);
-    ///     x.clear_bit(3);
-    ///     x.clear_bit(4);
-    ///     assert_eq!(x.to_string(), "100");
-    /// }
+    /// let mut x = Natural::from(0x7fu32);
+    /// x.clear_bit(0);
+    /// x.clear_bit(1);
+    /// x.clear_bit(3);
+    /// x.clear_bit(4);
+    /// assert_eq!(x.to_string(), "100");
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match *self {

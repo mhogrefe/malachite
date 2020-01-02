@@ -98,10 +98,8 @@ pub fn limbs_not_in_place(limbs: &mut [Limb]) {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((!Natural::ZERO).to_string(), "-1");
-///     assert_eq!((!Natural::from(123u32)).to_string(), "-124");
-/// }
+/// assert_eq!((!Natural::ZERO).to_string(), "-1");
+/// assert_eq!((!Natural::from(123u32)).to_string(), "-124");
 /// ```
 impl Not for Natural {
     type Output = Integer;
@@ -131,10 +129,8 @@ impl Not for Natural {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::natural::Natural;
 ///
-/// fn main() {
-///     assert_eq!((!&Natural::ZERO).to_string(), "-1");
-///     assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
-/// }
+/// assert_eq!((!&Natural::ZERO).to_string(), "-1");
+/// assert_eq!((!&Natural::from(123u32)).to_string(), "-124");
 /// ```
 impl<'a> Not for &'a Natural {
     type Output = Integer;

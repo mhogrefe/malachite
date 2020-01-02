@@ -128,7 +128,6 @@ pub mod integer {
 
     pub mod conversion {
         pub mod clone;
-        pub mod double_limb_from_integer;
         pub mod floating_point_from_integer;
         pub mod from_floating_point;
         pub mod from_natural;
@@ -136,11 +135,9 @@ pub mod integer {
         pub mod from_sign_and_limbs;
         pub mod from_twos_complement_bits;
         pub mod from_twos_complement_limbs;
-        pub mod limb_from_integer;
         pub mod natural_from_integer;
+        pub mod primitive_integer_from_integer;
         pub mod serde;
-        pub mod signed_double_limb_from_integer;
-        pub mod signed_limb_from_integer;
         pub mod to_sign_and_limbs;
         pub mod to_twos_complement_bits;
         pub mod to_twos_complement_limbs;

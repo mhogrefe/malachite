@@ -56,13 +56,11 @@ impl Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::ZERO + Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(-123) + Integer::ZERO).to_string(), "-123");
-///     assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
-///     assert_eq!((-Integer::trillion() + Integer::trillion() * Integer::from(2u32)).to_string(),
-///         "1000000000000");
-/// }
+/// assert_eq!((Integer::ZERO + Integer::from(123)).to_string(), "123");
+/// assert_eq!((Integer::from(-123) + Integer::ZERO).to_string(), "-123");
+/// assert_eq!((Integer::from(-123) + Integer::from(456)).to_string(), "333");
+/// assert_eq!((-Integer::trillion() + Integer::trillion() * Integer::from(2u32)).to_string(),
+///     "1000000000000");
 /// ```
 impl Add<Integer> for Integer {
     type Output = Integer;
@@ -95,15 +93,13 @@ impl Add<Integer> for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::ZERO + &Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
-///     assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-///     assert_eq!(
-///         (-Integer::trillion() + &(Integer::trillion() * Integer::from(2u32))).to_string(),
-///         "1000000000000"
-///     );
-/// }
+/// assert_eq!((Integer::ZERO + &Integer::from(123)).to_string(), "123");
+/// assert_eq!((Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
+/// assert_eq!((Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+/// assert_eq!(
+///     (-Integer::trillion() + &(Integer::trillion() * Integer::from(2u32))).to_string(),
+///     "1000000000000"
+/// );
 /// ```
 impl<'a> Add<&'a Integer> for Integer {
     type Output = Integer;
@@ -132,15 +128,13 @@ impl<'a> Add<&'a Integer> for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::ZERO + Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(-123) + Integer::ZERO).to_string(), "-123");
-///     assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
-///     assert_eq!(
-///         (&(-Integer::trillion()) + Integer::trillion() * Integer::from(2u32)).to_string(),
-///         "1000000000000"
-///     );
-/// }
+/// assert_eq!((&Integer::ZERO + Integer::from(123)).to_string(), "123");
+/// assert_eq!((&Integer::from(-123) + Integer::ZERO).to_string(), "-123");
+/// assert_eq!((&Integer::from(-123) + Integer::from(456)).to_string(), "333");
+/// assert_eq!(
+///     (&(-Integer::trillion()) + Integer::trillion() * Integer::from(2u32)).to_string(),
+///     "1000000000000"
+/// );
 /// ```
 impl<'a> Add<Integer> for &'a Integer {
     type Output = Integer;
@@ -168,15 +162,13 @@ impl<'a> Add<Integer> for &'a Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::ZERO + &Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
-///     assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
-///     assert_eq!(
-///         (&(-Integer::trillion()) + &(Integer::trillion() * Integer::from(2u32))).to_string(),
-///         "1000000000000"
-///     );
-/// }
+/// assert_eq!((&Integer::ZERO + &Integer::from(123)).to_string(), "123");
+/// assert_eq!((&Integer::from(-123) + &Integer::ZERO).to_string(), "-123");
+/// assert_eq!((&Integer::from(-123) + &Integer::from(456)).to_string(), "333");
+/// assert_eq!(
+///     (&(-Integer::trillion()) + &(Integer::trillion() * Integer::from(2u32))).to_string(),
+///     "1000000000000"
+/// );
 /// ```
 impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     type Output = Integer;
@@ -247,14 +239,12 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x += -Integer::trillion();
-///     x += Integer::trillion() * Integer::from(2u32);
-///     x += -Integer::trillion() * Integer::from(3u32);
-///     x += Integer::trillion() * Integer::from(4u32);
-///     assert_eq!(x.to_string(), "2000000000000");
-/// }
+/// let mut x = Integer::ZERO;
+/// x += -Integer::trillion();
+/// x += Integer::trillion() * Integer::from(2u32);
+/// x += -Integer::trillion() * Integer::from(3u32);
+/// x += Integer::trillion() * Integer::from(4u32);
+/// assert_eq!(x.to_string(), "2000000000000");
 /// ```
 impl AddAssign<Integer> for Integer {
     fn add_assign(&mut self, mut other: Integer) {
@@ -311,14 +301,12 @@ impl AddAssign<Integer> for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x += &(-Integer::trillion());
-///     x += &(Integer::trillion() * Integer::from(2u32));
-///     x += &(-Integer::trillion() * Integer::from(3u32));
-///     x += &(Integer::trillion() * Integer::from(4u32));
-///     assert_eq!(x.to_string(), "2000000000000");
-/// }
+/// let mut x = Integer::ZERO;
+/// x += &(-Integer::trillion());
+/// x += &(Integer::trillion() * Integer::from(2u32));
+/// x += &(-Integer::trillion() * Integer::from(3u32));
+/// x += &(Integer::trillion() * Integer::from(4u32));
+/// assert_eq!(x.to_string(), "2000000000000");
 /// ```
 impl<'a> AddAssign<&'a Integer> for Integer {
     fn add_assign(&mut self, other: &'a Integer) {

@@ -101,15 +101,13 @@ impl Crementable for Integer {
     /// use malachite_base::crement::Crementable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut i = Integer::from(10);
-    ///     i.increment();
-    ///     assert_eq!(i, 11);
+    /// let mut i = Integer::from(10);
+    /// i.increment();
+    /// assert_eq!(i, 11);
     ///
-    ///     let mut i = Integer::from(-5);
-    ///     i.increment();
-    ///     assert_eq!(i, -4);
-    /// }
+    /// let mut i = Integer::from(-5);
+    /// i.increment();
+    /// assert_eq!(i, -4);
     /// ```
     #[inline]
     fn increment(&mut self) {
@@ -132,15 +130,13 @@ impl Crementable for Integer {
     /// use malachite_base::crement::Crementable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut i = Integer::from(10);
-    ///     i.decrement();
-    ///     assert_eq!(i, 9);
+    /// let mut i = Integer::from(10);
+    /// i.decrement();
+    /// assert_eq!(i, 9);
     ///
-    ///     let mut i = Integer::from(-5);
-    ///     i.decrement();
-    ///     assert_eq!(i, -6);
-    /// }
+    /// let mut i = Integer::from(-5);
+    /// i.decrement();
+    /// assert_eq!(i, -6);
     /// ```
     #[inline]
     fn decrement(&mut self) {

@@ -18,19 +18,17 @@ use natural::Natural;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Integer::ZERO;
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Integer::from(123);
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "123");
+/// let mut x = Integer::from(123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
 ///
-///     let mut x = Integer::from(-123);
-///     x.abs_assign();
-///     assert_eq!(x.to_string(), "123");
-/// }
+/// let mut x = Integer::from(-123);
+/// x.abs_assign();
+/// assert_eq!(x.to_string(), "123");
 /// ```
 impl AbsAssign for Integer {
     #[inline]
@@ -57,11 +55,9 @@ impl Abs for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.abs().to_string(), "0");
-    ///     assert_eq!(Integer::from(123).abs().to_string(), "123");
-    ///     assert_eq!(Integer::from(-123).abs().to_string(), "123");
-    /// }
+    /// assert_eq!(Integer::ZERO.abs().to_string(), "0");
+    /// assert_eq!(Integer::from(123).abs().to_string(), "123");
+    /// assert_eq!(Integer::from(-123).abs().to_string(), "123");
     /// ```
     #[inline]
     fn abs(mut self) -> Integer {
@@ -90,11 +86,9 @@ impl<'a> Abs for &'a Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).abs().to_string(), "0");
-    ///     assert_eq!((&Integer::from(123)).abs().to_string(), "123");
-    ///     assert_eq!((&Integer::from(-123)).abs().to_string(), "123");
-    /// }
+    /// assert_eq!((&Integer::ZERO).abs().to_string(), "0");
+    /// assert_eq!((&Integer::from(123)).abs().to_string(), "123");
+    /// assert_eq!((&Integer::from(-123)).abs().to_string(), "123");
     /// ```
     fn abs(self) -> Integer {
         Integer {
@@ -123,11 +117,9 @@ impl UnsignedAbs for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.unsigned_abs().to_string(), "0");
-    ///     assert_eq!(Integer::from(123).unsigned_abs().to_string(), "123");
-    ///     assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
-    /// }
+    /// assert_eq!(Integer::ZERO.unsigned_abs().to_string(), "0");
+    /// assert_eq!(Integer::from(123).unsigned_abs().to_string(), "123");
+    /// assert_eq!(Integer::from(-123).unsigned_abs().to_string(), "123");
     /// ```
     #[inline]
     fn unsigned_abs(self) -> Natural {
@@ -156,11 +148,9 @@ impl<'a> UnsignedAbs for &'a Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).unsigned_abs().to_string(), "0");
-    ///     assert_eq!((&Integer::from(123)).unsigned_abs().to_string(), "123");
-    ///     assert_eq!((&Integer::from(-123)).unsigned_abs().to_string(), "123");
-    /// }
+    /// assert_eq!((&Integer::ZERO).unsigned_abs().to_string(), "0");
+    /// assert_eq!((&Integer::from(123)).unsigned_abs().to_string(), "123");
+    /// assert_eq!((&Integer::from(-123)).unsigned_abs().to_string(), "123");
     /// ```
     #[inline]
     fn unsigned_abs(self) -> Natural {
@@ -183,11 +173,9 @@ impl<'a> UnsignedAbs for &'a Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!(Integer::ZERO.unsigned_abs_ref().to_string(), "0");
-///     assert_eq!(Integer::from(123).unsigned_abs_ref().to_string(), "123");
-///     assert_eq!(Integer::from(-123).unsigned_abs_ref().to_string(), "123");
-/// }
+/// assert_eq!(Integer::ZERO.unsigned_abs_ref().to_string(), "0");
+/// assert_eq!(Integer::from(123).unsigned_abs_ref().to_string(), "123");
+/// assert_eq!(Integer::from(-123).unsigned_abs_ref().to_string(), "123");
 /// ```
 impl Integer {
     #[inline]

@@ -22,14 +22,12 @@ use natural::Natural;
 /// use malachite_nz::natural::random::special_random_natural_with_bits::*;
 /// use rand::{SeedableRng, StdRng};
 ///
-/// fn main() {
-///     let seed: &[_] = &[1, 2, 3, 4];
-///     let mut rng: StdRng = SeedableRng::from_seed(seed);
-///     assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 4)), "1101");
-///     assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 10)), "1111111100");
-///     assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 80)),
-///         "10000000000000000000010000000000000000000001111111111111111111100011111111111111");
-/// }
+/// let seed: &[_] = &[1, 2, 3, 4];
+/// let mut rng: StdRng = SeedableRng::from_seed(seed);
+/// assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 4)), "1101");
+/// assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 10)), "1111111100");
+/// assert_eq!(format!("{:b}", special_random_natural_with_bits(&mut rng, 80)),
+///     "10000000000000000000010000000000000000000001111111111111111111100011111111111111");
 /// ```
 pub fn special_random_natural_with_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     let mut n = special_random_natural_up_to_bits(rng, bits);
