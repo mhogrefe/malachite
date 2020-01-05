@@ -23,11 +23,9 @@ impl Sign for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.sign(), Ordering::Equal);
-    ///     assert_eq!(Integer::from(123).sign(), Ordering::Greater);
-    ///     assert_eq!(Integer::from(-123).sign(), Ordering::Less);
-    /// }
+    /// assert_eq!(Integer::ZERO.sign(), Ordering::Equal);
+    /// assert_eq!(Integer::from(123).sign(), Ordering::Greater);
+    /// assert_eq!(Integer::from(-123).sign(), Ordering::Less);
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {

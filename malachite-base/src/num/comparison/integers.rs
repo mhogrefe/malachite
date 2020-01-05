@@ -6,6 +6,22 @@ use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 macro_rules! impl_comparison_traits {
     ($t:ident) => {
         impl PartialOrdAbs<$t> for $t {
+            /// Compare the absolute values of `self` and `other`, taking both by reference. The
+            /// `PartialOrdAbs` interface allows for pairs of incomparable elements, but for
+            /// primitive integers these never occur.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
+            /// use std::cmp::Ordering;
+            ///
+            /// assert_eq!(123i32.partial_cmp_abs(&-456), Some(Ordering::Less));
+            /// assert_eq!(123i32.partial_cmp_abs(&-123), Some(Ordering::Equal));
+            /// ```
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 Some(self.cmp_abs(other))

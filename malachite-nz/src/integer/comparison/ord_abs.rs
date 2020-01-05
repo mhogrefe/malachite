@@ -20,12 +20,10 @@ use integer::Integer;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert!(Integer::from(-123).lt_abs(&Integer::from(-124)));
-///     assert!(Integer::from(-123).le_abs(&Integer::from(-124)));
-///     assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
-///     assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
-/// }
+/// assert!(Integer::from(-123).lt_abs(&Integer::from(-124)));
+/// assert!(Integer::from(-123).le_abs(&Integer::from(-124)));
+/// assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
+/// assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
 /// ```
 impl PartialOrdAbs for Integer {
     #[inline]

@@ -32,16 +32,14 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.to_sign_and_limbs_asc(), (Ordering::Equal, vec![]));
-    ///     assert_eq!(Integer::from(123).to_sign_and_limbs_asc(), (Ordering::Greater, vec![123]));
-    ///     assert_eq!(Integer::from(-123).to_sign_and_limbs_asc(), (Ordering::Less, vec![123]));
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().to_sign_and_limbs_asc(),
-    ///         (Ordering::Greater, vec![3567587328, 232]));
-    ///     assert_eq!((-Integer::trillion()).to_sign_and_limbs_asc(),
-    ///         (Ordering::Less, vec![3567587328, 232]));
-    /// }
+    /// assert_eq!(Integer::ZERO.to_sign_and_limbs_asc(), (Ordering::Equal, vec![]));
+    /// assert_eq!(Integer::from(123).to_sign_and_limbs_asc(), (Ordering::Greater, vec![123]));
+    /// assert_eq!(Integer::from(-123).to_sign_and_limbs_asc(), (Ordering::Less, vec![123]));
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Integer::trillion().to_sign_and_limbs_asc(),
+    ///     (Ordering::Greater, vec![3567587328, 232]));
+    /// assert_eq!((-Integer::trillion()).to_sign_and_limbs_asc(),
+    ///     (Ordering::Less, vec![3567587328, 232]));
     /// ```
     pub fn to_sign_and_limbs_asc(&self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.to_limbs_asc())
@@ -73,16 +71,14 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.to_sign_and_limbs_desc(), (Ordering::Equal, vec![]));
-    ///     assert_eq!(Integer::from(123).to_sign_and_limbs_desc(), (Ordering::Greater, vec![123]));
-    ///     assert_eq!(Integer::from(-123).to_sign_and_limbs_desc(), (Ordering::Less, vec![123]));
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().to_sign_and_limbs_desc(),
-    ///         (Ordering::Greater, vec![232, 3567587328]));
-    ///     assert_eq!((-Integer::trillion()).to_sign_and_limbs_desc(),
-    ///         (Ordering::Less, vec![232, 3567587328]));
-    /// }
+    /// assert_eq!(Integer::ZERO.to_sign_and_limbs_desc(), (Ordering::Equal, vec![]));
+    /// assert_eq!(Integer::from(123).to_sign_and_limbs_desc(), (Ordering::Greater, vec![123]));
+    /// assert_eq!(Integer::from(-123).to_sign_and_limbs_desc(), (Ordering::Less, vec![123]));
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Integer::trillion().to_sign_and_limbs_desc(),
+    ///     (Ordering::Greater, vec![232, 3567587328]));
+    /// assert_eq!((-Integer::trillion()).to_sign_and_limbs_desc(),
+    ///     (Ordering::Less, vec![232, 3567587328]));
     /// ```
     pub fn to_sign_and_limbs_desc(&self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.to_limbs_desc())
@@ -114,17 +110,15 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.into_sign_and_limbs_asc(), (Ordering::Equal, vec![]));
-    ///     assert_eq!(Integer::from(123).into_sign_and_limbs_asc(),
-    ///         (Ordering::Greater, vec![123]));
-    ///     assert_eq!(Integer::from(-123).into_sign_and_limbs_asc(), (Ordering::Less, vec![123]));
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().into_sign_and_limbs_asc(),
-    ///         (Ordering::Greater, vec![3567587328, 232]));
-    ///     assert_eq!((-Integer::trillion()).into_sign_and_limbs_asc(),
-    ///         (Ordering::Less, vec![3567587328, 232]));
-    /// }
+    /// assert_eq!(Integer::ZERO.into_sign_and_limbs_asc(), (Ordering::Equal, vec![]));
+    /// assert_eq!(Integer::from(123).into_sign_and_limbs_asc(),
+    ///     (Ordering::Greater, vec![123]));
+    /// assert_eq!(Integer::from(-123).into_sign_and_limbs_asc(), (Ordering::Less, vec![123]));
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Integer::trillion().into_sign_and_limbs_asc(),
+    ///     (Ordering::Greater, vec![3567587328, 232]));
+    /// assert_eq!((-Integer::trillion()).into_sign_and_limbs_asc(),
+    ///     (Ordering::Less, vec![3567587328, 232]));
     /// ```
     pub fn into_sign_and_limbs_asc(self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.into_limbs_asc())
@@ -156,17 +150,15 @@ impl Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.into_sign_and_limbs_desc(), (Ordering::Equal, vec![]));
-    ///     assert_eq!(Integer::from(123).into_sign_and_limbs_desc(),
-    ///         (Ordering::Greater, vec![123]));
-    ///     assert_eq!(Integer::from(-123).into_sign_and_limbs_desc(), (Ordering::Less, vec![123]));
-    ///     // 10^12 = 232 * 2^32 + 3567587328
-    ///     assert_eq!(Integer::trillion().into_sign_and_limbs_desc(),
-    ///         (Ordering::Greater, vec![232, 3567587328]));
-    ///     assert_eq!((-Integer::trillion()).into_sign_and_limbs_desc(),
-    ///         (Ordering::Less, vec![232, 3567587328]));
-    /// }
+    /// assert_eq!(Integer::ZERO.into_sign_and_limbs_desc(), (Ordering::Equal, vec![]));
+    /// assert_eq!(Integer::from(123).into_sign_and_limbs_desc(),
+    ///     (Ordering::Greater, vec![123]));
+    /// assert_eq!(Integer::from(-123).into_sign_and_limbs_desc(), (Ordering::Less, vec![123]));
+    /// // 10^12 = 232 * 2^32 + 3567587328
+    /// assert_eq!(Integer::trillion().into_sign_and_limbs_desc(),
+    ///     (Ordering::Greater, vec![232, 3567587328]));
+    /// assert_eq!((-Integer::trillion()).into_sign_and_limbs_desc(),
+    ///     (Ordering::Less, vec![232, 3567587328]));
     /// ```
     pub fn into_sign_and_limbs_desc(self) -> (Ordering, Vec<Limb>) {
         (self.sign(), self.abs.into_limbs_desc())

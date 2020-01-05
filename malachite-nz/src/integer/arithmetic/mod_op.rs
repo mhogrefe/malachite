@@ -32,19 +32,17 @@ impl Mod<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(Integer::from(23).mod_op(Integer::from(10)).to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(Integer::from(23).mod_op(Integer::from(10)).to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!(Integer::from(23).mod_op(Integer::from(-10)).to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!(Integer::from(23).mod_op(Integer::from(-10)).to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!(Integer::from(-23).mod_op(Integer::from(10)).to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(10)).to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!(Integer::from(-23).mod_op(Integer::from(-10)).to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!(Integer::from(-23).mod_op(Integer::from(-10)).to_string(), "-3");
     /// ```
     #[inline]
     fn mod_op(mut self, other: Integer) -> Integer {
@@ -77,19 +75,17 @@ impl<'a> Mod<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(Integer::from(23).mod_op(&Integer::from(10)).to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(10)).to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!(Integer::from(23).mod_op(&Integer::from(-10)).to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!(Integer::from(23).mod_op(&Integer::from(-10)).to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!(Integer::from(-23).mod_op(&Integer::from(10)).to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(10)).to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!(Integer::from(-23).mod_op(&Integer::from(-10)).to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!(Integer::from(-23).mod_op(&Integer::from(-10)).to_string(), "-3");
     /// ```
     #[inline]
     fn mod_op(mut self, other: &'a Integer) -> Integer {
@@ -122,19 +118,17 @@ impl<'a> Mod<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!((&Integer::from(23)).mod_op(Integer::from(10)).to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(10)).to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!((&Integer::from(23)).mod_op(Integer::from(-10)).to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!((&Integer::from(23)).mod_op(Integer::from(-10)).to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!((&Integer::from(-23)).mod_op(Integer::from(10)).to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(10)).to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)).to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)).to_string(), "-3");
     /// ```
     fn mod_op(self, other: Integer) -> Integer {
         let remainder = if self.sign == other.sign {
@@ -174,19 +168,17 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::Mod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!((&Integer::from(23)).mod_op(&Integer::from(10)).to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(10)).to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!((&Integer::from(23)).mod_op(&Integer::from(-10)).to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!((&Integer::from(23)).mod_op(&Integer::from(-10)).to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(10)).to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(10)).to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)).to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)).to_string(), "-3");
     /// ```
     fn mod_op(self, other: &'b Integer) -> Integer {
         let remainder = if self.sign == other.sign {
@@ -224,27 +216,25 @@ impl ModAssign<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.mod_assign(Integer::from(10));
-    ///     assert_eq!(x.to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Integer::from(23);
+    /// x.mod_assign(Integer::from(10));
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.mod_assign(Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// let mut x = Integer::from(23);
+    /// x.mod_assign(Integer::from(-10));
+    /// assert_eq!(x.to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.mod_assign(Integer::from(10));
-    ///     assert_eq!(x.to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.mod_assign(Integer::from(10));
+    /// assert_eq!(x.to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.mod_assign(Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.mod_assign(Integer::from(-10));
+    /// assert_eq!(x.to_string(), "-3");
     /// ```
     fn mod_assign(&mut self, other: Integer) {
         if self.sign == other.sign {
@@ -278,27 +268,25 @@ impl<'a> ModAssign<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::ModAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.mod_assign(&Integer::from(10));
-    ///     assert_eq!(x.to_string(), "3");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Integer::from(23);
+    /// x.mod_assign(&Integer::from(10));
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.mod_assign(&Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "-7");
+    /// // -3 * -10 + -7 = 23
+    /// let mut x = Integer::from(23);
+    /// x.mod_assign(&Integer::from(-10));
+    /// assert_eq!(x.to_string(), "-7");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.mod_assign(&Integer::from(10));
-    ///     assert_eq!(x.to_string(), "7");
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.mod_assign(&Integer::from(10));
+    /// assert_eq!(x.to_string(), "7");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.mod_assign(&Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "-3");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.mod_assign(&Integer::from(-10));
+    /// assert_eq!(x.to_string(), "-3");
     /// ```
     fn mod_assign(&mut self, other: &'a Integer) {
         if self.sign == other.sign {
@@ -588,19 +576,17 @@ impl CeilingMod<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(Integer::from(23).ceiling_mod(Integer::from(10)).to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(10)).to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!(Integer::from(23).ceiling_mod(Integer::from(-10)).to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!(Integer::from(23).ceiling_mod(Integer::from(-10)).to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(10)).to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(10)).to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(-10)).to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!(Integer::from(-23).ceiling_mod(Integer::from(-10)).to_string(), "7");
     /// ```
     #[inline]
     fn ceiling_mod(mut self, other: Integer) -> Integer {
@@ -633,19 +619,17 @@ impl<'a> CeilingMod<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(10)).to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(10)).to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(-10)).to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!(Integer::from(23).ceiling_mod(&Integer::from(-10)).to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(10)).to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(10)).to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(-10)).to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!(Integer::from(-23).ceiling_mod(&Integer::from(-10)).to_string(), "7");
     /// ```
     #[inline]
     fn ceiling_mod(mut self, other: &'a Integer) -> Integer {
@@ -678,19 +662,17 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(10)).to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(10)).to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(-10)).to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(Integer::from(-10)).to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(10)).to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(10)).to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)).to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)).to_string(), "7");
     /// ```
     fn ceiling_mod(self, other: Integer) -> Integer {
         let remainder = if self.sign == other.sign {
@@ -730,19 +712,17 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingMod;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(10)).to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(10)).to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(-10)).to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// assert_eq!((&Integer::from(23)).ceiling_mod(&Integer::from(-10)).to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(10)).to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(10)).to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)).to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)).to_string(), "7");
     /// ```
     fn ceiling_mod(self, other: &'b Integer) -> Integer {
         let remainder = if self.sign == other.sign {
@@ -781,27 +761,25 @@ impl CeilingModAssign<Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.ceiling_mod_assign(Integer::from(10));
-    ///     assert_eq!(x.to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Integer::from(23);
+    /// x.ceiling_mod_assign(Integer::from(10));
+    /// assert_eq!(x.to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.ceiling_mod_assign(Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// let mut x = Integer::from(23);
+    /// x.ceiling_mod_assign(Integer::from(-10));
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.ceiling_mod_assign(Integer::from(10));
-    ///     assert_eq!(x.to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.ceiling_mod_assign(Integer::from(10));
+    /// assert_eq!(x.to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.ceiling_mod_assign(Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.ceiling_mod_assign(Integer::from(-10));
+    /// assert_eq!(x.to_string(), "7");
     /// ```
     fn ceiling_mod_assign(&mut self, other: Integer) {
         if self.sign == other.sign {
@@ -835,27 +813,25 @@ impl<'a> CeilingModAssign<&'a Integer> for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 10 + 3 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.ceiling_mod_assign(&Integer::from(10));
-    ///     assert_eq!(x.to_string(), "-7");
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Integer::from(23);
+    /// x.ceiling_mod_assign(&Integer::from(10));
+    /// assert_eq!(x.to_string(), "-7");
     ///
-    ///     // -3 * -10 + -7 = 23
-    ///     let mut x = Integer::from(23);
-    ///     x.ceiling_mod_assign(&Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "3");
+    /// // -3 * -10 + -7 = 23
+    /// let mut x = Integer::from(23);
+    /// x.ceiling_mod_assign(&Integer::from(-10));
+    /// assert_eq!(x.to_string(), "3");
     ///
-    ///     // -3 * 10 + 7 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.ceiling_mod_assign(&Integer::from(10));
-    ///     assert_eq!(x.to_string(), "-3");
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.ceiling_mod_assign(&Integer::from(10));
+    /// assert_eq!(x.to_string(), "-3");
     ///
-    ///     // 2 * -10 + -3 = -23
-    ///     let mut x = Integer::from(-23);
-    ///     x.ceiling_mod_assign(&Integer::from(-10));
-    ///     assert_eq!(x.to_string(), "7");
-    /// }
+    /// // 2 * -10 + -3 = -23
+    /// let mut x = Integer::from(-23);
+    /// x.ceiling_mod_assign(&Integer::from(-10));
+    /// assert_eq!(x.to_string(), "7");
     /// ```
     fn ceiling_mod_assign(&mut self, other: &'a Integer) {
         if self.sign == other.sign {

@@ -26,13 +26,11 @@ impl DivisibleBy<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.divisible_by(Integer::ZERO), true);
-    ///     assert_eq!(Integer::from(-100).divisible_by(Integer::from(-3)), false);
-    ///     assert_eq!(Integer::from(102).divisible_by(Integer::from(-3)), true);
-    ///     assert_eq!(Integer::from_str("-1000000000000000000000000").unwrap()
-    ///         .divisible_by(Integer::from_str("1000000000000").unwrap()), true);
-    /// }
+    /// assert_eq!(Integer::ZERO.divisible_by(Integer::ZERO), true);
+    /// assert_eq!(Integer::from(-100).divisible_by(Integer::from(-3)), false);
+    /// assert_eq!(Integer::from(102).divisible_by(Integer::from(-3)), true);
+    /// assert_eq!(Integer::from_str("-1000000000000000000000000").unwrap()
+    ///     .divisible_by(Integer::from_str("1000000000000").unwrap()), true);
     /// ```
     fn divisible_by(self, other: Integer) -> bool {
         self.abs.divisible_by(other.abs)
@@ -63,13 +61,11 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.divisible_by(&Integer::ZERO), true);
-    ///     assert_eq!(Integer::from(-100).divisible_by(&Integer::from(-3)), false);
-    ///     assert_eq!(Integer::from(102).divisible_by(&Integer::from(-3)), true);
-    ///     assert_eq!(Integer::from_str("-1000000000000000000000000").unwrap()
-    ///         .divisible_by(&Integer::from_str("1000000000000").unwrap()), true);
-    /// }
+    /// assert_eq!(Integer::ZERO.divisible_by(&Integer::ZERO), true);
+    /// assert_eq!(Integer::from(-100).divisible_by(&Integer::from(-3)), false);
+    /// assert_eq!(Integer::from(102).divisible_by(&Integer::from(-3)), true);
+    /// assert_eq!(Integer::from_str("-1000000000000000000000000").unwrap()
+    ///     .divisible_by(&Integer::from_str("1000000000000").unwrap()), true);
     /// ```
     fn divisible_by(self, other: &'a Integer) -> bool {
         self.abs.divisible_by(&other.abs)
@@ -100,13 +96,11 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).divisible_by(Integer::ZERO), true);
-    ///     assert_eq!((&Integer::from(-100)).divisible_by(Integer::from(-3)), false);
-    ///     assert_eq!((&Integer::from(102)).divisible_by(Integer::from(-3)), true);
-    ///     assert_eq!((&Integer::from_str("-1000000000000000000000000").unwrap())
-    ///         .divisible_by(Integer::from_str("1000000000000").unwrap()), true);
-    /// }
+    /// assert_eq!((&Integer::ZERO).divisible_by(Integer::ZERO), true);
+    /// assert_eq!((&Integer::from(-100)).divisible_by(Integer::from(-3)), false);
+    /// assert_eq!((&Integer::from(102)).divisible_by(Integer::from(-3)), true);
+    /// assert_eq!((&Integer::from_str("-1000000000000000000000000").unwrap())
+    ///     .divisible_by(Integer::from_str("1000000000000").unwrap()), true);
     /// ```
     fn divisible_by(self, other: Integer) -> bool {
         (&self.abs).divisible_by(other.abs)
@@ -137,13 +131,11 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     assert_eq!((&Integer::ZERO).divisible_by(&Integer::ZERO), true);
-    ///     assert_eq!((&Integer::from(-100)).divisible_by(&Integer::from(-3)), false);
-    ///     assert_eq!((&Integer::from(102)).divisible_by(&Integer::from(-3)), true);
-    ///     assert_eq!((&Integer::from_str("-1000000000000000000000000").unwrap())
-    ///         .divisible_by(&Integer::from_str("1000000000000").unwrap()), true);
-    /// }
+    /// assert_eq!((&Integer::ZERO).divisible_by(&Integer::ZERO), true);
+    /// assert_eq!((&Integer::from(-100)).divisible_by(&Integer::from(-3)), false);
+    /// assert_eq!((&Integer::from(102)).divisible_by(&Integer::from(-3)), true);
+    /// assert_eq!((&Integer::from_str("-1000000000000000000000000").unwrap())
+    ///     .divisible_by(&Integer::from_str("1000000000000").unwrap()), true);
     /// ```
     fn divisible_by(self, other: &'b Integer) -> bool {
         (&self.abs).divisible_by(&other.abs)

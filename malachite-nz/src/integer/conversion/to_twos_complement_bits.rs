@@ -279,22 +279,20 @@ impl<'a> Iterator for TwosComplementBitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
+    /// assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
     ///
-    ///     // -105 = 10010111 in two's complement
-    ///     let n = Integer::from(-105);
-    ///     let mut bits = n.twos_complement_bits();
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(false));
-    ///     assert_eq!(bits.next(), Some(true));
-    ///     assert_eq!(bits.next(), None);
-    /// }
+    /// // -105 = 10010111 in two's complement
+    /// let n = Integer::from(-105);
+    /// let mut bits = n.twos_complement_bits();
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), None);
     /// ```
     fn next(&mut self) -> Option<bool> {
         match *self {
@@ -327,22 +325,20 @@ impl<'a> DoubleEndedIterator for TwosComplementBitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
+    /// assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
     ///
-    ///     // -105 = 10010111 in two's complement
-    ///     let n = Integer::from(-105);
-    ///     let mut bits = n.twos_complement_bits();
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(false));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), Some(true));
-    ///     assert_eq!(bits.next_back(), None);
-    /// }
+    /// // -105 = 10010111 in two's complement
+    /// let n = Integer::from(-105);
+    /// let mut bits = n.twos_complement_bits();
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), None);
     /// ```
     fn next_back(&mut self) -> Option<bool> {
         match *self {
@@ -379,22 +375,20 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.twos_complement_bits()[0], false);
+    /// assert_eq!(Integer::ZERO.twos_complement_bits()[0], false);
     ///
-    ///     // -105 = 10010111 in two's complement
-    ///     let n = Integer::from(-105);
-    ///     let bits = n.twos_complement_bits();
-    ///     assert_eq!(bits[0], true);
-    ///     assert_eq!(bits[1], true);
-    ///     assert_eq!(bits[2], true);
-    ///     assert_eq!(bits[3], false);
-    ///     assert_eq!(bits[4], true);
-    ///     assert_eq!(bits[5], false);
-    ///     assert_eq!(bits[6], false);
-    ///     assert_eq!(bits[7], true);
-    ///     assert_eq!(bits[100], true);
-    /// }
+    /// // -105 = 10010111 in two's complement
+    /// let n = Integer::from(-105);
+    /// let bits = n.twos_complement_bits();
+    /// assert_eq!(bits[0], true);
+    /// assert_eq!(bits[1], true);
+    /// assert_eq!(bits[2], true);
+    /// assert_eq!(bits[3], false);
+    /// assert_eq!(bits[4], true);
+    /// assert_eq!(bits[5], false);
+    /// assert_eq!(bits[6], false);
+    /// assert_eq!(bits[7], true);
+    /// assert_eq!(bits[100], true);
     /// ```
     fn index(&self, index: u64) -> &bool {
         let bit = match *self {
@@ -436,15 +430,13 @@ impl Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert!(Integer::ZERO.to_twos_complement_bits_asc().is_empty());
-    ///     // 105 = 01101001b, with a leading false bit to indicate sign
-    ///     assert_eq!(Integer::from(105).to_twos_complement_bits_asc(),
-    ///         vec![true, false, false, true, false, true, true, false]);
-    ///     // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    ///     assert_eq!(Integer::from(-105).to_twos_complement_bits_asc(),
-    ///         vec![true, true, true, false, true, false, false, true]);
-    /// }
+    /// assert!(Integer::ZERO.to_twos_complement_bits_asc().is_empty());
+    /// // 105 = 01101001b, with a leading false bit to indicate sign
+    /// assert_eq!(Integer::from(105).to_twos_complement_bits_asc(),
+    ///     vec![true, false, false, true, false, true, true, false]);
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(Integer::from(-105).to_twos_complement_bits_asc(),
+    ///     vec![true, true, true, false, true, false, false, true]);
     /// ```
     pub fn to_twos_complement_bits_asc(&self) -> Vec<bool> {
         let mut bits = self.abs.to_bits_asc();
@@ -481,15 +473,13 @@ impl Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert!(Integer::ZERO.to_twos_complement_bits_desc().is_empty());
-    ///     // 105 = 01101001b, with a leading false bit to indicate sign
-    ///     assert_eq!(Integer::from(105).to_twos_complement_bits_desc(),
-    ///         vec![false, true, true, false, true, false, false, true]);
-    ///     // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    ///     assert_eq!(Integer::from(-105).to_twos_complement_bits_desc(),
-    ///         vec![true, false, false, true, false, true, true, true]);
-    /// }
+    /// assert!(Integer::ZERO.to_twos_complement_bits_desc().is_empty());
+    /// // 105 = 01101001b, with a leading false bit to indicate sign
+    /// assert_eq!(Integer::from(105).to_twos_complement_bits_desc(),
+    ///     vec![false, true, true, false, true, false, false, true]);
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(Integer::from(-105).to_twos_complement_bits_desc(),
+    ///     vec![true, false, false, true, false, true, true, true]);
     /// ```
     pub fn to_twos_complement_bits_desc(&self) -> Vec<bool> {
         let mut bits = self.to_twos_complement_bits_asc();
@@ -516,23 +506,21 @@ impl Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
-    ///     // 105 = 01101001b, with a leading false bit to indicate sign
-    ///     assert_eq!(Integer::from(105).twos_complement_bits().collect::<Vec<bool>>(),
-    ///         vec![true, false, false, true, false, true, true, false]);
-    ///     // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    ///     assert_eq!(Integer::from(-105).twos_complement_bits().collect::<Vec<bool>>(),
-    ///         vec![true, true, true, false, true, false, false, true]);
+    /// assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
+    /// // 105 = 01101001b, with a leading false bit to indicate sign
+    /// assert_eq!(Integer::from(105).twos_complement_bits().collect::<Vec<bool>>(),
+    ///     vec![true, false, false, true, false, true, true, false]);
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(Integer::from(-105).twos_complement_bits().collect::<Vec<bool>>(),
+    ///     vec![true, true, true, false, true, false, false, true]);
     ///
-    ///     assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
-    ///     // 105 = 01101001b, with a leading false bit to indicate sign
-    ///     assert_eq!(Integer::from(105).twos_complement_bits().rev().collect::<Vec<bool>>(),
-    ///         vec![false, true, true, false, true, false, false, true]);
-    ///     // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    ///     assert_eq!(Integer::from(-105).twos_complement_bits().rev().collect::<Vec<bool>>(),
-    ///         vec![true, false, false, true, false, true, true, true]);
-    /// }
+    /// assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
+    /// // 105 = 01101001b, with a leading false bit to indicate sign
+    /// assert_eq!(Integer::from(105).twos_complement_bits().rev().collect::<Vec<bool>>(),
+    ///     vec![false, true, true, false, true, false, false, true]);
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(Integer::from(-105).twos_complement_bits().rev().collect::<Vec<bool>>(),
+    ///     vec![true, false, false, true, false, true, true, true]);
     /// ```
     pub fn twos_complement_bits(&self) -> TwosComplementBitIterator {
         if *self == 0 as Limb {

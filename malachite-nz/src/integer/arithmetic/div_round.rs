@@ -28,84 +28,82 @@ impl DivRound<Integer> for Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(4), RoundingMode::Down).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Floor).to_string(),
-    ///         "-333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(4), RoundingMode::Up).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "-333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(5), RoundingMode::Exact).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(3), RoundingMode::Nearest).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-20).div_round(Integer::from(3), RoundingMode::Nearest).to_string(),
-    ///         "-7"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(4), RoundingMode::Nearest).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-14).div_round(Integer::from(4), RoundingMode::Nearest).to_string(),
-    ///         "-4"
-    ///     );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Down).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Floor).to_string(),
+    ///     "-333333333334"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Up).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "-333333333333"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(5), RoundingMode::Exact).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(3), RoundingMode::Nearest).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).div_round(Integer::from(3), RoundingMode::Nearest).to_string(),
+    ///     "-7"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(4), RoundingMode::Nearest).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).div_round(Integer::from(4), RoundingMode::Nearest).to_string(),
+    ///     "-4"
+    /// );
     ///
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Down).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Up).to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(-5), RoundingMode::Exact).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(-3), RoundingMode::Nearest).to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-20).div_round(Integer::from(-3), RoundingMode::Nearest).to_string(),
-    ///         "7"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Nearest).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-14).div_round(Integer::from(-4), RoundingMode::Nearest).to_string(),
-    ///         "4"
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Down).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "333333333333"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Up).to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "333333333334"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(-5), RoundingMode::Exact).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).div_round(Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///     "7"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).div_round(Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///     "4"
+    /// );
     /// ```
     #[inline]
     fn div_round(mut self, other: Integer, rm: RoundingMode) -> Integer {
@@ -139,85 +137,83 @@ impl<'a> DivRound<&'a Integer> for Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Down).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "-333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Up).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "-333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(5), RoundingMode::Exact).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(3), RoundingMode::Nearest).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-20).div_round(&Integer::from(3), RoundingMode::Nearest).to_string(),
-    ///         "-7"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Nearest).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-14).div_round(&Integer::from(4), RoundingMode::Nearest).to_string(),
-    ///         "-4"
-    ///     );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Down).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "-333333333334"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Up).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "-333333333333"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(5), RoundingMode::Exact).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(3), RoundingMode::Nearest).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).div_round(&Integer::from(3), RoundingMode::Nearest).to_string(),
+    ///     "-7"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(4), RoundingMode::Nearest).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).div_round(&Integer::from(4), RoundingMode::Nearest).to_string(),
+    ///     "-4"
+    /// );
     ///
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Down).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Up).to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(-5), RoundingMode::Exact).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-20).div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
-    ///         "7"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         Integer::from(-14).div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
-    ///         "4"
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Down).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "333333333333"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Up).to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "333333333334"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(-5), RoundingMode::Exact).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-20).div_round(&Integer::from(-3), RoundingMode::Nearest).to_string(),
+    ///     "7"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-10).div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-14).div_round(&Integer::from(-4), RoundingMode::Nearest).to_string(),
+    ///     "4"
+    /// );
     /// ```
     #[inline]
     fn div_round(mut self, other: &'a Integer, rm: RoundingMode) -> Integer {
@@ -251,96 +247,94 @@ impl<'a> DivRound<Integer> for &'a Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Down).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "-333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Up).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "-333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(5), RoundingMode::Exact).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-20)).div_round(Integer::from(3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-7"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-14)).div_round(Integer::from(4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-4"
-    ///     );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Down).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "-333333333334"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Up).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(Integer::from(3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "-333333333333"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(5), RoundingMode::Exact).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).div_round(Integer::from(3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-7"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).div_round(Integer::from(4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-4"
+    /// );
     ///
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Down)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Up)
-    ///             .to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(-5), RoundingMode::Exact)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(-3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-20)).div_round(Integer::from(-3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "7"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-14)).div_round(Integer::from(-4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "4"
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Down)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "333333333333"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Up)
+    ///         .to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(Integer::from(-3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "333333333334"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(-5), RoundingMode::Exact)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).div_round(Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "7"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).div_round(Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "4"
+    /// );
     /// ```
     fn div_round(self, other: Integer, rm: RoundingMode) -> Integer {
         let result_sign = self.sign == other.sign;
@@ -377,96 +371,94 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Down).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "-333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Up).to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "-333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(5), RoundingMode::Exact).to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-20)).div_round(&Integer::from(3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-7"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-14)).div_round(&Integer::from(4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "-4"
-    ///     );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Down).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "-333333333334"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Up).to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(&Integer::from(3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "-333333333333"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(5), RoundingMode::Exact).to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-3"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).div_round(&Integer::from(3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-7"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).div_round(&Integer::from(4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "-4"
+    /// );
     ///
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Down)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Floor)
-    ///             .to_string(),
-    ///         "333333333333"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Up)
-    ///             .to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Ceiling)
-    ///             .to_string(),
-    ///         "333333333334"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(-5), RoundingMode::Exact)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(-3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "3"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-20)).div_round(&Integer::from(-3), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "7"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "2"
-    ///     );
-    ///     assert_eq!(
-    ///         (&Integer::from(-14)).div_round(&Integer::from(-4), RoundingMode::Nearest)
-    ///             .to_string(),
-    ///         "4"
-    ///     );
-    /// }
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Down)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Floor)
+    ///         .to_string(),
+    ///     "333333333333"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Up)
+    ///         .to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (&-Integer::trillion()).div_round(&Integer::from(-3), RoundingMode::Ceiling)
+    ///         .to_string(),
+    ///     "333333333334"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-5), RoundingMode::Exact)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "3"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-20)).div_round(&Integer::from(-3), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "7"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-10)).div_round(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-14)).div_round(&Integer::from(-4), RoundingMode::Nearest)
+    ///         .to_string(),
+    ///     "4"
+    /// );
     /// ```
     fn div_round(self, other: &'b Integer, rm: RoundingMode) -> Integer {
         let result_sign = self.sign == other.sign;
@@ -502,79 +494,77 @@ impl DivRoundAssign<Integer> for Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(4), RoundingMode::Down);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(4), RoundingMode::Down);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(Integer::from(3), RoundingMode::Floor);
-    ///     assert_eq!(n.to_string(), "-333333333334");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(Integer::from(3), RoundingMode::Floor);
+    /// assert_eq!(n.to_string(), "-333333333334");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(4), RoundingMode::Up);
-    ///     assert_eq!(n.to_string(), "-3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(4), RoundingMode::Up);
+    /// assert_eq!(n.to_string(), "-3");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(Integer::from(3), RoundingMode::Ceiling);
-    ///     assert_eq!(n.to_string(), "-333333333333");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(Integer::from(3), RoundingMode::Ceiling);
+    /// assert_eq!(n.to_string(), "-333333333333");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(5), RoundingMode::Exact);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(5), RoundingMode::Exact);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-3");
     ///
-    ///     let mut n = Integer::from(-20);
-    ///     n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-7");
+    /// let mut n = Integer::from(-20);
+    /// n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-7");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = Integer::from(-14);
-    ///     n.div_round_assign(Integer::from(4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-4");
+    /// let mut n = Integer::from(-14);
+    /// n.div_round_assign(Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-4");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(-4), RoundingMode::Down);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(-4), RoundingMode::Down);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Floor);
-    ///     assert_eq!(n.to_string(), "333333333333");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(Integer::from(-3), RoundingMode::Floor);
+    /// assert_eq!(n.to_string(), "333333333333");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(-4), RoundingMode::Up);
-    ///     assert_eq!(n.to_string(), "3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(-4), RoundingMode::Up);
+    /// assert_eq!(n.to_string(), "3");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Ceiling);
-    ///     assert_eq!(n.to_string(), "333333333334");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(Integer::from(-3), RoundingMode::Ceiling);
+    /// assert_eq!(n.to_string(), "333333333334");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(-5), RoundingMode::Exact);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(-5), RoundingMode::Exact);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "3");
     ///
-    ///     let mut n = Integer::from(-20);
-    ///     n.div_round_assign(Integer::from(-3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "7");
+    /// let mut n = Integer::from(-20);
+    /// n.div_round_assign(Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "7");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(-4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = Integer::from(-14);
-    ///     n.div_round_assign(Integer::from(-4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "4");
-    /// }
+    /// let mut n = Integer::from(-14);
+    /// n.div_round_assign(Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "4");
     /// ```
     fn div_round_assign(&mut self, other: Integer, rm: RoundingMode) {
         let result_sign = self.sign == other.sign;
@@ -607,79 +597,77 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// use malachite_base::round::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(4), RoundingMode::Down);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(4), RoundingMode::Down);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(&Integer::from(3), RoundingMode::Floor);
-    ///     assert_eq!(n.to_string(), "-333333333334");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(&Integer::from(3), RoundingMode::Floor);
+    /// assert_eq!(n.to_string(), "-333333333334");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(4), RoundingMode::Up);
-    ///     assert_eq!(n.to_string(), "-3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(4), RoundingMode::Up);
+    /// assert_eq!(n.to_string(), "-3");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(&Integer::from(3), RoundingMode::Ceiling);
-    ///     assert_eq!(n.to_string(), "-333333333333");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(&Integer::from(3), RoundingMode::Ceiling);
+    /// assert_eq!(n.to_string(), "-333333333333");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(5), RoundingMode::Exact);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(5), RoundingMode::Exact);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-3");
     ///
-    ///     let mut n = Integer::from(-20);
-    ///     n.div_round_assign(&Integer::from(3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-7");
+    /// let mut n = Integer::from(-20);
+    /// n.div_round_assign(&Integer::from(3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-7");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-2");
     ///
-    ///     let mut n = Integer::from(-14);
-    ///     n.div_round_assign(&Integer::from(4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "-4");
+    /// let mut n = Integer::from(-14);
+    /// n.div_round_assign(&Integer::from(4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "-4");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(-4), RoundingMode::Down);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(-4), RoundingMode::Down);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Floor);
-    ///     assert_eq!(n.to_string(), "333333333333");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(&Integer::from(-3), RoundingMode::Floor);
+    /// assert_eq!(n.to_string(), "333333333333");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(-4), RoundingMode::Up);
-    ///     assert_eq!(n.to_string(), "3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(-4), RoundingMode::Up);
+    /// assert_eq!(n.to_string(), "3");
     ///
-    ///     let mut n = -Integer::trillion();
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Ceiling);
-    ///     assert_eq!(n.to_string(), "333333333334");
+    /// let mut n = -Integer::trillion();
+    /// n.div_round_assign(&Integer::from(-3), RoundingMode::Ceiling);
+    /// assert_eq!(n.to_string(), "333333333334");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(-5), RoundingMode::Exact);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(-5), RoundingMode::Exact);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "3");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "3");
     ///
-    ///     let mut n = Integer::from(-20);
-    ///     n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "7");
+    /// let mut n = Integer::from(-20);
+    /// n.div_round_assign(&Integer::from(-3), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "7");
     ///
-    ///     let mut n = Integer::from(-10);
-    ///     n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "2");
+    /// let mut n = Integer::from(-10);
+    /// n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "2");
     ///
-    ///     let mut n = Integer::from(-14);
-    ///     n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest);
-    ///     assert_eq!(n.to_string(), "4");
-    /// }
+    /// let mut n = Integer::from(-14);
+    /// n.div_round_assign(&Integer::from(-4), RoundingMode::Nearest);
+    /// assert_eq!(n.to_string(), "4");
     /// ```
     fn div_round_assign(&mut self, other: &'a Integer, rm: RoundingMode) {
         let result_sign = self.sign == other.sign;

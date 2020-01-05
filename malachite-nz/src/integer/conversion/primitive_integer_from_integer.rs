@@ -26,12 +26,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(format!("{:?}", u32::checked_from(Integer::from(123))), "Some(123)");
-            ///     assert_eq!(format!("{:?}", u32::checked_from(Integer::from(-123))), "None");
-            ///     assert_eq!(format!("{:?}", u32::checked_from(Integer::trillion())), "None");
-            ///     assert_eq!(format!("{:?}", u32::checked_from(-Integer::trillion())), "None");
-            /// }
+            /// assert_eq!(format!("{:?}", u32::checked_from(Integer::from(123))), "Some(123)");
+            /// assert_eq!(format!("{:?}", u32::checked_from(Integer::from(-123))), "None");
+            /// assert_eq!(format!("{:?}", u32::checked_from(Integer::trillion())), "None");
+            /// assert_eq!(format!("{:?}", u32::checked_from(-Integer::trillion())), "None");
             /// ```
             #[inline]
             fn checked_from(value: Integer) -> Option<$u> {
@@ -56,15 +54,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(
-            ///         format!("{:?}", u32::checked_from(&Integer::from(123))),
-            ///         "Some(123)"
-            ///     );
-            ///     assert_eq!(format!("{:?}", u32::checked_from(&Integer::from(-123))), "None");
-            ///     assert_eq!(format!("{:?}", u32::checked_from(&Integer::trillion())), "None");
-            ///     assert_eq!(format!("{:?}", u32::checked_from(&-Integer::trillion())), "None");
-            /// }
+            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::from(123))), "Some(123)");
+            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::from(-123))), "None");
+            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::trillion())), "None");
+            /// assert_eq!(format!("{:?}", u32::checked_from(&-Integer::trillion())), "None");
             /// ```
             fn checked_from(value: &Integer) -> Option<$u> {
                 match *value {
@@ -93,12 +86,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::WrappingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::wrapping_from(Integer::from(123)), 123);
-            ///     assert_eq!(u32::wrapping_from(Integer::from(-123)), 4294967173);
-            ///     assert_eq!(u32::wrapping_from(Integer::trillion()), 3567587328);
-            ///     assert_eq!(u32::wrapping_from(-Integer::trillion()), 727379968);
-            /// }
+            /// assert_eq!(u32::wrapping_from(Integer::from(123)), 123);
+            /// assert_eq!(u32::wrapping_from(Integer::from(-123)), 4294967173);
+            /// assert_eq!(u32::wrapping_from(Integer::trillion()), 3567587328);
+            /// assert_eq!(u32::wrapping_from(-Integer::trillion()), 727379968);
             /// ```
             #[inline]
             fn wrapping_from(value: Integer) -> $u {
@@ -122,12 +113,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::WrappingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::wrapping_from(&Integer::from(123)), 123);
-            ///     assert_eq!(u32::wrapping_from(&Integer::from(-123)), 4294967173);
-            ///     assert_eq!(u32::wrapping_from(&Integer::trillion()), 3567587328);
-            ///     assert_eq!(u32::wrapping_from(&-Integer::trillion()), 727379968);
-            /// }
+            /// assert_eq!(u32::wrapping_from(&Integer::from(123)), 123);
+            /// assert_eq!(u32::wrapping_from(&Integer::from(-123)), 4294967173);
+            /// assert_eq!(u32::wrapping_from(&Integer::trillion()), 3567587328);
+            /// assert_eq!(u32::wrapping_from(&-Integer::trillion()), 727379968);
             /// ```
             fn wrapping_from(value: &Integer) -> $u {
                 match *value {
@@ -160,12 +149,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::SaturatingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::saturating_from(Integer::from(123)), 123);
-            ///     assert_eq!(u32::saturating_from(Integer::from(-123)), 0);
-            ///     assert_eq!(u32::saturating_from(Integer::trillion()), 4294967295);
-            ///     assert_eq!(u32::saturating_from(-Integer::trillion()), 0);
-            /// }
+            /// assert_eq!(u32::saturating_from(Integer::from(123)), 123);
+            /// assert_eq!(u32::saturating_from(Integer::from(-123)), 0);
+            /// assert_eq!(u32::saturating_from(Integer::trillion()), 4294967295);
+            /// assert_eq!(u32::saturating_from(-Integer::trillion()), 0);
             /// ```
             fn saturating_from(value: Integer) -> $u {
                 $u::saturating_from(&value)
@@ -189,12 +176,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::SaturatingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::saturating_from(&Integer::from(123)), 123);
-            ///     assert_eq!(u32::saturating_from(&Integer::from(-123)), 0);
-            ///     assert_eq!(u32::saturating_from(&Integer::trillion()), 4294967295);
-            ///     assert_eq!(u32::saturating_from(&-Integer::trillion()), 0);
-            /// }
+            /// assert_eq!(u32::saturating_from(&Integer::from(123)), 123);
+            /// assert_eq!(u32::saturating_from(&Integer::from(-123)), 0);
+            /// assert_eq!(u32::saturating_from(&Integer::trillion()), 4294967295);
+            /// assert_eq!(u32::saturating_from(&-Integer::trillion()), 0);
             /// ```
             fn saturating_from(value: &Integer) -> $u {
                 match *value {
@@ -224,12 +209,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::OverflowingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::overflowing_from(Integer::from(123)), (123, false));
-            ///     assert_eq!(u32::overflowing_from(Integer::from(-123)), (4294967173, true));
-            ///     assert_eq!(u32::overflowing_from(Integer::trillion()), (3567587328, true));
-            ///     assert_eq!(u32::overflowing_from(-Integer::trillion()), (727379968, true));
-            /// }
+            /// assert_eq!(u32::overflowing_from(Integer::from(123)), (123, false));
+            /// assert_eq!(u32::overflowing_from(Integer::from(-123)), (4294967173, true));
+            /// assert_eq!(u32::overflowing_from(Integer::trillion()), (3567587328, true));
+            /// assert_eq!(u32::overflowing_from(-Integer::trillion()), (727379968, true));
             /// ```
             fn overflowing_from(value: Integer) -> ($u, bool) {
                 $u::overflowing_from(&value)
@@ -253,12 +236,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::OverflowingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::overflowing_from(&Integer::from(123)), (123, false));
-            ///     assert_eq!(u32::overflowing_from(&Integer::from(-123)), (4294967173, true));
-            ///     assert_eq!(u32::overflowing_from(&Integer::trillion()), (3567587328, true));
-            ///     assert_eq!(u32::overflowing_from(&-Integer::trillion()), (727379968, true));
-            /// }
+            /// assert_eq!(u32::overflowing_from(&Integer::from(123)), (123, false));
+            /// assert_eq!(u32::overflowing_from(&Integer::from(-123)), (4294967173, true));
+            /// assert_eq!(u32::overflowing_from(&Integer::trillion()), (3567587328, true));
+            /// assert_eq!(u32::overflowing_from(&-Integer::trillion()), (727379968, true));
             /// ```
             fn overflowing_from(value: &Integer) -> ($u, bool) {
                 match *value {
@@ -290,12 +271,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::convertible_from(Integer::from(123)), true);
-            ///     assert_eq!(u32::convertible_from(Integer::from(-123)), false);
-            ///     assert_eq!(u32::convertible_from(Integer::trillion()), false);
-            ///     assert_eq!(u32::convertible_from(-Integer::trillion()), false);
-            /// }
+            /// assert_eq!(u32::convertible_from(Integer::from(123)), true);
+            /// assert_eq!(u32::convertible_from(Integer::from(-123)), false);
+            /// assert_eq!(u32::convertible_from(Integer::trillion()), false);
+            /// assert_eq!(u32::convertible_from(-Integer::trillion()), false);
             /// ```
             #[inline]
             fn convertible_from(value: Integer) -> bool {
@@ -319,12 +298,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(u32::convertible_from(&Integer::from(123)), true);
-            ///     assert_eq!(u32::convertible_from(&Integer::from(-123)), false);
-            ///     assert_eq!(u32::convertible_from(&Integer::trillion()), false);
-            ///     assert_eq!(u32::convertible_from(&-Integer::trillion()), false);
-            /// }
+            /// assert_eq!(u32::convertible_from(&Integer::from(123)), true);
+            /// assert_eq!(u32::convertible_from(&Integer::from(-123)), false);
+            /// assert_eq!(u32::convertible_from(&Integer::trillion()), false);
+            /// assert_eq!(u32::convertible_from(&-Integer::trillion()), false);
             /// ```
             fn convertible_from(value: &Integer) -> bool {
                 value.sign && $u::convertible_from(&value.abs)
@@ -348,12 +325,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::checked_from(Integer::from(123)), Some(123));
-            ///     assert_eq!(i32::checked_from(Integer::from(-123)), Some(-123));
-            ///     assert_eq!(i32::checked_from(Integer::trillion()), None);
-            ///     assert_eq!(i32::checked_from(-Integer::trillion()), None);
-            /// }
+            /// assert_eq!(i32::checked_from(Integer::from(123)), Some(123));
+            /// assert_eq!(i32::checked_from(Integer::from(-123)), Some(-123));
+            /// assert_eq!(i32::checked_from(Integer::trillion()), None);
+            /// assert_eq!(i32::checked_from(-Integer::trillion()), None);
             /// ```
             #[inline]
             fn checked_from(value: Integer) -> Option<$s> {
@@ -378,12 +353,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::checked_from(&Integer::from(123)), Some(123));
-            ///     assert_eq!(i32::checked_from(&Integer::from(-123)), Some(-123));
-            ///     assert_eq!(i32::checked_from(&Integer::trillion()), None);
-            ///     assert_eq!(i32::checked_from(&-Integer::trillion()), None);
-            /// }
+            /// assert_eq!(i32::checked_from(&Integer::from(123)), Some(123));
+            /// assert_eq!(i32::checked_from(&Integer::from(-123)), Some(-123));
+            /// assert_eq!(i32::checked_from(&Integer::trillion()), None);
+            /// assert_eq!(i32::checked_from(&-Integer::trillion()), None);
             /// ```
             fn checked_from(value: &Integer) -> Option<$s> {
                 if $s::convertible_from(value) {
@@ -410,12 +383,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::WrappingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::wrapping_from(Integer::from(123)), 123);
-            ///     assert_eq!(i32::wrapping_from(Integer::from(-123)), -123);
-            ///     assert_eq!(i32::wrapping_from(Integer::trillion()), -727379968);
-            ///     assert_eq!(i32::wrapping_from(-Integer::trillion()), 727379968);
-            /// }
+            /// assert_eq!(i32::wrapping_from(Integer::from(123)), 123);
+            /// assert_eq!(i32::wrapping_from(Integer::from(-123)), -123);
+            /// assert_eq!(i32::wrapping_from(Integer::trillion()), -727379968);
+            /// assert_eq!(i32::wrapping_from(-Integer::trillion()), 727379968);
             /// ```
             #[inline]
             fn wrapping_from(value: Integer) -> $s {
@@ -439,12 +410,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::WrappingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::wrapping_from(&Integer::from(123)), 123);
-            ///     assert_eq!(i32::wrapping_from(&Integer::from(-123)), -123);
-            ///     assert_eq!(i32::wrapping_from(&Integer::trillion()), -727379968);
-            ///     assert_eq!(i32::wrapping_from(&-Integer::trillion()), 727379968);
-            /// }
+            /// assert_eq!(i32::wrapping_from(&Integer::from(123)), 123);
+            /// assert_eq!(i32::wrapping_from(&Integer::from(-123)), -123);
+            /// assert_eq!(i32::wrapping_from(&Integer::trillion()), -727379968);
+            /// assert_eq!(i32::wrapping_from(&-Integer::trillion()), 727379968);
             /// ```
             fn wrapping_from(value: &Integer) -> $s {
                 $s::wrapping_from($u::wrapping_from(value))
@@ -468,12 +437,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::SaturatingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::saturating_from(Integer::from(123)), 123);
-            ///     assert_eq!(i32::saturating_from(Integer::from(-123)), -123);
-            ///     assert_eq!(i32::saturating_from(Integer::trillion()), 2147483647);
-            ///     assert_eq!(i32::saturating_from(-Integer::trillion()), -2147483648);
-            /// }
+            /// assert_eq!(i32::saturating_from(Integer::from(123)), 123);
+            /// assert_eq!(i32::saturating_from(Integer::from(-123)), -123);
+            /// assert_eq!(i32::saturating_from(Integer::trillion()), 2147483647);
+            /// assert_eq!(i32::saturating_from(-Integer::trillion()), -2147483648);
             /// ```
             fn saturating_from(value: Integer) -> $s {
                 $s::saturating_from(&value)
@@ -497,12 +464,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::SaturatingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::saturating_from(&Integer::from(123)), 123);
-            ///     assert_eq!(i32::saturating_from(&Integer::from(-123)), -123);
-            ///     assert_eq!(i32::saturating_from(&Integer::trillion()), 2147483647);
-            ///     assert_eq!(i32::saturating_from(&-Integer::trillion()), -2147483648);
-            /// }
+            /// assert_eq!(i32::saturating_from(&Integer::from(123)), 123);
+            /// assert_eq!(i32::saturating_from(&Integer::from(-123)), -123);
+            /// assert_eq!(i32::saturating_from(&Integer::trillion()), 2147483647);
+            /// assert_eq!(i32::saturating_from(&-Integer::trillion()), -2147483648);
             /// ```
             fn saturating_from(value: &Integer) -> $s {
                 match *value {
@@ -542,12 +507,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::OverflowingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::overflowing_from(Integer::from(123)), (123, false));
-            ///     assert_eq!(i32::overflowing_from(Integer::from(-123)), (-123, false));
-            ///     assert_eq!(i32::overflowing_from(Integer::trillion()), (-727379968, true));
-            ///     assert_eq!(i32::overflowing_from(-Integer::trillion()), (727379968, true));
-            /// }
+            /// assert_eq!(i32::overflowing_from(Integer::from(123)), (123, false));
+            /// assert_eq!(i32::overflowing_from(Integer::from(-123)), (-123, false));
+            /// assert_eq!(i32::overflowing_from(Integer::trillion()), (-727379968, true));
+            /// assert_eq!(i32::overflowing_from(-Integer::trillion()), (727379968, true));
             /// ```
             fn overflowing_from(value: Integer) -> ($s, bool) {
                 $s::overflowing_from(&value)
@@ -571,12 +534,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::OverflowingFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::overflowing_from(&Integer::from(123)), (123, false));
-            ///     assert_eq!(i32::overflowing_from(&Integer::from(-123)), (-123, false));
-            ///     assert_eq!(i32::overflowing_from(&Integer::trillion()), (-727379968, true));
-            ///     assert_eq!(i32::overflowing_from(&-Integer::trillion()), (727379968, true));
-            /// }
+            /// assert_eq!(i32::overflowing_from(&Integer::from(123)), (123, false));
+            /// assert_eq!(i32::overflowing_from(&Integer::from(-123)), (-123, false));
+            /// assert_eq!(i32::overflowing_from(&Integer::trillion()), (-727379968, true));
+            /// assert_eq!(i32::overflowing_from(&-Integer::trillion()), (727379968, true));
             /// ```
             fn overflowing_from(value: &Integer) -> ($s, bool) {
                 ($s::wrapping_from(value), !$s::convertible_from(value))
@@ -599,12 +560,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::convertible_from(Integer::from(123)), true);
-            ///     assert_eq!(i32::convertible_from(Integer::from(-123)), true);
-            ///     assert_eq!(i32::convertible_from(Integer::trillion()), false);
-            ///     assert_eq!(i32::convertible_from(-Integer::trillion()), false);
-            /// }
+            /// assert_eq!(i32::convertible_from(Integer::from(123)), true);
+            /// assert_eq!(i32::convertible_from(Integer::from(-123)), true);
+            /// assert_eq!(i32::convertible_from(Integer::trillion()), false);
+            /// assert_eq!(i32::convertible_from(-Integer::trillion()), false);
             /// ```
             #[inline]
             fn convertible_from(value: Integer) -> bool {
@@ -628,12 +587,10 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// fn main() {
-            ///     assert_eq!(i32::convertible_from(&Integer::from(123)), true);
-            ///     assert_eq!(i32::convertible_from(&Integer::from(-123)), true);
-            ///     assert_eq!(i32::convertible_from(&Integer::trillion()), false);
-            ///     assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
-            /// }
+            /// assert_eq!(i32::convertible_from(&Integer::from(123)), true);
+            /// assert_eq!(i32::convertible_from(&Integer::from(-123)), true);
+            /// assert_eq!(i32::convertible_from(&Integer::trillion()), false);
+            /// assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
             /// ```
             fn convertible_from(value: &Integer) -> bool {
                 let u_width = u64::from($u::WIDTH);

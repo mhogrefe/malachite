@@ -20,13 +20,11 @@ use platform::Limb;
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((Integer::ONE * Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(123) * Integer::ZERO).to_string(), "0");
-///     assert_eq!((Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
-///     assert_eq!((Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((Integer::ONE * Integer::from(123)).to_string(), "123");
+/// assert_eq!((Integer::from(123) * Integer::ZERO).to_string(), "0");
+/// assert_eq!((Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
+/// assert_eq!((Integer::from_str("-123456789000").unwrap() * Integer::from_str("-987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl Mul<Integer> for Integer {
     type Output = Integer;
@@ -55,14 +53,12 @@ impl Mul<Integer> for Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((Integer::ONE * &Integer::from(123)).to_string(), "123");
-///     assert_eq!((Integer::from(123) * &Integer::ZERO).to_string(), "0");
-///     assert_eq!((Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
-///     assert_eq!((Integer::from_str("-123456789000").unwrap() *
-///                 &Integer::from_str("-987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((Integer::ONE * &Integer::from(123)).to_string(), "123");
+/// assert_eq!((Integer::from(123) * &Integer::ZERO).to_string(), "0");
+/// assert_eq!((Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
+/// assert_eq!((Integer::from_str("-123456789000").unwrap() *
+///             &Integer::from_str("-987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a> Mul<&'a Integer> for Integer {
     type Output = Integer;
@@ -91,14 +87,12 @@ impl<'a> Mul<&'a Integer> for Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::ONE * Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(123) * Integer::ZERO).to_string(), "0");
-///     assert_eq!((&Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
-///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
-///                 Integer::from_str("-987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((&Integer::ONE * Integer::from(123)).to_string(), "123");
+/// assert_eq!((&Integer::from(123) * Integer::ZERO).to_string(), "0");
+/// assert_eq!((&Integer::from(123) * Integer::from(-456)).to_string(), "-56088");
+/// assert_eq!((&Integer::from_str("-123456789000").unwrap() *
+///             Integer::from_str("-987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a> Mul<Integer> for &'a Integer {
     type Output = Integer;
@@ -126,14 +120,12 @@ impl<'a> Mul<Integer> for &'a Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::ONE * &Integer::from(123)).to_string(), "123");
-///     assert_eq!((&Integer::from(123) * &Integer::ZERO).to_string(), "0");
-///     assert_eq!((&Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
-///     assert_eq!((&Integer::from_str("-123456789000").unwrap() *
-///                 &Integer::from_str("-987654321000")
-///                .unwrap()).to_string(), "121932631112635269000000");
-/// }
+/// assert_eq!((&Integer::ONE * &Integer::from(123)).to_string(), "123");
+/// assert_eq!((&Integer::from(123) * &Integer::ZERO).to_string(), "0");
+/// assert_eq!((&Integer::from(123) * &Integer::from(-456)).to_string(), "-56088");
+/// assert_eq!((&Integer::from_str("-123456789000").unwrap() *
+///             &Integer::from_str("-987654321000")
+///            .unwrap()).to_string(), "121932631112635269000000");
 /// ```
 impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     type Output = Integer;
@@ -164,14 +156,12 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     let mut x = Integer::NEGATIVE_ONE;
-///     x *= Integer::from_str("1000").unwrap();
-///     x *= Integer::from_str("2000").unwrap();
-///     x *= Integer::from_str("3000").unwrap();
-///     x *= Integer::from_str("4000").unwrap();
-///     assert_eq!(x.to_string(), "-24000000000000");
-/// }
+/// let mut x = Integer::NEGATIVE_ONE;
+/// x *= Integer::from_str("1000").unwrap();
+/// x *= Integer::from_str("2000").unwrap();
+/// x *= Integer::from_str("3000").unwrap();
+/// x *= Integer::from_str("4000").unwrap();
+/// assert_eq!(x.to_string(), "-24000000000000");
 /// ```
 impl MulAssign<Integer> for Integer {
     fn mul_assign(&mut self, other: Integer) {
@@ -197,14 +187,12 @@ impl MulAssign<Integer> for Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     let mut x = Integer::NEGATIVE_ONE;
-///     x *= &Integer::from_str("1000").unwrap();
-///     x *= &Integer::from_str("2000").unwrap();
-///     x *= &Integer::from_str("3000").unwrap();
-///     x *= &Integer::from_str("4000").unwrap();
-///     assert_eq!(x.to_string(), "-24000000000000");
-/// }
+/// let mut x = Integer::NEGATIVE_ONE;
+/// x *= &Integer::from_str("1000").unwrap();
+/// x *= &Integer::from_str("2000").unwrap();
+/// x *= &Integer::from_str("3000").unwrap();
+/// x *= &Integer::from_str("4000").unwrap();
+/// assert_eq!(x.to_string(), "-24000000000000");
 /// ```
 impl<'a> MulAssign<&'a Integer> for Integer {
     fn mul_assign(&mut self, other: &'a Integer) {

@@ -18,13 +18,11 @@ impl<'a> Parity for &'a Integer {
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.even(), true);
-    ///     assert_eq!(Integer::from(123).even(), false);
-    ///     assert_eq!(Integer::from(-0x80).even(), true);
-    ///     assert_eq!(Integer::trillion().even(), true);
-    ///     assert_eq!((-Integer::trillion() - Integer::ONE).even(), false);
-    /// }
+    /// assert_eq!(Integer::ZERO.even(), true);
+    /// assert_eq!(Integer::from(123).even(), false);
+    /// assert_eq!(Integer::from(-0x80).even(), true);
+    /// assert_eq!(Integer::trillion().even(), true);
+    /// assert_eq!((-Integer::trillion() - Integer::ONE).even(), false);
     /// ```
     fn even(self) -> bool {
         match *self {
@@ -47,13 +45,11 @@ impl<'a> Parity for &'a Integer {
     /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.odd(), false);
-    ///     assert_eq!(Integer::from(123).odd(), true);
-    ///     assert_eq!(Integer::from(-0x80).odd(), false);
-    ///     assert_eq!(Integer::trillion().odd(), false);
-    ///     assert_eq!((-Integer::trillion() - Integer::ONE).odd(), true);
-    /// }
+    /// assert_eq!(Integer::ZERO.odd(), false);
+    /// assert_eq!(Integer::from(123).odd(), true);
+    /// assert_eq!(Integer::from(-0x80).odd(), false);
+    /// assert_eq!(Integer::trillion().odd(), false);
+    /// assert_eq!((-Integer::trillion() - Integer::ONE).odd(), true);
     /// ```
     fn odd(self) -> bool {
         match *self {

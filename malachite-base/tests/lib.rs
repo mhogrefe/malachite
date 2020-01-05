@@ -5,6 +5,7 @@ pub mod chars;
 pub mod limbs;
 pub mod num {
     pub mod basic;
+    pub mod comparison;
     pub mod conversion;
     pub mod logic;
 }

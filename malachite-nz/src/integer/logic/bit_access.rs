@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
@@ -82,20 +84,24 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
     }
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
     let zero_bound = limbs_leading_zero_limbs(limbs);
-    if limb_index > zero_bound {
-        limbs[limb_index].clear_bit(reduced_index);
-    } else if limb_index == zero_bound {
-        let boundary_limb = &mut limbs[limb_index];
-        // boundary limb != 0 here
-        *boundary_limb -= 1;
-        boundary_limb.clear_bit(reduced_index);
-        // boundary limb != Limb::MAX here
-        *boundary_limb += 1;
-    } else {
-        assert!(!limbs_sub_limb_in_place(
-            &mut limbs[limb_index..],
-            1 << reduced_index,
-        ));
+    match limb_index.cmp(&zero_bound) {
+        Ordering::Equal => {
+            let boundary_limb = &mut limbs[limb_index];
+            // boundary limb != 0 here
+            *boundary_limb -= 1;
+            boundary_limb.clear_bit(reduced_index);
+            // boundary limb != Limb::MAX here
+            *boundary_limb += 1;
+        }
+        Ordering::Less => {
+            assert!(!limbs_sub_limb_in_place(
+                &mut limbs[limb_index..],
+                1 << reduced_index,
+            ));
+        }
+        Ordering::Greater => {
+            limbs[limb_index].clear_bit(reduced_index);
+        }
     }
 }
 

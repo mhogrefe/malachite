@@ -30,7 +30,7 @@ pub mod base {
 
     pub mod num {
         pub mod conversion {
-            pub mod checked_from;
+            pub mod checked_from_and_exact_from;
             pub mod convertible_from;
             pub mod from_other_type_slice;
             pub mod join_halves;
@@ -42,6 +42,10 @@ pub mod base {
             pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
             pub mod wrapping_from;
+        }
+
+        pub mod comparison {
+            pub mod ord_abs_partial_ord_abs_and_comparators;
         }
 
         pub mod logic {

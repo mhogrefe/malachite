@@ -21,13 +21,11 @@ impl CheckedFrom<Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(Integer::from(123))), "Some(123)");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(Integer::from(-123))), "None");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(Integer::trillion())),
-    ///         "Some(1000000000000)");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(-Integer::trillion())), "None");
-    /// }
+    /// assert_eq!(format!("{:?}", Natural::checked_from(Integer::from(123))), "Some(123)");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(Integer::from(-123))), "None");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(Integer::trillion())),
+    ///     "Some(1000000000000)");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(-Integer::trillion())), "None");
     /// ```
     fn checked_from(value: Integer) -> Option<Natural> {
         match value {
@@ -56,13 +54,11 @@ impl<'a> CheckedFrom<&'a Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(&Integer::from(123))), "Some(123)");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(&Integer::from(-123))), "None");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(&Integer::trillion())),
-    ///         "Some(1000000000000)");
-    ///     assert_eq!(format!("{:?}", Natural::checked_from(&(-Integer::trillion()))), "None");
-    /// }
+    /// assert_eq!(format!("{:?}", Natural::checked_from(&Integer::from(123))), "Some(123)");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(&Integer::from(-123))), "None");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(&Integer::trillion())),
+    ///     "Some(1000000000000)");
+    /// assert_eq!(format!("{:?}", Natural::checked_from(&(-Integer::trillion()))), "None");
     /// ```
     fn checked_from(value: &'a Integer) -> Option<Natural> {
         match *value {
@@ -92,12 +88,10 @@ impl SaturatingFrom<Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::saturating_from(Integer::from(123)).to_string(), "123");
-    ///     assert_eq!(Natural::saturating_from(Integer::from(-123)).to_string(), "0");
-    ///     assert_eq!(Natural::saturating_from(Integer::trillion()).to_string(), "1000000000000");
-    ///     assert_eq!(Natural::saturating_from(-Integer::trillion()).to_string(), "0");
-    /// }
+    /// assert_eq!(Natural::saturating_from(Integer::from(123)).to_string(), "123");
+    /// assert_eq!(Natural::saturating_from(Integer::from(-123)).to_string(), "0");
+    /// assert_eq!(Natural::saturating_from(Integer::trillion()).to_string(), "1000000000000");
+    /// assert_eq!(Natural::saturating_from(-Integer::trillion()).to_string(), "0");
     /// ```
     fn saturating_from(value: Integer) -> Natural {
         match value {
@@ -124,12 +118,10 @@ impl<'a> SaturatingFrom<&'a Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::saturating_from(&Integer::from(123)).to_string(), "123");
-    ///     assert_eq!(Natural::saturating_from(&Integer::from(-123)).to_string(), "0");
-    ///     assert_eq!(Natural::saturating_from(&Integer::trillion()).to_string(), "1000000000000");
-    ///     assert_eq!(Natural::saturating_from(&-Integer::trillion()).to_string(), "0");
-    /// }
+    /// assert_eq!(Natural::saturating_from(&Integer::from(123)).to_string(), "123");
+    /// assert_eq!(Natural::saturating_from(&Integer::from(-123)).to_string(), "0");
+    /// assert_eq!(Natural::saturating_from(&Integer::trillion()).to_string(), "1000000000000");
+    /// assert_eq!(Natural::saturating_from(&-Integer::trillion()).to_string(), "0");
     /// ```
     fn saturating_from(value: &'a Integer) -> Natural {
         match *value {
@@ -159,12 +151,10 @@ impl ConvertibleFrom<Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::convertible_from(Integer::from(123)), true);
-    ///     assert_eq!(Natural::convertible_from(Integer::from(-123)), false);
-    ///     assert_eq!(Natural::convertible_from(Integer::trillion()), true);
-    ///     assert_eq!(Natural::convertible_from(-Integer::trillion()), false);
-    /// }
+    /// assert_eq!(Natural::convertible_from(Integer::from(123)), true);
+    /// assert_eq!(Natural::convertible_from(Integer::from(-123)), false);
+    /// assert_eq!(Natural::convertible_from(Integer::trillion()), true);
+    /// assert_eq!(Natural::convertible_from(-Integer::trillion()), false);
     /// ```
     #[inline]
     fn convertible_from(value: Integer) -> bool {
@@ -189,12 +179,10 @@ impl<'a> ConvertibleFrom<&'a Integer> for Natural {
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
-    /// fn main() {
-    ///     assert_eq!(Natural::convertible_from(&Integer::from(123)), true);
-    ///     assert_eq!(Natural::convertible_from(&Integer::from(-123)), false);
-    ///     assert_eq!(Natural::convertible_from(&Integer::trillion()), true);
-    ///     assert_eq!(Natural::convertible_from(&-Integer::trillion()), false);
-    /// }
+    /// assert_eq!(Natural::convertible_from(&Integer::from(123)), true);
+    /// assert_eq!(Natural::convertible_from(&Integer::from(-123)), false);
+    /// assert_eq!(Natural::convertible_from(&Integer::trillion()), true);
+    /// assert_eq!(Natural::convertible_from(&-Integer::trillion()), false);
     /// ```
     #[inline]
     fn convertible_from(value: &'a Integer) -> bool {

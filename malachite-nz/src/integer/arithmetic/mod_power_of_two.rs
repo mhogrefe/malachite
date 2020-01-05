@@ -27,13 +27,11 @@ impl ModPowerOfTwo for Integer {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!(Integer::from(260).mod_power_of_two(8).to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!(Integer::from(260).mod_power_of_two(8).to_string(), "4");
     ///
-    ///     // -101 * 2^4 + 5 = -1611
-    ///     assert_eq!(Integer::from(-1611).mod_power_of_two(4).to_string(), "5");
-    /// }
+    /// // -101 * 2^4 + 5 = -1611
+    /// assert_eq!(Integer::from(-1611).mod_power_of_two(4).to_string(), "5");
     /// ```
     fn mod_power_of_two(self, other: u64) -> Natural {
         if self.sign {
@@ -64,12 +62,10 @@ impl<'a> ModPowerOfTwo for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!((&Integer::from(260)).mod_power_of_two(8).to_string(), "4");
-    ///     // -101 * 2^4 + 5 = -1611
-    ///     assert_eq!((&Integer::from(-1611)).mod_power_of_two(4).to_string(), "5");
-    /// }
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!((&Integer::from(260)).mod_power_of_two(8).to_string(), "4");
+    /// // -101 * 2^4 + 5 = -1611
+    /// assert_eq!((&Integer::from(-1611)).mod_power_of_two(4).to_string(), "5");
     /// ```
     fn mod_power_of_two(self, other: u64) -> Natural {
         if self.sign {
@@ -98,17 +94,15 @@ impl ModPowerOfTwoAssign for Integer {
     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     let mut x = Integer::from(260);
-    ///     x.mod_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// let mut x = Integer::from(260);
+    /// x.mod_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "4");
     ///
-    ///     // -101 * 2^4 + 5 = -1611
-    ///     let mut x = Integer::from(-1611);
-    ///     x.mod_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "5");
-    /// }
+    /// // -101 * 2^4 + 5 = -1611
+    /// let mut x = Integer::from(-1611);
+    /// x.mod_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "5");
     /// ```
     fn mod_power_of_two_assign(&mut self, other: u64) {
         if self.sign {
@@ -142,13 +136,11 @@ impl RemPowerOfTwo for Integer {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!(Integer::from(260).rem_power_of_two(8).to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!(Integer::from(260).rem_power_of_two(8).to_string(), "4");
     ///
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     assert_eq!(Integer::from(-1611).rem_power_of_two(4).to_string(), "-11");
-    /// }
+    /// // -100 * 2^4 + -11 = -1611
+    /// assert_eq!(Integer::from(-1611).rem_power_of_two(4).to_string(), "-11");
     /// ```
     fn rem_power_of_two(self, other: u64) -> Integer {
         let abs_rem = self.abs.mod_power_of_two(other);
@@ -181,12 +173,10 @@ impl<'a> RemPowerOfTwo for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     assert_eq!((&Integer::from(260)).rem_power_of_two(8).to_string(), "4");
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     assert_eq!((&Integer::from(-1611)).rem_power_of_two(4).to_string(), "-11");
-    /// }
+    /// // 1 * 2^8 + 4 = 260
+    /// assert_eq!((&Integer::from(260)).rem_power_of_two(8).to_string(), "4");
+    /// // -100 * 2^4 + -11 = -1611
+    /// assert_eq!((&Integer::from(-1611)).rem_power_of_two(4).to_string(), "-11");
     /// ```
     fn rem_power_of_two(self, other: u64) -> Integer {
         let abs_rem = (&self.abs).mod_power_of_two(other);
@@ -217,17 +207,15 @@ impl RemPowerOfTwoAssign for Integer {
     /// use malachite_base::num::arithmetic::traits::RemPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 1 * 2^8 + 4 = 260
-    ///     let mut x = Integer::from(260);
-    ///     x.rem_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "4");
+    /// // 1 * 2^8 + 4 = 260
+    /// let mut x = Integer::from(260);
+    /// x.rem_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "4");
     ///
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     let mut x = Integer::from(-1611);
-    ///     x.rem_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "-11");
-    /// }
+    /// // -100 * 2^4 + -11 = -1611
+    /// let mut x = Integer::from(-1611);
+    /// x.rem_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "-11");
     /// ```
     fn rem_power_of_two_assign(&mut self, other: u64) {
         self.abs.mod_power_of_two_assign(other);
@@ -255,13 +243,11 @@ impl CeilingModPowerOfTwo for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 + -252 = 260
-    ///     assert_eq!(Integer::from(260).ceiling_mod_power_of_two(8).to_string(), "-252");
+    /// // 2 * 2^8 + -252 = 260
+    /// assert_eq!(Integer::from(260).ceiling_mod_power_of_two(8).to_string(), "-252");
     ///
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     assert_eq!(Integer::from(-1611).ceiling_mod_power_of_two(4).to_string(), "-11");
-    /// }
+    /// // -100 * 2^4 + -11 = -1611
+    /// assert_eq!(Integer::from(-1611).ceiling_mod_power_of_two(4).to_string(), "-11");
     /// ```
     fn ceiling_mod_power_of_two(self, other: u64) -> Integer {
         let abs_mod = if self.sign {
@@ -295,12 +281,10 @@ impl<'a> CeilingModPowerOfTwo for &'a Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwo;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 + -252 = 260
-    ///     assert_eq!((&Integer::from(260)).ceiling_mod_power_of_two(8).to_string(), "-252");
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     assert_eq!((&Integer::from(-1611)).ceiling_mod_power_of_two(4).to_string(), "-11");
-    /// }
+    /// // 2 * 2^8 + -252 = 260
+    /// assert_eq!((&Integer::from(260)).ceiling_mod_power_of_two(8).to_string(), "-252");
+    /// // -100 * 2^4 + -11 = -1611
+    /// assert_eq!((&Integer::from(-1611)).ceiling_mod_power_of_two(4).to_string(), "-11");
     /// ```
     fn ceiling_mod_power_of_two(self, other: u64) -> Integer {
         let abs_mod = if self.sign {
@@ -331,17 +315,15 @@ impl CeilingModPowerOfTwoAssign for Integer {
     /// use malachite_base::num::arithmetic::traits::CeilingModPowerOfTwoAssign;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     // 2 * 2^8 + -252 = 260
-    ///     let mut x = Integer::from(260);
-    ///     x.ceiling_mod_power_of_two_assign(8);
-    ///     assert_eq!(x.to_string(), "-252");
-    ///     
-    ///     // -100 * 2^4 + -11 = -1611
-    ///     let mut x = Integer::from(-1611);
-    ///     x.ceiling_mod_power_of_two_assign(4);
-    ///     assert_eq!(x.to_string(), "-11");
-    /// }
+    /// // 2 * 2^8 + -252 = 260
+    /// let mut x = Integer::from(260);
+    /// x.ceiling_mod_power_of_two_assign(8);
+    /// assert_eq!(x.to_string(), "-252");
+    ///
+    /// // -100 * 2^4 + -11 = -1611
+    /// let mut x = Integer::from(-1611);
+    /// x.ceiling_mod_power_of_two_assign(4);
+    /// assert_eq!(x.to_string(), "-11");
     /// ```
     fn ceiling_mod_power_of_two_assign(&mut self, other: u64) {
         if self.sign {

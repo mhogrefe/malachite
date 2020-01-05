@@ -19,16 +19,14 @@ use platform::Limb;
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert!(Integer::from(123).gt_abs(&122));
-///     assert!(Integer::from(123).ge_abs(&122));
-///     assert!(Integer::from(123).lt_abs(&124));
-///     assert!(Integer::from(123).le_abs(&124));
-///     assert!(Integer::trillion().gt_abs(&123));
-///     assert!(Integer::trillion().ge_abs(&123));
-///     assert!((-Integer::trillion()).gt_abs(&123));
-///     assert!((-Integer::trillion()).ge_abs(&123));
-/// }
+/// assert!(Integer::from(123).gt_abs(&122));
+/// assert!(Integer::from(123).ge_abs(&122));
+/// assert!(Integer::from(123).lt_abs(&124));
+/// assert!(Integer::from(123).le_abs(&124));
+/// assert!(Integer::trillion().gt_abs(&123));
+/// assert!(Integer::trillion().ge_abs(&123));
+/// assert!((-Integer::trillion()).gt_abs(&123));
+/// assert!((-Integer::trillion()).ge_abs(&123));
 /// ```
 impl PartialOrdAbs<Limb> for Integer {
     fn partial_cmp_abs(&self, other: &Limb) -> Option<Ordering> {
@@ -58,16 +56,14 @@ impl PartialOrdAbs<u32> for Integer {
 /// use malachite_base::num::comparison::traits::PartialOrdAbs;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert!(122.lt_abs(&Integer::from(123)));
-///     assert!(122.le_abs(&Integer::from(123)));
-///     assert!(124.gt_abs(&Integer::from(123)));
-///     assert!(123.ge_abs(&Integer::from(123)));
-///     assert!(123.lt_abs(&Integer::trillion()));
-///     assert!(123.le_abs(&Integer::trillion()));
-///     assert!(123.lt_abs(&(-Integer::trillion())));
-///     assert!(123.le_abs(&(-Integer::trillion())));
-/// }
+/// assert!(122.lt_abs(&Integer::from(123)));
+/// assert!(122.le_abs(&Integer::from(123)));
+/// assert!(124.gt_abs(&Integer::from(123)));
+/// assert!(123.ge_abs(&Integer::from(123)));
+/// assert!(123.lt_abs(&Integer::trillion()));
+/// assert!(123.le_abs(&Integer::trillion()));
+/// assert!(123.lt_abs(&(-Integer::trillion())));
+/// assert!(123.le_abs(&(-Integer::trillion())));
 /// ```
 impl PartialOrdAbs<Integer> for Limb {
     fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {

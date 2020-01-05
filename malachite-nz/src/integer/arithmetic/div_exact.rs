@@ -34,17 +34,15 @@ impl DivExact<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     assert_eq!(Integer::from(-56088).div_exact(Integer::from(456)).to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// assert_eq!(Integer::from(-56088).div_exact(Integer::from(456)).to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         Integer::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(Integer::from_str("-987654321000").unwrap()).to_string(),
-    ///         "-123456789000"
-    ///     );
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     Integer::from_str("121932631112635269000000").unwrap()
+    ///         .div_exact(Integer::from_str("-987654321000").unwrap()).to_string(),
+    ///     "-123456789000"
+    /// );
     /// ```
     #[inline]
     fn div_exact(mut self, other: Integer) -> Integer {
@@ -83,17 +81,15 @@ impl<'a> DivExact<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     assert_eq!(Integer::from(-56088).div_exact(&Integer::from(456)).to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// assert_eq!(Integer::from(-56088).div_exact(&Integer::from(456)).to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         Integer::from_str("121932631112635269000000").unwrap()
-    ///             .div_exact(&Integer::from_str("-987654321000").unwrap()).to_string(),
-    ///         "-123456789000"
-    ///     );
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     Integer::from_str("121932631112635269000000").unwrap()
+    ///         .div_exact(&Integer::from_str("-987654321000").unwrap()).to_string(),
+    ///     "-123456789000"
+    /// );
     /// ```
     #[inline]
     fn div_exact(mut self, other: &'a Integer) -> Integer {
@@ -132,17 +128,15 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     assert_eq!((&Integer::from(-56088)).div_exact(Integer::from(456)).to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// assert_eq!((&Integer::from(-56088)).div_exact(Integer::from(456)).to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         (&Integer::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(Integer::from_str("-987654321000").unwrap()).to_string(),
-    ///         "-123456789000"
-    ///     );
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     (&Integer::from_str("121932631112635269000000").unwrap())
+    ///         .div_exact(Integer::from_str("-987654321000").unwrap()).to_string(),
+    ///     "-123456789000"
+    /// );
     /// ```
     fn div_exact(self, other: Integer) -> Integer {
         let quotient_abs = (&self.abs).div_exact(other.abs);
@@ -183,17 +177,15 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     assert_eq!((&Integer::from(-56088)).div_exact(&Integer::from(456)).to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// assert_eq!((&Integer::from(-56088)).div_exact(&Integer::from(456)).to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     assert_eq!(
-    ///         (&Integer::from_str("121932631112635269000000").unwrap())
-    ///             .div_exact(&Integer::from_str("-987654321000").unwrap()).to_string(),
-    ///         "-123456789000"
-    ///     );
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// assert_eq!(
+    ///     (&Integer::from_str("121932631112635269000000").unwrap())
+    ///         .div_exact(&Integer::from_str("-987654321000").unwrap()).to_string(),
+    ///     "-123456789000"
+    /// );
     /// ```
     fn div_exact(self, other: &'b Integer) -> Integer {
         let quotient_abs = (&self.abs).div_exact(&other.abs);
@@ -232,17 +224,15 @@ impl DivExactAssign<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     let mut x = Integer::from(-56088);
-    ///     x.div_exact_assign(Integer::from(456));
-    ///     assert_eq!(x.to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// let mut x = Integer::from(-56088);
+    /// x.div_exact_assign(Integer::from(456));
+    /// assert_eq!(x.to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     let mut x = Integer::from_str("121932631112635269000000").unwrap();
-    ///     x.div_exact_assign(Integer::from_str("-987654321000").unwrap());
-    ///     assert_eq!(x.to_string(), "-123456789000");
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// let mut x = Integer::from_str("121932631112635269000000").unwrap();
+    /// x.div_exact_assign(Integer::from_str("-987654321000").unwrap());
+    /// assert_eq!(x.to_string(), "-123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: Integer) {
         self.abs.div_exact_assign(other.abs);
@@ -278,17 +268,15 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
-    /// fn main() {
-    ///     // -123 * 456 = -56088
-    ///     let mut x = Integer::from(-56088);
-    ///     x.div_exact_assign(&Integer::from(456));
-    ///     assert_eq!(x.to_string(), "-123");
+    /// // -123 * 456 = -56088
+    /// let mut x = Integer::from(-56088);
+    /// x.div_exact_assign(&Integer::from(456));
+    /// assert_eq!(x.to_string(), "-123");
     ///
-    ///     // -123456789000 * -987654321000 = 121932631112635269000000
-    ///     let mut x = Integer::from_str("121932631112635269000000").unwrap();
-    ///     x.div_exact_assign(&Integer::from_str("-987654321000").unwrap());
-    ///     assert_eq!(x.to_string(), "-123456789000");
-    /// }
+    /// // -123456789000 * -987654321000 = 121932631112635269000000
+    /// let mut x = Integer::from_str("121932631112635269000000").unwrap();
+    /// x.div_exact_assign(&Integer::from_str("-987654321000").unwrap());
+    /// assert_eq!(x.to_string(), "-123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: &'a Integer) {
         self.abs.div_exact_assign(&other.abs);

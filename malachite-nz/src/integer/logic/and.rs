@@ -1,4 +1,4 @@
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 use std::ops::{BitAnd, BitAndAssign};
 
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
@@ -538,11 +538,15 @@ pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
     let ys_len = ys.len();
-    if xs_len > ys_len {
-        let ys_len = ys.len();
-        ys.extend(xs[ys_len..].iter());
-    } else if xs_len < ys_len {
-        ys.truncate(xs_len);
+    match xs_len.cmp(&ys_len) {
+        Ordering::Greater => {
+            let ys_len = ys.len();
+            ys.extend(xs[ys_len..].iter());
+        }
+        Ordering::Less => {
+            ys.truncate(xs_len);
+        }
+        _ => {}
     }
 }
 
@@ -978,11 +982,9 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-///     assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-1000000004096");
-/// }
+/// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+/// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-1000000004096");
 /// ```
 impl BitAnd<Integer> for Integer {
     type Output = Integer;
@@ -1011,11 +1013,9 @@ impl BitAnd<Integer> for Integer {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-///     assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-1000000004096");
-/// }
+/// assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+/// assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-1000000004096");
 /// ```
 impl<'a> BitAnd<&'a Integer> for Integer {
     type Output = Integer;
@@ -1045,11 +1045,9 @@ impl<'a> BitAnd<&'a Integer> for Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main () {
-///     assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-///     assert_eq!((&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-1000000004096");
-/// }
+/// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+/// assert_eq!((&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-1000000004096");
 /// ```
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
@@ -1079,11 +1077,9 @@ impl<'a> BitAnd<Integer> for &'a Integer {
 /// use malachite_nz::integer::Integer;
 /// use std::str::FromStr;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-///     assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-1000000004096");
-/// }
+/// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+/// assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-1000000004096");
 /// ```
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     type Output = Integer;
@@ -1127,14 +1123,12 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 /// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::NEGATIVE_ONE;
-///     x &= Integer::from(0x70ff_ffff);
-///     x &= Integer::from(0x7ff0_ffff);
-///     x &= Integer::from(0x7fff_f0ff);
-///     x &= Integer::from(0x7fff_fff0);
-///     assert_eq!(x, 0x70f0f0f0);
-/// }
+/// let mut x = Integer::NEGATIVE_ONE;
+/// x &= Integer::from(0x70ff_ffff);
+/// x &= Integer::from(0x7ff0_ffff);
+/// x &= Integer::from(0x7fff_f0ff);
+/// x &= Integer::from(0x7fff_fff0);
+/// assert_eq!(x, 0x70f0f0f0);
 /// ```
 impl BitAndAssign<Integer> for Integer {
     fn bitand_assign(&mut self, other: Integer) {
@@ -1167,14 +1161,12 @@ impl BitAndAssign<Integer> for Integer {
 /// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::NEGATIVE_ONE;
-///     x &= &Integer::from(0x70ff_ffff);
-///     x &= &Integer::from(0x7ff0_ffff);
-///     x &= &Integer::from(0x7fff_f0ff);
-///     x &= &Integer::from(0x7fff_fff0);
-///     assert_eq!(x, 0x70f0f0f0);
-/// }
+/// let mut x = Integer::NEGATIVE_ONE;
+/// x &= &Integer::from(0x70ff_ffff);
+/// x &= &Integer::from(0x7ff0_ffff);
+/// x &= &Integer::from(0x7fff_f0ff);
+/// x &= &Integer::from(0x7fff_fff0);
+/// assert_eq!(x, 0x70f0f0f0);
 /// ```
 impl<'a> BitAndAssign<&'a Integer> for Integer {
     fn bitand_assign(&mut self, other: &'a Integer) {

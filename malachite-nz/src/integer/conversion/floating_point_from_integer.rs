@@ -35,21 +35,19 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::rounding_from(Integer::from_str("123").unwrap(),
-        ///         RoundingMode::Exact), 123.0);
-        ///     assert_eq!(f32::rounding_from(Integer::from_str("1000000001").unwrap(),
-        ///         RoundingMode::Floor), 1.0e9);
-        ///     assert_eq!(f32::rounding_from(Integer::from_str("1000000001").unwrap(),
-        ///         RoundingMode::Ceiling), 1.00000006e9);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
-        ///         RoundingMode::Floor), -1.00000006e9);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
-        ///         RoundingMode::Ceiling), -1.0e9);
-        ///     assert_eq!(f32::rounding_from(
-        ///         Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap(), RoundingMode::Nearest), 3.4028235e38);
-        /// }
+        /// assert_eq!(f32::rounding_from(Integer::from_str("123").unwrap(),
+        ///     RoundingMode::Exact), 123.0);
+        /// assert_eq!(f32::rounding_from(Integer::from_str("1000000001").unwrap(),
+        ///     RoundingMode::Floor), 1.0e9);
+        /// assert_eq!(f32::rounding_from(Integer::from_str("1000000001").unwrap(),
+        ///     RoundingMode::Ceiling), 1.00000006e9);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
+        ///     RoundingMode::Floor), -1.00000006e9);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
+        ///     RoundingMode::Ceiling), -1.0e9);
+        /// assert_eq!(f32::rounding_from(
+        ///     Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
+        ///     RoundingMode::Nearest), 3.4028235e38);
         /// ```
         impl RoundingFrom<Integer> for $f {
             fn rounding_from(value: Integer, rm: RoundingMode) -> $f {
@@ -91,21 +89,19 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("123").unwrap(),
-        ///         RoundingMode::Exact), 123.0);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("1000000001").unwrap(),
-        ///         RoundingMode::Floor), 1.0e9);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("1000000001").unwrap(),
-        ///         RoundingMode::Ceiling), 1.00000006e9);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
-        ///         RoundingMode::Floor), -1.00000006e9);
-        ///     assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
-        ///         RoundingMode::Ceiling), -1.0e9);
-        ///     assert_eq!(f32::rounding_from(
-        ///         &Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap(), RoundingMode::Nearest), 3.4028235e38);
-        /// }
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("123").unwrap(),
+        ///     RoundingMode::Exact), 123.0);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("1000000001").unwrap(),
+        ///     RoundingMode::Floor), 1.0e9);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("1000000001").unwrap(),
+        ///     RoundingMode::Ceiling), 1.00000006e9);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
+        ///     RoundingMode::Floor), -1.00000006e9);
+        /// assert_eq!(f32::rounding_from(&Integer::from_str("-1000000001").unwrap(),
+        ///     RoundingMode::Ceiling), -1.0e9);
+        /// assert_eq!(f32::rounding_from(
+        ///     &Integer::from_str("10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap(), RoundingMode::Nearest), 3.4028235e38);
         /// ```
         impl<'a> RoundingFrom<&'a Integer> for $f {
             fn rounding_from(value: &'a Integer, rm: RoundingMode) -> $f {
@@ -134,13 +130,11 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::from(Integer::from_str("123").unwrap()), 123.0);
-        ///     assert_eq!(f32::from(Integer::from_str("-1000000001").unwrap()), -1.0e9);
-        ///     assert_eq!(f32::from(
-        ///         Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), 3.4028235e38);
-        /// }
+        /// assert_eq!(f32::from(Integer::from_str("123").unwrap()), 123.0);
+        /// assert_eq!(f32::from(Integer::from_str("-1000000001").unwrap()), -1.0e9);
+        /// assert_eq!(f32::from(
+        ///     Integer::from_str("10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), 3.4028235e38);
         /// ```
         impl From<Integer> for $f {
             fn from(value: Integer) -> $f {
@@ -170,13 +164,11 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::from(&Integer::from_str("123").unwrap()), 123.0);
-        ///     assert_eq!(f32::from(&Integer::from_str("-1000000001").unwrap()), -1.0e9);
-        ///     assert_eq!(f32::from(
-        ///         &Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), 3.4028235e38);
-        /// }
+        /// assert_eq!(f32::from(&Integer::from_str("123").unwrap()), 123.0);
+        /// assert_eq!(f32::from(&Integer::from_str("-1000000001").unwrap()), -1.0e9);
+        /// assert_eq!(f32::from(
+        ///     &Integer::from_str("10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), 3.4028235e38);
         /// ```
         impl<'a> From<&'a Integer> for $f {
             fn from(value: &'a Integer) -> $f {
@@ -205,15 +197,13 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::checked_from(Integer::from_str("123").unwrap()), Some(123.0));
-        ///     assert_eq!(f32::checked_from(Integer::from_str("-1000000000").unwrap()),
-        ///         Some(-1.0e9));
-        ///     assert_eq!(f32::checked_from(Integer::from_str("1000000001").unwrap()), None);
-        ///     assert_eq!(f32::checked_from(
-        ///         Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), None);
-        /// }
+        /// assert_eq!(f32::checked_from(Integer::from_str("123").unwrap()), Some(123.0));
+        /// assert_eq!(f32::checked_from(Integer::from_str("-1000000000").unwrap()),
+        ///     Some(-1.0e9));
+        /// assert_eq!(f32::checked_from(Integer::from_str("1000000001").unwrap()), None);
+        /// assert_eq!(f32::checked_from(
+        ///     Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), None);
         /// ```
         impl CheckedFrom<Integer> for $f {
             fn checked_from(value: Integer) -> Option<$f> {
@@ -238,15 +228,13 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::checked_from(&Integer::from_str("123").unwrap()), Some(123.0));
-        ///     assert_eq!(f32::checked_from(&Integer::from_str("-1000000000").unwrap()),
-        ///         Some(-1.0e9));
-        ///     assert_eq!(f32::checked_from(&Integer::from_str("1000000001").unwrap()), None);
-        ///     assert_eq!(f32::checked_from(
-        ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), None);
-        /// }
+        /// assert_eq!(f32::checked_from(&Integer::from_str("123").unwrap()), Some(123.0));
+        /// assert_eq!(f32::checked_from(&Integer::from_str("-1000000000").unwrap()),
+        ///     Some(-1.0e9));
+        /// assert_eq!(f32::checked_from(&Integer::from_str("1000000001").unwrap()), None);
+        /// assert_eq!(f32::checked_from(
+        ///     &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), None);
         /// ```
         impl<'a> CheckedFrom<&'a Integer> for $f {
             fn checked_from(value: &'a Integer) -> Option<$f> {
@@ -270,14 +258,12 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::convertible_from(Integer::from_str("123").unwrap()), true);
-        ///     assert_eq!(f32::convertible_from(Integer::from_str("-1000000000").unwrap()), true);
-        ///     assert_eq!(f32::convertible_from(Integer::from_str("1000000001").unwrap()), false);
-        ///     assert_eq!(f32::convertible_from(
-        ///         Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), false);
-        /// }
+        /// assert_eq!(f32::convertible_from(Integer::from_str("123").unwrap()), true);
+        /// assert_eq!(f32::convertible_from(Integer::from_str("-1000000000").unwrap()), true);
+        /// assert_eq!(f32::convertible_from(Integer::from_str("1000000001").unwrap()), false);
+        /// assert_eq!(f32::convertible_from(
+        ///     Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), false);
         /// ```
         impl ConvertibleFrom<Integer> for $f {
             #[inline]
@@ -302,14 +288,12 @@ macro_rules! float_impls {
         /// use malachite_nz::integer::Integer;
         /// use std::str::FromStr;
         ///
-        /// fn main() {
-        ///     assert_eq!(f32::convertible_from(&Integer::from_str("123").unwrap()), true);
-        ///     assert_eq!(f32::convertible_from(&Integer::from_str("-1000000000").unwrap()), true);
-        ///     assert_eq!(f32::convertible_from(&Integer::from_str("1000000001").unwrap()), false);
-        ///     assert_eq!(f32::convertible_from(
-        ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///         .unwrap()), false);
-        /// }
+        /// assert_eq!(f32::convertible_from(&Integer::from_str("123").unwrap()), true);
+        /// assert_eq!(f32::convertible_from(&Integer::from_str("-1000000000").unwrap()), true);
+        /// assert_eq!(f32::convertible_from(&Integer::from_str("1000000001").unwrap()), false);
+        /// assert_eq!(f32::convertible_from(
+        ///     &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+        ///     .unwrap()), false);
         /// ```
         impl<'a> ConvertibleFrom<&'a Integer> for $f {
             fn convertible_from(value: &'a Integer) -> bool {

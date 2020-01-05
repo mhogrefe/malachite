@@ -21,11 +21,9 @@ use platform::Limb;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((-Integer::ZERO).to_string(), "0");
-///     assert_eq!((-Integer::from(123)).to_string(), "-123");
-///     assert_eq!((-Integer::from(-123)).to_string(), "123");
-/// }
+/// assert_eq!((-Integer::ZERO).to_string(), "0");
+/// assert_eq!((-Integer::from(123)).to_string(), "-123");
+/// assert_eq!((-Integer::from(-123)).to_string(), "123");
 /// ```
 impl Neg for Integer {
     type Output = Integer;
@@ -54,11 +52,9 @@ impl Neg for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((-&Integer::ZERO).to_string(), "0");
-///     assert_eq!((-&Integer::from(123)).to_string(), "-123");
-///     assert_eq!((-&Integer::from(-123)).to_string(), "123");
-/// }
+/// assert_eq!((-&Integer::ZERO).to_string(), "0");
+/// assert_eq!((-&Integer::from(123)).to_string(), "-123");
+/// assert_eq!((-&Integer::from(-123)).to_string(), "123");
 /// ```
 impl<'a> Neg for &'a Integer {
     type Output = Integer;
@@ -90,19 +86,17 @@ impl<'a> Neg for &'a Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x.neg_assign();
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Integer::ZERO;
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Integer::from(123);
-///     x.neg_assign();
-///     assert_eq!(x.to_string(), "-123");
+/// let mut x = Integer::from(123);
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "-123");
 ///
-///     let mut x = Integer::from(-123);
-///     x.neg_assign();
-///     assert_eq!(x.to_string(), "123");
-/// }
+/// let mut x = Integer::from(-123);
+/// x.neg_assign();
+/// assert_eq!(x.to_string(), "123");
 /// ```
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {
