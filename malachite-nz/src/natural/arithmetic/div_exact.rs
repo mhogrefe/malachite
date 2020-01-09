@@ -669,7 +669,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
 }
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
-/// `rs.len()`.. D must be odd. `inverse` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
+/// `rs.len()`. D must be odd. `inverse` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
 /// `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// Output:

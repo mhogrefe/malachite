@@ -22,11 +22,9 @@ use integer::Integer;
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((!Integer::ZERO).to_string(), "-1");
-///     assert_eq!((!Integer::from(123)).to_string(), "-124");
-///     assert_eq!((!Integer::from(-123)).to_string(), "122");
-/// }
+/// assert_eq!((!Integer::ZERO).to_string(), "-1");
+/// assert_eq!((!Integer::from(123)).to_string(), "-124");
+/// assert_eq!((!Integer::from(-123)).to_string(), "122");
 /// ```
 impl Not for Integer {
     type Output = Integer;
@@ -55,11 +53,9 @@ impl Not for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((!&Integer::ZERO).to_string(), "-1");
-///     assert_eq!((!&Integer::from(123)).to_string(), "-124");
-///     assert_eq!((!&Integer::from(-123)).to_string(), "122");
-/// }
+/// assert_eq!((!&Integer::ZERO).to_string(), "-1");
+/// assert_eq!((!&Integer::from(123)).to_string(), "-124");
+/// assert_eq!((!&Integer::from(-123)).to_string(), "122");
 /// ```
 impl<'a> Not for &'a Integer {
     type Output = Integer;
@@ -102,19 +98,17 @@ impl<'a> Not for &'a Integer {
 /// use malachite_base::num::logic::traits::NotAssign;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x.not_assign();
-///     assert_eq!(x.to_string(), "-1");
+/// let mut x = Integer::ZERO;
+/// x.not_assign();
+/// assert_eq!(x.to_string(), "-1");
 ///
-///     let mut x = Integer::from(123);
-///     x.not_assign();
-///     assert_eq!(x.to_string(), "-124");
+/// let mut x = Integer::from(123);
+/// x.not_assign();
+/// assert_eq!(x.to_string(), "-124");
 ///
-///     let mut x = Integer::from(-123);
-///     x.not_assign();
-///     assert_eq!(x.to_string(), "122");
-/// }
+/// let mut x = Integer::from(-123);
+/// x.not_assign();
+/// assert_eq!(x.to_string(), "122");
 /// ```
 impl NotAssign for Integer {
     fn not_assign(&mut self) {

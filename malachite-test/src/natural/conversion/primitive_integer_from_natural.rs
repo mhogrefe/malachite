@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{naturals, rm_naturals};
+use inputs::natural::{naturals, naturals_var_1, naturals_var_2, rm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_checked_from_natural);
@@ -18,6 +18,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u32_checked_from_natural_ref);
     register_demo!(registry, demo_u64_checked_from_natural_ref);
     register_demo!(registry, demo_usize_checked_from_natural_ref);
+    register_demo!(registry, demo_u8_exact_from_natural);
+    register_demo!(registry, demo_u16_exact_from_natural);
+    register_demo!(registry, demo_u32_exact_from_natural);
+    register_demo!(registry, demo_u64_exact_from_natural);
+    register_demo!(registry, demo_usize_exact_from_natural);
+    register_demo!(registry, demo_u8_exact_from_natural_ref);
+    register_demo!(registry, demo_u16_exact_from_natural_ref);
+    register_demo!(registry, demo_u32_exact_from_natural_ref);
+    register_demo!(registry, demo_u64_exact_from_natural_ref);
+    register_demo!(registry, demo_usize_exact_from_natural_ref);
     register_demo!(registry, demo_u8_wrapping_from_natural);
     register_demo!(registry, demo_u16_wrapping_from_natural);
     register_demo!(registry, demo_u32_wrapping_from_natural);
@@ -68,6 +78,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_i32_checked_from_natural_ref);
     register_demo!(registry, demo_i64_checked_from_natural_ref);
     register_demo!(registry, demo_isize_checked_from_natural_ref);
+    register_demo!(registry, demo_i8_exact_from_natural);
+    register_demo!(registry, demo_i16_exact_from_natural);
+    register_demo!(registry, demo_i32_exact_from_natural);
+    register_demo!(registry, demo_i64_exact_from_natural);
+    register_demo!(registry, demo_isize_exact_from_natural);
+    register_demo!(registry, demo_i8_exact_from_natural_ref);
+    register_demo!(registry, demo_i16_exact_from_natural_ref);
+    register_demo!(registry, demo_i32_exact_from_natural_ref);
+    register_demo!(registry, demo_i64_exact_from_natural_ref);
+    register_demo!(registry, demo_isize_exact_from_natural_ref);
     register_demo!(registry, demo_i8_wrapping_from_natural);
     register_demo!(registry, demo_i16_wrapping_from_natural);
     register_demo!(registry, demo_i32_wrapping_from_natural);
@@ -157,6 +177,31 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_usize_checked_from_natural_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u8_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u16_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u64_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_usize_exact_from_natural_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -386,6 +431,31 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_i8_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i16_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i32_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i64_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_isize_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_i8_wrapping_from_natural_evaluation_strategy
     );
     register_bench!(
@@ -600,11 +670,14 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
 }
 
-macro_rules! demo_and_bench_unsigned {
+macro_rules! demo_and_bench {
     (
         $t:ident,
+        $exact_from_generator:ident,
         $checked_from_demo_name:ident,
         $checked_from_ref_demo_name:ident,
+        $exact_from_demo_name:ident,
+        $exact_from_ref_demo_name:ident,
         $wrapping_from_demo_name:ident,
         $wrapping_from_ref_demo_name:ident,
         $saturating_from_demo_name:ident,
@@ -615,6 +688,7 @@ macro_rules! demo_and_bench_unsigned {
         $convertible_from_ref_demo_name:ident,
         $checked_from_es_bench_name:ident,
         $checked_from_a_bench_name:ident,
+        $exact_from_es_bench_name:ident,
         $wrapping_from_es_bench_name:ident,
         $wrapping_from_a_bench_name:ident,
         $saturating_from_es_bench_name:ident,
@@ -643,6 +717,24 @@ macro_rules! demo_and_bench_unsigned {
                     n,
                     $t::checked_from(&n)
                 );
+            }
+        }
+
+        fn $exact_from_demo_name(gm: GenerationMode, limit: usize) {
+            for n in $exact_from_generator::<$t>(gm).take(limit) {
+                let n_clone = n.clone();
+                println!(
+                    "{}::exact_from({}) = {}",
+                    $t::NAME,
+                    n_clone,
+                    $t::exact_from(n)
+                );
+            }
+        }
+
+        fn $exact_from_ref_demo_name(gm: GenerationMode, limit: usize) {
+            for n in $exact_from_generator::<$t>(gm).take(limit) {
+                println!("{}::exact_from(&{}) = {}", $t::NAME, n, $t::exact_from(&n));
             }
         }
 
@@ -783,6 +875,29 @@ macro_rules! demo_and_bench_unsigned {
                                 Some(value)
                             };
                         }),
+                    ),
+                ],
+            );
+        }
+
+        fn $exact_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+            m_run_benchmark(
+                &format!("{}::exact_from(Natural)", $t::NAME),
+                BenchmarkType::EvaluationStrategy,
+                $exact_from_generator::<$t>(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|ref n| usize::exact_from(n.significant_bits())),
+                "n.significant_bits()",
+                &mut [
+                    (
+                        &format!("{}::exact_from(Natural)", $t::NAME),
+                        &mut (|n| no_out!($t::exact_from(n))),
+                    ),
+                    (
+                        &format!("{}::exact_from(&Natural)", $t::NAME),
+                        &mut (|n| no_out!($t::exact_from(&n))),
                     ),
                 ],
             );
@@ -944,10 +1059,13 @@ macro_rules! demo_and_bench_unsigned {
     };
 }
 
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u8,
+    naturals_var_1,
     demo_u8_checked_from_natural,
     demo_u8_checked_from_natural_ref,
+    demo_u8_exact_from_natural,
+    demo_u8_exact_from_natural_ref,
     demo_u8_wrapping_from_natural,
     demo_u8_wrapping_from_natural_ref,
     demo_u8_saturating_from_natural,
@@ -958,6 +1076,7 @@ demo_and_bench_unsigned!(
     demo_u8_convertible_from_natural_ref,
     benchmark_u8_checked_from_natural_evaluation_strategy,
     benchmark_u8_checked_from_natural_algorithms,
+    benchmark_u8_exact_from_natural_evaluation_strategy,
     benchmark_u8_wrapping_from_natural_evaluation_strategy,
     benchmark_u8_wrapping_from_natural_algorithms,
     benchmark_u8_saturating_from_natural_evaluation_strategy,
@@ -966,10 +1085,13 @@ demo_and_bench_unsigned!(
     benchmark_u8_convertible_from_natural_evaluation_strategy,
     benchmark_u8_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u16,
+    naturals_var_1,
     demo_u16_checked_from_natural,
     demo_u16_checked_from_natural_ref,
+    demo_u16_exact_from_natural,
+    demo_u16_exact_from_natural_ref,
     demo_u16_wrapping_from_natural,
     demo_u16_wrapping_from_natural_ref,
     demo_u16_saturating_from_natural,
@@ -980,6 +1102,7 @@ demo_and_bench_unsigned!(
     demo_u16_convertible_from_natural_ref,
     benchmark_u16_checked_from_natural_evaluation_strategy,
     benchmark_u16_checked_from_natural_algorithms,
+    benchmark_u16_exact_from_natural_evaluation_strategy,
     benchmark_u16_wrapping_from_natural_evaluation_strategy,
     benchmark_u16_wrapping_from_natural_algorithms,
     benchmark_u16_saturating_from_natural_evaluation_strategy,
@@ -988,10 +1111,13 @@ demo_and_bench_unsigned!(
     benchmark_u16_convertible_from_natural_evaluation_strategy,
     benchmark_u16_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u32,
+    naturals_var_1,
     demo_u32_checked_from_natural,
     demo_u32_checked_from_natural_ref,
+    demo_u32_exact_from_natural,
+    demo_u32_exact_from_natural_ref,
     demo_u32_wrapping_from_natural,
     demo_u32_wrapping_from_natural_ref,
     demo_u32_saturating_from_natural,
@@ -1002,6 +1128,7 @@ demo_and_bench_unsigned!(
     demo_u32_convertible_from_natural_ref,
     benchmark_u32_checked_from_natural_evaluation_strategy,
     benchmark_u32_checked_from_natural_algorithms,
+    benchmark_u32_exact_from_natural_evaluation_strategy,
     benchmark_u32_wrapping_from_natural_evaluation_strategy,
     benchmark_u32_wrapping_from_natural_algorithms,
     benchmark_u32_saturating_from_natural_evaluation_strategy,
@@ -1010,10 +1137,13 @@ demo_and_bench_unsigned!(
     benchmark_u32_convertible_from_natural_evaluation_strategy,
     benchmark_u32_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u64,
+    naturals_var_1,
     demo_u64_checked_from_natural,
     demo_u64_checked_from_natural_ref,
+    demo_u64_exact_from_natural,
+    demo_u64_exact_from_natural_ref,
     demo_u64_wrapping_from_natural,
     demo_u64_wrapping_from_natural_ref,
     demo_u64_saturating_from_natural,
@@ -1024,6 +1154,7 @@ demo_and_bench_unsigned!(
     demo_u64_convertible_from_natural_ref,
     benchmark_u64_checked_from_natural_evaluation_strategy,
     benchmark_u64_checked_from_natural_algorithms,
+    benchmark_u64_exact_from_natural_evaluation_strategy,
     benchmark_u64_wrapping_from_natural_evaluation_strategy,
     benchmark_u64_wrapping_from_natural_algorithms,
     benchmark_u64_saturating_from_natural_evaluation_strategy,
@@ -1032,10 +1163,13 @@ demo_and_bench_unsigned!(
     benchmark_u64_convertible_from_natural_evaluation_strategy,
     benchmark_u64_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     usize,
+    naturals_var_1,
     demo_usize_checked_from_natural,
     demo_usize_checked_from_natural_ref,
+    demo_usize_exact_from_natural,
+    demo_usize_exact_from_natural_ref,
     demo_usize_wrapping_from_natural,
     demo_usize_wrapping_from_natural_ref,
     demo_usize_saturating_from_natural,
@@ -1046,6 +1180,7 @@ demo_and_bench_unsigned!(
     demo_usize_convertible_from_natural_ref,
     benchmark_usize_checked_from_natural_evaluation_strategy,
     benchmark_usize_checked_from_natural_algorithms,
+    benchmark_usize_exact_from_natural_evaluation_strategy,
     benchmark_usize_wrapping_from_natural_evaluation_strategy,
     benchmark_usize_wrapping_from_natural_algorithms,
     benchmark_usize_saturating_from_natural_evaluation_strategy,
@@ -1054,10 +1189,13 @@ demo_and_bench_unsigned!(
     benchmark_usize_convertible_from_natural_evaluation_strategy,
     benchmark_usize_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i8,
+    naturals_var_2,
     demo_i8_checked_from_natural,
     demo_i8_checked_from_natural_ref,
+    demo_i8_exact_from_natural,
+    demo_i8_exact_from_natural_ref,
     demo_i8_wrapping_from_natural,
     demo_i8_wrapping_from_natural_ref,
     demo_i8_saturating_from_natural,
@@ -1068,6 +1206,7 @@ demo_and_bench_unsigned!(
     demo_i8_convertible_from_natural_ref,
     benchmark_i8_checked_from_natural_evaluation_strategy,
     benchmark_i8_checked_from_natural_algorithms,
+    benchmark_i8_exact_from_natural_evaluation_strategy,
     benchmark_i8_wrapping_from_natural_evaluation_strategy,
     benchmark_i8_wrapping_from_natural_algorithms,
     benchmark_i8_saturating_from_natural_evaluation_strategy,
@@ -1076,10 +1215,13 @@ demo_and_bench_unsigned!(
     benchmark_i8_convertible_from_natural_evaluation_strategy,
     benchmark_i8_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i16,
+    naturals_var_2,
     demo_i16_checked_from_natural,
     demo_i16_checked_from_natural_ref,
+    demo_i16_exact_from_natural,
+    demo_i16_exact_from_natural_ref,
     demo_i16_wrapping_from_natural,
     demo_i16_wrapping_from_natural_ref,
     demo_i16_saturating_from_natural,
@@ -1090,6 +1232,7 @@ demo_and_bench_unsigned!(
     demo_i16_convertible_from_natural_ref,
     benchmark_i16_checked_from_natural_evaluation_strategy,
     benchmark_i16_checked_from_natural_algorithms,
+    benchmark_i16_exact_from_natural_evaluation_strategy,
     benchmark_i16_wrapping_from_natural_evaluation_strategy,
     benchmark_i16_wrapping_from_natural_algorithms,
     benchmark_i16_saturating_from_natural_evaluation_strategy,
@@ -1098,10 +1241,13 @@ demo_and_bench_unsigned!(
     benchmark_i16_convertible_from_natural_evaluation_strategy,
     benchmark_i16_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i32,
+    naturals_var_2,
     demo_i32_checked_from_natural,
     demo_i32_checked_from_natural_ref,
+    demo_i32_exact_from_natural,
+    demo_i32_exact_from_natural_ref,
     demo_i32_wrapping_from_natural,
     demo_i32_wrapping_from_natural_ref,
     demo_i32_saturating_from_natural,
@@ -1112,6 +1258,7 @@ demo_and_bench_unsigned!(
     demo_i32_convertible_from_natural_ref,
     benchmark_i32_checked_from_natural_evaluation_strategy,
     benchmark_i32_checked_from_natural_algorithms,
+    benchmark_i32_exact_from_natural_evaluation_strategy,
     benchmark_i32_wrapping_from_natural_evaluation_strategy,
     benchmark_i32_wrapping_from_natural_algorithms,
     benchmark_i32_saturating_from_natural_evaluation_strategy,
@@ -1120,10 +1267,13 @@ demo_and_bench_unsigned!(
     benchmark_i32_convertible_from_natural_evaluation_strategy,
     benchmark_i32_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i64,
+    naturals_var_2,
     demo_i64_checked_from_natural,
     demo_i64_checked_from_natural_ref,
+    demo_i64_exact_from_natural,
+    demo_i64_exact_from_natural_ref,
     demo_i64_wrapping_from_natural,
     demo_i64_wrapping_from_natural_ref,
     demo_i64_saturating_from_natural,
@@ -1134,6 +1284,7 @@ demo_and_bench_unsigned!(
     demo_i64_convertible_from_natural_ref,
     benchmark_i64_checked_from_natural_evaluation_strategy,
     benchmark_i64_checked_from_natural_algorithms,
+    benchmark_i64_exact_from_natural_evaluation_strategy,
     benchmark_i64_wrapping_from_natural_evaluation_strategy,
     benchmark_i64_wrapping_from_natural_algorithms,
     benchmark_i64_saturating_from_natural_evaluation_strategy,
@@ -1142,10 +1293,13 @@ demo_and_bench_unsigned!(
     benchmark_i64_convertible_from_natural_evaluation_strategy,
     benchmark_i64_convertible_from_natural_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     isize,
+    naturals_var_2,
     demo_isize_checked_from_natural,
     demo_isize_checked_from_natural_ref,
+    demo_isize_exact_from_natural,
+    demo_isize_exact_from_natural_ref,
     demo_isize_wrapping_from_natural,
     demo_isize_wrapping_from_natural_ref,
     demo_isize_saturating_from_natural,
@@ -1156,6 +1310,7 @@ demo_and_bench_unsigned!(
     demo_isize_convertible_from_natural_ref,
     benchmark_isize_checked_from_natural_evaluation_strategy,
     benchmark_isize_checked_from_natural_algorithms,
+    benchmark_isize_exact_from_natural_evaluation_strategy,
     benchmark_isize_wrapping_from_natural_evaluation_strategy,
     benchmark_isize_wrapping_from_natural_algorithms,
     benchmark_isize_saturating_from_natural_evaluation_strategy,

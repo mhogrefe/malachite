@@ -30,6 +30,30 @@ fn test_u32_checked_from_natural() {
 }
 
 #[test]
+fn test_u32_exact_from_natural() {
+    let test = |n, out| {
+        assert_eq!(u32::exact_from(Natural::from_str(n).unwrap()), out);
+        assert_eq!(u32::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("4294967295", u32::MAX);
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_natural_fail_1() {
+    u32::exact_from(Natural::from_str("1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_natural_fail_2() {
+    u32::exact_from(Natural::from_str("4294967296").unwrap());
+}
+
+#[test]
 fn test_u32_wrapping_from_natural() {
     let test = |n, out| {
         assert_eq!(u32::wrapping_from(Natural::from_str(n).unwrap()), out);
@@ -92,8 +116,34 @@ fn test_u64_checked_from_natural() {
     test("0", Some(0));
     test("123", Some(123));
     test("1000000000000", Some(1_000_000_000_000));
+    test("1000000000000000000000000", None);
     test("18446744073709551615", Some(u64::MAX));
     test("18446744073709551616", None);
+}
+
+#[test]
+fn test_u64_exact_from_natural() {
+    let test = |n, out| {
+        assert_eq!(u64::exact_from(Natural::from_str(n).unwrap()), out);
+        assert_eq!(u64::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("1000000000000", 1_000_000_000_000);
+    test("18446744073709551615", u64::MAX);
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_natural_fail_1() {
+    u64::exact_from(Natural::from_str("1000000000000000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_natural_fail_2() {
+    u64::exact_from(Natural::from_str("18446744073709551616").unwrap());
 }
 
 #[test]
@@ -167,6 +217,30 @@ fn test_i32_checked_from_natural() {
 }
 
 #[test]
+fn test_i32_exact_from_natural() {
+    let test = |n, out| {
+        assert_eq!(i32::exact_from(Natural::from_str(n).unwrap()), out);
+        assert_eq!(i32::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("2147483647", i32::MAX);
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_natural_fail_1() {
+    i32::exact_from(Natural::from_str("1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_natural_fail_2() {
+    i32::exact_from(Natural::from_str("2147483648").unwrap());
+}
+
+#[test]
 fn test_i32_wrapping_from_natural() {
     let test = |n, out| {
         assert_eq!(i32::wrapping_from(Natural::from_str(n).unwrap()), out);
@@ -231,6 +305,30 @@ fn test_i64_checked_from_natural() {
     test("1000000000000000000000000", None);
     test("9223372036854775807", Some(i64::MAX));
     test("9223372036854775808", None);
+}
+
+#[test]
+fn test_i64_exact_from_natural() {
+    let test = |n, out| {
+        assert_eq!(i64::exact_from(Natural::from_str(n).unwrap()), out);
+        assert_eq!(i64::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("9223372036854775807", i64::MAX);
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_natural_fail_1() {
+    i64::exact_from(Natural::from_str("1000000000000000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_natural_fail_2() {
+    i64::exact_from(Natural::from_str("9223372036854775808").unwrap());
 }
 
 #[test]
@@ -341,7 +439,7 @@ macro_rules! properties {
             let result = $t::saturating_from(x);
             assert_eq!($t::saturating_from(x.clone()), result);
             //TODO assert!(result <= *x);
-            //TODO assert_eq!(result == *x, $t::convertible_from(x));
+            assert_eq!(result == *x, $t::convertible_from(x));
 
             let result = $t::overflowing_from(x);
             assert_eq!($t::overflowing_from(x.clone()), result);

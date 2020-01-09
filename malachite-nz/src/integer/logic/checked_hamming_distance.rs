@@ -168,12 +168,10 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
     /// use malachite_base::num::logic::traits::CheckedHammingDistance;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::from(123).checked_hamming_distance(&Integer::from(123)), Some(0));
-    ///     // 105 = 1101001b, 123 = 1111011
-    ///     assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(-123)), Some(2));
-    ///     assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(123)), None);
-    /// }
+    /// assert_eq!(Integer::from(123).checked_hamming_distance(&Integer::from(123)), Some(0));
+    /// // 105 = 1101001b, 123 = 1111011
+    /// assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(-123)), Some(2));
+    /// assert_eq!(Integer::from(-105).checked_hamming_distance(&Integer::from(123)), None);
     /// ```
     fn checked_hamming_distance(self, other: &Integer) -> Option<u64> {
         match (self.sign, other.sign) {

@@ -18,14 +18,12 @@ impl Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.checked_count_ones(), Some(0));
-    ///     // 105 = 1101001b
-    ///     assert_eq!(Integer::from(105).checked_count_ones(), Some(4));
-    ///     assert_eq!(Integer::from(-105).checked_count_ones(), None);
-    ///     // 10^12 = 1110100011010100101001010001000000000000b
-    ///     assert_eq!(Integer::trillion().checked_count_ones(), Some(13));
-    /// }
+    /// assert_eq!(Integer::ZERO.checked_count_ones(), Some(0));
+    /// // 105 = 1101001b
+    /// assert_eq!(Integer::from(105).checked_count_ones(), Some(4));
+    /// assert_eq!(Integer::from(-105).checked_count_ones(), None);
+    /// // 10^12 = 1110100011010100101001010001000000000000b
+    /// assert_eq!(Integer::trillion().checked_count_ones(), Some(13));
     /// ```
     pub fn checked_count_ones(&self) -> Option<u64> {
         if self.sign {

@@ -54,6 +54,30 @@ fn test_checked_from_i32() {
 }
 
 #[test]
+fn test_exact_from_i32() {
+    let test = |i: i32, out| {
+        let x = Natural::exact_from(i);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+    };
+    test(0, "0");
+    test(123, "123");
+    test(i32::MAX, "2147483647");
+}
+
+#[test]
+#[should_panic]
+fn exact_from_i32_fail_1() {
+    Natural::exact_from(-123i32);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_i32_fail_2() {
+    Natural::exact_from(i32::MIN);
+}
+
+#[test]
 fn test_saturating_from_i32() {
     let test = |i: i32, out| {
         let x = Natural::saturating_from(i);

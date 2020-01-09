@@ -7,7 +7,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
+};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::round::RoundingMode;
@@ -26,7 +28,7 @@ use rust_wheels::iterators::naturals::{
     special_random_positive_naturals, special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_signed, exhaustive_unsigned, special_random_unsigned,
+    exhaustive_signed, exhaustive_unsigned, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -37,7 +39,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, It};
+use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
@@ -66,6 +68,22 @@ pub fn positive_naturals(gm: GenerationMode) -> It<Natural> {
             Box::new(special_random_positive_naturals(&EXAMPLE_SEED, scale))
         }
     }
+}
+
+pub fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
+where
+    Natural: From<T>,
+{
+    Box::new(unsigneds::<T>(gm).map(Natural::from))
+}
+
+pub fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
+where
+    Natural: ExactFrom<T>,
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(natural_signeds::<T>(gm).map(Natural::exact_from))
 }
 
 pub fn pairs_of_naturals(gm: GenerationMode) -> It<(Natural, Natural)> {
@@ -288,6 +306,70 @@ pub(crate) fn rm_pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
 ) -> It<((T, rug::Integer), (T, Natural))> {
     Box::new(
         pairs_of_unsigned_and_natural(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
+    )
+}
+
+pub fn pairs_of_natural_and_signed<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_naturals(), exhaustive_signed()))
+        }
+        GenerationMode::Random(scale) => random_pairs_of_natural_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+        )),
+    }
+}
+
+pub(crate) fn rm_pairs_of_natural_and_signed<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<((rug::Integer, T), (Natural, T))>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_natural_and_signed(gm).map(|(x, y)| ((natural_to_rug_integer(&x), y), (x, y))),
+    )
+}
+
+pub(crate) fn pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, Natural)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_naturals()))
+        }
+        GenerationMode::Random(scale) => random_pairs_of_primitive_and_natural(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
+pub(crate) fn rm_pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<((T, rug::Integer), (T, Natural))>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_signed_and_natural(gm).map(|(x, y)| ((x, natural_to_rug_integer(&y)), (x, y))),
     )
 }
 
@@ -707,10 +789,12 @@ macro_rules! float_gen {
             )
         }
 
+        //TODO limit output length
         pub fn $naturals_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
             Box::new(naturals(gm).filter(|n| $f::convertible_from(n)))
         }
 
+        //TODO limit output length
         pub fn $floats_exactly_equal_to_natural(gm: GenerationMode) -> It<$f> {
             Box::new(naturals(gm).flat_map($f::checked_from))
         }

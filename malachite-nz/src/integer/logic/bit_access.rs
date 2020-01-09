@@ -107,17 +107,22 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
 
 fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
     let zero_bound = limbs_leading_zero_limbs(limbs);
-    if limb_index > zero_bound {
-        limbs[limb_index].set_bit(reduced_index);
-    } else if limb_index == zero_bound {
-        // limbs[limb_index] != 0 here
-        let mut boundary_limb = limbs[limb_index] - 1;
-        boundary_limb.set_bit(reduced_index);
-        boundary_limb.wrapping_add_assign(1);
-        limbs[limb_index] = boundary_limb;
-        if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut limbs[limb_index + 1..], 1) {
-            return true;
+    match limb_index.cmp(&zero_bound) {
+        Ordering::Equal => {
+            // limbs[limb_index] != 0 here
+            let mut boundary_limb = limbs[limb_index] - 1;
+            boundary_limb.set_bit(reduced_index);
+            boundary_limb.wrapping_add_assign(1);
+            limbs[limb_index] = boundary_limb;
+            if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut limbs[limb_index + 1..], 1)
+            {
+                return true;
+            }
         }
+        Ordering::Greater => {
+            limbs[limb_index].set_bit(reduced_index);
+        }
+        _ => {}
     }
     false
 }
@@ -150,11 +155,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & u64::from(Limb::WIDTH_MASK);
-    if limb_index < limbs.len() {
-        if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
-            panic!("Setting bit cannot be done within existing slice");
-        }
-    } else {
+    if limb_index >= limbs.len() || limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
         panic!("Setting bit cannot be done within existing slice");
     }
 }
@@ -209,39 +210,37 @@ pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
 /// use malachite_base::num::basic::traits::{NegativeOne, Zero};
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x.assign_bit(2, true);
-///     x.assign_bit(5, true);
-///     x.assign_bit(6, true);
-///     assert_eq!(x.to_string(), "100");
-///     x.assign_bit(2, false);
-///     x.assign_bit(5, false);
-///     x.assign_bit(6, false);
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Integer::ZERO;
+/// x.assign_bit(2, true);
+/// x.assign_bit(5, true);
+/// x.assign_bit(6, true);
+/// assert_eq!(x.to_string(), "100");
+/// x.assign_bit(2, false);
+/// x.assign_bit(5, false);
+/// x.assign_bit(6, false);
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Integer::from(-0x100);
-///     x.assign_bit(2, true);
-///     x.assign_bit(5, true);
-///     x.assign_bit(6, true);
-///     assert_eq!(x.to_string(), "-156");
-///     x.assign_bit(2, false);
-///     x.assign_bit(5, false);
-///     x.assign_bit(6, false);
-///     assert_eq!(x.to_string(), "-256");
+/// let mut x = Integer::from(-0x100);
+/// x.assign_bit(2, true);
+/// x.assign_bit(5, true);
+/// x.assign_bit(6, true);
+/// assert_eq!(x.to_string(), "-156");
+/// x.assign_bit(2, false);
+/// x.assign_bit(5, false);
+/// x.assign_bit(6, false);
+/// assert_eq!(x.to_string(), "-256");
 ///
-///     let mut x = Integer::ZERO;
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "1024");
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "0");
+/// let mut x = Integer::ZERO;
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "1024");
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "0");
 ///
-///     let mut x = Integer::NEGATIVE_ONE;
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "-1025");
-///     x.flip_bit(10);
-///     assert_eq!(x.to_string(), "-1");
-/// }
+/// let mut x = Integer::NEGATIVE_ONE;
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "-1025");
+/// x.flip_bit(10);
+/// assert_eq!(x.to_string(), "-1");
 /// ```
 impl BitAccess for Integer {
     /// Determines whether the `index`th bit of an `Integer`, or the coefficient of
@@ -263,18 +262,16 @@ impl BitAccess for Integer {
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::from(123).get_bit(2), false);
-    ///     assert_eq!(Integer::from(123).get_bit(3), true);
-    ///     assert_eq!(Integer::from(123).get_bit(100), false);
-    ///     assert_eq!(Integer::from(-123).get_bit(0), true);
-    ///     assert_eq!(Integer::from(-123).get_bit(1), false);
-    ///     assert_eq!(Integer::from(-123).get_bit(100), true);
-    ///     assert_eq!(Integer::trillion().get_bit(12), true);
-    ///     assert_eq!(Integer::trillion().get_bit(100), false);
-    ///     assert_eq!((-Integer::trillion()).get_bit(12), true);
-    ///     assert_eq!((-Integer::trillion()).get_bit(100), true);
-    /// }
+    /// assert_eq!(Integer::from(123).get_bit(2), false);
+    /// assert_eq!(Integer::from(123).get_bit(3), true);
+    /// assert_eq!(Integer::from(123).get_bit(100), false);
+    /// assert_eq!(Integer::from(-123).get_bit(0), true);
+    /// assert_eq!(Integer::from(-123).get_bit(1), false);
+    /// assert_eq!(Integer::from(-123).get_bit(100), true);
+    /// assert_eq!(Integer::trillion().get_bit(12), true);
+    /// assert_eq!(Integer::trillion().get_bit(100), false);
+    /// assert_eq!((-Integer::trillion()).get_bit(12), true);
+    /// assert_eq!((-Integer::trillion()).get_bit(100), true);
     /// ```
     fn get_bit(&self, index: u64) -> bool {
         match *self {
@@ -307,19 +304,17 @@ impl BitAccess for Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut x = Integer::ZERO;
-    ///     x.set_bit(2);
-    ///     x.set_bit(5);
-    ///     x.set_bit(6);
-    ///     assert_eq!(x.to_string(), "100");
+    /// let mut x = Integer::ZERO;
+    /// x.set_bit(2);
+    /// x.set_bit(5);
+    /// x.set_bit(6);
+    /// assert_eq!(x.to_string(), "100");
     ///
-    ///     let mut x = Integer::from(-0x100);
-    ///     x.set_bit(2);
-    ///     x.set_bit(5);
-    ///     x.set_bit(6);
-    ///     assert_eq!(x.to_string(), "-156");
-    /// }
+    /// let mut x = Integer::from(-0x100);
+    /// x.set_bit(2);
+    /// x.set_bit(5);
+    /// x.set_bit(6);
+    /// assert_eq!(x.to_string(), "-156");
     /// ```
     fn set_bit(&mut self, index: u64) {
         match *self {
@@ -351,20 +346,18 @@ impl BitAccess for Integer {
     /// use malachite_base::num::logic::traits::BitAccess;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     let mut x = Integer::from(0x7f);
-    ///     x.clear_bit(0);
-    ///     x.clear_bit(1);
-    ///     x.clear_bit(3);
-    ///     x.clear_bit(4);
-    ///     assert_eq!(x.to_string(), "100");
+    /// let mut x = Integer::from(0x7f);
+    /// x.clear_bit(0);
+    /// x.clear_bit(1);
+    /// x.clear_bit(3);
+    /// x.clear_bit(4);
+    /// assert_eq!(x.to_string(), "100");
     ///
-    ///     let mut x = Integer::from(-156);
-    ///     x.clear_bit(2);
-    ///     x.clear_bit(5);
-    ///     x.clear_bit(6);
-    ///     assert_eq!(x.to_string(), "-256");
-    /// }
+    /// let mut x = Integer::from(-156);
+    /// x.clear_bit(2);
+    /// x.clear_bit(5);
+    /// x.clear_bit(6);
+    /// assert_eq!(x.to_string(), "-256");
     /// ```
     fn clear_bit(&mut self, index: u64) {
         match *self {

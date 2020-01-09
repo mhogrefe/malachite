@@ -396,6 +396,24 @@ where
     }
 }
 
+pub fn pairs_of_natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs_from_single(exhaustive_natural_signed()))
+        }
+        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random_natural_signed(
+            &EXAMPLE_SEED,
+        ))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs_from_single(
+            special_random_natural_signed(&EXAMPLE_SEED),
+        )),
+    }
+}
+
 // All `u32`s smaller than `NUMBER_OF_CHARS`.
 pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
     match gm {

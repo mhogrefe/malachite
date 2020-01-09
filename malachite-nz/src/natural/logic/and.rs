@@ -464,7 +464,7 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 /// x &= Natural::from(0xfff0_ffffu32);
 /// x &= Natural::from(0xffff_f0ffu32);
 /// x &= Natural::from(0xffff_fff0u32);
-/// assert_eq!(x, 0xf0f0_f0f0);
+/// assert_eq!(x, 0xf0f0_f0f0u32);
 /// ```
 impl BitAndAssign<Natural> for Natural {
     fn bitand_assign(&mut self, other: Natural) {
@@ -501,7 +501,7 @@ impl BitAndAssign<Natural> for Natural {
 /// x &= &Natural::from(0xfff0_ffffu32);
 /// x &= &Natural::from(0xffff_f0ffu32);
 /// x &= &Natural::from(0xffff_fff0u32);
-/// assert_eq!(x, 0xf0f0_f0f0);
+/// assert_eq!(x, 0xf0f0_f0f0u32);
 /// ```
 impl<'a> BitAndAssign<&'a Natural> for Natural {
     fn bitand_assign(&mut self, other: &'a Natural) {

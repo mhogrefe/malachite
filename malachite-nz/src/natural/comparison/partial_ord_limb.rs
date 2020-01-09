@@ -30,13 +30,6 @@ impl PartialOrd<Limb> for Natural {
     }
 }
 
-#[cfg(not(feature = "32_bit_limbs"))]
-impl PartialOrd<u32> for Natural {
-    fn partial_cmp(&self, other: &u32) -> Option<Ordering> {
-        PartialOrd::partial_cmp(self, &Limb::from(*other))
-    }
-}
-
 /// Compares a `Limb` to `Natural`.
 ///
 /// Time: worst case O(1)
@@ -60,12 +53,5 @@ impl PartialOrd<Natural> for Limb {
             Natural(Small(ref small)) => self.partial_cmp(small),
             Natural(Large(_)) => Some(Ordering::Less),
         }
-    }
-}
-
-#[cfg(not(feature = "32_bit_limbs"))]
-impl PartialOrd<Natural> for u32 {
-    fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
-        PartialOrd::partial_cmp(&Limb::from(*self), other)
     }
 }

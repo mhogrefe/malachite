@@ -6,8 +6,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
-    naturals, pairs_of_natural_and_rounding_mode_var_1_f32,
-    pairs_of_natural_and_rounding_mode_var_1_f64,
+    naturals, naturals_exactly_equal_to_f32, naturals_exactly_equal_to_f64,
+    pairs_of_natural_and_rounding_mode_var_1_f32, pairs_of_natural_and_rounding_mode_var_1_f64,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -23,6 +23,10 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_f64_checked_from_natural);
     register_demo!(registry, demo_f32_checked_from_natural_ref);
     register_demo!(registry, demo_f64_checked_from_natural_ref);
+    register_demo!(registry, demo_f32_exact_from_natural);
+    register_demo!(registry, demo_f64_exact_from_natural);
+    register_demo!(registry, demo_f32_exact_from_natural_ref);
+    register_demo!(registry, demo_f64_exact_from_natural_ref);
     register_demo!(registry, demo_f32_convertible_from_natural);
     register_demo!(registry, demo_f64_convertible_from_natural);
     register_demo!(registry, demo_f32_convertible_from_natural_ref);
@@ -60,6 +64,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
+        benchmark_f32_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
+        benchmark_f64_exact_from_natural_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Small,
         benchmark_f32_convertible_from_natural_evaluation_strategy
     );
     register_bench!(
@@ -72,6 +86,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 macro_rules! float_demos_and_benches {
     (
         $f: ident,
+        $naturals_exactly_equal_to_float: ident,
         $pairs_of_natural_and_rounding_mode_var_1: ident,
         $demo_float_rounding_from_natural: ident,
         $demo_float_rounding_from_natural_ref: ident,
@@ -79,11 +94,14 @@ macro_rules! float_demos_and_benches {
         $demo_float_from_natural_ref: ident,
         $demo_float_checked_from_natural: ident,
         $demo_float_checked_from_natural_ref: ident,
+        $demo_float_exact_from_natural: ident,
+        $demo_float_exact_from_natural_ref: ident,
         $demo_float_convertible_from_natural: ident,
         $demo_float_convertible_from_natural_ref: ident,
         $benchmark_float_rounding_from_natural_evaluation_strategy: ident,
         $benchmark_float_from_natural_evaluation_strategy: ident,
         $benchmark_float_checked_from_natural_evaluation_strategy: ident,
+        $benchmark_float_exact_from_natural_evaluation_strategy: ident,
         $benchmark_float_convertible_from_natural_evaluation_strategy: ident,
     ) => {
         fn $demo_float_rounding_from_natural(gm: GenerationMode, limit: usize) {
@@ -118,7 +136,7 @@ macro_rules! float_demos_and_benches {
 
         fn $demo_float_from_natural_ref(gm: GenerationMode, limit: usize) {
             for n in naturals(gm).take(limit) {
-                println!("{}::from({}) = {:?}", $f::NAME, n.clone(), $f::from(n));
+                println!("{}::from({}) = {:?}", $f::NAME, n, $f::from(&n));
             }
         }
 
@@ -138,9 +156,26 @@ macro_rules! float_demos_and_benches {
                 println!(
                     "{}::checked_from({}) = {:?}",
                     $f::NAME,
-                    n.clone(),
-                    $f::checked_from(n)
+                    n,
+                    $f::checked_from(&n)
                 );
+            }
+        }
+
+        fn $demo_float_exact_from_natural(gm: GenerationMode, limit: usize) {
+            for n in $naturals_exactly_equal_to_float(gm).take(limit) {
+                println!(
+                    "{}::exact_from({}) = {}",
+                    $f::NAME,
+                    n.clone(),
+                    $f::exact_from(n)
+                );
+            }
+        }
+
+        fn $demo_float_exact_from_natural_ref(gm: GenerationMode, limit: usize) {
+            for n in $naturals_exactly_equal_to_float(gm).take(limit) {
+                println!("{}::exact_from({}) = {}", $f::NAME, n, $f::exact_from(&n));
             }
         }
 
@@ -247,6 +282,33 @@ macro_rules! float_demos_and_benches {
             );
         }
 
+        fn $benchmark_float_exact_from_natural_evaluation_strategy(
+            gm: GenerationMode,
+            limit: usize,
+            file_name: &str,
+        ) {
+            m_run_benchmark(
+                &format!("{}::checked_from(Natural)", stringify!($f)),
+                BenchmarkType::EvaluationStrategy,
+                $naturals_exactly_equal_to_float(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|ref n| usize::exact_from(n.significant_bits())),
+                "n.significant_bits()",
+                &mut [
+                    (
+                        &format!("{}::exact_from(Natural)", stringify!($f)),
+                        &mut (|n| no_out!($f::exact_from(n))),
+                    ),
+                    (
+                        &format!("{}::exact_from(&Natural)", stringify!($f)),
+                        &mut (|n| no_out!($f::exact_from(&n))),
+                    ),
+                ],
+            );
+        }
+
         fn $benchmark_float_convertible_from_natural_evaluation_strategy(
             gm: GenerationMode,
             limit: usize,
@@ -278,6 +340,7 @@ macro_rules! float_demos_and_benches {
 
 float_demos_and_benches!(
     f32,
+    naturals_exactly_equal_to_f32,
     pairs_of_natural_and_rounding_mode_var_1_f32,
     demo_f32_rounding_from_natural,
     demo_f32_rounding_from_natural_ref,
@@ -285,16 +348,20 @@ float_demos_and_benches!(
     demo_f32_from_natural_ref,
     demo_f32_checked_from_natural,
     demo_f32_checked_from_natural_ref,
+    demo_f32_exact_from_natural,
+    demo_f32_exact_from_natural_ref,
     demo_f32_convertible_from_natural,
     demo_f32_convertible_from_natural_ref,
     benchmark_f32_rounding_from_natural_evaluation_strategy,
     benchmark_f32_from_natural_evaluation_strategy,
     benchmark_f32_checked_from_natural_evaluation_strategy,
+    benchmark_f32_exact_from_natural_evaluation_strategy,
     benchmark_f32_convertible_from_natural_evaluation_strategy,
 );
 
 float_demos_and_benches!(
     f64,
+    naturals_exactly_equal_to_f64,
     pairs_of_natural_and_rounding_mode_var_1_f64,
     demo_f64_rounding_from_natural,
     demo_f64_rounding_from_natural_ref,
@@ -302,10 +369,13 @@ float_demos_and_benches!(
     demo_f64_from_natural_ref,
     demo_f64_checked_from_natural,
     demo_f64_checked_from_natural_ref,
+    demo_f64_exact_from_natural,
+    demo_f64_exact_from_natural_ref,
     demo_f64_convertible_from_natural,
     demo_f64_convertible_from_natural_ref,
     benchmark_f64_rounding_from_natural_evaluation_strategy,
     benchmark_f64_from_natural_evaluation_strategy,
     benchmark_f64_checked_from_natural_evaluation_strategy,
+    benchmark_f64_exact_from_natural_evaluation_strategy,
     benchmark_f64_convertible_from_natural_evaluation_strategy,
 );

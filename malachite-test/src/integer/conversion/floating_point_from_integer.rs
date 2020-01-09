@@ -94,7 +94,7 @@ macro_rules! float_demos_and_benches {
 
         fn $demo_float_from_integer_ref(gm: GenerationMode, limit: usize) {
             for n in integers(gm).take(limit) {
-                println!("{}::from({}) = {:?}", $f::NAME, n.clone(), $f::from(n));
+                println!("{}::from({}) = {:?}", $f::NAME, n, $f::from(&n));
             }
         }
 
@@ -114,8 +114,8 @@ macro_rules! float_demos_and_benches {
                 println!(
                     "{}::checked_from({}) = {:?}",
                     $f::NAME,
-                    n.clone(),
-                    $f::checked_from(n)
+                    n,
+                    $f::checked_from(&n)
                 );
             }
         }

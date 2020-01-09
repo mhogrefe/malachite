@@ -435,6 +435,216 @@ fn test_checked_from_f64() {
 }
 
 #[test]
+fn test_exact_from_f32() {
+    let test = |f: f32, out| {
+        let x = Natural::exact_from(f);
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
+    };
+    test(0.0, "0");
+    test(-0.0, "0");
+    test(123.0, "123");
+    test(1.0e9, "1000000000");
+    test(4294967295.0, "4294967296");
+    test(4294967296.0, "4294967296");
+    test(18446744073709551615.0, "18446744073709551616");
+    test(18446744073709551616.0, "18446744073709551616");
+    test(1.0e20, "100000002004087734272");
+    test(1.23e20, "122999999650278146048");
+    test(f32::MAX_FINITE, "340282346638528859811704183484516925440");
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_1() {
+    Natural::exact_from(f32::NAN);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_2() {
+    Natural::exact_from(f32::POSITIVE_INFINITY);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_3() {
+    Natural::exact_from(f32::NEGATIVE_INFINITY);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_4() {
+    Natural::exact_from(123.1);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_5() {
+    Natural::exact_from(123.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_6() {
+    Natural::exact_from(124.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_7() {
+    Natural::exact_from(-0.99);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_8() {
+    Natural::exact_from(-0.499);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_9() {
+    Natural::exact_from(-0.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_10() {
+    Natural::exact_from(-123.0);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_11() {
+    Natural::exact_from(f32::MIN_POSITIVE);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_12() {
+    Natural::exact_from(f32::MAX_SUBNORMAL);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f32_fail_13() {
+    Natural::exact_from(f32::MIN_POSITIVE_NORMAL);
+}
+
+#[test]
+fn test_exact_from_f64() {
+    let test = |f: f64, out| {
+        let x = Natural::exact_from(f);
+        assert_eq!(x.to_string(), out);
+        assert!(x.is_valid());
+    };
+    test(0.0, "0");
+    test(-0.0, "0");
+    test(123.0, "123");
+    test(1.0e9, "1000000000");
+    test(4294967295.0, "4294967295");
+    test(4294967296.0, "4294967296");
+    test(18446744073709551615.0, "18446744073709551616");
+    test(18446744073709551616.0, "18446744073709551616");
+    test(1.0e20, "100000000000000000000");
+    test(1.23e20, "123000000000000000000");
+    test(
+        1.0e100,
+        "100000000000000001590289110975991804683608085639452813897813275577478387721703810608134699\
+        85856815104",
+    );
+    test(
+        1.23e100,
+        "123000000000000008366862950845375853795062237854139353014252897832358837028676639186389822\
+        00322686976",
+    );
+    test(f64::MAX_FINITE,
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858368");
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_1() {
+    Natural::exact_from(f64::NAN);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_2() {
+    Natural::exact_from(f64::POSITIVE_INFINITY);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_3() {
+    Natural::exact_from(f64::NEGATIVE_INFINITY);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_4() {
+    Natural::exact_from(123.1);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_5() {
+    Natural::exact_from(123.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_6() {
+    Natural::exact_from(124.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_7() {
+    Natural::exact_from(-0.99);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_8() {
+    Natural::exact_from(-0.499);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_9() {
+    Natural::exact_from(-0.5);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_10() {
+    Natural::exact_from(-123.0);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_11() {
+    Natural::exact_from(f64::MIN_POSITIVE);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_12() {
+    Natural::exact_from(f64::MAX_SUBNORMAL);
+}
+
+#[test]
+#[should_panic]
+fn exact_from_f64_fail_13() {
+    Natural::exact_from(f64::MIN_POSITIVE_NORMAL);
+}
+
+#[test]
 fn test_convertible_from_f32() {
     let test = |f: f32, out| {
         assert_eq!(Natural::convertible_from(f), out);
