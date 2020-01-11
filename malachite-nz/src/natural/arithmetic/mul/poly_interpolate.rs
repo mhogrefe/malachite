@@ -1042,7 +1042,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
             let (out_11, out_12) = out_11.split_at_mut(n);
             let (r1_last, r1_2) = r1_2.split_last_mut().unwrap();
             let mut carry = *r1_last;
-            if limbs_slice_add_same_length_in_place_left(out_11, &r1_2) {
+            if limbs_slice_add_same_length_in_place_left(out_11, r1_2) {
                 carry.wrapping_add_assign(1);
             }
             assert!(!limbs_slice_add_limb_in_place(

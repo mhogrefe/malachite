@@ -1,4 +1,4 @@
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 use std::iter::repeat;
 use std::ops::{BitOr, BitOrAssign};
 
@@ -161,7 +161,7 @@ pub fn limbs_neg_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 /// assert_eq!(limbs_pos_or_neg_limb(&[6, 7], 3), 4294967289);
 /// assert_eq!(limbs_pos_or_neg_limb(&[100, 101, 102], 10), 4294967186);
 /// ```
-pub fn limbs_pos_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
+pub const fn limbs_pos_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
     (limbs[0] | limb).wrapping_neg()
 }
 
@@ -184,7 +184,7 @@ pub fn limbs_pos_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
 /// assert_eq!(limbs_neg_or_neg_limb(&[6, 7], 3), 5);
 /// assert_eq!(limbs_neg_or_neg_limb(&[100, 101, 102], 10), 98);
 /// ```
-pub fn limbs_neg_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
+pub const fn limbs_neg_or_neg_limb(limbs: &[Limb], limb: Limb) -> Limb {
     (limbs[0].wrapping_neg() | limb).wrapping_neg()
 }
 
@@ -231,16 +231,20 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
     let mut result_limbs = vec![0; min_i];
-    if x_i == y_i {
-        result_limbs.push((!xs[x_i] & (ys[y_i] - 1)) + 1);
-    } else if x_i > y_i {
-        result_limbs.extend_from_slice(&ys[y_i..x_i]);
-        result_limbs.push(!xs[x_i] & ys[x_i]);
-    } else {
-        result_limbs.push(xs[x_i].wrapping_neg());
-        result_limbs.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
-        result_limbs.push(!xs[y_i] & (ys[y_i] - 1));
-    };
+    match x_i.cmp(&y_i) {
+        Ordering::Equal => {
+            result_limbs.push((!xs[x_i] & (ys[y_i] - 1)) + 1);
+        }
+        Ordering::Less => {
+            result_limbs.push(xs[x_i].wrapping_neg());
+            result_limbs.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
+            result_limbs.push(!xs[y_i] & (ys[y_i] - 1));
+        }
+        Ordering::Greater => {
+            result_limbs.extend_from_slice(&ys[y_i..x_i]);
+            result_limbs.push(!xs[x_i] & ys[x_i]);
+        }
+    }
     result_limbs.extend(
         xs[max_i + 1..]
             .iter()
@@ -306,16 +310,20 @@ pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
     limbs_set_zero(&mut out[..min_i]);
-    if x_i == y_i {
-        out[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
-    } else if x_i > y_i {
-        out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-        out[x_i] = !xs[x_i] & ys[x_i];
-    } else {
-        out[x_i] = xs[x_i].wrapping_neg();
-        limbs_not_to_out(&mut out[x_i + 1..y_i], &xs[x_i + 1..y_i]);
-        out[y_i] = !xs[y_i] & (ys[y_i] - 1);
-    };
+    match x_i.cmp(&y_i) {
+        Ordering::Equal => {
+            out[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+        }
+        Ordering::Less => {
+            out[x_i] = xs[x_i].wrapping_neg();
+            limbs_not_to_out(&mut out[x_i + 1..y_i], &xs[x_i + 1..y_i]);
+            out[y_i] = !xs[y_i] & (ys[y_i] - 1);
+        }
+        Ordering::Greater => {
+            out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+            out[x_i] = !xs[x_i] & ys[x_i];
+        }
+    }
     for (out, (x, y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
@@ -374,16 +382,20 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> boo
         return false;
     }
     let max_i = max(x_i, y_i);
-    if x_i == y_i {
-        xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
-    } else if x_i > y_i {
-        xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-        xs[x_i] = !xs[x_i] & ys[x_i];
-    } else {
-        xs[x_i].wrapping_neg_assign();
-        limbs_not_in_place(&mut xs[x_i + 1..y_i]);
-        xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
-    };
+    match x_i.cmp(&y_i) {
+        Ordering::Equal => {
+            xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+        }
+        Ordering::Less => {
+            xs[x_i].wrapping_neg_assign();
+            limbs_not_in_place(&mut xs[x_i + 1..y_i]);
+            xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
+        }
+        Ordering::Greater => {
+            xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+            xs[x_i] = !xs[x_i] & ys[x_i];
+        }
+    }
     if xs_len < ys_len {
         for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..xs_len].iter()) {
             *x = !*x & y
@@ -445,16 +457,20 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
         return;
     }
     let max_i = max(x_i, y_i);
-    if x_i == y_i {
-        xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
-    } else if x_i > y_i {
-        xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-        xs[x_i] = !xs[x_i] & ys[x_i];
-    } else {
-        xs[x_i].wrapping_neg_assign();
-        limbs_not_in_place(&mut xs[x_i + 1..y_i]);
-        xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
-    };
+    match x_i.cmp(&y_i) {
+        Ordering::Equal => {
+            xs[x_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+        }
+        Ordering::Less => {
+            xs[x_i].wrapping_neg_assign();
+            limbs_not_in_place(&mut xs[x_i + 1..y_i]);
+            xs[y_i] = !xs[y_i] & (ys[y_i] - 1);
+        }
+        Ordering::Greater => {
+            xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+            xs[x_i] = !xs[x_i] & ys[x_i];
+        }
+    }
     if xs_len < ys_len {
         for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..xs_len].iter()) {
             *x = !*x & y
@@ -519,15 +535,19 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
         return;
     }
     let max_i = max(x_i, y_i);
-    if x_i == y_i {
-        ys[y_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
-    } else if x_i > y_i {
-        ys[x_i] &= !xs[x_i];
-    } else {
-        ys[x_i] = xs[x_i].wrapping_neg();
-        limbs_not_to_out(&mut ys[x_i + 1..y_i], &xs[x_i + 1..y_i]);
-        ys[y_i] = !xs[y_i] & (ys[y_i] - 1);
-    };
+    match x_i.cmp(&y_i) {
+        Ordering::Equal => {
+            ys[y_i] = (!xs[x_i] & (ys[y_i] - 1)) + 1;
+        }
+        Ordering::Less => {
+            ys[x_i] = xs[x_i].wrapping_neg();
+            limbs_not_to_out(&mut ys[x_i + 1..y_i], &xs[x_i + 1..y_i]);
+            ys[y_i] = !xs[y_i] & (ys[y_i] - 1);
+        }
+        Ordering::Greater => {
+            ys[x_i] &= !xs[x_i];
+        }
+    }
     if xs_len < ys_len {
         for (x, y) in xs[max_i + 1..].iter().zip(ys[max_i + 1..xs_len].iter_mut()) {
             *y &= !x;
@@ -575,18 +595,18 @@ pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
     let mut result_limbs = vec![0; min_i];
-    if x_i > y_i {
-        result_limbs.extend_from_slice(&ys[y_i..x_i]);
-    } else if y_i > x_i {
-        result_limbs.extend_from_slice(&xs[x_i..y_i]);
-    }
-    result_limbs.push(if x_i == y_i {
-        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
-    } else if x_i > y_i {
-        (xs[x_i] - 1) & ys[x_i]
-    } else {
-        xs[y_i] & (ys[y_i] - 1)
-    });
+    let limb = match x_i.cmp(&y_i) {
+        Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+        Ordering::Less => {
+            result_limbs.extend_from_slice(&xs[x_i..y_i]);
+            xs[y_i] & (ys[y_i] - 1)
+        }
+        Ordering::Greater => {
+            result_limbs.extend_from_slice(&ys[y_i..x_i]);
+            (xs[x_i] - 1) & ys[x_i]
+        }
+    };
+    result_limbs.push(limb);
     result_limbs.extend(
         xs[max_i + 1..]
             .iter()
@@ -642,18 +662,18 @@ pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
     limbs_set_zero(&mut out[..min_i]);
-    if x_i > y_i {
-        out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
-    } else if y_i > x_i {
-        out[x_i..y_i].copy_from_slice(&xs[x_i..y_i]);
-    }
-    out[max_i] = if x_i == y_i {
-        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
-    } else if x_i > y_i {
-        (xs[x_i] - 1) & ys[x_i]
-    } else {
-        xs[y_i] & (ys[y_i] - 1)
+    let limb = match x_i.cmp(&y_i) {
+        Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+        Ordering::Less => {
+            out[x_i..y_i].copy_from_slice(&xs[x_i..y_i]);
+            xs[y_i] & (ys[y_i] - 1)
+        }
+        Ordering::Greater => {
+            out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
+            (xs[x_i] - 1) & ys[x_i]
+        }
     };
+    out[max_i] = limb;
     for (out, (x, y)) in out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()))
@@ -709,12 +729,10 @@ pub fn limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     if x_i > y_i {
         xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
     }
-    xs[max_i] = if x_i == y_i {
-        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
-    } else if x_i > y_i {
-        (xs[x_i] - 1) & ys[x_i]
-    } else {
-        xs[y_i] & (ys[y_i] - 1)
+    xs[max_i] = match x_i.cmp(&y_i) {
+        Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+        Ordering::Less => xs[y_i] & (ys[y_i] - 1),
+        Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
     };
     for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
         *x &= y;
@@ -773,12 +791,10 @@ pub fn limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if x_i > y_i {
         xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
     }
-    xs[max_i] = if x_i == y_i {
-        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
-    } else if x_i > y_i {
-        (xs[x_i] - 1) & ys[x_i]
-    } else {
-        xs[y_i] & (ys[y_i] - 1)
+    xs[max_i] = match x_i.cmp(&y_i) {
+        Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+        Ordering::Less => xs[y_i] & (ys[y_i] - 1),
+        Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
     };
     for (x, y) in xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter()) {
         *x &= y;
@@ -839,12 +855,10 @@ pub fn limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> boo
         return true;
     }
     let max_i = max(x_i, y_i);
-    let boundary_limb = if x_i == y_i {
-        ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1
-    } else if x_i > y_i {
-        (xs[x_i] - 1) & ys[x_i]
-    } else {
-        xs[y_i] & (ys[y_i] - 1)
+    let boundary_limb = match x_i.cmp(&y_i) {
+        Ordering::Equal => ((xs[x_i] - 1) & (ys[y_i] - 1)) + 1,
+        Ordering::Less => xs[y_i] & (ys[y_i] - 1),
+        Ordering::Greater => (xs[x_i] - 1) & ys[x_i],
     };
     if xs_len > ys_len {
         if y_i > x_i {
@@ -884,13 +898,11 @@ pub fn limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> boo
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
-///     assert_eq!(
-///         (-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-999999995905"
-///     );
-/// }
+/// assert_eq!((Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
+/// assert_eq!(
+///     (-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-999999995905"
+/// );
 /// ```
 impl BitOr<Integer> for Integer {
     type Output = Integer;
@@ -919,11 +931,9 @@ impl BitOr<Integer> for Integer {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-///     assert_eq!((-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-999999995905");
-/// }
+/// assert_eq!((Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
+/// assert_eq!((-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-999999995905");
 /// ```
 impl<'a> BitOr<&'a Integer> for Integer {
     type Output = Integer;
@@ -952,11 +962,9 @@ impl<'a> BitOr<&'a Integer> for Integer {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
-///     assert_eq!((&-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-999999995905");
-/// }
+/// assert_eq!((&Integer::from(-123) | Integer::from(-456)).to_string(), "-67");
+/// assert_eq!((&-Integer::trillion() | -(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-999999995905");
 /// ```
 impl<'a> BitOr<Integer> for &'a Integer {
     type Output = Integer;
@@ -985,11 +993,9 @@ impl<'a> BitOr<Integer> for &'a Integer {
 /// use malachite_base::num::basic::traits::One;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     assert_eq!((&Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
-///     assert_eq!((&-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
-///         "-999999995905");
-/// }
+/// assert_eq!((&Integer::from(-123) | &Integer::from(-456)).to_string(), "-67");
+/// assert_eq!((&-Integer::trillion() | &-(Integer::trillion() + Integer::ONE)).to_string(),
+///     "-999999995905");
 /// ```
 impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
     type Output = Integer;
@@ -1034,14 +1040,12 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x |= Integer::from(0x0000_000f);
-///     x |= Integer::from(0x0000_0f00);
-///     x |= Integer::from(0x000f_0000);
-///     x |= Integer::from(0x0f00_0000);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Integer::ZERO;
+/// x |= Integer::from(0x0000_000f);
+/// x |= Integer::from(0x0000_0f00);
+/// x |= Integer::from(0x000f_0000);
+/// x |= Integer::from(0x0f00_0000);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl BitOrAssign<Integer> for Integer {
     fn bitor_assign(&mut self, other: Integer) {
@@ -1074,14 +1078,12 @@ impl BitOrAssign<Integer> for Integer {
 /// use malachite_base::num::basic::traits::Zero;
 /// use malachite_nz::integer::Integer;
 ///
-/// fn main() {
-///     let mut x = Integer::ZERO;
-///     x |= &Integer::from(0x0000_000f);
-///     x |= &Integer::from(0x0000_0f00);
-///     x |= &Integer::from(0x000f_0000);
-///     x |= &Integer::from(0x0f00_0000);
-///     assert_eq!(x, 0x0f0f_0f0f);
-/// }
+/// let mut x = Integer::ZERO;
+/// x |= &Integer::from(0x0000_000f);
+/// x |= &Integer::from(0x0000_0f00);
+/// x |= &Integer::from(0x000f_0000);
+/// x |= &Integer::from(0x0f00_0000);
+/// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl<'a> BitOrAssign<&'a Integer> for Integer {
     fn bitor_assign(&mut self, other: &'a Integer) {

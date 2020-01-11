@@ -70,12 +70,11 @@ impl<'a> Iterator for BitIterator<'a> {
             self.i += 1;
             if self.i == u64::from(Limb::WIDTH) {
                 self.i = 0;
-                match self.limbs.next() {
-                    Some(next) => self.current_limb_forward = next,
-                    None => {
-                        self.current_limb_forward = self.current_limb_back;
-                        self.indices_are_in_same_limb = true;
-                    }
+                if let Some(next) = self.limbs.next() {
+                    self.current_limb_forward = next;
+                } else {
+                    self.current_limb_forward = self.current_limb_back;
+                    self.indices_are_in_same_limb = true;
                 }
             }
             Some(bit)
@@ -147,12 +146,11 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
             let bit = self.current_limb_back.get_bit(self.j);
             if self.j == 0 {
                 self.j = u64::from(Limb::WIDTH) - 1;
-                match self.limbs.next_back() {
-                    Some(next_back) => self.current_limb_back = next_back,
-                    None => {
-                        self.current_limb_back = self.current_limb_forward;
-                        self.indices_are_in_same_limb = true;
-                    }
+                if let Some(next_back) = self.limbs.next_back() {
+                    self.current_limb_back = next_back;
+                } else {
+                    self.current_limb_back = self.current_limb_forward;
+                    self.indices_are_in_same_limb = true;
                 }
             } else {
                 self.j -= 1;

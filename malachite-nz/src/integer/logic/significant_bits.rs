@@ -19,11 +19,9 @@ impl<'a> SignificantBits for &'a Integer {
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
-    /// fn main() {
-    ///     assert_eq!(Integer::ZERO.significant_bits(), 0);
-    ///     assert_eq!(Integer::from(100).significant_bits(), 7);
-    ///     assert_eq!(Integer::from(-100).significant_bits(), 7);
-    /// }
+    /// assert_eq!(Integer::ZERO.significant_bits(), 0);
+    /// assert_eq!(Integer::from(100).significant_bits(), 7);
+    /// assert_eq!(Integer::from(-100).significant_bits(), 7);
     /// ```
     fn significant_bits(self) -> u64 {
         self.abs.significant_bits()

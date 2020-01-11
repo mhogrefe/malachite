@@ -176,7 +176,7 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 }
 
 // This is TOOM44_OK from mpn/generic/mul.c.
-fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
+const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < 4 * ys_len
 }
 

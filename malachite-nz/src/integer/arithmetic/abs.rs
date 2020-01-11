@@ -179,7 +179,7 @@ impl<'a> UnsignedAbs for &'a Integer {
 /// ```
 impl Integer {
     #[inline]
-    pub fn unsigned_abs_ref(&self) -> &Natural {
+    pub const fn unsigned_abs_ref(&self) -> &Natural {
         &self.abs
     }
 }

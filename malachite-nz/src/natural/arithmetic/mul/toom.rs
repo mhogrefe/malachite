@@ -562,7 +562,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
             limbs_sub_same_length_in_place_left(scratch, out);
             assert_eq!(limbs_slice_shr_in_place(scratch, 1), 0);
         } else {
-            limbs_slice_add_same_length_in_place_left(scratch, &out);
+            limbs_slice_add_same_length_in_place_left(scratch, out);
             assert_eq!(limbs_slice_shr_in_place(scratch, 1), 0);
         }
     }
@@ -2580,7 +2580,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
         // Compute ash = 32 * xs_0 + 16 * xs_1 + 8 * xs_2 + 4 * xs_3 + 2 * xs_4 + xs_5
         // = 2 * (2 * (2 * (2 * (2 * xs_0 + xs_1) + xs_2) + xs_3) + xs_4) + xs_5
         let mut carry = limbs_shl_to_out(ash_init, xs_0, 1);
-        for xs_i in [xs_1, xs_2, xs_3, xs_4].iter() {
+        for xs_i in &[xs_1, xs_2, xs_3, xs_4] {
             if limbs_slice_add_same_length_in_place_left(ash_init, xs_i) {
                 carry += 1;
             }
@@ -2647,7 +2647,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
             }
         } else {
             bsm2[n] = 0;
-            if limbs_cmp_same_length(&bsm1, ys_1) == Ordering::Less {
+            if limbs_cmp_same_length(bsm1, ys_1) == Ordering::Less {
                 assert!(!limbs_sub_same_length_to_out(bsm2, ys_1, bsm1));
                 true
             } else {
@@ -2691,7 +2691,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
         _unused
     );
     // v_neg_1, 2 * n + 1 limbs
-    limbs_mul_same_length_to_out(v_neg_1, asm1_init, &bsm1);
+    limbs_mul_same_length_to_out(v_neg_1, asm1_init, bsm1);
     {
         let (v_neg_1_last, v_neg_1_hi) = v_neg_1[n..p].split_last_mut().unwrap();
         *v_neg_1_last = if *asm1_last == 2 {

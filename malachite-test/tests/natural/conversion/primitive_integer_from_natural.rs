@@ -397,6 +397,7 @@ macro_rules! unsigned_properties {
             if x.significant_bits() <= u64::from($t::WIDTH) {
                 assert_eq!(Natural::from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
+                assert_eq!(result, Some($t::exact_from(x)));
             } else {
                 assert!(result.is_none());
             }
@@ -421,6 +422,7 @@ macro_rules! signed_properties {
             if *x >= Natural::ZERO && x.significant_bits() <= u64::from($t::WIDTH - 1) {
                 assert_eq!(Natural::exact_from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
+                assert_eq!(result, Some($t::exact_from(x)));
             } else {
                 assert!(result.is_none());
             }

@@ -21,6 +21,7 @@ use malachite_test::inputs::integer::{
 fn test_f32_rounding_from_integer() {
     let test = |n: &str, rm: RoundingMode, out| {
         assert_eq!(f32::rounding_from(Integer::from_str(n).unwrap(), rm), out);
+        assert_eq!(f32::rounding_from(&Integer::from_str(n).unwrap(), rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
     test("-3", RoundingMode::Exact, -3.0);
@@ -262,6 +263,39 @@ fn f32_rounding_from_integer_fail_3() {
 fn f32_rounding_from_integer_fail_4() {
     f32::rounding_from(
         Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
+        RoundingMode::Exact,
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_rounding_from_integer_ref_fail_1() {
+    f32::rounding_from(
+        &Integer::from_str("340282346638528859811704183484516925439").unwrap(),
+        RoundingMode::Exact,
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_rounding_from_integer_ref_fail_2() {
+    f32::rounding_from(
+        &Integer::from_str("340282346638528859811704183484516925441").unwrap(),
+        RoundingMode::Exact,
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_rounding_from_integer_ref_fail_3() {
+    f32::rounding_from(&Integer::from_str("16777217").unwrap(), RoundingMode::Exact);
+}
+
+#[test]
+#[should_panic]
+fn f32_rounding_from_integer_ref_fail_4() {
+    f32::rounding_from(
+        &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
         RoundingMode::Exact,
     );
 }
@@ -566,6 +600,37 @@ fn f64_rounding_from_integer_fail_3() {
 }
 
 #[test]
+#[should_panic]
+fn f64_rounding_from_integer_ref_fail_1() {
+    f64::rounding_from(&Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858367").unwrap(),
+                       RoundingMode::Exact);
+}
+
+#[test]
+#[should_panic]
+fn f64_rounding_from_integer_ref_fail_2() {
+    f64::rounding_from(&Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858369").unwrap(),
+                       RoundingMode::Exact);
+}
+
+#[test]
+#[should_panic]
+fn f64_rounding_from_integer_ref_fail_3() {
+    f64::rounding_from(
+        &Integer::from_str("9007199254740993").unwrap(),
+        RoundingMode::Exact,
+    );
+}
+
+#[test]
 fn test_f32_from_integer() {
     let test = |n: &str, out| {
         assert_eq!(f32::from(Integer::from_str(n).unwrap()), out);
@@ -777,6 +842,438 @@ fn test_f64_checked_from_integer() {
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
         38177180919299881250404026184124858369", None);
+}
+
+#[test]
+fn test_f32_exact_from_integer() {
+    let test = |n: &str, out| {
+        assert_eq!(f32::exact_from(Integer::from_str(n).unwrap()), out);
+    };
+    test("3", 3.0);
+    test("-3", -3.0);
+    test("123", 123.0);
+    test("-123", -123.0);
+    test("0", 0.0);
+    test("1000000000", 1.0e9);
+    test("-1000000000", -1.0e9);
+    test("16777216", 1.6777216e7);
+    test("-16777216", -1.6777216e7);
+    test("16777218", 1.6777218e7);
+    test("-16777218", -1.6777218e7);
+    test("33554432", 3.3554432e7);
+    test("-33554432", -3.3554432e7);
+    test("33554436", 3.3554436e7);
+    test("-33554436", -3.3554436e7);
+    test("340282346638528859811704183484516925440", 3.4028235e38);
+    test("-340282346638528859811704183484516925440", -3.4028235e38);
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_1() {
+    f32::exact_from(Integer::from_str("16777217").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_2() {
+    f32::exact_from(Integer::from_str("-16777217").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_3() {
+    f32::exact_from(Integer::from_str("33554433").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_4() {
+    f32::exact_from(Integer::from_str("-33554433").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_5() {
+    f32::exact_from(Integer::from_str("33554434").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_6() {
+    f32::exact_from(Integer::from_str("-33554434").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_7() {
+    f32::exact_from(Integer::from_str("33554435").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_8() {
+    f32::exact_from(Integer::from_str("-33554435").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_9() {
+    f32::exact_from(Integer::from_str("340282346638528859811704183484516925439").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_10() {
+    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925439").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_11() {
+    f32::exact_from(Integer::from_str("340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_12() {
+    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_13() {
+    f32::exact_from(Integer::from_str("340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_14() {
+    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_15() {
+    f32::exact_from(
+        Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_fail_16() {
+    f32::exact_from(
+        Integer::from_str("-10000000000000000000000000000000000000000000000000000").unwrap(),
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_1() {
+    f32::exact_from(&Integer::from_str("16777217").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_2() {
+    f32::exact_from(&Integer::from_str("-16777217").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_3() {
+    f32::exact_from(&Integer::from_str("33554433").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_4() {
+    f32::exact_from(&Integer::from_str("-33554433").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_5() {
+    f32::exact_from(&Integer::from_str("33554434").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_6() {
+    f32::exact_from(&Integer::from_str("-33554434").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_7() {
+    f32::exact_from(&Integer::from_str("33554435").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_8() {
+    f32::exact_from(&Integer::from_str("-33554435").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_9() {
+    f32::exact_from(&Integer::from_str("340282346638528859811704183484516925439").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_10() {
+    f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925439").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_11() {
+    f32::exact_from(&Integer::from_str("340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_12() {
+    f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_13() {
+    f32::exact_from(&Integer::from_str("340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_14() {
+    f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925441").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_15() {
+    f32::exact_from(
+        &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
+    );
+}
+
+#[test]
+#[should_panic]
+fn f32_exact_from_integer_ref_fail_16() {
+    f32::exact_from(
+        &Integer::from_str("-10000000000000000000000000000000000000000000000000000").unwrap(),
+    );
+}
+
+#[test]
+fn test_f64_exact_from_integer() {
+    let test = |n: &str, out| {
+        assert_eq!(f64::exact_from(Integer::from_str(n).unwrap()), out);
+    };
+    test("3", 3.0);
+    test("-3", -3.0);
+    test("123", 123.0);
+    test("-123", -123.0);
+    test("0", 0.0);
+    test("1000000000", 1.0e9);
+    test("-1000000000", -1.0e9);
+    test("9007199254740992", 9.007199254740992e15);
+    test("-9007199254740992", -9.007199254740992e15);
+    test("9007199254740994", 9.007199254740994e15);
+    test("-9007199254740994", -9.007199254740994e15);
+    test("18014398509481984", 1.8014398509481984e16);
+    test("-18014398509481984", -1.8014398509481984e16);
+    test("18014398509481988", 1.8014398509481988e16);
+    test("-18014398509481988", -1.8014398509481988e16);
+    test(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858368", 1.7976931348623157e308);
+    test(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858368", -1.7976931348623157e308);
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_1() {
+    f64::exact_from(Integer::from_str("18014398509481983").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_2() {
+    f64::exact_from(Integer::from_str("-18014398509481983").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_3() {
+    f64::exact_from(Integer::from_str("18014398509481985").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_4() {
+    f64::exact_from(Integer::from_str("-18014398509481985").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_5() {
+    f64::exact_from(Integer::from_str("18014398509481986").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_6() {
+    f64::exact_from(Integer::from_str("-18014398509481986").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_7() {
+    f64::exact_from(Integer::from_str("18014398509481987").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_8() {
+    f64::exact_from(Integer::from_str("-18014398509481987").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_9() {
+    f64::exact_from(Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858367").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_10() {
+    f64::exact_from(Integer::from_str(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858367").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_11() {
+    f64::exact_from(Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858369").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_fail_12() {
+    f64::exact_from(Integer::from_str(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858369").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_1() {
+    f64::exact_from(&Integer::from_str("18014398509481983").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_2() {
+    f64::exact_from(&Integer::from_str("-18014398509481983").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_3() {
+    f64::exact_from(&Integer::from_str("18014398509481985").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_4() {
+    f64::exact_from(&Integer::from_str("-18014398509481985").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_5() {
+    f64::exact_from(Integer::from_str("18014398509481986").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_6() {
+    f64::exact_from(&Integer::from_str("-18014398509481986").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_7() {
+    f64::exact_from(&Integer::from_str("18014398509481987").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_8() {
+    f64::exact_from(&Integer::from_str("-18014398509481987").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_9() {
+    f64::exact_from(&Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858367").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_10() {
+    f64::exact_from(&Integer::from_str(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858367").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_11() {
+    f64::exact_from(&Integer::from_str(
+        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
+        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
+        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
+        8177180919299881250404026184124858369").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn f64_exact_from_integer_ref_fail_12() {
+    f64::exact_from(&Integer::from_str(
+        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
+        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
+        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
+        38177180919299881250404026184124858369").unwrap());
 }
 
 #[test]

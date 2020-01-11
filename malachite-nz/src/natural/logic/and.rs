@@ -25,7 +25,7 @@ use platform::Limb;
 /// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
 /// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
 /// ```
-pub fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
+pub const fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
     limbs[0] & limb
 }
 

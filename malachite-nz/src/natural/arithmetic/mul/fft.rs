@@ -258,24 +258,24 @@ const MUL_FFT_TABLE3: [FFTTableNK; MUL_FFT_TABLE3_SIZE] = [
     FFTTableNK { n: 2_559, k: 15 },
     FFTTableNK { n: 5_887, k: 14 },
     FFTTableNK { n: 11_775, k: 16 },
-    FFTTableNK { n: 65_536, k: 17 },
-    FFTTableNK { n: 131_072, k: 18 },
-    FFTTableNK { n: 262_144, k: 19 },
-    FFTTableNK { n: 524_288, k: 20 },
+    FFTTableNK { n: 0x1_0000, k: 17 },
+    FFTTableNK { n: 0x2_0000, k: 18 },
+    FFTTableNK { n: 0x4_0000, k: 19 },
+    FFTTableNK { n: 0x8_0000, k: 20 },
     FFTTableNK {
-        n: 1_048_576,
+        n: 0x10_0000,
         k: 21,
     },
     FFTTableNK {
-        n: 2_097_152,
+        n: 0x20_0000,
         k: 22,
     },
     FFTTableNK {
-        n: 4_194_304,
+        n: 0x40_0000,
         k: 23,
     },
     FFTTableNK {
-        n: 8_388_608,
+        n: 0x80_0000,
         k: 24,
     },
 ];
@@ -479,24 +479,24 @@ const SQR_FFT_TABLE3: [FFTTableNK; SQR_FFT_TABLE3_SIZE] = [
     FFTTableNK { n: 2_559, k: 15 },
     FFTTableNK { n: 5_887, k: 14 },
     FFTTableNK { n: 11_775, k: 16 },
-    FFTTableNK { n: 65_536, k: 17 },
-    FFTTableNK { n: 131_072, k: 18 },
-    FFTTableNK { n: 262_144, k: 19 },
-    FFTTableNK { n: 524_288, k: 20 },
+    FFTTableNK { n: 0x1_0000, k: 17 },
+    FFTTableNK { n: 0x2_0000, k: 18 },
+    FFTTableNK { n: 0x4_0000, k: 19 },
+    FFTTableNK { n: 0x8_0000, k: 20 },
     FFTTableNK {
-        n: 1_048_576,
+        n: 0x10_0000,
         k: 21,
     },
     FFTTableNK {
-        n: 2_097_152,
+        n: 0x20_0000,
         k: 22,
     },
     FFTTableNK {
-        n: 4_194_304,
+        n: 0x40_0000,
         k: 23,
     },
     FFTTableNK {
-        n: 8_388_608,
+        n: 0x80_0000,
         k: 24,
     },
 ];
@@ -831,7 +831,7 @@ fn _limbs_mul_fft_decompose<'a>(
         len = k_times_n + 1;
         &scratch2
     } else {
-        &xs
+        xs
     };
     let mut a_table = Vec::with_capacity(k);
     let mut remainder: &mut [Limb] = a_limbs;
@@ -886,7 +886,7 @@ pub fn _limbs_mul_fft_fft(
         {
             let (xss_first, xss_tail) = xss.split_first_mut().unwrap();
             scratch.copy_from_slice(xss_first);
-            limbs_slice_add_same_length_in_place_left(xss_first, &xss_tail[increment - 1]);
+            limbs_slice_add_same_length_in_place_left(xss_first, xss_tail[increment - 1]);
             let (xss_0_last, xss_0_init) = xss_first.split_last_mut().unwrap();
             // can be 2 or 3
             if *xss_0_last > 1 {
@@ -976,7 +976,7 @@ pub fn _limbs_mul_fft_inverse(
     if k == 2 {
         let (xss_first, xss_tail) = xss.split_first_mut().unwrap();
         scratch.copy_from_slice(xss_first);
-        limbs_slice_add_same_length_in_place_left(xss_first, &xss_tail[0]);
+        limbs_slice_add_same_length_in_place_left(xss_first, xss_tail[0]);
         // can be 2 or 3
         let (xss_0_last, xss_0_init) = xss_first.split_last_mut().unwrap();
         if *xss_0_last > 1 {
@@ -1326,7 +1326,7 @@ pub fn _limbs_mul_fft_internal(
         lo -= a;
         sh -= a;
         let j = (two_pow_k - i) & (two_pow_k - 1);
-        if limbs_slice_add_same_length_in_place_left(&mut ys[sh..sh + width], &yss[j])
+        if limbs_slice_add_same_length_in_place_left(&mut ys[sh..sh + width], yss[j])
             && limbs_slice_add_limb_in_place(&mut ys[sh + width..], 1)
         {
             carry += 1;
@@ -1338,7 +1338,7 @@ pub fn _limbs_mul_fft_internal(
         } else {
             yss[0][2 * a - width] = i_plus_one;
         }
-        if limbs_cmp_same_length(&yss[j], scratch_lo) == Ordering::Greater {
+        if limbs_cmp_same_length(yss[j], scratch_lo) == Ordering::Greater {
             // subtract 2 ^ N' + 1
             if limbs_sub_limb_in_place(&mut ys[sh..], 1) {
                 carry -= 1;

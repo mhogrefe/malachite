@@ -76,14 +76,12 @@ pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
 /// use malachite_nz::natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 /// use rand::{SeedableRng, StdRng};
 ///
-/// fn main() {
-///     let seed: &[_] = &[1, 2, 3, 4];
-///     let mut rng: StdRng = SeedableRng::from_seed(seed);
-///     assert_eq!(random_natural_up_to_bits(&mut rng, 4).to_string(), "2");
-///     assert_eq!(random_natural_up_to_bits(&mut rng, 10).to_string(), "205");
-///     assert_eq!(random_natural_up_to_bits(&mut rng, 100).to_string(),
-///                "1147035045202790645135301334895");
-/// }
+/// let seed: &[_] = &[1, 2, 3, 4];
+/// let mut rng: StdRng = SeedableRng::from_seed(seed);
+/// assert_eq!(random_natural_up_to_bits(&mut rng, 4).to_string(), "2");
+/// assert_eq!(random_natural_up_to_bits(&mut rng, 10).to_string(), "205");
+/// assert_eq!(random_natural_up_to_bits(&mut rng, 100).to_string(),
+///            "1147035045202790645135301334895");
 /// ```
 #[cfg(feature = "32_bit_limbs")]
 pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {

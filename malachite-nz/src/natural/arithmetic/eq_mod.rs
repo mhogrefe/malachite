@@ -275,7 +275,7 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> 
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
-    let new_len = xs.len() - limbs_trailing_zero_limbs(&xs);
+    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
 }
 
@@ -312,7 +312,7 @@ pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, modulus: &mut [Limb]) -> bool
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
-    let new_len = xs.len() - limbs_trailing_zero_limbs(&xs);
+    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
     new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
 }
 
@@ -440,7 +440,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(&scratch);
+    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
     // scratch is non-empty here because xs != ys
     if new_len == 1 {
         scratch[0].divisible_by(modulus)
@@ -495,7 +495,7 @@ fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], modulus: Limb
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(&xs);
+    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
     // xs is non-empty here because xs != ys
     if new_len == 1 {
         xs[0].divisible_by(modulus)
@@ -680,7 +680,7 @@ fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Lim
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(&scratch);
+    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch[..new_len], modulus)
 }
 
@@ -695,7 +695,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(&xs);
+    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
 }
 
@@ -749,7 +749,7 @@ fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut 
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(&scratch);
+    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
     new_len >= modulus.len() && limbs_divisible_by(&mut scratch[..new_len], modulus)
 }
 
@@ -764,7 +764,7 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], modulus: &mut 
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(&xs);
+    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
     new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
 }
 
@@ -1026,7 +1026,7 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
             (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
             (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
             (ref x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
             (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
                 limbs_eq_mod_limb_val_ref(xs, ys, modulus)

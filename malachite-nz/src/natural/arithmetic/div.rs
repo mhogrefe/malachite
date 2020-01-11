@@ -659,7 +659,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             // Since the partial remainder fed to _limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
             // the largest possible value.
-            for limb in scratch_2.iter_mut() {
+            for limb in &mut scratch_2 {
                 *limb = Limb::MAX;
             }
         }
@@ -1459,8 +1459,8 @@ pub fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [
             _limbs_div_schoolbook(qs, ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
@@ -1484,8 +1484,8 @@ pub fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [
             _limbs_div_schoolbook(qs, new_ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(ds[d_len - 1], ds[d_len - 2]);
@@ -1527,8 +1527,8 @@ fn _limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[
             _limbs_div_schoolbook(qs, ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
@@ -1553,8 +1553,8 @@ fn _limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[
             _limbs_div_schoolbook(qs, new_ns, &new_ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(new_ds[d_len - 1], new_ds[d_len - 2]);
@@ -1598,8 +1598,8 @@ fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [
             _limbs_div_schoolbook(qs, &mut new_ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
@@ -1623,8 +1623,8 @@ fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [
             _limbs_div_schoolbook(qs, new_ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(ds[d_len - 1], ds[d_len - 2]);
@@ -1668,8 +1668,8 @@ fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb
             _limbs_div_schoolbook(qs, &mut new_ns, ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(highest_d, ds[d_len - 2]);
@@ -1694,8 +1694,8 @@ fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb
             _limbs_div_schoolbook(qs, new_ns, &new_ds, inverse)
         } else if d_len < MUPI_DIV_Q_THRESHOLD
             || n_len < 2 * MU_DIV_Q_THRESHOLD
-            || (2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64 * d_len as f64
-                + MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64
+            || ((2 * (MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD)) as f64)
+                .mul_add(d_len as f64, MUPI_DIV_Q_THRESHOLD as f64 * n_len as f64)
                 > d_len as f64 * n_len as f64
         {
             let inverse = limbs_two_limb_inverse_helper(new_ds[d_len - 1], new_ds[d_len - 2]);
@@ -1738,19 +1738,19 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
         let new_ds = &ds[d_len - q_len_plus_1..];
         let highest_q = if q_len_plus_1 == 2 {
             let mut new_ns = ns_tail.to_vec();
-            limbs_div_mod_by_two_limb_normalized(&mut scratch_2, &mut new_ns, &new_ds)
+            limbs_div_mod_by_two_limb_normalized(&mut scratch_2, &mut new_ns, new_ds)
         } else if q_len_plus_1 < DC_DIVAPPR_Q_THRESHOLD {
             let inverse = limbs_two_limb_inverse_helper(highest_d, new_ds[q_len - 1]);
             let mut new_ns = ns_tail.to_vec();
-            _limbs_div_schoolbook_approx(&mut scratch_2, &mut new_ns, &new_ds, inverse)
+            _limbs_div_schoolbook_approx(&mut scratch_2, &mut new_ns, new_ds, inverse)
         } else if q_len_plus_1 < MU_DIVAPPR_Q_THRESHOLD {
             let inverse = limbs_two_limb_inverse_helper(highest_d, new_ds[q_len - 1]);
             let mut new_ns = ns_tail.to_vec();
-            _limbs_div_divide_and_conquer_approx(&mut scratch_2, &mut new_ns, &new_ds, inverse)
+            _limbs_div_divide_and_conquer_approx(&mut scratch_2, &mut new_ns, new_ds, inverse)
         } else {
             let mut scratch =
                 vec![0; _limbs_div_barrett_approx_scratch_len(new_n_len, q_len_plus_1)];
-            _limbs_div_barrett_approx(&mut scratch_2, ns_tail, &new_ds, &mut scratch)
+            _limbs_div_barrett_approx(&mut scratch_2, ns_tail, new_ds, &mut scratch)
         };
         scratch_2[q_len] = if highest_q { 1 } else { 0 };
     } else {

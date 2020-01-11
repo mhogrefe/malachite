@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -28,6 +30,72 @@ fn test_checked_from_integer() {
     test("2147483648", "Some(2147483648)");
     test("-2147483648", "None");
     test("-2147483649", "None");
+}
+
+#[test]
+fn test_exact_from_integer() {
+    let test = |u, out| {
+        let n = Natural::exact_from(Integer::from_str(u).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = Natural::exact_from(&Integer::from_str(u).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+    };
+    test("0", "0");
+    test("123", "123");
+    test("1000000000000", "1000000000000");
+    test("2147483647", "2147483647");
+    test("2147483648", "2147483648");
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_fail_1() {
+    Natural::exact_from(Integer::from_str("-123").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_fail_2() {
+    Natural::exact_from(Integer::from_str("-1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_fail_3() {
+    Natural::exact_from(Integer::from_str("-2147483648").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_fail_4() {
+    Natural::exact_from(Integer::from_str("-2147483649").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_ref_fail_1() {
+    Natural::exact_from(&Integer::from_str("-123").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_ref_fail_2() {
+    Natural::exact_from(&Integer::from_str("-1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_ref_fail_3() {
+    Natural::exact_from(&Integer::from_str("-2147483648").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn natural_exact_from_integer_ref_fail_4() {
+    Natural::exact_from(&Integer::from_str("-2147483649").unwrap());
 }
 
 #[test]
@@ -89,6 +157,7 @@ fn checked_from_integer_properties() {
         assert_eq!(natural_x.is_some(), Natural::convertible_from(x));
         if let Some(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
+            assert_eq!(Natural::exact_from(x), n);
             assert_eq!(Integer::from(&n), *x);
             assert_eq!(Integer::from(n), *x);
         }

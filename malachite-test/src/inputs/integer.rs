@@ -45,7 +45,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, It};
+use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It};
 use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
@@ -74,6 +74,22 @@ pub fn nonzero_integers(gm: GenerationMode) -> It<Integer> {
             Box::new(special_random_nonzero_integers(&EXAMPLE_SEED, scale))
         }
     }
+}
+
+pub fn integers_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(unsigneds::<T>(gm).map(Integer::from))
+}
+
+pub fn integers_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Integer>
+where
+    Integer: From<T>,
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(signeds::<T>(gm).map(Integer::from))
 }
 
 pub fn pairs_of_integers(gm: GenerationMode) -> It<(Integer, Integer)> {

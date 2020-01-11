@@ -5,11 +5,13 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::integers;
+use inputs::integer::{integers, natural_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_from_integer);
     register_demo!(registry, demo_natural_checked_from_integer_ref);
+    register_demo!(registry, demo_natural_exact_from_integer);
+    register_demo!(registry, demo_natural_exact_from_integer_ref);
     register_demo!(registry, demo_natural_saturating_from_integer);
     register_demo!(registry, demo_natural_saturating_from_integer_ref);
     register_demo!(registry, demo_natural_convertible_from_integer);
@@ -18,6 +20,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_natural_checked_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_exact_from_integer_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -54,6 +61,23 @@ fn demo_natural_checked_from_integer_ref(gm: GenerationMode, limit: usize) {
             n,
             Natural::checked_from(&n)
         );
+    }
+}
+
+fn demo_natural_exact_from_integer(gm: GenerationMode, limit: usize) {
+    for n in natural_integers(gm).take(limit) {
+        let n_clone = n.clone();
+        println!(
+            "Natural::exact_from({}) = {}",
+            n_clone,
+            Natural::exact_from(n)
+        );
+    }
+}
+
+fn demo_natural_exact_from_integer_ref(gm: GenerationMode, limit: usize) {
+    for n in natural_integers(gm).take(limit) {
+        println!("Natural::exact_from(&{}) = {}", n, Natural::exact_from(&n));
     }
 }
 
@@ -129,6 +153,33 @@ fn benchmark_natural_checked_from_integer_evaluation_strategy(
             (
                 "Natural::checked_from(&Integer)",
                 &mut (|n| no_out!(Natural::checked_from(&n))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_exact_from_integer_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "Natural::exact_from(Integer)",
+        BenchmarkType::EvaluationStrategy,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            (
+                "Natural::exact_from(Integer)",
+                &mut (|n| no_out!(Natural::exact_from(n))),
+            ),
+            (
+                "Natural::exact_from(&Integer)",
+                &mut (|n| no_out!(Natural::exact_from(&n))),
             ),
         ],
     );

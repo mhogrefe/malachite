@@ -11,8 +11,7 @@ fn limbs_significant_length(limbs: &[Limb]) -> usize {
         .enumerate()
         .rev()
         .find(|&(_, &limb)| limb != 0)
-        .map(|(i, _)| i + 1)
-        .unwrap_or(0)
+        .map_or(0, |(i, _)| i + 1)
 }
 
 impl Natural {

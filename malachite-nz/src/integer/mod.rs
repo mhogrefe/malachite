@@ -172,9 +172,8 @@ pub mod arithmetic {
 pub mod comparison {
     pub mod ord;
     pub mod ord_abs;
-    pub mod partial_eq_limb;
     pub mod partial_eq_natural;
-    pub mod partial_eq_signed_limb;
+    pub mod partial_eq_primitive_integer;
     pub mod partial_ord_abs_limb;
     pub mod partial_ord_abs_natural;
     pub mod partial_ord_abs_signed_limb;

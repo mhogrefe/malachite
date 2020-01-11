@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{integers, rm_integers};
+use inputs::integer::{integers, integers_var_1, integers_var_2, rm_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_checked_from_integer);
@@ -18,6 +18,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u32_checked_from_integer_ref);
     register_demo!(registry, demo_u64_checked_from_integer_ref);
     register_demo!(registry, demo_usize_checked_from_integer_ref);
+    register_demo!(registry, demo_u8_exact_from_integer);
+    register_demo!(registry, demo_u16_exact_from_integer);
+    register_demo!(registry, demo_u32_exact_from_integer);
+    register_demo!(registry, demo_u64_exact_from_integer);
+    register_demo!(registry, demo_usize_exact_from_integer);
+    register_demo!(registry, demo_u8_exact_from_integer_ref);
+    register_demo!(registry, demo_u16_exact_from_integer_ref);
+    register_demo!(registry, demo_u32_exact_from_integer_ref);
+    register_demo!(registry, demo_u64_exact_from_integer_ref);
+    register_demo!(registry, demo_usize_exact_from_integer_ref);
     register_demo!(registry, demo_u8_wrapping_from_integer);
     register_demo!(registry, demo_u16_wrapping_from_integer);
     register_demo!(registry, demo_u32_wrapping_from_integer);
@@ -68,6 +78,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_i32_checked_from_integer_ref);
     register_demo!(registry, demo_i64_checked_from_integer_ref);
     register_demo!(registry, demo_isize_checked_from_integer_ref);
+    register_demo!(registry, demo_i8_exact_from_integer);
+    register_demo!(registry, demo_i16_exact_from_integer);
+    register_demo!(registry, demo_i32_exact_from_integer);
+    register_demo!(registry, demo_i64_exact_from_integer);
+    register_demo!(registry, demo_isize_exact_from_integer);
+    register_demo!(registry, demo_i8_exact_from_integer_ref);
+    register_demo!(registry, demo_i16_exact_from_integer_ref);
+    register_demo!(registry, demo_i32_exact_from_integer_ref);
+    register_demo!(registry, demo_i64_exact_from_integer_ref);
+    register_demo!(registry, demo_isize_exact_from_integer_ref);
     register_demo!(registry, demo_i8_wrapping_from_integer);
     register_demo!(registry, demo_i16_wrapping_from_integer);
     register_demo!(registry, demo_i32_wrapping_from_integer);
@@ -157,6 +177,31 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_usize_checked_from_integer_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u8_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u16_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u32_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_u64_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_usize_exact_from_integer_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -386,6 +431,31 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
+        benchmark_i8_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i16_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i32_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_i64_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_isize_exact_from_integer_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        Large,
         benchmark_i8_wrapping_from_integer_evaluation_strategy
     );
     register_bench!(
@@ -600,11 +670,14 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
 }
 
-macro_rules! demo_and_bench_unsigned {
+macro_rules! demo_and_bench {
     (
         $t:ident,
+        $exact_from_generator:ident,
         $checked_from_demo_name:ident,
         $checked_from_ref_demo_name:ident,
+        $exact_from_demo_name:ident,
+        $exact_from_ref_demo_name:ident,
         $wrapping_from_demo_name:ident,
         $wrapping_from_ref_demo_name:ident,
         $saturating_from_demo_name:ident,
@@ -615,6 +688,7 @@ macro_rules! demo_and_bench_unsigned {
         $convertible_from_ref_demo_name:ident,
         $checked_from_es_bench_name:ident,
         $checked_from_a_bench_name:ident,
+        $exact_from_es_bench_name:ident,
         $wrapping_from_es_bench_name:ident,
         $wrapping_from_a_bench_name:ident,
         $saturating_from_es_bench_name:ident,
@@ -643,6 +717,24 @@ macro_rules! demo_and_bench_unsigned {
                     n,
                     $t::checked_from(&n)
                 );
+            }
+        }
+
+        fn $exact_from_demo_name(gm: GenerationMode, limit: usize) {
+            for n in $exact_from_generator::<$t>(gm).take(limit) {
+                let n_clone = n.clone();
+                println!(
+                    "{}::exact_from({}) = {}",
+                    $t::NAME,
+                    n_clone,
+                    $t::exact_from(n)
+                );
+            }
+        }
+
+        fn $exact_from_ref_demo_name(gm: GenerationMode, limit: usize) {
+            for n in $exact_from_generator::<$t>(gm).take(limit) {
+                println!("{}::exact_from(&{}) = {}", $t::NAME, n, $t::exact_from(&n));
             }
         }
 
@@ -740,7 +832,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $checked_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::checked_from(Natural)", $t::NAME),
+                &format!("{}::checked_from(Integer)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 integers(gm),
                 gm.name(),
@@ -750,11 +842,11 @@ macro_rules! demo_and_bench_unsigned {
                 "n.significant_bits()",
                 &mut [
                     (
-                        &format!("{}::checked_from(Natural)", $t::NAME),
+                        &format!("{}::checked_from(Integer)", $t::NAME),
                         &mut (|n| no_out!($t::checked_from(n))),
                     ),
                     (
-                        &format!("{}::checked_from(&Natural)", $t::NAME),
+                        &format!("{}::checked_from(&Integer)", $t::NAME),
                         &mut (|n| no_out!($t::checked_from(&n))),
                     ),
                 ],
@@ -763,7 +855,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $checked_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::checked_from(Natural)", $t::NAME),
+                &format!("{}::checked_from(Integer)", $t::NAME),
                 BenchmarkType::Algorithms,
                 integers(gm),
                 gm.name(),
@@ -788,9 +880,32 @@ macro_rules! demo_and_bench_unsigned {
             );
         }
 
+        fn $exact_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
+            m_run_benchmark(
+                &format!("{}::exact_from(Integer)", $t::NAME),
+                BenchmarkType::EvaluationStrategy,
+                $exact_from_generator::<$t>(gm),
+                gm.name(),
+                limit,
+                file_name,
+                &(|ref n| usize::exact_from(n.significant_bits())),
+                "n.significant_bits()",
+                &mut [
+                    (
+                        &format!("{}::exact_from(Integer)", $t::NAME),
+                        &mut (|n| no_out!($t::exact_from(n))),
+                    ),
+                    (
+                        &format!("{}::exact_from(&Integer)", $t::NAME),
+                        &mut (|n| no_out!($t::exact_from(&n))),
+                    ),
+                ],
+            );
+        }
+
         fn $wrapping_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::wrapping_from(Natural)", $t::NAME),
+                &format!("{}::wrapping_from(Integer)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 integers(gm),
                 gm.name(),
@@ -800,11 +915,11 @@ macro_rules! demo_and_bench_unsigned {
                 "n.significant_bits()",
                 &mut [
                     (
-                        &format!("{}::wrapping_from(Natural)", $t::NAME),
+                        &format!("{}::wrapping_from(Integer)", $t::NAME),
                         &mut (|n| no_out!($t::wrapping_from(n))),
                     ),
                     (
-                        &format!("{}::wrapping_from(&Natural)", $t::NAME),
+                        &format!("{}::wrapping_from(&Integer)", $t::NAME),
                         &mut (|n| no_out!($t::wrapping_from(&n))),
                     ),
                 ],
@@ -813,7 +928,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $wrapping_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::wrapping_from(Natural)", $t::NAME),
+                &format!("{}::wrapping_from(Integer)", $t::NAME),
                 BenchmarkType::Algorithms,
                 integers(gm),
                 gm.name(),
@@ -835,7 +950,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $saturating_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::saturating_from(Natural)", $t::NAME),
+                &format!("{}::saturating_from(Integer)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 integers(gm),
                 gm.name(),
@@ -845,11 +960,11 @@ macro_rules! demo_and_bench_unsigned {
                 "n.significant_bits()",
                 &mut [
                     (
-                        &format!("{}::saturating_from(Natural)", $t::NAME),
+                        &format!("{}::saturating_from(Integer)", $t::NAME),
                         &mut (|n| no_out!($t::saturating_from(n))),
                     ),
                     (
-                        &format!("{}::saturating_from(&Natural)", $t::NAME),
+                        &format!("{}::saturating_from(&Integer)", $t::NAME),
                         &mut (|n| no_out!($t::saturating_from(&n))),
                     ),
                 ],
@@ -858,7 +973,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $overflowing_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::overflowing_from(Natural)", $t::NAME),
+                &format!("{}::overflowing_from(Integer)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 integers(gm),
                 gm.name(),
@@ -868,11 +983,11 @@ macro_rules! demo_and_bench_unsigned {
                 "n.significant_bits()",
                 &mut [
                     (
-                        &format!("{}::overflowing_from(Natural)", $t::NAME),
+                        &format!("{}::overflowing_from(Integer)", $t::NAME),
                         &mut (|n| no_out!($t::overflowing_from(n))),
                     ),
                     (
-                        &format!("{}::overflowing_from(&Natural)", $t::NAME),
+                        &format!("{}::overflowing_from(&Integer)", $t::NAME),
                         &mut (|n| no_out!($t::overflowing_from(&n))),
                     ),
                 ],
@@ -881,7 +996,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $overflowing_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::overflowing_from(Natural)", $t::NAME),
+                &format!("{}::overflowing_from(Integer)", $t::NAME),
                 BenchmarkType::Algorithms,
                 integers(gm),
                 gm.name(),
@@ -901,7 +1016,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $convertible_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::convertible_from(Natural)", $t::NAME),
+                &format!("{}::convertible_from(Integer)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 integers(gm),
                 gm.name(),
@@ -911,11 +1026,11 @@ macro_rules! demo_and_bench_unsigned {
                 "n.significant_bits()",
                 &mut [
                     (
-                        &format!("{}::convertible_from(Natural)", $t::NAME),
+                        &format!("{}::convertible_from(Integer)", $t::NAME),
                         &mut (|n| no_out!($t::convertible_from(n))),
                     ),
                     (
-                        &format!("{}::convertible_from(&Natural)", $t::NAME),
+                        &format!("{}::convertible_from(&Integer)", $t::NAME),
                         &mut (|n| no_out!($t::convertible_from(&n))),
                     ),
                 ],
@@ -924,7 +1039,7 @@ macro_rules! demo_and_bench_unsigned {
 
         fn $convertible_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
-                &format!("{}::convertible_from(Natural)", $t::NAME),
+                &format!("{}::convertible_from(Integer)", $t::NAME),
                 BenchmarkType::Algorithms,
                 integers(gm),
                 gm.name(),
@@ -944,10 +1059,13 @@ macro_rules! demo_and_bench_unsigned {
     };
 }
 
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u8,
+    integers_var_1,
     demo_u8_checked_from_integer,
     demo_u8_checked_from_integer_ref,
+    demo_u8_exact_from_integer,
+    demo_u8_exact_from_integer_ref,
     demo_u8_wrapping_from_integer,
     demo_u8_wrapping_from_integer_ref,
     demo_u8_saturating_from_integer,
@@ -958,6 +1076,7 @@ demo_and_bench_unsigned!(
     demo_u8_convertible_from_integer_ref,
     benchmark_u8_checked_from_integer_evaluation_strategy,
     benchmark_u8_checked_from_integer_algorithms,
+    benchmark_u8_exact_from_integer_evaluation_strategy,
     benchmark_u8_wrapping_from_integer_evaluation_strategy,
     benchmark_u8_wrapping_from_integer_algorithms,
     benchmark_u8_saturating_from_integer_evaluation_strategy,
@@ -966,10 +1085,13 @@ demo_and_bench_unsigned!(
     benchmark_u8_convertible_from_integer_evaluation_strategy,
     benchmark_u8_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u16,
+    integers_var_1,
     demo_u16_checked_from_integer,
     demo_u16_checked_from_integer_ref,
+    demo_u16_exact_from_integer,
+    demo_u16_exact_from_integer_ref,
     demo_u16_wrapping_from_integer,
     demo_u16_wrapping_from_integer_ref,
     demo_u16_saturating_from_integer,
@@ -980,6 +1102,7 @@ demo_and_bench_unsigned!(
     demo_u16_convertible_from_integer_ref,
     benchmark_u16_checked_from_integer_evaluation_strategy,
     benchmark_u16_checked_from_integer_algorithms,
+    benchmark_u16_exact_from_integer_evaluation_strategy,
     benchmark_u16_wrapping_from_integer_evaluation_strategy,
     benchmark_u16_wrapping_from_integer_algorithms,
     benchmark_u16_saturating_from_integer_evaluation_strategy,
@@ -988,10 +1111,13 @@ demo_and_bench_unsigned!(
     benchmark_u16_convertible_from_integer_evaluation_strategy,
     benchmark_u16_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u32,
+    integers_var_1,
     demo_u32_checked_from_integer,
     demo_u32_checked_from_integer_ref,
+    demo_u32_exact_from_integer,
+    demo_u32_exact_from_integer_ref,
     demo_u32_wrapping_from_integer,
     demo_u32_wrapping_from_integer_ref,
     demo_u32_saturating_from_integer,
@@ -1002,6 +1128,7 @@ demo_and_bench_unsigned!(
     demo_u32_convertible_from_integer_ref,
     benchmark_u32_checked_from_integer_evaluation_strategy,
     benchmark_u32_checked_from_integer_algorithms,
+    benchmark_u32_exact_from_integer_evaluation_strategy,
     benchmark_u32_wrapping_from_integer_evaluation_strategy,
     benchmark_u32_wrapping_from_integer_algorithms,
     benchmark_u32_saturating_from_integer_evaluation_strategy,
@@ -1010,10 +1137,13 @@ demo_and_bench_unsigned!(
     benchmark_u32_convertible_from_integer_evaluation_strategy,
     benchmark_u32_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     u64,
+    integers_var_1,
     demo_u64_checked_from_integer,
     demo_u64_checked_from_integer_ref,
+    demo_u64_exact_from_integer,
+    demo_u64_exact_from_integer_ref,
     demo_u64_wrapping_from_integer,
     demo_u64_wrapping_from_integer_ref,
     demo_u64_saturating_from_integer,
@@ -1024,6 +1154,7 @@ demo_and_bench_unsigned!(
     demo_u64_convertible_from_integer_ref,
     benchmark_u64_checked_from_integer_evaluation_strategy,
     benchmark_u64_checked_from_integer_algorithms,
+    benchmark_u64_exact_from_integer_evaluation_strategy,
     benchmark_u64_wrapping_from_integer_evaluation_strategy,
     benchmark_u64_wrapping_from_integer_algorithms,
     benchmark_u64_saturating_from_integer_evaluation_strategy,
@@ -1032,10 +1163,13 @@ demo_and_bench_unsigned!(
     benchmark_u64_convertible_from_integer_evaluation_strategy,
     benchmark_u64_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     usize,
+    integers_var_1,
     demo_usize_checked_from_integer,
     demo_usize_checked_from_integer_ref,
+    demo_usize_exact_from_integer,
+    demo_usize_exact_from_integer_ref,
     demo_usize_wrapping_from_integer,
     demo_usize_wrapping_from_integer_ref,
     demo_usize_saturating_from_integer,
@@ -1046,6 +1180,7 @@ demo_and_bench_unsigned!(
     demo_usize_convertible_from_integer_ref,
     benchmark_usize_checked_from_integer_evaluation_strategy,
     benchmark_usize_checked_from_integer_algorithms,
+    benchmark_usize_exact_from_integer_evaluation_strategy,
     benchmark_usize_wrapping_from_integer_evaluation_strategy,
     benchmark_usize_wrapping_from_integer_algorithms,
     benchmark_usize_saturating_from_integer_evaluation_strategy,
@@ -1054,10 +1189,13 @@ demo_and_bench_unsigned!(
     benchmark_usize_convertible_from_integer_evaluation_strategy,
     benchmark_usize_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i8,
+    integers_var_2,
     demo_i8_checked_from_integer,
     demo_i8_checked_from_integer_ref,
+    demo_i8_exact_from_integer,
+    demo_i8_exact_from_integer_ref,
     demo_i8_wrapping_from_integer,
     demo_i8_wrapping_from_integer_ref,
     demo_i8_saturating_from_integer,
@@ -1068,6 +1206,7 @@ demo_and_bench_unsigned!(
     demo_i8_convertible_from_integer_ref,
     benchmark_i8_checked_from_integer_evaluation_strategy,
     benchmark_i8_checked_from_integer_algorithms,
+    benchmark_i8_exact_from_integer_evaluation_strategy,
     benchmark_i8_wrapping_from_integer_evaluation_strategy,
     benchmark_i8_wrapping_from_integer_algorithms,
     benchmark_i8_saturating_from_integer_evaluation_strategy,
@@ -1076,10 +1215,13 @@ demo_and_bench_unsigned!(
     benchmark_i8_convertible_from_integer_evaluation_strategy,
     benchmark_i8_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i16,
+    integers_var_2,
     demo_i16_checked_from_integer,
     demo_i16_checked_from_integer_ref,
+    demo_i16_exact_from_integer,
+    demo_i16_exact_from_integer_ref,
     demo_i16_wrapping_from_integer,
     demo_i16_wrapping_from_integer_ref,
     demo_i16_saturating_from_integer,
@@ -1090,6 +1232,7 @@ demo_and_bench_unsigned!(
     demo_i16_convertible_from_integer_ref,
     benchmark_i16_checked_from_integer_evaluation_strategy,
     benchmark_i16_checked_from_integer_algorithms,
+    benchmark_i16_exact_from_integer_evaluation_strategy,
     benchmark_i16_wrapping_from_integer_evaluation_strategy,
     benchmark_i16_wrapping_from_integer_algorithms,
     benchmark_i16_saturating_from_integer_evaluation_strategy,
@@ -1098,10 +1241,13 @@ demo_and_bench_unsigned!(
     benchmark_i16_convertible_from_integer_evaluation_strategy,
     benchmark_i16_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i32,
+    integers_var_2,
     demo_i32_checked_from_integer,
     demo_i32_checked_from_integer_ref,
+    demo_i32_exact_from_integer,
+    demo_i32_exact_from_integer_ref,
     demo_i32_wrapping_from_integer,
     demo_i32_wrapping_from_integer_ref,
     demo_i32_saturating_from_integer,
@@ -1112,6 +1258,7 @@ demo_and_bench_unsigned!(
     demo_i32_convertible_from_integer_ref,
     benchmark_i32_checked_from_integer_evaluation_strategy,
     benchmark_i32_checked_from_integer_algorithms,
+    benchmark_i32_exact_from_integer_evaluation_strategy,
     benchmark_i32_wrapping_from_integer_evaluation_strategy,
     benchmark_i32_wrapping_from_integer_algorithms,
     benchmark_i32_saturating_from_integer_evaluation_strategy,
@@ -1120,10 +1267,13 @@ demo_and_bench_unsigned!(
     benchmark_i32_convertible_from_integer_evaluation_strategy,
     benchmark_i32_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     i64,
+    integers_var_2,
     demo_i64_checked_from_integer,
     demo_i64_checked_from_integer_ref,
+    demo_i64_exact_from_integer,
+    demo_i64_exact_from_integer_ref,
     demo_i64_wrapping_from_integer,
     demo_i64_wrapping_from_integer_ref,
     demo_i64_saturating_from_integer,
@@ -1134,6 +1284,7 @@ demo_and_bench_unsigned!(
     demo_i64_convertible_from_integer_ref,
     benchmark_i64_checked_from_integer_evaluation_strategy,
     benchmark_i64_checked_from_integer_algorithms,
+    benchmark_i64_exact_from_integer_evaluation_strategy,
     benchmark_i64_wrapping_from_integer_evaluation_strategy,
     benchmark_i64_wrapping_from_integer_algorithms,
     benchmark_i64_saturating_from_integer_evaluation_strategy,
@@ -1142,10 +1293,13 @@ demo_and_bench_unsigned!(
     benchmark_i64_convertible_from_integer_evaluation_strategy,
     benchmark_i64_convertible_from_integer_algorithms
 );
-demo_and_bench_unsigned!(
+demo_and_bench!(
     isize,
+    integers_var_2,
     demo_isize_checked_from_integer,
     demo_isize_checked_from_integer_ref,
+    demo_isize_exact_from_integer,
+    demo_isize_exact_from_integer_ref,
     demo_isize_wrapping_from_integer,
     demo_isize_wrapping_from_integer_ref,
     demo_isize_saturating_from_integer,
@@ -1156,6 +1310,7 @@ demo_and_bench_unsigned!(
     demo_isize_convertible_from_integer_ref,
     benchmark_isize_checked_from_integer_evaluation_strategy,
     benchmark_isize_checked_from_integer_algorithms,
+    benchmark_isize_exact_from_integer_evaluation_strategy,
     benchmark_isize_wrapping_from_integer_evaluation_strategy,
     benchmark_isize_wrapping_from_integer_algorithms,
     benchmark_isize_saturating_from_integer_evaluation_strategy,
@@ -1171,7 +1326,7 @@ fn benchmark_u32_checked_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u32::checked_from(Natural)",
+        "u32::checked_from(Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1192,7 +1347,7 @@ fn benchmark_u32_wrapping_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u32::wrapping_from(&Natural)",
+        "u32::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1213,7 +1368,7 @@ fn benchmark_u64_checked_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u64::checked_from(Natural)",
+        "u64::checked_from(Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1234,7 +1389,7 @@ fn benchmark_u64_wrapping_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "u64::wrapping_from(&Natural)",
+        "u64::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1255,7 +1410,7 @@ fn benchmark_i32_checked_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "i32::checked_from(Natural)",
+        "i32::checked_from(Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1276,7 +1431,7 @@ fn benchmark_i32_wrapping_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "i32::wrapping_from(&Natural)",
+        "i32::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1297,7 +1452,7 @@ fn benchmark_i64_checked_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "i64::checked_from(Natural)",
+        "i64::checked_from(Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),
@@ -1318,7 +1473,7 @@ fn benchmark_i64_wrapping_from_integer_library_comparison(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "i64::wrapping_from(&Natural)",
+        "i64::wrapping_from(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_integers(gm),
         gm.name(),

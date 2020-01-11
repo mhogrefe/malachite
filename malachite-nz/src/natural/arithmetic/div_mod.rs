@@ -803,7 +803,7 @@ pub fn _limbs_div_mod_divide_and_conquer(
         if m != 0 {
             let qs = &mut qs[..q_len];
             let ns = &mut ns[..d_len];
-            limbs_mul_to_out(&mut scratch, &qs, ds_lo);
+            limbs_mul_to_out(&mut scratch, qs, ds_lo);
             let mut carry = if limbs_sub_same_length_in_place_left(ns, &scratch) {
                 1
             } else {
@@ -1167,7 +1167,7 @@ fn _limbs_div_mod_barrett_preinverted(
         let (rs_lo, rs_hi) = rs.split_at_mut(n);
         // Compute the next block of quotient limbs by multiplying the inverse by the upper part of
         // the partial remainder.
-        limbs_mul_same_length_to_out(scratch, rs_hi, &is);
+        limbs_mul_same_length_to_out(scratch, rs_hi, is);
         // The inverse's most significant bit is implicit.
         assert!(!limbs_add_same_length_to_out(
             qs,
@@ -1283,7 +1283,7 @@ pub fn _limbs_div_mod_barrett_helper(
                 scratch_lo_tail.copy_from_slice(&ds[..i_len]);
                 *scratch_first = 1;
             }
-            _limbs_invert_approx(is, &scratch_lo, scratch_hi);
+            _limbs_invert_approx(is, scratch_lo, scratch_hi);
             limbs_move_left(is, 1);
         } else if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
             // TODO This branch is untested!
@@ -1523,8 +1523,8 @@ fn _limbs_div_mod_unbalanced(
         }
     } else if d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < 2 * MU_DIV_QR_THRESHOLD
-        || (2 * (MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD)) as f64 * d_len as f64
-            + MUPI_DIV_QR_THRESHOLD as f64 * n_len as f64
+        || ((2 * (MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD)) as f64)
+            .mul_add(d_len as f64, MUPI_DIV_QR_THRESHOLD as f64 * n_len as f64)
             > d_len as f64 * n_len as f64
     {
         _limbs_div_mod_divide_and_conquer(qs, ns_shifted, ds_shifted, inverse);
@@ -1719,7 +1719,7 @@ pub(crate) fn _limbs_div_mod_balanced(
         let (rs_lo, rs_hi) = rs.split_at_mut(i_len_alt);
         let rs_hi_len = rs_hi.len();
         rs_hi.copy_from_slice(&ns_shifted[..rs_hi_len]);
-        quotient_too_large |= limbs_sub_same_length_to_out(rs_lo, &ns[..i_len_alt], &scratch_lo)
+        quotient_too_large |= limbs_sub_same_length_to_out(rs_lo, &ns[..i_len_alt], scratch_lo)
             && limbs_sub_limb_in_place(&mut rs_hi[..min(rs_hi_len, r_len)], 1);
     }
     if quotient_too_large {

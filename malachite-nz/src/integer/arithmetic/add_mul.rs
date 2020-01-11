@@ -340,20 +340,17 @@ impl Natural {
                 (b - self, false)
             };
         }
-        match (self, b) {
-            (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) => {
-                let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
-                let mut result = Natural(Large(limbs));
-                result.trim();
-                (result, sign)
-            }
-            _ => {
-                let bc = b * Natural::from(c);
-                if *self >= bc {
-                    (self - bc, true)
-                } else {
-                    (bc - self, false)
-                }
+        if let (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) = (self, b) {
+            let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
+            let mut result = Natural(Large(limbs));
+            result.trim();
+            (result, sign)
+        } else {
+            let bc = b * Natural::from(c);
+            if *self >= bc {
+                (self - bc, true)
+            } else {
+                (bc - self, false)
             }
         }
     }

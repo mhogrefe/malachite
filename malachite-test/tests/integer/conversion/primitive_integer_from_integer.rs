@@ -34,6 +34,54 @@ fn test_u32_checked_from_integer() {
 }
 
 #[test]
+fn test_u32_exact_from_integer() {
+    let test = |n, out| {
+        assert_eq!(u32::exact_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(u32::exact_from(&Integer::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("4294967295", u32::MAX);
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_1() {
+    u32::exact_from(Integer::from_str("1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_2() {
+    u32::exact_from(Integer::from_str("4294967296").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_3() {
+    u32::exact_from(Integer::from_str("-123").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_4() {
+    u32::exact_from(Integer::from_str("-1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_5() {
+    u32::exact_from(Integer::from_str("-4294967295").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u32_exact_from_integer_fail_6() {
+    u32::exact_from(Integer::from_str("-4294967296").unwrap());
+}
+
+#[test]
 fn test_u32_wrapping_from_integer() {
     let test = |n, out| {
         assert_eq!(u32::wrapping_from(Integer::from_str(n).unwrap()), out);
@@ -118,6 +166,49 @@ fn test_u64_checked_from_integer() {
     test("-1000000000000", None);
     test("-18446744073709551615", None);
     test("-18446744073709551616", None);
+}
+
+#[test]
+fn test_u64_exact_from_integer() {
+    let test = |n, out| {
+        assert_eq!(u64::exact_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(u64::exact_from(&Integer::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("1000000000000", 1_000_000_000_000);
+    test("18446744073709551615", u64::MAX);
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_integer_fail_1() {
+    u64::exact_from(Integer::from_str("18446744073709551616").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_integer_fail_2() {
+    u64::exact_from(Integer::from_str("-123").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_integer_fail_3() {
+    u64::exact_from(Integer::from_str("-1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_integer_fail_4() {
+    u64::exact_from(Integer::from_str("-18446744073709551615").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn u64_exact_from_integer_fail_5() {
+    u64::exact_from(Integer::from_str("-18446744073709551616").unwrap());
 }
 
 #[test]
@@ -214,6 +305,44 @@ fn test_i32_checked_from_integer() {
 }
 
 #[test]
+fn test_i32_exact_from_integer() {
+    let test = |n, out| {
+        assert_eq!(i32::exact_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(i32::exact_from(&Integer::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("2147483647", i32::MAX);
+    test("-123", -123);
+    test("-2147483648", i32::MIN);
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_integer_fail_1() {
+    i32::exact_from(Integer::from_str("1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_integer_fail_2() {
+    i32::exact_from(Integer::from_str("2147483648").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_integer_fail_3() {
+    i32::exact_from(Integer::from_str("-1000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i32_exact_from_integer_fail_4() {
+    i32::exact_from(Integer::from_str("-2147483649").unwrap());
+}
+
+#[test]
 fn test_i32_wrapping_from_integer() {
     let test = |n, out| {
         assert_eq!(i32::wrapping_from(Integer::from_str(n).unwrap()), out);
@@ -301,6 +430,44 @@ fn test_i64_checked_from_integer() {
 }
 
 #[test]
+fn test_i64_exact_from_integer() {
+    let test = |n, out| {
+        assert_eq!(i64::exact_from(Integer::from_str(n).unwrap()), out);
+        assert_eq!(i64::exact_from(&Integer::from_str(n).unwrap()), out);
+        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64().unwrap(), out);
+    };
+    test("0", 0);
+    test("123", 123);
+    test("9223372036854775807", i64::MAX);
+    test("-123", -123);
+    test("-9223372036854775808", i64::MIN);
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_integer_fail_1() {
+    i64::exact_from(Integer::from_str("1000000000000000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_integer_fail_2() {
+    i64::exact_from(Integer::from_str("9223372036854775808").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_integer_fail_3() {
+    i64::exact_from(Integer::from_str("-1000000000000000000000000").unwrap());
+}
+
+#[test]
+#[should_panic]
+fn i64_exact_from_integer_fail_4() {
+    i64::exact_from(Integer::from_str("-9223372036854775809").unwrap());
+}
+
+#[test]
 fn test_i64_wrapping_from_integer() {
     let test = |n, out| {
         assert_eq!(i64::wrapping_from(Integer::from_str(n).unwrap()), out);
@@ -385,6 +552,7 @@ macro_rules! unsigned_properties {
             if *x >= Integer::ZERO && x.significant_bits() <= u64::from($t::WIDTH) {
                 assert_eq!(Integer::from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
+                assert_eq!(result, Some($t::exact_from(x)));
             } else {
                 assert!(result.is_none());
             }
@@ -409,6 +577,7 @@ macro_rules! signed_properties {
             //TODO if *x >= Integer::ZERO && x.significant_bits() <= u64::from($t::WIDTH - 1) {
             //TODO     assert_eq!(Integer::from(result.unwrap()), *x);
             //TODO     assert_eq!(result, Some($t::wrapping_from(x)));
+            //TODO     assert_eq!(result, Some($t::exact_from(x)));
             //TODO } else {
             //TODO     assert!(result.is_none());
             //TODO }

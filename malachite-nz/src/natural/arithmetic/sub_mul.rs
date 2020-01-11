@@ -341,7 +341,7 @@ pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) ->
     if *scratch.last().unwrap() == 0 {
         scratch.pop();
     }
-    let borrow = limbs_cmp(&xs, &scratch) == Ordering::Less;
+    let borrow = limbs_cmp(xs, &scratch) == Ordering::Less;
     if !borrow {
         assert!(!limbs_sub_in_place_left(xs, &scratch));
     }
