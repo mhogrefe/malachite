@@ -329,8 +329,8 @@ fn add_mul_properties() {
     });
 
     test_properties(integers, |a| {
-        assert_eq!(a.add_mul(a, &Integer::NEGATIVE_ONE), Integer::ZERO);
-        assert_eq!(a.add_mul(&(-a), &Integer::ONE), Integer::ZERO);
+        assert_eq!(a.add_mul(a, &Integer::NEGATIVE_ONE), 0);
+        assert_eq!(a.add_mul(&(-a), &Integer::ONE), 0);
     });
 
     test_properties(pairs_of_integers, |&(ref a, ref b)| {
@@ -339,7 +339,7 @@ fn add_mul_properties() {
         assert_eq!(Integer::ZERO.add_mul(a, b), a * b);
         assert_eq!(a.add_mul(b, &Integer::ZERO), *a);
         assert_eq!(a.add_mul(b, &Integer::ONE), a + b);
-        assert_eq!((a * b).add_mul(-a, b), Integer::ZERO);
-        assert_eq!((a * b).add_mul(a, -b), Integer::ZERO);
+        assert_eq!((a * b).add_mul(-a, b), 0);
+        assert_eq!((a * b).add_mul(a, -b), 0);
     });
 }

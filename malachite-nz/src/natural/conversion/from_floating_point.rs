@@ -8,7 +8,6 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 
 use natural::Natural;
-use platform::Limb;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -73,7 +72,7 @@ macro_rules! float_impls {
                         i32::exact_from(exponent) + $f::MIN_EXPONENT - 1,
                         if value_negative { -rm } else { rm },
                     );
-                    if value_negative && n != 0 as Limb {
+                    if value_negative && n != 0 {
                         panic!("Result is negative and cannot be converted to a Natural");
                     }
                     n

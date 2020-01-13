@@ -94,7 +94,7 @@ fn divisible_by_power_of_two_properties() {
             natural_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)),
             divisible
         );
-        if *x != 0 as Limb {
+        if *x != 0 {
             assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-x).divisible_by_power_of_two(pow), divisible);
@@ -107,7 +107,7 @@ fn divisible_by_power_of_two_properties() {
         |&(ref x, pow)| {
             assert!(x.divisible_by_power_of_two(pow));
             assert!(natural_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)));
-            if *x != 0 as Limb {
+            if *x != 0 {
                 assert!(x.trailing_zeros().unwrap() >= pow);
             }
             assert!((-x).divisible_by_power_of_two(pow));
@@ -120,7 +120,7 @@ fn divisible_by_power_of_two_properties() {
         |&(ref x, pow)| {
             assert!(!x.divisible_by_power_of_two(pow));
             assert!(!natural_to_rug_integer(x).is_divisible_2pow(u32::exact_from(pow)));
-            if *x != 0 as Limb {
+            if *x != 0 {
                 assert!(x.trailing_zeros().unwrap() < pow);
             }
             assert!(!(-x).divisible_by_power_of_two(pow));

@@ -7,17 +7,17 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use error::ParseIntegerError;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::Limb;
 
 impl Natural {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
         assert!(!src.starts_with('-'));
         *self = Natural::ZERO;
+        let radix = Natural::exact_from(radix);
         for c in src.chars() {
-            *self *= Natural::from(Limb::exact_from(radix));
+            *self *= &radix;
             if c >= '0' && c <= '9' {
-                *self += Natural::from(c as Limb - 48);
+                *self += Natural::from(c.to_digit(10).unwrap());
             }
         }
         Ok(())
@@ -39,12 +39,12 @@ impl Natural {
 fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
     assert!(!to_upper);
     assert!(radix >= 2 && radix <= 36, "radix out of range");
-    if *i == Natural::ZERO {
+    if *i == 0 {
         return "0".to_string();
     }
     let mut i_cloned = i.clone();
     let mut cs = Vec::new();
-    while i_cloned != Natural::ZERO {
+    while i_cloned != 0 {
         cs.push(
             i_cloned
                 .div_assign_mod_limb(10)

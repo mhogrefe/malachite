@@ -101,9 +101,9 @@ fn to_sign_and_limbs_asc_properties() {
             (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>())
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
-        if *x != 0 as Limb {
-            assert_ne!(*limbs.last().unwrap(), 0 as Limb);
+        assert_eq!(sign == Ordering::Equal, *x == 0);
+        if *x != 0 {
+            assert_ne!(*limbs.last().unwrap(), 0);
         }
         assert_eq!((-x).to_sign_and_limbs_asc(), (sign.reverse(), limbs));
     });
@@ -120,9 +120,9 @@ fn to_sign_and_limbs_desc_properties() {
             (sign, limbs.iter().cloned().rev().collect::<Vec<Limb>>())
         );
         assert_eq!(sign == Ordering::Equal, limbs.is_empty());
-        assert_eq!(sign == Ordering::Equal, *x == 0 as Limb);
-        if *x != 0 as Limb {
-            assert_ne!(limbs[0], 0 as Limb);
+        assert_eq!(sign == Ordering::Equal, *x == 0);
+        if *x != 0 {
+            assert_ne!(limbs[0], 0);
         }
         assert_eq!((-x).to_sign_and_limbs_desc(), (sign.reverse(), limbs));
     });

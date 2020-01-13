@@ -19,8 +19,8 @@ use inputs::base::{
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
-    let negative = *x < 0 as Limb;
-    if negative != (*y < 0 as Limb) {
+    let negative = *x < 0;
+    if negative != (*y < 0) {
         return None;
     }
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
@@ -50,10 +50,10 @@ pub fn rug_checked_hamming_distance(x: &rug::Integer, y: &rug::Integer) -> Optio
 }
 
 pub fn integer_checked_hamming_distance_alt_2(x: &Integer, y: &Integer) -> Option<u64> {
-    if (*x < 0 as Limb) != (*y < 0 as Limb) {
+    if (*x < 0) != (*y < 0) {
         return None;
     }
-    let extension = if *x < 0 as Limb { Limb::MAX } else { 0 };
+    let extension = if *x < 0 { Limb::MAX } else { 0 };
     let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(

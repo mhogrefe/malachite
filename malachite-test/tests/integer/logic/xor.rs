@@ -1173,9 +1173,9 @@ fn xor_properties() {
         assert_eq!(Integer::ZERO ^ x, *x);
         assert_eq!(x ^ Integer::NEGATIVE_ONE, !x);
         assert_eq!(Integer::NEGATIVE_ONE ^ x, !x);
-        assert_eq!(x ^ x, 0 as Limb);
-        assert_eq!(x ^ !x, -1 as SignedLimb);
-        assert_eq!(!x ^ x, -1 as SignedLimb);
+        assert_eq!(x ^ x, 0);
+        assert_eq!(x ^ !x, -1);
+        assert_eq!(!x ^ x, -1);
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {

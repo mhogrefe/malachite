@@ -4,7 +4,6 @@ use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRou
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use num::{BigUint, Integer};
 use rug::ops::DivRounding;
 
@@ -449,8 +448,8 @@ fn div_round_properties() {
     test_properties(
         pairs_of_positive_natural_and_rounding_mode,
         |&(ref x, rm)| {
-            assert_eq!(Natural::ZERO.div_round(x, rm), 0 as Limb);
-            assert_eq!(x.div_round(x, rm), 1 as Limb);
+            assert_eq!(Natural::ZERO.div_round(x, rm), 0);
+            assert_eq!(x.div_round(x, rm), 1);
         },
     );
 }

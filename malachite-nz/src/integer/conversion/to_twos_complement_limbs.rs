@@ -644,7 +644,7 @@ impl Integer {
     ///     .collect::<Vec<u32>>(), &[0xffff_ffff, 1]);
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
-        if *self == 0 as Limb {
+        if *self == 0 {
             TwosComplementLimbIterator::Zero
         } else if self.sign {
             TwosComplementLimbIterator::Positive(self.abs.limbs(), false)
@@ -664,7 +664,7 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     fn negative_limbs(&self) -> NegativeLimbIterator {
-        assert_ne!(*self, 0 as Limb, "Cannot get negative limbs of 0.");
+        assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
         NegativeLimbIterator {
             limbs: self.limbs(),
             first_nonzero_index: None,

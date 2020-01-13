@@ -1064,7 +1064,7 @@ fn mod_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder > Integer::ZERO) == (*y > Integer::ZERO));
+    assert!(remainder == 0 || (remainder > 0) == (*y > 0));
 
     assert_eq!((-x).mod_op(y), -x.ceiling_mod(y));
     assert_eq!(x.mod_op(-y), x.ceiling_mod(y));
@@ -1089,18 +1089,18 @@ fn mod_properties() {
     );
 
     test_properties(integers, |x| {
-        assert_eq!(x.mod_op(Integer::ONE), Integer::ZERO);
-        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), Integer::ZERO);
+        assert_eq!(x.mod_op(Integer::ONE), 0);
+        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
     });
 
     test_properties(nonzero_integers, |x| {
-        assert_eq!(x.mod_op(Integer::ONE), Integer::ZERO);
-        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), Integer::ZERO);
-        assert_eq!(x.mod_op(x), Integer::ZERO);
-        assert_eq!(x.mod_op(-x), Integer::ZERO);
-        assert_eq!(Integer::ZERO.mod_op(x), Integer::ZERO);
-        if *x > Integer::ONE {
-            assert_eq!(Integer::ONE.mod_op(x), Integer::ONE);
+        assert_eq!(x.mod_op(Integer::ONE), 0);
+        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
+        assert_eq!(x.mod_op(x), 0);
+        assert_eq!(x.mod_op(-x), 0);
+        assert_eq!(Integer::ZERO.mod_op(x), 0);
+        if *x > 1 {
+            assert_eq!(Integer::ONE.mod_op(x), 1);
             assert_eq!(Integer::NEGATIVE_ONE.mod_op(x), x - Integer::ONE);
         }
     });
@@ -1142,7 +1142,7 @@ fn rem_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder > Integer::ZERO) == (*x > Integer::ZERO));
+    assert!(remainder == 0 || (remainder > 0) == (*x > 0));
 
     assert_eq!((-x) % y, -&remainder);
     assert_eq!(x % (-y), remainder);
@@ -1167,19 +1167,19 @@ fn rem_properties() {
     );
 
     test_properties(integers, |x| {
-        assert_eq!(x % Integer::ONE, Integer::ZERO);
-        assert_eq!(x % Integer::NEGATIVE_ONE, Integer::ZERO);
+        assert_eq!(x % Integer::ONE, 0);
+        assert_eq!(x % Integer::NEGATIVE_ONE, 0);
     });
 
     test_properties(nonzero_integers, |x| {
-        assert_eq!(x % Integer::ONE, Integer::ZERO);
-        assert_eq!(x % Integer::NEGATIVE_ONE, Integer::ZERO);
-        assert_eq!(x % x, Integer::ZERO);
-        assert_eq!(x % -x, Integer::ZERO);
-        assert_eq!(Integer::ZERO % x, Integer::ZERO);
-        if *x > Integer::ONE {
-            assert_eq!(Integer::ONE % x, Integer::ONE);
-            assert_eq!(Integer::NEGATIVE_ONE % x, Integer::NEGATIVE_ONE);
+        assert_eq!(x % Integer::ONE, 0);
+        assert_eq!(x % Integer::NEGATIVE_ONE, 0);
+        assert_eq!(x % x, 0);
+        assert_eq!(x % -x, 0);
+        assert_eq!(Integer::ZERO % x, 0);
+        if *x > 1 {
+            assert_eq!(Integer::ONE % x, 1);
+            assert_eq!(Integer::NEGATIVE_ONE % x, -1);
         }
     });
 }
@@ -1218,7 +1218,7 @@ fn ceiling_mod_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder >= Integer::ZERO) != (*y > Integer::ZERO));
+    assert!(remainder == 0 || (remainder >= 0) != (*y > 0));
 
     assert_eq!((-x).ceiling_mod(y), -x.mod_op(y));
     assert_eq!(x.ceiling_mod(-y), x.mod_op(y));
@@ -1238,15 +1238,15 @@ fn ceiling_mod_properties() {
     );
 
     test_properties(integers, |x| {
-        assert_eq!(x.ceiling_mod(Integer::ONE), Integer::ZERO);
-        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), Integer::ZERO);
+        assert_eq!(x.ceiling_mod(Integer::ONE), 0);
+        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
     });
 
     test_properties(nonzero_integers, |x| {
-        assert_eq!(x.ceiling_mod(Integer::ONE), Integer::ZERO);
-        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), Integer::ZERO);
-        assert_eq!(x.ceiling_mod(x), Integer::ZERO);
-        assert_eq!(x.ceiling_mod(-x), Integer::ZERO);
-        assert_eq!(Integer::ZERO.ceiling_mod(x), Integer::ZERO);
+        assert_eq!(x.ceiling_mod(Integer::ONE), 0);
+        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
+        assert_eq!(x.ceiling_mod(x), 0);
+        assert_eq!(x.ceiling_mod(-x), 0);
+        assert_eq!(Integer::ZERO.ceiling_mod(x), 0);
     });
 }

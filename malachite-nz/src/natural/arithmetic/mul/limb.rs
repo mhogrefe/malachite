@@ -209,14 +209,14 @@ pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 
 impl Natural {
     pub(crate) fn mul_assign_limb(&mut self, other: Limb) {
-        if *self == 0 as Limb || other == 0 {
+        if *self == 0 || other == 0 {
             *self = Natural::ZERO;
             return;
         }
         if other == 1 {
             return;
         }
-        if *self == 1 as Limb {
+        if *self == 1 {
             *self = Natural::from(other);
             return;
         }
@@ -226,7 +226,7 @@ impl Natural {
     }
 
     pub(crate) fn mul_limb_ref(&self, other: Limb) -> Natural {
-        if *self == 0 as Limb || other == 0 {
+        if *self == 0 || other == 0 {
             return Natural::ZERO;
         }
         if other == 1 {

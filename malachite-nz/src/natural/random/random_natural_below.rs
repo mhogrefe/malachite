@@ -4,7 +4,6 @@ use rand::Rng;
 
 use natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use natural::Natural;
-use platform::Limb;
 
 /// Returns a random `Natural` uniformly sampled from [0, `n`).
 ///
@@ -34,7 +33,7 @@ use platform::Limb;
 /// assert_eq!(random_natural_below(&mut rng, &Natural::trillion()).to_string(), "525916362607");
 /// ```
 pub fn random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
-    assert_ne!(*n, 0 as Limb, "Cannot generate a Natural below 0");
+    assert_ne!(*n, 0, "Cannot generate a Natural below 0");
     if n.is_power_of_two() {
         random_natural_up_to_bits(rng, n.significant_bits() - 1)
     } else {

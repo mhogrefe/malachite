@@ -316,7 +316,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
             self / other
         } else {
             let (q, r) = self.div_mod(&other);
-            if r == 0 as Limb {
+            if r == 0 {
                 q
             } else {
                 match rm {
@@ -404,7 +404,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
             self / other
         } else {
             let (q, r) = self.div_mod(other);
-            if r == 0 as Limb {
+            if r == 0 {
                 q
             } else {
                 match rm {
@@ -482,7 +482,7 @@ impl DivRoundAssign<Natural> for Natural {
             *self /= other;
         } else {
             let r = self.div_assign_mod(&other);
-            if r != 0 as Limb {
+            if r != 0 {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
                         self.increment();
@@ -560,7 +560,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
             *self /= other;
         } else {
             let r = self.div_assign_mod(other);
-            if r != 0 as Limb {
+            if r != 0 {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
                         self.increment();

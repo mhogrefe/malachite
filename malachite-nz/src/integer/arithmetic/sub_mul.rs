@@ -594,7 +594,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
         } else {
             let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, &c.abs);
             Integer {
-                sign: (self.sign == abs_result_sign) || abs == 0 as Limb,
+                sign: (self.sign == abs_result_sign) || abs == 0,
                 abs,
             }
         }

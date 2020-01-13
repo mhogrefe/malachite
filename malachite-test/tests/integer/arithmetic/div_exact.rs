@@ -319,7 +319,7 @@ fn div_exact_properties() {
     });
 
     test_properties(nonzero_integers, |n| {
-        assert_eq!(Integer::ZERO.div_exact(n), Integer::ZERO);
-        assert_eq!(n.div_exact(n), Integer::ONE);
+        assert_eq!(Integer::ZERO.div_exact(n), 0);
+        assert_eq!(n.div_exact(n), 1);
     });
 }

@@ -10,7 +10,7 @@ use platform::Limb;
 
 impl Natural {
     fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             Some(self.clone())
         } else if c == 1 {
             self.checked_sub(b)
@@ -240,7 +240,7 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
 
 impl Natural {
     fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
-        if c == 0 || b == 0 as Limb {
+        if c == 0 || b == 0 {
             false
         } else if c == 1 {
             self.sub_assign_no_panic(b)
@@ -266,7 +266,7 @@ impl Natural {
     }
 
     fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             false
         } else if c == 1 {
             self.sub_assign_ref_no_panic(b)

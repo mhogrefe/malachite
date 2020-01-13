@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
 
@@ -47,7 +46,7 @@ fn neg_properties() {
         assert_eq!(bigint_to_integer(&neg_num(natural_to_biguint(x))), neg);
 
         assert_eq!(-Integer::from(x), neg);
-        assert_eq!(neg == *x, *x == 0 as Limb);
+        assert_eq!(neg == *x, *x == 0);
         assert_eq!(-neg, *x);
     });
 }

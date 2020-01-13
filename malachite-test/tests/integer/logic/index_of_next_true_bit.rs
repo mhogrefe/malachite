@@ -6,7 +6,7 @@ use malachite_base::num::logic::traits::{BitAccess, BitScan};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use malachite_test::common::integer_to_rug_integer;
@@ -113,7 +113,7 @@ fn index_of_next_true_bit_properties() {
                 .map(|u| u64::from(u)),
             result
         );
-        assert_eq!(result.is_some(), n >> u != 0 as Limb);
+        assert_eq!(result.is_some(), n >> u != 0);
         if let Some(result) = result {
             assert!(result >= u);
             assert!(n.get_bit(result));

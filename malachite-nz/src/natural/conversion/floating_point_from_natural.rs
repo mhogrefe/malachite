@@ -16,7 +16,6 @@ use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::Limb;
 
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {
@@ -75,7 +74,7 @@ macro_rules! float_impls {
         /// ```
         impl RoundingFrom<Natural> for $f {
             fn rounding_from(mut value: Natural, rm: RoundingMode) -> $f {
-                if value == 0 as Limb {
+                if value == 0 {
                     return 0.0;
                 }
                 if $gt_max_finite_float(&value) {
@@ -138,7 +137,7 @@ macro_rules! float_impls {
         /// ```
         impl<'a> RoundingFrom<&'a Natural> for $f {
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
-                if *value == 0 as Limb {
+                if *value == 0 {
                     return 0.0;
                 }
                 if $gt_max_finite_float(value) {
@@ -249,7 +248,7 @@ macro_rules! float_impls {
         /// ```
         impl CheckedFrom<Natural> for $f {
             fn checked_from(mut value: Natural) -> Option<$f> {
-                if value == 0 as Limb {
+                if value == 0 {
                     return Some(0.0);
                 }
                 if $gt_max_finite_float(&value) {
@@ -295,7 +294,7 @@ macro_rules! float_impls {
         /// ```
         impl<'a> CheckedFrom<&'a Natural> for $f {
             fn checked_from(value: &'a Natural) -> Option<$f> {
-                if *value == 0 as Limb {
+                if *value == 0 {
                     return Some(0.0);
                 }
                 if $gt_max_finite_float(value) {
@@ -369,7 +368,7 @@ macro_rules! float_impls {
         /// ```
         impl<'a> ConvertibleFrom<&'a Natural> for $f {
             fn convertible_from(value: &'a Natural) -> bool {
-                if *value == 0 as Limb {
+                if *value == 0 {
                     return true;
                 }
                 if $gt_max_finite_float(&value) {

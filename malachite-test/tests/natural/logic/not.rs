@@ -2,11 +2,11 @@ use std::str::FromStr;
 
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use rug;
 
-use malachite_test::common::test_properties;
-use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer};
+use malachite_test::common::{natural_to_rug_integer, rug_integer_to_integer, test_properties};
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_3, vecs_of_unsigned};
 use malachite_test::inputs::natural::naturals;
 
@@ -109,7 +109,7 @@ fn not_properties() {
         assert!(not_alt.is_valid());
         assert_eq!(not_alt, not);
 
-        assert!(not < 0 as Limb);
+        assert!(not < 0);
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
     });

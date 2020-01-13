@@ -350,7 +350,7 @@ fn twos_complement_limbs_properties() {
         } else {
             assert_eq!(
                 n.twos_complement_limbs().get(u),
-                if *n >= 0 as Limb { 0 } else { Limb::MAX }
+                if *n >= 0 { 0 } else { Limb::MAX }
             );
         }
     });

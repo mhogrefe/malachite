@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
 
@@ -59,7 +59,7 @@ fn neg_properties() {
             negative
         );
 
-        assert_eq!(negative == *x, *x == 0 as Limb);
+        assert_eq!(negative == *x, *x == 0);
         assert_eq!(-negative, *x);
     });
 

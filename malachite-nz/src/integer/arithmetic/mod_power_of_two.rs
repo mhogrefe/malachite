@@ -5,7 +5,6 @@ use malachite_base::num::arithmetic::traits::{
 
 use integer::Integer;
 use natural::Natural;
-use platform::Limb;
 
 impl ModPowerOfTwo for Integer {
     type Output = Natural;
@@ -145,7 +144,7 @@ impl RemPowerOfTwo for Integer {
     fn rem_power_of_two(self, other: u64) -> Integer {
         let abs_rem = self.abs.mod_power_of_two(other);
         Integer {
-            sign: self.sign || abs_rem == 0 as Limb,
+            sign: self.sign || abs_rem == 0,
             abs: abs_rem,
         }
     }
@@ -181,7 +180,7 @@ impl<'a> RemPowerOfTwo for &'a Integer {
     fn rem_power_of_two(self, other: u64) -> Integer {
         let abs_rem = (&self.abs).mod_power_of_two(other);
         Integer {
-            sign: self.sign || abs_rem == 0 as Limb,
+            sign: self.sign || abs_rem == 0,
             abs: abs_rem,
         }
     }
@@ -219,7 +218,7 @@ impl RemPowerOfTwoAssign for Integer {
     /// ```
     fn rem_power_of_two_assign(&mut self, other: u64) {
         self.abs.mod_power_of_two_assign(other);
-        if self.abs == 0 as Limb {
+        if self.abs == 0 {
             self.sign = true;
         }
     }
@@ -256,7 +255,7 @@ impl CeilingModPowerOfTwo for Integer {
             self.abs.mod_power_of_two(other)
         };
         Integer {
-            sign: abs_mod == 0 as Limb,
+            sign: abs_mod == 0,
             abs: abs_mod,
         }
     }
@@ -293,7 +292,7 @@ impl<'a> CeilingModPowerOfTwo for &'a Integer {
             (&self.abs).mod_power_of_two(other)
         };
         Integer {
-            sign: abs_mod == 0 as Limb,
+            sign: abs_mod == 0,
             abs: abs_mod,
         }
     }
@@ -331,6 +330,6 @@ impl CeilingModPowerOfTwoAssign for Integer {
         } else {
             self.abs.mod_power_of_two_assign(other)
         };
-        self.sign = self.abs == 0 as Limb;
+        self.sign = self.abs == 0;
     }
 }

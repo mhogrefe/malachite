@@ -144,14 +144,14 @@ fn saturating_sub_mul_properties() {
     });
 
     test_properties(naturals, |n| {
-        assert_eq!(n.saturating_sub_mul(n, &Natural::ONE), Natural::ZERO);
+        assert_eq!(n.saturating_sub_mul(n, &Natural::ONE), 0);
     });
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
-        assert_eq!(Natural::ZERO.saturating_sub_mul(a, b), Natural::ZERO);
+        assert_eq!(Natural::ZERO.saturating_sub_mul(a, b), 0);
         assert_eq!(a.saturating_sub_mul(&Natural::ZERO, b), *a);
         assert_eq!(a.saturating_sub_mul(b, &Natural::ZERO), *a);
-        assert_eq!((a * b).saturating_sub_mul(a, b), Natural::ZERO);
+        assert_eq!((a * b).saturating_sub_mul(a, b), 0);
         assert_eq!(a.saturating_sub_mul(&Natural::ONE, b), a.saturating_sub(b));
         assert_eq!(a.saturating_sub_mul(b, &Natural::ONE), a.saturating_sub(b));
     });

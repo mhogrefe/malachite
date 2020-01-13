@@ -12,7 +12,7 @@ impl Integer {
         if other == 0 {
             return;
         }
-        if *self == 0 as Limb {
+        if *self == 0 {
             *self = Integer::from(other);
             return;
         }
@@ -176,9 +176,9 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     fn add(self, other: &'a Integer) -> Integer {
         if self as *const Integer == other as *const Integer {
             self << 1
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             other.clone()
-        } else if *other == 0 as Limb {
+        } else if *other == 0 {
             self.clone()
         } else {
             match (self, other) {
@@ -192,7 +192,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
                         sign: sy,
                         abs: ref ay,
                     },
-                ) if sx == (sy && *ay != 0 as Limb) => Integer {
+                ) if sx == (sy && *ay != 0) => Integer {
                     sign: sx,
                     abs: ax + ay,
                 },
@@ -248,9 +248,9 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 /// ```
 impl AddAssign<Integer> for Integer {
     fn add_assign(&mut self, mut other: Integer) {
-        if other == 0 as Limb {
+        if other == 0 {
             return;
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = other;
             return;
         }
@@ -261,7 +261,7 @@ impl AddAssign<Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0 as Limb) => 0,
+            ) if sx == (sy && *ay != 0) => 0,
             (
                 &mut Integer {
                     sign: sx,
@@ -310,9 +310,9 @@ impl AddAssign<Integer> for Integer {
 /// ```
 impl<'a> AddAssign<&'a Integer> for Integer {
     fn add_assign(&mut self, other: &'a Integer) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             return;
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = other.clone();
             return;
         }
@@ -323,7 +323,7 @@ impl<'a> AddAssign<&'a Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0 as Limb) => 0,
+            ) if sx == (sy && *ay != 0) => 0,
             (
                 &mut Integer {
                     sign: sx,

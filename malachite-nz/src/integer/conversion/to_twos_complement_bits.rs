@@ -6,7 +6,6 @@ use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 use integer::Integer;
 use natural::conversion::to_bits::BitIterator;
 use natural::Natural;
-use platform::Limb;
 
 /// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
 /// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
@@ -523,7 +522,7 @@ impl Integer {
     ///     vec![true, false, false, true, false, true, true, true]);
     /// ```
     pub fn twos_complement_bits(&self) -> TwosComplementBitIterator {
-        if *self == 0 as Limb {
+        if *self == 0 {
             TwosComplementBitIterator::Zero
         } else if self.sign {
             TwosComplementBitIterator::Positive(self.abs.bits(), false)
@@ -543,7 +542,7 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     fn negative_bits(&self) -> NegativeBitIterator {
-        assert_ne!(*self, 0 as Limb, "Cannot get negative bits of 0.");
+        assert_ne!(*self, 0, "Cannot get negative bits of 0.");
         let bits = self.bits();
         NegativeBitIterator {
             bits,

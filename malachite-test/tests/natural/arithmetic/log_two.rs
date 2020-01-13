@@ -133,9 +133,8 @@ fn floor_log_two_properties() {
         assert_eq!(*x <= Limb::MAX, floor_log_two < u64::from(Limb::WIDTH));
         assert_eq!(floor_log_two, x.significant_bits() - 1);
         assert_eq!(floor_log_two, limbs_floor_log_two(&x.to_limbs_asc()));
-        let n = floor_log_two as Limb;
-        assert!(Natural::ONE << n <= *x);
-        assert!(*x < Natural::ONE << (n + 1));
+        assert!(Natural::ONE << floor_log_two <= *x);
+        assert!(*x < Natural::ONE << (floor_log_two + 1));
     });
 
     test_properties(positive_unsigneds::<Limb>, |&u| {
@@ -149,11 +148,10 @@ fn ceiling_log_two_properties() {
         let ceiling_log_two = x.ceiling_log_two();
         assert_eq!(*x <= Limb::MAX, ceiling_log_two <= u64::from(Limb::WIDTH));
         assert_eq!(ceiling_log_two, limbs_ceiling_log_two(&x.to_limbs_asc()));
-        let n = ceiling_log_two as Limb;
-        if n != 0 {
-            assert!(Natural::ONE << (n - 1) < *x);
+        if ceiling_log_two != 0 {
+            assert!(Natural::ONE << (ceiling_log_two - 1) < *x);
         }
-        assert!(*x <= Natural::ONE << n);
+        assert!(*x <= Natural::ONE << ceiling_log_two);
     });
 
     test_properties(positive_unsigneds::<Limb>, |&u| {

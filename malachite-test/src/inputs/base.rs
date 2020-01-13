@@ -382,6 +382,18 @@ pub fn pairs_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
     pairs_of_unsigneds_var_2_with_seed(gm, &EXAMPLE_SEED)
 }
 
+pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_triples_from_single(exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
+            special_random_unsigned(&EXAMPLE_SEED),
+        )),
+    }
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -391,6 +403,20 @@ where
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(exhaustive_signed())),
         GenerationMode::Random(_) => Box::new(random_pairs_from_single(random(&EXAMPLE_SEED))),
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs_from_single(
+            special_random_signed(&EXAMPLE_SEED),
+        )),
+    }
+}
+
+pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(exhaustive_signed())),
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
             special_random_signed(&EXAMPLE_SEED),
         )),
     }
@@ -426,7 +452,7 @@ pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
 
 // All `Limb`s smaller than 2<sup>Limb::WIDTH - 1<sup>.
 fn limbs_range_2(gm: GenerationMode) -> It<Limb> {
-    let upper = (1 as Limb) << (Limb::WIDTH - 1);
+    let upper = 1 << (Limb::WIDTH - 1);
     match gm {
         GenerationMode::Exhaustive => Box::new(range_down_increasing(upper)),
         GenerationMode::Random(_) => Box::new(random_range_down(&EXAMPLE_SEED, upper)),
@@ -1150,7 +1176,7 @@ pub fn pairs_of_limb_vec_var_9(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)>
             special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2),
         )),
     };
-    Box::new(qs.filter(|(n, d)| *d.last().unwrap() != Limb::ZERO && n.len() >= d.len()))
+    Box::new(qs.filter(|(n, d)| *d.last().unwrap() != 0 && n.len() >= d.len()))
 }
 
 // All pairs of `Vec<T>`, where `T` is unsigned and `ns` and `ds` meet the preconditions of
@@ -1232,9 +1258,11 @@ pub fn pairs_of_limb_vec_var_14(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)
             special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2),
         )),
     };
-    Box::new(qs.filter(|(n, d)| {
-        *n.last().unwrap() != Limb::ZERO && *d.last().unwrap() != Limb::ZERO && n.len() >= d.len()
-    }))
+    Box::new(
+        qs.filter(|(n, d)| {
+            *n.last().unwrap() != 0 && *d.last().unwrap() != 0 && n.len() >= d.len()
+        }),
+    )
 }
 
 // All triples of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact` and
@@ -2108,7 +2136,7 @@ pub fn triples_of_limb_vec_var_43(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
         )),
     };
     Box::new(ts.filter(|(q, n, d)| {
-        *d.last().unwrap() != Limb::ZERO && n.len() >= d.len() && q.len() >= n.len() - d.len() + 1
+        *d.last().unwrap() != 0 && n.len() >= d.len() && q.len() >= n.len() - d.len() + 1
     }))
 }
 
@@ -2134,9 +2162,9 @@ pub fn triples_of_limb_vec_var_45(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             special_random_unsigned_vecs_min_length(&EXAMPLE_SEED, scale, 2),
         )),
     };
-    Box::new(ts.filter(|(r, n, d)| {
-        *d.last().unwrap() != Limb::ZERO && n.len() >= d.len() && r.len() >= d.len()
-    }))
+    Box::new(
+        ts.filter(|(r, n, d)| *d.last().unwrap() != 0 && n.len() >= d.len() && r.len() >= d.len()),
+    )
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
@@ -2530,7 +2558,7 @@ const PRIME_FACTORS_OF_LIMB_MAX: &[Limb] = &[3, 5, 17, 257, 641, 65_537, 6_700_4
 // TODO use a more generic solution
 fn factors_of_limb_max() -> Vec<Limb> {
     let mut factors = Vec::new();
-    for i in (0 as Limb)..(1 << PRIME_FACTORS_OF_LIMB_MAX.len()) {
+    for i in Limb::ZERO..(1 << PRIME_FACTORS_OF_LIMB_MAX.len()) {
         let mut factor = 1;
         for (index, bit) in Natural::from(i).bits().enumerate() {
             if bit {
@@ -2612,7 +2640,7 @@ pub fn quadruples_of_limb_vec_var_2(
         )),
     };
     Box::new(qs.filter(|(q, r, n, d)| {
-        *d.last().unwrap() != Limb::ZERO
+        *d.last().unwrap() != 0
             && r.len() >= d.len()
             && n.len() >= d.len()
             && q.len() >= n.len() - d.len() + 1

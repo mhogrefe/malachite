@@ -7,7 +7,10 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
-use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds, signeds, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signeds, pairs_of_unsigneds, signeds, triples_of_signeds, triples_of_unsigneds,
+    unsigneds,
+};
 
 fn properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigneds::<T>, |&(x, y)| {
@@ -29,6 +32,14 @@ fn properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         assert!(!x.gt_abs(&x));
         assert!(x.le_abs(&T::MAX));
         assert!(x.ge_abs(&T::ZERO));
+    });
+
+    test_properties(triples_of_unsigneds::<T>, |&(i, j, k)| {
+        if i < j && j < k {
+            assert!(i < k);
+        } else if i > j && j > k {
+            assert!(i > k);
+        }
     });
 }
 
@@ -65,6 +76,14 @@ where
         assert!(!x.gt_abs(&x));
         assert!(x.le_abs(&T::MIN));
         assert!(x.ge_abs(&T::ZERO));
+    });
+
+    test_properties(triples_of_signeds::<T>, |&(i, j, k)| {
+        if i < j && j < k {
+            assert!(i < k);
+        } else if i > j && j > k {
+            assert!(i > k);
+        }
     });
 }
 

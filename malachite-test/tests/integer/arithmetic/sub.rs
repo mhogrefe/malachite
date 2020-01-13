@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
+use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use num::BigInt;
 use rug;
 
@@ -110,7 +110,7 @@ fn sub_properties() {
         assert_eq!(x - Integer::ZERO, *x);
         assert_eq!(Integer::ZERO - x, -x);
         assert_eq!(x - -x, x << 1);
-        assert_eq!(x - x, 0 as Limb)
+        assert_eq!(x - x, 0)
     });
 
     test_properties(pairs_of_naturals_var_1, |&(ref x, ref y)| {

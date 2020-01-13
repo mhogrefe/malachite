@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
+use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use num::BigInt;
 use rug;
 
@@ -150,8 +150,8 @@ fn mul_properties() {
 
     #[allow(unknown_lints, erasing_op)]
     test_properties(integers, |x| {
-        assert_eq!(x * Integer::ZERO, 0 as Limb);
-        assert_eq!(Integer::ZERO * x, 0 as Limb);
+        assert_eq!(x * Integer::ZERO, 0);
+        assert_eq!(Integer::ZERO * x, 0);
         assert_eq!(x * Integer::ONE, *x);
         assert_eq!(Integer::ONE * x, *x);
         assert_eq!(x * Integer::NEGATIVE_ONE, -x);

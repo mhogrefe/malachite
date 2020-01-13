@@ -685,7 +685,7 @@ impl Natural {
         if other == 0 {
             return;
         }
-        if *self == 0 as Limb {
+        if *self == 0 {
             *self = Natural::from(other);
             return;
         }

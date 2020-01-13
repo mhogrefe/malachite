@@ -1,13 +1,12 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
 
 pub fn integer_trailing_zeros_alt(n: &Integer) -> Option<u64> {
-    if *n == 0 as Limb {
+    if *n == 0 {
         None
     } else {
         Some(u64::wrapping_from(

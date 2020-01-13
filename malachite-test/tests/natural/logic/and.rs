@@ -435,8 +435,8 @@ fn and_properties() {
     });
 
     test_properties(naturals, |x| {
-        assert_eq!(x & Natural::ZERO, 0 as Limb);
-        assert_eq!(Natural::ZERO & x, 0 as Limb);
+        assert_eq!(x & Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO & x, 0);
         assert_eq!(x & x, *x);
     });
 

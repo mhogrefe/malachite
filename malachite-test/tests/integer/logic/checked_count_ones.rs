@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::natural_signeds;
@@ -44,7 +44,7 @@ fn checked_count_ones_properties() {
         let ones = x.checked_count_ones();
         assert_eq!(integer_checked_count_ones_alt_1(x), ones);
         assert_eq!(integer_checked_count_ones_alt_2(x), ones);
-        assert_eq!(ones == Some(0), *x == 0 as Limb);
+        assert_eq!(ones == Some(0), *x == 0);
         assert_eq!((!x).checked_count_zeros(), ones);
     });
 

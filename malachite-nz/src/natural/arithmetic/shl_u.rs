@@ -274,7 +274,7 @@ macro_rules! impl_natural_shl_unsigned {
             type Output = Natural;
 
             fn shl(self, other: $t) -> Natural {
-                if other == 0 || *self == 0 as Limb {
+                if other == 0 || *self == 0 {
                     return self.clone();
                 }
                 Natural(match *self {
@@ -312,7 +312,7 @@ macro_rules! impl_natural_shl_unsigned {
         /// ```
         impl ShlAssign<$t> for Natural {
             fn shl_assign(&mut self, other: $t) {
-                if other == 0 || *self == 0 as Limb {
+                if other == 0 || *self == 0 {
                     return;
                 }
                 //TODO use TrueCheckedShl

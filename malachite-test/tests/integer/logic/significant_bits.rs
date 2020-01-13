@@ -52,7 +52,7 @@ fn significant_bits_properties() {
             x_abs <= Limb::MAX,
             significant_bits <= u64::from(Limb::WIDTH)
         );
-        if x_abs != 0 as Limb {
+        if x_abs != 0 {
             assert!(Natural::ONE << (significant_bits - 1) <= x_abs);
             assert!(x_abs < Natural::ONE << significant_bits);
         }

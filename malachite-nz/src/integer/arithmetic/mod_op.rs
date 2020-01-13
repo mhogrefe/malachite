@@ -3,10 +3,8 @@ use std::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
 };
-use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
-use natural::Natural;
 
 impl Mod<Integer> for Integer {
     type Output = Integer;
@@ -242,7 +240,7 @@ impl ModAssign<Integer> for Integer {
         } else {
             self.abs.neg_mod_assign(other.abs);
         };
-        self.sign = other.sign || self.abs == Natural::ZERO;
+        self.sign = other.sign || self.abs == 0;
     }
 }
 
@@ -294,7 +292,7 @@ impl<'a> ModAssign<&'a Integer> for Integer {
         } else {
             self.abs.neg_mod_assign(&other.abs);
         };
-        self.sign = other.sign || self.abs == Natural::ZERO;
+        self.sign = other.sign || self.abs == 0;
     }
 }
 
@@ -503,7 +501,7 @@ impl RemAssign<Integer> for Integer {
     #[inline]
     fn rem_assign(&mut self, other: Integer) {
         self.abs %= other.abs;
-        self.sign = self.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign || self.abs == 0;
     }
 }
 
@@ -548,7 +546,7 @@ impl<'a> RemAssign<&'a Integer> for Integer {
     #[inline]
     fn rem_assign(&mut self, other: &'a Integer) {
         self.abs %= &other.abs;
-        self.sign = self.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign || self.abs == 0;
     }
 }
 
@@ -787,7 +785,7 @@ impl CeilingModAssign<Integer> for Integer {
         } else {
             self.abs %= other.abs;
         };
-        self.sign = !other.sign || self.abs == Natural::ZERO;
+        self.sign = !other.sign || self.abs == 0;
     }
 }
 
@@ -839,6 +837,6 @@ impl<'a> CeilingModAssign<&'a Integer> for Integer {
         } else {
             self.abs %= &other.abs;
         };
-        self.sign = !other.sign || self.abs == Natural::ZERO;
+        self.sign = !other.sign || self.abs == 0;
     }
 }

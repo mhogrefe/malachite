@@ -3,7 +3,6 @@ use std::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 
 use integer::Integer;
-use platform::Limb;
 
 impl Sign for Integer {
     /// Returns the sign of an `Integer`. Interpret the result as the result of a comparison to
@@ -29,7 +28,7 @@ impl Sign for Integer {
     /// ```
     fn sign(&self) -> Ordering {
         if self.sign {
-            if self.abs == 0 as Limb {
+            if self.abs == 0 {
                 Ordering::Equal
             } else {
                 Ordering::Greater

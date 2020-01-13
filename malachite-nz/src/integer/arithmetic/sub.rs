@@ -15,7 +15,7 @@ impl Integer {
         if other == 0 {
             return;
         }
-        if *self == 0 as Limb {
+        if *self == 0 {
             *self = -Natural::from(other);
             return;
         }
@@ -172,9 +172,9 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     fn sub(self, other: &'a Integer) -> Integer {
         if self as *const Integer == other as *const Integer {
             Integer::ZERO
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             -other.clone()
-        } else if *other == 0 as Limb {
+        } else if *other == 0 {
             self.clone()
         } else {
             match (self, other) {
@@ -188,7 +188,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
                         sign: sy,
                         abs: ref ay,
                     },
-                ) if sx == (!sy && *ay != 0 as Limb) => Integer {
+                ) if sx == (!sy && *ay != 0) => Integer {
                     sign: sx,
                     abs: ax + ay,
                 },
@@ -244,9 +244,9 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 /// ```
 impl SubAssign<Integer> for Integer {
     fn sub_assign(&mut self, mut other: Integer) {
-        if other == 0 as Limb {
+        if other == 0 {
             return;
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = other;
             self.neg_assign();
             return;
@@ -258,7 +258,7 @@ impl SubAssign<Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (!sy && *ay != 0 as Limb) => 0,
+            ) if sx == (!sy && *ay != 0) => 0,
             (
                 &mut Integer {
                     sign: sx,
@@ -308,9 +308,9 @@ impl SubAssign<Integer> for Integer {
 /// ```
 impl<'a> SubAssign<&'a Integer> for Integer {
     fn sub_assign(&mut self, other: &'a Integer) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             return;
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = -other.clone();
             return;
         }
@@ -321,7 +321,7 @@ impl<'a> SubAssign<&'a Integer> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (!sy && *ay != 0 as Limb) => 0,
+            ) if sx == (!sy && *ay != 0) => 0,
             (
                 &mut Integer {
                     sign: sx,

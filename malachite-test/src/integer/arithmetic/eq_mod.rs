@@ -1,7 +1,6 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::arithmetic::eq_mod::{
@@ -446,10 +445,7 @@ fn benchmark_integer_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_na
             (
                 "Integer == Integer || Integer != 0 && Integer % Natural == Integer % Natural",
                 &mut (|(x, y, m)| {
-                    no_out!(
-                        x == y
-                            || m != Integer::ZERO && x.unsigned_abs() % &m == y.unsigned_abs() % m
-                    )
+                    no_out!(x == y || m != 0 && x.unsigned_abs() % &m == y.unsigned_abs() % m)
                 }),
             ),
             (

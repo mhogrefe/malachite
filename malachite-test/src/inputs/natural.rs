@@ -28,7 +28,8 @@ use rust_wheels::iterators::naturals::{
     special_random_positive_naturals, special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_signed, exhaustive_unsigned, special_random_signed, special_random_unsigned,
+    exhaustive_natural_signed, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
+    special_random_natural_signed, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -373,6 +374,31 @@ where
     )
 }
 
+pub fn pairs_of_natural_and_natural_signed<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            exhaustive_natural_signed(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_natural_signed(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_natural_signed(seed)),
+        )),
+    }
+}
+
 pub fn pairs_of_natural_and_positive_natural(gm: GenerationMode) -> It<(Natural, Natural)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
@@ -632,6 +658,57 @@ pub fn triples_of_unsigned_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
             &(|seed| special_random_unsigned(seed)),
             &(|seed| special_random_naturals(seed, scale)),
             &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn triples_of_natural_signed_and_natural<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, Natural)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_signed(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random(seed)),
+            &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
+pub fn triples_of_signed_natural_and_signed<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, Natural, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_signed(),
+            exhaustive_naturals(),
+            exhaustive_signed(),
+        )),
+        GenerationMode::Random(scale) => random_triples_of_primitive_natural_and_primitive(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_signed(seed)),
         )),
     }
 }

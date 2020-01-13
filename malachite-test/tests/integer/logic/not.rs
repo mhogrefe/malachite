@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use malachite_test::common::test_properties;
@@ -54,7 +54,7 @@ fn not_properties() {
 
         assert_ne!(not, *x);
         assert_eq!(!&not, *x);
-        assert_eq!(*x >= 0 as Limb, not < 0 as Limb);
+        assert_eq!(*x >= 0, not < 0);
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {

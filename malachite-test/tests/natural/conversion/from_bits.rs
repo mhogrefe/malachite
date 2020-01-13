@@ -266,7 +266,7 @@ fn from_bits_asc_properties() {
         if !bits.is_empty() && *bits.last().unwrap() {
             assert_eq!(x.to_bits_asc(), *bits);
         }
-        assert_eq!(bits.iter().all(|b| !b), x == 0 as Limb);
+        assert_eq!(bits.iter().all(|b| !b), x == 0);
     });
 }
 
@@ -289,6 +289,6 @@ fn from_bits_desc_properties() {
         if !bits.is_empty() && bits[0] {
             assert_eq!(x.to_bits_desc(), *bits);
         }
-        assert_eq!(bits.iter().all(|b| !b), x == 0 as Limb);
+        assert_eq!(bits.iter().all(|b| !b), x == 0);
     });
 }

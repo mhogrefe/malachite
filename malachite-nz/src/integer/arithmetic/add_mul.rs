@@ -172,7 +172,7 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
         } else {
             let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, &c.abs);
             Integer {
-                sign: (self.sign == abs_result_sign) || abs == 0 as Limb,
+                sign: (self.sign == abs_result_sign) || abs == 0,
                 abs,
             }
         }
@@ -211,7 +211,7 @@ impl AddMulAssign<Integer, Integer> for Integer {
             self.abs.add_mul_assign(b.abs, c.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg(b.abs, c.abs);
-            self.sign = (self.sign == sign) || self.abs == 0 as Limb;
+            self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
@@ -248,7 +248,7 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
             self.abs.add_mul_assign(b.abs, &c.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_val_ref(b.abs, &c.abs);
-            self.sign = (self.sign == sign) || self.abs == 0 as Limb;
+            self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
@@ -285,7 +285,7 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
             self.abs.add_mul_assign(&b.abs, c.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_ref_val(&b.abs, c.abs);
-            self.sign = (self.sign == sign) || self.abs == 0 as Limb;
+            self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
@@ -322,7 +322,7 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
             self.abs.add_mul_assign(&b.abs, &c.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_ref_ref(&b.abs, &c.abs);
-            self.sign = (self.sign == sign) || self.abs == 0 as Limb;
+            self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
@@ -330,7 +330,7 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
 impl Natural {
     // self - b * c, returns sign (true means non-negative)
     fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             return (self.clone(), true);
         }
         if c == 1 {
@@ -357,7 +357,7 @@ impl Natural {
 
     // self -= b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
-        if c == 0 || b == 0 as Limb {
+        if c == 0 || b == 0 {
             return true;
         }
         if c == 1 {
@@ -395,7 +395,7 @@ impl Natural {
 
     // self -= &b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             return true;
         }
         if c == 1 {
@@ -469,7 +469,7 @@ impl Natural {
             self.add_mul_assign_limb_neg(c, small_b)
         } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_neg(b, small_c)
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
             false
         } else {
@@ -483,7 +483,7 @@ impl Natural {
             self.add_mul_assign_limb_neg_ref(c, small_b)
         } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_neg(b, small_c)
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
             false
         } else {
@@ -497,7 +497,7 @@ impl Natural {
             self.add_mul_assign_limb_neg(c, small_b)
         } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_neg_ref(b, small_c)
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
             false
         } else {
@@ -511,7 +511,7 @@ impl Natural {
             self.add_mul_assign_limb_neg_ref(c, small_b)
         } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_neg_ref(b, small_c)
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
             false
         } else {

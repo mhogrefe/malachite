@@ -1,5 +1,4 @@
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
@@ -101,7 +100,7 @@ fn from_twos_complement_bits_asc_properties() {
             ),
             x
         );
-        assert_eq!(bits.iter().all(|b| !b), x == 0 as Limb);
+        assert_eq!(bits.iter().all(|b| !b), x == 0);
     });
 }
 
@@ -116,6 +115,6 @@ fn from_twos_complement_limbs_desc_properties() {
             ),
             x
         );
-        assert_eq!(bits.iter().all(|b| !b), x == 0 as Limb);
+        assert_eq!(bits.iter().all(|b| !b), x == 0);
     });
 }

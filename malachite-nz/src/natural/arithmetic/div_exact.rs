@@ -1983,11 +1983,11 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// );
     /// ```
     fn div_exact(self, mut other: Natural) -> Natural {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
             self.clone()
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             Natural::ZERO
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
@@ -2054,11 +2054,11 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div_exact(self, other: &'b Natural) -> Natural {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
             self.clone()
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             Natural::ZERO
         } else if self as *const Natural == other as *const Natural {
             Natural::ONE
@@ -2122,10 +2122,10 @@ impl DivExactAssign<Natural> for Natural {
     /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: Natural) {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
-        } else if *self == 0 as Limb {
+        } else if other == 1 {
+        } else if *self == 0 {
             *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
@@ -2186,10 +2186,10 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: &'a Natural) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
-        } else if *self == 0 as Limb {
+        } else if *other == 1 {
+        } else if *self == 0 {
             *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");

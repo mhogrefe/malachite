@@ -42,10 +42,7 @@ fn test_divisible_by() {
 
         let x = Integer::from_str(u).unwrap();
         let y = Integer::from_str(v).unwrap();
-        assert_eq!(
-            x == Integer::ZERO || y != Integer::ZERO && x % y == Integer::ZERO,
-            divisible
-        );
+        assert_eq!(x == 0 || y != 0 && x % y == 0, divisible);
 
         assert_eq!(
             num_divisible_by(BigInt::from_str(u).unwrap(), BigInt::from_str(v).unwrap()),
@@ -384,10 +381,7 @@ fn divisible_by_properties() {
         assert_eq!(x.clone().divisible_by(y), divisible);
         assert_eq!(x.clone().divisible_by(y.clone()), divisible);
 
-        assert_eq!(
-            *x == Integer::ZERO || *y != Integer::ZERO && x % y == Integer::ZERO,
-            divisible
-        );
+        assert_eq!(*x == 0 || *y != 0 && x % y == 0, divisible);
         assert_eq!(
             num_divisible_by(integer_to_bigint(x), integer_to_bigint(y)),
             divisible
@@ -402,7 +396,7 @@ fn divisible_by_properties() {
         pairs_of_integer_and_nonzero_integer_var_1,
         |&(ref x, ref y)| {
             assert!(x.divisible_by(y));
-            assert!(*x == Integer::ZERO || *y != Integer::ZERO && x % y == Integer::ZERO);
+            assert!(*x == 0 || *y != 0 && x % y == 0);
             assert!(num_divisible_by(integer_to_bigint(x), integer_to_bigint(y)));
             assert!(integer_to_rug_integer(x).is_divisible(&integer_to_rug_integer(y)));
         },
@@ -412,7 +406,7 @@ fn divisible_by_properties() {
         pairs_of_integer_and_nonzero_integer_var_2,
         |&(ref x, ref y)| {
             assert!(!x.divisible_by(y));
-            assert!(*x != Integer::ZERO && (*y == Integer::ZERO || x * y != Integer::ZERO));
+            assert!(*x != 0 && (*y == 0 || x * y != 0));
             assert!(!num_divisible_by(
                 integer_to_bigint(x),
                 integer_to_bigint(y)
@@ -428,7 +422,7 @@ fn divisible_by_properties() {
     test_properties(nonzero_integers, |n| {
         assert!(!n.divisible_by(Integer::ZERO));
         assert!(Integer::ZERO.divisible_by(n));
-        if *n > Integer::ONE {
+        if *n > 1 {
             assert!(!Integer::ONE.divisible_by(n));
         }
         assert!(n.divisible_by(n));

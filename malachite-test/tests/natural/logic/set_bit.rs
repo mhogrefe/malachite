@@ -5,6 +5,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
@@ -131,7 +132,7 @@ fn set_bit_properties() {
 
         assert_eq!(n | (Natural::ONE << index), result);
 
-        assert_ne!(result, 0 as Limb);
+        assert_ne!(result, 0);
         assert!(result >= *n);
         if n.get_bit(index) {
             assert_eq!(result, *n);

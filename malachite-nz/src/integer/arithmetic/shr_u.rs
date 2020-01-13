@@ -5,7 +5,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
-use platform::Limb;
 
 macro_rules! impl_integer_shr_unsigned {
     ($t:ident) => {
@@ -74,7 +73,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref abs,
                     } => {
                         let abs_shifted = abs.shr_round(other, RoundingMode::Ceiling);
-                        if abs_shifted == 0 as Limb {
+                        if abs_shifted == 0 {
                             Integer::ZERO
                         } else {
                             Integer {
@@ -118,7 +117,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref mut abs,
                     } => {
                         abs.shr_round_assign(other, RoundingMode::Ceiling);
-                        if *abs == 0 as Limb {
+                        if *abs == 0 {
                             self.sign = true;
                         }
                     }
@@ -230,7 +229,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref abs,
                     } => {
                         let abs_shifted = abs.shr_round(other, -rm);
-                        if abs_shifted == 0 as Limb {
+                        if abs_shifted == 0 {
                             Integer::ZERO
                         } else {
                             Integer {
@@ -311,7 +310,7 @@ macro_rules! impl_integer_shr_unsigned {
                         ref mut abs,
                     } => {
                         abs.shr_round_assign(other, -rm);
-                        if *abs == 0 as Limb {
+                        if *abs == 0 {
                             self.sign = true;
                         }
                     }

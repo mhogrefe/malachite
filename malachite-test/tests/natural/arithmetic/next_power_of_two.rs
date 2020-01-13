@@ -170,7 +170,7 @@ fn next_power_of_two_properties() {
 
         assert!(result.is_power_of_two());
         assert!(result >= *n);
-        if *n != 0 as Limb {
+        if *n != 0 {
             assert!(&result >> 1 < *n);
             assert_eq!(Natural::ONE << n.ceiling_log_two(), result);
         }

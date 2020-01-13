@@ -10509,14 +10509,14 @@ fn mod_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n % Natural::ONE, 0 as Limb);
+        assert_eq!(n % Natural::ONE, 0);
     });
 
     test_properties(positive_naturals, |n| {
-        assert_eq!(n % n, 0 as Limb);
-        assert_eq!(Natural::ZERO % n, 0 as Limb);
-        if *n > 1 as Limb {
-            assert_eq!(Natural::ONE % n, 1 as Limb);
+        assert_eq!(n % n, 0);
+        assert_eq!(Natural::ZERO % n, 0);
+        if *n > 1 {
+            assert_eq!(Natural::ONE % n, 1);
         }
     });
 
@@ -10580,12 +10580,12 @@ fn neg_mod_properties() {
     );
 
     test_properties(naturals, |n| {
-        assert_eq!(n.neg_mod(Natural::ONE), 0 as Limb);
+        assert_eq!(n.neg_mod(Natural::ONE), 0);
     });
 
     test_properties(positive_naturals, |n| {
-        assert_eq!(n.neg_mod(n), 0 as Limb);
-        assert_eq!(Natural::ZERO.neg_mod(n), 0 as Limb);
+        assert_eq!(n.neg_mod(n), 0);
+        assert_eq!(Natural::ZERO.neg_mod(n), 0);
         assert_eq!(Natural::ONE.neg_mod(n), n - Natural::ONE);
     });
 

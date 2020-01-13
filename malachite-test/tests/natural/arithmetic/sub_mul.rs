@@ -649,13 +649,13 @@ fn sub_mul_properties() {
     });
 
     test_properties(naturals, |n| {
-        assert_eq!(n.sub_mul(n, &Natural::ONE), Natural::ZERO);
+        assert_eq!(n.sub_mul(n, &Natural::ONE), 0);
     });
 
     test_properties(pairs_of_naturals, |&(ref a, ref b)| {
         assert_eq!(a.sub_mul(&Natural::ZERO, b), *a);
         assert_eq!(a.sub_mul(b, &Natural::ZERO), *a);
-        assert_eq!((a * b).sub_mul(a, b), Natural::ZERO);
+        assert_eq!((a * b).sub_mul(a, b), 0);
     });
 
     test_properties(pairs_of_naturals_var_1, |&(ref a, ref b)| {

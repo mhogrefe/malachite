@@ -4,7 +4,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::small_unsigneds;
@@ -169,7 +168,7 @@ fn to_limbs_asc_properties() {
         let bits = x.to_bits_asc();
         assert_eq!(x.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_asc(&bits), *x);
-        if *x != 0 as Limb {
+        if *x != 0 {
             assert_ne!(*bits.last().unwrap(), false);
         }
     });
@@ -181,7 +180,7 @@ fn to_bits_desc_properties() {
         let bits = x.to_bits_desc();
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_desc(&bits), *x);
-        if *x != 0 as Limb {
+        if *x != 0 {
             assert_ne!(bits[0], false);
         }
     });

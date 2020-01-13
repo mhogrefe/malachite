@@ -7,7 +7,6 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 use num::BigInt;
 use rug;
 
@@ -133,7 +132,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
-                assert_eq!(Integer::ZERO << u, 0 as Limb);
+                assert_eq!(Integer::ZERO << u, 0);
                 assert!(Natural::exact_from(Integer::ONE << u).is_power_of_two());
             });
 

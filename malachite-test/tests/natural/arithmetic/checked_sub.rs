@@ -143,7 +143,7 @@ fn checked_sub_properties() {
     test_properties(naturals, |x| {
         assert_eq!(x.checked_sub(Natural::ZERO).as_ref(), Some(x));
         assert_eq!(x.checked_sub(x), Some(Natural::ZERO));
-        if *x != 0 as Limb {
+        if *x != 0 {
             assert!((Natural::ZERO.checked_sub(x)).is_none());
         }
     });

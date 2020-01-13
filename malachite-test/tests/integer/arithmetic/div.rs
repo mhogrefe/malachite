@@ -455,13 +455,13 @@ fn div_properties() {
     });
 
     test_properties(nonzero_integers, |x| {
-        assert_eq!(Integer::ZERO / x, Integer::ZERO);
+        assert_eq!(Integer::ZERO / x, 0);
         if *x > Integer::ONE {
-            assert_eq!(Integer::ONE / x, Integer::ZERO);
+            assert_eq!(Integer::ONE / x, 0);
         }
         assert_eq!(x / Integer::ONE, *x);
         assert_eq!(x / Integer::NEGATIVE_ONE, -x);
-        assert_eq!(x / x, Integer::ONE);
-        assert_eq!(x / -x, Integer::NEGATIVE_ONE);
+        assert_eq!(x / x, 1);
+        assert_eq!(x / -x, -1);
     });
 }

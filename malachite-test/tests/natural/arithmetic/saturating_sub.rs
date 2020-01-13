@@ -92,11 +92,11 @@ fn saturating_sub_properties() {
         assert!(difference_alt.is_valid());
 
         let reverse_difference = y.saturating_sub(x);
-        if difference > 0 as Limb {
-            assert_eq!(reverse_difference, 0 as Limb);
+        if difference > 0 {
+            assert_eq!(reverse_difference, 0);
         }
-        if reverse_difference > 0 as Limb {
-            assert_eq!(difference, 0 as Limb);
+        if reverse_difference > 0 {
+            assert_eq!(difference, 0);
         }
 
         assert!(difference <= *x);
@@ -113,7 +113,7 @@ fn saturating_sub_properties() {
     #[allow(unknown_lints, identity_op, eq_op)]
     test_properties(naturals, |x| {
         assert_eq!(x.saturating_sub(Natural::ZERO), *x);
-        assert_eq!(x.saturating_sub(x), Natural::ZERO);
-        assert_eq!(Natural::ZERO.saturating_sub(x), Natural::ZERO);
+        assert_eq!(x.saturating_sub(x), 0);
+        assert_eq!(Natural::ZERO.saturating_sub(x), 0);
     });
 }

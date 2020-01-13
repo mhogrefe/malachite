@@ -2,7 +2,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
@@ -10,7 +9,7 @@ use inputs::integer::pairs_of_integer_and_small_u64;
 
 pub fn integer_index_of_next_true_bit_alt(n: &Integer, u: u64) -> Option<u64> {
     if u >= n.significant_bits() {
-        if *n >= 0 as Limb {
+        if *n >= 0 {
             None
         } else {
             Some(u)

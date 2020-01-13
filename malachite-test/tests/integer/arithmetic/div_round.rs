@@ -1081,7 +1081,7 @@ fn div_round_properties() {
         pairs_of_integer_and_nonzero_integer_var_2,
         |&(ref x, ref y)| {
             let down = x.div_round(y, RoundingMode::Down);
-            let up = if (*x >= Integer::ZERO) == (*y >= Integer::ZERO) {
+            let up = if (*x >= 0) == (*y >= 0) {
                 &down + Integer::ONE
             } else {
                 &down - Integer::ONE
@@ -1103,10 +1103,10 @@ fn div_round_properties() {
     test_properties(
         pairs_of_nonzero_integer_and_rounding_mode,
         |&(ref x, rm)| {
-            assert_eq!(Integer::ZERO.div_round(x, rm), Integer::ZERO);
-            assert_eq!(x.div_round(x, rm), Integer::ONE);
-            assert_eq!(x.div_round(-x, rm), Integer::NEGATIVE_ONE);
-            assert_eq!((-x).div_round(x, rm), Integer::NEGATIVE_ONE);
+            assert_eq!(Integer::ZERO.div_round(x, rm), 0);
+            assert_eq!(x.div_round(x, rm), 1);
+            assert_eq!(x.div_round(-x, rm), -1);
+            assert_eq!((-x).div_round(x, rm), -1);
         },
     );
 }

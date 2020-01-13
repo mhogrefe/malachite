@@ -1993,9 +1993,9 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// );
     /// ```
     fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
             (self.clone(), Natural::ZERO)
         } else if self.limb_count() < other.limb_count() {
             (Natural::ZERO, self.clone())
@@ -2060,9 +2060,9 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div_mod(self, other: &'b Natural) -> (Natural, Natural) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
             (self.clone(), Natural::ZERO)
         } else if self as *const Natural == other as *const Natural {
             (Natural::ONE, Natural::ZERO)
@@ -2123,9 +2123,9 @@ impl DivAssignMod<Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
             Natural::ZERO
         } else if self.limb_count() < other.limb_count() {
             let mut r = Natural::ZERO;
@@ -2187,9 +2187,9 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, other: &'a Natural) -> Natural {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
             Natural::ZERO
         } else if self.limb_count() < other.limb_count() {
             let mut r = Natural::ZERO;
@@ -2621,7 +2621,7 @@ impl<'a> CeilingDivNegMod<Natural> for &'a Natural {
     /// ```
     fn ceiling_div_neg_mod(self, other: Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(&other);
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             (quotient, remainder)
         } else {
             (quotient.add_limb(1), other - remainder)
@@ -2671,7 +2671,7 @@ impl<'a, 'b> CeilingDivNegMod<&'b Natural> for &'a Natural {
     /// ```
     fn ceiling_div_neg_mod(self, other: &'b Natural) -> (Natural, Natural) {
         let (quotient, remainder) = self.div_mod(other);
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             (quotient, remainder)
         } else {
             (quotient.add_limb(1), other - remainder)
@@ -2722,7 +2722,7 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: Natural) -> Natural {
         let remainder = self.div_assign_mod(&other);
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             Natural::ZERO
         } else {
             self.increment();
@@ -2774,7 +2774,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &'a Natural) -> Natural {
         let remainder = self.div_assign_mod(other);
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             Natural::ZERO
         } else {
             self.increment();

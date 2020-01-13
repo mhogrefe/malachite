@@ -114,7 +114,7 @@ fn index_of_next_false_bit_properties() {
                 .map(|u| u64::from(u)),
             result
         );
-        assert_eq!(result.is_some(), n >> u != -1 as SignedLimb);
+        assert_eq!(result.is_some(), n >> u != -1);
         if let Some(result) = result {
             assert!(result >= u);
             assert!(!n.get_bit(result));

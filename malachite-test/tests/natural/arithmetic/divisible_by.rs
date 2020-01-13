@@ -812,10 +812,7 @@ fn test_divisible_by() {
 
         let x = Natural::from_str(u).unwrap();
         let y = Natural::from_str(v).unwrap();
-        assert_eq!(
-            x == Natural::ZERO || y != Natural::ZERO && x % y == Natural::ZERO,
-            divisible
-        );
+        assert_eq!(x == 0 || y != 0 && x % y == 0, divisible);
 
         assert_eq!(
             num_divisible_by(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap()),
@@ -975,10 +972,7 @@ fn divisible_by_properties() {
         assert_eq!(x.clone().divisible_by(y), divisible);
         assert_eq!(x.clone().divisible_by(y.clone()), divisible);
 
-        assert_eq!(
-            *x == Natural::ZERO || *y != Natural::ZERO && x % y == Natural::ZERO,
-            divisible,
-        );
+        assert_eq!(*x == 0 || *y != 0 && x % y == 0, divisible,);
         assert_eq!(
             num_divisible_by(natural_to_biguint(x), natural_to_biguint(y)),
             divisible
@@ -993,7 +987,7 @@ fn divisible_by_properties() {
         pairs_of_natural_and_positive_natural_var_1,
         |&(ref x, ref y)| {
             assert!(x.divisible_by(y));
-            assert!(*x == Natural::ZERO || *y != Natural::ZERO && x % y == Natural::ZERO);
+            assert!(*x == 0 || *y != 0 && x % y == 0);
             assert!(num_divisible_by(
                 natural_to_biguint(x),
                 natural_to_biguint(y)
@@ -1006,7 +1000,7 @@ fn divisible_by_properties() {
         pairs_of_natural_and_positive_natural_var_2,
         |&(ref x, ref y)| {
             assert!(!x.divisible_by(y));
-            assert!(*x != Natural::ZERO && (*y == Natural::ZERO || x * y != Natural::ZERO));
+            assert!(*x != 0 && (*y == 0 || x * y != 0));
             assert!(!num_divisible_by(
                 natural_to_biguint(x),
                 natural_to_biguint(y)
@@ -1022,7 +1016,7 @@ fn divisible_by_properties() {
     test_properties(positive_naturals, |n| {
         assert!(!n.divisible_by(Natural::ZERO));
         assert!(Natural::ZERO.divisible_by(n));
-        if *n > Natural::ONE {
+        if *n > 1 {
             assert!(!Natural::ONE.divisible_by(n));
         }
         assert!(n.divisible_by(n));

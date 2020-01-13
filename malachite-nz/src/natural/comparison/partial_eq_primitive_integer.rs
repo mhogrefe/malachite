@@ -102,7 +102,7 @@ macro_rules! impl_partial_eq_larger_than_limb_or_usize {
     ($u: ident) => {
         impl PartialEq<Natural> for $u {
             /// Determines whether a value of a primitive unsigned integer type that's larger than a
-            /// `Limb`. is equal to a `Natural`. This implementation is general enough to also work
+            /// `Limb` is equal to a `Natural`. This implementation is general enough to also work
             /// for `usize`, regardless of whether it is equal in width to `Limb`.
             ///
             /// Time: worst case O(1)

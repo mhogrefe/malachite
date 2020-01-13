@@ -5,7 +5,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
-use platform::Limb;
 
 /// Returns the negative of an `Integer`, taking the `Integer` by value.
 ///
@@ -29,7 +28,7 @@ impl Neg for Integer {
     type Output = Integer;
 
     fn neg(mut self) -> Integer {
-        if self.abs != 0 as Limb {
+        if self.abs != 0 {
             self.sign.not_assign();
         }
         self
@@ -60,7 +59,7 @@ impl<'a> Neg for &'a Integer {
     type Output = Integer;
 
     fn neg(self) -> Integer {
-        if self.abs == 0 as Limb {
+        if self.abs == 0 {
             Integer::ZERO
         } else {
             Integer {
@@ -100,7 +99,7 @@ impl<'a> Neg for &'a Integer {
 /// ```
 impl NegAssign for Integer {
     fn neg_assign(&mut self) {
-        if self.abs != 0 as Limb {
+        if self.abs != 0 {
             self.sign.not_assign();
         }
     }

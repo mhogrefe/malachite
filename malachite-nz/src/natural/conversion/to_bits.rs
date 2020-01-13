@@ -234,7 +234,7 @@ impl Natural {
     /// ```
     pub fn to_bits_asc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
-        if *self == 0 as Limb {
+        if *self == 0 {
             return bits;
         }
         let limbs = self.limbs();
@@ -276,7 +276,7 @@ impl Natural {
     /// ```
     pub fn to_bits_desc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
-        if *self == 0 as Limb {
+        if *self == 0 {
             return bits;
         }
         let mut first = true;

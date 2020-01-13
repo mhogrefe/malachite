@@ -248,7 +248,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
 impl Natural {
     // self -= other, return borrow
     pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
-        if other == 0 as Limb {
+        if other == 0 {
             false
         } else if self.limb_count() < other.limb_count() {
             true
@@ -270,7 +270,7 @@ impl Natural {
 
     // self -= &other, return borrow
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
-        if *other == 0 as Limb {
+        if *other == 0 {
             false
         } else if self as *const Natural == other as *const Natural {
             *self = Natural::ZERO;

@@ -11,6 +11,7 @@ use malachite_nz::natural::arithmetic::shl_u::{
 };
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::natural::Natural;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 use num::BigUint;
 use rug;
@@ -391,7 +392,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
-                assert_eq!(Natural::ZERO << u, 0 as Limb);
+                assert_eq!(Natural::ZERO << u, 0);
                 assert!((Natural::ONE << u).is_power_of_two());
             });
         }

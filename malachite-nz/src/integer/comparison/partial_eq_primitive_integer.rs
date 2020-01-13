@@ -5,7 +5,7 @@ use integer::Integer;
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialEq<$t> for Integer {
-            /// Determines whether an `Integer` is equal to a a value of unsigned primitive integer
+            /// Determines whether an `Integer` is equal to a value of unsigned primitive integer
             /// type.
             ///
             /// Time: worst case O(1)
@@ -50,7 +50,7 @@ macro_rules! impl_unsigned {
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialEq<$t> for Integer {
-            /// Determines whether an `Integer` is equal to a a value of signed primitive integer
+            /// Determines whether an `Integer` is equal to a value of signed primitive integer
             /// type.
             ///
             /// Time: worst case O(1)

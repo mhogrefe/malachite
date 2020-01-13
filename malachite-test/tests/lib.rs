@@ -120,12 +120,10 @@ pub mod integer {
         pub mod ord_abs;
         pub mod partial_eq_natural;
         pub mod partial_eq_primitive_integer;
-        pub mod partial_ord_abs_limb;
-        pub mod partial_ord_abs_natural;
-        pub mod partial_ord_abs_signed_limb;
-        pub mod partial_ord_limb;
+        pub mod partial_ord_abs_natural_and_comparators;
+        pub mod partial_ord_abs_primitive_integer_and_comparators;
         pub mod partial_ord_natural;
-        pub mod partial_ord_signed_limb;
+        pub mod partial_ord_primitive_integer;
         pub mod sign;
     }
 
@@ -210,7 +208,8 @@ pub mod natural {
         pub mod hash;
         pub mod ord;
         pub mod partial_eq_primitive_integer;
-        pub mod partial_ord_limb;
+        pub mod partial_ord_abs_primitive_integer_and_comparators;
+        pub mod partial_ord_primitive_integer;
     }
 
     pub mod conversion {

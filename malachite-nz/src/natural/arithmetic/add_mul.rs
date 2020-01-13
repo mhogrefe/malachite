@@ -2,7 +2,7 @@ use std::mem::swap;
 
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 
 use natural::arithmetic::add::{
     limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -95,7 +95,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
         xs[i] = limb_result.lower_half();
         carry = limb_result >> Limb::WIDTH;
     }
-    carry as Limb
+    Limb::exact_from(carry)
 }
 
 /// Given the limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The lowest limbs of
@@ -142,7 +142,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
         ys[i] = limb_result.lower_half();
         carry = limb_result >> Limb::WIDTH;
     }
-    carry as Limb
+    Limb::exact_from(carry)
 }
 
 /// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
@@ -430,7 +430,7 @@ pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb])
 
 impl Natural {
     fn add_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Natural {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             return self.clone();
         }
         if c == 1 {
@@ -445,7 +445,7 @@ impl Natural {
     }
 
     fn add_mul_assign_limb(&mut self, mut b: Natural, c: Limb) {
-        if c == 0 || b == 0 as Limb {
+        if c == 0 || b == 0 {
             return;
         }
         if c == 1 {
@@ -467,7 +467,7 @@ impl Natural {
     }
 
     fn add_mul_assign_limb_ref(&mut self, b: &Natural, c: Limb) {
-        if c == 0 || *b == 0 as Limb {
+        if c == 0 || *b == 0 {
             return;
         }
         if c == 1 {
@@ -692,7 +692,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
             self.add_mul_assign_limb(c, small_b);
         } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb(b, small_c);
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
@@ -737,7 +737,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
             self.add_mul_assign_limb_ref(c, small_b);
         } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb(b, small_c);
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
@@ -782,7 +782,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
             self.add_mul_assign_limb(c, small_b);
         } else if let Natural(Small(small_c)) = c {
             self.add_mul_assign_limb_ref(b, small_c);
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();
@@ -827,7 +827,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
             self.add_mul_assign_limb_ref(c, small_b);
         } else if let Natural(Small(small_c)) = *c {
             self.add_mul_assign_limb_ref(b, small_c);
-        } else if *self == 0 as Limb {
+        } else if *self == 0 {
             *self = b * c;
         } else {
             let self_limbs = self.promote_in_place();

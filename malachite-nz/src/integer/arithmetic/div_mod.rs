@@ -2,10 +2,8 @@ use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
     DivAssignRem, DivMod, DivRem,
 };
-use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
-use natural::Natural;
 
 impl DivMod<Integer> for Integer {
     type DivOutput = Integer;
@@ -262,7 +260,7 @@ impl DivAssignMod<Integer> for Integer {
             self.abs.div_assign_mod(other.abs)
         } else {
             let remainder = self.abs.ceiling_div_assign_neg_mod(other.abs);
-            if self.abs != Natural::ZERO {
+            if self.abs != 0 {
                 self.sign = false;
             }
             remainder
@@ -326,7 +324,7 @@ impl<'a> DivAssignMod<&'a Integer> for Integer {
             self.abs.div_assign_mod(&other.abs)
         } else {
             let remainder = self.abs.ceiling_div_assign_neg_mod(&other.abs);
-            if self.abs != Natural::ZERO {
+            if self.abs != 0 {
                 self.sign = false;
             }
             remainder
@@ -592,7 +590,7 @@ impl DivAssignRem<Integer> for Integer {
         } else {
             -remainder
         };
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
         remainder
     }
 }
@@ -650,7 +648,7 @@ impl<'a> DivAssignRem<&'a Integer> for Integer {
         } else {
             -remainder
         };
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
         remainder
     }
 }
@@ -958,7 +956,7 @@ impl CeilingDivAssignMod<Integer> for Integer {
             self.abs.ceiling_div_assign_neg_mod(other.abs)
         } else {
             let remainder = self.abs.div_assign_mod(other.abs);
-            self.sign = self.abs == Natural::ZERO;
+            self.sign = self.abs == 0;
             remainder
         };
         if other.sign {
@@ -1020,7 +1018,7 @@ impl<'a> CeilingDivAssignMod<&'a Integer> for Integer {
             self.abs.ceiling_div_assign_neg_mod(&other.abs)
         } else {
             let remainder = self.abs.div_assign_mod(&other.abs);
-            self.sign = self.abs == Natural::ZERO;
+            self.sign = self.abs == 0;
             remainder
         };
         if other.sign {

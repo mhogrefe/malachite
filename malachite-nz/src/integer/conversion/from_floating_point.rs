@@ -3,7 +3,6 @@ use malachite_base::round::RoundingMode;
 
 use integer::Integer;
 use natural::Natural;
-use platform::Limb;
 
 macro_rules! float_impls {
     ($f: ident) => {
@@ -63,7 +62,7 @@ macro_rules! float_impls {
                 } else {
                     let abs = Natural::rounding_from(-value, -rm);
                     Integer {
-                        sign: abs == 0 as Limb,
+                        sign: abs == 0,
                         abs,
                     }
                 }
@@ -105,7 +104,7 @@ macro_rules! float_impls {
             fn from(value: $f) -> Integer {
                 let abs = Natural::from(value.abs());
                 Integer {
-                    sign: value >= 0.0 || abs == 0 as Limb,
+                    sign: value >= 0.0 || abs == 0,
                     abs,
                 }
             }

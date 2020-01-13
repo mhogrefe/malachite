@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 
 use integer::Integer;
@@ -570,7 +569,7 @@ impl DivRoundAssign<Integer> for Integer {
         let result_sign = self.sign == other.sign;
         self.abs
             .div_round_assign(other.abs, if result_sign { rm } else { -rm });
-        self.sign = result_sign || self.abs == Integer::ZERO;
+        self.sign = result_sign || self.abs == 0;
     }
 }
 
@@ -673,6 +672,6 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
         let result_sign = self.sign == other.sign;
         self.abs
             .div_round_assign(&other.abs, if result_sign { rm } else { -rm });
-        self.sign = result_sign || self.abs == Integer::ZERO;
+        self.sign = result_sign || self.abs == 0;
     }
 }

@@ -1536,7 +1536,7 @@ fn div_mod_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder > Integer::ZERO) == (*y > Integer::ZERO));
+    assert!(remainder == 0 || (remainder > 0) == (*y > 0));
     assert_eq!(quotient * y + remainder, *x);
 
     let (neg_quotient, neg_remainder) = (-x).div_mod(y);
@@ -1567,11 +1567,11 @@ fn div_mod_properties() {
     test_properties(integers, |x| {
         let (q, r) = x.div_mod(Integer::ONE);
         assert_eq!(q, *x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
 
         let (q, r) = x.div_mod(Integer::NEGATIVE_ONE);
         assert_eq!(q, -x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
     });
 
     test_properties(nonzero_integers, |x| {
@@ -1580,7 +1580,7 @@ fn div_mod_properties() {
         assert_eq!(x.div_mod(x), (Integer::ONE, Integer::ZERO));
         assert_eq!(x.div_mod(-x), (Integer::NEGATIVE_ONE, Integer::ZERO));
         assert_eq!(Integer::ZERO.div_mod(x), (Integer::ZERO, Integer::ZERO));
-        if *x > Integer::ONE {
+        if *x > 1 {
             assert_eq!(Integer::ONE.div_mod(x), (Integer::ZERO, Integer::ONE));
             assert_eq!(
                 Integer::NEGATIVE_ONE.div_mod(x),
@@ -1642,7 +1642,7 @@ fn div_rem_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder > Integer::ZERO) == (*x > Integer::ZERO));
+    assert!(remainder == 0 || (remainder > 0) == (*x > 0));
     assert_eq!(&quotient * y + &remainder, *x);
 
     assert_eq!((-x).div_rem(y), (-&quotient, -&remainder));
@@ -1670,11 +1670,11 @@ fn div_rem_properties() {
     test_properties(integers, |x| {
         let (q, r) = x.div_rem(Integer::ONE);
         assert_eq!(q, *x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
 
         let (q, r) = x.div_rem(Integer::NEGATIVE_ONE);
         assert_eq!(q, -x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
     });
 
     test_properties(nonzero_integers, |x| {
@@ -1683,7 +1683,7 @@ fn div_rem_properties() {
         assert_eq!(x.div_rem(x), (Integer::ONE, Integer::ZERO));
         assert_eq!(x.div_rem(-x), (Integer::NEGATIVE_ONE, Integer::ZERO));
         assert_eq!(Integer::ZERO.div_rem(x), (Integer::ZERO, Integer::ZERO));
-        if *x > Integer::ONE {
+        if *x > 1 {
             assert_eq!(Integer::ONE.div_rem(x), (Integer::ZERO, Integer::ONE));
             assert_eq!(
                 Integer::NEGATIVE_ONE.div_rem(x),
@@ -1742,7 +1742,7 @@ fn ceiling_div_mod_properties_helper(x: &Integer, y: &Integer) {
     assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
 
     assert!(remainder.lt_abs(y));
-    assert!(remainder == Integer::ZERO || (remainder >= Integer::ZERO) != (*y > Integer::ZERO));
+    assert!(remainder == 0 || (remainder >= 0) != (*y > 0));
     assert_eq!(quotient * y + remainder, *x);
 
     let (neg_quotient, neg_remainder) = (-x).ceiling_div_mod(y);
@@ -1768,11 +1768,11 @@ fn ceiling_div_mod_properties() {
     test_properties(integers, |x| {
         let (q, r) = x.ceiling_div_mod(Integer::ONE);
         assert_eq!(q, *x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
 
         let (q, r) = x.ceiling_div_mod(Integer::NEGATIVE_ONE);
         assert_eq!(q, -x);
-        assert_eq!(r, Integer::ZERO);
+        assert_eq!(r, 0);
     });
 
     test_properties(nonzero_integers, |x| {

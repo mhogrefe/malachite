@@ -5,7 +5,6 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
 use natural::Natural;
-use platform::Limb;
 
 /// An integer.
 ///
@@ -25,7 +24,7 @@ impl Integer {
     /// Returns true iff `self` is valid. To be valid, its absolute value must be valid, and if the
     /// absolute value is zero, the sign must be true. All `Integer`s must be valid.
     pub fn is_valid(&self) -> bool {
-        self.abs.is_valid() && (self.sign || self.abs != 0 as Limb)
+        self.abs.is_valid() && (self.sign || self.abs != 0)
     }
 
     pub fn trillion() -> Integer {
@@ -174,12 +173,10 @@ pub mod comparison {
     pub mod ord_abs;
     pub mod partial_eq_natural;
     pub mod partial_eq_primitive_integer;
-    pub mod partial_ord_abs_limb;
     pub mod partial_ord_abs_natural;
-    pub mod partial_ord_abs_signed_limb;
-    pub mod partial_ord_limb;
+    pub mod partial_ord_abs_primitive_integer;
     pub mod partial_ord_natural;
-    pub mod partial_ord_signed_limb;
+    pub mod partial_ord_primitive_integer;
     pub mod sign;
 }
 

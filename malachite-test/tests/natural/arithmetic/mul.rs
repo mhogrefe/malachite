@@ -3,6 +3,7 @@ use std::str::FromStr;
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::fft::{
@@ -64,7 +65,7 @@ use malachite_test::inputs::base::{
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 
 fn series(start: Limb, len: usize) -> Vec<Limb> {
-    (start..start + len as Limb).collect()
+    (start..start + Limb::exact_from(len)).collect()
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -20457,18 +20458,18 @@ fn mul_properties() {
             product
         );
         assert_eq!(y * x, product);
-        if *x != 0 as Limb {
+        if *x != 0 {
             let (q, r) = (&product).div_mod(x);
             assert_eq!(q, *y);
-            assert_eq!(r, 0 as Limb);
+            assert_eq!(r, 0);
         }
-        if *y != 0 as Limb {
+        if *y != 0 {
             let (q, r) = (&product).div_mod(y);
             assert_eq!(q, *x);
-            assert_eq!(r, 0 as Limb);
+            assert_eq!(r, 0);
         }
 
-        if *x != 0 as Limb && *y != 0 as Limb {
+        if *x != 0 && *y != 0 {
             assert!(product >= *x);
             assert!(product >= *y);
         }
@@ -20483,8 +20484,8 @@ fn mul_properties() {
 
     #[allow(unknown_lints, erasing_op)]
     test_properties_custom_scale(2_048, naturals, |x| {
-        assert_eq!(x * Natural::ZERO, 0 as Limb);
-        assert_eq!(Natural::ZERO * x, 0 as Limb);
+        assert_eq!(x * Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO * x, 0);
         assert_eq!(x * Natural::ONE, *x);
         assert_eq!(Natural::ONE * x, *x);
         //TODO assert_eq!(x * x, x.pow(2));

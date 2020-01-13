@@ -4,7 +4,6 @@ use rand::Rng;
 
 use natural::random::special_random_natural_up_to_bits::special_random_natural_up_to_bits;
 use natural::Natural;
-use platform::Limb;
 
 /// Returns a random `Natural` sampled from [0, `n`). The `Natural` will typically have long runs of
 /// 0s and 1s in its binary expansion, to help trigger edge cases for testing.
@@ -39,7 +38,7 @@ use platform::Limb;
 ///     "11111110000111111111100011111111000");
 /// ```
 pub fn special_random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
-    assert_ne!(*n, 0 as Limb, "Cannot generate a Natural below 0");
+    assert_ne!(*n, 0, "Cannot generate a Natural below 0");
     if n.is_power_of_two() {
         special_random_natural_up_to_bits(rng, n.significant_bits() - 1)
     } else {

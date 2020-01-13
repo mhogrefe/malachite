@@ -16750,7 +16750,7 @@ fn div_mod_properties() {
     test_properties(positive_naturals, |n| {
         assert_eq!(n.div_mod(n), (Natural::ONE, Natural::ZERO));
         assert_eq!(Natural::ZERO.div_mod(n), (Natural::ZERO, Natural::ZERO));
-        if *n > 1 as Limb {
+        if *n > 1 {
             assert_eq!(Natural::ONE.div_mod(n), (Natural::ZERO, Natural::ONE));
         }
     });
@@ -16834,7 +16834,7 @@ fn ceiling_div_neg_mod_properties() {
             Natural::ZERO.ceiling_div_neg_mod(n),
             (Natural::ZERO, Natural::ZERO)
         );
-        if *n > 1 as Limb {
+        if *n > 1 {
             assert_eq!(
                 Natural::ONE.ceiling_div_neg_mod(n),
                 (Natural::ONE, n - Natural::ONE)

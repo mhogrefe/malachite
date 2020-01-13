@@ -1,9 +1,6 @@
 use std::ops::{Div, DivAssign};
 
-use malachite_base::num::basic::traits::Zero;
-
 use integer::Integer;
-use natural::Natural;
 
 impl Div<Integer> for Integer {
     type Output = Integer;
@@ -210,7 +207,7 @@ impl DivAssign<Integer> for Integer {
     #[inline]
     fn div_assign(&mut self, other: Integer) {
         self.abs /= other.abs;
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
@@ -255,6 +252,6 @@ impl<'a> DivAssign<&'a Integer> for Integer {
     #[inline]
     fn div_assign(&mut self, other: &'a Integer) {
         self.abs /= &other.abs;
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
     }
 }

@@ -1,8 +1,6 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::integer::Integer;
 use num::{BigInt, Integer as NumInteger, Zero as NumZero};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -88,9 +86,7 @@ fn benchmark_integer_divisible_by_algorithms(gm: GenerationMode, limit: usize, f
             ("standard", &mut (|(x, y)| no_out!(x.divisible_by(y)))),
             (
                 "using %",
-                &mut (|(x, y)| {
-                    no_out!(x == Integer::ZERO || y != Integer::ZERO && x % y == Integer::ZERO)
-                }),
+                &mut (|(x, y)| no_out!(x == 0 || y != 0 && x % y == 0)),
             ),
         ],
     );

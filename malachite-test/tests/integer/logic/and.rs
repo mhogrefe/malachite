@@ -1131,10 +1131,10 @@ fn and_properties() {
     });
 
     test_properties(integers, |x| {
-        assert_eq!(x & Integer::ZERO, 0 as Limb);
-        assert_eq!(Integer::ZERO & x, 0 as Limb);
+        assert_eq!(x & Integer::ZERO, 0);
+        assert_eq!(Integer::ZERO & x, 0);
         assert_eq!(x & x, *x);
-        assert_eq!(x & !x, Integer::ZERO);
+        assert_eq!(x & !x, 0);
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {

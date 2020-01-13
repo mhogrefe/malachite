@@ -61,7 +61,7 @@ fn count_ones_properties() {
         let ones = x.count_ones();
         assert_eq!(natural_count_ones_alt_1(x), ones);
         assert_eq!(natural_count_ones_alt_2(x), ones);
-        assert_eq!(ones == 0, *x == 0 as Limb);
+        assert_eq!(ones == 0, *x == 0);
         assert_eq!(ones == 1, x.is_power_of_two());
         assert_eq!((!x).checked_count_zeros(), Some(ones));
     });

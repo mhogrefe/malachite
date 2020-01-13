@@ -8,7 +8,6 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
@@ -86,7 +85,7 @@ fn set_bit_properties() {
 
         assert_eq!(n | (Integer::ONE << index), result);
 
-        assert_ne!(result, 0 as Limb);
+        assert_ne!(result, 0);
         assert!(result >= *n);
         if n.get_bit(index) {
             assert_eq!(result, *n);

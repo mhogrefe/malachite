@@ -1,8 +1,6 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
-use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
-use natural::Natural;
 
 impl DivExact<Integer> for Integer {
     type Output = Integer;
@@ -141,7 +139,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
     fn div_exact(self, other: Integer) -> Integer {
         let quotient_abs = (&self.abs).div_exact(other.abs);
         Integer {
-            sign: self.sign == other.sign || quotient_abs == Natural::ZERO,
+            sign: self.sign == other.sign || quotient_abs == 0,
             abs: quotient_abs,
         }
     }
@@ -190,7 +188,7 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     fn div_exact(self, other: &'b Integer) -> Integer {
         let quotient_abs = (&self.abs).div_exact(&other.abs);
         Integer {
-            sign: self.sign == other.sign || quotient_abs == Natural::ZERO,
+            sign: self.sign == other.sign || quotient_abs == 0,
             abs: quotient_abs,
         }
     }
@@ -236,7 +234,7 @@ impl DivExactAssign<Integer> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: Integer) {
         self.abs.div_exact_assign(other.abs);
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
     }
 }
 
@@ -280,6 +278,6 @@ impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: &'a Integer) {
         self.abs.div_exact_assign(&other.abs);
-        self.sign = self.sign == other.sign || self.abs == Natural::ZERO;
+        self.sign = self.sign == other.sign || self.abs == 0;
     }
 }

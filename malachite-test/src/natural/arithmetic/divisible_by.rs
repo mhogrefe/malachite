@@ -1,6 +1,5 @@
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::divisible_by::{
@@ -8,7 +7,6 @@ use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
-use malachite_nz::natural::Natural;
 use num::{BigUint, Integer, Zero as NumZero};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -258,9 +256,7 @@ fn benchmark_natural_divisible_by_algorithms(gm: GenerationMode, limit: usize, f
             ("standard", &mut (|(x, y)| no_out!(x.divisible_by(y)))),
             (
                 "using %",
-                &mut (|(x, y)| {
-                    no_out!(x == Natural::ZERO || y != Natural::ZERO && x % y == Natural::ZERO)
-                }),
+                &mut (|(x, y)| no_out!(x == 0 || y != 0 && x % y == 0)),
             ),
         ],
     );

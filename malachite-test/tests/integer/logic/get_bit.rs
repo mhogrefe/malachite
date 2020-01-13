@@ -6,7 +6,9 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::{Limb, SignedLimb};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::platform::Limb;
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use malachite_test::common::integer_to_rug_integer;
@@ -103,14 +105,14 @@ fn get_bit_properties() {
             bit
         );
 
-        assert_eq!(n & (Integer::ONE << index) != 0 as Limb, bit);
+        assert_eq!(n & (Integer::ONE << index) != 0, bit);
         assert_eq!(!(!n).get_bit(index), bit);
     });
 
     test_properties(natural_integers, |n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if *n != 0 as Limb {
+        if *n != 0 {
             assert!(n.get_bit(significant_bits - 1));
         }
     });

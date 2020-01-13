@@ -1,9 +1,9 @@
+use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{
     Parity, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use natural::arithmetic::add::{
@@ -754,7 +754,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
         {
             let out_init_hi = &mut out_init[shift_limbs..];
             *out_last = if limbs_sub_limb_in_place(out_init_hi, carry) {
-                Limb::ONE.wrapping_neg()
+                Limb::MAX
             } else {
                 0
             };

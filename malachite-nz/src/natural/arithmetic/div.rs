@@ -2166,9 +2166,9 @@ impl<'a> Div<Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, mut other: Natural) -> Natural {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
             self.clone()
         } else if self.limb_count() < other.limb_count() {
             Natural::ZERO
@@ -2227,9 +2227,9 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, other: &'b Natural) -> Natural {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
             self.clone()
         } else if self as *const Natural == other as *const Natural {
             Natural::ONE
@@ -2283,9 +2283,9 @@ impl DivAssign<Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign(&mut self, other: Natural) {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
         } else if self.limb_count() < other.limb_count() {
             *self = Natural::ZERO;
         } else {
@@ -2339,9 +2339,9 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign(&mut self, other: &'a Natural) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
         } else if self.limb_count() < other.limb_count() {
             *self = Natural::ZERO;
         } else {

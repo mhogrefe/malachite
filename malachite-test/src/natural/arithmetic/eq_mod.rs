@@ -1,7 +1,6 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
@@ -14,7 +13,6 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
-use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -666,7 +664,7 @@ fn benchmark_natural_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_na
             ),
             (
                 "Natural == Natural || Natural != 0 && Natural % Natural == Natural % Natural",
-                &mut (|(x, y, m)| no_out!(x == y || m != Natural::ZERO && x % &m == y % m)),
+                &mut (|(x, y, m)| no_out!(x == y || m != 0 && x % &m == y % m)),
             ),
             (
                 "|Natural - Natural|.divisible_by(Natural)",

@@ -7569,7 +7569,7 @@ fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let expected_q = Natural::from_limbs_asc(qs);
     let (q, r) = n.div_mod(d);
     assert_eq!(q, expected_q);
-    assert_eq!(r, 0 as Limb);
+    assert_eq!(r, 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -8247,6 +8247,6 @@ fn div_exact_properties() {
 
     test_properties(positive_naturals, |n| {
         assert_eq!(Natural::ZERO.div_exact(n), Natural::ZERO);
-        assert_eq!(n.div_exact(n), Natural::ONE);
+        assert_eq!(n.div_exact(n), 1);
     });
 }

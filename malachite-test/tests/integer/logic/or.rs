@@ -879,10 +879,10 @@ fn or_properties() {
     test_properties(integers, |x| {
         assert_eq!(x | Integer::ZERO, *x);
         assert_eq!(Integer::ZERO | x, *x);
-        assert_eq!(x | Integer::NEGATIVE_ONE, -1 as SignedLimb);
-        assert_eq!(Integer::NEGATIVE_ONE | x, -1 as SignedLimb);
+        assert_eq!(x | Integer::NEGATIVE_ONE, -1);
+        assert_eq!(Integer::NEGATIVE_ONE | x, -1);
         assert_eq!(x | x, *x);
-        assert_eq!(x | !x, -1 as SignedLimb);
+        assert_eq!(x | !x, -1);
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {

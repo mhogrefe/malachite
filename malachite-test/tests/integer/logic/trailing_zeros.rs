@@ -39,9 +39,9 @@ fn trailing_zeros_properties() {
     test_properties(integers, |x| {
         let trailing_zeros = x.trailing_zeros();
         assert_eq!(integer_trailing_zeros_alt(x), trailing_zeros);
-        assert_eq!(trailing_zeros.is_none(), *x == 0 as Limb);
+        assert_eq!(trailing_zeros.is_none(), *x == 0);
         assert_eq!((-x).trailing_zeros(), trailing_zeros);
-        if *x != 0 as Limb {
+        if *x != 0 {
             let trailing_zeros = trailing_zeros.unwrap();
             assert_ne!((!x).trailing_zeros() == Some(0), trailing_zeros == 0);
             if trailing_zeros <= u64::from(Limb::MAX) {

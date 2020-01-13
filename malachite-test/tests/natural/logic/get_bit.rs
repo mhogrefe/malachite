@@ -81,14 +81,14 @@ fn get_bit_properties() {
             bit
         );
 
-        assert_eq!(n & (Natural::ONE << index) != 0 as Limb, bit);
+        assert_eq!(n & (Natural::ONE << index) != 0, bit);
         assert_ne!((!n).get_bit(index), bit);
     });
 
     test_properties(naturals, |n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if *n != 0 as Limb {
+        if *n != 0 {
             assert!(n.get_bit(significant_bits - 1));
         }
     });

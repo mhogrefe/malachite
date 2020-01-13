@@ -1,7 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_bits::*;
-use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
@@ -277,7 +276,7 @@ fn benchmark_integer_twos_complement_bits_get_algorithms(
                     let bits = n.to_twos_complement_bits_asc();
                     let u = usize::exact_from(u);
                     if u >= bits.len() {
-                        n < 0 as Limb
+                        n < 0
                     } else {
                         bits[u]
                     };

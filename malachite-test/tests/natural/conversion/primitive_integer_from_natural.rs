@@ -3,7 +3,6 @@ use std::str::FromStr;
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
@@ -419,7 +418,7 @@ macro_rules! signed_properties {
         test_properties(naturals, |x| {
             let result = $t::checked_from(x);
             assert_eq!($t::checked_from(x.clone()), result);
-            if *x >= Natural::ZERO && x.significant_bits() <= u64::from($t::WIDTH - 1) {
+            if *x >= 0 && x.significant_bits() <= u64::from($t::WIDTH - 1) {
                 assert_eq!(Natural::exact_from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
                 assert_eq!(result, Some($t::exact_from(x)));

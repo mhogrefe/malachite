@@ -4890,7 +4890,7 @@ fn verify_limbs_div_approx_2(
     let q_is_too_large = q != expected_q;
     if q_is_too_large {
         assert!(q > expected_q);
-        assert!(q - &expected_q <= 4 as Limb);
+        assert!(q - &expected_q <= 4);
         assert_eq!(expected_q * &d + expected_r, n);
     } else {
         assert_eq!(q * &d + expected_r, n);
@@ -11142,9 +11142,9 @@ fn div_properties() {
     });
 
     test_properties(positive_naturals, |n| {
-        assert_eq!(n / n, Natural::ONE);
+        assert_eq!(n / n, 1);
         assert_eq!(Natural::ZERO / n, Natural::ZERO);
-        if *n > 1 as Limb {
+        if *n > 1 {
             assert_eq!(Natural::ONE / n, Natural::ZERO);
         }
     });

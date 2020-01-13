@@ -229,7 +229,8 @@ pub mod conversion;
 pub mod comparison {
     pub mod ord;
     pub mod partial_eq_primitive_integer;
-    pub mod partial_ord_limb;
+    pub mod partial_ord_abs_primitive_integer;
+    pub mod partial_ord_primitive_integer;
 }
 
 pub mod logic {

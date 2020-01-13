@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
 
@@ -30,7 +30,7 @@ fn test_sign() {
 fn sign_properties() {
     test_properties(integers, |n| {
         let sign = n.sign();
-        assert_eq!(n.partial_cmp(&(0 as Limb)), Some(sign));
+        assert_eq!(n.partial_cmp(&(0)), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });
 

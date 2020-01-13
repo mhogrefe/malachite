@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::CheckedInto;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::{Limb, SignedDoubleLimb, SignedLimb};
+use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use num::{BigInt, Signed};
 use rug;
 
@@ -73,8 +73,8 @@ fn abs_properties() {
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 
-        assert!(abs >= 0 as Limb);
-        assert_eq!(abs == *x, *x >= 0 as Limb);
+        assert!(abs >= 0);
+        assert_eq!(abs == *x, *x >= 0);
         assert_eq!((&abs).abs(), abs);
 
         let abs_alt = x.clone().unsigned_abs();

@@ -4,7 +4,6 @@ use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
-use malachite_nz::platform::Limb;
 use rug;
 
 use malachite_test::common::test_properties;
@@ -209,7 +208,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(signeds::<$t>, |&i| {
-                assert_eq!(Integer::ZERO >> i, 0 as Limb);
+                assert_eq!(Integer::ZERO >> i, 0);
             });
 
             test_properties(pairs_of_natural_and_small_signed::<$t>, |&(ref n, i)| {
@@ -1428,7 +1427,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_signed_and_rounding_mode::<$t>, |&(i, rm)| {
-                assert_eq!(Integer::ZERO.shr_round(i, rm), 0 as Limb);
+                assert_eq!(Integer::ZERO.shr_round(i, rm), 0);
             });
 
             test_properties(

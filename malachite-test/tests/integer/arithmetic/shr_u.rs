@@ -197,9 +197,9 @@ macro_rules! tests_and_properties {
                     if let Some(sum) = j.checked_add($t::exact_from(SignedLimb::WIDTH)) {
                         let shifted = Integer::from(i) >> sum;
                         if i >= 0 {
-                            assert_eq!(shifted, 0 as Limb);
+                            assert_eq!(shifted, 0);
                         } else {
-                            assert_eq!(shifted, -1 as SignedLimb);
+                            assert_eq!(shifted, -1);
                         }
                     }
 
@@ -223,7 +223,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(unsigneds::<$t>, |&u| {
-                assert_eq!(Integer::ZERO >> u, 0 as Limb);
+                assert_eq!(Integer::ZERO >> u, 0);
             });
 
             test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {
@@ -1357,7 +1357,7 @@ macro_rules! tests_and_properties {
                     let floor = n.shr_round(u, RoundingMode::Floor);
                     let ceiling = &floor + Integer::ONE;
                     assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
-                    if *n >= 0 as Limb {
+                    if *n >= 0 {
                         assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);
                         assert_eq!(n.shr_round(u, RoundingMode::Down), floor);
                     } else {
@@ -1373,24 +1373,12 @@ macro_rules! tests_and_properties {
                 pairs_of_positive_signed_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
                     if let Some(sum) = u.checked_add($t::exact_from(Limb::WIDTH - 1)) {
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Down),
-                            0 as Limb
-                        );
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Floor),
-                            0 as Limb
-                        );
-                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1 as Limb);
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Ceiling),
-                            1 as Limb
-                        );
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), 0);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), 1);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 1);
                         if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(
-                                Integer::from(i).shr_round(sum, RoundingMode::Nearest),
-                                0 as Limb
-                            );
+                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
                         }
                     }
                 },
@@ -1400,27 +1388,12 @@ macro_rules! tests_and_properties {
                 pairs_of_negative_signed_not_min_and_small_unsigned::<SignedLimb, $t>,
                 |&(i, u)| {
                     if let Some(sum) = u.checked_add($t::exact_from(Limb::WIDTH - 1)) {
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Down),
-                            0 as Limb
-                        );
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Floor),
-                            -1 as SignedLimb
-                        );
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Up),
-                            -1 as SignedLimb
-                        );
-                        assert_eq!(
-                            Integer::from(i).shr_round(sum, RoundingMode::Ceiling),
-                            0 as Limb
-                        );
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Down), 0);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Floor), -1);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Up), -1);
+                        assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Ceiling), 0);
                         if let Some(sum) = sum.checked_add(1) {
-                            assert_eq!(
-                                Integer::from(i).shr_round(sum, RoundingMode::Nearest),
-                                0 as Limb
-                            );
+                            assert_eq!(Integer::from(i).shr_round(sum, RoundingMode::Nearest), 0);
                         }
                     }
                 },
@@ -1431,7 +1404,7 @@ macro_rules! tests_and_properties {
             });
 
             test_properties(pairs_of_unsigned_and_rounding_mode::<$t>, |&(u, rm)| {
-                assert_eq!(Integer::ZERO.shr_round(u, rm), 0 as Limb);
+                assert_eq!(Integer::ZERO.shr_round(u, rm), 0);
             });
 
             test_properties(

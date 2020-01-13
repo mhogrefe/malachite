@@ -1198,7 +1198,7 @@ impl Natural {
     }
 
     fn and_assign_neg_limb_neg(&mut self, other: Limb) {
-        if *self == 0 as Limb {
+        if *self == 0 {
             return;
         }
         mutate_with_possible_promotion!(

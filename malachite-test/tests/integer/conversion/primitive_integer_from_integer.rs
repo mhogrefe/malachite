@@ -3,7 +3,6 @@ use std::str::FromStr;
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
@@ -549,7 +548,7 @@ macro_rules! unsigned_properties {
         test_properties(integers, |x| {
             let result = $t::checked_from(x);
             assert_eq!($t::checked_from(x.clone()), result);
-            if *x >= Integer::ZERO && x.significant_bits() <= u64::from($t::WIDTH) {
+            if *x >= 0 && x.significant_bits() <= u64::from($t::WIDTH) {
                 assert_eq!(Integer::from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
                 assert_eq!(result, Some($t::exact_from(x)));
@@ -574,7 +573,7 @@ macro_rules! signed_properties {
         test_properties(integers, |x| {
             let result = $t::checked_from(x);
             assert_eq!($t::checked_from(x.clone()), result);
-            //TODO if *x >= Integer::ZERO && x.significant_bits() <= u64::from($t::WIDTH - 1) {
+            //TODO if *x >= 0 && x.significant_bits() <= u64::from($t::WIDTH - 1) {
             //TODO     assert_eq!(Integer::from(result.unwrap()), *x);
             //TODO     assert_eq!(result, Some($t::wrapping_from(x)));
             //TODO     assert_eq!(result, Some($t::exact_from(x)));

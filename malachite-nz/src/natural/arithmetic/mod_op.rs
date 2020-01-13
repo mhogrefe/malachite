@@ -1363,9 +1363,9 @@ impl<'a> Rem<Natural> for &'a Natural {
     /// );
     /// ```
     fn rem(self, other: Natural) -> Natural {
-        if other == 0 as Limb {
+        if other == 0 {
             panic!("division by zero");
-        } else if other == 1 as Limb {
+        } else if other == 1 {
             Natural::ZERO
         } else if self.limb_count() < other.limb_count() {
             self.clone()
@@ -1419,9 +1419,9 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn rem(self, other: &'b Natural) -> Natural {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb || self as *const Natural == other as *const Natural {
+        } else if *other == 1 || self as *const Natural == other as *const Natural {
             Natural::ZERO
         } else if self.limb_count() < other.limb_count() {
             self.clone()
@@ -1511,9 +1511,9 @@ impl<'a> RemAssign<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "530068894399");
     /// ```
     fn rem_assign(&mut self, other: &'a Natural) {
-        if *other == 0 as Limb {
+        if *other == 0 {
             panic!("division by zero");
-        } else if *other == 1 as Limb {
+        } else if *other == 1 {
             *self = Natural::ZERO;
         } else if self.limb_count() < other.limb_count() {
         } else {
@@ -1655,7 +1655,7 @@ impl<'a> NegMod<Natural> for &'a Natural {
     /// ```
     fn neg_mod(self, other: Natural) -> Natural {
         let remainder = self % &other;
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             remainder
         } else {
             other - remainder
@@ -1700,7 +1700,7 @@ impl<'a, 'b> NegMod<&'b Natural> for &'a Natural {
     /// ```
     fn neg_mod(self, other: &'b Natural) -> Natural {
         let remainder = self % other;
-        if remainder == 0 as Limb {
+        if remainder == 0 {
             remainder
         } else {
             other - remainder
@@ -1743,7 +1743,7 @@ impl NegModAssign<Natural> for Natural {
     /// ```
     fn neg_mod_assign(&mut self, other: Natural) {
         *self %= &other;
-        if *self != 0 as Limb {
+        if *self != 0 {
             self.sub_right_assign_no_panic(&other);
         }
     }
@@ -1785,7 +1785,7 @@ impl<'a> NegModAssign<&'a Natural> for Natural {
     /// ```
     fn neg_mod_assign(&mut self, other: &'a Natural) {
         *self %= other;
-        if *self != 0 as Limb {
+        if *self != 0 {
             self.sub_right_assign_no_panic(other);
         }
     }

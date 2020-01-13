@@ -1,5 +1,4 @@
 use malachite_base::comparison::{Max, Min};
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
@@ -168,7 +167,7 @@ macro_rules! signed_properties {
                 assert_eq!($t::exact_from(x), i);
                 assert_eq!(Natural::exact_from(i128::exact_from(i)), n);
             } else {
-                assert_eq!(n, Natural::ZERO);
+                assert_eq!(n, 0);
             }
         });
     };
