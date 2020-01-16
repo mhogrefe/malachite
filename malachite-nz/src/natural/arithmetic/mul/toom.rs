@@ -3063,8 +3063,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         // xs.len() < 18 / 17 * ys.len()
         n = 1 + (xs_len - 1) / 6;
         half = false;
-        s = isize::exact_from(xs_len) - (5 * n) as isize;
-        t = isize::exact_from(ys_len) - (5 * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(5 * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(5 * n);
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len()
@@ -3098,8 +3098,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = isize::exact_from(xs_len) - (p * n) as isize;
-        t = isize::exact_from(ys_len) - (q * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
         if half {
             // Recover from-badly chosen splitting
             if s < 1 {
@@ -3178,7 +3178,7 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
-    let itch = (isize::exact_from(n) - _limbs_mul_toom_6h_min_threshold() as isize) * 2
+    let itch = (isize::exact_from(n) - isize::exact_from(_limbs_mul_toom_6h_min_threshold())) * 2
         + isize::exact_from(max(
             _limbs_mul_toom_6h_min_threshold() * 2 + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_greater_to_out_toom_44_scratch_len(_limbs_mul_toom_6h_min_threshold()),
@@ -3250,8 +3250,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p = 5;
         q = 5;
         half = false;
-        s = isize::exact_from(xs_len) - (5 * n) as isize;
-        t = isize::exact_from(ys_len) - (5 * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(5 * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(5 * n);
     } else {
         if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
             // xs.len() < 119 / 90 * ys.len(), half
@@ -3285,8 +3285,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         p -= 1;
         q -= 1;
 
-        s = isize::exact_from(xs_len) - (p * n) as isize;
-        t = isize::exact_from(ys_len) - (q * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
 
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
         if half {
@@ -3524,8 +3524,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         p -= 1;
         q -= 1;
 
-        s = isize::exact_from(xs_len) - (p * n) as isize;
-        t = isize::exact_from(ys_len) - (q * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
 
         if half {
             // Recover from badly chosen splitting
@@ -3611,7 +3611,7 @@ fn _limbs_mul_toom_8h_min_threshold() -> usize {
 // This is mpn_toom8_mul_n_itch from gmp-impl.h.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
     let itch = ((isize::exact_from(n) * 15) >> 3)
-        - ((_limbs_mul_toom_8h_min_threshold() as isize * 15) >> 3)
+        - ((isize::exact_from(_limbs_mul_toom_8h_min_threshold()) * 15) >> 3)
         + isize::exact_from(max(
             ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3)
                 + usize::wrapping_from(Limb::WIDTH) * 6,
@@ -3746,8 +3746,8 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         p -= 1;
         q -= 1;
 
-        s = isize::exact_from(xs_len) - (p * n) as isize;
-        t = isize::exact_from(ys_len) - (q * n) as isize;
+        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
+        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
 
         if half {
             // Recover from badly chosen splitting

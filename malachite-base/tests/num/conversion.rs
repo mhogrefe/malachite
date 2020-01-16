@@ -355,16 +355,16 @@ pub fn test_from_other_type_slice() {
     test::<u8, u16>(&[0xab, 0xcd, 0xef], 0xcdab);
     test::<u8, u64>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67],
-        0x67452301efcdab,
+        0x67_4523_01ef_cdab,
     );
     test::<u8, u64>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xff],
-        0x8967452301efcdab,
+        0x8967_4523_01ef_cdab,
     );
 
     test::<u64, u32>(&[], 0);
     test::<u16, u8>(&[0xabcd, 0xef01], 0xcd);
-    test::<u128, u8>(&[0x1234567890abcdef01234567890abcde], 0xde);
+    test::<u128, u8>(&[0x1234_5678_90ab_cdef_0123_4567_890a_bcde], 0xde);
 }
 
 #[test]

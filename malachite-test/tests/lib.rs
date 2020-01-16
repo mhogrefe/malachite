@@ -29,6 +29,14 @@ pub mod base {
     }
 
     pub mod num {
+        pub mod arithmetic {
+            pub mod log_two;
+        }
+
+        pub mod basic {
+            pub mod crement;
+        }
+
         pub mod conversion {
             pub mod checked_from_and_exact_from;
             pub mod convertible_from;
@@ -49,18 +57,10 @@ pub mod base {
         }
 
         pub mod logic {
+            pub mod bit_access;
             pub mod get_highest_bit;
+            pub mod significant_bits;
         }
-
-        pub mod assign_bit;
-        pub mod clear_bit;
-        pub mod decrement;
-        pub mod flip_bit;
-        pub mod get_bit;
-        pub mod increment;
-        pub mod log_two;
-        pub mod set_bit;
-        pub mod significant_bits;
     }
 
     pub mod rounding_modes {

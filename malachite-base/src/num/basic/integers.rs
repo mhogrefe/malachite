@@ -30,7 +30,7 @@ use num::conversion::traits::{
     SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
-    BitAccess, BitScan, CountOnes, CountZeros, Endian, HammingDistance, LeadingZeros, NotAssign,
+    BitAccess, BitScan, CountOnes, CountZeros, HammingDistance, LeadingZeros, NotAssign,
     RotateLeft, RotateRight, SignificantBits, TrailingZeros,
 };
 
@@ -98,7 +98,6 @@ pub trait PrimitiveInteger:
     + DivRem<DivOutput = Self, RemOutput = Self>
     + DivRound<Output = Self>
     + DivRoundAssign
-    + Endian
     + Eq
     + EqMod<Self, Self>
     + EqModPowerOfTwo<Self>
@@ -435,10 +434,20 @@ macro_rules! impl_basic_traits {
             const TWO: $t = 2;
         }
 
+        /// The lowest value representable by this type.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
         impl Min for $t {
             const MIN: $t = std::$t::MIN;
         }
 
+        /// The highest value representable by this type.
+        ///
+        /// Time: worst case O(1)
+        ///
+        /// Additional memory: worst case O(1)
         impl Max for $t {
             const MAX: $t = std::$t::MAX;
         }

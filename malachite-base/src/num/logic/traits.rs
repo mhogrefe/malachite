@@ -34,37 +34,26 @@ pub trait RotateRight {
     fn rotate_right(self, n: u32) -> Self;
 }
 
-/// Defines functions for manipulating the endianness of a value.
-pub trait Endian {
-    /// Reverses the byte order of the value.
-    fn swap_bytes(self) -> Self;
-
-    /// Converts a value from big endian to the target's endianness.
-    ///
-    /// On big endian this is a no-op. On little endian the bytes are swapped.
-    fn from_be(x: Self) -> Self;
-
-    /// Converts a value from little endian to the target's endianness.
-    ///
-    /// On little endian this is a no-op. On big endian the bytes are swapped.
-    fn from_le(x: Self) -> Self;
-
-    /// Converts `self` to big endian from the target's endianness.
-    ///
-    /// On big endian this is a no-op. On little endian the bytes are swapped.
-    fn to_be(self) -> Self;
-
-    /// Converts `self` to little endian from the target's endianness.
-    ///
-    /// On little endian this is a no-op. On big endian the bytes are swapped.
-    fn to_le(self) -> Self;
+/// Replaces a number with its bitwise negation.
+pub trait NotAssign {
+    fn not_assign(&mut self);
 }
 
-//TODO docs, test
-pub trait BitScan {
-    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64>;
+/// Provides a function to get the number of significant bits of `self`.
+pub trait SignificantBits {
+    /// The number of bits it takes to represent `self`. This is useful when benchmarking functions;
+    /// the functions' inputs can be bucketed based on their number of significant bits.
+    fn significant_bits(self) -> u64;
+}
 
-    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64>;
+//TODO doc and test
+pub trait HammingDistance<RHS> {
+    fn hamming_distance(self, rhs: RHS) -> u64;
+}
+
+//TODO doc and test
+pub trait CheckedHammingDistance<RHS> {
+    fn checked_hamming_distance(self, rhs: RHS) -> Option<u64>;
 }
 
 /// This trait defines functions that access or modify individual bits in a value, indexed by a
@@ -122,23 +111,9 @@ pub trait BitAccess {
     }
 }
 
-/// Provides a function to get the number of significant bits of `self`.
-pub trait SignificantBits {
-    /// The number of bits it takes to represent `self`. This is useful when benchmarking functions;
-    /// the functions' inputs can be bucketed based on their number of significant bits.
-    fn significant_bits(self) -> u64;
-}
+//TODO docs, test
+pub trait BitScan {
+    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64>;
 
-//TODO doc and test
-pub trait HammingDistance<RHS> {
-    fn hamming_distance(self, rhs: RHS) -> u64;
-}
-
-//TODO doc and test
-pub trait CheckedHammingDistance<RHS> {
-    fn checked_hamming_distance(self, rhs: RHS) -> Option<u64>;
-}
-
-pub trait NotAssign {
-    fn not_assign(&mut self);
+    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64>;
 }
