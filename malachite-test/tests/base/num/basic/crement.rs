@@ -38,10 +38,12 @@ fn increment_properties() {
     increment_properties_helper_unsigned::<u16>();
     increment_properties_helper_unsigned::<u32>();
     increment_properties_helper_unsigned::<u64>();
+    increment_properties_helper_unsigned::<usize>();
     increment_properties_helper_signed::<i8>();
     increment_properties_helper_signed::<i16>();
     increment_properties_helper_signed::<i32>();
     increment_properties_helper_signed::<i64>();
+    increment_properties_helper_signed::<isize>();
 }
 
 fn decrement_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
@@ -74,8 +76,10 @@ fn decrement_properties() {
     decrement_properties_helper_unsigned::<u16>();
     decrement_properties_helper_unsigned::<u32>();
     decrement_properties_helper_unsigned::<u64>();
+    decrement_properties_helper_unsigned::<usize>();
     decrement_properties_helper_signed::<i8>();
     decrement_properties_helper_signed::<i16>();
     decrement_properties_helper_signed::<i32>();
     decrement_properties_helper_signed::<i64>();
+    decrement_properties_helper_signed::<isize>();
 }

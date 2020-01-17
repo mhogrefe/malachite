@@ -58,10 +58,12 @@ fn get_bit_properties() {
     get_bit_properties_helper_unsigned::<u16>();
     get_bit_properties_helper_unsigned::<u32>();
     get_bit_properties_helper_unsigned::<u64>();
+    get_bit_properties_helper_unsigned::<usize>();
     get_bit_properties_helper_signed::<i8>();
     get_bit_properties_helper_signed::<i16>();
     get_bit_properties_helper_signed::<i32>();
     get_bit_properties_helper_signed::<i64>();
+    get_bit_properties_helper_signed::<isize>();
 }
 
 fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
@@ -127,10 +129,12 @@ fn set_bit_properties() {
     set_bit_properties_helper_unsigned::<u16>();
     set_bit_properties_helper_unsigned::<u32>();
     set_bit_properties_helper_unsigned::<u64>();
+    set_bit_properties_helper_unsigned::<usize>();
     set_bit_properties_helper_signed::<i8>();
     set_bit_properties_helper_signed::<i16>();
     set_bit_properties_helper_signed::<i32>();
     set_bit_properties_helper_signed::<i64>();
+    set_bit_properties_helper_signed::<isize>();
 }
 
 fn clear_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
@@ -194,10 +198,12 @@ fn clear_bit_properties() {
     clear_bit_properties_helper_unsigned::<u16>();
     clear_bit_properties_helper_unsigned::<u32>();
     clear_bit_properties_helper_unsigned::<u64>();
+    clear_bit_properties_helper_unsigned::<usize>();
     clear_bit_properties_helper_signed::<i8>();
     clear_bit_properties_helper_signed::<i16>();
     clear_bit_properties_helper_signed::<i32>();
     clear_bit_properties_helper_signed::<i64>();
+    clear_bit_properties_helper_signed::<isize>();
 }
 
 fn assign_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
@@ -230,10 +236,12 @@ fn assign_bit_properties() {
     assign_bit_properties_helper_unsigned::<u16>();
     assign_bit_properties_helper_unsigned::<u32>();
     assign_bit_properties_helper_unsigned::<u64>();
+    assign_bit_properties_helper_unsigned::<usize>();
     assign_bit_properties_helper_signed::<i8>();
     assign_bit_properties_helper_signed::<i16>();
     assign_bit_properties_helper_signed::<i32>();
     assign_bit_properties_helper_signed::<i64>();
+    assign_bit_properties_helper_signed::<isize>();
 }
 
 fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
@@ -268,8 +276,10 @@ fn flip_bit_properties() {
     flip_bit_properties_helper_unsigned::<u16>();
     flip_bit_properties_helper_unsigned::<u32>();
     flip_bit_properties_helper_unsigned::<u64>();
+    flip_bit_properties_helper_unsigned::<usize>();
     flip_bit_properties_helper_signed::<i8>();
     flip_bit_properties_helper_signed::<i16>();
     flip_bit_properties_helper_signed::<i32>();
     flip_bit_properties_helper_signed::<i64>();
+    flip_bit_properties_helper_signed::<isize>();
 }

@@ -16,6 +16,7 @@ use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
+use malachite_test::inputs::natural::naturals;
 
 #[test]
 fn test_significant_bits() {
@@ -56,6 +57,10 @@ fn significant_bits_properties() {
             assert!(Natural::ONE << (significant_bits - 1) <= x_abs);
             assert!(x_abs < Natural::ONE << significant_bits);
         }
+    });
+
+    test_properties(naturals, |n| {
+        assert_eq!(Integer::from(n).significant_bits(), n.significant_bits());
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {

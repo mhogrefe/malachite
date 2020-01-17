@@ -1,3 +1,9 @@
+use malachite_base::comparison::Max;
+use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
+
 fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     let test = |n, out| {
         assert_eq!(T::exact_from(n).floor_log_two(), out);
@@ -19,6 +25,7 @@ fn test_floor_log_two() {
     floor_log_two_helper_unsigned::<u16>(u16::MAX.into());
     floor_log_two_helper_unsigned::<u32>(u32::MAX.into());
     floor_log_two_helper_unsigned::<u64>(u64::MAX);
+    floor_log_two_helper_unsigned::<usize>(u64::wrapping_from(usize::MAX));
 }
 
 macro_rules! floor_log_two_fail {
@@ -35,6 +42,7 @@ floor_log_two_fail!(u8, floor_log_two_u8_fail);
 floor_log_two_fail!(u16, floor_log_two_u16_fail);
 floor_log_two_fail!(u32, floor_log_two_limb_fail);
 floor_log_two_fail!(u64, floor_log_two_u64_fail);
+floor_log_two_fail!(usize, floor_log_two_usize_fail);
 
 fn ceiling_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     let test = |n, out| {
@@ -57,6 +65,7 @@ fn test_ceiling_log_two() {
     ceiling_log_two_helper_unsigned::<u16>(u16::MAX.into());
     ceiling_log_two_helper_unsigned::<u32>(u32::MAX.into());
     ceiling_log_two_helper_unsigned::<u64>(u64::MAX);
+    ceiling_log_two_helper_unsigned::<usize>(u64::wrapping_from(usize::MAX));
 }
 
 macro_rules! ceiling_log_two_fail {
@@ -73,3 +82,4 @@ ceiling_log_two_fail!(u8, ceiling_log_two_u8_fail);
 ceiling_log_two_fail!(u16, ceiling_log_two_u16_fail);
 ceiling_log_two_fail!(u32, ceiling_log_two_limb_fail);
 ceiling_log_two_fail!(u64, ceiling_log_two_u64_fail);
+ceiling_log_two_fail!(usize, ceiling_log_two_usize_fail);

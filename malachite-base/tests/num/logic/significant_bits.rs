@@ -2,6 +2,7 @@ use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 fn significant_bits_helper_common<T: PrimitiveInteger>() {
     let test = |n, out| {
@@ -46,8 +47,13 @@ fn test_significant_bits() {
     significant_bits_helper_unsigned::<u16>(u16::MAX.into());
     significant_bits_helper_unsigned::<u32>(u32::MAX.into());
     significant_bits_helper_unsigned::<u64>(u64::MAX);
+    significant_bits_helper_unsigned::<usize>(u64::wrapping_from(usize::MAX));
     significant_bits_helper_signed::<i8>(i8::MAX.into(), i8::MIN.into());
     significant_bits_helper_signed::<i16>(i16::MAX.into(), i16::MIN.into());
     significant_bits_helper_signed::<i32>(i32::MAX.into(), i32::MIN.into());
     significant_bits_helper_signed::<i64>(i64::MAX, i64::MIN);
+    significant_bits_helper_signed::<isize>(
+        i64::wrapping_from(isize::MAX),
+        i64::wrapping_from(isize::MIN),
+    );
 }

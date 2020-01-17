@@ -1,7 +1,13 @@
 use common::DemoBenchRegistry;
 
+pub mod bit_access;
 pub mod get_highest_bit;
+pub mod not_assign;
+pub mod significant_bits;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    bit_access::register(registry);
     get_highest_bit::register(registry);
+    not_assign::register(registry);
+    significant_bits::register(registry);
 }

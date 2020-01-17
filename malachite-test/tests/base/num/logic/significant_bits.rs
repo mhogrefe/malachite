@@ -39,8 +39,10 @@ fn significant_bits_properties() {
     significant_bits_properties_helper_unsigned::<u16>();
     significant_bits_properties_helper_unsigned::<u32>();
     significant_bits_properties_helper_unsigned::<u64>();
+    significant_bits_properties_helper_unsigned::<usize>();
     significant_bits_properties_helper_signed::<i8>();
     significant_bits_properties_helper_signed::<i16>();
     significant_bits_properties_helper_signed::<i32>();
     significant_bits_properties_helper_signed::<i64>();
+    significant_bits_properties_helper_signed::<isize>();
 }

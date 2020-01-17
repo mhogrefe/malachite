@@ -8,20 +8,24 @@ use inputs::base::positive_unsigneds;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_floor_log_two);
     register_demo!(registry, demo_u16_floor_log_two);
-    register_demo!(registry, demo_limb_floor_log_two);
+    register_demo!(registry, demo_u32_floor_log_two);
     register_demo!(registry, demo_u64_floor_log_two);
+    register_demo!(registry, demo_usize_floor_log_two);
     register_demo!(registry, demo_u8_ceiling_log_two);
     register_demo!(registry, demo_u16_ceiling_log_two);
-    register_demo!(registry, demo_limb_ceiling_log_two);
+    register_demo!(registry, demo_u32_ceiling_log_two);
     register_demo!(registry, demo_u64_ceiling_log_two);
+    register_demo!(registry, demo_usize_ceiling_log_two);
     register_bench!(registry, None, benchmark_u8_floor_log_two);
     register_bench!(registry, None, benchmark_u16_floor_log_two);
-    register_bench!(registry, None, benchmark_limb_floor_log_two);
+    register_bench!(registry, None, benchmark_u32_floor_log_two);
     register_bench!(registry, None, benchmark_u64_floor_log_two);
+    register_bench!(registry, None, benchmark_usize_floor_log_two);
     register_bench!(registry, None, benchmark_u8_ceiling_log_two);
     register_bench!(registry, None, benchmark_u16_ceiling_log_two);
-    register_bench!(registry, None, benchmark_limb_ceiling_log_two);
+    register_bench!(registry, None, benchmark_u32_ceiling_log_two);
     register_bench!(registry, None, benchmark_u64_ceiling_log_two);
+    register_bench!(registry, None, benchmark_usize_ceiling_log_two);
 }
 
 fn demo_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
@@ -114,10 +118,10 @@ unsigned!(
 );
 unsigned!(
     u32,
-    demo_limb_floor_log_two,
-    demo_limb_ceiling_log_two,
-    benchmark_limb_floor_log_two,
-    benchmark_limb_ceiling_log_two
+    demo_u32_floor_log_two,
+    demo_u32_ceiling_log_two,
+    benchmark_u32_floor_log_two,
+    benchmark_u32_ceiling_log_two
 );
 unsigned!(
     u64,
@@ -125,4 +129,11 @@ unsigned!(
     demo_u64_ceiling_log_two,
     benchmark_u64_floor_log_two,
     benchmark_u64_ceiling_log_two
+);
+unsigned!(
+    usize,
+    demo_usize_floor_log_two,
+    demo_usize_ceiling_log_two,
+    benchmark_usize_floor_log_two,
+    benchmark_usize_ceiling_log_two
 );

@@ -21,6 +21,7 @@ fn floor_log_two_properties() {
     floor_log_two_properties_helper::<u16>();
     floor_log_two_properties_helper::<u32>();
     floor_log_two_properties_helper::<u64>();
+    floor_log_two_properties_helper::<usize>();
 }
 
 fn ceiling_log_two_properties_helper<T: PrimitiveUnsigned + Rand>() {
@@ -37,4 +38,5 @@ fn ceiling_log_two_properties() {
     ceiling_log_two_properties_helper::<u16>();
     ceiling_log_two_properties_helper::<u32>();
     ceiling_log_two_properties_helper::<u64>();
+    ceiling_log_two_properties_helper::<usize>();
 }
