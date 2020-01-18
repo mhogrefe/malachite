@@ -70,6 +70,20 @@ macro_rules! impl_logic_traits {
         }
 
         impl HammingDistance<$t> for $t {
+            /// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips
+            /// needed to turn `self` into `rhs`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::HammingDistance;
+            ///
+            /// assert_eq!(123u32.hamming_distance(456), 6);
+            /// assert_eq!(0i8.hamming_distance(-1), 8);
+            /// ```
             #[inline]
             fn hamming_distance(self, other: $t) -> u64 {
                 u64::from((self ^ other).count_ones())

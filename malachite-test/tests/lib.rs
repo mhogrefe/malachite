@@ -59,6 +59,7 @@ pub mod base {
         pub mod logic {
             pub mod bit_access;
             pub mod get_highest_bit;
+            pub mod hamming_distance;
             pub mod not_assign;
             pub mod significant_bits;
         }

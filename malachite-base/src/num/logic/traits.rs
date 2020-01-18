@@ -46,13 +46,17 @@ pub trait SignificantBits {
     fn significant_bits(self) -> u64;
 }
 
-//TODO doc and test
-pub trait HammingDistance<RHS> {
+/// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips needed to turn
+/// `self` into `rhs`.
+pub trait HammingDistance<RHS = Self> {
     fn hamming_distance(self, rhs: RHS) -> u64;
 }
 
-//TODO doc and test
-pub trait CheckedHammingDistance<RHS> {
+/// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips needed to turn
+/// `self` into `rhs`. This trait allows for the possibility of the distance being undefined for
+/// some pairs of `self` and `rhs`, in which case the `checked_hamming_distance` function should
+/// return `None`.
+pub trait CheckedHammingDistance<RHS = Self> {
     fn checked_hamming_distance(self, rhs: RHS) -> Option<u64>;
 }
 
