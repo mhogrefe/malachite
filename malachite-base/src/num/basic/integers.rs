@@ -30,8 +30,8 @@ use num::conversion::traits::{
     SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
-    BitAccess, BitScan, CountOnes, CountZeros, HammingDistance, LeadingZeros, NotAssign,
-    RotateLeft, RotateRight, SignificantBits, TrailingZeros,
+    BitAccess, BitScan, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight,
+    SignificantBits, TrailingZeros,
 };
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
@@ -126,7 +126,6 @@ pub trait PrimitiveInteger:
     + ExactInto<i128>
     + ExactInto<isize>
     + FromStr
-    + HammingDistance<Self>
     + Hash
     + LeadingZeros
     + LowerHex

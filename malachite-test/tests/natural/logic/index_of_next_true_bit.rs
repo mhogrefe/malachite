@@ -111,7 +111,7 @@ fn index_of_next_true_bit_properties() {
         assert_eq!(n.index_of_next_true_bit(0), n.trailing_zeros());
     });
 
-    test_properties(unsigneds, |&u: &u64| {
+    test_properties(unsigneds::<u64>, |&u| {
         assert_eq!(Natural::ZERO.index_of_next_true_bit(u), None);
     });
 

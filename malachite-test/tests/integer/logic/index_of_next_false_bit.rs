@@ -15,6 +15,7 @@ use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u64};
+use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_test::integer::logic::index_of_next_false_bit::integer_index_of_next_false_bit_alt;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -127,10 +128,20 @@ fn index_of_next_false_bit_properties() {
         assert_eq!(n.index_of_next_false_bit(0), (!n).trailing_zeros());
     });
 
-    test_properties(unsigneds, |&u: &u64| {
+    test_properties(unsigneds::<u64>, |&u| {
         assert_eq!(Integer::ZERO.index_of_next_false_bit(u), Some(u));
         assert_eq!(Integer::NEGATIVE_ONE.index_of_next_false_bit(u), None);
     });
+
+    test_properties(
+        pairs_of_natural_and_small_unsigned::<u64>,
+        |&(ref n, index)| {
+            assert_eq!(
+                Integer::from(n).index_of_next_false_bit(index),
+                n.index_of_next_false_bit(index)
+            );
+        },
+    );
 
     test_properties(
         pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,

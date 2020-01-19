@@ -7,12 +7,14 @@ use malachite_nz::integer::logic::checked_hamming_distance::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use malachite_test::common::integer_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_var_6,
+    pairs_of_signeds, pairs_of_unsigned_vec_and_positive_unsigned_var_2,
+    pairs_of_unsigned_vec_var_6,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_natural_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
@@ -201,6 +203,13 @@ fn checked_hamming_distance_properties() {
         assert_eq!(
             Integer::from(x).checked_hamming_distance(&Integer::from(y)),
             Some(x.hamming_distance(y))
+        );
+    });
+
+    test_properties(pairs_of_signeds::<SignedLimb>, |&(x, y)| {
+        assert_eq!(
+            Integer::from(x).checked_hamming_distance(&Integer::from(y)),
+            x.checked_hamming_distance(y)
         );
     });
 }

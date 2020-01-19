@@ -210,6 +210,14 @@ pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T>
     }
 }
 
+pub fn signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(nonzero_signeds(gm).filter(|&i| i != T::NEGATIVE_ONE))
+}
+
 macro_rules! float_gen {
     (
         $f: ident,
@@ -408,6 +416,15 @@ where
     }
 }
 
+// All pairs of signeds with the same sign.
+pub fn pairs_of_signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(pairs_of_signeds(gm).filter(|&(x, y)| (x >= T::ZERO) == (y >= T::ZERO)))
+}
+
 pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -420,6 +437,19 @@ where
             special_random_signed(&EXAMPLE_SEED),
         )),
     }
+}
+
+// All triples of signeds with the same sign.
+pub fn triples_of_signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        triples_of_signeds(gm).filter(|&(x, y, z)| {
+            (x >= T::ZERO) == (y >= T::ZERO) && (y >= T::ZERO) == (z >= T::ZERO)
+        }),
+    )
 }
 
 pub fn pairs_of_natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>

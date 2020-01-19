@@ -118,7 +118,7 @@ macro_rules! identity_conversion {
 /// This macro defines conversions from type $a to type $b, where every value of type $a is
 /// representable by a value of type $b.
 macro_rules! lossless_conversion {
-    ($a:ty, $b:ty) => {
+    ($a:ty, $b:ident) => {
         /// Converts a value to another type. Since this conversion is always lossless and leaves
         /// the value unchanged, `None` is never returned.
         ///
@@ -136,7 +136,7 @@ macro_rules! lossless_conversion {
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
-                Some(value.into())
+                Some($b::from(value))
             }
         }
 
@@ -157,7 +157,7 @@ macro_rules! lossless_conversion {
         impl WrappingFrom<$a> for $b {
             #[inline]
             fn wrapping_from(value: $a) -> $b {
-                value.into()
+                $b::from(value)
             }
         }
 
@@ -178,7 +178,7 @@ macro_rules! lossless_conversion {
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
-                value.into()
+                $b::from(value)
             }
         }
 
@@ -200,7 +200,7 @@ macro_rules! lossless_conversion {
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
-                (value.into(), false)
+                ($b::from(value), false)
             }
         }
 

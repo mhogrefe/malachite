@@ -115,9 +115,12 @@ pub trait BitAccess {
     }
 }
 
-//TODO docs, test
+/// This trait defines functions search for the next true or false bit, starting at a specified
+/// index and searching in the more-significant direction.
 pub trait BitScan {
+    /// Finds the smallest index of a `false` bit that is greater than or equal to `starting_index`.
     fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64>;
 
+    /// Finds the smallest index of a `true` bit that is greater than or equal to `starting_index`.
     fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64>;
 }

@@ -113,7 +113,7 @@ macro_rules! impl_arithmetic_traits {
 
             #[inline]
             fn mod_power_of_two(self, pow: u64) -> $t {
-                if self == 0 || pow >= $t::WIDTH.into() {
+                if self == 0 || pow >= u64::from($t::WIDTH) {
                     self
                 } else {
                     self & ((1 << pow) - 1)
@@ -124,7 +124,7 @@ macro_rules! impl_arithmetic_traits {
         impl ModPowerOfTwoAssign for $t {
             #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
-                if *self != 0 && pow < $t::WIDTH.into() {
+                if *self != 0 && pow < u64::from($t::WIDTH) {
                     *self &= (1 << pow) - 1;
                 }
             }

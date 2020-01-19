@@ -7,6 +7,7 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
+use num::logic::traits::CheckedHammingDistance;
 
 /// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:
@@ -14,6 +15,7 @@ pub trait PrimitiveSigned:
     + CeilingMod
     + CeilingModAssign
     + CheckedAbs<Output = Self>
+    + CheckedHammingDistance
     + From<i8>
     + Neg<Output = Self>
     + NegAssign

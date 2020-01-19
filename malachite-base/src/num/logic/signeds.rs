@@ -1,6 +1,6 @@
 use num::arithmetic::traits::UnsignedAbs;
 use num::basic::integers::PrimitiveInteger;
-use num::logic::traits::{BitAccess, BitScan, SignificantBits};
+use num::logic::traits::{BitAccess, BitScan, CheckedHammingDistance, SignificantBits};
 
 macro_rules! impl_logic_traits {
     ($t:ident) => {
@@ -22,6 +22,33 @@ macro_rules! impl_logic_traits {
             #[inline]
             fn significant_bits(self) -> u64 {
                 self.unsigned_abs().significant_bits()
+            }
+        }
+
+        impl CheckedHammingDistance<$t> for $t {
+            /// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips
+            /// needed to turn `self` into `rhs`. If `self` and `rhs` have opposite signs, then the
+            /// number of flips would be infinite, so the result is `None`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::CheckedHammingDistance;
+            ///
+            /// assert_eq!(123i32.checked_hamming_distance(456), Some(6));
+            /// assert_eq!(0i8.checked_hamming_distance(127), Some(7));
+            /// assert_eq!(0i8.checked_hamming_distance(-1), None);
+            /// ```
+            #[inline]
+            fn checked_hamming_distance(self, other: $t) -> Option<u64> {
+                if (self >= 0) == (other >= 0) {
+                    Some(u64::from((self ^ other).count_ones()))
+                } else {
+                    None
+                }
             }
         }
 
@@ -97,7 +124,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                if index < Self::WIDTH.into() {
+                if index < u64::from(Self::WIDTH) {
                     self & (1 << index) != 0
                 } else {
                     *self < 0
@@ -137,7 +164,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                if index < Self::WIDTH.into() {
+                if index < u64::from(Self::WIDTH) {
                     *self |= 1 << index;
                 } else if *self >= 0 {
                     panic!(
@@ -183,7 +210,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                if index < Self::WIDTH.into() {
+                if index < u64::from(Self::WIDTH) {
                     *self &= !(1 << index);
                 } else if *self < 0 {
                     panic!(
@@ -195,8 +222,31 @@ macro_rules! impl_logic_traits {
             }
         }
 
-        //TODO
         impl BitScan for $t {
+            /// Finds the smallest index of a `false` bit that is greater than or equal to
+            /// `starting_index`.
+            ///
+            /// If the input is negative and starting index is greater than or equal to the type's
+            /// width, the result will be `None` since there are no `false` bits past that point. If
+            /// the input is non-negative, the result will be the starting index.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::logic::traits::BitScan;
+            ///
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(0), Some(0));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(20), Some(20));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(31), Some(31));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(32), Some(34));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(33), Some(34));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(34), Some(34));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(35), None);
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(100), None);
+            /// ```
             #[inline]
             fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
@@ -206,17 +256,40 @@ macro_rules! impl_logic_traits {
                         None
                     }
                 } else {
-                    let index = (!(self | ((1 << starting_index) - 1)))
-                        .trailing_zeros()
-                        .into();
-                    if index == $t::WIDTH.into() {
+                    let index = (!(self | ((1 << starting_index) - 1))).trailing_zeros();
+                    if index == $t::WIDTH {
                         None
                     } else {
-                        Some(index)
+                        Some(u64::from(index))
                     }
                 }
             }
 
+            /// Finds the smallest index of a `true` bit that is greater than or equal to
+            /// `starting_index`.
+            ///
+            /// If the input is non-negative and starting index is greater than or equal to the
+            /// type's width, the result will be `None` since there are no `true` bits past that
+            /// point. If the input is negative, the result will be the starting index.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::logic::traits::BitScan;
+            ///
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(0), Some(32));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(20), Some(32));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(31), Some(32));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(32), Some(32));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(33), Some(33));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(34), Some(35));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(35), Some(35));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(36), Some(36));
+            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(100), Some(100));
+            /// ```
             #[inline]
             fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
                 if starting_index >= u64::from(Self::WIDTH) - 1 {
@@ -226,13 +299,11 @@ macro_rules! impl_logic_traits {
                         Some(starting_index)
                     }
                 } else {
-                    let index = (self & !((1 << starting_index) - 1))
-                        .trailing_zeros()
-                        .into();
-                    if index == $t::WIDTH.into() {
+                    let index = (self & !((1 << starting_index) - 1)).trailing_zeros();
+                    if index == $t::WIDTH {
                         None
                     } else {
-                        Some(index)
+                        Some(u64::from(index))
                     }
                 }
             }

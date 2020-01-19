@@ -110,7 +110,7 @@ pub trait PrimitiveFloat:
     fn adjusted_exponent(self) -> u32 {
         let bits = self.to_bits();
         let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
-        exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into())
+        exponent.mod_power_of_two(u64::from(Self::EXPONENT_WIDTH))
     }
 
     fn from_adjusted_mantissa_and_exponent(
