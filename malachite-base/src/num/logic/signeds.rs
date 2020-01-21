@@ -1,6 +1,9 @@
-use num::arithmetic::traits::UnsignedAbs;
+use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
-use num::logic::traits::{BitAccess, BitScan, CheckedHammingDistance, SignificantBits};
+use num::basic::signeds::PrimitiveSigned;
+use num::logic::traits::{
+    BitAccess, BitBlockAccess, BitScan, CheckedHammingDistance, SignificantBits,
+};
 
 macro_rules! impl_logic_traits {
     ($t:ident) => {
@@ -248,15 +251,15 @@ macro_rules! impl_logic_traits {
             /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(100), None);
             /// ```
             #[inline]
-            fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
-                if starting_index >= u64::from(Self::WIDTH) - 1 {
+            fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
+                if start >= u64::from(Self::WIDTH) - 1 {
                     if self >= 0 {
-                        Some(starting_index)
+                        Some(start)
                     } else {
                         None
                     }
                 } else {
-                    let index = (!(self | ((1 << starting_index) - 1))).trailing_zeros();
+                    let index = (!(self | ((1 << start) - 1))).trailing_zeros();
                     if index == $t::WIDTH {
                         None
                     } else {
@@ -291,21 +294,61 @@ macro_rules! impl_logic_traits {
             /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(100), Some(100));
             /// ```
             #[inline]
-            fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
-                if starting_index >= u64::from(Self::WIDTH) - 1 {
+            fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
+                if start >= u64::from(Self::WIDTH) - 1 {
                     if self >= 0 {
                         None
                     } else {
-                        Some(starting_index)
+                        Some(start)
                     }
                 } else {
-                    let index = (self & !((1 << starting_index) - 1)).trailing_zeros();
+                    let index = (self & !((1 << start) - 1)).trailing_zeros();
                     if index == $t::WIDTH {
                         None
                     } else {
                         Some(u64::from(index))
                     }
                 }
+            }
+        }
+
+        impl BitBlockAccess for $t {
+            type Output = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
+
+            /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            /// The type of the block of bits is the unsigned version of the input type. If `end` is
+            /// greater than the type's width, the high bits of the result are all 0, or all 1,
+            /// depending on the input value's sign; and if the input is negative and `end - start`
+            /// is greater than the type's width, the function panics.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `self < 0 && end - start > $t::WIDTH`.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitBlockAccess;
+            ///
+            /// assert_eq!((-0x5433i16).get_bits(4, 8), 0xc);
+            /// assert_eq!((-0x5433i16).get_bits(5, 9), 14);
+            /// assert_eq!((-0x5433i16).get_bits(5, 5), 0);
+            /// assert_eq!((-0x5433i16).get_bits(100, 104), 0xf);
+            /// ```
+            fn get_bits(&self, start: u64, end: u64) -> Self::Output {
+                assert!(start <= end);
+                (if start >= u64::from($t::WIDTH) {
+                    if *self >= 0 {
+                        0
+                    } else {
+                        -1
+                    }
+                } else {
+                    self >> start
+                })
+                .mod_power_of_two(end - start)
             }
         }
     };

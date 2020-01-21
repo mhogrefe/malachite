@@ -118,9 +118,43 @@ pub trait BitAccess {
 /// This trait defines functions search for the next true or false bit, starting at a specified
 /// index and searching in the more-significant direction.
 pub trait BitScan {
-    /// Finds the smallest index of a `false` bit that is greater than or equal to `starting_index`.
-    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64>;
+    /// Finds the smallest index of a `false` bit that is greater than or equal to `start`.
+    fn index_of_next_false_bit(self, start: u64) -> Option<u64>;
 
-    /// Finds the smallest index of a `true` bit that is greater than or equal to `starting_index`.
-    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64>;
+    /// Finds the smallest index of a `true` bit that is greater than or equal to `start`.
+    fn index_of_next_true_bit(self, start: u64) -> Option<u64>;
+}
+
+/// This trait defines functions that access or modify blocks of adjacent bits in a value, where the
+/// start (inclusive) and end (exclusive) indices of the block are specified.
+pub trait BitBlockAccess: Sized {
+    type Output;
+
+    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+    fn get_bits(&self, start: u64, end: u64) -> Self::Output;
+
+    /// Extracts a block of bits whose first index is `start` and last index is `end - 1`, taking
+    /// ownership of `self`.
+    ///
+    /// Time: worst case O(f(n)), where f(n) is the worst-case time complexity of `Self::get_bits`.
+    ///
+    /// Additional memory: worst case O(f(n)), where f(n) is the worst-case additional-memory
+    /// complexity of `Self::get_bits`.
+    ///
+    /// # Panics
+    /// See panics for `get_bits`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::logic::traits::BitBlockAccess;
+    ///
+    /// assert_eq!((-0x5433i16).get_bits_owned(4, 8), 0xc);
+    /// assert_eq!((-0x5433i16).get_bits_owned(5, 9), 14);
+    /// assert_eq!((-0x5433i16).get_bits_owned(5, 5), 0);
+    /// assert_eq!((-0x5433i16).get_bits_owned(100, 104), 0xf);
+    /// ```
+    #[inline]
+    fn get_bits_owned(self, start: u64, end: u64) -> Self::Output {
+        self.get_bits(start, end)
+    }
 }

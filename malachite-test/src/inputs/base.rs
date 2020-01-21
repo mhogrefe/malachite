@@ -9,7 +9,9 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
+};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
@@ -388,6 +390,12 @@ fn pairs_of_unsigneds_var_2_with_seed<T: PrimitiveUnsigned + Rand>(
 // All pairs of `T`s, where `T` is unsigned and the most-significant bit of the first `T` is set.
 pub fn pairs_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
     pairs_of_unsigneds_var_2_with_seed(gm, &EXAMPLE_SEED)
+}
+
+//TODO use subset_pairs
+// All pairs of `T`s where `T` is unsigned and the first `T` is less than or equal to the second.
+pub fn pairs_of_unsigneds_var_3<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x <= y))
 }
 
 pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
@@ -782,6 +790,71 @@ pub fn triples_of_unsigned_unsigned_width_range_and_bool_var_1<
         )),
     };
     Box::new(unfiltered.filter(|&(_, index, bit)| !bit || index < U::exact_from(T::WIDTH)))
+}
+
+// All triples of T, U, and U, where T and U are unsigned and the first U is less than or equal to
+// the second.
+pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, U)> {
+    let ts = match gm {
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+            exhaustive_unsigned(),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    };
+    Box::new(ts.filter(|&(_, start, end)| start <= end))
+}
+
+// All triples of T, U, and U, where T is signed, U is unsigned, the first U is less than or equal
+// to the second, and if the T is negative, the difference between the two Us is no greater than the
+// width of T.
+pub fn triples_of_signed_small_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveSigned + Rand,
+    U: PrimitiveUnsigned + Rand + ExactFrom<u64>,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    let ts = match gm {
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+            exhaustive_signed(),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    };
+    Box::new(ts.filter(|&(n, start, end)| {
+        start <= end && (n > T::ZERO || end - start <= U::exact_from(T::WIDTH))
+    }))
 }
 
 // All triples of signed `T`, `U`, and `bool`, where `T` is signed, `U` is unsigned, and `U` is

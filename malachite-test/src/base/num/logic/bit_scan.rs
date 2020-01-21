@@ -56,12 +56,12 @@ fn demo_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
 ) {
-    for (n, starting_index) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
+    for (n, start) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
         println!(
             "{}.index_of_next_false_bit({}) = {:?}",
             n,
-            starting_index,
-            n.index_of_next_false_bit(starting_index)
+            start,
+            n.index_of_next_false_bit(start)
         );
     }
 }
@@ -70,12 +70,12 @@ fn demo_unsigned_index_of_next_true_bit<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
 ) {
-    for (n, starting_index) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
+    for (n, start) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
         println!(
             "{}.index_of_next_true_bit({}) = {:?}",
             n,
-            starting_index,
-            n.index_of_next_true_bit(starting_index)
+            start,
+            n.index_of_next_true_bit(start)
         );
     }
 }
@@ -85,12 +85,12 @@ where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    for (n, starting_index) in pairs_of_signed_and_small_unsigned::<T, u64>(gm).take(limit) {
+    for (n, start) in pairs_of_signed_and_small_unsigned::<T, u64>(gm).take(limit) {
         println!(
             "{}.index_of_next_false_bit({}) = {:?}",
             n,
-            starting_index,
-            n.index_of_next_false_bit(starting_index)
+            start,
+            n.index_of_next_false_bit(start)
         );
     }
 }
@@ -100,12 +100,12 @@ where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    for (n, starting_index) in pairs_of_signed_and_small_unsigned::<T, u64>(gm).take(limit) {
+    for (n, start) in pairs_of_signed_and_small_unsigned::<T, u64>(gm).take(limit) {
         println!(
             "{}.index_of_next_true_bit({}) = {:?}",
             n,
-            starting_index,
-            n.index_of_next_true_bit(starting_index)
+            start,
+            n.index_of_next_true_bit(start)
         );
     }
 }

@@ -1,5 +1,6 @@
+use num::arithmetic::traits::ModPowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
-use num::logic::traits::{BitAccess, BitScan, HammingDistance, SignificantBits};
+use num::logic::traits::{BitAccess, BitBlockAccess, BitScan, HammingDistance, SignificantBits};
 
 macro_rules! impl_logic_traits {
     ($t:ident) => {
@@ -183,11 +184,11 @@ macro_rules! impl_logic_traits {
             /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(100), Some(100));
             /// ```
             #[inline]
-            fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
-                Some(if starting_index >= u64::from(Self::WIDTH) {
-                    starting_index
+            fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
+                Some(if start >= u64::from(Self::WIDTH) {
+                    start
                 } else {
-                    u64::from((!(self | ((1 << starting_index) - 1))).trailing_zeros())
+                    u64::from((!(self | ((1 << start) - 1))).trailing_zeros())
                 })
             }
 
@@ -216,16 +217,47 @@ macro_rules! impl_logic_traits {
             /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(100), None);
             /// ```
             #[inline]
-            fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
-                if starting_index >= u64::from(Self::WIDTH) {
+            fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
+                if start >= u64::from(Self::WIDTH) {
                     None
                 } else {
-                    let index = (self & !((1 << starting_index) - 1)).trailing_zeros();
+                    let index = (self & !((1 << start) - 1)).trailing_zeros();
                     if index == Self::WIDTH {
                         None
                     } else {
                         Some(u64::from(index))
                     }
+                }
+            }
+        }
+
+        impl BitBlockAccess for $t {
+            type Output = $t;
+
+            /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            /// The block of bits has the same type as the input. If `end` is greater than the
+            /// type's width, the high bits of the result are all 0.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitBlockAccess;
+            ///
+            /// assert_eq!(0xabcdu16.get_bits(4, 8), 0xc);
+            /// assert_eq!(0xabcdu16.get_bits(12, 100), 0xa);
+            /// assert_eq!(0xabcdu16.get_bits(5, 9), 14);
+            /// assert_eq!(0xabcdu16.get_bits(5, 5), 0);
+            /// assert_eq!(0xabcdu16.get_bits(100, 200), 0);
+            /// ```
+            fn get_bits(&self, start: u64, end: u64) -> Self {
+                assert!(start <= end);
+                if start >= u64::from($t::WIDTH) {
+                    0
+                } else {
+                    (self >> start).mod_power_of_two(end - start)
                 }
             }
         }

@@ -1,3 +1,5 @@
+use num::basic::integers::PrimitiveInteger;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{
     CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight, TrailingZeros,
 };
@@ -82,3 +84,13 @@ impl_logic_traits!(i32);
 impl_logic_traits!(i64);
 impl_logic_traits!(i128);
 impl_logic_traits!(isize);
+
+pub fn _get_bits_naive<T: PrimitiveInteger, U: PrimitiveUnsigned>(n: T, start: u64, end: u64) -> U {
+    let mut result = U::ZERO;
+    for i in start..end {
+        if n.get_bit(i) {
+            result.set_bit(i - start);
+        }
+    }
+    result
+}

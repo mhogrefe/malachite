@@ -15,6 +15,7 @@ pub mod num {
     pub mod conversion;
     pub mod logic {
         pub mod bit_access;
+        pub mod bit_block_access;
         pub mod bit_scan;
         pub mod get_highest_bit;
         pub mod hamming_distance;

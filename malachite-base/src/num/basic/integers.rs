@@ -13,8 +13,8 @@ use named::Named;
 use num::arithmetic::traits::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem, CheckedSub,
     DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, OverflowingAdd,
-    OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
+    OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
     OverflowingRemAssign, OverflowingSub, Parity, Pow, SaturatingAdd, SaturatingAddAssign,
     SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign,
@@ -30,8 +30,8 @@ use num::conversion::traits::{
     SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
-    BitAccess, BitScan, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight,
-    SignificantBits, TrailingZeros,
+    BitAccess, BitBlockAccess, BitScan, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft,
+    RotateRight, SignificantBits, TrailingZeros,
 };
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
@@ -43,6 +43,7 @@ pub trait PrimitiveInteger:
     + BitAccess
     + BitAnd<Output = Self>
     + BitAndAssign<Self>
+    + BitBlockAccess
     + BitOr<Output = Self>
     + BitOrAssign<Self>
     + BitScan
@@ -133,6 +134,7 @@ pub trait PrimitiveInteger:
     + Max
     + Mod
     + ModAssign
+    + ModPowerOfTwo
     + Mul<Output = Self>
     + MulAssign<Self>
     + Named

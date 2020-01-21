@@ -2,9 +2,11 @@ use std::cmp::Ordering;
 
 use num::arithmetic::traits::{
     Abs, CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    CheckedAbs, DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, NegAssign, NegMod,
-    OverflowingAbs, Sign, TrueCheckedShl, TrueCheckedShr, UnsignedAbs, WrappingAbs,
+    CheckedAbs, DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo,
+    NegAssign, NegMod, OverflowingAbs, Sign, TrueCheckedShl, TrueCheckedShr, UnsignedAbs,
+    WrappingAbs,
 };
+use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use round::RoundingMode;
@@ -71,6 +73,23 @@ macro_rules! impl_arithmetic_traits {
             fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 <$t as PrimitiveSigned>::UnsignedOfEqualWidth::wrapping_from(self)
                     .divisible_by_power_of_two(pow)
+            }
+        }
+
+        impl ModPowerOfTwo for $t {
+            type Output = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
+
+            #[inline]
+            fn mod_power_of_two(self, pow: u64) -> Self::Output {
+                if pow > u64::from($t::WIDTH) && self < 0 {
+                    panic!("Result exceeds width of output type");
+                }
+                let x = Self::Output::wrapping_from(self);
+                if x == 0 || pow >= u64::from($t::WIDTH) {
+                    x
+                } else {
+                    x & ((1 << pow) - 1)
+                }
             }
         }
 
