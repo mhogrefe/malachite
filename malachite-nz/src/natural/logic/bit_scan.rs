@@ -9,7 +9,7 @@ use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
-/// lowest index greater than or equal to `starting_index` at which the `Natural` has a `false` bit.
+/// lowest index greater than or equal to `start` at which the `Natural` has a `false` bit.
 ///
 /// Time: worst case O(n)
 ///
@@ -32,13 +32,13 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 35), 36);
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
-pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64 {
-    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
+pub fn limbs_index_of_next_false_bit(limbs: &[Limb], start: u64) -> u64 {
+    let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_limb_index >= limbs.len() {
-        return starting_index;
+        return start;
     }
-    if let Some(result) = limbs[starting_limb_index]
-        .index_of_next_false_bit(starting_index & u64::from(Limb::WIDTH_MASK))
+    if let Some(result) =
+        limbs[starting_limb_index].index_of_next_false_bit(start & u64::from(Limb::WIDTH_MASK))
     {
         if result != u64::from(Limb::WIDTH) {
             return (u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result;
@@ -61,9 +61,8 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
-/// lowest index greater than or equal to `starting_index` at which the `Natural` has a `true` bit.
-/// If the starting index is too large and there are no more `true` bits above it, `None` is
-/// returned.
+/// lowest index greater than or equal to `start` at which the `Natural` has a `true` bit. If the
+/// starting index is too large and there are no more `true` bits above it, `None` is returned.
 ///
 /// Time: worst case O(n)
 ///
@@ -87,13 +86,13 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], starting_index: u64) -> u64
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 36), None);
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
-pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Option<u64> {
-    let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
+pub fn limbs_index_of_next_true_bit(limbs: &[Limb], start: u64) -> Option<u64> {
+    let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_limb_index >= limbs.len() {
         return None;
     }
-    if let Some(result) = limbs[starting_limb_index]
-        .index_of_next_true_bit(starting_index & u64::from(Limb::WIDTH_MASK))
+    if let Some(result) =
+        limbs[starting_limb_index].index_of_next_true_bit(start & u64::from(Limb::WIDTH_MASK))
     {
         return Some((u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result);
     }
@@ -115,8 +114,8 @@ pub fn limbs_index_of_next_true_bit(limbs: &[Limb], starting_index: u64) -> Opti
 }
 
 impl<'a> BitScan for &'a Natural {
-    /// Finds the lowest index greater than or equal to `starting_index` at which the `Natural` has
-    /// a `false` bit. This function always returns a `Some`.
+    /// Finds the lowest index greater than or equal to `start` at which the `Natural` has a `false`
+    /// bit. This function always returns a `Some`.
     ///
     /// Time: worst case O(n)
     ///
@@ -141,16 +140,16 @@ impl<'a> BitScan for &'a Natural {
     /// assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_false_bit(35), Some(36));
     /// assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_false_bit(100), Some(100));
     /// ```
-    fn index_of_next_false_bit(self, starting_index: u64) -> Option<u64> {
+    fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
         match *self {
-            Natural(Small(small)) => small.index_of_next_false_bit(starting_index),
-            Natural(Large(ref limbs)) => Some(limbs_index_of_next_false_bit(limbs, starting_index)),
+            Natural(Small(small)) => small.index_of_next_false_bit(start),
+            Natural(Large(ref limbs)) => Some(limbs_index_of_next_false_bit(limbs, start)),
         }
     }
 
-    /// Finds the lowest index greater than or equal to `starting_index` at which the `Natural` has
-    /// a `true` bit. If the starting index is too large and there are no more `true` bits above it,
-    /// `None` is returned.
+    /// Finds the lowest index greater than or equal to `start` at which the `Natural` has a `true`
+    /// bit. If the starting index is too large and there are no more `true` bits above it, `None`
+    /// is returned.
     ///
     /// Time: worst case O(n)
     ///
@@ -176,10 +175,10 @@ impl<'a> BitScan for &'a Natural {
     /// assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_true_bit(36), None);
     /// assert_eq!(Natural::from(0xb_0000_0000u64).index_of_next_true_bit(100), None);
     /// ```
-    fn index_of_next_true_bit(self, starting_index: u64) -> Option<u64> {
+    fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
         match *self {
-            Natural(Small(small)) => small.index_of_next_true_bit(starting_index),
-            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit(limbs, starting_index),
+            Natural(Small(small)) => small.index_of_next_true_bit(start),
+            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit(limbs, start),
         }
     }
 }

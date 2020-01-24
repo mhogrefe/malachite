@@ -37,19 +37,19 @@ fn demo_limbs_get_bit(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_get_bit(gm: GenerationMode, limit: usize) {
     for (n, index) in pairs_of_natural_and_small_unsigned(gm).take(limit) {
-        println!("get_bit({}, {}) = {}", n, index, n.get_bit(index));
+        println!("{}.get_bit({}) = {}", n, index, n.get_bit(index));
     }
 }
 
 fn benchmark_limbs_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_get_bit(&[u32], u64)",
+        "limbs_get_bit(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
-        &(|&(ref limbs, _)| limbs.len()),
+        &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
             "malachite",

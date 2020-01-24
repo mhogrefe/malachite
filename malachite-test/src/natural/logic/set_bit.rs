@@ -58,7 +58,7 @@ fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_slice_set_bit(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_slice_set_bit(&mut [u32], u64)",
+        "limbs_slice_set_bit(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_limb_vec_and_small_u64_var_2(gm),
         gm.name(),

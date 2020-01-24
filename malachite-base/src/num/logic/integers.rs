@@ -1,7 +1,7 @@
-use num::basic::integers::PrimitiveInteger;
-use num::basic::unsigneds::PrimitiveUnsigned;
+use num::basic::traits::Zero;
 use num::logic::traits::{
-    CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight, TrailingZeros,
+    BitAccess, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight,
+    TrailingZeros,
 };
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
@@ -85,7 +85,7 @@ impl_logic_traits!(i64);
 impl_logic_traits!(i128);
 impl_logic_traits!(isize);
 
-pub fn _get_bits_naive<T: PrimitiveInteger, U: PrimitiveUnsigned>(n: T, start: u64, end: u64) -> U {
+pub fn _get_bits_naive<T: BitAccess, U: BitAccess + Zero>(n: &T, start: u64, end: u64) -> U {
     let mut result = U::ZERO;
     for i in start..end {
         if n.get_bit(i) {

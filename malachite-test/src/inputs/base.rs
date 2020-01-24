@@ -3644,6 +3644,46 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_2<T: PrimitiveUnsigned + 
     )
 }
 
+fn triples_of_unsigned_vec_small_unsigned_and_small_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, U, U)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+// All triples of `Vec<T>`, `U`, and `U`, where `T` and `U` are unsigned and the first `U` is less
+// than or equal to the second.
+pub fn triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, U, U)> {
+    Box::new(
+        triples_of_unsigned_vec_small_unsigned_and_small_unsigned(gm)
+            .filter(|&(_, start, end)| start <= end),
+    )
+}
+
 pub fn vecs_of_bool(gm: GenerationMode) -> It<Vec<bool>> {
     match gm {
         //TODO shortlex would be better

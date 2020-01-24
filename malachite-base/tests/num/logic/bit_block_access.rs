@@ -13,7 +13,7 @@ pub fn test_get_bits_unsigned() {
     {
         // The return type of get_bits is just T, but the type system doesn't know that.
         assert_eq!(T::exact_from(x.get_bits(start, end)), out);
-        assert_eq!(_get_bits_naive::<T, T>(x, start, end), out)
+        assert_eq!(_get_bits_naive::<T, T>(&x, start, end), out)
     };
     test(0xabcdu16, 4, 8, 0xc);
     test(0xabcdu16, 12, 100, 0xa);
@@ -27,6 +27,22 @@ pub fn test_get_bits_unsigned() {
     test(0xabcdu64, 5, 5, 0);
     test(0xabcdu64, 100, 200, 0);
 }
+
+macro_rules! get_bits_fail_helper_unsigned {
+    ($t:ident, $fail:ident) => {
+        #[test]
+        #[should_panic]
+        fn $fail() {
+            $t::from(100u8).get_bits(10, 5);
+        }
+    };
+}
+
+get_bits_fail_helper_unsigned!(u8, get_bits_u8_fail);
+get_bits_fail_helper_unsigned!(u16, get_bits_u16_fail);
+get_bits_fail_helper_unsigned!(u32, get_bits_u32_fail);
+get_bits_fail_helper_unsigned!(u64, get_bits_u64_fail);
+get_bits_fail_helper_unsigned!(usize, get_bits_usize_fail);
 
 #[test]
 pub fn test_get_bits_signed() {
@@ -42,7 +58,7 @@ pub fn test_get_bits_signed() {
             out
         );
         assert_eq!(
-            _get_bits_naive::<T, T::UnsignedOfEqualWidth>(x, start, end),
+            _get_bits_naive::<T, T::UnsignedOfEqualWidth>(&x, start, end),
             out
         )
     };
@@ -60,17 +76,23 @@ pub fn test_get_bits_signed() {
 }
 
 macro_rules! get_bits_fail_helper_signed {
-    ($t:ident, $fail:ident) => {
+    ($t:ident, $fail_1:ident, $fail_2:ident) => {
         #[test]
         #[should_panic]
-        fn $fail() {
+        fn $fail_1() {
+            $t::from(10i8).get_bits(10, 5);
+        }
+
+        #[test]
+        #[should_panic]
+        fn $fail_2() {
             $t::from(-10i8).get_bits(100, 200);
         }
     };
 }
 
-get_bits_fail_helper_signed!(i8, get_bits_i8_fail_helper);
-get_bits_fail_helper_signed!(i16, get_bits_i16_fail_helper);
-get_bits_fail_helper_signed!(i32, get_bits_i32_fail_helper);
-get_bits_fail_helper_signed!(i64, get_bits_i64_fail_helper);
-get_bits_fail_helper_signed!(isize, get_bits_isize_fail_helper);
+get_bits_fail_helper_signed!(i8, get_bits_i8_fail_1, get_bits_i8_fail_2);
+get_bits_fail_helper_signed!(i16, get_bits_i16_fail_1, get_bits_i16_fail_2);
+get_bits_fail_helper_signed!(i32, get_bits_i32_fail_1, get_bits_i32_fail_2);
+get_bits_fail_helper_signed!(i64, get_bits_i64_fail_1, get_bits_i64_fail_2);
+get_bits_fail_helper_signed!(isize, get_bits_isize_fail_1, get_bits_isize_fail_2);

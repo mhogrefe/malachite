@@ -34,7 +34,7 @@ fn demo_natural_clear_bit(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_clear_bit(&mut Vec<u32>, u64)",
+        "limbs_clear_bit(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),

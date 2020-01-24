@@ -236,6 +236,7 @@ pub mod natural {
         pub mod count_ones;
         pub mod flip_bit;
         pub mod get_bit;
+        pub mod get_bits;
         pub mod hamming_distance;
         pub mod index_of_next_false_bit;
         pub mod index_of_next_true_bit;

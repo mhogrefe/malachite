@@ -25,8 +25,8 @@ where
         triples_of_unsigned_small_unsigned_and_small_unsigned_var_1::<T, u64>,
         |&(n, start, end)| {
             let bits = T::exact_from(n.get_bits(start, end));
+            assert_eq!(_get_bits_naive::<T, T>(&n, start, end), bits);
             assert!(bits <= n);
-            assert_eq!(_get_bits_naive::<T, T>(n, start, end), bits);
             assert_eq!(
                 T::exact_from(n.get_bits(start + width, end + width)),
                 T::ZERO
@@ -58,7 +58,7 @@ where
         |&(n, start, end)| {
             let bits = T::UnsignedOfEqualWidth::exact_from(n.get_bits(start, end));
             assert_eq!(
-                _get_bits_naive::<T, T::UnsignedOfEqualWidth>(n, start, end),
+                _get_bits_naive::<T, T::UnsignedOfEqualWidth>(&n, start, end),
                 bits
             );
         },
