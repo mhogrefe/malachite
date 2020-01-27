@@ -185,6 +185,7 @@ pub mod conversion;
 pub mod logic {
     pub mod and;
     pub mod bit_access;
+    pub mod bit_block_access;
     pub mod bit_scan;
     pub mod checked_count_ones;
     pub mod checked_count_zeros;

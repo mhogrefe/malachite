@@ -602,8 +602,8 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
     }
 }
 
-// All pairs of `Natural` and small `T`, where `T` is unsigned and the `Natural` is not divisible by
-// 2 to the power of the `T`.
+// All triples of `Natural`, small `T`, and small `T`, where `T` is unsigned and the first `T` is
+// less than or equal to the second.
 pub fn triples_of_natural_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, T, T)> {

@@ -857,6 +857,35 @@ where
     }))
 }
 
+// All triples of T, U, and U, where T and U are unsigned, T is positive, and the first U is less
+// than or equal to the second.
+pub fn triples_of_positive_unsigned_small_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, U)> {
+    let ts = match gm {
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+            exhaustive_positive(),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    };
+    Box::new(ts.filter(|&(_, start, end)| start <= end))
+}
+
 // All triples of signed `T`, `U`, and `bool`, where `T` is signed, `U` is unsigned, and `U` is
 // smaller than `T::WIDTH` or the `bool` is equal to whether the `T` is negative.
 pub fn triples_of_signed_unsigned_width_range_and_bool_var_1<
@@ -3681,6 +3710,17 @@ pub fn triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1<
     Box::new(
         triples_of_unsigned_vec_small_unsigned_and_small_unsigned(gm)
             .filter(|&(_, start, end)| start <= end),
+    )
+}
+
+// All triples of `Vec<Limb>`, `T`, and `T`, where `T` is unsigned, the `Vec` does not only contain
+// zeros, and the first `T` is less than or equal to the second.
+pub fn triples_of_limb_vec_small_unsigned_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, T, T)> {
+    Box::new(
+        triples_of_unsigned_vec_small_unsigned_and_small_unsigned(gm)
+            .filter(|&(ref limbs, start, end)| !limbs_test_zero(limbs) && start <= end),
     )
 }
 

@@ -564,6 +564,17 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned<
     }
 }
 
+// All triples of `Integer`, small `T`, and small `T`, where `T` is unsigned and the first `T` is
+// less than or equal to the second.
+pub fn triples_of_integer_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, T, T)> {
+    Box::new(
+        triples_of_integer_small_unsigned_and_small_unsigned(gm)
+            .filter(|&(_, start, end)| start <= end),
+    )
+}
+
 fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> It<(Integer, T)> {
     Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
 }

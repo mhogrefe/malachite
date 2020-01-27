@@ -14,6 +14,7 @@ pub mod checked_hamming_distance;
 pub mod clear_bit;
 pub mod flip_bit;
 pub mod get_bit;
+pub mod get_bits;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod not;
@@ -78,6 +79,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     clear_bit::register(registry);
     flip_bit::register(registry);
     get_bit::register(registry);
+    get_bits::register(registry);
     index_of_next_false_bit::register(registry);
     index_of_next_true_bit::register(registry);
     not::register(registry);

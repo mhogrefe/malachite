@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::integers::_get_bits_naive;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
@@ -16,15 +16,29 @@ use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_small_unsigned_var_1,
 };
 
+fn verify_limbs_get_bits(limbs: &[Limb], start: u64, end: u64, out: &[Limb]) {
+    let n = Natural::from_limbs_asc(limbs);
+    let result = n.get_bits(start, end);
+    assert_eq!(_get_bits_naive::<Natural, Natural>(&n, start, end), result);
+    assert_eq!(Natural::from_limbs_asc(out), result);
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_get_bits() {
     let test = |limbs: &[Limb], start: u64, end: u64, out: &[Limb]| {
         assert_eq!(limbs_slice_get_bits(limbs, start, end), out);
+        verify_limbs_get_bits(limbs, start, end, out);
     };
+    // limb_start >= len
     test(&[], 10, 20, &[]);
+    // limb_start < len
+    // limb_end >= len
+    // offset != 0
     test(&[0x1234_5678, 0xabcd_ef01], 16, 48, &[0xef01_1234]);
+    // limb_end < len
     test(&[0x1234_5678, 0xabcd_ef01], 4, 16, &[0x567]);
+    // offset == 0
     test(
         &[0x1234_5678, 0xabcd_ef01],
         0,
@@ -103,15 +117,10 @@ fn limbs_get_bits_properties() {
     test_properties(
         triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1,
         |&(ref limbs, start, end)| {
-            let result = Natural::from_limbs_asc(limbs).get_bits(start, end);
-            assert_eq!(
-                Natural::from_owned_limbs_asc(limbs_slice_get_bits(limbs, start, end)),
-                result
-            );
-            assert_eq!(
-                Natural::from_owned_limbs_asc(limbs_vec_get_bits(limbs.to_vec(), start, end)),
-                result
-            );
+            let out = limbs_slice_get_bits(limbs, start, end);
+            verify_limbs_get_bits(limbs, start, end, &out);
+            let out = limbs_vec_get_bits(limbs.to_vec(), start, end);
+            verify_limbs_get_bits(limbs, start, end, &out);
         },
     );
 }
@@ -129,6 +138,10 @@ fn get_bits_properties() {
             assert_eq!(
                 n.get_bits(start + significant_bits, end + significant_bits),
                 0
+            );
+            assert_eq!(
+                (!n).get_bits(start, end),
+                (Natural::ONE << (end - start)) - bits - Natural::ONE
             );
         },
     );
