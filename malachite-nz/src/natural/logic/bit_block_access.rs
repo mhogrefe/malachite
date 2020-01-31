@@ -104,7 +104,7 @@ pub fn limbs_vec_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Lim
 }
 
 impl BitBlockAccess for Natural {
-    type Output = Natural;
+    type Bits = Natural;
 
     /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
     /// is taken by reference, and the resulting bits are returned as a `Natural`. If `end` is
@@ -198,5 +198,9 @@ impl BitBlockAccess for Natural {
                 bits
             }
         }
+    }
+
+    fn assign_bits(&mut self, _start: u64, _end: u64, _bits: &Natural) {
+        unimplemented!();
     }
 }

@@ -94,3 +94,9 @@ pub fn _get_bits_naive<T: BitAccess, U: BitAccess + Zero>(n: &T, start: u64, end
     }
     result
 }
+
+pub fn _assign_bits_naive<T: BitAccess, U: BitAccess>(n: &mut T, start: u64, end: u64, bits: &U) {
+    for i in start..end {
+        n.assign_bit(i, bits.get_bit(i - start));
+    }
+}

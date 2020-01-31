@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use num::arithmetic::traits::ModPowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{BitAccess, BitBlockAccess, BitScan, HammingDistance, SignificantBits};
@@ -232,7 +234,7 @@ macro_rules! impl_logic_traits {
         }
 
         impl BitBlockAccess for $t {
-            type Output = $t;
+            type Bits = $t;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
             /// The block of bits has the same type as the input. If `end` is greater than the
@@ -259,6 +261,25 @@ macro_rules! impl_logic_traits {
                 } else {
                     (self >> start).mod_power_of_two(end - start)
                 }
+            }
+
+            fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
+                assert!(start <= end);
+                let width = u64::from($t::WIDTH);
+                let bits_width = end - start;
+                let bits = bits.mod_power_of_two(bits_width);
+                if bits != 0 && u64::from(bits.leading_zeros()) < start {
+                    panic!("Result exceeds width of output type");
+                } else if start >= width {
+                    // bits must be 0
+                    return;
+                } else if start == 0 && bits_width >= width {
+                    *self = 0;
+                } else {
+                    assert!(min(end, width) - start < width);
+                    *self &= !(((1 << (min(end, width) - start)) - 1) << start);
+                }
+                *self |= bits << start;
             }
         }
     };

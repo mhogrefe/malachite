@@ -128,10 +128,10 @@ pub trait BitScan {
 /// This trait defines functions that access or modify blocks of adjacent bits in a value, where the
 /// start (inclusive) and end (exclusive) indices of the block are specified.
 pub trait BitBlockAccess: Sized {
-    type Output;
+    type Bits;
 
     /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
-    fn get_bits(&self, start: u64, end: u64) -> Self::Output;
+    fn get_bits(&self, start: u64, end: u64) -> Self::Bits;
 
     /// Extracts a block of bits whose first index is `start` and last index is `end - 1`, taking
     /// ownership of `self`.
@@ -154,7 +154,9 @@ pub trait BitBlockAccess: Sized {
     /// assert_eq!((-0x5433i16).get_bits_owned(100, 104), 0xf);
     /// ```
     #[inline]
-    fn get_bits_owned(self, start: u64, end: u64) -> Self::Output {
+    fn get_bits_owned(self, start: u64, end: u64) -> Self::Bits {
         self.get_bits(start, end)
     }
+
+    fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }

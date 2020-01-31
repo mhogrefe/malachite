@@ -280,11 +280,17 @@ macro_rules! impl_arithmetic_traits {
             type Output = $t;
 
             fn true_checked_shl(self, rhs: u32) -> Option<$t> {
-                let result = self << rhs;
-                if result >> rhs == self {
-                    Some(result)
-                } else {
+                if self == 0 {
+                    Some(self)
+                } else if rhs > $t::WIDTH {
                     None
+                } else {
+                    let result = self << rhs;
+                    if result >> rhs == self {
+                        Some(result)
+                    } else {
+                        None
+                    }
                 }
             }
         }

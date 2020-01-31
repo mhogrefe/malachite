@@ -1,6 +1,10 @@
+use std::cmp::min;
+
+use comparison::Max;
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
+use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitScan, CheckedHammingDistance, SignificantBits,
 };
@@ -313,7 +317,7 @@ macro_rules! impl_logic_traits {
         }
 
         impl BitBlockAccess for $t {
-            type Output = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
+            type Bits = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
             /// The type of the block of bits is the unsigned version of the input type. If `end` is
@@ -337,7 +341,7 @@ macro_rules! impl_logic_traits {
             /// assert_eq!((-0x5433i16).get_bits(5, 5), 0);
             /// assert_eq!((-0x5433i16).get_bits(100, 104), 0xf);
             /// ```
-            fn get_bits(&self, start: u64, end: u64) -> Self::Output {
+            fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
                 assert!(start <= end);
                 (if start >= u64::from($t::WIDTH) {
                     if *self >= 0 {
@@ -349,6 +353,40 @@ macro_rules! impl_logic_traits {
                     self >> start
                 })
                 .mod_power_of_two(end - start)
+            }
+
+            fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
+                assert!(start <= end);
+                if *self >= 0 {
+                    let mut abs_self = self.unsigned_abs();
+                    abs_self.assign_bits(start, end, bits);
+                    if abs_self.get_highest_bit() {
+                        panic!("Result exceeds width of output type");
+                    }
+                    *self = $t::wrapping_from(abs_self);
+                } else {
+                    let width = u64::from($t::WIDTH);
+                    let bits_width = end - start;
+                    let bits = bits.mod_power_of_two(bits_width);
+                    let max = <$t as PrimitiveSigned>::UnsignedOfEqualWidth::MAX;
+                    if bits_width > width {
+                        panic!("Result exceeds width of output type");
+                    } else if start >= width - 1 {
+                        if bits == max.mod_power_of_two(bits_width) {
+                            return;
+                        } else {
+                            panic!("Result exceeds width of output type");
+                        }
+                    } else if end >= width
+                        && bits >> (width - start - 1) != max.mod_power_of_two(end - width + 1)
+                    {
+                        panic!("Result exceeds width of output type");
+                    }
+                    let mask: <$t as PrimitiveSigned>::UnsignedOfEqualWidth =
+                        !(((1 << (min(end, width - 1) - start)) - 1) << start);
+                    *self &= $t::wrapping_from(mask);
+                    *self |= $t::wrapping_from(bits << start);
+                }
             }
         }
     };

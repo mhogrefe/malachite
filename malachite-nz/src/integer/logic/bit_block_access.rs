@@ -228,7 +228,7 @@ impl Natural {
 }
 
 impl BitBlockAccess for Integer {
-    type Output = Natural;
+    type Bits = Natural;
 
     /// Extracts a block of bits whose first index is `start` and last index is `end - 1`. The input
     /// is taken by reference, and the resulting bits are returned as a `Natural`. If `end` is
@@ -322,5 +322,9 @@ impl BitBlockAccess for Integer {
         } else {
             self.abs.neg_get_bits_owned(start, end)
         }
+    }
+
+    fn assign_bits(&mut self, _start: u64, _end: u64, _bits: &Natural) {
+        unimplemented!();
     }
 }

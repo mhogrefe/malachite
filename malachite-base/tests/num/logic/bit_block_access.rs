@@ -8,8 +8,8 @@ use malachite_base::num::logic::traits::BitBlockAccess;
 pub fn test_get_bits_unsigned() {
     fn test<T: PrimitiveUnsigned>(x: T, start: u64, end: u64, out: T)
     where
-        <T as BitBlockAccess>::Output: PrimitiveUnsigned,
-        T: ExactFrom<<T as BitBlockAccess>::Output>,
+        <T as BitBlockAccess>::Bits: PrimitiveUnsigned,
+        T: ExactFrom<<T as BitBlockAccess>::Bits>,
     {
         // The return type of get_bits is just T, but the type system doesn't know that.
         assert_eq!(T::exact_from(x.get_bits(start, end)), out);
@@ -48,8 +48,8 @@ get_bits_fail_helper_unsigned!(usize, get_bits_usize_fail);
 pub fn test_get_bits_signed() {
     fn test<T: PrimitiveSigned>(x: T, start: u64, end: u64, out: T::UnsignedOfEqualWidth)
     where
-        <T as BitBlockAccess>::Output: PrimitiveUnsigned,
-        T::UnsignedOfEqualWidth: ExactFrom<<T as BitBlockAccess>::Output>,
+        <T as BitBlockAccess>::Bits: PrimitiveUnsigned,
+        T::UnsignedOfEqualWidth: ExactFrom<<T as BitBlockAccess>::Bits>,
     {
         // The return type of get_bits is just T::UnsignedOfEqualWidth, but the type system doesn't
         // know that.
