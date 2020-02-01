@@ -330,7 +330,7 @@ macro_rules! impl_logic_traits {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self < 0 && end - start > $t::WIDTH`.
+            /// Panics if `start < end` or `self < 0 && end - start > $t::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -355,6 +355,40 @@ macro_rules! impl_logic_traits {
                 .mod_power_of_two(end - start)
             }
 
+            /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
+            /// (inclusive) through `end` (exclusive) of `self`. The type of the block of bits is
+            /// the unsigned version of the input type. If `bits` has fewer bits than `end - start`,
+            /// the high bits are interpreted as 0 or 1, depending on the sign of `self`. If `end`
+            /// is greater than the type's width, the high bits of `bits` must be 0 or 1, depending
+            /// on the sign of `self`.
+            ///
+            /// The sign of `self` remains unchanged, since only a finite number of bits are changed
+            /// and the sign is determined by the implied infinite prefix of bits.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `start < end`, or if `end >= $t::WIDTH` and bits `$t::WIDTH - start`
+            /// through `end - start` of `bits` are not equal to the original sign bit of `self`.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitBlockAccess;
+            ///
+            /// let mut x = 0x2b5di16;
+            /// x.assign_bits(4, 8, &0xc);
+            /// assert_eq!(x, 0x2bcd);
+            ///
+            /// let mut x = -0x5413i16;
+            /// x.assign_bits(4, 8, &0xc);
+            /// assert_eq!(x, -0x5433);
+            ///
+            /// let mut x = -0x5433i16;
+            /// x.assign_bits(100, 104, &0xf);
+            /// assert_eq!(x, -0x5433);
+            /// ```
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 assert!(start <= end);
                 if *self >= 0 {
@@ -365,27 +399,27 @@ macro_rules! impl_logic_traits {
                     }
                     *self = $t::wrapping_from(abs_self);
                 } else {
-                    let width = u64::from($t::WIDTH);
+                    let width = u64::from($t::WIDTH) - 1;
                     let bits_width = end - start;
                     let bits = bits.mod_power_of_two(bits_width);
-                    let max = <$t as PrimitiveSigned>::UnsignedOfEqualWidth::MAX;
-                    if bits_width > width {
+                    let max = Self::Bits::MAX;
+                    if bits_width > width + 1 {
                         panic!("Result exceeds width of output type");
-                    } else if start >= width - 1 {
-                        if bits == max.mod_power_of_two(bits_width) {
-                            return;
-                        } else {
+                    } else if start >= width {
+                        if bits != max.mod_power_of_two(bits_width) {
                             panic!("Result exceeds width of output type");
                         }
-                    } else if end >= width
-                        && bits >> (width - start - 1) != max.mod_power_of_two(end - width + 1)
-                    {
-                        panic!("Result exceeds width of output type");
+                    } else {
+                        let lower_width = width - start;
+                        if end > width && bits >> lower_width != max.mod_power_of_two(end - width) {
+                            panic!("Result exceeds width of output type");
+                        } else {
+                            *self &= $t::wrapping_from(
+                                !(max.mod_power_of_two(min(bits_width, lower_width)) << start),
+                            );
+                            *self |= $t::wrapping_from(bits << start);
+                        }
                     }
-                    let mask: <$t as PrimitiveSigned>::UnsignedOfEqualWidth =
-                        !(((1 << (min(end, width - 1) - start)) - 1) << start);
-                    *self &= $t::wrapping_from(mask);
-                    *self |= $t::wrapping_from(bits << start);
                 }
             }
         }

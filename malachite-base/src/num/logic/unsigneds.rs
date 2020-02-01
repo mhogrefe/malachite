@@ -1,5 +1,6 @@
 use std::cmp::min;
 
+use comparison::Max;
 use num::arithmetic::traits::ModPowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{BitAccess, BitBlockAccess, BitScan, HammingDistance, SignificantBits};
@@ -244,6 +245,9 @@ macro_rules! impl_logic_traits {
             ///
             /// Additional memory: worst case O(1)
             ///
+            /// # Panics
+            /// Panics if `start < end`.
+            ///
             /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitBlockAccess;
@@ -263,6 +267,36 @@ macro_rules! impl_logic_traits {
                 }
             }
 
+            /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
+            /// (inclusive) through `end` (exclusive) of `self`. The block of bits has the same type
+            /// as the input. If `bits` has fewer bits than `end - start`, the high bits are
+            /// interpreted as 0. If `end` is greater than the type's width, the high bits of `bits`
+            /// must be 0.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `start < end`, or if `end > $t::WIDTH` and bits `$t::WIDTH - start`
+            /// through `end - start` of `bits` are nonzero.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitBlockAccess;
+            ///
+            /// let mut x = 0xab5du16;
+            /// x.assign_bits(4, 8, &0xc);
+            /// assert_eq!(x, 0xabcd);
+            ///
+            /// let mut x = 0xabcdu16;
+            /// x.assign_bits(100, 200, &0);
+            /// assert_eq!(x, 0xabcd);
+            ///
+            /// let mut x = 0xabcdu16;
+            /// x.assign_bits(0, 100, &0x1234);
+            /// assert_eq!(x, 0x1234);
+            /// ```
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 assert!(start <= end);
                 let width = u64::from($t::WIDTH);
@@ -273,11 +307,8 @@ macro_rules! impl_logic_traits {
                 } else if start >= width {
                     // bits must be 0
                     return;
-                } else if start == 0 && bits_width >= width {
-                    *self = 0;
                 } else {
-                    assert!(min(end, width) - start < width);
-                    *self &= !(((1 << (min(end, width) - start)) - 1) << start);
+                    *self &= !($t::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
                 }
                 *self |= bits << start;
             }

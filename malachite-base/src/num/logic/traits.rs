@@ -158,5 +158,7 @@ pub trait BitBlockAccess: Sized {
         self.get_bits(start, end)
     }
 
+    /// Assigns the least-significant `end - start` bits of `bits` to bits `start` (inclusive)
+    /// through `end` (exclusive) of `self`.
     fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }

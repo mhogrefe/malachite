@@ -176,6 +176,7 @@ where
                 mut_n.get_bits(start, end),
                 bits.mod_power_of_two(end - start)
             );
+            assert_eq!(mut_n >= T::ZERO, n >= T::ZERO);
         },
     );
 
