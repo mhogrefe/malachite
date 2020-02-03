@@ -8,6 +8,7 @@ use common::DemoBenchRegistry;
 
 pub mod and;
 pub mod assign_bit;
+pub mod assign_bits;
 pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
@@ -54,6 +55,7 @@ fn natural_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Natural, y: &Natur
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
     assign_bit::register(registry);
+    assign_bits::register(registry);
     clear_bit::register(registry);
     count_ones::register(registry);
     flip_bit::register(registry);

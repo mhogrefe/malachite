@@ -233,6 +233,7 @@ pub mod natural {
     pub mod logic {
         pub mod and;
         pub mod assign_bit;
+        pub mod assign_bits;
         pub mod clear_bit;
         pub mod count_ones;
         pub mod flip_bit;

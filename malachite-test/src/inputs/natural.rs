@@ -35,13 +35,13 @@ use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_r
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_quadruples, random_triples, random_triples_from_single,
+    random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, It};
-use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
+use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
     match gm {
@@ -1251,4 +1251,40 @@ pub fn quadruples_of_natural_natural_natural_and_small_unsigned<T: PrimitiveUnsi
             &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
+}
+
+fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, T, Natural)> {
+    permute_1_3_4_2(reshape_2_2_to_4(match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_pairs_from_single(exhaustive_naturals()),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_pairs_from_single(random_naturals(seed, scale))),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
+            }),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_pairs_from_single(special_random_naturals(seed, scale))),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
+            }),
+        )),
+    }))
+}
+
+pub fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural_var_1<
+    T: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Natural, T, T, Natural)> {
+    Box::new(
+        quadruples_of_natural_small_unsigned_small_unsigned_and_natural(gm)
+            .filter(|&(_, start, end, _)| start < end),
+    )
 }

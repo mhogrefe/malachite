@@ -3045,7 +3045,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     let ps: It<((T, V), (U, U))> = match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
             exhaustive_pairs(exhaustive_signed(), exhaustive_unsigned()),
             exhaustive_pairs_from_single(exhaustive_unsigned()),
         )),
@@ -4668,6 +4668,48 @@ pub fn triples_of_limb_vec_limb_and_limb_vec_var_5(
                     .eq_mod(-Natural::from(y), Natural::from_limbs_asc(modulus))
             },
         ),
+    )
+}
+
+fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, U, U, Vec<T>)> {
+    permute_1_3_4_2(reshape_2_2_to_4(match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_pairs_from_single(exhaustive_vecs(exhaustive_unsigned())),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs_from_single(random_vecs(seed, scale, &(|seed_2| random(seed_2))))
+            }),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(U::checked_from))
+            }),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_pairs_from_single(special_random_unsigned_vecs(seed, scale))),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(U::checked_from))
+            }),
+        )),
+    }))
+}
+
+pub fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, U, U, Vec<T>)> {
+    Box::new(
+        quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec(gm)
+            .filter(|&(_, start, end, _)| start < end),
     )
 }
 

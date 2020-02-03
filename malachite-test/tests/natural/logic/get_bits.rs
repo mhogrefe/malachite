@@ -13,7 +13,7 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1,
 };
 use malachite_test::inputs::natural::{
-    pairs_of_natural_and_small_unsigned, triples_of_natural_small_unsigned_and_small_unsigned_var_1,
+    pairs_of_natural_and_unsigned, triples_of_natural_small_unsigned_and_small_unsigned_var_1,
 };
 
 fn verify_limbs_get_bits(limbs: &[Limb], start: u64, end: u64, out: &[Limb]) {
@@ -146,7 +146,7 @@ fn get_bits_properties() {
         },
     );
 
-    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, start)| {
+    test_properties(pairs_of_natural_and_unsigned, |&(ref n, start)| {
         assert_eq!(n.get_bits(start, start), 0);
     });
 
