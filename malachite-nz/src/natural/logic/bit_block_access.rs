@@ -1,5 +1,5 @@
 use malachite_base::limbs::{limbs_delete_left, limbs_set_zero};
-use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoAssign, ShrRound};
+use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
@@ -8,6 +8,7 @@ use malachite_base::round::RoundingMode;
 use natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
 use natural::arithmetic::shl_u::limbs_slice_shl_in_place;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
+use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
@@ -130,6 +131,47 @@ fn copy_from_diff_len_slice(xs: &mut [Limb], ys: &[Limb]) {
     }
 }
 
+pub(crate) fn limbs_assign_bits_helper(
+    limbs: &mut Vec<Limb>,
+    start: u64,
+    end: u64,
+    mut bits: &[Limb],
+    invert: bool,
+) {
+    let start_limb = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let end_limb = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
+    let bits_limb_width =
+        usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    if bits_limb_width < bits.len() {
+        bits = &bits[..bits_limb_width];
+    }
+    let start_remainder = start & u64::from(Limb::WIDTH_MASK);
+    let end_remainder = end & u64::from(Limb::WIDTH_MASK);
+    if end_limb > limbs.len() {
+        // Possible inefficiency here: we might write many zeros only to delete them later.
+        limbs.resize(end_limb, 0);
+    }
+    let limbs = &mut limbs[start_limb..end_limb];
+    assert!(!limbs.is_empty());
+    let original_first_limb = limbs[0];
+    let original_last_limb = *limbs.last().unwrap();
+    copy_from_diff_len_slice(limbs, bits);
+    if invert {
+        limbs_not_in_place(limbs);
+    }
+    if start_remainder != 0 {
+        limbs_slice_shl_in_place(limbs, u32::wrapping_from(start_remainder));
+        limbs[0] |= original_first_limb.mod_power_of_two(start_remainder);
+    }
+    if end_remainder != 0 {
+        limbs.last_mut().unwrap().assign_bits(
+            end_remainder,
+            u64::from(Limb::WIDTH),
+            &(original_last_limb >> end_remainder),
+        );
+    }
+}
+
 /// Writes the limbs of `bits` into the limbs of `limbs`, starting at bit `start` of `limbs`
 /// (inclusive) and ending at bit `end` of `limbs` (exclusive). The bit indices do not need to be
 /// aligned with any limb boundaries. If `bits` has more than `end` - `start` bits, only the first
@@ -163,37 +205,9 @@ fn copy_from_diff_len_slice(xs: &mut [Limb], ys: &[Limb]) {
 /// limbs_assign_bits(&mut limbs, 80, 100, &[789, 321]);
 /// assert_eq!(limbs, &[123, 456, 51707904, 0]);
 /// ```
-pub fn limbs_assign_bits(limbs: &mut Vec<Limb>, start: u64, end: u64, mut bits: &[Limb]) {
+pub fn limbs_assign_bits(limbs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
-    let start_limb = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let end_limb = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
-    let bits_limb_width =
-        usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
-    if bits_limb_width < bits.len() {
-        bits = &bits[..bits_limb_width];
-    }
-    let start_remainder = start & u64::from(Limb::WIDTH_MASK);
-    let end_remainder = end & u64::from(Limb::WIDTH_MASK);
-    if end_limb > limbs.len() {
-        // Possible inefficiency here: we might write many zeros only to delete them later.
-        limbs.resize(end_limb, 0);
-    }
-    let limbs = &mut limbs[start_limb..end_limb];
-    assert!(!limbs.is_empty());
-    let original_first_limb = limbs[0];
-    let original_last_limb = *limbs.last().unwrap();
-    copy_from_diff_len_slice(limbs, bits);
-    if start_remainder != 0 {
-        limbs_slice_shl_in_place(limbs, u32::wrapping_from(start_remainder));
-        limbs[0] |= original_first_limb.mod_power_of_two(start_remainder);
-    }
-    if end_remainder != 0 {
-        limbs.last_mut().unwrap().assign_bits(
-            end_remainder,
-            u64::from(Limb::WIDTH),
-            &(original_last_limb >> end_remainder),
-        );
-    }
+    limbs_assign_bits_helper(limbs, start, end, bits, false);
 }
 
 impl BitBlockAccess for Natural {
@@ -333,9 +347,9 @@ impl BitBlockAccess for Natural {
             return;
         }
         if let Natural(Small(ref mut small_self)) = self {
-            if let Natural(Small(mut small_bits)) = bits {
+            if let Natural(Small(small_bits)) = bits {
                 let bits_width = end - start;
-                small_bits.mod_power_of_two_assign(bits_width);
+                let small_bits = small_bits.mod_power_of_two(bits_width);
                 if small_bits == 0 || u64::from(small_bits.leading_zeros()) >= start {
                     small_self.assign_bits(start, end, &small_bits);
                     return;

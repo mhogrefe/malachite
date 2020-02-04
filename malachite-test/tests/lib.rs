@@ -151,6 +151,7 @@ pub mod integer {
     pub mod logic {
         pub mod and;
         pub mod assign_bit;
+        pub mod assign_bits;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
         pub mod checked_hamming_distance;

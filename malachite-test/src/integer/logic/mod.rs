@@ -8,6 +8,7 @@ use common::DemoBenchRegistry;
 
 pub mod and;
 pub mod assign_bit;
+pub mod assign_bits;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
@@ -73,6 +74,7 @@ fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integ
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
     assign_bit::register(registry);
+    assign_bits::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);
     checked_hamming_distance::register(registry);

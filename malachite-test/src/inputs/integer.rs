@@ -23,10 +23,11 @@ use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::{random, Random};
 use rust_wheels::iterators::integers::{
-    exhaustive_integers, exhaustive_natural_integers, exhaustive_nonzero_integers, random_integers,
-    random_natural_integers, random_nonzero_integers, range_down_decreasing_integer,
+    exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
+    exhaustive_nonzero_integers, random_integers, random_natural_integers,
+    random_negative_integers, random_nonzero_integers, range_down_decreasing_integer,
     range_up_increasing_integer, special_random_integers, special_random_natural_integers,
-    special_random_nonzero_integers,
+    special_random_negative_integers, special_random_nonzero_integers,
 };
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
@@ -40,13 +41,13 @@ use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_r
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_quadruples, random_triples, random_triples_from_single,
+    random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
 use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It};
-use inputs::common::{reshape_1_2_to_3, reshape_2_1_to_3};
+use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
     match gm {
@@ -157,6 +158,16 @@ pub fn natural_integers(gm: GenerationMode) -> It<Integer> {
         GenerationMode::Random(scale) => Box::new(random_natural_integers(&EXAMPLE_SEED, scale)),
         GenerationMode::SpecialRandom(scale) => {
             Box::new(special_random_natural_integers(&EXAMPLE_SEED, scale))
+        }
+    }
+}
+
+pub fn negative_integers(gm: GenerationMode) -> It<Integer> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_negative_integers()),
+        GenerationMode::Random(scale) => Box::new(random_negative_integers(&EXAMPLE_SEED, scale)),
+        GenerationMode::SpecialRandom(scale) => {
+            Box::new(special_random_negative_integers(&EXAMPLE_SEED, scale))
         }
     }
 }
@@ -912,6 +923,30 @@ pub(crate) fn rm_triples_of_integer_small_u64_and_bool(
     )
 }
 
+pub fn triples_of_integer_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, T, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_unsigned(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random(seed)),
+            &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
 pub fn pairs_of_integer_and_rounding_mode(gm: GenerationMode) -> It<(Integer, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
@@ -1398,5 +1433,53 @@ pub fn triples_of_integer_nonzero_integer_and_rounding_mode_var_1(
                 (x, y, rm)
             }
         }),
+    )
+}
+
+fn quadruples_of_integer_small_unsigned_small_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Integer, T, T, Natural)> {
+    permute_1_3_4_2(reshape_2_2_to_4(match gm {
+        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+            exhaustive_pairs(exhaustive_integers(), exhaustive_naturals()),
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs(
+                    seed,
+                    &(|seed_2| random_integers(seed_2, scale)),
+                    &(|seed_2| random_naturals(seed_2, scale)),
+                )
+            }),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
+            }),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| {
+                random_pairs(
+                    seed,
+                    &(|seed_2| special_random_integers(seed_2, scale)),
+                    &(|seed_2| special_random_naturals(seed_2, scale)),
+                )
+            }),
+            &(|seed| {
+                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
+            }),
+        )),
+    }))
+}
+
+pub fn quadruples_of_integer_small_unsigned_small_unsigned_and_natural_var_1<
+    T: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Integer, T, T, Natural)> {
+    Box::new(
+        quadruples_of_integer_small_unsigned_small_unsigned_and_natural(gm)
+            .filter(|&(_, start, end, _)| start < end),
     )
 }

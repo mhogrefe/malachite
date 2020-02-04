@@ -141,8 +141,11 @@ fn get_bits_properties() {
             );
             assert_eq!(
                 (!n).get_bits(start, end),
-                (Natural::ONE << (end - start)) - bits - Natural::ONE
+                (Natural::ONE << (end - start)) - &bits - Natural::ONE
             );
+            let mut mut_n = n.clone();
+            mut_n.assign_bits(start, end, &bits);
+            assert_eq!(*n, mut_n);
         },
     );
 

@@ -4713,6 +4713,18 @@ pub fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec
     )
 }
 
+pub fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec_var_2<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, U, U, Vec<T>)> {
+    Box::new(
+        quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec(gm)
+            .filter(|&(ref limbs, start, end, _)| start < end && !limbs_test_zero(limbs)),
+    )
+}
+
 fn triples_of_unsigned_vec_small_unsigned_and_rounding_mode<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned,
