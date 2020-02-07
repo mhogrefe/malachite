@@ -3,7 +3,10 @@ use std::cmp::min;
 use comparison::Max;
 use num::arithmetic::traits::ModPowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
-use num::logic::traits::{BitAccess, BitBlockAccess, BitScan, HammingDistance, SignificantBits};
+use num::basic::unsigneds::PrimitiveUnsigned;
+use num::logic::traits::{
+    BitAccess, BitBlockAccess, BitConvertible, BitScan, HammingDistance, SignificantBits,
+};
 
 macro_rules! impl_logic_traits {
     ($t:ident) => {
@@ -313,6 +316,69 @@ macro_rules! impl_logic_traits {
                 *self |= bits << start;
             }
         }
+
+        impl BitConvertible for $t {
+            /// Returns a `Vec` containing the bits of `self` in ascending order: least- to most-
+            /// significant. If `self` is 0, the `Vec` is empty; otherwise, it ends with `true`.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(n)
+            ///
+            /// where n = `self.significant_bits()`
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(0u8.to_bits_asc(), &[]);
+            /// assert_eq!(2u16.to_bits_asc(), &[false, true]);
+            /// assert_eq!(123u32.to_bits_asc(), &[true, true, false, true, true, true, true]);
+            /// ```
+            fn to_bits_asc(&self) -> Vec<bool> {
+                let mut bits = Vec::new();
+                let mut x = *self;
+                while x != 0 {
+                    bits.push(x.get_bit(0));
+                    x >>= 1;
+                }
+                bits
+            }
+
+            /// Returns a `Vec` containing the bits of `self` in descending order: most- to least-
+            /// significant. If `self` is 0, the `Vec` is empty; otherwise, it begins with `true`.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(n)
+            ///
+            /// where n = `self.significant_bits()`
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(0u8.to_bits_desc(), &[]);
+            /// assert_eq!(2u16.to_bits_desc(), &[true, false]);
+            /// assert_eq!(123u32.to_bits_desc(), &[true, true, true, true, false, true, true]);
+            /// ```
+            fn to_bits_desc(&self) -> Vec<bool> {
+                let mut bits = Vec::new();
+                if *self == 0 {
+                    return bits;
+                }
+                bits.push(true);
+                if *self == 1 {
+                    return bits;
+                }
+                let mut mask = 1 << ($t::WIDTH - self.leading_zeros() - 2);
+                while mask != 0 {
+                    bits.push(*self & mask != 0);
+                    mask >>= 1;
+                }
+                bits
+            }
+        }
     };
 }
 
@@ -322,3 +388,19 @@ impl_logic_traits!(u32);
 impl_logic_traits!(u64);
 impl_logic_traits!(u128);
 impl_logic_traits!(usize);
+
+pub fn _to_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for i in 0..n.significant_bits() {
+        bits.push(n.get_bit(i));
+    }
+    bits
+}
+
+pub fn _to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for i in (0..n.significant_bits()).rev() {
+        bits.push(n.get_bit(i));
+    }
+    bits
+}

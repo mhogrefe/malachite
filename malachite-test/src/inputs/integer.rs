@@ -12,6 +12,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -1320,7 +1321,7 @@ impl Iterator for RandomIntegerAndVecOfBoolVar2 {
     fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
         let n = self.integers.next().unwrap();
         let mut bools = Vec::new();
-        for _ in 0..n.to_twos_complement_bits_asc().len() {
+        for _ in 0..n.to_bits_asc().len() {
             bools.push(self.rng.gen::<bool>());
         }
         Some((n, bools))
@@ -1354,7 +1355,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Integer
         GenerationMode::Exhaustive => {
             let f = move |n: &Integer| {
                 exhaustive_fixed_size_vecs_from_single(
-                    u64::wrapping_from(n.to_twos_complement_bits_asc().len()),
+                    u64::wrapping_from(n.to_bits_asc().len()),
                     exhaustive_bools(),
                 )
             };

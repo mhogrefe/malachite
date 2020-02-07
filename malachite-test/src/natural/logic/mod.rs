@@ -12,6 +12,7 @@ pub mod assign_bits;
 pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
+pub mod from_bits;
 pub mod get_bit;
 pub mod get_bits;
 pub mod hamming_distance;
@@ -22,6 +23,7 @@ pub mod not;
 pub mod or;
 pub mod set_bit;
 pub mod significant_bits;
+pub mod to_bits;
 pub mod trailing_zeros;
 pub mod xor;
 
@@ -59,6 +61,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     clear_bit::register(registry);
     count_ones::register(registry);
     flip_bit::register(registry);
+    from_bits::register(registry);
     get_bit::register(registry);
     get_bits::register(registry);
     hamming_distance::register(registry);
@@ -69,6 +72,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     or::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
+    to_bits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
 }

@@ -2,15 +2,21 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+use malachite_base::num::logic::integers::_to_bits_desc_alt;
+use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
+use malachite_nz::integer::logic::bit_convertible::{
+    bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
+    bits_vec_to_twos_complement_bits_negative,
+};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
-use malachite_test::inputs::base::{small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
+use malachite_test::inputs::base::{signeds, small_unsigneds, vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_u64, pairs_of_integer_and_vec_of_bool_var_2,
 };
+use malachite_test::integer::logic::to_bits::{_to_bits_asc_naive, _to_bits_desc_naive};
 
 #[test]
 fn test_bits_to_twos_complement_bits_non_negative() {
@@ -58,11 +64,12 @@ fn bits_vec_to_twos_complement_bits_negative_fail() {
 }
 
 #[test]
-fn test_to_twos_complement_bits_asc() {
+fn test_to_bits_asc() {
     let test = |n, out| {
         let n = Integer::from_str(n).unwrap();
         assert_eq!(n.twos_complement_bits().collect::<Vec<bool>>(), out);
-        assert_eq!(n.to_twos_complement_bits_asc(), out);
+        assert_eq!(n.to_bits_asc(), out);
+        assert_eq!(_to_bits_asc_naive(&n), out);
     };
     test("0", vec![]);
     test("1", vec![true, false]);
@@ -225,11 +232,13 @@ fn test_to_twos_complement_bits_asc() {
 }
 
 #[test]
-fn test_to_twos_complement_bits_desc() {
+fn test_to_bits_desc() {
     let test = |n, out| {
         let n = Integer::from_str(n).unwrap();
         assert_eq!(n.twos_complement_bits().rev().collect::<Vec<bool>>(), out);
-        assert_eq!(n.to_twos_complement_bits_desc(), out);
+        assert_eq!(n.to_bits_desc(), out);
+        assert_eq!(_to_bits_desc_naive(&n), out);
+        assert_eq!(_to_bits_desc_alt(&n), out);
     };
     test("0", vec![]);
     test("1", vec![false, true]);
@@ -364,31 +373,44 @@ fn bits_vec_to_twos_complement_bits_negative_properties() {
 }
 
 #[test]
-fn to_twos_complement_bits_asc_properties() {
+fn to_bits_asc_properties() {
     test_properties(integers, |x| {
-        let bits = x.to_twos_complement_bits_asc();
-        assert_eq!(
-            x.twos_complement_bits().collect::<Vec<bool>>(),
-            bits,
-            "{}",
-            x
-        );
+        let bits = x.to_bits_asc();
+        assert_eq!(_to_bits_asc_naive(x), bits);
+        assert_eq!(x.twos_complement_bits().collect::<Vec<bool>>(), bits);
         assert_eq!(Integer::from_twos_complement_bits_asc(&bits), *x);
         if *x != 0 {
             assert_eq!(*bits.last().unwrap(), *x < 0);
         }
+        let bit_len = bits.len();
+        if bit_len > 1 {
+            assert_ne!(bits[bit_len - 1], bits[bit_len - 2]);
+        }
+    });
+
+    test_properties(signeds::<SignedLimb>, |&i| {
+        assert_eq!(i.to_bits_asc(), Integer::from(i).to_bits_asc());
     });
 }
 
 #[test]
-fn to_twos_complement_bits_desc_properties() {
+fn to_bits_desc_properties() {
     test_properties(integers, |x| {
-        let bits = x.to_twos_complement_bits_desc();
+        let bits = x.to_bits_desc();
+        assert_eq!(_to_bits_desc_naive(x), bits);
+        assert_eq!(_to_bits_desc_alt(x), bits);
         assert_eq!(x.twos_complement_bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Integer::from_twos_complement_bits_desc(&bits), *x);
         if *x != 0 {
             assert_eq!(bits[0], *x < 0);
         }
+        if bits.len() > 1 {
+            assert_ne!(bits[0], bits[1]);
+        }
+    });
+
+    test_properties(signeds::<SignedLimb>, |&i| {
+        assert_eq!(i.to_bits_desc(), Integer::from(i).to_bits_desc());
     });
 }
 
@@ -410,7 +432,7 @@ fn twos_complement_bits_properties() {
             }
             assert!(bits.next().is_none());
             assert!(bits.next_back().is_none());
-            assert_eq!(n.to_twos_complement_bits_asc(), bit_vec);
+            assert_eq!(n.to_bits_asc(), bit_vec);
         },
     );
 
@@ -418,7 +440,7 @@ fn twos_complement_bits_properties() {
         if u < n.significant_bits() {
             assert_eq!(
                 n.twos_complement_bits()[u],
-                n.to_twos_complement_bits_asc()[usize::exact_from(u)]
+                n.to_bits_asc()[usize::exact_from(u)]
             );
         } else {
             assert_eq!(n.twos_complement_bits()[u], *n < 0);

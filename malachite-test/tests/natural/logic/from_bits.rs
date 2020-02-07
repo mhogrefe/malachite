@@ -1,4 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_nz::natural::conversion::from_bits::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };

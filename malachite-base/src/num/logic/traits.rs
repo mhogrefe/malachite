@@ -162,3 +162,15 @@ pub trait BitBlockAccess: Sized {
     /// through `end` (exclusive) of `self`.
     fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }
+
+/// This trait defines functions that express a value as a `Vec` of bits, read a value from a slice
+/// of bits, and iterate over a value's bits.
+pub trait BitConvertible {
+    /// Returns a `Vec` containing the bits of a value in ascending order: least- to most-
+    /// significant.
+    fn to_bits_asc(&self) -> Vec<bool>;
+
+    /// Returns a `Vec` containing the bits of a value in descending order: most- to least-
+    /// significant.
+    fn to_bits_desc(&self) -> Vec<bool>;
+}

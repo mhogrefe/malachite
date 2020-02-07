@@ -6,7 +6,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{
-    BitAccess, BitBlockAccess, BitScan, CheckedHammingDistance, SignificantBits,
+    BitAccess, BitBlockAccess, BitConvertible, BitScan, CheckedHammingDistance, SignificantBits,
 };
 
 macro_rules! impl_logic_traits {
@@ -423,6 +423,105 @@ macro_rules! impl_logic_traits {
                 }
             }
         }
+
+        impl BitConvertible for $t {
+            /// Returns a `Vec` containing the bits of `self` in ascending order: least- to most-
+            /// significant. If `self` is 0, the `Vec` is empty; otherwise, the last bit is the sign
+            /// bit: `false` if `self` is non-negative and `true` if `self` is negative.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(n)
+            ///
+            /// where n = `self.significant_bits()`
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(0i8.to_bits_asc(), &[]);
+            /// assert_eq!(2i16.to_bits_asc(), &[false, true, false]);
+            /// assert_eq!(
+            ///     (-123i32).to_bits_asc(),
+            ///     &[true, false, true, false, false, false, false, true]
+            /// );
+            /// ```
+            fn to_bits_asc(&self) -> Vec<bool> {
+                let mut bits = Vec::new();
+                let mut x = *self;
+                if *self >= 0 {
+                    while x != 0 {
+                        bits.push(x.get_bit(0));
+                        x >>= 1;
+                    }
+                    if !bits.is_empty() {
+                        bits.push(false);
+                    }
+                } else {
+                    while x != -1 {
+                        bits.push(x.get_bit(0));
+                        x >>= 1;
+                    }
+                    bits.push(true);
+                }
+                bits
+            }
+
+            /// Returns a `Vec` containing the bits of `self` in ascending order: most- to least-
+            /// significant. If `self` is 0, the `Vec` is empty; otherwise, the first bit is the
+            /// sign bit: `false` if `self` is non-negative and `true` if `self` is negative.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(n)
+            ///
+            /// where n = `self.significant_bits()`
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(0i8.to_bits_desc(), &[]);
+            /// assert_eq!(2i16.to_bits_desc(), &[false, true, false]);
+            /// assert_eq!(
+            ///     (-123i32).to_bits_desc(),
+            ///     &[true, false, false, false, false, true, false, true]
+            /// );
+            /// ```
+            fn to_bits_desc(&self) -> Vec<bool> {
+                let mut bits = Vec::new();
+                if *self >= 0 {
+                    if *self == 0 {
+                        return bits;
+                    }
+                    bits.push(false);
+                    bits.push(true);
+                    if *self == 1 {
+                        return bits;
+                    }
+                    let mut mask = 1 << ($t::WIDTH - self.leading_zeros() - 2);
+                    while mask != 0 {
+                        bits.push(*self & mask != 0);
+                        mask >>= 1;
+                    }
+                } else {
+                    bits.push(true);
+                    if *self == -1 {
+                        return bits;
+                    }
+                    bits.push(false);
+                    if *self == -2 {
+                        return bits;
+                    }
+                    let mut mask = 1 << ($t::WIDTH - (!*self).leading_zeros() - 2);
+                    while mask != 0 {
+                        bits.push(*self & mask != 0);
+                        mask >>= 1;
+                    }
+                }
+                bits
+            }
+        }
     };
 }
 
@@ -432,3 +531,34 @@ impl_logic_traits!(i32);
 impl_logic_traits!(i64);
 impl_logic_traits!(i128);
 impl_logic_traits!(isize);
+
+pub fn _to_bits_asc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if n == T::ZERO {
+        return bits;
+    }
+    for i in 0..n.significant_bits() {
+        bits.push(n.get_bit(i));
+    }
+    let last_bit = *bits.last().unwrap();
+    if last_bit != (n < T::ZERO) {
+        bits.push(!last_bit);
+    }
+    bits
+}
+
+pub fn _to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if n == T::ZERO {
+        return bits;
+    }
+    let significant_bits = n.significant_bits();
+    let last_bit = n.get_bit(significant_bits - 1);
+    if last_bit != (n < T::ZERO) {
+        bits.push(!last_bit);
+    }
+    for i in (0..significant_bits).rev() {
+        bits.push(n.get_bit(i));
+    }
+    bits
+}

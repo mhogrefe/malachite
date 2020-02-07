@@ -1,7 +1,7 @@
 use num::basic::traits::Zero;
 use num::logic::traits::{
-    BitAccess, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft, RotateRight,
-    TrailingZeros,
+    BitAccess, BitConvertible, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft,
+    RotateRight, TrailingZeros,
 };
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
@@ -99,4 +99,10 @@ pub fn _assign_bits_naive<T: BitAccess, U: BitAccess>(n: &mut T, start: u64, end
     for i in start..end {
         n.assign_bit(i, bits.get_bit(i - start));
     }
+}
+
+pub fn _to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
+    let mut bits = n.to_bits_asc();
+    bits.reverse();
+    bits
 }

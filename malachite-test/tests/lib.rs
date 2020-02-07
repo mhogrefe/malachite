@@ -59,6 +59,7 @@ pub mod base {
         pub mod logic {
             pub mod bit_access;
             pub mod bit_block_access;
+            pub mod bit_convertible;
             pub mod bit_scan;
             pub mod get_highest_bit;
             pub mod hamming_distance;
@@ -137,14 +138,11 @@ pub mod integer {
         pub mod from_floating_point;
         pub mod from_natural;
         pub mod from_primitive_integer;
-        pub mod from_sign_and_limbs;
         pub mod from_twos_complement_bits;
         pub mod from_twos_complement_limbs;
         pub mod natural_from_integer;
         pub mod primitive_integer_from_integer;
         pub mod serde;
-        pub mod to_sign_and_limbs;
-        pub mod to_twos_complement_bits;
         pub mod to_twos_complement_limbs;
     }
 
@@ -165,6 +163,7 @@ pub mod integer {
         pub mod or;
         pub mod set_bit;
         pub mod significant_bits;
+        pub mod to_bits;
         pub mod trailing_zeros;
         pub mod xor;
     }
@@ -221,13 +220,11 @@ pub mod natural {
     pub mod conversion {
         pub mod clone;
         pub mod floating_point_from_natural;
-        pub mod from_bits;
         pub mod from_floating_point;
         pub mod from_limbs;
         pub mod from_primitive_integer;
         pub mod primitive_integer_from_natural;
         pub mod serde;
-        pub mod to_bits;
         pub mod to_limbs;
     }
 
@@ -238,6 +235,7 @@ pub mod natural {
         pub mod clear_bit;
         pub mod count_ones;
         pub mod flip_bit;
+        pub mod from_bits;
         pub mod get_bit;
         pub mod get_bits;
         pub mod hamming_distance;
@@ -248,6 +246,7 @@ pub mod natural {
         pub mod or;
         pub mod set_bit;
         pub mod significant_bits;
+        pub mod to_bits;
         pub mod trailing_zeros;
         pub mod xor;
     }

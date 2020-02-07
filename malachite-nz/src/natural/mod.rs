@@ -237,6 +237,7 @@ pub mod logic {
     pub mod and;
     pub mod bit_access;
     pub mod bit_block_access;
+    pub mod bit_convertible;
     pub mod bit_scan;
     pub mod count_ones;
     pub mod hamming_distance;

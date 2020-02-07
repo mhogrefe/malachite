@@ -1,6 +1,11 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::integer::conversion::to_twos_complement_bits::*;
+use malachite_base::num::logic::integers::_to_bits_desc_alt;
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
+use malachite_nz::integer::logic::bit_convertible::{
+    bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
+    bits_vec_to_twos_complement_bits_negative,
+};
+use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
@@ -10,8 +15,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_bits_to_twos_complement_bits_non_negative);
     register_demo!(registry, demo_bits_slice_to_twos_complement_bits_negative);
     register_demo!(registry, demo_bits_vec_to_twos_complement_bits_negative);
-    register_demo!(registry, demo_integer_to_twos_complement_bits_asc);
-    register_demo!(registry, demo_integer_to_twos_complement_bits_desc);
+    register_demo!(registry, demo_integer_to_bits_asc);
+    register_demo!(registry, demo_integer_to_bits_desc);
     register_demo!(registry, demo_integer_twos_complement_bits);
     register_demo!(registry, demo_integer_twos_complement_bits_rev);
     register_demo!(registry, demo_integer_twos_complement_bits_index);
@@ -33,18 +38,51 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_integer_to_twos_complement_bits_asc_evaluation_strategy
+        benchmark_integer_to_bits_asc_evaluation_strategy
     );
+    register_bench!(registry, Large, benchmark_integer_to_bits_asc_algorithms);
     register_bench!(
         registry,
         Large,
-        benchmark_integer_to_twos_complement_bits_desc_evaluation_strategy
+        benchmark_integer_to_bits_desc_evaluation_strategy
     );
+    register_bench!(registry, Large, benchmark_integer_to_bits_desc_algorithms);
     register_bench!(
         registry,
         Large,
         benchmark_integer_twos_complement_bits_get_algorithms
     );
+}
+
+pub fn _to_bits_asc_naive(n: &Integer) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if *n == 0 {
+        return bits;
+    }
+    for i in 0..n.significant_bits() {
+        bits.push(n.get_bit(i));
+    }
+    let last_bit = *bits.last().unwrap();
+    if last_bit != (*n < 0) {
+        bits.push(!last_bit);
+    }
+    bits
+}
+
+pub fn _to_bits_desc_naive(n: &Integer) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if *n == 0 {
+        return bits;
+    }
+    let significant_bits = n.significant_bits();
+    let last_bit = n.get_bit(significant_bits - 1);
+    if last_bit != (*n < 0) {
+        bits.push(!last_bit);
+    }
+    for i in (0..significant_bits).rev() {
+        bits.push(n.get_bit(i));
+    }
+    bits
 }
 
 fn demo_bits_to_twos_complement_bits_non_negative(gm: GenerationMode, limit: usize) {
@@ -81,23 +119,15 @@ fn demo_bits_vec_to_twos_complement_bits_negative(gm: GenerationMode, limit: usi
     }
 }
 
-fn demo_integer_to_twos_complement_bits_asc(gm: GenerationMode, limit: usize) {
+fn demo_integer_to_bits_asc(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!(
-            "to_twos_complement_bits_asc({}) = {:?}",
-            n,
-            n.to_twos_complement_bits_asc()
-        );
+        println!("to_bits_asc({}) = {:?}", n, n.to_bits_asc());
     }
 }
 
-fn demo_integer_to_twos_complement_bits_desc(gm: GenerationMode, limit: usize) {
+fn demo_integer_to_bits_desc(gm: GenerationMode, limit: usize) {
     for n in integers(gm).take(limit) {
-        println!(
-            "to_twos_complement_bits_desc({}) = {:?}",
-            n,
-            n.to_twos_complement_bits_desc()
-        );
+        println!("to_bits_desc({}) = {:?}", n, n.to_bits_desc());
     }
 }
 
@@ -195,14 +225,13 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
     );
 }
 
-#[allow(unused_collect)]
-fn benchmark_integer_to_twos_complement_bits_asc_evaluation_strategy(
+fn benchmark_integer_to_bits_asc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.to_twos_complement_bits_asc()",
+        "Integer.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
         gm.name(),
@@ -211,10 +240,7 @@ fn benchmark_integer_to_twos_complement_bits_asc_evaluation_strategy(
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            (
-                "Integer.to_twos_complement_bits_asc()",
-                &mut (|n| no_out!(n.to_twos_complement_bits_asc())),
-            ),
+            ("Integer.to_bits_asc()", &mut (|n| no_out!(n.to_bits_asc()))),
             (
                 "Integer.twos_complement_bits().collect::<Vec<bool>>()",
                 &mut (|n| no_out!(n.twos_complement_bits().collect::<Vec<bool>>())),
@@ -223,14 +249,31 @@ fn benchmark_integer_to_twos_complement_bits_asc_evaluation_strategy(
     );
 }
 
+fn benchmark_integer_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Integer.to_bits_asc()",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            ("default", &mut (|n| no_out!(n.to_bits_asc()))),
+            ("naive", &mut (|n| no_out!(_to_bits_asc_naive(&n)))),
+        ],
+    );
+}
+
 #[allow(unused_collect)]
-fn benchmark_integer_to_twos_complement_bits_desc_evaluation_strategy(
+fn benchmark_integer_to_bits_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Integer.to_twos_complement_bits_desc()",
+        "Integer.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
         gm.name(),
@@ -240,13 +283,31 @@ fn benchmark_integer_to_twos_complement_bits_desc_evaluation_strategy(
         "n.significant_bits()",
         &mut [
             (
-                "Integer.to_twos_complement_bits_desc()",
-                &mut (|n| no_out!(n.to_twos_complement_bits_desc())),
+                "Integer.to_bits_desc()",
+                &mut (|n| no_out!(n.to_bits_desc())),
             ),
             (
                 "Integer.twos_complement_bits().rev().collect::<Vec<bool>>()",
                 &mut (|n| no_out!(n.twos_complement_bits().collect::<Vec<bool>>())),
             ),
+        ],
+    );
+}
+
+fn benchmark_integer_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Integer.to_bits_desc()",
+        BenchmarkType::Algorithms,
+        integers(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            ("default", &mut (|n| no_out!(n.to_bits_desc()))),
+            ("alt", &mut (|n| no_out!(_to_bits_desc_alt(&n)))),
+            ("naive", &mut (|n| no_out!(_to_bits_desc_naive(&n)))),
         ],
     );
 }
@@ -271,9 +332,9 @@ fn benchmark_integer_twos_complement_bits_get_algorithms(
                 &mut (|(n, u)| no_out!(n.twos_complement_bits()[u])),
             ),
             (
-                "Integer.into_twos_complement_bits_asc()[u]",
+                "Integer.to_bits_asc()[u]",
                 &mut (|(n, u)| {
-                    let bits = n.to_twos_complement_bits_asc();
+                    let bits = n.to_bits_asc();
                     let u = usize::exact_from(u);
                     if u >= bits.len() {
                         n < 0

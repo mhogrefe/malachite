@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::platform::Limb;
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
@@ -11,13 +11,35 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_bits);
     register_demo!(registry, demo_natural_bits_rev);
     register_demo!(registry, demo_natural_bits_size_hint);
-    register_bench!(registry, Large, benchmark_natural_bits_evaluation_strategy);
     register_bench!(
         registry,
         Large,
-        benchmark_natural_bits_rev_evaluation_strategy
+        benchmark_natural_to_bits_asc_evaluation_strategy
     );
+    register_bench!(registry, Large, benchmark_natural_to_bits_asc_algorithms);
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_to_bits_desc_evaluation_strategy
+    );
+    register_bench!(registry, Large, benchmark_natural_to_bits_desc_algorithms);
     register_bench!(registry, Large, benchmark_natural_bits_size_hint);
+}
+
+pub fn _to_bits_asc_naive(n: &Natural) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for i in 0..n.significant_bits() {
+        bits.push(n.get_bit(i));
+    }
+    bits
+}
+
+pub fn _to_bits_desc_naive(n: &Natural) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for i in (0..n.significant_bits()).rev() {
+        bits.push(n.get_bit(i));
+    }
+    bits
 }
 
 fn demo_natural_to_bits_asc(gm: GenerationMode, limit: usize) {
@@ -54,10 +76,14 @@ fn demo_natural_bits_size_hint(gm: GenerationMode, limit: usize) {
     }
 }
 
-#[allow(unknown_lints, unused_collect)]
-fn benchmark_natural_bits_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
+#[allow(unused_collect)]
+fn benchmark_natural_to_bits_asc_evaluation_strategy(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
     m_run_benchmark(
-        "Natural.bits()",
+        "Natural.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),
         gm.name(),
@@ -75,14 +101,32 @@ fn benchmark_natural_bits_evaluation_strategy(gm: GenerationMode, limit: usize, 
     );
 }
 
-#[allow(unknown_lints, unused_collect)]
-fn benchmark_natural_bits_rev_evaluation_strategy(
+#[allow(unused_collect)]
+fn benchmark_natural_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.to_bits_asc()",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            ("default", &mut (|n| no_out!(n.to_bits_asc()))),
+            ("naive", &mut (|n| no_out!(_to_bits_asc_naive(&n)))),
+        ],
+    );
+}
+
+#[allow(unused_collect)]
+fn benchmark_natural_to_bits_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "Natural.bits().rev()",
+        "Natural.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),
         gm.name(),
@@ -96,9 +140,28 @@ fn benchmark_natural_bits_rev_evaluation_strategy(
                 &mut (|n| no_out!(n.to_bits_desc())),
             ),
             (
-                "Natural.limbs().rev().collect::<Vec<Limb>>()",
-                &mut (|n| no_out!(n.limbs().rev().collect::<Vec<Limb>>())),
+                "Natural.bits().rev().collect::<Vec<bool>>()",
+                &mut (|n| no_out!(n.bits().collect::<Vec<bool>>())),
             ),
+        ],
+    );
+}
+
+#[allow(unused_collect)]
+fn benchmark_natural_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "Natural.to_bits_desc()",
+        BenchmarkType::Algorithms,
+        naturals(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|n| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            ("default", &mut (|n| no_out!(n.to_bits_desc()))),
+            ("alt", &mut (|n| no_out!(n._to_bits_desc_alt()))),
+            ("naive", &mut (|n| no_out!(_to_bits_desc_naive(&n)))),
         ],
     );
 }
