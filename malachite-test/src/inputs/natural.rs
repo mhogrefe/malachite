@@ -71,14 +71,14 @@ pub fn positive_naturals(gm: GenerationMode) -> It<Natural> {
     }
 }
 
-pub fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
+pub(crate) fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
 where
     Natural: From<T>,
 {
     Box::new(unsigneds::<T>(gm).map(Natural::from))
 }
 
-pub fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
+pub(crate) fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
 where
     Natural: ExactFrom<T>,
     T::UnsignedOfEqualWidth: Rand,

@@ -78,14 +78,14 @@ pub fn nonzero_integers(gm: GenerationMode) -> It<Integer> {
     }
 }
 
-pub fn integers_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Integer>
+pub(crate) fn integers_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Integer>
 where
     Integer: From<T>,
 {
     Box::new(unsigneds::<T>(gm).map(Integer::from))
 }
 
-pub fn integers_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Integer>
+pub(crate) fn integers_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Integer>
 where
     Integer: From<T>,
     T::UnsignedOfEqualWidth: Rand,

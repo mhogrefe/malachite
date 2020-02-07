@@ -1,5 +1,4 @@
 use std::char;
-use std::cmp::Ordering;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
@@ -63,7 +62,6 @@ use rust_wheels::iterators::general::{random, random_from_vector, range_increasi
 use rust_wheels::iterators::integers_geometric::{
     positive_u32s_geometric, range_up_geometric_u32, u32s_geometric,
 };
-use rust_wheels::iterators::orderings::{exhaustive_orderings, random_orderings};
 use rust_wheels::iterators::primitive_floats::{
     exhaustive_f32s, exhaustive_f64s, exhaustive_finite_f32s, exhaustive_finite_f64s,
     random_finite_primitive_floats, random_primitive_floats, special_random_f32s,
@@ -3438,38 +3436,6 @@ pub fn triples_of_limb_vec_limb_and_limb_var_1(gm: GenerationMode) -> It<(Vec<Li
             &(|seed| special_random_unsigned(seed)),
         )),
     }
-}
-
-fn pairs_of_ordering_and_vec_of_unsigned<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Ordering, Vec<T>)> {
-    match gm {
-        GenerationMode::Exhaustive => permute_2_1(Box::new(lex_pairs(
-            exhaustive_vecs(exhaustive_unsigned()),
-            exhaustive_orderings(),
-        ))),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_orderings(seed)),
-            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_orderings(seed)),
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-        )),
-    }
-}
-
-// All pairs of `Ordering` and `Vec<T>` where `T` is unsigned, such that the `Ordering` is
-// `Ordering::Equal` iff all `T`s in the `Vec` are zero.
-pub fn pairs_of_ordering_and_vec_of_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Ordering, Vec<T>)> {
-    Box::new(
-        pairs_of_ordering_and_vec_of_unsigned(gm)
-            .filter(|&(sign, ref limbs)| limbs_test_zero(limbs) == (sign == Ordering::Equal)),
-    )
 }
 
 fn exhaustive_pairs_of_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>() -> It<(Vec<T>, T)> {
