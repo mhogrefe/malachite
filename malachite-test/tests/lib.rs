@@ -138,7 +138,6 @@ pub mod integer {
         pub mod from_floating_point;
         pub mod from_natural;
         pub mod from_primitive_integer;
-        pub mod from_twos_complement_bits;
         pub mod from_twos_complement_limbs;
         pub mod natural_from_integer;
         pub mod primitive_integer_from_integer;
@@ -155,6 +154,7 @@ pub mod integer {
         pub mod checked_hamming_distance;
         pub mod clear_bit;
         pub mod flip_bit;
+        pub mod from_bits;
         pub mod get_bit;
         pub mod get_bits;
         pub mod index_of_next_false_bit;

@@ -25,10 +25,12 @@ fn test_not_assign() {
     not_assign_helper::<u16>();
     not_assign_helper::<u32>();
     not_assign_helper::<u64>();
+    not_assign_helper::<u128>();
     not_assign_helper::<usize>();
     not_assign_helper::<i8>();
     not_assign_helper::<i16>();
     not_assign_helper::<i32>();
     not_assign_helper::<i64>();
+    not_assign_helper::<i128>();
     not_assign_helper::<isize>();
 }

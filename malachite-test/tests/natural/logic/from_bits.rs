@@ -1,6 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::num::logic::integers::{_from_bits_asc_alt, _from_bits_desc_alt};
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_nz::natural::conversion::from_bits::{
+use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };
 use malachite_nz::natural::Natural;
@@ -8,6 +10,7 @@ use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
+use malachite_test::natural::logic::from_bits::{_from_bits_asc_naive, _from_bits_desc_naive};
 
 #[test]
 fn test_limbs_asc_from_bits_asc() {
@@ -256,6 +259,8 @@ fn from_bits_asc_properties() {
     test_properties(vecs_of_bool, |bits| {
         let x = Natural::from_bits_asc(bits);
         assert!(x.is_valid());
+        assert_eq!(_from_bits_asc_naive(bits), x);
+        assert_eq!(_from_bits_asc_alt::<Natural>(bits), x);
         let mut trimmed_bits: Vec<bool> =
             bits.iter().cloned().rev().skip_while(|&bit| !bit).collect();
         trimmed_bits.reverse();
@@ -268,6 +273,10 @@ fn from_bits_asc_properties() {
             assert_eq!(x.to_bits_asc(), *bits);
         }
         assert_eq!(bits.iter().all(|b| !b), x == 0);
+
+        if Limb::convertible_from(&x) {
+            assert_eq!(Limb::from_bits_asc(bits), x);
+        }
     });
 }
 
@@ -276,6 +285,8 @@ fn from_bits_desc_properties() {
     test_properties(vecs_of_bool, |bits| {
         let x = Natural::from_bits_desc(bits);
         assert!(x.is_valid());
+        assert_eq!(_from_bits_desc_naive(bits), x);
+        assert_eq!(_from_bits_desc_alt::<Natural>(bits), x);
         assert_eq!(
             x.to_bits_desc(),
             bits.iter()
@@ -291,5 +302,9 @@ fn from_bits_desc_properties() {
             assert_eq!(x.to_bits_desc(), *bits);
         }
         assert_eq!(bits.iter().all(|b| !b), x == 0);
+
+        if Limb::convertible_from(&x) {
+            assert_eq!(Limb::from_bits_desc(bits), x);
+        }
     });
 }

@@ -4,6 +4,7 @@ use comparison::Max;
 use num::arithmetic::traits::ModPowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::traits::ExactFrom;
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitScan, HammingDistance, SignificantBits,
 };
@@ -378,6 +379,81 @@ macro_rules! impl_logic_traits {
                 }
                 bits
             }
+
+            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
+            /// to most-significant. The function panics if the input represents a number that can't
+            /// fit in $t.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// where n = `bits.len()`
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by $t.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(u8::from_bits_asc(&[]), 0);
+            /// assert_eq!(u16::from_bits_asc(&[false, true, false]), 2);
+            /// assert_eq!(u32::from_bits_asc(&[true, true, false, true, true, true, true]), 123);
+            /// ```
+            fn from_bits_asc(bits: &[bool]) -> $t {
+                let width = usize::exact_from($t::WIDTH);
+                if bits.len() > width {
+                    assert!(bits[width..].iter().all(|&bit| !bit));
+                }
+                let mut n = 0;
+                let mut mask = 1;
+                for &bit in bits {
+                    if bit {
+                        n |= mask;
+                    }
+                    mask <<= 1;
+                }
+                n
+            }
+
+            /// Converts a slice of bits into a value. The input bits are in descending order: most-
+            /// to least-significant. The function panics if the input represents a number that
+            /// can't fit in $t.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// where n = `bits.len()`
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by $t.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(u8::from_bits_desc(&[]), 0);
+            /// assert_eq!(u16::from_bits_desc(&[false, true, false]), 2);
+            /// assert_eq!(u32::from_bits_desc(&[true, true, true, true, false, true, true]), 123);
+            /// ```
+            fn from_bits_desc(mut bits: &[bool]) -> $t {
+                let width = usize::exact_from($t::WIDTH);
+                if bits.len() > width {
+                    let (bits_lo, bits_hi) = bits.split_at(bits.len() - width);
+                    assert!(bits_lo.iter().all(|&bit| !bit));
+                    bits = bits_hi;
+                }
+                let mut n = 0;
+                for &bit in bits {
+                    n <<= 1;
+                    if bit {
+                        n |= 1;
+                    }
+                }
+                n
+            }
         }
     };
 }
@@ -403,4 +479,29 @@ pub fn _to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
         bits.push(n.get_bit(i));
     }
     bits
+}
+
+pub fn _from_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
+    let mut n = T::ZERO;
+    for i in bits
+        .iter()
+        .enumerate()
+        .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
+    {
+        n.set_bit(i);
+    }
+    n
+}
+
+pub fn _from_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
+    let mut n = T::ZERO;
+    for i in
+        bits.iter()
+            .rev()
+            .enumerate()
+            .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
+    {
+        n.set_bit(i);
+    }
+    n
 }

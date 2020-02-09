@@ -4,13 +4,13 @@ use comparison::Max;
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::WrappingFrom;
+use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitScan, CheckedHammingDistance, SignificantBits,
 };
 
 macro_rules! impl_logic_traits {
-    ($t:ident) => {
+    ($t:ident, $u:ident) => {
         /// Returns the number of significant bits of a primitive signed integer; this is the
         /// integer's width minus the number of leading zeros of its absolute value.
         ///
@@ -317,7 +317,7 @@ macro_rules! impl_logic_traits {
         }
 
         impl BitBlockAccess for $t {
-            type Bits = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
+            type Bits = $u;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
             /// The type of the block of bits is the unsigned version of the input type. If `end` is
@@ -521,16 +521,106 @@ macro_rules! impl_logic_traits {
                 }
                 bits
             }
+
+            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
+            /// to most-significant. The function panics if the input represents a number that can't
+            /// fit in $t.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// where n = `bits.len()`
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by $t.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(i8::from_bits_asc(&[]), 0);
+            /// assert_eq!(i16::from_bits_asc(&[false, true, false]), 2);
+            /// assert_eq!(
+            ///     i32::from_bits_asc(&[true, false, true, false, false, false, false, true]),
+            ///     -123
+            /// );
+            /// ```
+            fn from_bits_asc(bits: &[bool]) -> $t {
+                if bits.is_empty() {
+                    0
+                } else if !*bits.last().unwrap() {
+                    $t::exact_from($u::from_bits_asc(bits))
+                } else {
+                    let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
+                    let significant_bits = bits.len() - trailing_trues;
+                    assert!(significant_bits < usize::exact_from($t::WIDTH));
+                    let mut u: $u = !((1 << significant_bits) - 1);
+                    let mut mask = 1;
+                    for &bit in &bits[..significant_bits] {
+                        if bit {
+                            u |= mask;
+                        }
+                        mask <<= 1;
+                    }
+                    $t::wrapping_from(u)
+                }
+            }
+
+            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
+            /// to most-significant. The function panics if the input represents a number that can't
+            /// fit in $t.
+            ///
+            /// Time: worst case O(n)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// where n = `bits.len()`
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by $t.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            ///
+            /// assert_eq!(i8::from_bits_desc(&[]), 0);
+            /// assert_eq!(i16::from_bits_desc(&[false, true, false]), 2);
+            /// assert_eq!(
+            ///     i32::from_bits_desc(&[true, false, false, false, false, true, false, true]),
+            ///     -123
+            /// );
+            /// ```
+            fn from_bits_desc(bits: &[bool]) -> $t {
+                if bits.is_empty() {
+                    0
+                } else if !bits[0] {
+                    $t::exact_from($u::from_bits_desc(bits))
+                } else {
+                    let leading_trues = bits.iter().take_while(|&&bit| bit).count();
+                    let significant_bits = bits.len() - leading_trues;
+                    assert!(significant_bits < usize::exact_from($t::WIDTH));
+                    let mut mask: $u = 1 << significant_bits;
+                    let mut u = !(mask - 1);
+                    for &bit in &bits[leading_trues..] {
+                        mask >>= 1;
+                        if bit {
+                            u |= mask;
+                        }
+                    }
+                    $t::wrapping_from(u)
+                }
+            }
         }
     };
 }
 
-impl_logic_traits!(i8);
-impl_logic_traits!(i16);
-impl_logic_traits!(i32);
-impl_logic_traits!(i64);
-impl_logic_traits!(i128);
-impl_logic_traits!(isize);
+impl_logic_traits!(i8, u8);
+impl_logic_traits!(i16, u16);
+impl_logic_traits!(i32, u32);
+impl_logic_traits!(i64, u64);
+impl_logic_traits!(i128, u128);
+impl_logic_traits!(isize, usize);
 
 pub fn _to_bits_asc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     let mut bits = Vec::new();
@@ -561,4 +651,62 @@ pub fn _to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
         bits.push(n.get_bit(i));
     }
     bits
+}
+
+pub fn _from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
+    if bits.is_empty() {
+        return T::ZERO;
+    }
+    let mut n;
+    if *bits.last().unwrap() {
+        n = T::NEGATIVE_ONE;
+        for i in
+            bits.iter()
+                .enumerate()
+                .filter_map(|(i, &bit)| if bit { None } else { Some(u64::exact_from(i)) })
+        {
+            n.clear_bit(i);
+        }
+    } else {
+        n = T::ZERO;
+        for i in
+            bits.iter()
+                .enumerate()
+                .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
+        {
+            n.set_bit(i);
+        }
+    };
+    n
+}
+
+pub fn _from_bits_desc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
+    if bits.is_empty() {
+        return T::ZERO;
+    }
+    let mut n;
+    if bits[0] {
+        n = T::NEGATIVE_ONE;
+        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
+            if bit {
+                None
+            } else {
+                Some(u64::exact_from(i))
+            }
+        }) {
+            n.clear_bit(i);
+        }
+    } else {
+        n = T::ZERO;
+        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
+            if bit {
+                Some(u64::exact_from(i))
+            } else {
+                None
+            }
+        }) {
+            n.set_bit(i);
+        }
+    };
+    n
 }

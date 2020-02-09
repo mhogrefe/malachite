@@ -1,12 +1,17 @@
+use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base::num::logic::integers::{_from_bits_asc_alt, _from_bits_desc_alt};
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
+use malachite_test::integer::logic::from_bits::{_from_bits_asc_naive, _from_bits_desc_naive};
 
 #[test]
-fn test_from_twos_complement_bits_asc() {
+fn test_from_bits_asc() {
     let test = |bits: &[bool], out| {
-        let x = Integer::from_twos_complement_bits_asc(bits);
+        let x = Integer::from_bits_asc(bits);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -47,9 +52,9 @@ fn test_from_twos_complement_bits_asc() {
 }
 
 #[test]
-fn test_from_twos_complement_bits_desc() {
+fn test_from_bits_desc() {
     let test = |bits: &[bool], out| {
-        let x = Integer::from_twos_complement_bits_desc(bits);
+        let x = Integer::from_bits_desc(bits);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -90,31 +95,39 @@ fn test_from_twos_complement_bits_desc() {
 }
 
 #[test]
-fn from_twos_complement_bits_asc_properties() {
+fn from_bits_asc_properties() {
     test_properties(vecs_of_bool, |bits| {
-        let x = Integer::from_twos_complement_bits_asc(bits);
+        let x = Integer::from_bits_asc(bits);
         assert!(x.is_valid());
+        assert_eq!(_from_bits_asc_naive(bits), x);
+        assert_eq!(_from_bits_asc_alt::<Integer>(bits), x);
         assert_eq!(
-            Integer::from_twos_complement_bits_desc(
-                &bits.iter().cloned().rev().collect::<Vec<bool>>()
-            ),
+            Integer::from_bits_desc(&bits.iter().cloned().rev().collect::<Vec<bool>>()),
             x
         );
         assert_eq!(bits.iter().all(|b| !b), x == 0);
+
+        if SignedLimb::convertible_from(&x) {
+            assert_eq!(SignedLimb::from_bits_asc(bits), x);
+        }
     });
 }
 
 #[test]
-fn from_twos_complement_limbs_desc_properties() {
+fn from_limbs_desc_properties() {
     test_properties(vecs_of_bool, |bits| {
-        let x = Integer::from_twos_complement_bits_desc(bits);
+        let x = Integer::from_bits_desc(bits);
         assert!(x.is_valid());
+        assert_eq!(_from_bits_desc_naive(bits), x);
+        assert_eq!(_from_bits_desc_alt::<Integer>(bits), x);
         assert_eq!(
-            Integer::from_twos_complement_bits_asc(
-                &bits.iter().cloned().rev().collect::<Vec<bool>>()
-            ),
+            Integer::from_bits_asc(&bits.iter().cloned().rev().collect::<Vec<bool>>()),
             x
         );
         assert_eq!(bits.iter().all(|b| !b), x == 0);
+
+        if SignedLimb::convertible_from(&x) {
+            assert_eq!(SignedLimb::from_bits_desc(bits), x);
+        }
     });
 }

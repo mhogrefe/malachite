@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::integers::_to_bits_desc_alt;
+use malachite_base::num::logic::integers::{_to_bits_asc_alt, _to_bits_desc_alt};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
@@ -261,6 +261,7 @@ fn benchmark_integer_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.to_bits_asc()))),
+            ("alt", &mut (|n| no_out!(_to_bits_asc_alt(&n)))),
             ("naive", &mut (|n| no_out!(_to_bits_asc_naive(&n)))),
         ],
     );

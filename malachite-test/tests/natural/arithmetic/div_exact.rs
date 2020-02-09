@@ -33,7 +33,7 @@ use malachite_test::inputs::base::{
     quadruples_of_three_limb_vecs_and_limb_var_3, quadruples_of_three_limb_vecs_and_limb_var_4,
     quadruples_of_three_limb_vecs_and_limb_var_5, quadruples_of_three_limb_vecs_and_limb_var_6,
     triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_limb_vec_var_50,
-    triples_of_limb_vec_var_51, triples_of_limb_vec_var_53, vecs_of_limb_var_5,
+    triples_of_limb_vec_var_51, triples_of_limb_vec_var_53, vecs_of_limb_var_4,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural_var_1, positive_naturals,
@@ -7982,7 +7982,7 @@ fn limbs_div_exact_limb_in_place_properties() {
 
 #[test]
 fn limbs_div_exact_3_properties() {
-    test_properties(vecs_of_limb_var_5, |ref limbs| {
+    test_properties(vecs_of_limb_var_4, |ref limbs| {
         let quotient_limbs = Natural::from_owned_limbs_asc(limbs_div_exact_3(limbs));
         assert_eq!(
             Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, 3)),
@@ -8020,7 +8020,7 @@ fn limbs_div_exact_3_to_out_properties() {
 
 #[test]
 fn limbs_div_exact_3_in_place_properties() {
-    test_properties(vecs_of_limb_var_5, |ref limbs| {
+    test_properties(vecs_of_limb_var_4, |ref limbs| {
         let old_limbs = limbs;
         let mut limbs = old_limbs.to_vec();
         limbs_div_exact_3_in_place(&mut limbs);

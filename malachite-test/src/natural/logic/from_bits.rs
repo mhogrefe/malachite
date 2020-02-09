@@ -1,4 +1,8 @@
-use malachite_nz::natural::conversion::from_bits::{
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::integers::{_from_bits_asc_alt, _from_bits_desc_alt};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };
 use malachite_nz::natural::Natural;
@@ -13,8 +17,35 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_from_bits_desc);
     register_bench!(registry, Large, benchmark_limbs_asc_from_bits_asc);
     register_bench!(registry, Large, benchmark_limbs_asc_from_bits_desc);
-    register_bench!(registry, Large, benchmark_natural_from_bits_asc);
-    register_bench!(registry, Large, benchmark_natural_from_bits_desc);
+    register_bench!(registry, Large, benchmark_natural_from_bits_asc_algorithms);
+    register_bench!(registry, Large, benchmark_natural_from_bits_desc_algorithms);
+}
+
+pub fn _from_bits_asc_naive(bits: &[bool]) -> Natural {
+    let mut n = Natural::ZERO;
+    for i in bits
+        .iter()
+        .enumerate()
+        .filter(|(_, &bit)| bit)
+        .map(|p| u64::exact_from(p.0))
+    {
+        n.set_bit(i);
+    }
+    n
+}
+
+pub fn _from_bits_desc_naive(bits: &[bool]) -> Natural {
+    let mut n = Natural::ZERO;
+    for i in bits
+        .iter()
+        .rev()
+        .enumerate()
+        .filter(|(_, &bit)| bit)
+        .map(|p| u64::exact_from(p.0))
+    {
+        n.set_bit(i);
+    }
+    n
 }
 
 fn demo_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize) {
@@ -91,36 +122,56 @@ fn benchmark_limbs_asc_from_bits_desc(gm: GenerationMode, limit: usize, file_nam
     );
 }
 
-fn benchmark_natural_from_bits_asc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural::from_bits_asc(&[bool])",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         vecs_of_bool(gm),
         gm.name(),
         limit,
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [(
-            "Natural::from_bits_asc(&[bool])",
-            &mut (|ref bits| no_out!(Natural::from_bits_asc(bits))),
-        )],
+        &mut [
+            (
+                "default",
+                &mut (|ref bits| no_out!(Natural::from_bits_asc(bits))),
+            ),
+            (
+                "alt",
+                &mut (|ref bits| no_out!(_from_bits_asc_alt::<Natural>(bits))),
+            ),
+            (
+                "naive",
+                &mut (|ref bits| no_out!(_from_bits_asc_naive(bits))),
+            ),
+        ],
     );
 }
 
-fn benchmark_natural_from_bits_desc(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_natural_from_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural::from_bits_desc(&[bool])",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         vecs_of_bool(gm),
         gm.name(),
         limit,
         file_name,
         &(|bits| bits.len()),
         "bits.len()",
-        &mut [(
-            "Natural::from_bits_desc(&[bool])",
-            &mut (|ref bits| no_out!(Natural::from_bits_desc(bits))),
-        )],
+        &mut [
+            (
+                "default",
+                &mut (|ref bits| no_out!(Natural::from_bits_desc(bits))),
+            ),
+            (
+                "alt",
+                &mut (|ref bits| no_out!(_from_bits_desc_alt::<Natural>(bits))),
+            ),
+            (
+                "naive",
+                &mut (|ref bits| no_out!(_from_bits_desc_naive(bits))),
+            ),
+        ],
     );
 }

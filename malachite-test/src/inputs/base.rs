@@ -1233,7 +1233,7 @@ pub fn vecs_of_unsigned_var_3<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -
 }
 
 // All `Vec<Limb>` that are nonempty and represent a `Natural` divisible by 3.
-pub fn vecs_of_limb_var_5(gm: GenerationMode) -> It<Vec<Limb>> {
+pub fn vecs_of_limb_var_4(gm: GenerationMode) -> It<Vec<Limb>> {
     Box::new(
         vecs_of_unsigned(gm)
             .filter(|ref limbs| !limbs.is_empty())
@@ -3895,6 +3895,60 @@ pub fn vecs_of_bool(gm: GenerationMode) -> It<Vec<bool>> {
 // All `Vec<bool>` that are nonempty and don't only contain `false`s.
 pub fn vecs_of_bool_var_1(gm: GenerationMode) -> It<Vec<bool>> {
     Box::new(vecs_of_bool(gm).filter(|bits| bits.iter().any(|&bit| bit)))
+}
+
+// All `Vec<bool>` that could be the bits, in ascending order, of a value of type `T`, which is
+// unsigned.
+pub fn vecs_of_bool_var_2<T: PrimitiveUnsigned>(gm: GenerationMode) -> It<Vec<bool>> {
+    Box::new(vecs_of_bool(gm).filter(|bits| {
+        let width = usize::exact_from(T::WIDTH);
+        bits.len() <= width || bits[width..].iter().all(|&bit| !bit)
+    }))
+}
+
+// All `Vec<bool>` that could be the bits, in ascending order, of a value of type `T`, which is
+// signed.
+pub fn vecs_of_bool_var_3<T: PrimitiveSigned>(gm: GenerationMode) -> It<Vec<bool>> {
+    Box::new(vecs_of_bool(gm).filter(|bits| {
+        if bits.is_empty() {
+            return true;
+        }
+        let width = usize::exact_from(T::WIDTH);
+        if !*bits.last().unwrap() {
+            bits.len() < width || bits[width - 1..].iter().all(|&bit| !bit)
+        } else {
+            let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
+            let significant_bits = bits.len() - trailing_trues;
+            significant_bits < width
+        }
+    }))
+}
+
+// All `Vec<bool>` that could be the bits, in descending order, of a value of type `T`, which is
+// unsigned.
+pub fn vecs_of_bool_var_4<T: PrimitiveUnsigned>(gm: GenerationMode) -> It<Vec<bool>> {
+    Box::new(vecs_of_bool(gm).filter(|bits| {
+        let width = usize::exact_from(T::WIDTH);
+        bits.len() <= width || bits[..bits.len() - width].iter().all(|&bit| !bit)
+    }))
+}
+
+// All `Vec<bool>` that could be the bits, in descending order, of a value of type `T`, which is
+// signed.
+pub fn vecs_of_bool_var_5<T: PrimitiveSigned>(gm: GenerationMode) -> It<Vec<bool>> {
+    Box::new(vecs_of_bool(gm).filter(|bits| {
+        if bits.is_empty() {
+            return true;
+        }
+        let width = usize::exact_from(T::WIDTH);
+        if !*bits.last().unwrap() {
+            bits.len() < width || bits[..bits.len() - width + 1].iter().all(|&bit| !bit)
+        } else {
+            let trailing_trues = bits.iter().take_while(|&&bit| bit).count();
+            let significant_bits = bits.len() - trailing_trues;
+            significant_bits < width
+        }
+    }))
 }
 
 fn triples_of_unsigned_vec_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(

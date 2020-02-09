@@ -115,7 +115,6 @@ impl fmt::Binary for Natural {
 }
 
 pub mod floating_point_from_natural;
-pub mod from_bits;
 pub mod from_floating_point;
 pub mod from_limbs;
 pub mod from_primitive_integer;

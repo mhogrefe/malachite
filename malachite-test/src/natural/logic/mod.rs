@@ -1,6 +1,6 @@
 use std::iter::repeat;
 
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

@@ -101,8 +101,26 @@ pub fn _assign_bits_naive<T: BitAccess, U: BitAccess>(n: &mut T, start: u64, end
     }
 }
 
+pub fn _to_bits_asc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
+    let mut bits = n.to_bits_desc();
+    bits.reverse();
+    bits
+}
+
 pub fn _to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
     let mut bits = n.to_bits_asc();
     bits.reverse();
     bits
+}
+
+pub fn _from_bits_asc_alt<T: BitConvertible>(bits: &[bool]) -> T {
+    let mut bits = bits.to_vec();
+    bits.reverse();
+    T::from_bits_desc(&bits)
+}
+
+pub fn _from_bits_desc_alt<T: BitConvertible>(bits: &[bool]) -> T {
+    let mut bits = bits.to_vec();
+    bits.reverse();
+    T::from_bits_asc(&bits)
 }

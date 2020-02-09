@@ -19,7 +19,7 @@ fn significant_bits_helper_common<T: PrimitiveInteger>() {
     test(64, 7);
 }
 
-fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
+fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u128) {
     significant_bits_helper_common::<T>();
 
     let test = |n, out: u64| {
@@ -29,7 +29,7 @@ fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u64) {
     test(max, T::WIDTH.into());
 }
 
-fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i64, min: i64) {
+fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i128, min: i128) {
     significant_bits_helper_common::<T>();
 
     let test = |n, out: u64| {
@@ -46,14 +46,16 @@ fn test_significant_bits() {
     significant_bits_helper_unsigned::<u8>(u8::MAX.into());
     significant_bits_helper_unsigned::<u16>(u16::MAX.into());
     significant_bits_helper_unsigned::<u32>(u32::MAX.into());
-    significant_bits_helper_unsigned::<u64>(u64::MAX);
-    significant_bits_helper_unsigned::<usize>(u64::wrapping_from(usize::MAX));
+    significant_bits_helper_unsigned::<u64>(u64::MAX.into());
+    significant_bits_helper_unsigned::<u128>(u128::MAX);
+    significant_bits_helper_unsigned::<usize>(u128::wrapping_from(usize::MAX));
     significant_bits_helper_signed::<i8>(i8::MAX.into(), i8::MIN.into());
     significant_bits_helper_signed::<i16>(i16::MAX.into(), i16::MIN.into());
     significant_bits_helper_signed::<i32>(i32::MAX.into(), i32::MIN.into());
-    significant_bits_helper_signed::<i64>(i64::MAX, i64::MIN);
+    significant_bits_helper_signed::<i64>(i64::MAX.into(), i64::MIN.into());
+    significant_bits_helper_signed::<i128>(i128::MAX, i128::MIN);
     significant_bits_helper_signed::<isize>(
-        i64::wrapping_from(isize::MAX),
-        i64::wrapping_from(isize::MIN),
+        i128::wrapping_from(isize::MAX),
+        i128::wrapping_from(isize::MIN),
     );
 }

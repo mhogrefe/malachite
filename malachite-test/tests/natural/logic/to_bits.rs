@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::integers::{_to_bits_asc_alt, _to_bits_desc_alt};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -172,6 +173,7 @@ fn to_bits_asc_properties() {
     test_properties(naturals, |x| {
         let bits = x.to_bits_asc();
         assert_eq!(_to_bits_asc_naive(x), bits);
+        assert_eq!(_to_bits_asc_alt(x), bits);
         assert_eq!(x.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_asc(&bits), *x);
         if *x != 0 {
@@ -189,6 +191,7 @@ fn to_bits_desc_properties() {
     test_properties(naturals, |x| {
         let bits = x.to_bits_desc();
         assert_eq!(_to_bits_desc_naive(x), bits);
+        assert_eq!(_to_bits_desc_alt(x), bits);
         assert_eq!(x._to_bits_desc_alt(), bits);
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_desc(&bits), *x);

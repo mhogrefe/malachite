@@ -173,4 +173,12 @@ pub trait BitConvertible {
     /// Returns a `Vec` containing the bits of a value in descending order: most- to least-
     /// significant.
     fn to_bits_desc(&self) -> Vec<bool>;
+
+    /// Converts a slice of bits into a value. The input bits are in ascending order: least- to
+    /// most-significant.
+    fn from_bits_asc(bits: &[bool]) -> Self;
+
+    /// Converts a slice of bits into a value. The input bits are in descending order: most- to
+    /// least-significant.
+    fn from_bits_desc(bits: &[bool]) -> Self;
 }

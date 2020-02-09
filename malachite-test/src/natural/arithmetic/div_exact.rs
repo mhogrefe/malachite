@@ -28,7 +28,7 @@ use inputs::base::{
     quadruples_of_three_limb_vecs_and_limb_var_6, quadruples_of_three_limb_vecs_and_limb_var_7,
     triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_limb_vec_var_50,
     triples_of_limb_vec_var_51, triples_of_limb_vec_var_53, triples_of_limb_vec_var_54,
-    vecs_of_limb_var_5,
+    vecs_of_limb_var_4,
 };
 use inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural_var_1, pairs_of_natural_and_positive_natural_var_1,
@@ -192,7 +192,7 @@ fn demo_limbs_div_exact_limb_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_exact_3(gm: GenerationMode, limit: usize) {
-    for limbs in vecs_of_limb_var_5(gm).take(limit) {
+    for limbs in vecs_of_limb_var_4(gm).take(limit) {
         println!(
             "limbs_div_exact_3({:?}) = {:?}",
             limbs,
@@ -215,7 +215,7 @@ fn demo_limbs_div_exact_3_to_out(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_div_exact_3_in_place(gm: GenerationMode, limit: usize) {
-    for limbs in vecs_of_limb_var_5(gm).take(limit) {
+    for limbs in vecs_of_limb_var_4(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let limbs_old = limbs.clone();
         limbs_div_exact_3_in_place(&mut limbs);
@@ -556,7 +556,7 @@ fn benchmark_limbs_div_exact_3_algorithms(gm: GenerationMode, limit: usize, file
     m_run_benchmark(
         "limbs_div_exact_3(&[Limb])",
         BenchmarkType::Algorithms,
-        vecs_of_limb_var_5(gm),
+        vecs_of_limb_var_4(gm),
         gm.name(),
         limit,
         file_name,
@@ -616,7 +616,7 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
     m_run_benchmark(
         "limbs_div_exact_limb_in_place(&mut [Limb], 3)",
         BenchmarkType::Algorithms,
-        vecs_of_limb_var_5(gm),
+        vecs_of_limb_var_4(gm),
         gm.name(),
         limit,
         file_name,

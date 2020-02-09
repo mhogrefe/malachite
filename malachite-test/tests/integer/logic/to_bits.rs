@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::integers::_to_bits_desc_alt;
+use malachite_base::num::logic::integers::{_to_bits_asc_alt, _to_bits_desc_alt};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
@@ -377,8 +377,9 @@ fn to_bits_asc_properties() {
     test_properties(integers, |x| {
         let bits = x.to_bits_asc();
         assert_eq!(_to_bits_asc_naive(x), bits);
+        assert_eq!(_to_bits_asc_alt(x), bits);
         assert_eq!(x.twos_complement_bits().collect::<Vec<bool>>(), bits);
-        assert_eq!(Integer::from_twos_complement_bits_asc(&bits), *x);
+        assert_eq!(Integer::from_bits_asc(&bits), *x);
         if *x != 0 {
             assert_eq!(*bits.last().unwrap(), *x < 0);
         }
@@ -400,7 +401,7 @@ fn to_bits_desc_properties() {
         assert_eq!(_to_bits_desc_naive(x), bits);
         assert_eq!(_to_bits_desc_alt(x), bits);
         assert_eq!(x.twos_complement_bits().rev().collect::<Vec<bool>>(), bits);
-        assert_eq!(Integer::from_twos_complement_bits_desc(&bits), *x);
+        assert_eq!(Integer::from_bits_desc(&bits), *x);
         if *x != 0 {
             assert_eq!(bits[0], *x < 0);
         }

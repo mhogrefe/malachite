@@ -41,6 +41,7 @@ get_bits_fail_helper_unsigned!(u8, get_bits_u8_fail);
 get_bits_fail_helper_unsigned!(u16, get_bits_u16_fail);
 get_bits_fail_helper_unsigned!(u32, get_bits_u32_fail);
 get_bits_fail_helper_unsigned!(u64, get_bits_u64_fail);
+get_bits_fail_helper_unsigned!(u128, get_bits_u128_fail);
 get_bits_fail_helper_unsigned!(usize, get_bits_usize_fail);
 
 #[test]
@@ -76,7 +77,7 @@ macro_rules! get_bits_fail_helper_signed {
         #[test]
         #[should_panic]
         fn $fail_2() {
-            $t::from(-10i8).get_bits(100, 200);
+            $t::from(-10i8).get_bits(100, 300);
         }
     };
 }
@@ -85,6 +86,7 @@ get_bits_fail_helper_signed!(i8, get_bits_i8_fail_1, get_bits_i8_fail_2);
 get_bits_fail_helper_signed!(i16, get_bits_i16_fail_1, get_bits_i16_fail_2);
 get_bits_fail_helper_signed!(i32, get_bits_i32_fail_1, get_bits_i32_fail_2);
 get_bits_fail_helper_signed!(i64, get_bits_i64_fail_1, get_bits_i64_fail_2);
+get_bits_fail_helper_signed!(i128, get_bits_i128_fail_1, get_bits_i128_fail_2);
 get_bits_fail_helper_signed!(isize, get_bits_isize_fail_1, get_bits_isize_fail_2);
 
 #[test]
@@ -140,6 +142,7 @@ assign_bits_fail_helper_unsigned!(u8, assign_bits_u8_fail_1, assign_bits_u8_fail
 assign_bits_fail_helper_unsigned!(u16, assign_bits_u16_fail_1, assign_bits_u16_fail_2);
 assign_bits_fail_helper_unsigned!(u32, assign_bits_u32_fail_1, assign_bits_u32_fail_2);
 assign_bits_fail_helper_unsigned!(u64, assign_bits_u64_fail_1, assign_bits_u64_fail_2);
+assign_bits_fail_helper_unsigned!(u128, assign_bits_u128_fail_1, assign_bits_u128_fail_2);
 assign_bits_fail_helper_unsigned!(usize, assign_bits_usize_fail_1, assign_bits_usize_fail_2);
 
 #[test]
@@ -251,6 +254,14 @@ assign_bits_fail_helper_signed!(
     assign_bits_i64_fail_3,
     assign_bits_i64_fail_4,
     assign_bits_i64_fail_5
+);
+assign_bits_fail_helper_signed!(
+    i128,
+    assign_bits_i128_fail_1,
+    assign_bits_i128_fail_2,
+    assign_bits_i128_fail_3,
+    assign_bits_i128_fail_4,
+    assign_bits_i128_fail_5
 );
 assign_bits_fail_helper_signed!(
     isize,

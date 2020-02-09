@@ -1,4 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::integers::_to_bits_asc_alt;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
 use malachite_nz::natural::Natural;
 
@@ -114,6 +115,7 @@ fn benchmark_natural_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.to_bits_asc()))),
+            ("alt", &mut (|n| no_out!(_to_bits_asc_alt(&n)))),
             ("naive", &mut (|n| no_out!(_to_bits_asc_naive(&n)))),
         ],
     );

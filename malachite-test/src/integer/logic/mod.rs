@@ -1,6 +1,7 @@
 use std::iter::repeat;
 
 use malachite_base::comparison::Max;
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
@@ -14,6 +15,7 @@ pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
 pub mod clear_bit;
 pub mod flip_bit;
+pub mod from_bits;
 pub mod get_bit;
 pub mod get_bits;
 pub mod index_of_next_false_bit;
@@ -42,11 +44,11 @@ fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer
                     .zip(y.twos_complement_bits()),
             )
         };
-    let mut and_bits = Vec::new();
+    let mut bits = Vec::new();
     for (b, c) in bit_zip {
-        and_bits.push(bit_fn(b, c));
+        bits.push(bit_fn(b, c));
     }
-    Integer::from_twos_complement_bits_asc(&and_bits)
+    Integer::from_bits_asc(&bits)
 }
 
 fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integer) -> Integer {
@@ -65,11 +67,11 @@ fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integ
                     .zip(y.twos_complement_limbs()),
             )
         };
-    let mut and_limbs = Vec::new();
+    let mut limbs = Vec::new();
     for (x, y) in limb_zip {
-        and_limbs.push(limb_fn(x, y));
+        limbs.push(limb_fn(x, y));
     }
-    Integer::from_owned_twos_complement_limbs_asc(and_limbs)
+    Integer::from_owned_twos_complement_limbs_asc(limbs)
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -81,6 +83,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     checked_hamming_distance::register(registry);
     clear_bit::register(registry);
     flip_bit::register(registry);
+    from_bits::register(registry);
     get_bit::register(registry);
     get_bits::register(registry);
     index_of_next_false_bit::register(registry);

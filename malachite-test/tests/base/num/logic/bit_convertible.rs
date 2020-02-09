@@ -1,20 +1,33 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::integers::_to_bits_desc_alt;
-use malachite_base::num::logic::signeds::{_to_bits_asc_signed_naive, _to_bits_desc_signed_naive};
+use malachite_base::num::logic::integers::{
+    _from_bits_asc_alt, _from_bits_desc_alt, _to_bits_asc_alt, _to_bits_desc_alt,
+};
+use malachite_base::num::logic::signeds::{
+    _from_bits_asc_signed_naive, _from_bits_desc_signed_naive, _to_bits_asc_signed_naive,
+    _to_bits_desc_signed_naive,
+};
 use malachite_base::num::logic::unsigneds::{
-    _to_bits_asc_unsigned_naive, _to_bits_desc_unsigned_naive,
+    _from_bits_asc_unsigned_naive, _from_bits_desc_unsigned_naive, _to_bits_asc_unsigned_naive,
+    _to_bits_desc_unsigned_naive,
 };
 use rand::Rand;
 
-use malachite_test::common::test_properties;
-use malachite_test::inputs::base::{signeds, unsigneds};
+use malachite_test::common::{
+    test_properties, test_properties_custom_limit, test_properties_no_special, SMALL_LIMIT,
+};
+use malachite_test::inputs::base::{
+    signeds, small_unsigneds, unsigneds, vecs_of_bool_var_2, vecs_of_bool_var_3,
+    vecs_of_bool_var_4, vecs_of_bool_var_5,
+};
 
 fn to_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds::<T>, |&u| {
         let bits = u.to_bits_asc();
         assert_eq!(_to_bits_asc_unsigned_naive(u), bits);
+        assert_eq!(_to_bits_asc_alt(&u), bits);
+        assert_eq!(T::from_bits_asc(&bits), u);
         if u != T::ZERO {
             assert_eq!(*bits.last().unwrap(), true);
         }
@@ -29,7 +42,9 @@ where
 {
     test_properties(signeds::<T>, |&i| {
         let bits = i.to_bits_asc();
-        assert_eq!(_to_bits_asc_signed_naive(i), bits, "{}", i);
+        assert_eq!(_to_bits_asc_signed_naive(i), bits);
+        assert_eq!(_to_bits_asc_alt(&i), bits);
+        assert_eq!(T::from_bits_asc(&bits), i);
         if i != T::ZERO {
             assert_eq!(*bits.last().unwrap(), i < T::ZERO);
         }
@@ -60,6 +75,7 @@ fn to_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         let bits = u.to_bits_desc();
         assert_eq!(_to_bits_desc_unsigned_naive(u), bits);
         assert_eq!(_to_bits_desc_alt(&u), bits);
+        assert_eq!(T::from_bits_desc(&bits), u);
         if u != T::ZERO {
             assert_eq!(bits[0], true);
         }
@@ -76,6 +92,7 @@ where
         let bits = i.to_bits_desc();
         assert_eq!(_to_bits_desc_signed_naive(i), bits);
         assert_eq!(_to_bits_desc_alt(&i), bits);
+        assert_eq!(T::from_bits_desc(&bits), i);
         if i != T::ZERO {
             assert_eq!(bits[0], i < T::ZERO);
         }
@@ -99,4 +116,118 @@ fn to_bits_desc_properties() {
     to_bits_desc_properties_helper_signed::<i32>();
     to_bits_desc_properties_helper_signed::<i64>();
     to_bits_desc_properties_helper_signed::<isize>();
+}
+
+fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
+    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_2::<T>, |bits| {
+        let n = T::from_bits_asc(bits);
+        assert_eq!(_from_bits_asc_unsigned_naive::<T>(bits), n);
+        assert_eq!(_from_bits_asc_alt::<T>(bits), n);
+        let trailing_falses = bits.iter().rev().take_while(|&&bit| !bit).count();
+        let trimmed_bits = bits[..bits.len() - trailing_falses].to_vec();
+        assert_eq!(n.to_bits_asc(), trimmed_bits);
+    });
+
+    test_properties_no_special(small_unsigneds, |&u| {
+        assert_eq!(T::from_bits_asc(&vec![false; u]), T::ZERO);
+    });
+}
+
+fn from_bits_asc_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_3::<T>, |bits| {
+        let n = T::from_bits_asc(bits);
+        assert_eq!(_from_bits_asc_signed_naive::<T>(bits), n);
+        assert_eq!(_from_bits_asc_alt::<T>(bits), n);
+        let trimmed_bits = if bits.iter().all(|&bit| !bit) {
+            Vec::new()
+        } else {
+            let sign_bits = if *bits.last().unwrap() {
+                bits.iter().rev().take_while(|&&bit| bit).count()
+            } else {
+                bits.iter().rev().take_while(|&&bit| !bit).count()
+            };
+            bits[..bits.len() - sign_bits + 1].to_vec()
+        };
+        assert_eq!(n.to_bits_asc(), trimmed_bits);
+    });
+
+    test_properties_no_special(small_unsigneds, |&u| {
+        assert_eq!(T::from_bits_asc(&vec![false; u]), T::ZERO);
+        assert_eq!(T::from_bits_asc(&vec![true; u + 1]), T::NEGATIVE_ONE);
+    });
+}
+
+#[test]
+fn from_bits_asc_properties() {
+    from_bits_asc_properties_helper_unsigned::<u8>();
+    from_bits_asc_properties_helper_unsigned::<u16>();
+    from_bits_asc_properties_helper_unsigned::<u32>();
+    from_bits_asc_properties_helper_unsigned::<u64>();
+    from_bits_asc_properties_helper_unsigned::<usize>();
+    from_bits_asc_properties_helper_signed::<i8>();
+    from_bits_asc_properties_helper_signed::<i16>();
+    from_bits_asc_properties_helper_signed::<i32>();
+    from_bits_asc_properties_helper_signed::<i64>();
+    from_bits_asc_properties_helper_signed::<isize>();
+}
+
+fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
+    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_4::<T>, |bits| {
+        let n = T::from_bits_desc(bits);
+        assert_eq!(_from_bits_desc_unsigned_naive::<T>(bits), n);
+        assert_eq!(_from_bits_desc_alt::<T>(bits), n);
+        let leading_falses = bits.iter().take_while(|&&bit| !bit).count();
+        let trimmed_bits = bits[leading_falses..].to_vec();
+        assert_eq!(n.to_bits_desc(), trimmed_bits);
+    });
+
+    test_properties_no_special(small_unsigneds, |&u| {
+        assert_eq!(T::from_bits_desc(&vec![false; u]), T::ZERO);
+    });
+}
+
+fn from_bits_desc_properties_helper_signed<T: PrimitiveSigned + Rand>()
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_5::<T>, |bits| {
+        let n = T::from_bits_desc(bits);
+        assert_eq!(_from_bits_desc_signed_naive::<T>(bits), n);
+        assert_eq!(_from_bits_desc_alt::<T>(bits), n);
+        let trimmed_bits = if bits.iter().all(|&bit| !bit) {
+            Vec::new()
+        } else {
+            let sign_bits = if bits[0] {
+                bits.iter().take_while(|&&bit| bit).count()
+            } else {
+                bits.iter().take_while(|&&bit| !bit).count()
+            };
+            bits[sign_bits - 1..].to_vec()
+        };
+        assert_eq!(n.to_bits_desc(), trimmed_bits);
+    });
+
+    test_properties_no_special(small_unsigneds, |&u| {
+        assert_eq!(T::from_bits_desc(&vec![false; u]), T::ZERO);
+        assert_eq!(T::from_bits_desc(&vec![true; u + 1]), T::NEGATIVE_ONE);
+    });
+}
+
+#[test]
+fn from_bits_desc_properties() {
+    from_bits_desc_properties_helper_unsigned::<u8>();
+    from_bits_desc_properties_helper_unsigned::<u16>();
+    from_bits_desc_properties_helper_unsigned::<u32>();
+    from_bits_desc_properties_helper_unsigned::<u64>();
+    from_bits_desc_properties_helper_unsigned::<usize>();
+    from_bits_desc_properties_helper_signed::<i8>();
+    from_bits_desc_properties_helper_signed::<i16>();
+    from_bits_desc_properties_helper_signed::<i32>();
+    from_bits_desc_properties_helper_signed::<i64>();
+    from_bits_desc_properties_helper_signed::<isize>();
 }
