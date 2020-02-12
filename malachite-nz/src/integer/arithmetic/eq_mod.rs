@@ -94,8 +94,8 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> O
     assert_ne!(*modulus.last().unwrap(), 0);
     let m_0 = modulus[0];
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    let twos = m_0.trailing_zeros();
-    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos)) {
+    let twos = u64::from(m_0.trailing_zeros());
+    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, twos) {
         return Some(false);
     }
     // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is even

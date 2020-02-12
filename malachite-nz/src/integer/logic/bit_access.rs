@@ -49,7 +49,7 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
         } else {
             !limbs[limb_index]
         };
-        limb.get_bit(index & u64::from(Limb::WIDTH_MASK))
+        limb.get_bit(index & Limb::WIDTH_MASK)
     }
 }
 
@@ -82,7 +82,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
     if limb_index >= limbs.len() {
         return;
     }
-    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
+    let reduced_index = index & Limb::WIDTH_MASK;
     let zero_bound = limbs_leading_zero_limbs(limbs);
     match limb_index.cmp(&zero_bound) {
         Ordering::Equal => {
@@ -154,7 +154,7 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 /// additional memory needs to be given to d.
 pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
+    let reduced_index = index & Limb::WIDTH_MASK;
     if limb_index >= limbs.len() || limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
         panic!("Setting bit cannot be done within existing slice");
     }
@@ -185,7 +185,7 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
 /// This is mpz_clrbit from mpz/clrbit.c, where d is negative.
 pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    let reduced_index = index & u64::from(Limb::WIDTH_MASK);
+    let reduced_index = index & Limb::WIDTH_MASK;
     if limb_index < limbs.len() {
         if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
             limbs.push(1);
@@ -377,9 +377,7 @@ impl Natural {
     // self cannot be zero
     pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
         match *self {
-            Natural(Small(small)) => {
-                index >= u64::from(Limb::WIDTH) || small.wrapping_neg().get_bit(index)
-            }
+            Natural(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
             Natural(Large(ref limbs)) => limbs_get_bit_neg(limbs, index),
         }
     }
@@ -388,7 +386,7 @@ impl Natural {
     fn set_bit_neg(&mut self, index: u64) {
         match *self {
             Natural(Small(ref mut small)) => {
-                if index < u64::from(Limb::WIDTH) {
+                if index < Limb::WIDTH {
                     small.wrapping_neg_assign();
                     small.set_bit(index);
                     small.wrapping_neg_assign();
@@ -407,7 +405,7 @@ impl Natural {
             small,
             limbs,
             {
-                if index < u64::from(Limb::WIDTH) {
+                if index < Limb::WIDTH {
                     let mut cleared_small = small.wrapping_neg();
                     cleared_small.clear_bit(index);
                     if cleared_small == 0 {

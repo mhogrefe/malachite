@@ -65,7 +65,7 @@ fn test_significant_bits() {
 fn limbs_significant_bits_properties() {
     test_properties(vecs_of_unsigned_var_1, |limbs| {
         let significant_bits = limbs_significant_bits(limbs);
-        assert_eq!(limbs.len() == 1, significant_bits <= u64::from(Limb::WIDTH));
+        assert_eq!(limbs.len() == 1, significant_bits <= Limb::WIDTH);
         assert_eq!(significant_bits, limbs_floor_log_two(limbs) + 1);
         assert_eq!(
             significant_bits,
@@ -86,7 +86,7 @@ fn significant_bits_properties() {
             u64::from(natural_to_rug_integer(x).significant_bits()),
             significant_bits
         );
-        assert_eq!(*x <= Limb::MAX, significant_bits <= u64::from(Limb::WIDTH));
+        assert_eq!(*x <= Limb::MAX, significant_bits <= Limb::WIDTH);
         if *x != 0 {
             assert_eq!(significant_bits, x.floor_log_two() + 1);
             assert_eq!(significant_bits, limbs_significant_bits(&x.to_limbs_asc()));

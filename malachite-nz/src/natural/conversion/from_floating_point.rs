@@ -67,7 +67,7 @@ macro_rules! float_impls {
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
                     let value_negative = value < 0.0;
-                    mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
+                    mantissa.set_bit($f::MANTISSA_WIDTH);
                     let n = Natural::from(mantissa).shl_round(
                         i32::exact_from(exponent) + $f::MIN_EXPONENT - 1,
                         if value_negative { -rm } else { rm },
@@ -164,7 +164,7 @@ macro_rules! float_impls {
                     Some(Natural::ZERO)
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
-                    mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
+                    mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i32::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     if exponent >= 0
                         || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
@@ -218,7 +218,7 @@ macro_rules! float_impls {
                     true
                 } else {
                     let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
-                    mantissa.set_bit(u64::from($f::MANTISSA_WIDTH));
+                    mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i32::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     exponent >= 0
                         || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))

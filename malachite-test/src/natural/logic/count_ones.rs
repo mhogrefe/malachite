@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 

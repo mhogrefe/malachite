@@ -151,7 +151,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(
     assert_ne!(len, 0);
     assert!(out.len() >= len);
     if divisor.even() {
-        let shift = divisor.trailing_zeros();
+        let shift = u64::from(divisor.trailing_zeros());
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
         let inverse = limbs_modular_invert_limb(shifted_divisor);
@@ -207,7 +207,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(limbs: &mut [Limb], divisor: 
     let len = limbs.len();
     assert_ne!(len, 0);
     if divisor.even() {
-        let shift = divisor.trailing_zeros();
+        let shift = u64::from(divisor.trailing_zeros());
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
         let inverse = limbs_modular_invert_limb(shifted_divisor);

@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -9,9 +9,7 @@ pub fn integer_trailing_zeros_alt(n: &Integer) -> Option<u64> {
     if *n == 0 {
         None
     } else {
-        Some(u64::wrapping_from(
-            n.twos_complement_bits().take_while(|&b| !b).count(),
-        ))
+        Some(u64::wrapping_from(n.bits().take_while(|&b| !b).count()))
     }
 }
 

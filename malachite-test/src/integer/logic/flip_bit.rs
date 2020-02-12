@@ -4,7 +4,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{pairs_of_integer_and_small_u64, rm_pairs_of_integer_and_small_u64};
+use inputs::integer::{
+    pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_flip_bit);
@@ -16,7 +18,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_integer_flip_bit(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_integer_and_small_u64(gm).take(limit) {
+    for (mut n, index) in pairs_of_integer_and_small_unsigned(gm).take(limit) {
         let n_old = n.clone();
         n.flip_bit(index);
         println!("x := {}; x.flip_bit({}); x = {}", n_old, index, n);
@@ -31,7 +33,7 @@ fn benchmark_integer_flip_bit_library_comparison(
     m_run_benchmark(
         "Integer.flip_bit(u64)",
         BenchmarkType::LibraryComparison,
-        rm_pairs_of_integer_and_small_u64(gm),
+        rm_pairs_of_integer_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

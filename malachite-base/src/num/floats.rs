@@ -56,9 +56,9 @@ pub trait PrimitiveFloat:
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
     type SignedOfEqualWidth: PrimitiveSigned;
 
-    const WIDTH: u32 = Self::UnsignedOfEqualWidth::WIDTH;
-    const EXPONENT_WIDTH: u32 = Self::WIDTH - Self::MANTISSA_WIDTH - 1;
-    const MANTISSA_WIDTH: u32;
+    const WIDTH: u64 = Self::UnsignedOfEqualWidth::WIDTH;
+    const EXPONENT_WIDTH: u64 = Self::WIDTH - Self::MANTISSA_WIDTH - 1;
+    const MANTISSA_WIDTH: u64;
     const MIN_NORMAL_EXPONENT: i32 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
     const MIN_EXPONENT: i32 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i32);
     const MAX_EXPONENT: u32 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
@@ -101,16 +101,16 @@ pub trait PrimitiveFloat:
 
     fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
         let bits = self.to_bits();
-        let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH.into());
+        let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH);
         let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
-        let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH.into());
+        let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH);
         (mantissa, exponent)
     }
 
     fn adjusted_exponent(self) -> u32 {
         let bits = self.to_bits();
         let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
-        exponent.mod_power_of_two(u64::from(Self::EXPONENT_WIDTH))
+        exponent.mod_power_of_two(Self::EXPONENT_WIDTH)
     }
 
     fn from_adjusted_mantissa_and_exponent(
@@ -131,16 +131,16 @@ pub trait PrimitiveFloat:
 macro_rules! float_traits {
     (
         $t: ident,
-        $ut: ident,
+        $u: ident,
         $min_positive: expr,
         $max_subnormal: expr,
         $min_positive_normal: expr
     ) => {
         //TODO docs
         impl PrimitiveFloat for $t {
-            type UnsignedOfEqualWidth = $ut;
-            type SignedOfEqualWidth = <$ut as PrimitiveUnsigned>::SignedOfEqualWidth;
-            const MANTISSA_WIDTH: u32 = std::$t::MANTISSA_DIGITS - 1;
+            type UnsignedOfEqualWidth = $u;
+            type SignedOfEqualWidth = <$u as PrimitiveUnsigned>::SignedOfEqualWidth;
+            const MANTISSA_WIDTH: u64 = (std::$t::MANTISSA_DIGITS as u64) - 1;
 
             const POSITIVE_INFINITY: Self = std::$t::INFINITY;
             const NEGATIVE_INFINITY: Self = std::$t::NEG_INFINITY;
@@ -151,7 +151,7 @@ macro_rules! float_traits {
             const MIN_POSITIVE: Self = $min_positive;
             const MAX_SUBNORMAL: Self = $max_subnormal;
             const MIN_POSITIVE_NORMAL: Self = $min_positive_normal;
-            const SMALLEST_UNREPRESENTABLE_UINT: $ut = (1 << (Self::MANTISSA_WIDTH + 1)) + 1;
+            const SMALLEST_UNREPRESENTABLE_UINT: $u = (1 << (Self::MANTISSA_WIDTH + 1)) + 1;
 
             #[inline]
             fn is_nan(self) -> bool {
@@ -189,12 +189,12 @@ macro_rules! float_traits {
             }
 
             #[inline]
-            fn to_bits(self) -> $ut {
+            fn to_bits(self) -> $u {
                 $t::to_bits(self)
             }
 
             #[inline]
-            fn from_bits(v: $ut) -> $t {
+            fn from_bits(v: $u) -> $t {
                 $t::from_bits(v)
             }
 
@@ -212,22 +212,22 @@ macro_rules! float_traits {
                 }
             }
 
-            fn to_ordered_representation(self) -> $ut {
+            fn to_ordered_representation(self) -> $u {
                 if self.is_nan() {
                     panic!("float cannot be NaN.");
                 }
                 if self >= 0.0 {
-                    (1 << ($ut::WIDTH - 1)) + self.abs_negative_zeros().to_bits()
+                    (1 << ($u::WIDTH - 1)) + self.abs_negative_zeros().to_bits()
                 } else {
-                    (1 << ($ut::WIDTH - 1)) - (-self).to_bits()
+                    (1 << ($u::WIDTH - 1)) - (-self).to_bits()
                 }
             }
 
-            fn from_ordered_representation(n: $ut) -> $t {
+            fn from_ordered_representation(n: $u) -> $t {
                 let f = if n.get_highest_bit() {
-                    $t::from_bits(n - (1 << ($ut::WIDTH - 1)))
+                    $t::from_bits(n - (1 << ($u::WIDTH - 1)))
                 } else {
-                    -$t::from_bits((1 << ($ut::WIDTH - 1)) - n)
+                    -$t::from_bits((1 << ($u::WIDTH - 1)) - n)
                 };
                 if f.is_nan() {
                     panic!("invalid ordered representation");

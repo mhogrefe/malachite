@@ -34,7 +34,7 @@ pub fn limbs_divisible_by_power_of_two(limbs: &[Limb], pow: u64) -> bool {
     let zero_limbs = usize::exact_from(pow >> Limb::LOG_WIDTH);
     zero_limbs < limbs.len()
         && limbs_test_zero(&limbs[..zero_limbs])
-        && limbs[zero_limbs].divisible_by_power_of_two(pow & u64::from(Limb::WIDTH_MASK))
+        && limbs[zero_limbs].divisible_by_power_of_two(pow & Limb::WIDTH_MASK)
 }
 
 impl<'a> DivisibleByPowerOfTwo for &'a Natural {

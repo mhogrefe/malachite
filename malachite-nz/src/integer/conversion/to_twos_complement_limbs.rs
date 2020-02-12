@@ -161,7 +161,7 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     fn next(&mut self) -> Option<Limb> {
-        let previous_i = u64::wrapping_from(self.limbs.i);
+        let previous_i = self.limbs.i;
         self.limbs.next().map(|limb| {
             if let Some(first_nonzero_index) = self.first_nonzero_index {
                 if previous_i <= u64::wrapping_from(first_nonzero_index) {
@@ -211,7 +211,7 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
                 self.first_nonzero_index = Some(i);
             }
             let first_nonzero_index = self.first_nonzero_index.unwrap();
-            if previous_j <= u64::wrapping_from(first_nonzero_index) {
+            if previous_j <= u64::exact_from(first_nonzero_index) {
                 limb.wrapping_neg()
             } else {
                 !limb

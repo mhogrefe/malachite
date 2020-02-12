@@ -24,7 +24,7 @@ where
     T: ExactFrom<<T as BitBlockAccess>::Bits>,
     <T as BitBlockAccess>::Bits: ExactFrom<T>,
 {
-    let width = u64::from(T::WIDTH);
+    let width = T::WIDTH;
     test_properties(
         triples_of_unsigned_small_unsigned_and_small_unsigned_var_1::<T, u64>,
         |&(n, start, end)| {
@@ -59,7 +59,7 @@ where
     <T as PrimitiveSigned>::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    let width = u64::from(T::WIDTH);
+    let width = T::WIDTH;
     test_properties(
         triples_of_signed_small_unsigned_and_small_unsigned_var_1::<T, u64>,
         |&(n, start, end)| {
@@ -109,7 +109,7 @@ fn assign_bits_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>()
 where
     T: BitBlockAccess<Bits = T>,
 {
-    let width = u64::from(T::WIDTH);
+    let width = T::WIDTH;
     test_properties(
         quadruples_of_unsigned_small_u64_small_u64_and_unsigned_var_1::<T, T>,
         |&(n, start, end, bits)| {
@@ -160,7 +160,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as UnsignedAbs>::Output: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 {
-    let width = u64::from(T::WIDTH);
+    let width = T::WIDTH;
     test_properties(
         quadruples_of_signed_small_u64_small_u64_and_unsigned_var_1::<T, U>,
         |&(n, start, end, bits)| {

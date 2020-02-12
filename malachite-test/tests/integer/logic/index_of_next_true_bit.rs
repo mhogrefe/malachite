@@ -14,7 +14,7 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1, unsigneds,
 };
-use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_u64};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 use malachite_test::integer::logic::index_of_next_true_bit::integer_index_of_next_true_bit_alt;
 
@@ -105,7 +105,7 @@ fn limbs_index_of_next_true_bit_neg_properties() {
 
 #[test]
 fn index_of_next_true_bit_properties() {
-    test_properties(pairs_of_integer_and_small_u64, |&(ref n, u)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
         let result = n.index_of_next_true_bit(u);
         assert_eq!(result, integer_index_of_next_true_bit_alt(n, u));
         assert_eq!(

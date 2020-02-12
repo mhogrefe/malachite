@@ -7,7 +7,9 @@ use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, 
 use inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
 };
-use inputs::natural::{nm_pairs_of_natural_and_small_u64, pairs_of_natural_and_small_unsigned};
+use inputs::natural::{
+    nm_pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_slice_set_bit);
@@ -94,7 +96,7 @@ fn benchmark_natural_set_bit_library_comparison(gm: GenerationMode, limit: usize
     m_run_benchmark(
         "Natural.set_bit(u64)",
         BenchmarkType::LibraryComparison,
-        nm_pairs_of_natural_and_small_u64(gm),
+        nm_pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

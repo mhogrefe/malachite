@@ -46,7 +46,7 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
-        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
@@ -89,7 +89,7 @@ pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
         vec![1]
     } else {
         let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
-        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(&mut result_limbs, small_bits) == 0;
@@ -106,7 +106,7 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> 
     if limbs_to_delete >= limbs.len() {
         Vec::new()
     } else {
-        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
@@ -266,6 +266,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
     let len = in_limbs.len();
     assert_ne!(len, 0);
     assert_ne!(bits, 0);
+    let bits = u64::from(bits);
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= len);
     let cobits = Limb::WIDTH - bits;
@@ -311,6 +312,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 /// This is mpn_rshift from mpn/generic/rshift.c, where the rp == up.
 pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
     assert_ne!(bits, 0);
+    let bits = u64::from(bits);
     assert!(bits < Limb::WIDTH);
     let len = limbs.len();
     assert_ne!(len, 0);
@@ -392,7 +394,7 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
-        let small_shift = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_shift = u32::exact_from(bits & Limb::WIDTH_MASK);
         limbs_delete_left(limbs, limbs_to_delete);
         if small_shift != 0 {
             limbs_slice_shr_in_place(limbs, small_shift);
@@ -467,7 +469,7 @@ pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
         limbs[0] = 1;
     } else {
         let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
-        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
         limbs_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(limbs, small_bits) == 0;
@@ -483,7 +485,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
-        let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
+        let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
         limbs_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             limbs_slice_shr_in_place(limbs, small_bits);

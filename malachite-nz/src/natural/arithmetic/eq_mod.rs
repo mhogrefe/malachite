@@ -150,7 +150,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
         let m_1 = modulus[1];
         if m_1 < 1 << m_trailing_zeros {
             let m_0_trailing_zeros = m_0.trailing_zeros();
-            let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
+            let m_0 = (m_0 >> m_0_trailing_zeros)
+                | (m_1 << (Limb::WIDTH - u64::from(m_0_trailing_zeros)));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
                 let r = limbs_mod_limb(xs, m_0);
                 if y < m_0 {

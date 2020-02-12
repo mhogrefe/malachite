@@ -81,11 +81,11 @@ macro_rules! impl_arithmetic_traits {
 
             #[inline]
             fn mod_power_of_two(self, pow: u64) -> Self::Output {
-                if pow > u64::from($t::WIDTH) && self < 0 {
+                if pow > $t::WIDTH && self < 0 {
                     panic!("Result exceeds width of output type");
                 }
                 let x = Self::Output::wrapping_from(self);
-                if x == 0 || pow >= u64::from($t::WIDTH) {
+                if x == 0 || pow >= $t::WIDTH {
                     x
                 } else {
                     x & ((1 << pow) - 1)
@@ -237,7 +237,7 @@ macro_rules! impl_arithmetic_traits {
         impl TrueCheckedShl for $t {
             type Output = $t;
 
-            fn true_checked_shl(self, _rhs: u32) -> Option<$t> {
+            fn true_checked_shl(self, _rhs: u64) -> Option<$t> {
                 unimplemented!();
             }
         }
@@ -245,7 +245,7 @@ macro_rules! impl_arithmetic_traits {
         impl TrueCheckedShr for $t {
             type Output = $t;
 
-            fn true_checked_shr(self, _rhs: u32) -> Option<$t> {
+            fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
                 unimplemented!();
             }
         }

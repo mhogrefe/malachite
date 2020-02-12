@@ -39,8 +39,7 @@ pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> b
     } else if i == 0 {
         limbs[0].eq_mod_power_of_two(limb, pow)
     } else {
-        limbs[0] == limb
-            && limbs_divisible_by_power_of_two(&limbs[1..], pow - u64::from(Limb::WIDTH))
+        limbs[0] == limb && limbs_divisible_by_power_of_two(&limbs[1..], pow - Limb::WIDTH)
     }
 }
 
@@ -51,7 +50,7 @@ fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> 
     if i >= len {
         xs == ys
     } else {
-        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(Limb::WIDTH_MASK))
+        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & Limb::WIDTH_MASK)
     }
 }
 
@@ -66,10 +65,10 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
         &xs[..ys_len] == ys
             && limbs_divisible_by_power_of_two(
                 &xs[ys_len..],
-                pow - u64::from(Limb::WIDTH) * u64::wrapping_from(ys_len),
+                pow - Limb::WIDTH * u64::wrapping_from(ys_len),
             )
     } else {
-        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & u64::from(Limb::WIDTH_MASK))
+        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & Limb::WIDTH_MASK)
     }
 }
 

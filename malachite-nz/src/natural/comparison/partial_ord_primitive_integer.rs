@@ -181,7 +181,7 @@ macro_rules! impl_partial_ord_larger_than_limb {
                 if limb_count_cmp != Ordering::Equal || limb_count == 0 {
                     return Some(limb_count_cmp);
                 }
-                let width = u64::from(Limb::WIDTH);
+                let width = Limb::WIDTH;
                 let mut i = limb_count << Limb::LOG_WIDTH;
                 let mut mask = $u::from(Limb::MAX) << (i - width);
                 for limb in self.limbs().rev() {

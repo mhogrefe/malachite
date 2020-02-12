@@ -60,6 +60,7 @@ pub mod base {
             pub mod bit_access;
             pub mod bit_block_access;
             pub mod bit_convertible;
+            pub mod bit_iterable;
             pub mod bit_scan;
             pub mod get_highest_bit;
             pub mod hamming_distance;
@@ -149,6 +150,7 @@ pub mod integer {
         pub mod and;
         pub mod assign_bit;
         pub mod assign_bits;
+        pub mod bits;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
         pub mod checked_hamming_distance;
@@ -232,6 +234,7 @@ pub mod natural {
         pub mod and;
         pub mod assign_bit;
         pub mod assign_bits;
+        pub mod bits;
         pub mod clear_bit;
         pub mod count_ones;
         pub mod flip_bit;

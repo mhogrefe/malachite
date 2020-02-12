@@ -361,7 +361,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
 ) -> bool {
     assert!(degree >= 3);
     let degree_u32 = u32::exact_from(degree);
-    assert!(shift * degree_u32 < Limb::WIDTH);
+    assert!(shift * degree_u32 < u32::exact_from(Limb::WIDTH));
     assert_eq!(v_2_pow.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();

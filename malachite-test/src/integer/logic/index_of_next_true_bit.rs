@@ -1,11 +1,11 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitScan, SignificantBits};
+use malachite_base::num::logic::traits::{BitIterable, BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
-use inputs::integer::pairs_of_integer_and_small_u64;
+use inputs::integer::pairs_of_integer_and_small_unsigned;
 
 pub fn integer_index_of_next_true_bit_alt(n: &Integer, u: u64) -> Option<u64> {
     if u >= n.significant_bits() {
@@ -15,11 +15,7 @@ pub fn integer_index_of_next_true_bit_alt(n: &Integer, u: u64) -> Option<u64> {
             Some(u)
         }
     } else {
-        for (i, bit) in n
-            .twos_complement_bits()
-            .enumerate()
-            .skip(usize::exact_from(u))
-        {
+        for (i, bit) in n.bits().enumerate().skip(usize::exact_from(u)) {
             if bit {
                 return Some(u64::wrapping_from(i));
             }
@@ -51,7 +47,7 @@ fn demo_limbs_index_of_next_true_bit_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_integer_index_of_next_true_bit(gm: GenerationMode, limit: usize) {
-    for (n, u) in pairs_of_integer_and_small_u64(gm).take(limit) {
+    for (n, u) in pairs_of_integer_and_small_unsigned(gm).take(limit) {
         println!(
             "index_of_next_true_bit({}, {}) = {:?}",
             n,
@@ -86,7 +82,7 @@ fn benchmark_integer_index_of_next_true_bit_algorithms(
     m_run_benchmark(
         "Integer.index_of_next_true_bit(u64)",
         BenchmarkType::Algorithms,
-        pairs_of_integer_and_small_u64(gm),
+        pairs_of_integer_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

@@ -17,7 +17,7 @@ fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         pairs_of_unsigned_and_small_unsigned::<T, u64>,
         |&(n, index)| {
             let bit = n.get_bit(index);
-            if index >= u64::from(T::WIDTH) {
+            if index >= T::WIDTH {
                 assert!(!bit);
             } else {
                 assert_eq!(bit, !(!n).get_bit(index));
@@ -43,7 +43,7 @@ where
         pairs_of_signed_and_small_unsigned,
         |&(n, index): &(T, u64)| {
             let bit = n.get_bit(index);
-            if index >= u64::from(T::WIDTH) {
+            if index >= T::WIDTH {
                 assert_eq!(bit, n < T::ZERO);
             } else {
                 assert_eq!(bit, !(!n).get_bit(index));
@@ -101,7 +101,7 @@ where
         assert_eq!(mut_n_2, mut_n);
 
         assert_ne!(mut_n, T::ZERO);
-        if n >= T::ZERO && index == u64::from(T::WIDTH) - 1 {
+        if n >= T::ZERO && index == T::WIDTH - 1 {
             assert!(mut_n < T::ZERO);
         } else {
             assert!(mut_n >= n);
@@ -170,7 +170,7 @@ where
         mut_n_2.assign_bit(index, false);
         assert_eq!(mut_n_2, mut_n);
 
-        if n < T::ZERO && index == u64::from(T::WIDTH) - 1 {
+        if n < T::ZERO && index == T::WIDTH - 1 {
             assert!(mut_n >= T::ZERO);
         } else {
             assert!(mut_n <= n);

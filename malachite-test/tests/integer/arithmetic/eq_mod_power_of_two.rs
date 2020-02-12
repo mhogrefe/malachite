@@ -44,7 +44,7 @@ fn test_limbs_eq_mod_power_of_two_neg_limb() {
     let test = |limbs, limb, pow, out| {
         assert_eq!(limbs_eq_mod_power_of_two_neg_limb(limbs, limb, pow), out);
     };
-    let width = u64::from(Limb::WIDTH);
+    let width = Limb::WIDTH;
     test(&[1, 1], 3, 0, true);
     test(&[1, 1], 3, 1, true);
     test(&[1, 1], 3, 2, true);

@@ -29,13 +29,11 @@ use platform::Limb;
 pub fn limbs_get_bit(limbs: &[Limb], index: u64) -> bool {
     limbs
         .get(usize::exact_from(index >> Limb::LOG_WIDTH))
-        .map_or(false, |limb| {
-            limb.get_bit(index & u64::from(Limb::WIDTH_MASK))
-        })
+        .map_or(false, |limb| limb.get_bit(index & Limb::WIDTH_MASK))
 }
 
 fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
-    limbs[limb_index].set_bit(index & u64::from(Limb::WIDTH_MASK));
+    limbs[limb_index].set_bit(index & Limb::WIDTH_MASK);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -123,7 +121,7 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
 pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if limb_index < limbs.len() {
-        limbs[limb_index].clear_bit(index & u64::from(Limb::WIDTH_MASK));
+        limbs[limb_index].clear_bit(index & Limb::WIDTH_MASK);
     }
 }
 
@@ -212,7 +210,7 @@ impl BitAccess for Natural {
             small,
             limbs,
             {
-                if index < u64::from(Limb::WIDTH) {
+                if index < Limb::WIDTH {
                     let mut modified = *small;
                     modified.set_bit(index);
                     Some(modified)

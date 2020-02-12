@@ -38,9 +38,9 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], start: u64) -> u64 {
         return start;
     }
     if let Some(result) =
-        limbs[starting_limb_index].index_of_next_false_bit(start & u64::from(Limb::WIDTH_MASK))
+        limbs[starting_limb_index].index_of_next_false_bit(start & Limb::WIDTH_MASK)
     {
-        if result != u64::from(Limb::WIDTH) {
+        if result != Limb::WIDTH {
             return (u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result;
         }
     }
@@ -92,7 +92,7 @@ pub fn limbs_index_of_next_true_bit(limbs: &[Limb], start: u64) -> Option<u64> {
         return None;
     }
     if let Some(result) =
-        limbs[starting_limb_index].index_of_next_true_bit(start & u64::from(Limb::WIDTH_MASK))
+        limbs[starting_limb_index].index_of_next_true_bit(start & Limb::WIDTH_MASK)
     {
         return Some((u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result);
     }

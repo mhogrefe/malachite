@@ -187,7 +187,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb)
     let len = in_limbs.len();
     assert!(len > 1);
     let out = &mut out[..len];
-    let bits = divisor.leading_zeros();
+    let bits = u64::from(divisor.leading_zeros());
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
         let (remainder, in_limbs_init) = in_limbs.split_last().unwrap();
@@ -269,7 +269,7 @@ pub fn limbs_div_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
-    let bits = divisor.leading_zeros();
+    let bits = u64::from(divisor.leading_zeros());
     let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
@@ -1761,7 +1761,7 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
         let new_ns = &mut scratch[..new_n_len];
         let mut new_ds = vec![0; q_len_plus_1];
         limbs_shl_to_out(&mut new_ds, &ds[d_len - q_len_plus_1..], bits);
-        new_ds[0] |= ds[d_len - q_len_plus_1 - 1] >> (Limb::WIDTH - bits);
+        new_ds[0] |= ds[d_len - q_len_plus_1 - 1] >> (Limb::WIDTH - u64::from(bits));
         let highest_q = if q_len_plus_1 == 2 {
             limbs_div_mod_by_two_limb_normalized(&mut scratch_2, new_ns, &new_ds)
         } else if q_len_plus_1 < DC_DIVAPPR_Q_THRESHOLD {

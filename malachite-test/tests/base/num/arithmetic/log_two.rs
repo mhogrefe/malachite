@@ -10,7 +10,7 @@ fn floor_log_two_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(positive_unsigneds, |&n: &T| {
         let floor_log_two = n.floor_log_two();
         assert_eq!(floor_log_two, n.significant_bits() - 1);
-        assert!(floor_log_two < u64::from(T::WIDTH));
+        assert!(floor_log_two < T::WIDTH);
         assert_eq!(floor_log_two == 0, n == T::ONE);
     });
 }
@@ -27,7 +27,7 @@ fn floor_log_two_properties() {
 fn ceiling_log_two_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(positive_unsigneds, |&n: &T| {
         let ceiling_log_two = n.ceiling_log_two();
-        assert!(ceiling_log_two <= u64::from(T::WIDTH));
+        assert!(ceiling_log_two <= T::WIDTH);
         assert_eq!(ceiling_log_two == 0, n == T::ONE);
     });
 }

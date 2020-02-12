@@ -11,7 +11,7 @@ use malachite_test::inputs::base::{signeds, unsigneds};
 fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds, |&n: &T| {
         let significant_bits = n.significant_bits();
-        assert!(significant_bits <= u64::from(T::WIDTH));
+        assert!(significant_bits <= T::WIDTH);
         assert_eq!(significant_bits == 0, n == T::ZERO);
         if n != T::ZERO {
             assert_eq!(significant_bits, n.floor_log_two() + 1)
@@ -26,9 +26,9 @@ where
 {
     test_properties(signeds, |&n: &T| {
         let significant_bits = n.significant_bits();
-        assert!(significant_bits <= u64::from(T::WIDTH));
+        assert!(significant_bits <= T::WIDTH);
         assert_eq!(significant_bits == 0, n == T::ZERO);
-        assert_eq!(significant_bits == u64::from(T::WIDTH), n == T::MIN);
+        assert_eq!(significant_bits == T::WIDTH, n == T::MIN);
         assert_eq!(n.wrapping_neg().significant_bits(), significant_bits);
     });
 }

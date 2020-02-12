@@ -133,7 +133,7 @@ macro_rules! assign_bits_fail_helper_unsigned {
         #[test]
         #[should_panic]
         fn $fail_2() {
-            $t::from(100u8).assign_bits(3, 3 + u64::from($t::WIDTH), &$t::MAX);
+            $t::from(100u8).assign_bits(3, 3 + $t::WIDTH, &$t::MAX);
         }
     };
 }
@@ -197,7 +197,7 @@ macro_rules! assign_bits_fail_helper_signed {
         fn $fail_2() {
             $t::from(100i8).assign_bits(
                 0,
-                u64::from($t::WIDTH),
+                $t::WIDTH,
                 &<$t as PrimitiveSigned>::UnsignedOfEqualWidth::MAX,
             );
         }
@@ -205,19 +205,19 @@ macro_rules! assign_bits_fail_helper_signed {
         #[test]
         #[should_panic]
         fn $fail_3() {
-            $t::from(-100i8).assign_bits(0, u64::from($t::WIDTH) + 1, &0);
+            $t::from(-100i8).assign_bits(0, $t::WIDTH + 1, &0);
         }
 
         #[test]
         #[should_panic]
         fn $fail_4() {
-            $t::from(-100i8).assign_bits(u64::from($t::WIDTH) + 1, u64::from($t::WIDTH) + 2, &0);
+            $t::from(-100i8).assign_bits($t::WIDTH + 1, $t::WIDTH + 2, &0);
         }
 
         #[test]
         #[should_panic]
         fn $fail_5() {
-            let half_width = u64::from($t::WIDTH) >> 1;
+            let half_width = $t::WIDTH >> 1;
             $t::from(-100i8).assign_bits(half_width, 3 * half_width - 4, &0);
         }
     };

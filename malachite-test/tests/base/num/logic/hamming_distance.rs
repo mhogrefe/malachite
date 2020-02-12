@@ -24,7 +24,7 @@ fn hamming_distance_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
 
     test_properties(unsigneds::<T>, |&n| {
         assert_eq!(n.hamming_distance(n), 0);
-        assert_eq!(n.hamming_distance(!n), u64::from(T::WIDTH));
+        assert_eq!(n.hamming_distance(!n), T::WIDTH);
         assert_eq!(n.hamming_distance(T::ZERO), u64::from(n.count_ones()));
         assert_eq!(T::ZERO.hamming_distance(n), u64::from(n.count_ones()));
     });

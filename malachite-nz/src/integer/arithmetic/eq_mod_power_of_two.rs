@@ -46,14 +46,14 @@ pub fn limbs_eq_mod_power_of_two_neg_limb(limbs: &[Limb], limb: Limb, pow: u64) 
     } else {
         limbs[0] == limb.wrapping_neg()
             && limbs[1..i].iter().all(|&x| x == Limb::MAX)
-            && limbs[i].eq_mod_power_of_two(Limb::MAX, pow & u64::from(Limb::WIDTH_MASK))
+            && limbs[i].eq_mod_power_of_two(Limb::MAX, pow & Limb::WIDTH_MASK)
     }
 }
 
 fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    let small_pow = pow & u64::from(Limb::WIDTH_MASK);
+    let small_pow = pow & Limb::WIDTH_MASK;
     if i > xs_len || i == xs_len && small_pow != 0 {
         false
     } else {
@@ -134,8 +134,7 @@ impl Natural {
     fn eq_mod_power_of_two_neg_limb(&self, other: Limb, pow: u64) -> bool {
         match *self {
             Natural(Small(ref small)) => {
-                pow <= u64::from(Limb::WIDTH)
-                    && small.wrapping_neg().eq_mod_power_of_two(other, pow)
+                pow <= Limb::WIDTH && small.wrapping_neg().eq_mod_power_of_two(other, pow)
             }
             Natural(Large(ref limbs)) => limbs_eq_mod_power_of_two_neg_limb(limbs, other, pow),
         }

@@ -47,7 +47,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It};
+use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It, RandomValueAndVecOfBoolVar2};
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
@@ -523,30 +523,6 @@ pub fn pairs_of_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_integer_and_small_unsigned::<T>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
-    )
-}
-
-pub fn pairs_of_integer_and_small_u64(gm: GenerationMode) -> It<(Integer, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => log_pairs_of_integer_and_unsigned(),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_integers(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_integers(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(|i| i.into())),
-        )),
-    }
-}
-
-pub(crate) fn rm_pairs_of_integer_and_small_u64(
-    gm: GenerationMode,
-) -> It<((rug::Integer, u64), (Integer, u64))> {
-    Box::new(
-        pairs_of_integer_and_small_u64(gm).map(|(x, y)| ((integer_to_rug_integer(&x), y), (x, y))),
     )
 }
 
@@ -1310,30 +1286,12 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer
     }
 }
 
-struct RandomIntegerAndVecOfBoolVar2 {
-    integers: It<Integer>,
-    rng: Box<IsaacRng>,
-}
-
-impl Iterator for RandomIntegerAndVecOfBoolVar2 {
-    type Item = (Integer, Vec<bool>);
-
-    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
-        let n = self.integers.next().unwrap();
-        let mut bools = Vec::new();
-        for _ in 0..n.to_bits_asc().len() {
-            bools.push(self.rng.gen::<bool>());
-        }
-        Some((n, bools))
-    }
-}
-
 fn random_pairs_of_integer_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomIntegerAndVecOfBoolVar2 {
-    RandomIntegerAndVecOfBoolVar2 {
-        integers: Box::new(random_integers(&scramble(seed, "integers"), scale)),
+) -> RandomValueAndVecOfBoolVar2<Integer> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(random_integers(&scramble(seed, "integers"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }
@@ -1341,9 +1299,9 @@ fn random_pairs_of_integer_and_vec_of_bool_var_2(
 fn special_random_pairs_of_integer_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomIntegerAndVecOfBoolVar2 {
-    RandomIntegerAndVecOfBoolVar2 {
-        integers: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
+) -> RandomValueAndVecOfBoolVar2<Integer> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }

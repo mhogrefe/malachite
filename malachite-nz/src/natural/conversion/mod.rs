@@ -120,5 +120,4 @@ pub mod from_limbs;
 pub mod from_primitive_integer;
 pub mod limb_count;
 pub mod primitive_integer_from_natural;
-pub mod to_bits;
 pub mod to_limbs;

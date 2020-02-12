@@ -30,7 +30,7 @@ macro_rules! float_impls {
                         Ordering::Greater => true,
                         Ordering::Equal => {
                             const TRAILING_ZEROS_OF_MAX: u64 =
-                                ($f::MAX_EXPONENT - $f::MANTISSA_WIDTH) as u64;
+                                ($f::MAX_EXPONENT as u64) - $f::MANTISSA_WIDTH;
                             limbs_index_of_next_false_bit(limbs, TRAILING_ZEROS_OF_MAX) >= MAX_WIDTH
                                 && !limbs_divisible_by_power_of_two(limbs, TRAILING_ZEROS_OF_MAX)
                         }
@@ -92,11 +92,11 @@ macro_rules! float_impls {
                 let shift = i32::exact_from(exponent) - i32::exact_from($f::MANTISSA_WIDTH);
                 value.shr_round_assign(shift, rm);
                 let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(value);
-                if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
+                if mantissa.get_bit($f::MANTISSA_WIDTH + 1) {
                     exponent += 1;
                     mantissa >>= 1;
                 }
-                mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
+                mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)
             }
@@ -156,11 +156,11 @@ macro_rules! float_impls {
                 let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(
                     value.shr_round(shift, rm),
                 );
-                if mantissa.get_bit(u64::from($f::MANTISSA_WIDTH + 1)) {
+                if mantissa.get_bit($f::MANTISSA_WIDTH + 1) {
                     exponent += 1;
                     mantissa >>= 1;
                 }
-                mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
+                mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)
             }
@@ -262,7 +262,7 @@ macro_rules! float_impls {
                 value >>= shift;
                 let mut mantissa =
                     <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value);
-                mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
+                mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 Some($f::from_adjusted_mantissa_and_exponent(mantissa, exponent))
             }
@@ -307,7 +307,7 @@ macro_rules! float_impls {
                 }
                 let mut mantissa =
                     <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value >> shift);
-                mantissa.clear_bit(u64::from($f::MANTISSA_WIDTH));
+                mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = u32::wrapping_from(exponent) + $f::MAX_EXPONENT;
                 Some($f::from_adjusted_mantissa_and_exponent(mantissa, exponent))
             }

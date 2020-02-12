@@ -593,20 +593,19 @@ macro_rules! impl_from {
             /// assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
             /// ```
             fn convertible_from(value: &Integer) -> bool {
-                let u_width = u64::from($u::WIDTH);
                 match *value {
                     Integer {
                         sign: true,
                         ref abs,
-                    } => abs.significant_bits() < u_width,
+                    } => abs.significant_bits() < $u::WIDTH,
                     Integer {
                         sign: false,
                         ref abs,
                     } => {
                         let significant_bits = abs.significant_bits();
-                        significant_bits < u_width
-                            || significant_bits == u_width
-                                && abs.divisible_by_power_of_two(u_width - 1)
+                        significant_bits < $u::WIDTH
+                            || significant_bits == $u::WIDTH
+                                && abs.divisible_by_power_of_two($u::WIDTH - 1)
                     }
                 }
             }

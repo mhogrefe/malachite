@@ -113,7 +113,7 @@ macro_rules! impl_arithmetic_traits {
 
             #[inline]
             fn mod_power_of_two(self, pow: u64) -> $t {
-                if self == 0 || pow >= u64::from($t::WIDTH) {
+                if self == 0 || pow >= $t::WIDTH {
                     self
                 } else {
                     self & ((1 << pow) - 1)
@@ -124,7 +124,7 @@ macro_rules! impl_arithmetic_traits {
         impl ModPowerOfTwoAssign for $t {
             #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
-                if *self != 0 && pow < u64::from($t::WIDTH) {
+                if *self != 0 && pow < $t::WIDTH {
                     *self &= (1 << pow) - 1;
                 }
             }
@@ -279,7 +279,7 @@ macro_rules! impl_arithmetic_traits {
         impl TrueCheckedShl for $t {
             type Output = $t;
 
-            fn true_checked_shl(self, rhs: u32) -> Option<$t> {
+            fn true_checked_shl(self, rhs: u64) -> Option<$t> {
                 if self == 0 {
                     Some(self)
                 } else if rhs > $t::WIDTH {
@@ -298,7 +298,7 @@ macro_rules! impl_arithmetic_traits {
         impl TrueCheckedShr for $t {
             type Output = $t;
 
-            fn true_checked_shr(self, _rhs: u32) -> Option<$t> {
+            fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
                 unimplemented!();
             }
         }

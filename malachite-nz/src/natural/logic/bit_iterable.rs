@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
 
 use natural::conversion::to_limbs::LimbIterator;
 use natural::Natural;
@@ -14,22 +14,22 @@ use platform::Limb;
 /// This struct also supports retrieving bits by index. This functionality is completely independent
 /// of the iterator's state. Indexing the implicit leading false bits is allowed.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct BitIterator<'a> {
+pub struct NaturalBitIterator<'a> {
     pub(crate) significant_bits: u64,
     pub(crate) limbs: LimbIterator<'a>,
     some_remaining: bool,
     indices_are_in_same_limb: bool,
     current_limb_forward: Limb,
     current_limb_back: Limb,
-    // If `n` is nonzero, this index initially points to the least-significant bit in the least-
-    // significant limb, and is incremented by next().
-    i: u64,
-    // If `n` is nonzero, this index initially points to the most-significant nonzero bit in the
-    // most-significant limb, and is decremented by next_back().
-    j: u64,
+    // If `n` is nonzero, this mask initially points to the least-significant bit, and is left-
+    // shifted by next().
+    i_mask: Limb,
+    // If `n` is nonzero, this mask initially points to the most-significant nonzero bit, and is
+    // right-shifted by next_back().
+    j_mask: Limb,
 }
 
-impl<'a> Iterator for BitIterator<'a> {
+impl<'a> Iterator for NaturalBitIterator<'a> {
     type Item = bool;
 
     /// A function to iterate through the bits of a `Natural` in ascending order (least-significant
@@ -45,6 +45,7 @@ impl<'a> Iterator for BitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.bits().next(), None);
@@ -63,13 +64,13 @@ impl<'a> Iterator for BitIterator<'a> {
     /// ```
     fn next(&mut self) -> Option<bool> {
         if self.some_remaining {
-            let bit = self.current_limb_forward.get_bit(self.i);
-            if self.indices_are_in_same_limb && self.i == self.j {
+            let bit = self.current_limb_forward & self.i_mask != 0;
+            if self.indices_are_in_same_limb && self.i_mask == self.j_mask {
                 self.some_remaining = false;
             }
-            self.i += 1;
-            if self.i == u64::from(Limb::WIDTH) {
-                self.i = 0;
+            self.i_mask <<= 1;
+            if self.i_mask == 0 {
+                self.i_mask = 1;
                 if let Some(next) = self.limbs.next() {
                     self.current_limb_forward = next;
                 } else {
@@ -97,6 +98,7 @@ impl<'a> Iterator for BitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.bits().size_hint(), (0, Some(0)));
@@ -108,7 +110,7 @@ impl<'a> Iterator for BitIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for BitIterator<'a> {
+impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
     /// A function to iterate through the bits of a `Natural` in descending order (most-significant
     /// first).
     ///
@@ -122,6 +124,7 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.bits().next_back(), None);
@@ -140,12 +143,12 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
     /// ```
     fn next_back(&mut self) -> Option<bool> {
         if self.some_remaining {
-            if self.indices_are_in_same_limb && self.i == self.j {
+            if self.indices_are_in_same_limb && self.i_mask == self.j_mask {
                 self.some_remaining = false;
             }
-            let bit = self.current_limb_back.get_bit(self.j);
-            if self.j == 0 {
-                self.j = u64::from(Limb::WIDTH) - 1;
+            let bit = self.current_limb_back & self.j_mask != 0;
+            if self.j_mask == 1 {
+                self.j_mask = 1 << (Limb::WIDTH - 1);
                 if let Some(next_back) = self.limbs.next_back() {
                     self.current_limb_back = next_back;
                 } else {
@@ -153,7 +156,7 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
                     self.indices_are_in_same_limb = true;
                 }
             } else {
-                self.j -= 1;
+                self.j_mask >>= 1;
             }
             Some(bit)
         } else {
@@ -163,13 +166,13 @@ impl<'a> DoubleEndedIterator for BitIterator<'a> {
 }
 
 /// This allows for some optimizations, e.g. when collecting into a `Vec`.
-impl<'a> ExactSizeIterator for BitIterator<'a> {}
+impl<'a> ExactSizeIterator for NaturalBitIterator<'a> {}
 
-impl<'a> Index<u64> for BitIterator<'a> {
+impl<'a> Index<u64> for NaturalBitIterator<'a> {
     type Output = bool;
 
-    /// A function to retrieve bits by index. The index is the power of 2<sup>32</sub> of which the
-    /// limbs is a coefficient. Indexing at or above the significant bit count returns false bits.
+    /// A function to retrieve bits by index. The index is the power of 2 of which the bit is a
+    /// coefficient. Indexing at or above the significant bit count returns false bits.
     ///
     /// This is equivalent to the `get_bit` function.
     ///
@@ -183,6 +186,7 @@ impl<'a> Index<u64> for BitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.bits()[0], false);
@@ -209,7 +213,9 @@ impl<'a> Index<u64> for BitIterator<'a> {
     }
 }
 
-impl Natural {
+impl<'a> BitIterable for &'a Natural {
+    type BitIterator = NaturalBitIterator<'a>;
+
     /// Returns a double-ended iterator over the bits of a `Natural`. The forward order is
     /// ascending, so that less significant bits appear first. There are no trailing false bits
     /// going forward, or leading falses going backward.
@@ -227,6 +233,7 @@ impl Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert!(Natural::ZERO.bits().next().is_none());
@@ -239,17 +246,22 @@ impl Natural {
     /// assert_eq!(Natural::from(105u32).bits().rev().collect::<Vec<bool>>(),
     ///     vec![true, true, false, true, false, false, true]);
     /// ```
-    pub fn bits(&self) -> BitIterator {
+    fn bits(self) -> NaturalBitIterator<'a> {
         let significant_bits = self.significant_bits();
-        let mut bits = BitIterator {
+        let remainder = significant_bits & Limb::WIDTH_MASK;
+        let mut bits = NaturalBitIterator {
             significant_bits,
             limbs: self.limbs(),
             some_remaining: significant_bits != 0,
-            indices_are_in_same_limb: significant_bits <= u64::from(Limb::WIDTH),
+            indices_are_in_same_limb: significant_bits <= Limb::WIDTH,
             current_limb_forward: 0,
             current_limb_back: 0,
-            i: 0,
-            j: 0,
+            i_mask: 1,
+            j_mask: if remainder != 0 {
+                1 << (remainder - 1)
+            } else {
+                1 << (Limb::WIDTH - 1)
+            },
         };
         if let Some(next) = bits.limbs.next() {
             bits.current_limb_forward = next;
@@ -258,12 +270,6 @@ impl Natural {
             bits.current_limb_back = next_back;
         } else {
             bits.current_limb_back = bits.current_limb_forward;
-        }
-        let remainder = significant_bits & u64::from(Limb::WIDTH_MASK);
-        if remainder != 0 {
-            bits.j = remainder - 1;
-        } else {
-            bits.j = u64::from(Limb::WIDTH) - 1;
         }
         bits
     }

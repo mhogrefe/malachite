@@ -1,6 +1,6 @@
 use std::iter::repeat;
 
-use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
+use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -9,6 +9,7 @@ use common::DemoBenchRegistry;
 pub mod and;
 pub mod assign_bit;
 pub mod assign_bits;
+pub mod bits;
 pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
@@ -58,6 +59,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
     assign_bit::register(registry);
     assign_bits::register(registry);
+    bits::register(registry);
     clear_bit::register(registry);
     count_ones::register(registry);
     flip_bit::register(registry);

@@ -1,18 +1,18 @@
 use std::ops::Index;
 
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::num::logic::traits::{BitAccess, BitIterable};
 
 use integer::Integer;
-use natural::conversion::to_bits::BitIterator;
+use natural::logic::bit_iterable::NaturalBitIterator;
 use natural::Natural;
 
 /// A double-ended iterator over the two's complement bits of the negative of a `Natural`. The
-/// forward order is ascending (least-significant first). There may be at most one implicit
-/// most-significant `true` bit.
+/// forward order is ascending (least-significant first). There may be at most one implicit most-
+/// significant `true` bit.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NegativeBitIterator<'a> {
-    pub(crate) bits: BitIterator<'a>,
+    pub(crate) bits: NaturalBitIterator<'a>,
     i: u64,
     j: u64,
     first_true_index: Option<u64>,
@@ -127,7 +127,7 @@ trait SignExtendedBitIterator: DoubleEndedIterator<Item = bool> {
     }
 }
 
-impl<'a> SignExtendedBitIterator for BitIterator<'a> {
+impl<'a> SignExtendedBitIterator for NaturalBitIterator<'a> {
     const EXTENSION: bool = false;
 
     fn needs_sign_extension(&self) -> bool {
@@ -144,13 +144,11 @@ impl<'a> SignExtendedBitIterator for NegativeBitIterator<'a> {
             i += 1;
         }
         let last_bit_index = self.bits.significant_bits - 1;
-        let last_bit = self.bits[last_bit_index];
-        let twos_complement_bit = if i == last_bit_index {
-            last_bit
+        if i == last_bit_index {
+            !self.bits[last_bit_index]
         } else {
-            !last_bit
-        };
-        !twos_complement_bit
+            self.bits[last_bit_index]
+        }
     }
 }
 
@@ -159,13 +157,13 @@ impl<'a> SignExtendedBitIterator for NegativeBitIterator<'a> {
 /// `Integer`; `false` for non-negative and `true` for negative. This means that there may be a
 /// single most-significant sign-extension bit.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum TwosComplementBitIterator<'a> {
+pub enum IntegerBitIterator<'a> {
     Zero,
-    Positive(BitIterator<'a>, bool),
+    Positive(NaturalBitIterator<'a>, bool),
     Negative(NegativeBitIterator<'a>, bool),
 }
 
-impl<'a> Iterator for TwosComplementBitIterator<'a> {
+impl<'a> Iterator for IntegerBitIterator<'a> {
     type Item = bool;
 
     /// A function to iterate through the twos-complement bits of an `Integer` in ascending order
@@ -181,13 +179,14 @@ impl<'a> Iterator for TwosComplementBitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
+    /// assert_eq!(Integer::ZERO.bits().next(), None);
     ///
     /// // -105 = 10010111 in two's complement
     /// let n = Integer::from(-105);
-    /// let mut bits = n.twos_complement_bits();
+    /// let mut bits = n.bits();
     /// assert_eq!(bits.next(), Some(true));
     /// assert_eq!(bits.next(), Some(true));
     /// assert_eq!(bits.next(), Some(true));
@@ -200,18 +199,18 @@ impl<'a> Iterator for TwosComplementBitIterator<'a> {
     /// ```
     fn next(&mut self) -> Option<bool> {
         match *self {
-            TwosComplementBitIterator::Zero => None,
-            TwosComplementBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Zero => None,
+            IntegerBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
-            TwosComplementBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
                 bits.iterate_forward(extension_checked)
             }
         }
     }
 }
 
-impl<'a> DoubleEndedIterator for TwosComplementBitIterator<'a> {
+impl<'a> DoubleEndedIterator for IntegerBitIterator<'a> {
     /// A function to iterate through the twos-complement bits of an `Integer` in descending order
     /// (most-significant first). The first bit may be a sign-extension bit.
     ///
@@ -227,13 +226,14 @@ impl<'a> DoubleEndedIterator for TwosComplementBitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
+    /// assert_eq!(Integer::ZERO.bits().next_back(), None);
     ///
     /// // -105 = 10010111 in two's complement
     /// let n = Integer::from(-105);
-    /// let mut bits = n.twos_complement_bits();
+    /// let mut bits = n.bits();
     /// assert_eq!(bits.next_back(), Some(true));
     /// assert_eq!(bits.next_back(), Some(false));
     /// assert_eq!(bits.next_back(), Some(false));
@@ -246,22 +246,22 @@ impl<'a> DoubleEndedIterator for TwosComplementBitIterator<'a> {
     /// ```
     fn next_back(&mut self) -> Option<bool> {
         match *self {
-            TwosComplementBitIterator::Zero => None,
-            TwosComplementBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Zero => None,
+            IntegerBitIterator::Positive(ref mut bits, ref mut extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
-            TwosComplementBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
+            IntegerBitIterator::Negative(ref mut bits, ref mut extension_checked) => {
                 bits.iterate_backward(extension_checked)
             }
         }
     }
 }
 
-impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
+impl<'a> Index<u64> for IntegerBitIterator<'a> {
     type Output = bool;
 
     /// A function to retrieve two's complement bits by index. Indexing at or above the significant
-    /// bit count is allowed.
+    /// bit count returns false or true bits, depending on the value's sign.
     ///
     /// This is equivalent to the `get_bit` function.
     ///
@@ -277,13 +277,14 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_bits()[0], false);
+    /// assert_eq!(Integer::ZERO.bits()[0], false);
     ///
     /// // -105 = 10010111 in two's complement
     /// let n = Integer::from(-105);
-    /// let bits = n.twos_complement_bits();
+    /// let bits = n.bits();
     /// assert_eq!(bits[0], true);
     /// assert_eq!(bits[1], true);
     /// assert_eq!(bits[2], true);
@@ -296,11 +297,9 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
     /// ```
     fn index(&self, index: u64) -> &bool {
         let bit = match *self {
-            TwosComplementBitIterator::Zero => false,
-            TwosComplementBitIterator::Positive(ref bits, _) => bits.limbs.n.get_bit(index),
-            TwosComplementBitIterator::Negative(ref bits, _) => {
-                bits.bits.limbs.n.get_bit_neg(index)
-            }
+            IntegerBitIterator::Zero => false,
+            IntegerBitIterator::Positive(ref bits, _) => bits.limbs.n.get_bit(index),
+            IntegerBitIterator::Negative(ref bits, _) => bits.bits.limbs.n.get_bit_neg(index),
         };
         if bit {
             &true
@@ -310,13 +309,15 @@ impl<'a> Index<u64> for TwosComplementBitIterator<'a> {
     }
 }
 
-impl Integer {
+impl<'a> BitIterable for &'a Integer {
+    type BitIterator = IntegerBitIterator<'a>;
+
     /// Returns a double-ended iterator over the twos-complement bits of an `Integer`. The forward
     /// order is ascending, so that less significant bits appear first. There may be a
     /// most-significant sign-extension bit.
     ///
     /// If it's necessary to get a `Vec` of all the twos_complement bits, consider using
-    /// `to_twos_complement_bits_asc` or `to_twos_complement_bits_desc` instead.
+    /// `to_bits_asc` or `to_bits_desc` instead.
     ///
     /// Time: worst case O(1)
     ///
@@ -328,31 +329,32 @@ impl Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_bits().next(), None);
+    /// assert_eq!(Integer::ZERO.bits().next(), None);
     /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(Integer::from(105).twos_complement_bits().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(105).bits().collect::<Vec<bool>>(),
     ///     vec![true, false, false, true, false, true, true, false]);
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(Integer::from(-105).twos_complement_bits().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(-105).bits().collect::<Vec<bool>>(),
     ///     vec![true, true, true, false, true, false, false, true]);
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_bits().next_back(), None);
+    /// assert_eq!(Integer::ZERO.bits().next_back(), None);
     /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(Integer::from(105).twos_complement_bits().rev().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(105).bits().rev().collect::<Vec<bool>>(),
     ///     vec![false, true, true, false, true, false, false, true]);
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(Integer::from(-105).twos_complement_bits().rev().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(-105).bits().rev().collect::<Vec<bool>>(),
     ///     vec![true, false, false, true, false, true, true, true]);
     /// ```
-    pub fn twos_complement_bits(&self) -> TwosComplementBitIterator {
+    fn bits(self) -> IntegerBitIterator<'a> {
         if *self == 0 {
-            TwosComplementBitIterator::Zero
+            IntegerBitIterator::Zero
         } else if self.sign {
-            TwosComplementBitIterator::Positive(self.abs.bits(), false)
+            IntegerBitIterator::Positive(self.abs.bits(), false)
         } else {
-            TwosComplementBitIterator::Negative(self.abs.negative_bits(), false)
+            IntegerBitIterator::Negative(self.abs.negative_bits(), false)
         }
     }
 }

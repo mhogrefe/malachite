@@ -393,7 +393,7 @@ macro_rules! unsigned_properties {
         test_properties(naturals, |x| {
             let result = $t::checked_from(x);
             assert_eq!($t::checked_from(x.clone()), result);
-            if x.significant_bits() <= u64::from($t::WIDTH) {
+            if x.significant_bits() <= $t::WIDTH {
                 assert_eq!(Natural::from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
                 assert_eq!(result, Some($t::exact_from(x)));
@@ -403,10 +403,7 @@ macro_rules! unsigned_properties {
             assert_eq!(result.is_none(), $t::overflowing_from(x).1);
 
             let result = $t::wrapping_from(x);
-            assert_eq!(
-                result,
-                $t::exact_from((&x).mod_power_of_two(u64::from($t::WIDTH)))
-            );
+            assert_eq!(result, $t::exact_from((&x).mod_power_of_two($t::WIDTH)));
         });
     };
 }

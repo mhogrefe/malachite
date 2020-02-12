@@ -591,12 +591,12 @@ pub trait ShrRoundAssign<Rhs = Self> {
 pub trait TrueCheckedShl {
     type Output;
 
-    fn true_checked_shl(self, rhs: u32) -> Option<Self::Output>;
+    fn true_checked_shl(self, rhs: u64) -> Option<Self::Output>;
 }
 
 /// Checked shift right. Computes `self >> rhs`, returning `None` if there is no valid result.
 pub trait TrueCheckedShr {
     type Output;
 
-    fn true_checked_shr(self, rhs: u32) -> Option<Self::Output>;
+    fn true_checked_shr(self, rhs: u64) -> Option<Self::Output>;
 }

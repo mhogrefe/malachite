@@ -77,7 +77,7 @@ pub fn _limbs_mod_limb_alt_3(limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
-    let bits = divisor.leading_zeros();
+    let bits = u64::from(divisor.leading_zeros());
     let (limbs_last, limbs_init) = limbs.split_last().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
@@ -813,7 +813,7 @@ fn _limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
         limbs_mod_by_two_limb_normalized(ns, ds)
     } else {
         let ds_0 = ds[0];
-        let cobits = Limb::WIDTH - bits;
+        let cobits = Limb::WIDTH - u64::from(bits);
         let mut ns_shifted = vec![0; n_len + 1];
         let ns_shifted = &mut ns_shifted;
         let carry = limbs_shl_to_out(ns_shifted, ns, bits);
@@ -1884,7 +1884,7 @@ fn limbs_mod_limb_normalized_shl(
         return mod_by_preinversion(high_limb, limbs[0] << bits, divisor, divisor_inverse);
     }
     let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
-    let cobits = Limb::WIDTH - bits;
+    let cobits = Limb::WIDTH - u64::from(bits);
     let second_highest_limb = limbs[len - 2];
     let highest_limb_after_shl = (limbs[len - 1] << bits) | (second_highest_limb >> cobits);
     let mut second_highest_limb_after_shl = second_highest_limb << bits;
@@ -1939,7 +1939,7 @@ pub fn _limbs_mod_limb_alt_1(limbs: &[Limb], divisor: Limb) -> Limb {
         limbs_mod_limb_normalized(&limbs[..len_minus_1], highest_limb, divisor, limb_inverse)
     } else {
         let divisor = divisor << bits;
-        let cobits = Limb::WIDTH - bits;
+        let cobits = Limb::WIDTH - u64::from(bits);
         let limb_inverse = limbs_invert_limb(divisor);
         let remainder = mod_by_preinversion(
             highest_limb >> cobits,
@@ -2045,7 +2045,7 @@ pub fn _limbs_mod_limb_small_unnormalized_large(
     divisor <<= shift;
     let (limbs_last, limbs_init) = limbs.split_last().unwrap();
     let mut previous_limb = *limbs_last;
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = Limb::WIDTH - u64::from(shift);
     remainder = (remainder << shift) | (previous_limb >> co_shift);
     let divisor_inverse = limbs_invert_limb(divisor);
     for &limb in limbs_init.iter().rev() {
@@ -2107,7 +2107,7 @@ pub fn _limbs_mod_limb_any_leading_zeros(limbs: &[Limb], divisor: Limb) -> Limb 
 pub fn _limbs_mod_limb_any_leading_zeros_1(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len >= 2);
-    let shift = divisor.leading_zeros();
+    let shift = u64::from(divisor.leading_zeros());
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let mut base_mod_divisor = divisor.wrapping_neg();
@@ -2150,7 +2150,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(limbs: &[Limb], divisor: Limb) -> Lim
 pub fn _limbs_mod_limb_any_leading_zeros_2(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len >= 2);
-    let shift = divisor.leading_zeros();
+    let shift = u64::from(divisor.leading_zeros());
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = if shift == 0 {
@@ -2219,7 +2219,7 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(limbs: &[Limb], divisor: Limb) ->
     assert_ne!(len, 0);
     let shift = divisor.leading_zeros();
     assert_ne!(shift, 0);
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = Limb::WIDTH - u64::from(shift);
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = divisor
@@ -2283,7 +2283,7 @@ pub fn _limbs_mod_limb_at_least_2_leading_zeros(limbs: &[Limb], divisor: Limb) -
     assert_ne!(len, 0);
     let shift = divisor.leading_zeros();
     assert!(shift >= 2);
-    let co_shift = Limb::WIDTH - shift;
+    let co_shift = Limb::WIDTH - u64::from(shift);
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = divisor

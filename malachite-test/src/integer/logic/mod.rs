@@ -1,7 +1,7 @@
 use std::iter::repeat;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::logic::traits::BitConvertible;
+use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
@@ -10,6 +10,7 @@ use common::DemoBenchRegistry;
 pub mod and;
 pub mod assign_bit;
 pub mod assign_bits;
+pub mod bits;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
@@ -31,19 +32,11 @@ pub mod xor;
 fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer) -> Integer {
     let x_negative = *x < 0;
     let y_negative = *y < 0;
-    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
-        if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
-            Box::new(
-                x.twos_complement_bits()
-                    .zip(y.twos_complement_bits().chain(repeat(y_negative))),
-            )
-        } else {
-            Box::new(
-                x.twos_complement_bits()
-                    .chain(repeat(x_negative))
-                    .zip(y.twos_complement_bits()),
-            )
-        };
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> = if x.bits().count() >= y.bits().count() {
+        Box::new(x.bits().zip(y.bits().chain(repeat(y_negative))))
+    } else {
+        Box::new(x.bits().chain(repeat(x_negative)).zip(y.bits()))
+    };
     let mut bits = Vec::new();
     for (b, c) in bit_zip {
         bits.push(bit_fn(b, c));
@@ -78,6 +71,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     and::register(registry);
     assign_bit::register(registry);
     assign_bits::register(registry);
+    bits::register(registry);
     checked_count_ones::register(registry);
     checked_count_zeros::register(registry);
     checked_hamming_distance::register(registry);

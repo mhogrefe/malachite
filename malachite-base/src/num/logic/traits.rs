@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 /// Returns the number of ones in the binary representation of `self`.
 pub trait CountOnes {
     fn count_ones(self) -> u32;
@@ -181,4 +183,13 @@ pub trait BitConvertible {
     /// Converts a slice of bits into a value. The input bits are in descending order: most- to
     /// least-significant.
     fn from_bits_desc(bits: &[bool]) -> Self;
+}
+
+/// This trait defines an iterator over a value's bits.
+pub trait BitIterable {
+    type BitIterator: Iterator<Item = bool> + DoubleEndedIterator<Item = bool> + Index<u64>;
+
+    /// Returns a double-ended iterator over a value's bits. The iterator ends after the value's
+    /// most-significant bit.
+    fn bits(self) -> Self::BitIterator;
 }

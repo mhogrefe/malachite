@@ -678,8 +678,8 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
-    let small_bits = u32::wrapping_from(bits) & Limb::WIDTH_MASK;
-    let mut shift_limbs = bits >> usize::wrapping_from(Limb::LOG_WIDTH);
+    let small_bits = u32::exact_from(bits) & u32::exact_from(Limb::WIDTH_MASK);
+    let mut shift_limbs = bits >> Limb::LOG_WIDTH;
     // negate
     if shift_limbs >= n {
         // out[0..shift_limbs - 1]  <-- xs[n - shift_limbs..n - 1] << small_bits

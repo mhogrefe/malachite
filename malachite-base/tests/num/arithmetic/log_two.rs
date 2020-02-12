@@ -16,7 +16,7 @@ fn floor_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u128) {
     test(5, 2);
     test(100, 6);
     test(128, 7);
-    test(max, u64::from(T::WIDTH) - 1);
+    test(max, T::WIDTH - 1);
 }
 
 #[test]

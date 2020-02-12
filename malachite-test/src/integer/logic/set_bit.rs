@@ -6,7 +6,7 @@ use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
-use inputs::integer::pairs_of_integer_and_small_u64;
+use inputs::integer::pairs_of_integer_and_small_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_set_bit_neg);
@@ -27,7 +27,7 @@ fn demo_limbs_set_bit_neg(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_integer_set_bit(gm: GenerationMode, limit: usize) {
-    for (mut n, index) in pairs_of_integer_and_small_u64(gm).take(limit) {
+    for (mut n, index) in pairs_of_integer_and_small_unsigned(gm).take(limit) {
         let n_old = n.clone();
         n.set_bit(index);
         println!("x := {}; x.set_bit({}); x = {}", n_old, index, n);
@@ -55,7 +55,7 @@ fn benchmark_integer_set_bit(gm: GenerationMode, limit: usize, file_name: &str) 
     m_run_benchmark(
         "Integer.set_bit(u64)",
         BenchmarkType::Single,
-        pairs_of_integer_and_small_u64(gm),
+        pairs_of_integer_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,

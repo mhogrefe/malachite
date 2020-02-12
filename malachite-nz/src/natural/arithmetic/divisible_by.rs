@@ -123,7 +123,8 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
+            let d_low =
+                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -231,7 +232,8 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
+            let d_low =
+                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -340,7 +342,8 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
+            let d_low =
+                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -446,7 +449,8 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
+            let d_low =
+                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {

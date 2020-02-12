@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::integers::_to_bits_asc_alt;
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, SignificantBits};
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -9,9 +9,6 @@ use inputs::natural::naturals;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_to_bits_asc);
     register_demo!(registry, demo_natural_to_bits_desc);
-    register_demo!(registry, demo_natural_bits);
-    register_demo!(registry, demo_natural_bits_rev);
-    register_demo!(registry, demo_natural_bits_size_hint);
     register_bench!(
         registry,
         Large,
@@ -24,7 +21,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_natural_to_bits_desc_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_natural_to_bits_desc_algorithms);
-    register_bench!(registry, Large, benchmark_natural_bits_size_hint);
 }
 
 pub fn _to_bits_asc_naive(n: &Natural) -> Vec<bool> {
@@ -52,28 +48,6 @@ fn demo_natural_to_bits_asc(gm: GenerationMode, limit: usize) {
 fn demo_natural_to_bits_desc(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("to_bits_desc({}) = {:?}", n, n.to_bits_desc());
-    }
-}
-
-fn demo_natural_bits(gm: GenerationMode, limit: usize) {
-    for n in naturals(gm).take(limit) {
-        println!("bits({}) = {:?}", n, n.bits().collect::<Vec<bool>>());
-    }
-}
-
-fn demo_natural_bits_rev(gm: GenerationMode, limit: usize) {
-    for n in naturals(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            n,
-            n.bits().rev().collect::<Vec<bool>>()
-        );
-    }
-}
-
-fn demo_natural_bits_size_hint(gm: GenerationMode, limit: usize) {
-    for n in naturals(gm).take(limit) {
-        println!("bits({}).size_hint() = {:?}", n, n.bits().size_hint());
     }
 }
 
@@ -165,22 +139,5 @@ fn benchmark_natural_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, f
             ("alt", &mut (|n| no_out!(n._to_bits_desc_alt()))),
             ("naive", &mut (|n| no_out!(_to_bits_desc_naive(&n)))),
         ],
-    );
-}
-
-fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural.bits().size_hint()",
-        BenchmarkType::Single,
-        naturals(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|n| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [(
-            "Natural.bits().size_hint()",
-            &mut (|n| no_out!(n.bits().size_hint())),
-        )],
     );
 }

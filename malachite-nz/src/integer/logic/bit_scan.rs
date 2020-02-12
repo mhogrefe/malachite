@@ -48,12 +48,12 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
     let after_boundary_offset = (u64::wrapping_from(i) + 1) << Limb::LOG_WIDTH;
     match starting_limb_index.cmp(&i) {
         Ordering::Equal => {
-            let within_limb_index = starting_index & u64::from(Limb::WIDTH_MASK);
+            let within_limb_index = starting_index & Limb::WIDTH_MASK;
             if let Some(result) = limbs[i]
                 .wrapping_neg()
                 .index_of_next_false_bit(within_limb_index)
             {
-                if result < u64::from(Limb::WIDTH) {
+                if result < Limb::WIDTH {
                     return Some((u64::wrapping_from(i) << Limb::LOG_WIDTH) + result);
                 } else {
                     starting_index = 0;
@@ -111,7 +111,7 @@ pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64)
         starting_limb_index = i;
     }
     if starting_limb_index == i {
-        let within_limb_index = starting_index & u64::from(Limb::WIDTH_MASK);
+        let within_limb_index = starting_index & Limb::WIDTH_MASK;
         if let Some(result) = limbs[i]
             .wrapping_neg()
             .index_of_next_true_bit(within_limb_index)
@@ -204,12 +204,12 @@ impl Natural {
     fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
         match *self {
             Natural(Small(small)) => {
-                if starting_index >= u64::from(Limb::WIDTH) {
+                if starting_index >= Limb::WIDTH {
                     None
                 } else {
                     let index =
                         u64::from(((small - 1) & !((1 << starting_index) - 1)).trailing_zeros());
-                    if index == u64::from(Limb::WIDTH) {
+                    if index == Limb::WIDTH {
                         None
                     } else {
                         Some(index)
@@ -224,7 +224,7 @@ impl Natural {
     fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
         match *self {
             Natural(Small(small)) => {
-                if starting_index >= u64::from(Limb::WIDTH) {
+                if starting_index >= Limb::WIDTH {
                     starting_index
                 } else {
                     u64::from((!((small - 1) | ((1 << starting_index) - 1))).trailing_zeros())

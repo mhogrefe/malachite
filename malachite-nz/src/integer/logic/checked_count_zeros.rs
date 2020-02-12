@@ -26,14 +26,14 @@ pub fn limbs_count_zeros_neg(limbs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_limb_seen = false;
     for &limb in limbs.iter() {
-        sum += u64::from(if nonzero_limb_seen {
-            limb.count_ones()
+        sum += if nonzero_limb_seen {
+            u64::from(limb.count_ones())
         } else if limb == 0 {
             Limb::WIDTH
         } else {
             nonzero_limb_seen = true;
-            limb.wrapping_neg().count_zeros()
-        });
+            u64::from(limb.wrapping_neg().count_zeros())
+        };
     }
     sum
 }

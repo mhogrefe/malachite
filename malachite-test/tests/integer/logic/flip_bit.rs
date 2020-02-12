@@ -8,7 +8,7 @@ use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::integer::pairs_of_integer_and_small_u64;
+use malachite_test::inputs::integer::pairs_of_integer_and_small_unsigned;
 
 #[test]
 fn test_flip_bit() {
@@ -38,7 +38,7 @@ fn test_flip_bit() {
 
 #[test]
 fn flip_bit_properties() {
-    test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, index)| {
         let mut mut_n = n.clone();
         mut_n.flip_bit(index);
         assert!(mut_n.is_valid());

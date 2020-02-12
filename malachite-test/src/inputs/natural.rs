@@ -40,7 +40,9 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, It};
+use inputs::base::{
+    finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomValueAndVecOfBoolVar2,
+};
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
@@ -559,9 +561,9 @@ pub(crate) fn rm_pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
     )
 }
 
-pub(crate) fn nm_pairs_of_natural_and_small_u64(
+pub(crate) fn nm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<((BigUint, u64), (Natural, u64))> {
+) -> It<((BigUint, T), (Natural, T))> {
     Box::new(
         pairs_of_natural_and_small_unsigned(gm).map(|(x, y)| ((natural_to_biguint(&x), y), (x, y))),
     )
@@ -1168,30 +1170,12 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
     }
 }
 
-struct RandomNaturalAndVecOfBoolVar2 {
-    naturals: It<Natural>,
-    rng: Box<IsaacRng>,
-}
-
-impl Iterator for RandomNaturalAndVecOfBoolVar2 {
-    type Item = (Natural, Vec<bool>);
-
-    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
-        let n = self.naturals.next().unwrap();
-        let mut bools = Vec::new();
-        for _ in 0..n.significant_bits() {
-            bools.push(self.rng.gen::<bool>());
-        }
-        Some((n, bools))
-    }
-}
-
 fn random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomNaturalAndVecOfBoolVar2 {
-    RandomNaturalAndVecOfBoolVar2 {
-        naturals: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
+) -> RandomValueAndVecOfBoolVar2<Natural> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }
@@ -1199,9 +1183,9 @@ fn random_pairs_of_natural_and_vec_of_bool_var_2(
 fn special_random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomNaturalAndVecOfBoolVar2 {
-    RandomNaturalAndVecOfBoolVar2 {
-        naturals: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
+) -> RandomValueAndVecOfBoolVar2<Natural> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
 }

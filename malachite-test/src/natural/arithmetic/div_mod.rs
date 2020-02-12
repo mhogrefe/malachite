@@ -846,7 +846,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, mut ds)| {
                     let q_len = ns.len() - ds.len() + 1;
-                    ds[q_len - 1].set_bit(u64::from(Limb::WIDTH) - 1);
+                    ds[q_len - 1].set_bit(Limb::WIDTH - 1);
                     let inverse = limbs_two_limb_inverse_helper(ds[q_len - 1], ds[q_len - 2]);
                     no_out!(_limbs_div_mod_divide_and_conquer(
                         &mut qs,
@@ -863,7 +863,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
                     let mut rs = vec![0; d_len];
                     let q_len = ns.len() - d_len + 1;
                     let q_len_2 = q_len << 1;
-                    ds[q_len - 1].set_bit(u64::from(Limb::WIDTH) - 1);
+                    ds[q_len - 1].set_bit(Limb::WIDTH - 1);
                     limbs_two_limb_inverse_helper(ds[q_len - 1], ds[q_len - 2]);
                     let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(q_len_2, q_len)];
                     _limbs_div_mod_barrett(

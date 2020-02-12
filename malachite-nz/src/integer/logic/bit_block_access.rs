@@ -55,7 +55,7 @@ pub fn limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64) -> Vec<Limb> {
         return Vec::new();
     }
     let bit_len = end - start;
-    if start >= u64::from(Limb::WIDTH) {
+    if start >= Limb::WIDTH {
         let mut result_limbs =
             vec![
                 Limb::MAX;
@@ -130,7 +130,7 @@ pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Lim
         &limbs[limb_start..limb_end]
     })
     .to_vec();
-    let offset = u32::exact_from(start & u64::from(Limb::WIDTH_MASK));
+    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
     if offset != 0 {
         limbs_slice_shr_in_place(&mut result_limbs, offset);
     }
@@ -194,7 +194,7 @@ pub fn limbs_vec_neg_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
     limbs.truncate(limb_end);
     limbs_delete_left(&mut limbs, limb_start);
-    let offset = u32::exact_from(start & u64::from(Limb::WIDTH_MASK));
+    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);
     }
@@ -275,7 +275,7 @@ impl Natural {
             return;
         }
         let bits_width = end - start;
-        if bits_width <= u64::from(Limb::WIDTH) {
+        if bits_width <= Limb::WIDTH {
             if let Natural(Small(ref mut small_self)) = self {
                 if let Natural(Small(small_bits)) = bits {
                     let small_bits = (!small_bits).mod_power_of_two(bits_width);

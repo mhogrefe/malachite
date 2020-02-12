@@ -56,7 +56,7 @@ pub fn limbs_slice_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
         &limbs[limb_start..limb_end]
     })
     .to_vec();
-    let offset = u32::exact_from(start & u64::from(Limb::WIDTH_MASK));
+    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
     if offset != 0 {
         limbs_slice_shr_in_place(&mut result_limbs, offset);
     }
@@ -100,7 +100,7 @@ pub fn limbs_vec_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Lim
     }
     limbs_mod_power_of_two_in_place(&mut limbs, end);
     limbs_delete_left(&mut limbs, limb_start);
-    let offset = u32::exact_from(start & u64::from(Limb::WIDTH_MASK));
+    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);
     }
@@ -145,8 +145,8 @@ pub(crate) fn limbs_assign_bits_helper(
     if bits_limb_width < bits.len() {
         bits = &bits[..bits_limb_width];
     }
-    let start_remainder = start & u64::from(Limb::WIDTH_MASK);
-    let end_remainder = end & u64::from(Limb::WIDTH_MASK);
+    let start_remainder = start & Limb::WIDTH_MASK;
+    let end_remainder = end & Limb::WIDTH_MASK;
     if end_limb > limbs.len() {
         // Possible inefficiency here: we might write many zeros only to delete them later.
         limbs.resize(end_limb, 0);
@@ -166,7 +166,7 @@ pub(crate) fn limbs_assign_bits_helper(
     if end_remainder != 0 {
         limbs.last_mut().unwrap().assign_bits(
             end_remainder,
-            u64::from(Limb::WIDTH),
+            Limb::WIDTH,
             &(original_last_limb >> end_remainder),
         );
     }

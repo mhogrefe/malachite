@@ -30,8 +30,8 @@ use num::conversion::traits::{
     SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitScan, CountOnes, CountZeros, LeadingZeros,
-    NotAssign, RotateLeft, RotateRight, SignificantBits, TrailingZeros,
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
+    LeadingZeros, NotAssign, RotateLeft, RotateRight, SignificantBits, TrailingZeros,
 };
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
@@ -45,6 +45,7 @@ pub trait PrimitiveInteger:
     + BitAndAssign<Self>
     + BitBlockAccess
     + BitConvertible
+    + BitIterable
     + BitOr<Output = Self>
     + BitOrAssign<Self>
     + BitScan
@@ -354,7 +355,7 @@ pub trait PrimitiveInteger:
     + Zero
 {
     /// The number of bits of `Self`.
-    const WIDTH: u32;
+    const WIDTH: u64;
 
     /// The base-2 logarithm of the number of bits of `Self`. Instead of `n / WIDTH`, use
     /// `n >> LOG_WIDTH`.
@@ -369,7 +370,7 @@ pub trait PrimitiveInteger:
     /// Note that this value is correct for all of the built-in primitive integer types, but it will
     /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
     /// `WIDTH_MASK` should not be used.
-    const WIDTH_MASK: u32 = Self::WIDTH - 1;
+    const WIDTH_MASK: u64 = Self::WIDTH - 1;
 
     /// Gets the most-significant bit of `Self`. For signed integers, this is the sign bit.
     ///
@@ -388,7 +389,7 @@ pub trait PrimitiveInteger:
     /// ```
     #[inline]
     fn get_highest_bit(&self) -> bool {
-        self.get_bit(u64::from(Self::WIDTH - 1))
+        self.get_bit(Self::WIDTH - 1)
     }
 }
 
@@ -404,7 +405,7 @@ macro_rules! impl_basic_traits {
         /// assert_eq!(u32::WIDTH_MASK, 0x1f);
         /// ```
         impl PrimitiveInteger for $t {
-            const WIDTH: u32 = $width;
+            const WIDTH: u64 = $width;
         }
 
         impl_named!($t);
@@ -519,10 +520,10 @@ impl_basic_traits!(u16, 16);
 impl_basic_traits!(u32, 32);
 impl_basic_traits!(u64, 64);
 impl_basic_traits!(u128, 128);
-impl_basic_traits!(usize, 0usize.trailing_zeros());
+impl_basic_traits!(usize, 0usize.trailing_zeros() as u64);
 impl_basic_traits!(i8, 8);
 impl_basic_traits!(i16, 16);
 impl_basic_traits!(i32, 32);
 impl_basic_traits!(i64, 64);
 impl_basic_traits!(i128, 128);
-impl_basic_traits!(isize, 0usize.trailing_zeros());
+impl_basic_traits!(isize, 0usize.trailing_zeros() as u64);

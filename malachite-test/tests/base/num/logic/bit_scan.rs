@@ -17,7 +17,7 @@ fn index_of_next_false_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Ran
         assert_eq!(result == u, !n.get_bit(u));
         assert_eq!(
             (!n).index_of_next_true_bit(u),
-            if result < u64::from(T::WIDTH) {
+            if result < T::WIDTH {
                 Some(result)
             } else {
                 None
@@ -69,7 +69,7 @@ where
         let result = n.index_of_next_false_bit(u);
         assert_eq!(
             result.is_some(),
-            if u >= u64::from(T::WIDTH) {
+            if u >= T::WIDTH {
                 n >= T::ZERO
             } else {
                 n | (T::ONE << u).wrapping_sub(T::ONE) != T::NEGATIVE_ONE
@@ -105,7 +105,7 @@ where
         let result = n.index_of_next_true_bit(u);
         assert_eq!(
             result.is_some(),
-            if u >= u64::from(T::WIDTH) {
+            if u >= T::WIDTH {
                 n < T::ZERO
             } else {
                 n >> u != T::ZERO

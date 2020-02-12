@@ -11,7 +11,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
 };
-use malachite_base::num::logic::traits::{BitAccess, BitBlockAccess};
+use malachite_base::num::logic::traits::{BitAccess, BitBlockAccess, BitConvertible, BitIterable};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
@@ -54,10 +54,11 @@ use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
-use rand::Rand;
+use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
-use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
+use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::{random, random_from_vector, range_increasing};
 use rust_wheels::iterators::integers_geometric::{
     positive_u32s_geometric, range_up_geometric_u32, u32s_geometric,
@@ -87,8 +88,8 @@ use rust_wheels::iterators::tuples::{
     random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
-    exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
-    special_random_bool_vecs, special_random_unsigned_vecs,
+    exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
+    random_vecs, random_vecs_min_length, special_random_bool_vecs, special_random_unsigned_vecs,
     special_random_unsigned_vecs_min_length,
 };
 
@@ -198,12 +199,12 @@ pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T>
     match gm {
         GenerationMode::Exhaustive => Box::new(range_up_increasing(T::ONE << (T::WIDTH - 1))),
         GenerationMode::Random(_) => Box::new(random::<T>(&EXAMPLE_SEED).map(|mut u| {
-            u.set_bit(u64::from(T::WIDTH - 1));
+            u.set_bit(T::WIDTH - 1);
             u
         })),
         GenerationMode::SpecialRandom(_) => {
             Box::new(special_random_unsigned::<T>(&EXAMPLE_SEED).map(|mut u| {
-                u.set_bit(u64::from(T::WIDTH - 1));
+                u.set_bit(T::WIDTH - 1);
                 u
             }))
         }
@@ -372,13 +373,13 @@ fn pairs_of_unsigneds_var_2_with_seed<T: PrimitiveUnsigned + Rand>(
         )),
         GenerationMode::Random(_) => Box::new(random_pairs_from_single(random::<T>(seed)).map(
             |(mut u, v)| {
-                u.set_bit(u64::from(T::WIDTH - 1));
+                u.set_bit(T::WIDTH - 1);
                 (u, v)
             },
         )),
         GenerationMode::SpecialRandom(_) => Box::new(
             random_pairs_from_single(special_random_unsigned::<T>(seed)).map(|(mut u, v)| {
-                u.set_bit(u64::from(T::WIDTH - 1));
+                u.set_bit(T::WIDTH - 1);
                 (u, v)
             }),
         ),
@@ -682,7 +683,7 @@ type ItU<T> = It<(T, u64)>;
 fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>() -> ItU<T> {
     Box::new(lex_pairs(
         exhaustive_unsigned(),
-        range_down_increasing(u64::from(T::WIDTH) - 1),
+        range_down_increasing(T::WIDTH - 1),
     ))
 }
 
@@ -690,7 +691,7 @@ fn random_pairs_of_primitive_and_u64_width_range<T: PrimitiveInteger + Rand>() -
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
-        &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
+        &(|seed| random_range_down(seed, T::WIDTH - 1)),
     ))
 }
 
@@ -704,7 +705,7 @@ pub fn pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>(
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
-            &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
+            &(|seed| random_range_down(seed, T::WIDTH - 1)),
         )),
     }
 }
@@ -720,13 +721,13 @@ where
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_signed(),
-            range_down_increasing(u64::from(T::WIDTH) - 1),
+            range_down_increasing(T::WIDTH - 1),
         )),
         GenerationMode::Random(_) => random_pairs_of_primitive_and_u64_width_range(),
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
-            &(|seed| random_range_down(seed, u64::from(T::WIDTH) - 1)),
+            &(|seed| random_range_down(seed, T::WIDTH - 1)),
         )),
     }
 }
@@ -742,7 +743,7 @@ where
 {
     Box::new(
         pairs_of_signed_and_small_unsigned(gm)
-            .filter(|&(n, index)| n < T::ZERO || index < u64::from(T::WIDTH)),
+            .filter(|&(n, index)| n < T::ZERO || index < T::WIDTH),
     )
 }
 
@@ -757,7 +758,7 @@ where
 {
     Box::new(
         pairs_of_signed_and_small_unsigned(gm)
-            .filter(|&(n, index)| n >= T::ZERO || index < u64::from(T::WIDTH)),
+            .filter(|&(n, index)| n >= T::ZERO || index < T::WIDTH),
     )
 }
 
@@ -3091,7 +3092,7 @@ where
                     }
                 } else {
                     start <= end && {
-                        let width = u64::from(T::WIDTH);
+                        let width = T::WIDTH;
                         let bits_width = end - start;
                         let bits = bits.mod_power_of_two(bits_width);
                         bits_width <= width
@@ -3509,7 +3510,7 @@ pub(crate) fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Ra
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
             &(|seed| {
                 random::<T>(seed).map(|mut u| {
-                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u.set_bit(T::WIDTH - 1);
                     u
                 })
             }),
@@ -3519,7 +3520,7 @@ pub(crate) fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Ra
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
             &(|seed| {
                 special_random_unsigned::<T>(seed).map(|mut u| {
-                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u.set_bit(T::WIDTH - 1);
                     u
                 })
             }),
@@ -3548,7 +3549,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + 
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
             &(|seed| {
                 random::<T>(seed).map(|mut u| {
-                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u.set_bit(T::WIDTH - 1);
                     u
                 })
             }),
@@ -3558,7 +3559,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + 
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
             &(|seed| {
                 special_random_unsigned::<T>(seed).map(|mut u| {
-                    u.set_bit(u64::from(T::WIDTH - 1));
+                    u.set_bit(T::WIDTH - 1);
                     u
                 })
             }),
@@ -3589,7 +3590,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1<
             &(|seed| {
                 special_random_unsigned::<T>(seed)
                     .map(|mut u| {
-                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u.clear_bit(T::WIDTH - 1);
                         u
                     })
                     .filter(|&u| u != T::ZERO)
@@ -3621,7 +3622,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2<
             &(|seed| {
                 special_random_unsigned::<T>(seed)
                     .map(|mut u| {
-                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u.clear_bit(T::WIDTH - 1);
                         u.clear_bit(u64::from(T::WIDTH - 2));
                         u
                     })
@@ -3708,7 +3709,7 @@ pub(crate) fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
             &(|seed| {
                 special_random_unsigned::<T>(seed)
                     .map(|mut u| {
-                        u.clear_bit(u64::from(T::WIDTH - 1));
+                        u.clear_bit(T::WIDTH - 1);
                         u
                     })
                     .filter(|&u| u != T::ZERO)
@@ -3724,17 +3725,17 @@ pub fn pairs_of_unsigned_vec_and_limb_var_1<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs(exhaustive_unsigned()),
-            range_increasing(1, u32::WIDTH - 1),
+            range_increasing(1, u32::exact_from(u32::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
         )),
     }
 }
@@ -4043,19 +4044,19 @@ fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_4<T: PrimitiveUnsigned + Ra
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs(exhaustive_unsigned()),
-            range_increasing(1, u32::WIDTH - 1),
+            range_increasing(1, u32::exact_from(u32::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
+            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
         )),
     }
 }
@@ -4939,6 +4940,104 @@ where
             }
         }),
     )
+}
+
+pub(crate) struct RandomValueAndVecOfBoolVar2<T: BitConvertible> {
+    pub(crate) xs: It<T>,
+    pub(crate) rng: Box<IsaacRng>,
+}
+
+impl<T: BitConvertible> Iterator for RandomValueAndVecOfBoolVar2<T> {
+    type Item = (T, Vec<bool>);
+
+    fn next(&mut self) -> Option<(T, Vec<bool>)> {
+        let n = self.xs.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in n.to_bits_asc() {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, bools))
+    }
+}
+
+fn random_pairs_of_primitive_and_vec_of_bool_var_2<T: PrimitiveInteger + Rand>(
+    seed: &[u32],
+) -> RandomValueAndVecOfBoolVar2<T> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(random(&scramble(seed, "naturals"))),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_pairs_of_unsigned_and_vec_of_bool_var_2<T: PrimitiveUnsigned + Rand>(
+    seed: &[u32],
+) -> RandomValueAndVecOfBoolVar2<T> {
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(special_random_unsigned(&scramble(seed, "naturals"))),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `T` and `Vec<bool>`, where `T` is unsigned and the length of the `Vec` is equal to
+// the significant bit count of the `T`.
+pub fn pairs_of_unsigned_and_vec_of_bool_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, Vec<bool>)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = |n: &T| {
+                exhaustive_fixed_size_vecs_from_single(n.significant_bits(), exhaustive_bools())
+            };
+            Box::new(dependent_pairs(exhaustive_unsigned(), f))
+        }
+        GenerationMode::Random(_) => Box::new(random_pairs_of_primitive_and_vec_of_bool_var_2(
+            &EXAMPLE_SEED,
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(
+            special_random_pairs_of_unsigned_and_vec_of_bool_var_2(&EXAMPLE_SEED),
+        ),
+    }
+}
+
+fn special_random_pairs_of_signed_and_vec_of_bool_var_2<T: PrimitiveSigned + Rand>(
+    seed: &[u32],
+) -> RandomValueAndVecOfBoolVar2<T>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    RandomValueAndVecOfBoolVar2 {
+        xs: Box::new(special_random_signed(&scramble(seed, "naturals"))),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `T` and `Vec<bool>`, where `T` is signed and the length of the `Vec` is equal to the
+// significant bit count of the `T`.
+pub fn pairs_of_signed_and_vec_of_bool_var_2<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, Vec<bool>)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = |n: &T| {
+                exhaustive_fixed_size_vecs_from_single(
+                    u64::wrapping_from(n.to_bits_asc().len()),
+                    exhaustive_bools(),
+                )
+            };
+            Box::new(dependent_pairs(exhaustive_signed(), f))
+        }
+        GenerationMode::Random(_) => Box::new(random_pairs_of_primitive_and_vec_of_bool_var_2(
+            &EXAMPLE_SEED,
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(
+            special_random_pairs_of_signed_and_vec_of_bool_var_2(&EXAMPLE_SEED),
+        ),
+    }
 }
 
 pub fn strings(gm: NoSpecialGenerationMode) -> It<String> {

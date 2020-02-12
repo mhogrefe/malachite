@@ -35,7 +35,7 @@ pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
         return Vec::new();
     }
     let result_limb_count = pow >> Limb::LOG_WIDTH;
-    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     let result_limb_count = usize::exact_from(result_limb_count);
     if result_limb_count >= limbs.len() {
         return limbs.to_vec();
@@ -79,7 +79,7 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
         return;
     }
     let mut new_limb_count = pow >> Limb::LOG_WIDTH;
-    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
@@ -147,7 +147,7 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// the limbs of -in.
 pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     let mut new_limb_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    let leftover_bits = pow & u64::from(Limb::WIDTH_MASK);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
@@ -416,7 +416,7 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
                 Natural(Small(small)) => {
                     if small == 0 {
                         Natural::ZERO
-                    } else if other < u64::from(Limb::WIDTH) {
+                    } else if other < Limb::WIDTH {
                         Natural(Small(small.wrapping_neg().mod_power_of_two(other)))
                     } else {
                         let mut result =
@@ -473,7 +473,7 @@ impl NegModPowerOfTwoAssign for Natural {
             {
                 if *small == 0 {
                     Some(0)
-                } else if other < u64::from(Limb::WIDTH) {
+                } else if other < Limb::WIDTH {
                     Some(small.wrapping_neg().mod_power_of_two(other))
                 } else {
                     None

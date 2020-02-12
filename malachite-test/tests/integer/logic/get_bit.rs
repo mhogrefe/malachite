@@ -16,7 +16,7 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
-use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_u64};
+use malachite_test::inputs::integer::{natural_integers, pairs_of_integer_and_small_unsigned};
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -98,7 +98,7 @@ fn limbs_get_bit_neg_properties() {
 
 #[test]
 fn get_bit_properties() {
-    test_properties(pairs_of_integer_and_small_u64, |&(ref n, index)| {
+    test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, index)| {
         let bit = n.get_bit(index);
         assert_eq!(
             integer_to_rug_integer(n).get_bit(u32::exact_from(index)),

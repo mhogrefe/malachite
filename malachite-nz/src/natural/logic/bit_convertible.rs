@@ -40,7 +40,7 @@ pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
     let mut limbs = vec![0; limb_count];
     let mut limb_i = 0;
     let mut i = 0;
-    let width = u64::from(Limb::WIDTH);
+    let width = Limb::WIDTH;
     for &bit in bits {
         if bit {
             limbs[limb_i].set_bit(i);
@@ -88,7 +88,7 @@ pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
     }
     let mut limbs = vec![0; limb_count];
     let mut limb_i = limb_count - 1;
-    let width_minus_one = u64::from(Limb::WIDTH) - 1;
+    let width_minus_one = Limb::WIDTH - 1;
     let mut i = if remainder == 0 {
         width_minus_one
     } else {
@@ -143,7 +143,7 @@ impl BitConvertible for Natural {
         let last_index = usize::exact_from(self.limb_count()) - 1;
         let mut last = limbs[last_index];
         for limb in limbs.take(last_index) {
-            for i in 0..u64::from(Limb::WIDTH) {
+            for i in 0..Limb::WIDTH {
                 bits.push(limb.get_bit(i));
             }
         }
@@ -246,12 +246,12 @@ impl Natural {
         }
         let mut first = true;
         for limb in self.limbs().rev() {
-            let mut i = u64::from(if first {
+            let mut i = if first {
                 first = false;
-                Limb::WIDTH - limb.leading_zeros() - 1
+                Limb::WIDTH - u64::from(limb.leading_zeros()) - 1
             } else {
                 Limb::WIDTH - 1
-            });
+            };
             loop {
                 bits.push(limb.get_bit(i));
                 if i == 0 {

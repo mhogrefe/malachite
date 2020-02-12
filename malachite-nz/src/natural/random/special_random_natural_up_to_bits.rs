@@ -58,19 +58,20 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     let max_chunk_size = max(1, bits / (rng.gen_range(0, 4) + 1));
     let chunk_size_range = Range::new(1, max_chunk_size + 1);
     // Start i at a random position in the highest limb.
-    let mut i = (limb_count << T::LOG_WIDTH) - u64::from(rng.gen_range(0, T::WIDTH));
+    let mut i =
+        (limb_count << T::LOG_WIDTH) - u64::from(rng.gen_range(0, u32::exact_from(T::WIDTH)));
     loop {
         let mut chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         if i == 0 {
             break;
         }
-        limbs[usize::exact_from(i >> T::LOG_WIDTH)].clear_bit(i & u64::from(T::WIDTH_MASK));
+        limbs[usize::exact_from(i >> T::LOG_WIDTH)].clear_bit(i & T::WIDTH_MASK);
         chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
             &mut limbs[usize::exact_from(i >> T::LOG_WIDTH)..],
-            T::ONE << (i & u64::from(T::WIDTH_MASK)),
+            T::ONE << (i & T::WIDTH_MASK),
         );
         if i == 0 {
             break;

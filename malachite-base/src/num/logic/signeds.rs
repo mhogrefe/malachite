@@ -1,13 +1,126 @@
 use std::cmp::min;
+use std::cmp::Ordering;
+use std::ops::Index;
 
 use comparison::Max;
-use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
+use num::arithmetic::traits::{ModPowerOfTwo, Sign, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitScan, CheckedHammingDistance, SignificantBits,
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CheckedHammingDistance,
+    SignificantBits,
 };
+use num::logic::unsigneds::PrimitiveUnsignedBitIterator;
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub struct PrimitiveSignedBitIterator<T: PrimitiveSigned>(
+    PrimitiveUnsignedBitIterator<T::UnsignedOfEqualWidth>,
+);
+
+impl<T: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<T> {
+    type Item = bool;
+
+    /// A function to iterate through the bits of a primitive signed integer in ascending order
+    /// (least-significant first).
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// use malachite_base::num::logic::traits::BitIterable;
+    ///
+    /// assert_eq!(0i8.bits().next(), None);
+    ///
+    /// // -105 = 10010111 in two's complement
+    /// let mut bits = (-105i32).bits();
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(false));
+    /// assert_eq!(bits.next(), Some(true));
+    /// assert_eq!(bits.next(), None);
+    /// ```
+    fn next(&mut self) -> Option<bool> {
+        self.0.next()
+    }
+}
+
+impl<T: PrimitiveSigned> DoubleEndedIterator for PrimitiveSignedBitIterator<T> {
+    /// A function to iterate through the bits of a primitive signed integer in descending order
+    /// (most-significant first).
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// use malachite_base::num::logic::traits::BitIterable;
+    ///
+    /// assert_eq!(0i8.bits().next_back(), None);
+    ///
+    /// // -105 = 10010111 in two's complement
+    /// let mut bits = (-105i32).bits();
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(false));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), Some(true));
+    /// assert_eq!(bits.next_back(), None);
+    /// ```
+    fn next_back(&mut self) -> Option<bool> {
+        self.0.next_back()
+    }
+}
+
+impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
+    type Output = bool;
+
+    /// A function to retrieve bits by index. The index is the power of 2 of which the bit is a
+    /// coefficient. Indexing at or above the significant bit count returns false or true bits,
+    /// depending on the value's sign.
+    ///
+    /// This is equivalent to the `get_bit` function.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Example
+    /// ```
+    /// use malachite_base::num::logic::traits::BitIterable;
+    ///
+    /// assert_eq!(0i8.bits()[0], false);
+    ///
+    /// // -105 = 10010111 in two's complement
+    /// let bits = (-105i32).bits();
+    /// assert_eq!(bits[0], true);
+    /// assert_eq!(bits[1], true);
+    /// assert_eq!(bits[2], true);
+    /// assert_eq!(bits[3], false);
+    /// assert_eq!(bits[4], true);
+    /// assert_eq!(bits[5], false);
+    /// assert_eq!(bits[6], false);
+    /// assert_eq!(bits[7], true);
+    /// assert_eq!(bits[100], true);
+    /// ```
+    fn index(&self, index: u64) -> &bool {
+        if self.0[min(index, T::WIDTH - 1)] {
+            &true
+        } else {
+            &false
+        }
+    }
+}
 
 macro_rules! impl_logic_traits {
     ($t:ident, $u:ident) => {
@@ -131,7 +244,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                if index < u64::from(Self::WIDTH) {
+                if index < Self::WIDTH {
                     self & (1 << index) != 0
                 } else {
                     *self < 0
@@ -171,7 +284,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                if index < u64::from(Self::WIDTH) {
+                if index < Self::WIDTH {
                     *self |= 1 << index;
                 } else if *self >= 0 {
                     panic!(
@@ -217,7 +330,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                if index < u64::from(Self::WIDTH) {
+                if index < Self::WIDTH {
                     *self &= !(1 << index);
                 } else if *self < 0 {
                     panic!(
@@ -256,18 +369,18 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-                if start >= u64::from(Self::WIDTH) - 1 {
+                if start >= Self::WIDTH - 1 {
                     if self >= 0 {
                         Some(start)
                     } else {
                         None
                     }
                 } else {
-                    let index = (!(self | ((1 << start) - 1))).trailing_zeros();
+                    let index = u64::from((!(self | ((1 << start) - 1))).trailing_zeros());
                     if index == $t::WIDTH {
                         None
                     } else {
-                        Some(u64::from(index))
+                        Some(index)
                     }
                 }
             }
@@ -299,18 +412,18 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-                if start >= u64::from(Self::WIDTH) - 1 {
+                if start >= Self::WIDTH - 1 {
                     if self >= 0 {
                         None
                     } else {
                         Some(start)
                     }
                 } else {
-                    let index = (self & !((1 << start) - 1)).trailing_zeros();
+                    let index = u64::from((self & !((1 << start) - 1)).trailing_zeros());
                     if index == $t::WIDTH {
                         None
                     } else {
-                        Some(u64::from(index))
+                        Some(index)
                     }
                 }
             }
@@ -343,7 +456,7 @@ macro_rules! impl_logic_traits {
             /// ```
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
                 assert!(start <= end);
-                (if start >= u64::from($t::WIDTH) {
+                (if start >= $t::WIDTH {
                     if *self >= 0 {
                         0
                     } else {
@@ -399,7 +512,7 @@ macro_rules! impl_logic_traits {
                     }
                     *self = $t::wrapping_from(abs_self);
                 } else {
-                    let width = u64::from($t::WIDTH) - 1;
+                    let width = $t::WIDTH - 1;
                     let bits_width = end - start;
                     let bits = bits.mod_power_of_two(bits_width);
                     let max = Self::Bits::MAX;
@@ -499,7 +612,7 @@ macro_rules! impl_logic_traits {
                     if *self == 1 {
                         return bits;
                     }
-                    let mut mask = 1 << ($t::WIDTH - self.leading_zeros() - 2);
+                    let mut mask = 1 << ($t::WIDTH - u64::from(self.leading_zeros()) - 2);
                     while mask != 0 {
                         bits.push(*self & mask != 0);
                         mask >>= 1;
@@ -513,7 +626,7 @@ macro_rules! impl_logic_traits {
                     if *self == -2 {
                         return bits;
                     }
-                    let mut mask = 1 << ($t::WIDTH - (!*self).leading_zeros() - 2);
+                    let mut mask = 1 << ($t::WIDTH - u64::from((!*self).leading_zeros()) - 2);
                     while mask != 0 {
                         bits.push(*self & mask != 0);
                         mask >>= 1;
@@ -610,6 +723,56 @@ macro_rules! impl_logic_traits {
                     }
                     $t::wrapping_from(u)
                 }
+            }
+        }
+
+        impl BitIterable for $t {
+            type BitIterator = PrimitiveSignedBitIterator<$t>;
+
+            /// Returns a double-ended iterator over the bits of a primitive signed integer. The
+            /// forward order is ascending, so that less significant bits appear first. There are no
+            /// trailing sign bits going forward, or leading sign bits going backward.
+            ///
+            /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
+            /// `to_limbs_desc` instead.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::logic::traits::BitIterable;
+            ///
+            /// assert_eq!(0i8.bits().next(), None);
+            /// // 105 = 01101001b, with a leading false bit to indicate sign
+            /// assert_eq!(105i32.bits().collect::<Vec<bool>>(),
+            ///     vec![true, false, false, true, false, true, true, false]);
+            /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+            /// assert_eq!((-105i32).bits().collect::<Vec<bool>>(),
+            ///     vec![true, true, true, false, true, false, false, true]);
+            ///
+            /// assert_eq!(0i8.bits().next_back(), None);
+            /// // 105 = 01101001b, with a leading false bit to indicate sign
+            /// assert_eq!(105i32.bits().rev().collect::<Vec<bool>>(),
+            ///     vec![false, true, true, false, true, false, false, true]);
+            /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+            /// assert_eq!((-105i32).bits().rev().collect::<Vec<bool>>(),
+            ///     vec![true, false, false, true, false, true, true, true]);
+            /// ```
+            fn bits(self) -> PrimitiveSignedBitIterator<$t> {
+                let unsigned = $u::wrapping_from(self);
+                let significant_bits = match self.sign() {
+                    Ordering::Equal => 0,
+                    Ordering::Greater => unsigned.significant_bits() + 1,
+                    Ordering::Less => (!unsigned).significant_bits() + 1,
+                };
+                PrimitiveSignedBitIterator(PrimitiveUnsignedBitIterator {
+                    value: unsigned,
+                    some_remaining: significant_bits != 0,
+                    i_mask: 1,
+                    j_mask: 1 << significant_bits.saturating_sub(1),
+                })
             }
         }
     };

@@ -102,7 +102,7 @@ fn ceiling_log_two_fail() {
 fn limbs_floor_log_two_properties() {
     test_properties(vecs_of_unsigned_var_1, |limbs| {
         let floor_log_two = limbs_floor_log_two(limbs);
-        assert_eq!(limbs.len() == 1, floor_log_two < u64::from(Limb::WIDTH));
+        assert_eq!(limbs.len() == 1, floor_log_two < Limb::WIDTH);
         assert_eq!(floor_log_two, limbs_significant_bits(limbs) - 1);
         assert_eq!(
             floor_log_two,
@@ -117,7 +117,7 @@ fn limbs_ceiling_log_two_properties() {
         let ceiling_log_two = limbs_ceiling_log_two(limbs);
         assert_eq!(
             limbs.len() == 1 || limbs == &[0, 1],
-            ceiling_log_two <= u64::from(Limb::WIDTH)
+            ceiling_log_two <= Limb::WIDTH
         );
         assert_eq!(
             ceiling_log_two,
@@ -130,7 +130,7 @@ fn limbs_ceiling_log_two_properties() {
 fn floor_log_two_properties() {
     test_properties(positive_naturals, |x| {
         let floor_log_two = x.floor_log_two();
-        assert_eq!(*x <= Limb::MAX, floor_log_two < u64::from(Limb::WIDTH));
+        assert_eq!(*x <= Limb::MAX, floor_log_two < Limb::WIDTH);
         assert_eq!(floor_log_two, x.significant_bits() - 1);
         assert_eq!(floor_log_two, limbs_floor_log_two(&x.to_limbs_asc()));
         assert!(Natural::ONE << floor_log_two <= *x);
@@ -146,7 +146,7 @@ fn floor_log_two_properties() {
 fn ceiling_log_two_properties() {
     test_properties(positive_naturals, |x| {
         let ceiling_log_two = x.ceiling_log_two();
-        assert_eq!(*x <= Limb::MAX, ceiling_log_two <= u64::from(Limb::WIDTH));
+        assert_eq!(*x <= Limb::MAX, ceiling_log_two <= Limb::WIDTH);
         assert_eq!(ceiling_log_two, limbs_ceiling_log_two(&x.to_limbs_asc()));
         if ceiling_log_two != 0 {
             assert!(Natural::ONE << (ceiling_log_two - 1) < *x);

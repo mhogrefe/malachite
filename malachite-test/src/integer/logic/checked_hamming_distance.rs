@@ -4,7 +4,7 @@ use std::iter::repeat;
 use malachite_base::comparison::Max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
-    CheckedHammingDistance, HammingDistance, SignificantBits,
+    BitIterable, CheckedHammingDistance, HammingDistance, SignificantBits,
 };
 use malachite_nz::integer::logic::checked_hamming_distance::{
     limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
@@ -23,19 +23,11 @@ pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Optio
     if negative != (*y < 0) {
         return None;
     }
-    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =
-        if x.twos_complement_bits().count() >= y.twos_complement_bits().count() {
-            Box::new(
-                x.twos_complement_bits()
-                    .zip(y.twos_complement_bits().chain(repeat(negative))),
-            )
-        } else {
-            Box::new(
-                x.twos_complement_bits()
-                    .chain(repeat(negative))
-                    .zip(y.twos_complement_bits()),
-            )
-        };
+    let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> = if x.bits().count() >= y.bits().count() {
+        Box::new(x.bits().zip(y.bits().chain(repeat(negative))))
+    } else {
+        Box::new(x.bits().chain(repeat(negative)).zip(y.bits()))
+    };
     let mut distance = 0u64;
     for (b, c) in bit_zip {
         if b != c {
