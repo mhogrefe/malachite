@@ -20,9 +20,7 @@ where
         if T::LOG_WIDTH >= U::LOG_WIDTH {
             assert_eq!(xs_alt, xs);
         } else {
-            let number_of_extra_zeros = xs
-                .len()
-                .neg_mod_power_of_two(u64::from(U::LOG_WIDTH - T::LOG_WIDTH));
+            let number_of_extra_zeros = xs.len().neg_mod_power_of_two(U::LOG_WIDTH - T::LOG_WIDTH);
             let (xs_alt_lo, xs_alt_hi) = xs_alt.split_at(xs.len());
             assert_eq!(xs_alt_hi.len(), number_of_extra_zeros);
             assert_eq!(xs_alt_lo, xs);

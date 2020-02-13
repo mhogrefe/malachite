@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
+use malachite_base::num::logic::traits::CountOnes;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -67,6 +68,6 @@ fn count_ones_properties() {
     });
 
     test_properties(unsigneds::<Limb>, |&u| {
-        assert_eq!(Natural::from(u).count_ones(), u64::from(u.count_ones()));
+        assert_eq!(Natural::from(u).count_ones(), CountOnes::count_ones(u));
     });
 }

@@ -44,7 +44,7 @@ pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
     bits: u64,
 ) -> Vec<T> {
     assert_ne!(bits, 0);
-    let remainder_bits = bits.mod_power_of_two(u64::from(T::LOG_WIDTH));
+    let remainder_bits = bits.mod_power_of_two(T::LOG_WIDTH);
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
     let mut limbs: Vec<T> = Vec::with_capacity(usize::exact_from(limb_count));
     for _ in 0..limb_count {

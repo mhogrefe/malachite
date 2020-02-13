@@ -1,6 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::TrailingZeros;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
@@ -28,7 +29,7 @@ fn index_of_next_false_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Ran
     test_properties(unsigneds::<T>, |&n| {
         assert_eq!(
             n.index_of_next_false_bit(0),
-            Some(u64::from((!n).trailing_zeros()))
+            Some(TrailingZeros::trailing_zeros(!n))
         );
     });
 
@@ -51,7 +52,7 @@ fn index_of_next_true_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand
     test_properties(positive_unsigneds::<T>, |n| {
         assert_eq!(
             n.index_of_next_true_bit(0),
-            Some(u64::from(n.trailing_zeros()))
+            Some(TrailingZeros::trailing_zeros(*n))
         );
     });
 
@@ -86,7 +87,7 @@ where
     test_properties(signeds_var_1::<T>, |&n| {
         assert_eq!(
             n.index_of_next_false_bit(0),
-            Some(u64::from((!n).trailing_zeros()))
+            Some(TrailingZeros::trailing_zeros(!n))
         );
     });
 
@@ -122,7 +123,7 @@ where
     test_properties(signeds_var_1::<T>, |&n| {
         assert_eq!(
             n.index_of_next_true_bit(0),
-            Some(u64::from(n.trailing_zeros()))
+            Some(TrailingZeros::trailing_zeros(n))
         );
     });
 

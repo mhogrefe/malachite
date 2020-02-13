@@ -7,8 +7,8 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::ExactFrom;
 use num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, HammingDistance,
-    SignificantBits,
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, HammingDistance,
+    LeadingZeros, SignificantBits, TrailingZeros,
 };
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -184,7 +184,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn significant_bits(self) -> u64 {
-                Self::WIDTH - u64::from(self.leading_zeros())
+                Self::WIDTH - LeadingZeros::leading_zeros(self)
             }
         }
 
@@ -205,7 +205,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn hamming_distance(self, other: $t) -> u64 {
-                u64::from((self ^ other).count_ones())
+                CountOnes::count_ones(self ^ other)
             }
         }
 
@@ -351,7 +351,7 @@ macro_rules! impl_logic_traits {
                 Some(if start >= Self::WIDTH {
                     start
                 } else {
-                    u64::from((!(self | ((1 << start) - 1))).trailing_zeros())
+                    TrailingZeros::trailing_zeros(!(self | ((1 << start) - 1)))
                 })
             }
 
@@ -384,7 +384,7 @@ macro_rules! impl_logic_traits {
                 if start >= Self::WIDTH {
                     None
                 } else {
-                    let index = u64::from((self & !((1 << start) - 1)).trailing_zeros());
+                    let index = TrailingZeros::trailing_zeros(self & !((1 << start) - 1));
                     if index == Self::WIDTH {
                         None
                     } else {
@@ -528,7 +528,7 @@ macro_rules! impl_logic_traits {
                 if *self == 1 {
                     return bits;
                 }
-                let mut mask = 1 << ($t::WIDTH - u64::from(self.leading_zeros()) - 2);
+                let mut mask = 1 << ($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
                 while mask != 0 {
                     bits.push(*self & mask != 0);
                     mask >>= 1;

@@ -1,6 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 use rand::Rand;
 
 use malachite_test::common::test_properties;
@@ -14,7 +15,7 @@ fn hamming_distance_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         let distance = x.hamming_distance(y);
         assert_eq!(y.hamming_distance(x), distance);
         assert_eq!(distance == 0, x == y);
-        assert_eq!(u64::from((x ^ y).count_ones()), distance);
+        assert_eq!(CountOnes::count_ones(x ^ y), distance);
         assert_eq!((!x).hamming_distance(!y), distance);
     });
 
@@ -25,8 +26,8 @@ fn hamming_distance_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds::<T>, |&n| {
         assert_eq!(n.hamming_distance(n), 0);
         assert_eq!(n.hamming_distance(!n), T::WIDTH);
-        assert_eq!(n.hamming_distance(T::ZERO), u64::from(n.count_ones()));
-        assert_eq!(T::ZERO.hamming_distance(n), u64::from(n.count_ones()));
+        assert_eq!(n.hamming_distance(T::ZERO), CountOnes::count_ones(n));
+        assert_eq!(T::ZERO.hamming_distance(n), CountOnes::count_ones(n));
     });
 }
 
@@ -46,7 +47,7 @@ where
         let distance = x.checked_hamming_distance(y).unwrap();
         assert_eq!(y.checked_hamming_distance(x).unwrap(), distance);
         assert_eq!(distance == 0, x == y);
-        assert_eq!(u64::from((x ^ y).count_ones()), distance);
+        assert_eq!(CountOnes::count_ones(x ^ y), distance);
         assert_eq!((!x).checked_hamming_distance(!y).unwrap(), distance);
     });
 
@@ -65,22 +66,22 @@ where
     test_properties(natural_signeds::<T>, |&n| {
         assert_eq!(
             n.checked_hamming_distance(T::ZERO),
-            Some(u64::from(n.count_ones()))
+            Some(CountOnes::count_ones(n))
         );
         assert_eq!(
             T::ZERO.checked_hamming_distance(n),
-            Some(u64::from(n.count_ones()))
+            Some(CountOnes::count_ones(n))
         );
     });
 
     test_properties(negative_signeds::<T>, |&n| {
         assert_eq!(
             n.checked_hamming_distance(T::NEGATIVE_ONE),
-            Some(u64::from(n.count_zeros()))
+            Some(CountZeros::count_zeros(n))
         );
         assert_eq!(
             T::NEGATIVE_ONE.checked_hamming_distance(n),
-            Some(u64::from(n.count_zeros()))
+            Some(CountZeros::count_zeros(n))
         );
     });
 }

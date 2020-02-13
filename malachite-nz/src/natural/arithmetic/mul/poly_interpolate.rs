@@ -1,13 +1,9 @@
-use std::mem::swap;
-
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::ExactFrom;
-
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -29,6 +25,7 @@ use platform::{
     Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
     AORSMUL_FASTER_AORS_AORSLSH,
 };
+use std::mem::swap;
 
 /// Time: worst case O(k)
 ///
@@ -640,7 +637,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
 pub fn _limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
-    shift: u32,
+    shift: u64,
     scratch: &mut [Limb],
 ) -> Limb {
     let n = ys.len();
@@ -658,10 +655,9 @@ pub fn _limbs_shl_and_sub_same_length(
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// This is DO_mpn_subrsh from mpn/generic/toom_interpolate_8pts.c.
-fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u32, scratch: &mut [Limb]) {
+fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u64, scratch: &mut [Limb]) {
     assert!(!limbs_sub_limb_in_place(xs, ys[0] >> shift));
-    let carry =
-        _limbs_shl_and_sub_same_length(xs, &ys[1..], u32::exact_from(Limb::WIDTH) - shift, scratch);
+    let carry = _limbs_shl_and_sub_same_length(xs, &ys[1..], Limb::WIDTH - shift, scratch);
     assert!(!limbs_sub_limb_in_place(&mut xs[ys.len() - 1..], carry));
 }
 
@@ -669,19 +665,14 @@ fn _limbs_shl_and_sub_special(
     xs_init: &mut [Limb],
     xs_last: &mut Limb,
     ys: &[Limb],
-    shift: u32,
+    shift: u64,
     scratch: &mut [Limb],
 ) {
     let (ys_first, ys_tail) = ys.split_first().unwrap();
     if limbs_sub_limb_in_place(xs_init, *ys_first >> shift) {
         *xs_last = xs_last.checked_sub(1).unwrap();
     }
-    let carry = _limbs_shl_and_sub_same_length(
-        xs_init,
-        ys_tail,
-        u32::exact_from(Limb::WIDTH) - shift,
-        scratch,
-    );
+    let carry = _limbs_shl_and_sub_same_length(xs_init, ys_tail, Limb::WIDTH - shift, scratch);
     if limbs_sub_limb_in_place(&mut xs_init[ys_tail.len()..], carry) {
         *xs_last = xs_last.checked_sub(1).unwrap();
     }
@@ -1074,9 +1065,9 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
 }
 
 #[cfg(feature = "32_bit_limbs")]
-const CORRECTED_WIDTH: u32 = 42 - (Limb::WIDTH as u32);
+const CORRECTED_WIDTH: u64 = 42 - Limb::WIDTH;
 #[cfg(not(feature = "32_bit_limbs"))]
-const CORRECTED_WIDTH: u32 = 42;
+const CORRECTED_WIDTH: u64 = 42;
 
 /// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
 /// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
@@ -1199,12 +1190,8 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
                 _limbs_shl_and_sub_same_length(&mut r7[n + 1..], pp_lo, CORRECTED_WIDTH, scratch);
                 let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
                 assert!(!limbs_sub_limb_in_place(r1, pp_lo_first >> 6));
-                let carry = _limbs_shl_and_sub_same_length(
-                    r1,
-                    pp_lo_tail,
-                    u32::exact_from(Limb::WIDTH) - 6,
-                    scratch,
-                );
+                let carry =
+                    _limbs_shl_and_sub_same_length(r1, pp_lo_tail, Limb::WIDTH - 6, scratch);
                 limbs_sub_limb_in_place(&mut r1[2 * n - 1..], carry);
             } else {
                 let carry =

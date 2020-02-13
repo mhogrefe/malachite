@@ -59,9 +59,9 @@ pub trait PrimitiveFloat:
     const WIDTH: u64 = Self::UnsignedOfEqualWidth::WIDTH;
     const EXPONENT_WIDTH: u64 = Self::WIDTH - Self::MANTISSA_WIDTH - 1;
     const MANTISSA_WIDTH: u64;
-    const MIN_NORMAL_EXPONENT: i32 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
-    const MIN_EXPONENT: i32 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i32);
-    const MAX_EXPONENT: u32 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
+    const MIN_NORMAL_EXPONENT: i64 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
+    const MIN_EXPONENT: i64 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i64);
+    const MAX_EXPONENT: u64 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
     const MIN_POSITIVE: Self;
     const MAX_SUBNORMAL: Self;
     const MIN_POSITIVE_NORMAL: Self;
@@ -99,31 +99,31 @@ pub trait PrimitiveFloat:
 
     fn from_ordered_representation(n: Self::UnsignedOfEqualWidth) -> Self;
 
-    fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u32) {
+    fn to_adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u64) {
         let bits = self.to_bits();
         let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH);
-        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
+        let exponent: u64 = (bits >> Self::MANTISSA_WIDTH).exact_into();
         let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH);
         (mantissa, exponent)
     }
 
-    fn adjusted_exponent(self) -> u32 {
+    fn adjusted_exponent(self) -> u64 {
         let bits = self.to_bits();
-        let exponent: u32 = (bits >> Self::MANTISSA_WIDTH).exact_into();
+        let exponent: u64 = (bits >> Self::MANTISSA_WIDTH).exact_into();
         exponent.mod_power_of_two(Self::EXPONENT_WIDTH)
     }
 
     fn from_adjusted_mantissa_and_exponent(
         mantissa: Self::UnsignedOfEqualWidth,
-        exponent: u32,
+        exponent: u64,
     ) -> Self {
         Self::from_bits(
             (Self::UnsignedOfEqualWidth::exact_from(exponent) << Self::MANTISSA_WIDTH) + mantissa,
         )
     }
 
-    fn exponent(self) -> i32 {
-        i32::exact_from(self.adjusted_exponent()) - i32::exact_from(Self::MAX_EXPONENT)
+    fn exponent(self) -> i64 {
+        i64::exact_from(self.adjusted_exponent()) - i64::exact_from(Self::MAX_EXPONENT)
     }
 }
 

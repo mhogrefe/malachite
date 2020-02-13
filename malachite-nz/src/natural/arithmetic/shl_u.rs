@@ -76,11 +76,10 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c.
-pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb {
+pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb {
     let len = in_limbs.len();
     assert!(out.len() >= len);
     assert_ne!(bits, 0);
-    let bits = u64::from(bits);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
@@ -117,9 +116,8 @@ pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u32) -> Limb 
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, where rp == up.
-pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
+pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
-    let bits = u64::from(bits);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
@@ -158,7 +156,7 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u32) -> Limb {
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, where rp == up and the carry is appended to rp.
 pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
-    let small_bits = u32::exact_from(bits & Limb::WIDTH_MASK);
+    let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
         0
     } else {
@@ -200,11 +198,10 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 /// ```
 ///
 /// This is mpn_lshiftc from mpn/generic/mpn_lshiftc.
-pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u32) -> Limb {
+pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_ne!(bits, 0);
-    let bits = u64::from(bits);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut low_limb = *xs.last().unwrap();

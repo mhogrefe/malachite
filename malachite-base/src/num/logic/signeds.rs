@@ -9,7 +9,7 @@ use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CheckedHammingDistance,
-    SignificantBits,
+    CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
 use num::logic::unsigneds::PrimitiveUnsignedBitIterator;
 
@@ -165,7 +165,7 @@ macro_rules! impl_logic_traits {
             #[inline]
             fn checked_hamming_distance(self, other: $t) -> Option<u64> {
                 if (self >= 0) == (other >= 0) {
-                    Some(u64::from((self ^ other).count_ones()))
+                    Some(CountOnes::count_ones(self ^ other))
                 } else {
                     None
                 }
@@ -419,7 +419,7 @@ macro_rules! impl_logic_traits {
                         Some(start)
                     }
                 } else {
-                    let index = u64::from((self & !((1 << start) - 1)).trailing_zeros());
+                    let index = TrailingZeros::trailing_zeros(self & !((1 << start) - 1));
                     if index == $t::WIDTH {
                         None
                     } else {
@@ -626,7 +626,7 @@ macro_rules! impl_logic_traits {
                     if *self == -2 {
                         return bits;
                     }
-                    let mut mask = 1 << ($t::WIDTH - u64::from((!*self).leading_zeros()) - 2);
+                    let mut mask = 1 << ($t::WIDTH - LeadingZeros::leading_zeros(!*self) - 2);
                     while mask != 0 {
                         bits.push(*self & mask != 0);
                         mask >>= 1;

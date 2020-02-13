@@ -1,6 +1,7 @@
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::logic::traits::TrailingZeros;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -28,7 +29,7 @@ use platform::Limb;
 /// ```
 pub fn limbs_trailing_zeros(limbs: &[Limb]) -> u64 {
     let zero_limbs = limbs_leading_zero_limbs(limbs);
-    let remaining_zeros = u64::from(limbs[zero_limbs].trailing_zeros());
+    let remaining_zeros = TrailingZeros::trailing_zeros(limbs[zero_limbs]);
     (u64::wrapping_from(zero_limbs) << Limb::LOG_WIDTH) + remaining_zeros
 }
 
@@ -59,7 +60,7 @@ impl Natural {
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
             Natural(Small(0)) => None,
-            Natural(Small(small)) => Some(u64::from(small.trailing_zeros())),
+            Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(small)),
             Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
         }
     }

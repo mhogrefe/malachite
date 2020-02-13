@@ -10,9 +10,9 @@ use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_limb_var_1, pairs_of_unsigned_vec_and_small_unsigned,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_5,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_1,
+    triples_of_unsigned_vec_unsigned_vec_and_u64_var_5,
+    triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
 };
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
@@ -103,7 +103,7 @@ fn demo_limbs_shl(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_shl_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_limb_var_5(gm).take(limit)
+    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_u64_var_5(gm).take(limit)
     {
         let mut out = out.to_vec();
         let out_old = out.clone();
@@ -116,7 +116,7 @@ fn demo_limbs_shl_to_out(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, bits) in pairs_of_unsigned_vec_and_limb_var_1(gm).take(limit) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_u64_var_1(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let limbs_old = limbs.clone();
         let carry = limbs_slice_shl_in_place(&mut limbs, bits);
@@ -140,7 +140,7 @@ fn demo_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_shl_with_complement_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm).take(limit)
+    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm).take(limit)
     {
         let mut out = out.to_vec();
         let out_old = out.clone();
@@ -247,7 +247,7 @@ demos_and_benches!(
 
 fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shl(&[u32], u32)",
+        "limbs_shl(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -264,9 +264,9 @@ fn benchmark_limbs_shl(gm: GenerationMode, limit: usize, file_name: &str) {
 
 fn benchmark_limbs_shl_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shl_to_out(&mut [u32], &[u32], u32)",
+        "limbs_shl_to_out(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_5(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_5(gm),
         gm.name(),
         limit,
         file_name,
@@ -281,9 +281,9 @@ fn benchmark_limbs_shl_to_out(gm: GenerationMode, limit: usize, file_name: &str)
 
 fn benchmark_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_slice_shl_in_place(&mut [u32], u32)",
+        "limbs_slice_shl_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_limb_var_1(gm),
+        pairs_of_unsigned_vec_and_u64_var_1(gm),
         gm.name(),
         limit,
         file_name,
@@ -298,7 +298,7 @@ fn benchmark_limbs_slice_shl_in_place(gm: GenerationMode, limit: usize, file_nam
 
 fn benchmark_limbs_vec_shl_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_shl_in_place(&mut Vec<u32>, u32)",
+        "limbs_vec_shl_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -359,7 +359,7 @@ fn benchmark_limbs_shl_with_complement_to_out_algorithms(
     m_run_benchmark(
         "limbs_shl_with_complement_to_out(&mut [u32], &[u32], u32)",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm),
         gm.name(),
         limit,
         file_name,

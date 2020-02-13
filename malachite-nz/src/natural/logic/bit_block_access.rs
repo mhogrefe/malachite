@@ -1,8 +1,8 @@
 use malachite_base::limbs::{limbs_delete_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::round::RoundingMode;
 
 use natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
@@ -56,7 +56,7 @@ pub fn limbs_slice_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
         &limbs[limb_start..limb_end]
     })
     .to_vec();
-    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
+    let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut result_limbs, offset);
     }
@@ -100,7 +100,7 @@ pub fn limbs_vec_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Lim
     }
     limbs_mod_power_of_two_in_place(&mut limbs, end);
     limbs_delete_left(&mut limbs, limb_start);
-    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
+    let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);
     }
@@ -160,7 +160,7 @@ pub(crate) fn limbs_assign_bits_helper(
         limbs_not_in_place(limbs);
     }
     if start_remainder != 0 {
-        limbs_slice_shl_in_place(limbs, u32::wrapping_from(start_remainder));
+        limbs_slice_shl_in_place(limbs, start_remainder);
         limbs[0] |= original_first_limb.mod_power_of_two(start_remainder);
     }
     if end_remainder != 0 {
@@ -350,7 +350,7 @@ impl BitBlockAccess for Natural {
             if let Natural(Small(small_bits)) = bits {
                 let bits_width = end - start;
                 let small_bits = small_bits.mod_power_of_two(bits_width);
-                if small_bits == 0 || u64::from(small_bits.leading_zeros()) >= start {
+                if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
                     small_self.assign_bits(start, end, &small_bits);
                     return;
                 }

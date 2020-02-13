@@ -3,7 +3,7 @@ use malachite_base::limbs::limbs_delete_left;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
 use malachite_base::round::RoundingMode;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -50,7 +50,7 @@ use platform::Limb;
 /// ```
 pub fn limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let trailing_zeros = u64::from(limb.trailing_zeros());
+    let trailing_zeros = TrailingZeros::trailing_zeros(limb);
     if trailing_zeros >= end {
         return Vec::new();
     }
@@ -130,7 +130,7 @@ pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Lim
         &limbs[limb_start..limb_end]
     })
     .to_vec();
-    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
+    let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut result_limbs, offset);
     }
@@ -194,7 +194,7 @@ pub fn limbs_vec_neg_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
     limbs.truncate(limb_end);
     limbs_delete_left(&mut limbs, limb_start);
-    let offset = u32::exact_from(start & Limb::WIDTH_MASK);
+    let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);
     }
@@ -279,7 +279,7 @@ impl Natural {
             if let Natural(Small(ref mut small_self)) = self {
                 if let Natural(Small(small_bits)) = bits {
                     let small_bits = (!small_bits).mod_power_of_two(bits_width);
-                    if small_bits == 0 || u64::from(small_bits.leading_zeros()) >= start {
+                    if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
                         let mut new_small_self = *small_self - 1;
                         new_small_self.assign_bits(start, end, &small_bits);
                         let (sum, overflow) = new_small_self.overflowing_add(1);

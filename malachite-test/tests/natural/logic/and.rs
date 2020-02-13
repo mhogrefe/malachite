@@ -430,8 +430,8 @@ fn and_properties() {
         assert!(result <= *y);
 
         let ones = result.count_ones();
-        assert!(ones <= u64::from(x.count_ones()));
-        assert!(ones <= u64::from(y.count_ones()));
+        assert!(ones <= x.count_ones());
+        assert!(ones <= y.count_ones());
     });
 
     test_properties(naturals, |x| {

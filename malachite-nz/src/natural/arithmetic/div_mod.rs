@@ -10,7 +10,8 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
 
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
@@ -166,7 +167,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], divisor: L
     let len = in_limbs.len();
     assert!(len > 1);
     let out = &mut out[..len];
-    let bits = u64::from(divisor.leading_zeros());
+    let bits = LeadingZeros::leading_zeros(divisor);
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
         let (remainder, in_limbs_init) = in_limbs.split_last().unwrap();
@@ -254,7 +255,7 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
-    let bits = u64::from(divisor.leading_zeros());
+    let bits = LeadingZeros::leading_zeros(divisor);
     let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
@@ -1433,7 +1434,7 @@ pub fn _limbs_div_mod_barrett(
 fn _limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let ds_1 = ds[1];
-    let bits = ds_1.leading_zeros();
+    let bits = LeadingZeros::leading_zeros(ds_1);
     if bits == 0 {
         let mut ns = ns.to_vec();
         // always store n_len - 1 quotient limbs
@@ -1446,7 +1447,7 @@ fn _limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds:
         rs[1] = ns[1];
     } else {
         let ds_0 = ds[0];
-        let cobits = Limb::WIDTH - u64::from(bits);
+        let cobits = Limb::WIDTH - bits;
         let mut ns_shifted = vec![0; n_len + 1];
         let ns_shifted = &mut ns_shifted;
         let carry = limbs_shl_to_out(ns_shifted, ns, bits);
@@ -1498,7 +1499,7 @@ fn _limbs_div_mod_unbalanced(
     let ds_shifted: &[Limb];
     let mut ns_shifted_vec = vec![0; n_len + 1];
     let ns_shifted = &mut ns_shifted_vec;
-    let bits = ds.last().unwrap().leading_zeros();
+    let bits = LeadingZeros::leading_zeros(*ds.last().unwrap());
     if bits == 0 {
         ds_shifted = ds;
         ns_shifted[..n_len].copy_from_slice(ns);
@@ -1603,8 +1604,8 @@ pub(crate) fn _limbs_div_mod_balanced(
     let i_len = d_len - q_len;
     // Normalize the denominator by shifting it to the left such that its most significant bit is
     // set. Then shift the numerator the same amount, to mathematically preserve the quotient.
-    let bits = ds[d_len - 1].leading_zeros();
-    let cobits = u32::exact_from(Limb::WIDTH) - bits;
+    let bits = LeadingZeros::leading_zeros(ds[d_len - 1]);
+    let cobits = Limb::WIDTH - bits;
     let q_len_2 = q_len << 1;
     let m = n_len - q_len_2;
     let mut ns_shifted_vec = vec![0; q_len_2 + 1];
@@ -1662,7 +1663,7 @@ pub(crate) fn _limbs_div_mod_balanced(
     let mut r_len = q_len;
     let mut x = ds_lo_last << bits;
     if i_len >= 2 {
-        x |= ds[i_len - 2] >> 1 >> (u64::from(!bits) & Limb::WIDTH_MASK);
+        x |= ds[i_len - 2] >> 1 >> (!bits & Limb::WIDTH_MASK);
     }
     if ns_shifted[q_len - 1] < (DoubleLimb::from(x) * DoubleLimb::from(qs[q_len - 1])).upper_half()
     {
@@ -2976,7 +2977,7 @@ pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], in_limbs: &[Limb], divis
     assert!(out.len() >= len);
     let (highest_limb, in_limbs_init) = in_limbs.split_last().unwrap();
     let mut highest_limb = *highest_limb;
-    let bits = divisor.leading_zeros();
+    let bits = LeadingZeros::leading_zeros(divisor);
     if bits == 0 {
         let (out_last, out_init) = out.split_last_mut().unwrap();
         *out_last = if highest_limb >= divisor {
@@ -3013,7 +3014,7 @@ pub fn _limbs_div_limb_in_place_mod_alt(limbs: &mut [Limb], divisor: Limb) -> Li
     assert!(len > 1);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    let bits = divisor.leading_zeros();
+    let bits = LeadingZeros::leading_zeros(divisor);
     if bits == 0 {
         limbs[len_minus_1] = if highest_limb >= divisor {
             highest_limb -= divisor;

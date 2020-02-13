@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo, NegMod};
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::logic::traits::TrailingZeros;
 
 use integer::Integer;
 use natural::arithmetic::add::{limbs_add, limbs_add_limb};
@@ -94,7 +95,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> O
     assert_ne!(*modulus.last().unwrap(), 0);
     let m_0 = modulus[0];
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
-    let twos = u64::from(m_0.trailing_zeros());
+    let twos = TrailingZeros::trailing_zeros(m_0);
     if !xs[0].wrapping_neg().eq_mod_power_of_two(y, twos) {
         return Some(false);
     }
@@ -232,7 +233,7 @@ fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
     if !xs[0]
         .wrapping_neg()
-        .eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros()))
+        .eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(modulus))
     {
         return false;
     }
@@ -250,7 +251,7 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
     if !xs[0]
         .wrapping_neg()
-        .eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+        .eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(modulus[0]))
     {
         Some(false)
     } else {

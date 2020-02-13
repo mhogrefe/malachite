@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
 
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
@@ -77,7 +78,7 @@ pub fn _limbs_mod_limb_alt_3(limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
     assert!(len > 1);
-    let bits = u64::from(divisor.leading_zeros());
+    let bits = LeadingZeros::leading_zeros(divisor);
     let (limbs_last, limbs_init) = limbs.split_last().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
@@ -808,12 +809,12 @@ pub fn _limbs_mod_barrett(
 fn _limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     let n_len = ns.len();
     let ds_1 = ds[1];
-    let bits = ds_1.leading_zeros();
+    let bits = LeadingZeros::leading_zeros(ds_1);
     if bits == 0 {
         limbs_mod_by_two_limb_normalized(ns, ds)
     } else {
         let ds_0 = ds[0];
-        let cobits = Limb::WIDTH - u64::from(bits);
+        let cobits = Limb::WIDTH - bits;
         let mut ns_shifted = vec![0; n_len + 1];
         let ns_shifted = &mut ns_shifted;
         let carry = limbs_shl_to_out(ns_shifted, ns, bits);
@@ -846,7 +847,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
     let ds_shifted: &[Limb];
     let mut ns_shifted_vec = vec![0; n_len + 1];
     let ns_shifted = &mut ns_shifted_vec;
-    let bits = ds.last().unwrap().leading_zeros();
+    let bits = LeadingZeros::leading_zeros(*ds.last().unwrap());
     if bits == 0 {
         ds_shifted = ds;
         ns_shifted[..n_len].copy_from_slice(ns);
@@ -1877,14 +1878,14 @@ fn limbs_mod_limb_normalized_shl(
     high_limb: Limb,
     divisor: Limb,
     divisor_inverse: Limb,
-    bits: u32,
+    bits: u64,
 ) -> Limb {
     let len = limbs.len();
     if len == 1 {
         return mod_by_preinversion(high_limb, limbs[0] << bits, divisor, divisor_inverse);
     }
     let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
-    let cobits = Limb::WIDTH - u64::from(bits);
+    let cobits = Limb::WIDTH - bits;
     let second_highest_limb = limbs[len - 2];
     let highest_limb_after_shl = (limbs[len - 1] << bits) | (second_highest_limb >> cobits);
     let mut second_highest_limb_after_shl = second_highest_limb << bits;
@@ -1930,7 +1931,7 @@ pub fn _limbs_mod_limb_alt_1(limbs: &[Limb], divisor: Limb) -> Limb {
     assert!(len > 1);
     let len_minus_1 = len - 1;
     let mut highest_limb = limbs[len_minus_1];
-    let bits = divisor.leading_zeros();
+    let bits = LeadingZeros::leading_zeros(divisor);
     if bits == 0 {
         if highest_limb >= divisor {
             highest_limb -= divisor;
@@ -1939,7 +1940,7 @@ pub fn _limbs_mod_limb_alt_1(limbs: &[Limb], divisor: Limb) -> Limb {
         limbs_mod_limb_normalized(&limbs[..len_minus_1], highest_limb, divisor, limb_inverse)
     } else {
         let divisor = divisor << bits;
-        let cobits = Limb::WIDTH - u64::from(bits);
+        let cobits = Limb::WIDTH - bits;
         let limb_inverse = limbs_invert_limb(divisor);
         let remainder = mod_by_preinversion(
             highest_limb >> cobits,
@@ -2041,11 +2042,11 @@ pub fn _limbs_mod_limb_small_unnormalized_large(
     mut divisor: Limb,
     mut remainder: Limb,
 ) -> Limb {
-    let shift = divisor.leading_zeros();
+    let shift = LeadingZeros::leading_zeros(divisor);
     divisor <<= shift;
     let (limbs_last, limbs_init) = limbs.split_last().unwrap();
     let mut previous_limb = *limbs_last;
-    let co_shift = Limb::WIDTH - u64::from(shift);
+    let co_shift = Limb::WIDTH - shift;
     remainder = (remainder << shift) | (previous_limb >> co_shift);
     let divisor_inverse = limbs_invert_limb(divisor);
     for &limb in limbs_init.iter().rev() {
@@ -2150,7 +2151,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(limbs: &[Limb], divisor: Limb) -> Lim
 pub fn _limbs_mod_limb_any_leading_zeros_2(limbs: &[Limb], divisor: Limb) -> Limb {
     let len = limbs.len();
     assert!(len >= 2);
-    let shift = u64::from(divisor.leading_zeros());
+    let shift = LeadingZeros::leading_zeros(divisor);
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = if shift == 0 {
@@ -2217,9 +2218,9 @@ pub fn _limbs_mod_limb_any_leading_zeros_2(limbs: &[Limb], divisor: Limb) -> Lim
 pub fn _limbs_mod_limb_at_least_1_leading_zero(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
-    let shift = divisor.leading_zeros();
+    let shift = LeadingZeros::leading_zeros(divisor);
     assert_ne!(shift, 0);
-    let co_shift = Limb::WIDTH - u64::from(shift);
+    let co_shift = Limb::WIDTH - shift;
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = divisor

@@ -1,4 +1,5 @@
 use num::basic::traits::Zero;
+use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{
     BitAccess, BitConvertible, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft,
     RotateRight, TrailingZeros,
@@ -9,43 +10,43 @@ macro_rules! impl_logic_traits {
     ($t:ident) => {
         impl CountZeros for $t {
             #[inline]
-            fn count_zeros(self) -> u32 {
-                $t::count_zeros(self)
+            fn count_zeros(self) -> u64 {
+                u64::from($t::count_zeros(self))
             }
         }
 
         impl CountOnes for $t {
             #[inline]
-            fn count_ones(self) -> u32 {
-                $t::count_ones(self)
+            fn count_ones(self) -> u64 {
+                u64::from($t::count_ones(self))
             }
         }
 
         impl LeadingZeros for $t {
             #[inline]
-            fn leading_zeros(self) -> u32 {
-                $t::leading_zeros(self)
+            fn leading_zeros(self) -> u64 {
+                u64::from($t::leading_zeros(self))
             }
         }
 
         impl TrailingZeros for $t {
             #[inline]
-            fn trailing_zeros(self) -> u32 {
-                $t::trailing_zeros(self)
+            fn trailing_zeros(self) -> u64 {
+                u64::from($t::trailing_zeros(self))
             }
         }
 
         impl RotateLeft for $t {
             #[inline]
-            fn rotate_left(self, n: u32) -> $t {
-                $t::rotate_left(self, n)
+            fn rotate_left(self, n: u64) -> $t {
+                $t::rotate_left(self, u32::wrapping_from(n))
             }
         }
 
         impl RotateRight for $t {
             #[inline]
-            fn rotate_right(self, n: u32) -> $t {
-                $t::rotate_right(self, n)
+            fn rotate_right(self, n: u64) -> $t {
+                $t::rotate_right(self, u32::wrapping_from(n))
             }
         }
 

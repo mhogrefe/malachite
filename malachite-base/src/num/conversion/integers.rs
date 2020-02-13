@@ -2,7 +2,8 @@ use std::num::ParseIntError;
 
 use comparison::{Max, Min};
 use num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, FromStrRadix, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
+    WrappingFrom,
 };
 
 /// This macro defines conversions from a type to itself.
@@ -480,8 +481,8 @@ macro_rules! impl_conversion_traits {
     ($t:ident) => {
         impl FromStrRadix for $t {
             #[inline]
-            fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError> {
-                $t::from_str_radix(src, radix)
+            fn from_str_radix(src: &str, radix: u64) -> Result<Self, ParseIntError> {
+                $t::from_str_radix(src, u32::exact_from(radix))
             }
         }
     };

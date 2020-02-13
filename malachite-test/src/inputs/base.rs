@@ -11,7 +11,9 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
 };
-use malachite_base::num::logic::traits::{BitAccess, BitBlockAccess, BitConvertible, BitIterable};
+use malachite_base::num::logic::traits::{
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros,
+};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
@@ -496,7 +498,7 @@ fn limbs_range_2(gm: GenerationMode) -> It<Limb> {
         GenerationMode::SpecialRandom(_) => {
             Box::new(special_random_unsigned::<Limb>(&EXAMPLE_SEED).map(|u| {
                 let mut u = u;
-                u.clear_bit(u64::from(u32::WIDTH - 1));
+                u.clear_bit(u32::WIDTH - 1);
                 u
             }))
         }
@@ -3014,7 +3016,7 @@ fn unsigned_assign_bits_valid<T: PrimitiveUnsigned>(start: u64, end: u64, bits: 
     start <= end && {
         let bits_width = end - start;
         let bits = bits.mod_power_of_two(bits_width);
-        bits == T::ZERO || u64::from(bits.leading_zeros()) >= start
+        bits == T::ZERO || LeadingZeros::leading_zeros(bits) >= start
     }
 }
 
@@ -3623,7 +3625,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2<
                 special_random_unsigned::<T>(seed)
                     .map(|mut u| {
                         u.clear_bit(T::WIDTH - 1);
-                        u.clear_bit(u64::from(T::WIDTH - 2));
+                        u.clear_bit(T::WIDTH - 2);
                         u
                     })
                     .filter(|&u| u != T::ZERO)
@@ -3718,34 +3720,34 @@ pub(crate) fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
     }
 }
 
-// All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive.
-pub fn pairs_of_unsigned_vec_and_limb_var_1<T: PrimitiveUnsigned + Rand>(
+// All pairs of `Vec<T>` where `T` is unsigned, and a `u64` between 1 and 31, inclusive.
+pub fn pairs_of_unsigned_vec_and_u64_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<(Vec<T>, u32)> {
+) -> It<(Vec<T>, u64)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs(exhaustive_unsigned()),
-            range_increasing(1, u32::exact_from(u32::WIDTH - 1)),
+            range_increasing(1, u32::WIDTH - 1),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
         )),
     }
 }
 
-// All pairs of `Vec<T>` where `T` is unsigned, and a `u32` between 1 and 31, inclusive, where the
+// All pairs of `Vec<T>` where `T` is unsigned, and a `u64` between 1 and 31, inclusive, where the
 // `Vec` is nonempty.
-pub fn pairs_of_unsigned_vec_and_limb_var_2<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_unsigned_vec_and_u64_var_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<(Vec<T>, u32)> {
-    Box::new(pairs_of_unsigned_vec_and_limb_var_1(gm).filter(|&(ref xs, _)| !xs.is_empty()))
+) -> It<(Vec<T>, u64)> {
+    Box::new(pairs_of_unsigned_vec_and_u64_var_1(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
 pub fn pairs_of_unsigned_vec_and_small_unsigned<
@@ -4035,50 +4037,50 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3<T: PrimitiveUnsig
     )
 }
 
-// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned and the `u32` is between 1 and
+// All triples of `Vec<T>`, `Vec<T>`, and `u64` where `T` is unsigned and the `u64` is between 1 and
 // 31, inclusive.
-fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_4<T: PrimitiveUnsigned + Rand>(
+fn triples_of_unsigned_vec_unsigned_vec_and_u64_var_4<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, u32)> {
+) -> It<(Vec<T>, Vec<T>, u64)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs(exhaustive_unsigned()),
-            range_increasing(1, u32::exact_from(u32::WIDTH - 1)),
+            range_increasing(1, u32::WIDTH - 1),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| random_range(seed, 1, u32::exact_from(u32::WIDTH - 1))),
+            &(|seed| random_range(seed, 1, u32::WIDTH - 1)),
         )),
     }
 }
 
-// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned, the first `Vec` is at least
-// as long as the second, and the `u32` is between 1 and 31, inclusive.
-pub fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_5<T: PrimitiveUnsigned + Rand>(
+// All triples of `Vec<T>`, `Vec<T>`, and `u64` where `T` is unsigned, the first `Vec` is at least
+// as long as the second, and the `u64` is between 1 and 31, inclusive.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_u64_var_5<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, u32)> {
+) -> It<(Vec<T>, Vec<T>, u64)> {
     Box::new(
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_4(gm)
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_4(gm)
             .filter(|&(ref out, ref in_limbs, _)| out.len() >= in_limbs.len()),
     )
 }
 
-// All triples of `Vec<T>`, `Vec<T>`, and `u32` where `T` is unsigned, the first `Vec` is at least
-// as long as the second, the second is nonempty, and the `u32` is between 1 and 31, inclusive.
-pub fn triples_of_unsigned_vec_unsigned_vec_and_limb_var_6<T: PrimitiveUnsigned + Rand>(
+// All triples of `Vec<T>`, `Vec<T>`, and `u64` where `T` is unsigned, the first `Vec` is at least
+// as long as the second, the second is nonempty, and the `u64` is between 1 and 31, inclusive.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_u64_var_6<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, u32)> {
+) -> It<(Vec<T>, Vec<T>, u64)> {
     Box::new(
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_4(gm).filter(
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_4(gm).filter(
             |&(ref out, ref in_limbs, _)| !in_limbs.is_empty() && out.len() >= in_limbs.len(),
         ),
     )

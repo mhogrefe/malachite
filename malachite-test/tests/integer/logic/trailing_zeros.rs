@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
 
@@ -54,7 +55,7 @@ fn trailing_zeros_properties() {
     test_properties(nonzero_signeds::<SignedLimb>, |&i| {
         assert_eq!(
             Integer::from(i).trailing_zeros(),
-            Some(u64::from(i.trailing_zeros()))
+            Some(TrailingZeros::trailing_zeros(i))
         );
     });
 }

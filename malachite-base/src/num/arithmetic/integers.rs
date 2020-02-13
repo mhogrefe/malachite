@@ -12,7 +12,7 @@ use num::arithmetic::traits::{
     WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub,
     WrappingSubAssign,
 };
-use num::conversion::traits::WrappingFrom;
+use num::conversion::traits::{ExactFrom, WrappingFrom};
 use round::RoundingMode;
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
@@ -72,12 +72,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl CheckedPow<u32> for $t {
+        impl CheckedPow<u64> for $t {
             type Output = $t;
 
             #[inline]
-            fn checked_pow(self, exp: u32) -> Option<$t> {
-                $t::checked_pow(self, exp)
+            fn checked_pow(self, exp: u64) -> Option<$t> {
+                $t::checked_pow(self, u32::exact_from(exp))
             }
         }
 
@@ -108,12 +108,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl SaturatingPow<u32> for $t {
+        impl SaturatingPow<u64> for $t {
             type Output = $t;
 
             #[inline]
-            fn saturating_pow(self, rhs: u32) -> $t {
-                $t::saturating_pow(self, rhs)
+            fn saturating_pow(self, rhs: u64) -> $t {
+                $t::saturating_pow(self, u32::exact_from(rhs))
             }
         }
 
@@ -171,12 +171,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl WrappingPow<u32> for $t {
+        impl WrappingPow<u64> for $t {
             type Output = $t;
 
             #[inline]
-            fn wrapping_pow(self, rhs: u32) -> $t {
-                $t::wrapping_pow(self, rhs)
+            fn wrapping_pow(self, rhs: u64) -> $t {
+                $t::wrapping_pow(self, u32::exact_from(rhs))
             }
         }
 
@@ -234,21 +234,21 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl OverflowingPow<u32> for $t {
+        impl OverflowingPow<u64> for $t {
             type Output = $t;
 
             #[inline]
-            fn overflowing_pow(self, rhs: u32) -> ($t, bool) {
-                $t::overflowing_pow(self, rhs)
+            fn overflowing_pow(self, rhs: u64) -> ($t, bool) {
+                $t::overflowing_pow(self, u32::exact_from(rhs))
             }
         }
 
-        impl Pow<u32> for $t {
+        impl Pow<u64> for $t {
             type Output = $t;
 
             #[inline]
-            fn pow(self, exp: u32) -> $t {
-                $t::pow(self, exp)
+            fn pow(self, exp: u64) -> $t {
+                $t::pow(self, u32::exact_from(exp))
             }
         }
 

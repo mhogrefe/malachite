@@ -211,7 +211,7 @@ impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
                 self.first_nonzero_index = Some(i);
             }
             let first_nonzero_index = self.first_nonzero_index.unwrap();
-            if previous_j <= u64::exact_from(first_nonzero_index) {
+            if previous_j <= u64::wrapping_from(first_nonzero_index) {
                 limb.wrapping_neg()
             } else {
                 !limb

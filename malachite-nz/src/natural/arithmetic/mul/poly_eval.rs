@@ -1,10 +1,7 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
-
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_to_out, limbs_slice_add_greater_in_place_left,
@@ -14,6 +11,7 @@ use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 /// the last, which has width `n_high` limbs.
@@ -356,12 +354,12 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     degree: usize,
     poly: &[Limb],
     n: usize,
-    shift: u32,
+    shift: u64,
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree >= 3);
-    let degree_u32 = u32::exact_from(degree);
-    assert!(shift * degree_u32 < u32::exact_from(Limb::WIDTH));
+    let degree_u64 = u64::exact_from(degree);
+    assert!(shift * degree_u64 < Limb::WIDTH);
     assert_eq!(v_2_pow.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
@@ -404,7 +402,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
         }
     }
 
-    v_neg_2_pow[n_high] = limbs_shl_to_out(v_neg_2_pow, coefficients[degree], degree_u32 * shift);
+    v_neg_2_pow[n_high] = limbs_shl_to_out(v_neg_2_pow, coefficients[degree], degree_u64 * shift);
     if degree.even() {
         limbs_slice_add_greater_in_place_left(v_2_pow, &v_neg_2_pow[..n_high + 1]);
     } else {
@@ -434,7 +432,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
 pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
-    shift: u32,
+    shift: u64,
     scratch: &mut [Limb],
 ) -> Limb {
     let n = ys.len();
@@ -462,19 +460,19 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     degree: usize,
     poly: &[Limb],
     n: usize,
-    shift: u32,
+    shift: u64,
     scratch: &mut [Limb],
 ) -> bool {
     assert_ne!(shift, 0); // or `_limbs_mul_toom_evaluate_poly_in_1_and_neg_1` should be used
     assert!(degree > 1);
-    let degree_u32 = u32::exact_from(degree);
+    let degree_u64 = u64::exact_from(degree);
     assert_eq!(v_2_pow_neg.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
     assert_eq!(coefficients.len(), degree + 1);
 
-    v_2_pow_neg[n] = limbs_shl_to_out(v_2_pow_neg, coefficients[0], shift * degree_u32);
-    scratch[n] = limbs_shl_to_out(scratch, coefficients[1], shift * (degree_u32 - 1));
+    v_2_pow_neg[n] = limbs_shl_to_out(v_2_pow_neg, coefficients[0], shift * degree_u64);
+    scratch[n] = limbs_shl_to_out(scratch, coefficients[1], shift * (degree_u64 - 1));
     if degree.even() {
         assert!(!limbs_slice_add_greater_in_place_left(
             v_2_pow_neg,
@@ -494,7 +492,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
         v_2_pow_neg[n].wrapping_add_assign(carry);
     }
     let mut i = 2;
-    let mut local_shift = shift * (degree_u32 - 2);
+    let mut local_shift = shift * (degree_u64 - 2);
     while i < degree - 1 {
         let carry = _limbs_shl_and_add_same_length_in_place_left(
             v_2_pow_neg,

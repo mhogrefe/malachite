@@ -1,6 +1,7 @@
 use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::logic::traits::TrailingZeros;
 
 use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
@@ -52,8 +53,8 @@ pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool 
 pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     assert!(limbs.len() > 1);
     if divisor.even() {
-        let twos = divisor.trailing_zeros();
-        limbs[0].divisible_by_power_of_two(u64::from(twos))
+        let twos = TrailingZeros::trailing_zeros(divisor);
+        limbs[0].divisible_by_power_of_two(twos)
             && limbs_mod_exact_odd_limb(limbs, divisor >> twos, 0) == 0
     } else {
         limbs_mod_exact_odd_limb(limbs, divisor, 0) == 0
@@ -119,12 +120,11 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
-    let trailing_zeros = d_0.trailing_zeros();
+    let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low =
-                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
+            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -228,12 +228,11 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
-    let trailing_zeros = d_0.trailing_zeros();
+    let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low =
-                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
+            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -338,12 +337,11 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
-    let trailing_zeros = d_0.trailing_zeros();
+    let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low =
-                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
+            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
@@ -445,12 +443,11 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
             limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
-    let trailing_zeros = d_0.trailing_zeros();
+    let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
     if d_len == 2 {
         let d_1 = ds[1];
         if d_1 <= d_mask {
-            let d_low =
-                (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - u64::from(trailing_zeros)));
+            let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
                 limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {

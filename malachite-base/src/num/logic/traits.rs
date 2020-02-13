@@ -2,22 +2,22 @@ use std::ops::Index;
 
 /// Returns the number of ones in the binary representation of `self`.
 pub trait CountOnes {
-    fn count_ones(self) -> u32;
+    fn count_ones(self) -> u64;
 }
 
 /// Returns the number of zeros in the binary representation of `self`.
 pub trait CountZeros {
-    fn count_zeros(self) -> u32;
+    fn count_zeros(self) -> u64;
 }
 
 /// Returns the number of leading zeros in the binary representation of `self`.
 pub trait LeadingZeros {
-    fn leading_zeros(self) -> u32;
+    fn leading_zeros(self) -> u64;
 }
 
 /// Returns the number of trailing zeros in the binary representation of `self`.
 pub trait TrailingZeros {
-    fn trailing_zeros(self) -> u32;
+    fn trailing_zeros(self) -> u64;
 }
 
 /// Shifts the bits to the left by a specified amount, `n`, wrapping the truncated bits to the end
@@ -25,7 +25,7 @@ pub trait TrailingZeros {
 ///
 /// Please note this isn't the same operation as `<<`!
 pub trait RotateLeft {
-    fn rotate_left(self, n: u32) -> Self;
+    fn rotate_left(self, n: u64) -> Self;
 }
 
 /// Shifts the bits to the right by a specified amount, `n`, wrapping the truncated bits to the end
@@ -33,7 +33,7 @@ pub trait RotateLeft {
 ///
 /// Please note this isn't the same operation as `>>`!
 pub trait RotateRight {
-    fn rotate_right(self, n: u32) -> Self;
+    fn rotate_right(self, n: u64) -> Self;
 }
 
 /// Replaces a number with its bitwise negation.

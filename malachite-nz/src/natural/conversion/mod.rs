@@ -2,7 +2,6 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
 
 use error::ParseIntegerError;
 use natural::InnerNatural::{Large, Small};
@@ -10,10 +9,10 @@ use natural::Natural;
 
 impl Natural {
     //TODO test
-    pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
+    pub fn assign_str_radix(&mut self, src: &str, radix: u64) -> Result<(), ParseIntegerError> {
         assert!(!src.starts_with('-'));
         *self = Natural::ZERO;
-        let radix = Natural::exact_from(radix);
+        let radix = Natural::from(radix);
         for c in src.chars() {
             *self *= &radix;
             if c >= '0' && c <= '9' {
@@ -24,7 +23,7 @@ impl Natural {
     }
 
     //TODO test
-    pub fn from_str_radix(src: &str, radix: i32) -> Result<Natural, ParseIntegerError> {
+    pub fn from_str_radix(src: &str, radix: u64) -> Result<Natural, ParseIntegerError> {
         let mut i = Natural::ZERO;
         i.assign_str_radix(src, radix)?;
         Ok(i)
@@ -36,7 +35,7 @@ impl Natural {
     }
 }
 
-fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
+fn make_string(i: &Natural, radix: u64, to_upper: bool) -> String {
     assert!(!to_upper);
     assert!(radix >= 2 && radix <= 36, "radix out of range");
     if *i == 0 {
@@ -60,7 +59,7 @@ fn make_string(i: &Natural, radix: i32, to_upper: bool) -> String {
 fn fmt_radix(
     i: &Natural,
     f: &mut Formatter,
-    radix: i32,
+    radix: u64,
     to_upper: bool,
     prefix: &str,
 ) -> fmt::Result {

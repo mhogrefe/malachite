@@ -6,6 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::logic::traits::TrailingZeros;
 
 use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::divisible_by::{
@@ -113,11 +114,8 @@ pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool
     assert_ne!(modulus, 0);
     assert!(limbs.len() > 1);
     let remainder = if modulus.even() {
-        let twos = modulus.trailing_zeros();
-        if !limbs[0]
-            .wrapping_sub(limb)
-            .divisible_by_power_of_two(u64::from(twos))
-        {
+        let twos = TrailingZeros::trailing_zeros(modulus);
+        if !limbs[0].wrapping_sub(limb).divisible_by_power_of_two(twos) {
             return false;
         }
         limbs_mod_exact_odd_limb(limbs, modulus >> twos, limb)
@@ -149,9 +147,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
     if m_len == 2 && m_0 != 0 {
         let m_1 = modulus[1];
         if m_1 < 1 << m_trailing_zeros {
-            let m_0_trailing_zeros = m_0.trailing_zeros();
-            let m_0 = (m_0 >> m_0_trailing_zeros)
-                | (m_1 << (Limb::WIDTH - u64::from(m_0_trailing_zeros)));
+            let m_0_trailing_zeros = TrailingZeros::trailing_zeros(m_0);
+            let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
                 let r = limbs_mod_limb(xs, m_0);
                 if y < m_0 {
@@ -519,7 +516,7 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
     if xs == ys {
         Some(true)
     } else if m_len > x_len
-        || !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+        || !xs[0].eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(modulus[0]))
     {
         // Either: x < m, y < m, and x != y, so x != y mod m
         // Or: xs != ys mod low zero bits of m_0

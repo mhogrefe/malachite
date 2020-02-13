@@ -49,7 +49,7 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     bits: u64,
 ) -> Vec<T> {
     assert_ne!(bits, 0);
-    let remainder_bits = bits.mod_power_of_two(u64::from(T::LOG_WIDTH));
+    let remainder_bits = bits.mod_power_of_two(T::LOG_WIDTH);
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
     // Initialize the value to all binary 1s; later we'll remove chunks to create blocks of 0s.
     let mut limbs = vec![T::MAX; usize::exact_from(limb_count)];

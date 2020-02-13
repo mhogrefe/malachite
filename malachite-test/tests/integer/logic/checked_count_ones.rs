@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::num::logic::traits::CountOnes;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 
@@ -51,7 +52,7 @@ fn checked_count_ones_properties() {
     test_properties(natural_signeds::<SignedLimb>, |&i| {
         assert_eq!(
             Integer::from(i).checked_count_ones(),
-            Some(u64::from(i.count_ones()))
+            Some(CountOnes::count_ones(i))
         );
     });
 }

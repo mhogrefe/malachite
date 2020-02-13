@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use malachite_base::num::logic::traits::CountZeros;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -78,7 +79,7 @@ fn checked_count_zeros_properties() {
     test_properties(negative_signeds::<SignedLimb>, |&i| {
         assert_eq!(
             Integer::from(i).checked_count_zeros(),
-            Some(u64::from(i.count_zeros()))
+            Some(CountZeros::count_zeros(i))
         );
     });
 }

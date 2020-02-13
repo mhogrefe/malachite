@@ -2,7 +2,7 @@ use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::BitScan;
+use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -107,7 +107,7 @@ pub fn limbs_index_of_next_true_bit(limbs: &[Limb], start: u64) -> Option<u64> {
         let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
         Some(
             result_offset
-                .checked_add(u64::from(limbs[true_index].trailing_zeros()))
+                .checked_add(TrailingZeros::trailing_zeros(limbs[true_index]))
                 .unwrap(),
         )
     }

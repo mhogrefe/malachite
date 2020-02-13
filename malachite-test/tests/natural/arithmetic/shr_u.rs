@@ -24,11 +24,11 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_positive_unsigned_and_small_unsigned, pairs_of_unsigned_and_rounding_mode,
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_limb_var_2,
-    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
+    pairs_of_unsigned_vec_and_small_unsigned_var_1, pairs_of_unsigned_vec_and_u64_var_2,
     triples_of_unsigned_small_unsigned_and_rounding_mode_var_1,
     triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6, unsigneds,
+    triples_of_unsigned_vec_unsigned_vec_and_u64_var_6, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_rounding_mode, pairs_of_natural_and_small_unsigned,
@@ -199,7 +199,7 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
 #[test]
 fn test_limbs_shr_to_out() {
     let test =
-        |out_before: &[Limb], limbs_in: &[Limb], bits: Limb, carry: Limb, out_after: &[Limb]| {
+        |out_before: &[Limb], limbs_in: &[Limb], bits: u64, carry: Limb, out_after: &[Limb]| {
             let mut out = out_before.to_vec();
             assert_eq!(limbs_shr_to_out(&mut out, limbs_in, bits), carry);
             assert_eq!(out, out_after);
@@ -277,7 +277,7 @@ fn limbs_shr_to_out_fail_4() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_shr_in_place() {
-    let test = |limbs: &[Limb], bits: Limb, carry: Limb, out: &[Limb]| {
+    let test = |limbs: &[Limb], bits: u64, carry: Limb, out: &[Limb]| {
         let mut limbs = limbs.to_vec();
         assert_eq!(limbs_slice_shr_in_place(&mut limbs, bits), carry);
         assert_eq!(limbs, out);
@@ -399,7 +399,7 @@ fn limbs_shr_round_properties() {
 #[test]
 fn limbs_shr_to_out_properties() {
     test_properties(
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
         |&(ref out, ref in_limbs, bits)| {
             let mut out = out.to_vec();
             let old_out = out.clone();
@@ -419,20 +419,17 @@ fn limbs_shr_to_out_properties() {
 
 #[test]
 fn limbs_slice_shr_in_place_properties() {
-    test_properties(
-        pairs_of_unsigned_vec_and_limb_var_2,
-        |&(ref limbs, bits)| {
-            let mut limbs = limbs.to_vec();
-            let old_limbs = limbs.clone();
-            let carry = limbs_slice_shr_in_place(&mut limbs, bits);
-            let n = Natural::from_limbs_asc(&old_limbs);
-            let m = &n >> bits;
-            assert_eq!(carry == 0, &m << bits == n);
-            let mut expected_limbs = m.into_limbs_asc();
-            expected_limbs.resize(limbs.len(), 0);
-            assert_eq!(limbs, expected_limbs);
-        },
-    );
+    test_properties(pairs_of_unsigned_vec_and_u64_var_2, |&(ref limbs, bits)| {
+        let mut limbs = limbs.to_vec();
+        let old_limbs = limbs.clone();
+        let carry = limbs_slice_shr_in_place(&mut limbs, bits);
+        let n = Natural::from_limbs_asc(&old_limbs);
+        let m = &n >> bits;
+        assert_eq!(carry == 0, &m << bits == n);
+        let mut expected_limbs = m.into_limbs_asc();
+        expected_limbs.resize(limbs.len(), 0);
+        assert_eq!(limbs, expected_limbs);
+    });
 }
 
 #[test]

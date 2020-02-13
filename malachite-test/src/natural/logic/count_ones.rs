@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
+use malachite_base::num::logic::traits::{BitIterable, CountOnes, SignificantBits};
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 
@@ -12,7 +12,7 @@ pub fn natural_count_ones_alt_1(n: &Natural) -> u64 {
 }
 
 pub fn natural_count_ones_alt_2(n: &Natural) -> u64 {
-    n.limbs().map(|limb| u64::from(limb.count_ones())).sum()
+    n.limbs().map(|limb| CountOnes::count_ones(limb)).sum()
 }
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

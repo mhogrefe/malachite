@@ -1,6 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, LeadingZeros};
 
 use natural::Natural;
 use platform::Limb;
@@ -248,7 +248,7 @@ impl Natural {
         for limb in self.limbs().rev() {
             let mut i = if first {
                 first = false;
-                Limb::WIDTH - u64::from(limb.leading_zeros()) - 1
+                Limb::WIDTH - LeadingZeros::leading_zeros(limb) - 1
             } else {
                 Limb::WIDTH - 1
             };

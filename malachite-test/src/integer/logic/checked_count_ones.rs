@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
+use malachite_base::num::logic::traits::{BitIterable, CountOnes, SignificantBits};
 use malachite_nz::integer::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -17,7 +17,7 @@ pub fn integer_checked_count_ones_alt_2(n: &Integer) -> Option<u64> {
     if *n >= 0 {
         Some(
             n.twos_complement_limbs()
-                .map(|limb| u64::from(limb.count_ones()))
+                .map(|limb| CountOnes::count_ones(limb))
                 .sum(),
         )
     } else {

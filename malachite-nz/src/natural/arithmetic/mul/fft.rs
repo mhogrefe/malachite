@@ -1,5 +1,3 @@
-use std::cmp::{max, Ordering};
-
 use malachite_base::comparison::Max;
 use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{
@@ -8,7 +6,6 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
-
 use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -26,6 +23,7 @@ use natural::arithmetic::sub::{
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::Limb;
+use std::cmp::{max, Ordering};
 
 //TODO double check this
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
@@ -678,7 +676,7 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
-    let small_bits = u32::exact_from(bits) & u32::exact_from(Limb::WIDTH_MASK);
+    let small_bits = u64::exact_from(bits) & Limb::WIDTH_MASK;
     let mut shift_limbs = bits >> Limb::LOG_WIDTH;
     // negate
     if shift_limbs >= n {
@@ -1321,7 +1319,7 @@ pub fn _limbs_mul_fft_internal(
     let ys = &mut ys[..q];
     // B has k * width limbs, which is >= q, i.e. enough
     limbs_set_zero(ys);
-    let mut carry = 0i32; // will accumulate the (signed) carry at p[q]
+    let mut carry = 0i64; // will accumulate the (signed) carry at p[q]
     let mut sh = a * two_pow_k;
     let mut lo = sh + width_minus_one;
     for i in (0..two_pow_k).rev() {

@@ -173,7 +173,7 @@ pub trait ConvertibleFrom<T> {
 /// * `a-z`
 /// * `A-Z`
 pub trait FromStrRadix: Sized {
-    fn from_str_radix(src: &str, radix: u32) -> Result<Self, ParseIntError>;
+    fn from_str_radix(src: &str, radix: u64) -> Result<Self, ParseIntError>;
 }
 
 /// Associates with `Self` a type that's half `Self`'s size.

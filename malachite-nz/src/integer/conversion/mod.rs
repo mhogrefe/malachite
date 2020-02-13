@@ -8,7 +8,7 @@ use integer::Integer;
 
 impl Integer {
     //TODO test
-    pub fn assign_str_radix(&mut self, src: &str, radix: i32) -> Result<(), ParseIntegerError> {
+    pub fn assign_str_radix(&mut self, src: &str, radix: u64) -> Result<(), ParseIntegerError> {
         assert_eq!(radix, 10);
         if src.starts_with('-') {
             self.sign = false;
@@ -21,7 +21,7 @@ impl Integer {
     }
 
     //TODO test
-    pub fn from_str_radix(src: &str, radix: i32) -> Result<Integer, ParseIntegerError> {
+    pub fn from_str_radix(src: &str, radix: u64) -> Result<Integer, ParseIntegerError> {
         let mut i = Integer::ZERO;
         i.assign_str_radix(src, radix)?;
         Ok(i)

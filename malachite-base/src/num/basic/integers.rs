@@ -79,7 +79,7 @@ pub trait PrimitiveInteger:
     + CheckedInto<isize>
     + CheckedMul<Output = Self>
     + CheckedNeg<Output = Self>
-    + CheckedPow<u32, Output = Self>
+    + CheckedPow<u64, Output = Self>
     + CheckedRem<Output = Self>
     + CheckedSub<Output = Self>
     + Clone
@@ -178,7 +178,7 @@ pub trait PrimitiveInteger:
     + OverflowingMulAssign
     + OverflowingNeg<Output = Self>
     + OverflowingNegAssign
-    + OverflowingPow<u32, Output = Self>
+    + OverflowingPow<u64, Output = Self>
     + OverflowingRem<Output = Self>
     + OverflowingRemAssign
     + OverflowingSub<Output = Self>
@@ -186,7 +186,7 @@ pub trait PrimitiveInteger:
     + PartialEq<Self>
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
-    + Pow<u32>
+    + Pow<u64>
     + Product
     + Rem<Output = Self>
     + RemAssign<Self>
@@ -220,7 +220,7 @@ pub trait PrimitiveInteger:
     + SaturatingInto<isize>
     + SaturatingMul<Output = Self>
     + SaturatingMulAssign
-    + SaturatingPow<u32, Output = Self>
+    + SaturatingPow<u64, Output = Self>
     + SaturatingSub<Output = Self>
     + SaturatingSubAssign
     + Shl<i8, Output = Self>
@@ -347,7 +347,7 @@ pub trait PrimitiveInteger:
     + WrappingMulAssign
     + WrappingNeg<Output = Self>
     + WrappingNegAssign
-    + WrappingPow<u32, Output = Self>
+    + WrappingPow<u64, Output = Self>
     + WrappingRem<Output = Self>
     + WrappingRemAssign
     + WrappingSub<Output = Self>
@@ -363,7 +363,7 @@ pub trait PrimitiveInteger:
     /// Note that this value is correct for all of the built-in primitive integer types, but it will
     /// not be correct for custom types with a non-power-of-two `WIDTH`. For such implementations
     /// `LOG_WIDTH` should not be used.
-    const LOG_WIDTH: u32 = Self::WIDTH.trailing_zeros();
+    const LOG_WIDTH: u64 = Self::WIDTH.trailing_zeros() as u64;
 
     /// A mask that consists of `LOG_WIDTH` bits. Instead of `n % WIDTH`, use `n & WIDTH_MASK`.
     ///

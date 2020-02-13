@@ -217,7 +217,7 @@ macro_rules! impl_slice_traits_large_to_small {
             /// );
             /// ```
             fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                const LOG_SIZE_RATIO: u32 = $a::LOG_WIDTH - $b::LOG_WIDTH;
+                const LOG_SIZE_RATIO: u64 = $a::LOG_WIDTH - $b::LOG_WIDTH;
                 const SIZE_RATIO: usize = 1 << LOG_SIZE_RATIO;
                 let mut xs = vec![$b::ZERO; slice.len() << LOG_SIZE_RATIO];
                 for (chunk, &u) in xs.chunks_exact_mut(SIZE_RATIO).zip(slice.iter()) {
@@ -313,7 +313,7 @@ macro_rules! impl_slice_traits_small_to_large {
             /// );
             /// ```
             fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                const LOG_SIZE_RATIO: u32 = $b::LOG_WIDTH - $a::LOG_WIDTH;
+                const LOG_SIZE_RATIO: u64 = $b::LOG_WIDTH - $a::LOG_WIDTH;
                 const SIZE_RATIO: usize = 1 << LOG_SIZE_RATIO;
                 let mut xs =
                     vec![$b::ZERO; slice.len().shr_round(LOG_SIZE_RATIO, RoundingMode::Ceiling)];

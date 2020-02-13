@@ -14,10 +14,10 @@ use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_unsigned_vec_and_limb_var_2, pairs_of_unsigned_vec_and_small_unsigned,
-    pairs_of_unsigned_vec_and_small_unsigned_var_1,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
+    pairs_of_unsigned_vec_and_u64_var_2,
     triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
-    triples_of_unsigned_vec_unsigned_vec_and_limb_var_6,
+    triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
 };
 use inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
@@ -220,7 +220,7 @@ fn demo_limbs_shr_round(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_shr_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm).take(limit)
+    for (out, in_limbs, bits) in triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm).take(limit)
     {
         let mut out = out.to_vec();
         let out_old = out.clone();
@@ -233,7 +233,7 @@ fn demo_limbs_shr_to_out(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, bits) in pairs_of_unsigned_vec_and_limb_var_2(gm).take(limit) {
+    for (limbs, bits) in pairs_of_unsigned_vec_and_u64_var_2(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let limbs_old = limbs.clone();
         let carry = limbs_slice_shr_in_place(&mut limbs, bits);
@@ -521,7 +521,7 @@ demos_and_benches!(
 
 fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr(&[u32], u64)",
+        "limbs_shr(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -543,7 +543,7 @@ fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
 
 fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_round_up(&[u32], u64)",
+        "limbs_shr_round_up(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),
@@ -565,7 +565,7 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
 
 fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_round_to_nearest(&[u32], u64)",
+        "limbs_shr_round_to_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -587,7 +587,7 @@ fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_n
 
 fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_exact(&[u32], u64)",
+        "limbs_shr_exact(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),
@@ -609,7 +609,7 @@ fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) 
 
 fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_round(&[u32], u64, RoundingMode)",
+        "limbs_shr_round(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
         gm.name(),
@@ -631,9 +631,9 @@ fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) 
 
 fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_to_out(&mut [u32], &[u32], u64)",
+        "limbs_shr_to_out(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_limb_var_6(gm),
+        triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm),
         gm.name(),
         limit,
         file_name,
@@ -648,9 +648,9 @@ fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str)
 
 fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_slice_shr_in_place(&mut [u32], u64)",
+        "limbs_slice_shr_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_limb_var_2(gm),
+        pairs_of_unsigned_vec_and_u64_var_2(gm),
         gm.name(),
         limit,
         file_name,
@@ -665,7 +665,7 @@ fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_nam
 
 fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_shr_in_place(&mut Vec<u32>, u64)",
+        "limbs_vec_shr_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -682,7 +682,7 @@ fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name:
 
 fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_shr_round_up_in_place(&mut Vec<u32>, u64)",
+        "limbs_vec_shr_round_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),
@@ -703,7 +703,7 @@ fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_vec_shr_round_to_nearest_in_place(&mut Vec<u32>, u64)",
+        "limbs_vec_shr_round_to_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -720,7 +720,7 @@ fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
 
 fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_shr_exact_in_place(&mut Vec<u32>, u64)",
+        "limbs_vec_shr_exact_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
         gm.name(),
@@ -737,7 +737,7 @@ fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file
 
 fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_vec_shr_round_in_place(&mut Vec<u32>, u32, RoundingMode)",
+        "limbs_vec_shr_round_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
         gm.name(),

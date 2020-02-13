@@ -1,3 +1,5 @@
+use malachite_base::num::logic::traits::CountOnes;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
@@ -19,7 +21,7 @@ use platform::Limb;
 /// assert_eq!(limbs_count_ones(&[1, 0xffff_ffff]), 33);
 /// ```
 pub fn limbs_count_ones(limbs: &[Limb]) -> u64 {
-    limbs.iter().map(|limb| u64::from(limb.count_ones())).sum()
+    limbs.iter().map(|limb| CountOnes::count_ones(*limb)).sum()
 }
 
 impl Natural {
@@ -47,7 +49,7 @@ impl Natural {
     /// ```
     pub fn count_ones(&self) -> u64 {
         match *self {
-            Natural(Small(small)) => u64::from(small.count_ones()),
+            Natural(Small(small)) => CountOnes::count_ones(small),
             Natural(Large(ref limbs)) => limbs_count_ones(limbs),
         }
     }

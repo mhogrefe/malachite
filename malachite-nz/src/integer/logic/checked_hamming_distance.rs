@@ -1,7 +1,9 @@
 use std::cmp::Ordering;
 
 use malachite_base::limbs::limbs_leading_zero_limbs;
-use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
+use malachite_base::num::logic::traits::{
+    CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
+};
 
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
@@ -34,12 +36,15 @@ use platform::Limb;
 /// ```
 pub fn limbs_hamming_distance_limb_neg(limbs: &[Limb], other_limb: Limb) -> u64 {
     let least_significant_limb = limbs[0].wrapping_neg();
-    limbs_count_zeros_neg(limbs) - u64::from(least_significant_limb.count_zeros())
+    limbs_count_zeros_neg(limbs) - CountZeros::count_zeros(least_significant_limb)
         + least_significant_limb.hamming_distance(other_limb.wrapping_neg())
 }
 
 fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
-    limbs.iter().map(|limb| u64::from(limb.count_zeros())).sum()
+    limbs
+        .iter()
+        .map(|&limb| CountZeros::count_zeros(limb))
+        .sum()
 }
 
 fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: usize) -> u64 {
@@ -48,12 +53,14 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: 
     match xs_len.cmp(&ys_len) {
         Ordering::Equal => limbs_hamming_distance_same_length(&xs[i + 1..], &ys[i + 1..]),
         Ordering::Less => {
-            limbs_hamming_distance_same_length(&ys[i + 1..xs_len], &xs[i + 1..])
-                + limbs_count_ones(&ys[xs_len..])
+            let (ys_lo, ys_hi) = ys.split_at(xs_len);
+            limbs_hamming_distance_same_length(&ys_lo[i + 1..], &xs[i + 1..])
+                + limbs_count_ones(ys_hi)
         }
         Ordering::Greater => {
-            limbs_hamming_distance_same_length(&xs[i + 1..ys_len], &ys[i + 1..])
-                + limbs_count_ones(&xs[ys_len..])
+            let (xs_lo, xs_hi) = xs.split_at(ys_len);
+            limbs_hamming_distance_same_length(&xs_lo[i + 1..], &ys[i + 1..])
+                + limbs_count_ones(xs_hi)
         }
     }
 }
@@ -70,7 +77,7 @@ fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: 
 /// limb. xs_i and ys_i are the indices of the boundary limbs in xs and ys. xs_i < ys_i but xs may
 /// be shorter, longer, or the same length as ys.
 fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i: usize) -> u64 {
-    let mut distance = u64::from(xs[xs_i].wrapping_neg().count_ones());
+    let mut distance = CountOnes::count_ones(xs[xs_i].wrapping_neg());
     let xs_len = xs.len();
     if xs_i == xs_len - 1 {
         return distance + limbs_count_zeros_neg(&ys[xs_len..]);

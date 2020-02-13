@@ -1,4 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 
 use integer::Integer;
 use natural::InnerNatural::{Large, Small};
@@ -27,12 +28,12 @@ pub fn limbs_count_zeros_neg(limbs: &[Limb]) -> u64 {
     let mut nonzero_limb_seen = false;
     for &limb in limbs.iter() {
         sum += if nonzero_limb_seen {
-            u64::from(limb.count_ones())
+            CountOnes::count_ones(limb)
         } else if limb == 0 {
             Limb::WIDTH
         } else {
             nonzero_limb_seen = true;
-            u64::from(limb.wrapping_neg().count_zeros())
+            CountZeros::count_zeros(limb.wrapping_neg())
         };
     }
     sum
@@ -75,7 +76,7 @@ impl Integer {
 impl Natural {
     fn count_zeros_neg(&self) -> u64 {
         match *self {
-            Natural(Small(small)) => u64::from(small.wrapping_neg().count_zeros()),
+            Natural(Small(small)) => CountZeros::count_zeros(small.wrapping_neg()),
             Natural(Large(ref limbs)) => limbs_count_zeros_neg(limbs),
         }
     }

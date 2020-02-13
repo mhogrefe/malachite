@@ -1,5 +1,3 @@
-use std::cmp::{max, Ordering};
-
 use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{
     EqModPowerOfTwo, WrappingAddAssign, WrappingSubAssign,
@@ -7,7 +5,6 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
-
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
@@ -47,6 +44,7 @@ use platform::{
     Limb, SignedLimb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
     MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use std::cmp::{max, Ordering};
 
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
@@ -71,8 +69,8 @@ fn _limbs_toom_couple_handling(
     ys: &mut [Limb],
     y_sign: bool,
     offset: usize,
-    x_shift: u32,
-    y_shift: u32,
+    x_shift: u64,
+    y_shift: u64,
 ) {
     let n = ys.len();
     assert!(xs.len() >= n + offset);

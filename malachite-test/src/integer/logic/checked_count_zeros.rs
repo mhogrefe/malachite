@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
+use malachite_base::num::logic::traits::{BitIterable, CountZeros, SignificantBits};
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz::integer::Integer;
 
@@ -19,7 +19,7 @@ pub fn integer_checked_count_zeros_alt_2(n: &Integer) -> Option<u64> {
     if *n < 0 {
         Some(
             n.twos_complement_limbs()
-                .map(|limb| u64::from(limb.count_zeros()))
+                .map(|limb| CountZeros::count_zeros(limb))
                 .sum(),
         )
     } else {

@@ -9,6 +9,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
+use malachite_base::num::logic::traits::TrailingZeros;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
@@ -151,7 +152,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(
     assert_ne!(len, 0);
     assert!(out.len() >= len);
     if divisor.even() {
-        let shift = u64::from(divisor.trailing_zeros());
+        let shift = TrailingZeros::trailing_zeros(divisor);
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
         let inverse = limbs_modular_invert_limb(shifted_divisor);
@@ -207,7 +208,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(limbs: &mut [Limb], divisor: 
     let len = limbs.len();
     assert_ne!(len, 0);
     if divisor.even() {
-        let shift = u64::from(divisor.trailing_zeros());
+        let shift = TrailingZeros::trailing_zeros(divisor);
         let shift_complement = Limb::WIDTH - shift;
         let shifted_divisor = divisor >> shift;
         let inverse = limbs_modular_invert_limb(shifted_divisor);
@@ -1577,7 +1578,7 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
         return;
     }
     let q_len = n_len - d_len + 1;
-    let shift = ds[0].trailing_zeros();
+    let shift = TrailingZeros::trailing_zeros(ds[0]);
     if shift != 0 {
         let q_len_plus_1 = q_len + 1;
         let ds_limit_len = if d_len > q_len { q_len_plus_1 } else { d_len };
@@ -1647,7 +1648,7 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
         return;
     }
     let q_len = n_len - d_len + 1;
-    let shift = ds[0].trailing_zeros();
+    let shift = TrailingZeros::trailing_zeros(ds[0]);
     if shift != 0 {
         let q_len_plus_1 = q_len + 1;
         let ds_scratch_len = if d_len > q_len { q_len_plus_1 } else { d_len };
@@ -1720,7 +1721,7 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
         return;
     }
     let q_len = n_len - d_len + 1;
-    let shift = ds[0].trailing_zeros();
+    let shift = TrailingZeros::trailing_zeros(ds[0]);
     if shift != 0 {
         let q_len_plus_1 = q_len + 1;
         let ds_limit_len = if d_len > q_len { q_len_plus_1 } else { d_len };
@@ -1790,7 +1791,7 @@ pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb])
         return;
     }
     let q_len = n_len - d_len + 1;
-    let shift = ds[0].trailing_zeros();
+    let shift = TrailingZeros::trailing_zeros(ds[0]);
     if shift != 0 {
         let q_len_plus_1 = q_len + 1;
         let ds_scratch_len = if d_len > q_len { q_len_plus_1 } else { d_len };
