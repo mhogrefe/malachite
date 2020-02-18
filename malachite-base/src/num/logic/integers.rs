@@ -1,8 +1,8 @@
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{
-    BitAccess, BitConvertible, CountOnes, CountZeros, LeadingZeros, NotAssign, RotateLeft,
-    RotateRight, TrailingZeros,
+    BitAccess, BitConvertible, CountOnes, CountZeros, LeadingZeros, NotAssign, Rotate,
+    TrailingZeros,
 };
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
@@ -36,14 +36,42 @@ macro_rules! impl_logic_traits {
             }
         }
 
-        impl RotateLeft for $t {
+        impl Rotate for $t {
+            /// Rotate a value `n` bits to the left. Bits that leave the value from the left come
+            /// back from the right.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::Rotate;
+            ///
+            /// assert_eq!(Rotate::rotate_left(123u8, 0), 123);
+            /// assert_eq!(Rotate::rotate_left(123u8, 5), 111);
+            /// assert_eq!(Rotate::rotate_left(123u8, 1_005), 111);
+            /// ```
             #[inline]
             fn rotate_left(self, n: u64) -> $t {
                 $t::rotate_left(self, u32::wrapping_from(n))
             }
-        }
 
-        impl RotateRight for $t {
+            /// Rotate a value `n` bits to the right. Bits that leave the value from the right come
+            /// back from the left.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::Rotate;
+            ///
+            /// assert_eq!(Rotate::rotate_right(123u8, 0), 123);
+            /// assert_eq!(Rotate::rotate_right(123u8, 3), 111);
+            /// assert_eq!(Rotate::rotate_right(123u8, 1_003), 111);
+            /// ```
             #[inline]
             fn rotate_right(self, n: u64) -> $t {
                 $t::rotate_right(self, u32::wrapping_from(n))

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
+use malachite_base::num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_limb, limbs_hamming_distance_same_length,
 };

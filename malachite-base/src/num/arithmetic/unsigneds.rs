@@ -1,13 +1,13 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedNextPowerOfTwo, DivAssignMod,
-    DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModPowerOfTwo,
-    ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
-    NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
-    ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
+    ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
+    RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
-use num::logic::traits::SignificantBits;
+use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -43,6 +43,22 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn next_power_of_two_assign(&mut self) {
                 *self = $t::next_power_of_two(*self)
+            }
+        }
+
+        impl CheckedLogTwo for $t {
+            #[inline]
+            fn checked_log_two(self) -> Option<u64> {
+                if self == 0 {
+                    panic!("Cannot take the base-2 logarithm of 0.");
+                }
+                let leading_zeros = LeadingZeros::leading_zeros(self);
+                let trailing_zeros = TrailingZeros::trailing_zeros(self);
+                if leading_zeros + trailing_zeros == $t::WIDTH - 1 {
+                    Some(trailing_zeros)
+                } else {
+                    None
+                }
             }
         }
 

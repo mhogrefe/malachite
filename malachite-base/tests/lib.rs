@@ -22,6 +22,8 @@ pub mod num {
         pub mod get_highest_bit;
         pub mod hamming_distance;
         pub mod not_assign;
+        pub mod power_of_two_digits;
+        pub mod rotate;
         pub mod significant_bits;
     }
 }

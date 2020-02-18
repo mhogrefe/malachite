@@ -2,6 +2,7 @@ use std::cmp::max;
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::CountOnes;
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
     limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,

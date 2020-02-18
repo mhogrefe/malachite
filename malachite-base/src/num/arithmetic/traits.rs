@@ -548,6 +548,10 @@ pub trait SaturatingSubMul<B, C> {
     fn saturating_sub_mul(self, b: B, c: C) -> Self::Output;
 }
 
+pub trait CheckedLogTwo {
+    fn checked_log_two(self) -> Option<u64>;
+}
+
 /// Provides a function to get the floor of the base-2 logarithm of `self`.
 pub trait FloorLogTwo {
     /// floor(log<sub>2</sub>(`self`))

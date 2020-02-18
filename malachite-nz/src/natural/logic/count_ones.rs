@@ -24,7 +24,7 @@ pub fn limbs_count_ones(limbs: &[Limb]) -> u64 {
     limbs.iter().map(|limb| CountOnes::count_ones(*limb)).sum()
 }
 
-impl Natural {
+impl CountOnes for &Natural {
     /// Counts the number of ones in the binary expansion of a `Natural`.
     ///
     /// Time: worst case O(n)
@@ -39,6 +39,7 @@ impl Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::logic::traits::CountOnes;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.count_ones(), 0);
@@ -47,7 +48,7 @@ impl Natural {
     /// // 10^12 = 1110100011010100101001010001000000000000b
     /// assert_eq!(Natural::trillion().count_ones(), 13);
     /// ```
-    pub fn count_ones(&self) -> u64 {
+    fn count_ones(self) -> u64 {
         match *self {
             Natural(Small(small)) => CountOnes::count_ones(small),
             Natural(Large(ref limbs)) => limbs_count_ones(limbs),

@@ -1,3 +1,5 @@
+use malachite_base::num::logic::traits::CountOnes;
+
 use integer::Integer;
 
 impl Integer {

@@ -20,19 +20,18 @@ pub trait TrailingZeros {
     fn trailing_zeros(self) -> u64;
 }
 
-/// Shifts the bits to the left by a specified amount, `n`, wrapping the truncated bits to the end
-/// of the resulting value.
-///
-/// Please note this isn't the same operation as `<<`!
-pub trait RotateLeft {
+/// Rotate a value's bits left or right.
+pub trait Rotate {
+    /// Shifts the bits to the left by a specified amount, `n`, wrapping the truncated bits to the
+    /// end of the resulting value.
+    ///
+    /// Please note this isn't the same operation as `<<`!
     fn rotate_left(self, n: u64) -> Self;
-}
 
-/// Shifts the bits to the right by a specified amount, `n`, wrapping the truncated bits to the end
-/// of the resulting value.
-///
-/// Please note this isn't the same operation as `>>`!
-pub trait RotateRight {
+    /// Shifts the bits to the right by a specified amount, `n`, wrapping the truncated bits to the
+    /// end of the resulting value.
+    ///
+    /// Please note this isn't the same operation as `>>`!
     fn rotate_right(self, n: u64) -> Self;
 }
 
@@ -165,8 +164,8 @@ pub trait BitBlockAccess: Sized {
     fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits);
 }
 
-/// This trait defines functions that express a value as a `Vec` of bits, read a value from a slice
-/// of bits, and iterate over a value's bits.
+/// This trait defines functions that express a value as a `Vec` of bits and read a value from a
+/// slice of bits.
 pub trait BitConvertible {
     /// Returns a `Vec` containing the bits of a value in ascending order: least- to most-
     /// significant.
@@ -192,4 +191,17 @@ pub trait BitIterable {
     /// Returns a double-ended iterator over a value's bits. The iterator ends after the value's
     /// most-significant bit.
     fn bits(self) -> Self::BitIterator;
+}
+
+/// This trait defines functions that express a value as a `Vec` of digits and read a value from a
+/// slice of bits, where the base is a power of two. The base-2 logarithm of the base is specified,
+/// and the trait is parameterized by the digit type.
+pub trait PowerOfTwoDigits<T> {
+    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
+    /// significant. The base is 2<sup>`log_base`</sup>.
+    fn to_power_of_two_digits_asc(&self, log_base: u64) -> Vec<T>;
+
+    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
+    /// significant. The base is 2<sup>`log_base`</sup>.
+    fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<T>;
 }

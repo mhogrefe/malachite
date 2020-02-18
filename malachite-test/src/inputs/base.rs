@@ -521,6 +521,51 @@ pub fn pairs_of_u32s_range_1(gm: NoSpecialGenerationMode) -> It<(u32, u32)> {
     }
 }
 
+pub fn pairs_of_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn pairs_of_signed_and_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
 pub fn small_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenerationMode) -> It<T> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
@@ -536,6 +581,14 @@ pub fn small_positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenera
         NoSpecialGenerationMode::Random(scale) => {
             Box::new(positive_u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
         }
+    }
+}
+
+// All `u64`s where the `u64` is between 1 and T::WIDTH, inclusive.
+pub fn small_u64s_var_1<T: PrimitiveUnsigned>(gm: NoSpecialGenerationMode) -> It<u64> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(1, T::WIDTH)),
+        NoSpecialGenerationMode::Random(_) => Box::new(random_range(&EXAMPLE_SEED, 1, T::WIDTH)),
     }
 }
 
@@ -569,6 +622,35 @@ pub fn pairs_of_unsigned_and_small_unsigned<
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+fn random_pairs_of_primitive_and_small_unsigned_var_1<
+    T: PrimitiveInteger + Rand,
+    U: PrimitiveUnsigned,
+>() -> It<(T, u64)> {
+    Box::new(random_pairs(
+        &EXAMPLE_SEED,
+        &(|seed| random(seed)),
+        &(|seed| random_range(seed, 1, U::WIDTH)),
+    ))
+}
+
+// All pairs of unsigned `T` and `u64`, where the `u64` is between 1 and `U::WIDTH`, inclusive.
+pub fn pairs_of_unsigned_and_small_u64_var_1<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(T, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_unsigned(),
+            range_increasing(1, U::WIDTH),
+        )),
+        GenerationMode::Random(_) => random_pairs_of_primitive_and_small_unsigned_var_1::<T, U>(),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| random_range(seed, 1, U::WIDTH)),
         )),
     }
 }
@@ -734,7 +816,7 @@ where
     }
 }
 
-// All pairs of signed `T` and `u64`, where the signed `T` i s negative or the `u64` is smaller than
+// All pairs of signed `T` and `u64`, where the signed `T` is negative or the `u64` is smaller than
 // `T::WIDTH`.
 pub fn pairs_of_signed_and_u64_width_range_var_1<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,

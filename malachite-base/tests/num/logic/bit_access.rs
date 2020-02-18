@@ -125,18 +125,18 @@ macro_rules! set_bit_fail_helper {
     };
 }
 
-set_bit_fail_helper!(u8, set_bit_u8_fail_helper);
-set_bit_fail_helper!(u16, set_bit_u16_fail_helper);
-set_bit_fail_helper!(u32, set_bit_u32_fail_helper);
-set_bit_fail_helper!(u64, set_bit_u64_fail_helper);
-set_bit_fail_helper!(u128, set_bit_u128_fail_helper);
-set_bit_fail_helper!(usize, set_bit_usize_fail_helper);
-set_bit_fail_helper!(i8, set_bit_i8_fail_helper);
-set_bit_fail_helper!(i16, set_bit_i16_fail_helper);
-set_bit_fail_helper!(i32, set_bit_i32_fail_helper);
-set_bit_fail_helper!(i64, set_bit_i64_fail_helper);
-set_bit_fail_helper!(i128, set_bit_i128_fail_helper);
-set_bit_fail_helper!(isize, set_bit_isize_fail_helper);
+set_bit_fail_helper!(u8, set_bit_u8_fail);
+set_bit_fail_helper!(u16, set_bit_u16_fail);
+set_bit_fail_helper!(u32, set_bit_u32_fail);
+set_bit_fail_helper!(u64, set_bit_u64_fail);
+set_bit_fail_helper!(u128, set_bit_u128_fail);
+set_bit_fail_helper!(usize, set_bit_usize_fail);
+set_bit_fail_helper!(i8, set_bit_i8_fail);
+set_bit_fail_helper!(i16, set_bit_i16_fail);
+set_bit_fail_helper!(i32, set_bit_i32_fail);
+set_bit_fail_helper!(i64, set_bit_i64_fail);
+set_bit_fail_helper!(i128, set_bit_i128_fail);
+set_bit_fail_helper!(isize, set_bit_isize_fail);
 
 fn clear_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
@@ -201,12 +201,12 @@ macro_rules! clear_bit_fail_helper {
     };
 }
 
-clear_bit_fail_helper!(i8, clear_bit_i8_fail_helper);
-clear_bit_fail_helper!(i16, clear_bit_i16_fail_helper);
-clear_bit_fail_helper!(i32, clear_bit_i32_fail_helper);
-clear_bit_fail_helper!(i64, clear_bit_i64_fail_helper);
-clear_bit_fail_helper!(i128, clear_bit_i128_fail_helper);
-clear_bit_fail_helper!(isize, clear_bit_isize_fail_helper);
+clear_bit_fail_helper!(i8, clear_bit_i8_fail);
+clear_bit_fail_helper!(i16, clear_bit_i16_fail);
+clear_bit_fail_helper!(i32, clear_bit_i32_fail);
+clear_bit_fail_helper!(i64, clear_bit_i64_fail);
+clear_bit_fail_helper!(i128, clear_bit_i128_fail);
+clear_bit_fail_helper!(isize, clear_bit_isize_fail);
 
 fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, bit, out: u64| {
@@ -293,38 +293,22 @@ macro_rules! assign_bit_fail_helper_signed {
     };
 }
 
-assign_bit_fail_helper_unsigned!(u8, assign_bit_u8_fail_helper);
-assign_bit_fail_helper_unsigned!(u16, assign_bit_u16_fail_helper);
-assign_bit_fail_helper_unsigned!(u32, assign_bit_u32_fail_helper);
-assign_bit_fail_helper_unsigned!(u64, assign_bit_u64_fail_helper);
-assign_bit_fail_helper_unsigned!(u128, assign_bit_u128_fail_helper);
-assign_bit_fail_helper_unsigned!(usize, assign_bit_usize_fail_helper);
-assign_bit_fail_helper_signed!(i8, assign_bit_i8_fail_1_helper, assign_bit_i8_fail_2_helper);
-assign_bit_fail_helper_signed!(
-    i16,
-    assign_bit_i16_fail_1_helper,
-    assign_bit_i16_fail_2_helper
-);
+assign_bit_fail_helper_unsigned!(u8, assign_bit_u8_fail);
+assign_bit_fail_helper_unsigned!(u16, assign_bit_u16_fail);
+assign_bit_fail_helper_unsigned!(u32, assign_bit_u32_fail);
+assign_bit_fail_helper_unsigned!(u64, assign_bit_u64_fail);
+assign_bit_fail_helper_unsigned!(u128, assign_bit_u128_fail);
+assign_bit_fail_helper_unsigned!(usize, assign_bit_usize_fail);
+assign_bit_fail_helper_signed!(i8, assign_bit_i8_fail_1, assign_bit_i8_fail_2);
+assign_bit_fail_helper_signed!(i16, assign_bit_i16_fail_1, assign_bit_i16_fail_2);
 assign_bit_fail_helper_signed!(
     i32,
-    assign_bit_signed_u32_fail_1_helper,
-    assign_bit_signed_u32_fail_2_helper
+    assign_bit_signed_u32_fail_1,
+    assign_bit_signed_u32_fail_2
 );
-assign_bit_fail_helper_signed!(
-    i64,
-    assign_bit_i64_fail_1_helper,
-    assign_bit_i64_fail_2_helper
-);
-assign_bit_fail_helper_signed!(
-    i128,
-    assign_bit_i128_fail_1_helper,
-    assign_bit_i128_fail_2_helper
-);
-assign_bit_fail_helper_signed!(
-    isize,
-    assign_bit_isize_fail_1_helper,
-    assign_bit_isize_fail_2_helper
-);
+assign_bit_fail_helper_signed!(i64, assign_bit_i64_fail_1, assign_bit_i64_fail_2);
+assign_bit_fail_helper_signed!(i128, assign_bit_i128_fail_1, assign_bit_i128_fail_2);
+assign_bit_fail_helper_signed!(isize, assign_bit_isize_fail_1, assign_bit_isize_fail_2);
 
 fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
     let test = |n: u64, index, out: u64| {
@@ -410,27 +394,15 @@ macro_rules! flip_bit_fail_helper_signed {
     };
 }
 
-flip_bit_fail_helper_unsigned!(u8, flip_bit_u8_fail_helper);
-flip_bit_fail_helper_unsigned!(u16, flip_bit_u16_fail_helper);
-flip_bit_fail_helper_unsigned!(u32, flip_bit_u32_fail_helper);
-flip_bit_fail_helper_unsigned!(u64, flip_bit_u64_fail_helper);
-flip_bit_fail_helper_unsigned!(u128, flip_bit_u128_fail_helper);
-flip_bit_fail_helper_unsigned!(usize, flip_bit_usize_fail_helper);
-flip_bit_fail_helper_signed!(i8, flip_bit_i8_fail_1_helper, flip_bit_i8_fail_2_helper);
-flip_bit_fail_helper_signed!(i16, flip_bit_i16_fail_1_helper, flip_bit_i16_fail_2_helper);
-flip_bit_fail_helper_signed!(
-    i32,
-    flip_bit_signed_u32_fail_1_helper,
-    flip_bit_signed_u32_fail_2_helper
-);
-flip_bit_fail_helper_signed!(i64, flip_bit_i64_fail_1_helper, flip_bit_i64_fail_2_helper);
-flip_bit_fail_helper_signed!(
-    i128,
-    flip_bit_i128_fail_1_helper,
-    flip_bit_i128_fail_2_helper
-);
-flip_bit_fail_helper_signed!(
-    isize,
-    flip_bit_isize_fail_1_helper,
-    flip_bit_isize_fail_2_helper
-);
+flip_bit_fail_helper_unsigned!(u8, flip_bit_u8_fail);
+flip_bit_fail_helper_unsigned!(u16, flip_bit_u16_fail);
+flip_bit_fail_helper_unsigned!(u32, flip_bit_u32_fail);
+flip_bit_fail_helper_unsigned!(u64, flip_bit_u64_fail);
+flip_bit_fail_helper_unsigned!(u128, flip_bit_u128_fail);
+flip_bit_fail_helper_unsigned!(usize, flip_bit_usize_fail);
+flip_bit_fail_helper_signed!(i8, flip_bit_i8_fail_1, flip_bit_i8_fail_2);
+flip_bit_fail_helper_signed!(i16, flip_bit_i16_fail_1, flip_bit_i16_fail_2);
+flip_bit_fail_helper_signed!(i32, flip_bit_signed_u32_fail_1, flip_bit_signed_u32_fail_2);
+flip_bit_fail_helper_signed!(i64, flip_bit_i64_fail_1, flip_bit_i64_fail_2);
+flip_bit_fail_helper_signed!(i128, flip_bit_i128_fail_1, flip_bit_i128_fail_2);
+flip_bit_fail_helper_signed!(isize, flip_bit_isize_fail_1, flip_bit_isize_fail_2);

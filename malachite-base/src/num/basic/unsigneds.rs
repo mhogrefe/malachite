@@ -1,19 +1,20 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedNextPowerOfTwo, FloorLogTwo,
-    IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
+    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
+    FloorLogTwo, IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice};
-use num::logic::traits::HammingDistance;
+use num::logic::traits::{HammingDistance, PowerOfTwoDigits};
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
     CeilingLogTwo
     + CeilingDivNegMod
     + CeilingDivAssignNegMod
+    + CheckedLogTwo
     + CheckedNextPowerOfTwo<Output = Self>
     + FloorLogTwo
     + From<u8>
@@ -33,6 +34,12 @@ pub trait PrimitiveUnsigned:
     + NegModPowerOfTwoAssign
     + NextPowerOfTwo<Output = Self>
     + NextPowerOfTwoAssign
+    + PowerOfTwoDigits<u8>
+    + PowerOfTwoDigits<u16>
+    + PowerOfTwoDigits<u32>
+    + PowerOfTwoDigits<u64>
+    + PowerOfTwoDigits<u128>
+    + PowerOfTwoDigits<usize>
     + PrimitiveInteger
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
