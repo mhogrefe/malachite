@@ -131,12 +131,9 @@ pub fn limbs_leading_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
 /// assert_eq!(limbs_trailing_zero_limbs::<u32>(&[1, 2, 3]), 0);
 /// assert_eq!(limbs_trailing_zero_limbs::<u32>(&[1, 2, 3, 0, 0, 0]), 3);
 /// ```
-pub fn limbs_trailing_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
-    limbs
-        .iter()
-        .rev()
-        .take_while(|&&limb| limb == T::ZERO)
-        .count()
+pub fn limbs_trailing_zero_limbs<T: Eq + Zero>(limbs: &[T]) -> usize {
+    let zero = T::ZERO;
+    limbs.iter().rev().take_while(|&limb| limb == &zero).count()
 }
 
 /// Given a slice of limbs and an amount, copies the contents of `&limbs[amount..]` to

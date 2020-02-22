@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, LeadingZeros};
@@ -148,7 +149,7 @@ impl BitConvertible for Natural {
             }
         }
         while last != 0 {
-            bits.push(last.get_bit(0));
+            bits.push(last.odd());
             last >>= 1;
         }
         bits

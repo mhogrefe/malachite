@@ -20,7 +20,7 @@ use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
-use rust_wheels::iterators::general::random;
+use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
     exhaustive_naturals, exhaustive_positive_naturals, random_naturals, random_positive_naturals,
@@ -29,7 +29,7 @@ use rust_wheels::iterators::naturals::{
 };
 use rust_wheels::iterators::primitive_ints::{
     exhaustive_natural_signed, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
-    special_random_natural_signed, special_random_signed, special_random_unsigned,
+    random_range, special_random_natural_signed, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -528,6 +528,35 @@ pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
         pairs_of_natural_and_small_unsigned::<T>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
+}
+
+// All pairs of `Natural` and positive small unsigned.
+pub fn pairs_of_natural_and_small_unsigned_var_3<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)> {
+    Box::new(pairs_of_natural_and_small_unsigned(gm).filter(|&(_, u)| u != T::ZERO))
+}
+
+// All pairs of `Natural` and `u64`, where the `u64` is between 1 and `T::WIDTH`, inclusive.
+pub fn pairs_of_natural_and_small_u64_var_3<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(Natural, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_naturals(),
+            range_increasing(1, T::WIDTH),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+        )),
+    }
 }
 
 fn log_pairs_of_natural_and_signed<T: PrimitiveSigned>() -> It<(Natural, T)> {

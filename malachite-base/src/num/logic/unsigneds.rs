@@ -656,8 +656,8 @@ macro_rules! impl_logic_traits {
         macro_rules! impl_logic_traits_inner {
             ($u:ident) => {
                 impl PowerOfTwoDigits<$u> for $t {
-                    /// Returns a `Vec` containing the digits of `self` in descending order: most-
-                    /// to least-significant, where the base is a power of two. The base-2 logarithm
+                    /// Returns a `Vec` containing the digits of `self` in ascending order: least-
+                    /// to most-significant, where the base is a power of two. The base-2 logarithm
                     /// of the base is specified. The type of each digit is `$u`, and `log_base`
                     /// must be no larger than the width of `$u`. If `self` is 0, the `Vec` is
                     /// empty; otherwise, it ends with a nonzero digit.
@@ -718,8 +718,8 @@ macro_rules! impl_logic_traits {
                         digits
                     }
 
-                    /// Returns a `Vec` containing the digits of `self` in ascending order: least-
-                    /// to most-significant, where the base is a power of two. The base-2 logarithm
+                    /// Returns a `Vec` containing the digits of `self` in descending order: most-
+                    /// to least-significant, where the base is a power of two. The base-2 logarithm
                     /// of the base is specified. The type of each digit is `$u`, and `log_base`
                     /// must be no larger than the width of `$u`. If `self` is 0, the `Vec` is
                     /// empty; otherwise, it begins with a nonzero digit.

@@ -25,6 +25,7 @@ pub mod or;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod to_bits;
+pub mod to_power_of_two_digits;
 pub mod trailing_zeros;
 pub mod xor;
 
@@ -75,6 +76,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     set_bit::register(registry);
     significant_bits::register(registry);
     to_bits::register(registry);
+    to_power_of_two_digits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
 }

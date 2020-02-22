@@ -252,6 +252,7 @@ pub mod natural {
         pub mod set_bit;
         pub mod significant_bits;
         pub mod to_bits;
+        pub mod to_power_of_two_digits;
         pub mod trailing_zeros;
         pub mod xor;
     }

@@ -316,7 +316,11 @@ fn benchmark_to_power_of_two_digits_asc<T: PrimitiveUnsigned + Rand, U: Primitiv
     T: PowerOfTwoDigits<U>,
 {
     m_run_benchmark(
-        &format!("{}.to_power_of_two_digits_asc(u64)", T::NAME),
+        &format!(
+            "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc(&{}, u64)",
+            U::NAME,
+            T::NAME
+        ),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_1::<T, U>(gm),
         gm.name(),
@@ -343,7 +347,11 @@ fn benchmark_to_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand, U: Primiti
     T: PowerOfTwoDigits<U>,
 {
     m_run_benchmark(
-        &format!("{}.to_power_of_two_digits_desc(u64)", T::NAME),
+        &format!(
+            "PowerOfTwoDigits::<{}>::to_power_of_two_digits_desc(&{}, u64)",
+            U::NAME,
+            T::NAME
+        ),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_1::<T, U>(gm),
         gm.name(),
