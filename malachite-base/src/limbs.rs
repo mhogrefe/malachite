@@ -16,7 +16,7 @@ use num::basic::traits::Zero;
 /// assert!(!limbs_test_zero::<u32>(&[0, 1, 0]));
 /// ```
 ///
-/// This is mpn_zero_p from gmp.h.
+/// This is mpn_zero_p from gmp.h, GMP 6.1.2.
 pub fn limbs_test_zero<T: Copy + Eq + Zero>(limbs: &[T]) -> bool {
     limbs.iter().all(|&limb| limb == T::ZERO)
 }
@@ -38,8 +38,8 @@ pub fn limbs_test_zero<T: Copy + Eq + Zero>(limbs: &[T]) -> bool {
 /// assert_eq!(limbs, [1, 0, 0, 0, 5]);
 /// ```
 ///
-/// This is mpn_zero from mpn/generic/zero.c. Note that this is needed less often in Malachite than
-/// in GMP, since Malachite generally initializes new memory with zeros.
+/// This is mpn_zero from mpn/generic/zero.c, GMP 6.1.2. Note that this is needed less often in
+/// Malachite than in GMP, since Malachite generally initializes new memory with zeros.
 pub fn limbs_set_zero<T: Zero>(limbs: &mut [T]) {
     for limb in limbs.iter_mut() {
         *limb = T::ZERO;
@@ -112,8 +112,9 @@ pub fn limbs_delete_left<T: Copy>(limbs: &mut Vec<T>, delete_size: usize) {
 /// assert_eq!(limbs_leading_zero_limbs::<u32>(&[1, 2, 3]), 0);
 /// assert_eq!(limbs_leading_zero_limbs::<u32>(&[0, 0, 0, 1, 2, 3]), 3);
 /// ```
-pub fn limbs_leading_zero_limbs<T: Copy + Eq + Zero>(limbs: &[T]) -> usize {
-    limbs.iter().take_while(|&&limb| limb == T::ZERO).count()
+pub fn limbs_leading_zero_limbs<T: Eq + Zero>(limbs: &[T]) -> usize {
+    let zero = T::ZERO;
+    limbs.iter().take_while(|&limb| limb == &zero).count()
 }
 
 /// Counts the number of zero limbs that a slice ends with.

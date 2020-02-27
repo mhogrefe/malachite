@@ -622,10 +622,7 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
         &(|bits| bits.len()),
         "bits.len()",
         &mut [
-            (
-                "malachite",
-                &mut (|ref bits| no_out!(T::from_bits_asc(bits))),
-            ),
+            ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
             (
                 "alt",
                 &mut (|ref bits| no_out!(_from_bits_asc_alt::<T>(bits))),
@@ -656,10 +653,7 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
         &(|bits| bits.len()),
         "bits.len()",
         &mut [
-            (
-                "malachite",
-                &mut (|ref bits| no_out!(T::from_bits_asc(bits))),
-            ),
+            ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
             (
                 "alt",
                 &mut (|ref bits| no_out!(_from_bits_asc_alt::<T>(bits))),

@@ -32,8 +32,8 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], 0xffff_ffff), &[123, 333, 123]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and w
-/// is returned instead of overwriting the first input.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// positive, and w is returned instead of overwriting the first input.
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut result;
     if xs.len() >= ys.len() {
@@ -80,7 +80,7 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(xs, &[123, 333]);
 /// ```
 ///
-/// This is mpn_addmul_1 from mpn/generic/addmul_1.c.
+/// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.1.2.
 pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -125,9 +125,9 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 /// assert_eq!(ys, &[123, 333]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and have the same
-/// lengths, sub is positive, the lowest limbs of the result are written to the second input rather
-/// than the first, and the highest limb is returned.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive and have the
+/// same lengths, sub is positive, the lowest limbs of the result are written to the second input
+/// rather than the first, and the highest limb is returned.
 pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -177,7 +177,8 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// assert_eq!(xs, &[123, 333, 123]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and sub is positive.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive and sub is
+/// positive.
 pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
@@ -246,8 +247,8 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// assert_eq!(ys, &[123, 333, 123]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
-/// result is written to the second input rather than the first.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// positive, and the result is written to the second input rather than the first.
 pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
@@ -321,8 +322,8 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 /// assert_eq!(ys, &[0, 123]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is positive, and the
-/// result is written to the longer input.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// positive, and the result is written to the longer input.
 pub fn limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -361,8 +362,8 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 ///         &[39606, 334167, 516795, 987, 654]);
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is positive, and w
-/// is returned instead of overwriting the first input.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// positive, and w is returned instead of overwriting the first input.
 pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();
@@ -410,7 +411,8 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(xs, &[39606, 334167, 516795, 987, 654]);
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive and sub is positive.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive and sub is
+/// positive.
 pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut product_size = ys.len() + zs.len();

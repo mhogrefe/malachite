@@ -292,8 +292,8 @@ pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 /// assert_eq!(limbs_and_pos_neg(&[1, 2, 5], &[100, 200]), &[0, 2, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res is returned, the first input is positive, and the
-/// second is negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned, the first input is positive,
+/// and the second is negative.
 pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -356,7 +356,8 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(result, &[0, 2, 5, 10]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where the first input is positive and the second is negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where the first input is positive and the second is
+/// negative.
 pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -417,8 +418,8 @@ pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// assert_eq!(xs, &[0, 2, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res == op1, the first input is positive, and the second is
-/// negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1, the first input is positive, and
+/// the second is negative.
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -473,8 +474,8 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// assert_eq!(ys, &[0, 2]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res == op2, the first input is positive, the second is
-/// negative, and the length of op2 is not changed; instead, a carry is returned.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op2, the first input is positive, the
+/// second is negative, and the length of op2 is not changed; instead, a carry is returned.
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -532,8 +533,8 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 /// assert_eq!(ys, &[100, 200]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res == op2, the first input is positive and the second is
-/// negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op2, the first input is positive and the
+/// second is negative.
 pub fn limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
@@ -583,7 +584,7 @@ fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb 
 /// assert_eq!(limbs_and_neg_neg(&[1, 2, 5], &[100, 200]), &[100, 202, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res is returned and both inputs are negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are negative.
 pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -667,7 +668,7 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(result, &[100, 202, 5, 10]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where both inputs are negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are negative.
 pub fn limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -758,8 +759,8 @@ pub fn limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// assert_eq!(xs, &[100, 202, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res == op1, both inputs are negative, and the length of op1
-/// is not changed; instead, a carry is returned.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1, both inputs are negative, and the
+/// length of op1 is not changed; instead, a carry is returned.
 pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -837,7 +838,7 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// assert_eq!(xs, &[100, 202, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where res == op1 and both inputs are negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are negative.
 pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -906,8 +907,8 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(ys, &[100, 202, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where both inputs are negative, the result is written to the
-/// longer input slice, and the length of op1 is not changed; instead, a carry is returned.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are negative, the result is written
+/// to the longer input slice, and the length of op1 is not changed; instead, a carry is returned.
 pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_and_neg_neg_in_place_left(xs, ys))
@@ -954,8 +955,8 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb])
 /// assert_eq!(ys, &[100, 202, 5]);
 /// ```
 ///
-/// This is mpz_and from mpz/and.c where both inputs are negative and the result is written to the
-/// longer input slice.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are negative and the result is
+/// written to the longer input slice.
 pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         limbs_vec_and_neg_neg_in_place_left(xs, ys);

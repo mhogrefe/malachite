@@ -182,6 +182,14 @@ macro_rules! power_of_two_digits_primitive {
                 digits.reverse();
                 digits
             }
+
+            fn from_power_of_two_digits_asc(_log_base: u64, _digits: &[$t]) -> Natural {
+                unimplemented!();
+            }
+
+            fn from_power_of_two_digits_desc(_log_base: u64, _digits: &[$t]) -> Natural {
+                unimplemented!();
+            }
         }
 
         impl Natural {
@@ -371,6 +379,14 @@ impl PowerOfTwoDigits<Natural> for Natural {
         let mut digits = self.to_power_of_two_digits_asc(log_base);
         digits.reverse();
         digits
+    }
+
+    fn from_power_of_two_digits_asc(_log_base: u64, _digits: &[Natural]) -> Natural {
+        unimplemented!();
+    }
+
+    fn from_power_of_two_digits_desc(_log_base: u64, _digits: &[Natural]) -> Natural {
+        unimplemented!();
     }
 }
 

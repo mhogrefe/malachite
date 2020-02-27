@@ -298,7 +298,7 @@ macro_rules! impl_arithmetic_traits {
             fn true_checked_shl(self, rhs: u64) -> Option<$t> {
                 if self == 0 {
                     Some(self)
-                } else if rhs > $t::WIDTH {
+                } else if rhs >= $t::WIDTH {
                     None
                 } else {
                     let result = self << rhs;

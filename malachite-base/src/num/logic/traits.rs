@@ -204,4 +204,12 @@ pub trait PowerOfTwoDigits<T> {
     /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
     /// significant. The base is 2<sup>`log_base`</sup>.
     fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<T>;
+
+    /// Converts a slice of digits into a value. The input digits are in ascending order: least- to
+    /// most-significant. The base is 2<sup>`log_base`</sup>.
+    fn from_power_of_two_digits_asc(log_base: u64, digits: &[T]) -> Self;
+
+    /// Converts a slice of digits into a value. The input digits are in descending order: most- to
+    /// least-significant. The base is 2<sup>`log_base`</sup>.
+    fn from_power_of_two_digits_desc(log_base: u64, digits: &[T]) -> Self;
 }

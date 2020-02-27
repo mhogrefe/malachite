@@ -479,8 +479,8 @@ fn limbs_xor_pos_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb 
 /// assert_eq!(limbs_xor_pos_neg(&[1, 2, 5], &[100, 200]), &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where res is returned, the first input is positive, and the
-/// second is negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned, the first input is positive,
+/// and the second is negative.
 pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -575,7 +575,8 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(result, &[99, 202, 5, 10]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where the first input is positive and the second is negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where the first input is positive and the second is
+/// negative.
 pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -716,8 +717,8 @@ fn limbs_xor_pos_neg_in_place_left_helper(
 /// assert_eq!(xs, &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where res == op1 and the first input is positive and the second
-/// is negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op1 and the first input is positive and
+/// the second is negative.
 pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -824,8 +825,8 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 /// assert_eq!(ys, &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where res == op2 and the first input is positive and the second
-/// is negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op2 and the first input is positive and
+/// the second is negative.
 pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -901,8 +902,8 @@ pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
 /// assert_eq!(ys, &[101, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where the first input is positive, the second is negative, and
-/// the result is written to the longer input slice.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where the first input is positive, the second is
+/// negative, and the result is written to the longer input slice.
 pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -964,7 +965,7 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
 /// assert_eq!(limbs_xor_neg_neg(&[1, 2, 5], &[100, 200]), &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where res is returned and both inputs are negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are negative.
 pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -1033,7 +1034,7 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(result, &[99, 202, 5, 10]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where both inputs are negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are negative.
 pub fn limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -1129,7 +1130,7 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
 /// assert_eq!(xs, &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_xor from mpz/xor.c where res == op1 and both inputs are negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op1 and both inputs are negative.
 pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -1187,8 +1188,8 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(ys, &[99, 202, 5]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c where both inputs are negative and the result is written to the
-/// longer input slice.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are negative and the result is
+/// written to the longer input slice.
 pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();

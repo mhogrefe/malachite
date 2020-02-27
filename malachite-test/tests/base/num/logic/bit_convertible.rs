@@ -1,3 +1,4 @@
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -15,7 +16,8 @@ use malachite_base::num::logic::unsigneds::{
 use rand::Rand;
 
 use malachite_test::common::{
-    test_properties, test_properties_custom_limit, test_properties_no_special, SMALL_LIMIT,
+    test_properties, test_properties_custom_limit, test_properties_no_special, LARGE_LIMIT,
+    SMALL_LIMIT,
 };
 use malachite_test::inputs::base::{
     signeds, small_unsigneds, unsigneds, vecs_of_bool_var_2, vecs_of_bool_var_3,
@@ -139,7 +141,12 @@ fn to_bits_desc_properties() {
 }
 
 fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
-    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_2::<T>, |bits| {
+    let limit = if T::WIDTH == u8::WIDTH {
+        SMALL_LIMIT
+    } else {
+        LARGE_LIMIT
+    };
+    test_properties_custom_limit(limit, vecs_of_bool_var_2::<T>, |bits| {
         let n = T::from_bits_asc(bits);
         assert_eq!(_from_bits_asc_unsigned_naive::<T>(bits), n);
         assert_eq!(_from_bits_asc_alt::<T>(bits), n);
@@ -158,7 +165,12 @@ where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_3::<T>, |bits| {
+    let limit = if T::WIDTH == u8::WIDTH {
+        SMALL_LIMIT
+    } else {
+        LARGE_LIMIT
+    };
+    test_properties_custom_limit(limit, vecs_of_bool_var_3::<T>, |bits| {
         let n = T::from_bits_asc(bits);
         assert_eq!(_from_bits_asc_signed_naive::<T>(bits), n);
         assert_eq!(_from_bits_asc_alt::<T>(bits), n);
@@ -196,7 +208,12 @@ fn from_bits_asc_properties() {
 }
 
 fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
-    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_4::<T>, |bits| {
+    let limit = if T::WIDTH == u8::WIDTH {
+        SMALL_LIMIT
+    } else {
+        LARGE_LIMIT
+    };
+    test_properties_custom_limit(limit, vecs_of_bool_var_4::<T>, |bits| {
         let n = T::from_bits_desc(bits);
         assert_eq!(_from_bits_desc_unsigned_naive::<T>(bits), n);
         assert_eq!(_from_bits_desc_alt::<T>(bits), n);
@@ -215,7 +232,12 @@ where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    test_properties_custom_limit(SMALL_LIMIT, vecs_of_bool_var_5::<T>, |bits| {
+    let limit = if T::WIDTH == u8::WIDTH {
+        SMALL_LIMIT
+    } else {
+        LARGE_LIMIT
+    };
+    test_properties_custom_limit(limit, vecs_of_bool_var_5::<T>, |bits| {
         let n = T::from_bits_desc(bits);
         assert_eq!(_from_bits_desc_signed_naive::<T>(bits), n);
         assert_eq!(_from_bits_desc_alt::<T>(bits), n);

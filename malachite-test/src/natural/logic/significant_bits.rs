@@ -1,6 +1,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
+use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned_var_1;
@@ -14,7 +15,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_significant_bits(gm: GenerationMode, limit: usize) {
-    for limbs in vecs_of_unsigned_var_1(gm).take(limit) {
+    for limbs in vecs_of_unsigned_var_1::<Limb>(gm).take(limit) {
         println!(
             "limbs_significant_bits({:?}) = {}",
             limbs,
@@ -33,7 +34,7 @@ fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_name:
     m_run_benchmark(
         "limbs_significant_bits(&[u32])",
         BenchmarkType::Single,
-        vecs_of_unsigned_var_1(gm),
+        vecs_of_unsigned_var_1::<Limb>(gm),
         gm.name(),
         limit,
         file_name,

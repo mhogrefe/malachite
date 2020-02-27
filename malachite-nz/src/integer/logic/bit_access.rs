@@ -37,7 +37,7 @@ use platform::Limb;
 /// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
 /// ```
 ///
-/// This is mpz_tstbit from mpz/tstbit.c, where d is negative.
+/// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if limb_index >= limbs.len() {
@@ -76,7 +76,7 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
 /// assert_eq!(limbs, &[1, 2, 1]);
 /// ```
 ///
-/// This is mpz_setbit from mpz/setbit.c, where d is negative.
+/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if limb_index >= limbs.len() {
@@ -150,8 +150,8 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 /// assert_eq!(limbs, &[4, 2, 1]);
 /// ```
 ///
-/// This is mpz_clrbit from mpz/clrbit.c, where d is negative and bit_idx small enough that no
-/// additional memory needs to be given to d.
+/// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative and bit_idx small enough
+/// that no additional memory needs to be given to d.
 pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
@@ -182,7 +182,7 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```
 ///
-/// This is mpz_clrbit from mpz/clrbit.c, where d is negative.
+/// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;

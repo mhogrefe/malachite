@@ -45,8 +45,8 @@ use platform::Limb;
 ///         (vec![4294967050, 4294966962, 455], false));
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, and w
-/// is returned instead of overwriting the first input. w_sign is also returned.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
 pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> (Vec<Limb>, bool) {
     let mut result;
     let sign = if xs.len() >= ys.len() {
@@ -89,8 +89,8 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> (
 /// assert_eq!(xs, &[4294967050, 4294966962, 455]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, and
-/// w_sign is returned.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, and w_sign is returned.
 pub fn limbs_overflowing_sub_mul_limb_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
@@ -197,9 +197,9 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 /// assert_eq!(ys, &[4294967050, 4294966962, 455]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, the
-/// limbs of the result are written to the second input rather than the first, and w_sign is
-/// returned.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, the limbs of the result are written to the second input rather than the first, and
+/// w_sign is returned.
 pub fn limbs_overflowing_sub_mul_limb_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -310,8 +310,8 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 /// assert_eq!(ys, &[4294967050, 4294966962, 455]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, the
-/// result is written to the longer input, and w_sign is returned.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, the result is written to the longer input, and w_sign is returned.
 pub fn limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -354,8 +354,8 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_either(
 ///         (vec![4294927936, 4294634040, 4294452078, 986, 654], true));
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative, and w
-/// is returned instead of overwriting the first input. w_sign is also returned.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
 pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<Limb>, bool) {
     let mut xs = xs.to_vec();
     let sign = limbs_overflowing_sub_mul_in_place_left(&mut xs, ys, zs);
@@ -389,8 +389,8 @@ pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<
 /// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 986, 654]);
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative, and
-/// w_sign is returned.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// negative, and w_sign is returned.
 pub fn limbs_overflowing_sub_mul_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],

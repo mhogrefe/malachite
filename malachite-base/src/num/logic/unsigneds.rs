@@ -3,8 +3,7 @@ use std::ops::Index;
 
 use comparison::Max;
 use named::Named;
-use num::arithmetic::traits::ModPowerOfTwo;
-use num::arithmetic::traits::Parity;
+use num::arithmetic::traits::{ModPowerOfTwo, Parity, TrueCheckedShl};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -731,7 +730,8 @@ macro_rules! impl_logic_traits {
                     /// where n = `self.significant_bits()`
                     ///
                     /// # Panics
-                    /// Panics if
+                    /// Panics if `log_base` is greater than the width of `$u`, or if `log_base` is
+                    /// zero.
                     ///
                     /// # Examples
                     /// ```
@@ -755,6 +755,106 @@ macro_rules! impl_logic_traits {
                         let mut digits = self.to_power_of_two_digits_asc(log_base);
                         digits.reverse();
                         digits
+                    }
+
+                    /// Converts a slice of digits into a value, where the base is a power of two.
+                    /// The base-2 logarithm of the base is specified. The input digits are in
+                    /// ascending order: least- to most-significant. The type of each digit is `$u`,
+                    /// and `log_base` must be no larger than the width of `$u`. The function panics
+                    /// if the input represents a number that can't fit in $t.
+                    ///
+                    /// Time: worst case O(n)
+                    ///
+                    /// Additional memory: worst case O(1)
+                    ///
+                    /// where n = `digits.len()`
+                    ///
+                    /// # Panics
+                    /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
+                    /// zero, or if the digits represent a value that isn't representable by $t.
+                    ///
+                    /// # Examples
+                    /// ```
+                    /// use malachite_base::num::logic::traits::PowerOfTwoDigits;
+                    ///
+                    /// let digits: &[u64] = &[0, 0, 0];
+                    /// assert_eq!(u8::from_power_of_two_digits_asc(6, digits), 0);
+                    ///
+                    /// let digits: &[u64] = &[2, 0];
+                    /// assert_eq!(u16::from_power_of_two_digits_asc(6, digits), 2);
+                    ///
+                    /// let digits: &[u16] = &[3, 7, 1];
+                    /// assert_eq!(u32::from_power_of_two_digits_asc(3, digits), 123);
+                    /// ```
+                    fn from_power_of_two_digits_asc(log_base: u64, digits: &[$u]) -> $t {
+                        assert_ne!(log_base, 0);
+                        if log_base > $u::WIDTH {
+                            panic!(
+                                "type {:?} is too small for a digit of width {}",
+                                $u::NAME,
+                                log_base
+                            );
+                        }
+                        let mut n = 0;
+                        for &digit in digits.iter().rev() {
+                            assert!(digit.significant_bits() <= log_base);
+                            if let Some(shifted) = n.true_checked_shl(log_base) {
+                                n = shifted | $t::wrapping_from(digit);
+                            } else {
+                                panic!("value represented by digits is too large");
+                            }
+                        }
+                        n
+                    }
+
+                    /// Converts a slice of digits into a value, where the base is a power of two.
+                    /// The base-2 logarithm of the base is specified. The input digits are in
+                    /// descending order: most- to least-significant. The type of each digit is
+                    /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
+                    /// panics if the input represents a number that can't fit in $t.
+                    ///
+                    /// Time: worst case O(n)
+                    ///
+                    /// Additional memory: worst case O(1)
+                    ///
+                    /// where n = `digits.len()`
+                    ///
+                    /// # Panics
+                    /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
+                    /// zero, or if the digits represent a value that isn't representable by $t.
+                    ///
+                    /// # Examples
+                    /// ```
+                    /// use malachite_base::num::logic::traits::PowerOfTwoDigits;
+                    ///
+                    /// let digits: &[u64] = &[0, 0, 0];
+                    /// assert_eq!(u8::from_power_of_two_digits_desc(6, digits), 0);
+                    ///
+                    /// let digits: &[u64] = &[0, 2];
+                    /// assert_eq!(u16::from_power_of_two_digits_desc(6, digits), 2);
+                    ///
+                    /// let digits: &[u16] = &[1, 7, 3];
+                    /// assert_eq!(u32::from_power_of_two_digits_desc(3, digits), 123);
+                    /// ```
+                    fn from_power_of_two_digits_desc(log_base: u64, digits: &[$u]) -> $t {
+                        assert_ne!(log_base, 0);
+                        if log_base > $u::WIDTH {
+                            panic!(
+                                "type {:?} is too small for a digit of width {}",
+                                $u::NAME,
+                                log_base
+                            );
+                        }
+                        let mut n = 0;
+                        for &digit in digits {
+                            assert!(digit.significant_bits() <= log_base);
+                            if let Some(shifted) = n.true_checked_shl(log_base) {
+                                n = shifted | $t::wrapping_from(digit);
+                            } else {
+                                panic!("value represented by digits is too large");
+                            }
+                        }
+                        n
                     }
                 }
             };
