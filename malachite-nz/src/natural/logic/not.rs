@@ -14,7 +14,7 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_com from mpn/generic/com.c where rp is returned.
+/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp is returned.
 ///
 /// # Example
 /// ```
@@ -36,7 +36,7 @@ pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `in_limbs.len()`
 ///
-/// This is mpn_com from mpn/generic/com.c where rp != up.
+/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp != up.
 ///
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs`.
@@ -64,7 +64,7 @@ pub fn limbs_not_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_com from mpn/generic/com.c where rp == up.
+/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp == up.
 ///
 /// # Example
 /// ```

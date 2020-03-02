@@ -1,5 +1,5 @@
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
+use malachite_base::slices::slice_test_zero;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -30,7 +30,7 @@ use platform::Limb;
 /// ```
 pub fn limbs_is_power_of_two(limbs: &[Limb]) -> bool {
     let (limbs_last, limbs_init) = limbs.split_last().unwrap();
-    limbs_test_zero(limbs_init) && limbs_last.is_power_of_two()
+    slice_test_zero(limbs_init) && limbs_last.is_power_of_two()
 }
 
 impl<'a> IsPowerOfTwo for &'a Natural {

@@ -1,7 +1,7 @@
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
 use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
@@ -19,7 +19,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// limbs.len() must be greater than 1; divisor must be nonzero.
 ///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative.
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     if limbs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
@@ -48,8 +48,8 @@ pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool 
 /// assert_eq!(limbs_divisible_by_limb(&[332, 333], 3), false);
 /// ```
 ///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, where a is non-negative and the ABOVE_THRESHOLD
-/// branch is excluded.
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative and the
+/// ABOVE_THRESHOLD branch is excluded.
 pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
     assert!(limbs.len() > 1);
     if divisor.even() {
@@ -87,7 +87,8 @@ pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
@@ -97,9 +98,9 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     assert_ne!(*ns.last().unwrap(), 0);
     assert_ne!(*ds.last().unwrap(), 0);
     // Strip low zero limbs from ds, requiring n == 0 on those.
-    let offset = limbs_leading_zero_limbs(ds);
+    let offset = slice_leading_zeros(ds);
     let (ns_lo, ns) = ns.split_at_mut(offset);
-    if !limbs_test_zero(ns_lo) {
+    if !slice_test_zero(ns_lo) {
         // n has fewer low zero limbs than d, so not divisible
         return false;
     }
@@ -165,7 +166,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         _limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
-    limbs_test_zero(rs)
+    slice_test_zero(rs)
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -194,7 +195,8 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
@@ -204,9 +206,9 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     assert_ne!(*ns.last().unwrap(), 0);
     assert_ne!(*ds.last().unwrap(), 0);
     // Strip low zero limbs from ds, requiring n == 0 on those.
-    let offset = limbs_leading_zero_limbs(ds);
+    let offset = slice_leading_zeros(ds);
     let (ns_lo, ns) = ns.split_at_mut(offset);
-    if !limbs_test_zero(ns_lo) {
+    if !slice_test_zero(ns_lo) {
         // n has fewer low zero limbs than d, so not divisible
         return false;
     }
@@ -275,7 +277,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         _limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
-    limbs_test_zero(rs)
+    slice_test_zero(rs)
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -304,7 +306,8 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
@@ -314,9 +317,9 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     assert_ne!(*ns.last().unwrap(), 0);
     assert_ne!(*ds.last().unwrap(), 0);
     // Strip low zero limbs from ds, requiring n == 0 on those.
-    let offset = limbs_leading_zero_limbs(ds);
+    let offset = slice_leading_zeros(ds);
     let (ns_lo, ns) = ns.split_at(offset);
-    if !limbs_test_zero(ns_lo) {
+    if !slice_test_zero(ns_lo) {
         // n has fewer low zero limbs than d, so not divisible
         return false;
     }
@@ -381,7 +384,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         _limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
-    limbs_test_zero(rs)
+    slice_test_zero(rs)
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -410,7 +413,8 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, where an >= dn and neither are zero.
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
@@ -420,9 +424,9 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     assert_ne!(*ns.last().unwrap(), 0);
     assert_ne!(*ds.last().unwrap(), 0);
     // Strip low zero limbs from ds, requiring n == 0 on those.
-    let offset = limbs_leading_zero_limbs(ds);
+    let offset = slice_leading_zeros(ds);
     let (ns_lo, ns) = ns.split_at(offset);
-    if !limbs_test_zero(ns_lo) {
+    if !slice_test_zero(ns_lo) {
         // n has fewer low zero limbs than d, so not divisible
         return false;
     }
@@ -489,7 +493,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         _limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
-    limbs_test_zero(rs)
+    slice_test_zero(rs)
 }
 
 impl Natural {

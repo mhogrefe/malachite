@@ -3,7 +3,6 @@ use std::mem::swap;
 
 use malachite_base::comparison::Max;
 use malachite_base::crement::Crementable;
-use malachite_base::limbs::{limbs_move_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSub, WrappingSubAssign,
@@ -12,6 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base::slices::{slice_move_left, slice_set_zero};
 
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
@@ -65,7 +65,7 @@ use platform::{
 /// assert_eq!(limbs_invert_limb(0xffff_fffe), 2);
 /// ```
 ///
-/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h.
+/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.1.2.
 #[inline]
 pub fn limbs_invert_limb(divisor: Limb) -> Limb {
     (DoubleLimb::join_halves(!divisor, Limb::MAX) / DoubleLimb::from(divisor)).lower_half()
@@ -75,7 +75,7 @@ pub fn limbs_invert_limb(divisor: Limb) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is udiv_qrnnd_preinv from gmp-impl.h.
+/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn div_mod_by_preinversion(
     n_high: Limb,
     n_low: Limb,
@@ -122,9 +122,9 @@ pub(crate) fn div_mod_by_preinversion(
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qxn is 0, un > 1, and both results are
-/// returned. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
-/// unnecessary (they would always be 0).
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0, un > 1, and both
+/// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
+/// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
 pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
     let mut quotient_limbs = vec![0; limbs.len()];
     let remainder = limbs_div_limb_to_out_mod(&mut quotient_limbs, limbs, divisor);
@@ -159,9 +159,9 @@ pub fn limbs_div_limb_mod(limbs: &[Limb], divisor: Limb) -> (Vec<Limb>, Limb) {
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qxn is 0 and un > 1. Experiments show
-/// that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be
-/// 0).
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1.
+/// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
+/// (they would always be 0).
 pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -248,9 +248,9 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], in_limbs: &[Limb], divisor: L
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c where qp == up, qxn is 0, and un > 1.
-/// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
-/// (they would always be 0).
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qp == up, qxn is 0, and
+/// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
+/// unnecessary (they would always be 0).
 pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();
@@ -326,8 +326,8 @@ pub fn limbs_div_limb_in_place_mod(limbs: &mut [Limb], divisor: Limb) -> Limb {
 /// assert_eq!(limbs_two_limb_inverse_helper(2325651385, 3907343530), 3636893938);
 /// ```
 ///
-/// This is invert_pi1 from gmp-impl.h, where the result is returned instead of being written to
-/// dinv.
+/// This is invert_pi1 from gmp-impl.h, GMP 6.1.2, where the result is returned instead of being
+/// written to dinv.
 pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     let mut inverse = limbs_invert_limb(hi);
     let mut hi_product = hi.wrapping_mul(inverse);
@@ -383,7 +383,7 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 /// );
 /// ```
 ///
-/// This is udiv_qr_3by2 from gmp-impl.h.
+/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.1.2.
 pub fn limbs_div_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
@@ -441,7 +441,7 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
 /// assert_eq!(ns, &[166, 2147483626, 3, 4, 5]);
 /// ```
 ///
-/// This is mpn_divrem_2 from mpn/generic/divrem_2.c.
+/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.1.2.
 pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
@@ -490,7 +490,7 @@ pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds
 /// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
 /// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c.
+/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.1.2.
 pub fn _limbs_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -565,7 +565,7 @@ pub fn _limbs_div_mod_schoolbook(
 ///
 /// where n = `ds.len()`
 ///
-/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c.
+/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2.
 pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -652,7 +652,7 @@ pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
 /// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
 /// set.
 ///
-/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c.
+/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2.
 pub fn _limbs_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -841,8 +841,8 @@ pub fn _limbs_div_mod_divide_and_conquer(
 /// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 /// of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, where the return value is `true` iff
-/// the return value of mpn_bc_invertappr would be 0.
+/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// `true` iff the return value of mpn_bc_invertappr would be 0.
 pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -905,8 +905,8 @@ pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
 /// Panics if `ds` has length less than 5, `is` is shorter than `ds`, `scratch` is shorter than
 /// twice the length of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_ni_invertappr from mpn/generic/invertappr.c, where the return value is `true` iff
-/// the return value of mpn_ni_invertappr would be 0.
+/// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// `true` iff the return value of mpn_ni_invertappr would be 0.
 pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
     assert!(d_len > 4);
@@ -1080,8 +1080,8 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
 /// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 /// of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_invertappr from mpn/generic/invertappr.c, where the return value is `true` iff
-/// the return value of mpn_invertappr would be 0.
+/// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// `true` iff the return value of mpn_invertappr would be 0.
 pub fn _limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
         _limbs_invert_basecase_approx(is, ds, scratch)
@@ -1129,7 +1129,7 @@ pub fn _limbs_div_barrett_large_product(
 ///
 /// where n = `ns.len()`, d = `ds.len()`
 ///
-/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c.
+/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2.
 fn _limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1236,7 +1236,7 @@ fn _limbs_div_mod_barrett_preinverted(
 ///
 /// Result is O(`q_len`)
 ///
-/// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, where k == 0.
+/// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.1.2, where k == 0.
 pub fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
@@ -1256,7 +1256,7 @@ pub fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c.
+/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.1.2.
 pub fn _limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1285,14 +1285,14 @@ pub fn _limbs_div_mod_barrett_helper(
                 *scratch_first = 1;
             }
             _limbs_invert_approx(is, scratch_lo, scratch_hi);
-            limbs_move_left(is, 1);
+            slice_move_left(is, 1);
         } else if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
             // TODO This branch is untested!
-            limbs_set_zero(&mut is[..i_len]);
+            slice_set_zero(&mut is[..i_len]);
         } else {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
             _limbs_invert_approx(is, scratch_lo, scratch_hi);
-            limbs_move_left(is, 1);
+            slice_move_left(is, 1);
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
@@ -1305,8 +1305,8 @@ pub fn _limbs_div_mod_barrett_helper(
 ///
 /// Result is O(`d_len`)
 ///
-/// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, but nn is omitted from the
-/// arguments as it is unused.
+/// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.1.2, but nn is omitted
+/// from the arguments as it is unused.
 fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
     let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
@@ -1317,7 +1317,7 @@ fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) ->
 ///
 /// Additional memory: Worst case O(1)
 ///
-/// This is mpn_invertappr_itch from gmp-impl.h.
+/// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     is_len << 1
 }
@@ -1328,7 +1328,7 @@ pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
 ///
 /// Result is O(`n_len`)
 ///
-/// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, where mua_k == 0.
+/// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.1.2, where mua_k == 0.
 pub fn _limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = _limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = _limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
@@ -1402,7 +1402,7 @@ pub fn _limbs_div_mod_barrett_large_helper(
 /// less than `ns.len()` - `ds.len()`, `scratch` is too short, or the last limb of `ds` does not
 /// have its highest bit set.
 ///
-/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c.
+/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2.
 pub fn _limbs_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1754,7 +1754,7 @@ pub(crate) fn _limbs_div_mod_balanced(
 /// assert_eq!(limbs_div_mod(&[1, 2, 3], &[4, 5]), (vec![2576980377, 0], vec![2576980381, 2]));
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, where qp and rp are returned.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where qp and rp are returned.
 pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
@@ -1798,7 +1798,7 @@ pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 /// assert_eq!(rs, &[2576980381, 2, 10, 10]);
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2.
 pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -2819,8 +2819,8 @@ pub fn _limbs_div_limb_in_place_mod_naive(limbs: &mut [Limb], divisor: Limb) -> 
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2, where
-/// qp == up.
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.1.2, with
+/// DIV_QR_1N_METHOD == 2, where qp == up.
 fn limbs_div_limb_normalized_in_place_mod(
     limbs: &mut [Limb],
     highest_limb: Limb,
@@ -2899,7 +2899,8 @@ fn limbs_div_limb_normalized_in_place_mod(
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c with DIV_QR_1N_METHOD == 2.
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.1.2, with
+/// DIV_QR_1N_METHOD == 2.
 fn limbs_div_limb_normalized_to_out_mod(
     out: &mut [Limb],
     in_limbs: &[Limb],
@@ -2967,8 +2968,8 @@ fn limbs_div_limb_normalized_to_out_mod(
     remainder
 }
 
-/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where len > 1. Experiments show that this is
-/// always slower than `_limbs_div_limb_to_out_mod`.
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where len > 1. Experiments show
+/// that this is always slower than `_limbs_div_limb_to_out_mod`.
 pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = in_limbs.len();
@@ -3006,8 +3007,8 @@ pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], in_limbs: &[Limb], divis
     }
 }
 
-/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c where qp == up and len > 1. Experiments show
-/// that this is always slower than `_limbs_div_limb_in_place_mod`.
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where qp == up and len > 1.
+/// Experiments show that this is always slower than `_limbs_div_limb_in_place_mod`.
 pub fn _limbs_div_limb_in_place_mod_alt(limbs: &mut [Limb], divisor: Limb) -> Limb {
     assert_ne!(divisor, 0);
     let len = limbs.len();

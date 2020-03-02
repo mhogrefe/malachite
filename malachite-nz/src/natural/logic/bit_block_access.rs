@@ -1,9 +1,10 @@
-use malachite_base::limbs::{limbs_delete_left, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::round::RoundingMode;
+use malachite_base::slices::slice_set_zero;
+use malachite_base::vecs::vec_delete_left;
 
 use natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
 use natural::arithmetic::shl_u::limbs_slice_shl_in_place;
@@ -99,7 +100,7 @@ pub fn limbs_vec_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Lim
         return Vec::new();
     }
     limbs_mod_power_of_two_in_place(&mut limbs, end);
-    limbs_delete_left(&mut limbs, limb_start);
+    vec_delete_left(&mut limbs, limb_start);
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);
@@ -127,7 +128,7 @@ fn copy_from_diff_len_slice(xs: &mut [Limb], ys: &[Limb]) {
     } else {
         let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
         xs_lo.copy_from_slice(ys);
-        limbs_set_zero(xs_hi);
+        slice_set_zero(xs_hi);
     }
 }
 

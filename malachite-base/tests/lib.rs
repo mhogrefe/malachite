@@ -2,7 +2,6 @@ extern crate malachite_base;
 
 pub mod bools;
 pub mod chars;
-pub mod limbs;
 pub mod num {
     pub mod arithmetic {
         pub mod log_two;
@@ -28,4 +27,5 @@ pub mod num {
     }
 }
 pub mod round;
+pub mod slices;
 pub mod strings;

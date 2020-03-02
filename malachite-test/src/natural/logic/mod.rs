@@ -14,6 +14,7 @@ pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
 pub mod from_bits;
+pub mod from_power_of_two_digits;
 pub mod get_bit;
 pub mod get_bits;
 pub mod hamming_distance;
@@ -65,6 +66,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     count_ones::register(registry);
     flip_bit::register(registry);
     from_bits::register(registry);
+    from_power_of_two_digits::register(registry);
     get_bit::register(registry);
     get_bits::register(registry);
     hamming_distance::register(registry);

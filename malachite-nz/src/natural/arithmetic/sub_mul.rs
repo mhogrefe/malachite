@@ -33,8 +33,8 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[0, 123], 0xffff_ffff), None);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, and w
-/// is returned instead of overwriting the first input.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, and w is returned instead of overwriting the first input.
 pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Option<Vec<Limb>> {
     let ys_len = ys.len();
     let mut result = xs.to_vec();
@@ -78,7 +78,7 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Optio
 /// assert_eq!(xs, &[123, 579]);
 /// ```
 ///
-/// This is mpn_submul_1 from mpn/generic/submul_1.c.
+/// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
 pub fn limbs_sub_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -135,8 +135,8 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(
 /// assert_eq!(xs, &[123, 579]);
 /// ```
 ///
-/// This is mpn_submul_1 from mpn/generic/submul_1.c, but where the first input may be longer than
-/// the second.
+/// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2, but where the first input may be
+/// longer than the second.
 pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], limb: Limb) -> Limb {
     let (xs_lo, xs_hi) = xs.split_at_mut(ys.len());
     let borrow = limbs_sub_mul_limb_same_length_in_place_left(xs_lo, ys, limb);
@@ -179,9 +179,9 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive and have the same
-/// lengths, sub is negative, and the lowest limbs of the result are written to the second input
-/// rather than the first.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive and have the
+/// same lengths, sub is negative, and the lowest limbs of the result are written to the second
+/// input rather than the first.
 pub fn limbs_sub_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -240,8 +240,8 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, where w and x are positive, sub is negative, and the
-/// result is written to the second input rather than the first.
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// negative, and the result is written to the second input rather than the first.
 pub fn limbs_sub_mul_limb_greater_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -289,9 +289,9 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(
 ///         Some(vec![4294927936, 4294634040, 4294452078, 0]));
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative,
-/// negative results are converted to `None`, and w is returned instead of overwriting the first
-/// input.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// negative, negative results are converted to `None`, and w is returned instead of overwriting the
+/// first input.
 pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
     let mut xs = xs.to_vec();
     if limbs_sub_mul_in_place_left(&mut xs, ys, zs) {
@@ -331,8 +331,8 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
 /// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 0]);
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, where w, x, and y are positive, sub is negative and
-/// negative results are discarded.
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// negative and negative results are discarded.
 pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);
     assert!(zs.len() > 1);

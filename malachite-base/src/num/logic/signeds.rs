@@ -734,7 +734,7 @@ macro_rules! impl_logic_traits {
             /// trailing sign bits going forward, or leading sign bits going backward.
             ///
             /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
-            /// `to_limbs_desc` instead.
+            /// `to_bits_desc` instead.
             ///
             /// Time: worst case O(1)
             ///

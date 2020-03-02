@@ -1,7 +1,7 @@
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::arithmetic::divisible_by::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
     limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
@@ -201,7 +201,7 @@ fn benchmark_limbs_divisible_by_algorithms(gm: GenerationMode, limit: usize, fil
             ),
             (
                 "divisibility using limbs_mod",
-                &mut (|(ref ns, ref ds)| no_out!(limbs_test_zero(&limbs_mod(ns, ds)))),
+                &mut (|(ref ns, ref ds)| no_out!(slice_test_zero(&limbs_mod(ns, ds)))),
             ),
         ],
     );

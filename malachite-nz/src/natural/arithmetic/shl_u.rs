@@ -1,8 +1,8 @@
 use std::ops::{Shl, ShlAssign};
 
-use malachite_base::limbs::limbs_pad_left;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::vecs::vec_pad_left;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -27,7 +27,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1_968, 7_296]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, where the result is returned.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where the result is returned.
 pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut shifted_limbs = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
@@ -75,7 +75,7 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(out, &[2_147_483_648, 61, 0]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2.
 pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb {
     let len = in_limbs.len();
     assert!(out.len() >= len);
@@ -115,7 +115,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb 
 /// assert_eq!(limbs, &[2_147_483_648, 61]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, where rp == up.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up.
 pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -154,7 +154,8 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
 /// assert_eq!(limbs, &[2_147_483_648, 61, 228]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, where rp == up and the carry is appended to rp.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up and the carry is
+/// appended to rp.
 pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
@@ -162,7 +163,7 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     } else {
         limbs_slice_shl_in_place(limbs, small_bits)
     };
-    limbs_pad_left(limbs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
+    vec_pad_left(limbs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
     if remaining_bits != 0 {
         limbs.push(remaining_bits);
     }
@@ -197,7 +198,7 @@ pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 /// assert_eq!(out, &[2147483647, 4294967234, 0]);
 /// ```
 ///
-/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc.
+/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.1.2.
 pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);

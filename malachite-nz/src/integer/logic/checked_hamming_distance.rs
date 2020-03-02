@@ -1,9 +1,9 @@
 use std::cmp::Ordering;
 
-use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::logic::traits::{
     CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
 };
+use malachite_base::slices::slice_leading_zeros;
 
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;
@@ -122,8 +122,8 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 /// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are negative and have
 /// the same length.
 pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
-    let xs_i = limbs_leading_zero_limbs(xs);
-    let ys_i = limbs_leading_zero_limbs(ys);
+    let xs_i = slice_leading_zeros(xs);
+    let ys_i = slice_leading_zeros(ys);
     match xs_i.cmp(&ys_i) {
         Ordering::Equal => {
             xs[xs_i]

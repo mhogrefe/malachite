@@ -1,10 +1,10 @@
 use std::cmp::min;
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
@@ -30,7 +30,7 @@ pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 ///
 /// Result is O(`n`)
 ///
-/// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c.
+/// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
 pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
         n
@@ -54,7 +54,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
 ///
 /// Result is O(`n`)
 ///
-/// This is mpn_mulmod_bnm1_itch from gmp-impl.h.
+/// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
@@ -88,7 +88,7 @@ pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
 /// Panics if `xs` and `ys` have different lengths, if `out` or `scratch` are too short, or if the
 /// input slices are empty.
 ///
-/// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
+/// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
 fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
     out: &mut [Limb],
     xs: &[Limb],
@@ -119,7 +119,7 @@ fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
 /// # Panics
 /// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
 ///
-// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, where rp == tp.
+// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
 fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     limbs_mul_same_length_to_out(out, &xs[..n + 1], &ys[..n + 1]);
@@ -169,7 +169,7 @@ const FFT_FIRST_K: usize = 4;
 /// Panics if `xs` is shorter than `ys`, if `ys` is empty, is `xs` is longer than n, or if `out` or
 /// `scratch` are too short.
 ///
-/// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c.
+/// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
 pub fn _limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
@@ -343,7 +343,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
         // The residue class 0 is represented by [2 ^ (Limb::WIDTH * half_n) - 1]; except when
         // both inputs are zero.
         //
-        // scratch[half_n] == 1 implies limbs_test_zero(scratch[..half_n]).
+        // scratch[half_n] == 1 implies slice_test_zero(scratch[..half_n]).
         let mut carry = scratch[half_n];
         if limbs_slice_add_same_length_in_place_left(&mut out[..half_n], &scratch[..half_n]) {
             carry += 1;
@@ -388,7 +388,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             ) {
                 carry += 1;
             }
-            assert!(xs_len + ys_len == n - 1 || limbs_test_zero(&scratch[a + 1..n - half_n]));
+            assert!(xs_len + ys_len == n - 1 || slice_test_zero(&scratch[a + 1..n - half_n]));
             if limbs_sub_limb_in_place(&mut out[..xs_len + ys_len], carry) {
                 assert_eq!(scratch[a], 1);
             } else {

@@ -1,7 +1,7 @@
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_leading_zeros;
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -27,7 +27,7 @@ use platform::Limb;
 /// assert_eq!(limbs_twos_complement(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
 /// ```
 pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
-    let i = limbs_leading_zero_limbs(limbs);
+    let i = slice_leading_zeros(limbs);
     let mut result_limbs = vec![0; i];
     if i != limbs.len() {
         result_limbs.push(limbs[i].wrapping_neg());

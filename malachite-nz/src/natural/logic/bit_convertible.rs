@@ -30,29 +30,9 @@ use platform::Limb;
 ///     vec![3567587328, 232]);
 /// ```
 pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
-    if bits.is_empty() {
-        return Vec::new();
-    }
-    let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
-    let remainder = bits.len() & usize::wrapping_from(Limb::WIDTH_MASK);
-    if remainder != 0 {
-        limb_count += 1;
-    }
-    let mut limbs = vec![0; limb_count];
-    let mut limb_i = 0;
-    let mut i = 0;
-    let width = Limb::WIDTH;
-    for &bit in bits {
-        if bit {
-            limbs[limb_i].set_bit(i);
-        }
-        i += 1;
-        if i == width {
-            i = 0;
-            limb_i += 1;
-        }
-    }
-    limbs
+    bits.chunks(usize::wrapping_from(Limb::WIDTH))
+        .map(Limb::from_bits_asc)
+        .collect()
 }
 
 /// Converts a slice of bits in descending order to a `Vec` of limbs in ascending order. There may
@@ -79,36 +59,9 @@ pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
 ///     vec![3567587328, 232]);
 /// ```
 pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
-    if bits.is_empty() {
-        return Vec::new();
-    }
-    let mut limb_count = bits.len() >> Limb::LOG_WIDTH;
-    let remainder = bits.len() & usize::wrapping_from(Limb::WIDTH_MASK);
-    if remainder != 0 {
-        limb_count += 1;
-    }
-    let mut limbs = vec![0; limb_count];
-    let mut limb_i = limb_count - 1;
-    let width_minus_one = Limb::WIDTH - 1;
-    let mut i = if remainder == 0 {
-        width_minus_one
-    } else {
-        u64::wrapping_from(remainder) - 1
-    };
-    for &bit in bits {
-        if bit {
-            limbs[limb_i].set_bit(i);
-        }
-        if i == 0 {
-            i = width_minus_one;
-            if limb_i != 0 {
-                limb_i -= 1;
-            }
-        } else {
-            i -= 1;
-        }
-    }
-    limbs
+    bits.rchunks(usize::wrapping_from(Limb::WIDTH))
+        .map(Limb::from_bits_desc)
+        .collect()
 }
 
 impl BitConvertible for Natural {

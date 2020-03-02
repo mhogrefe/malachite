@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Min;
 use malachite_base::crement::Crementable;
-use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::slices::slice_trailing_zeros;
 
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
@@ -57,7 +57,7 @@ impl Natural {
 
     pub(crate) fn trim(&mut self) {
         if let Natural(Large(ref mut limbs)) = *self {
-            let trailing_zero_count = limbs_trailing_zero_limbs(limbs);
+            let trailing_zero_count = slice_trailing_zeros(limbs);
             if trailing_zero_count != 0 {
                 let len = limbs.len();
                 limbs.truncate(len - trailing_zero_count);

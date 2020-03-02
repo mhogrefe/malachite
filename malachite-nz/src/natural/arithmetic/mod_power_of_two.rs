@@ -28,8 +28,8 @@ use platform::Limb;
 /// assert_eq!(limbs_mod_power_of_two(&[123, 456], 40), &[123, 200]);
 /// ```
 ///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is non-negative and the result is
-/// returned.
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is non-negative and the
+/// result is returned.
 pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
@@ -72,7 +72,8 @@ pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// assert_eq!(limbs, &[123, 200]);
 /// ```
 ///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is non-negative and res == in.
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is non-negative and
+/// res == in.
 pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         limbs.clear();
@@ -110,8 +111,8 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 40), &[4_294_967_173, 55]);
 /// ```
 ///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is negative and the result is returned.
-/// `limbs` are the limbs of -in.
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and the result
+/// is returned. `limbs` are the limbs of -in.
 pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result_limbs = limbs.to_vec();
     limbs_neg_mod_power_of_two_in_place(&mut result_limbs, pow);
@@ -143,8 +144,8 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 /// assert_eq!(limbs, &[4_294_967_173, 55]);
 /// ```
 ///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, where in is negative and res == in. `limbs` are
-/// the limbs of -in.
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and res == in.
+/// `limbs` are the limbs of -in.
 pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
     let mut new_limb_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let leftover_bits = pow & Limb::WIDTH_MASK;

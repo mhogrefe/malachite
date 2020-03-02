@@ -1,8 +1,8 @@
 use std::cmp::Ordering;
 use std::ops::{BitAnd, BitAndAssign};
 
-use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::slices::slice_set_zero;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -39,7 +39,8 @@ pub const fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
 ///
 /// where n = min(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_and from mpz/and.c where res is returned and both inputs are non-negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
+/// negative.
 ///
 /// # Example
 /// ```
@@ -62,7 +63,7 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_and_n from gmp-impl.h.
+/// This is mpn_and_n from gmp-impl.h, GMP 6.1.2.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
@@ -98,7 +99,7 @@ pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_and from mpz/and.c where both inputs are non-negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative.
 ///
 /// # Panics
 /// Panics if `out` is too short.
@@ -121,11 +122,11 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     if xs_len >= ys_len {
         assert!(out.len() >= xs_len);
         limbs_and_same_length_to_out(out, &xs[..ys_len], ys);
-        limbs_set_zero(&mut out[ys_len..xs_len]);
+        slice_set_zero(&mut out[ys_len..xs_len]);
     } else {
         assert!(out.len() >= ys_len);
         limbs_and_same_length_to_out(out, xs, &ys[..xs_len]);
-        limbs_set_zero(&mut out[xs_len..ys_len]);
+        slice_set_zero(&mut out[xs_len..ys_len]);
     }
 }
 
@@ -138,7 +139,7 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_and_n from gmp-impl.h where rp == up.
+/// This is mpn_and_n from gmp-impl.h, GMP 6.1.2, where rp == up.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -175,7 +176,7 @@ pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// where n = min(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_and from mpz/and.c where res == op1 and both inputs are non-negative.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -223,9 +224,9 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usi
 ///
 /// where n = min(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_and from mpz/and.c where res == op1 and both inputs are non-negative and have the
-/// same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len()) trailing
-/// zero limbs.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative and
+/// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
+/// trailing zero limbs.
 ///
 /// # Example
 /// ```
@@ -260,8 +261,8 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = min(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_and from mpz/and.c where both inputs are non-negative and the result is written to
-/// the shorter input slice.
+/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
+/// written to the shorter input slice.
 ///
 /// # Example
 /// ```

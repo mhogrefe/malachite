@@ -1,10 +1,10 @@
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_delete_left;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
 use malachite_base::round::RoundingMode;
+use malachite_base::vecs::vec_delete_left;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
@@ -193,7 +193,7 @@ pub fn limbs_vec_neg_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec
     }
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
     limbs.truncate(limb_end);
-    limbs_delete_left(&mut limbs, limb_start);
+    vec_delete_left(&mut limbs, limb_start);
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut limbs, offset);

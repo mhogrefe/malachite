@@ -18,16 +18,6 @@ pub mod base {
         pub mod increment;
     }
 
-    pub mod limbs {
-        pub mod limbs_delete_left;
-        pub mod limbs_leading_zero_limbs;
-        pub mod limbs_move_left;
-        pub mod limbs_pad_left;
-        pub mod limbs_set_zero;
-        pub mod limbs_test_zero;
-        pub mod limbs_trailing_zero_limbs;
-    }
-
     pub mod num {
         pub mod arithmetic {
             pub mod log_two;
@@ -81,10 +71,23 @@ pub mod base {
         pub mod size;
     }
 
+    pub mod slices {
+        pub mod slice_leading_zeros;
+        pub mod slice_move_left;
+        pub mod slice_set_zero;
+        pub mod slice_test_zero;
+        pub mod slice_trailing_zeros;
+    }
+
     pub mod strings {
         pub mod string_is_subset;
         pub mod string_nub;
         pub mod string_sort;
+    }
+
+    pub mod vecs {
+        pub mod vec_delete_left;
+        pub mod vec_pad_left;
     }
 }
 
@@ -241,6 +244,7 @@ pub mod natural {
         pub mod count_ones;
         pub mod flip_bit;
         pub mod from_bits;
+        pub mod from_power_of_two_digits;
         pub mod get_bit;
         pub mod get_bits;
         pub mod hamming_distance;

@@ -6,6 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
@@ -19,17 +20,23 @@ use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
-use rust_wheels::iterators::dependent_pairs::dependent_pairs;
+use rust_wheels::iterators::dependent_pairs::{
+    dependent_pairs, exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
+};
 use rust_wheels::iterators::general::{random, range_increasing};
-use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
+use rust_wheels::iterators::integers_geometric::{
+    i32s_geometric, range_up_geometric_u32, u32s_geometric,
+};
 use rust_wheels::iterators::naturals::{
     exhaustive_naturals, exhaustive_positive_naturals, random_naturals, random_positive_naturals,
     random_range_up_natural, range_up_increasing_natural, special_random_naturals,
-    special_random_positive_naturals, special_random_range_up_natural,
+    special_random_positive_naturals, special_random_range_natural,
+    special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_natural_signed, exhaustive_signed, exhaustive_unsigned, random_natural_signed,
-    random_range, special_random_natural_signed, special_random_signed, special_random_unsigned,
+    exhaustive_natural_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
+    random_natural_signed, random_range, range_down_increasing, special_random_natural_signed,
+    special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
@@ -37,7 +44,9 @@ use rust_wheels::iterators::tuples::{
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
     random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
 };
-use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
+use rust_wheels::iterators::vecs::{
+    exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs,
+};
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{
@@ -1300,4 +1309,70 @@ pub fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural_var_1<
         quadruples_of_natural_small_unsigned_small_unsigned_and_natural(gm)
             .filter(|&(_, start, end, _)| start < end),
     )
+}
+
+fn pairs_of_u64_and_natural_vec_var_1_random_helper(
+    &scale: &u32,
+    &log_base: &u64,
+) -> It<Vec<Natural>> {
+    Box::new(random_vecs(
+        &EXAMPLE_SEED,
+        scale,
+        &(|seed| {
+            special_random_range_natural(
+                seed,
+                Natural::ZERO,
+                (Natural::ONE << log_base) - Natural::ONE,
+            )
+        }),
+    ))
+}
+
+fn pairs_of_u64_and_natural_vec_var_1_special_random_helper(
+    &scale: &u32,
+    &log_base: &u64,
+) -> It<Vec<Natural>> {
+    Box::new(random_vecs(
+        &EXAMPLE_SEED,
+        scale,
+        &(|seed| {
+            special_random_range_natural(
+                seed,
+                Natural::ZERO,
+                (Natural::ONE << log_base) - Natural::ONE,
+            )
+        }),
+    ))
+}
+
+// All pairs of `u64` and `Vec<Natural>`, where each pair is a valid input to
+// `from_power_of_two_digits_asc<Natural, Natural>`.
+pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Natural>)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = |_: &(), &log_base: &u64| -> It<Vec<Natural>> {
+                let digits = range_down_increasing((Natural::ONE << log_base) - Natural::ONE);
+                if log_base == 1 {
+                    exhaustive_vecs_shortlex(digits)
+                } else {
+                    Box::new(exhaustive_vecs(digits))
+                }
+            };
+            Box::new(exhaustive_dependent_pairs_infinite_sqrt(
+                (),
+                exhaustive_positive(),
+                f,
+            ))
+        }
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            scale,
+            range_up_geometric_u32(&EXAMPLE_SEED, scale, 1).map(u64::from),
+            pairs_of_u64_and_natural_vec_var_1_random_helper,
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            scale,
+            range_up_geometric_u32(&EXAMPLE_SEED, scale, 1).map(u64::from),
+            pairs_of_u64_and_natural_vec_var_1_special_random_helper,
+        )),
+    }
 }

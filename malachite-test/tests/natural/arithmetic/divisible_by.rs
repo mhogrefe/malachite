@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::arithmetic::divisible_by::{
     _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
     limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
@@ -960,7 +960,7 @@ fn limbs_divisible_by_properties() {
 
     test_properties_custom_scale(512, pairs_of_limb_vec_var_14, |&(ref ns, ref ds)| {
         let divisible = limbs_divisible_by_ref_ref(ns, ds);
-        assert_eq!(limbs_test_zero(&limbs_mod(ns, ds)), divisible);
+        assert_eq!(slice_test_zero(&limbs_mod(ns, ds)), divisible);
     });
 }
 

@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Max;
 use malachite_base::crement::Crementable;
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
@@ -1247,7 +1247,7 @@ fn limbs_sub_same_length_in_place_with_overlap_properties() {
         let xs_old = xs;
         let mut xs = xs_old.to_vec();
         assert!(!limbs_sub_same_length_in_place_with_overlap(&mut xs, 0));
-        assert!(limbs_test_zero(&xs));
+        assert!(slice_test_zero(&xs));
 
         let mut xs = xs_old.to_vec();
         assert!(!limbs_sub_same_length_in_place_with_overlap(
@@ -1293,7 +1293,7 @@ fn limbs_sub_same_length_to_out_with_overlap_properties() {
         let xs_old = xs;
         let mut xs = xs_old.to_vec();
         assert!(!limbs_sub_same_length_to_out_with_overlap(&mut xs, xs_old));
-        assert!(limbs_test_zero(&xs));
+        assert!(slice_test_zero(&xs));
 
         let mut xs = xs_old.to_vec();
         assert!(!limbs_sub_same_length_to_out_with_overlap(&mut xs, &[]));

@@ -1,9 +1,9 @@
 use std::cmp::Ordering;
 
-use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
+use malachite_base::slices::slice_leading_zeros;
 
 use integer::Integer;
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
@@ -39,7 +39,7 @@ use platform::Limb;
 /// This is mpz_scan0 from mpz/scan0.c, GMP 6.1.2.
 pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64) -> Option<u64> {
     let n = limbs.len();
-    let i = limbs_leading_zero_limbs(limbs);
+    let i = slice_leading_zeros(limbs);
     assert!(i < n);
     let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {
@@ -99,7 +99,7 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
 /// This is mpz_scan1 from mpz/scan1.c, GMP 6.1.2.
 pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64) -> u64 {
     let n = limbs.len();
-    let i = limbs_leading_zero_limbs(limbs);
+    let i = slice_leading_zeros(limbs);
     assert!(i < n);
     let mut starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {

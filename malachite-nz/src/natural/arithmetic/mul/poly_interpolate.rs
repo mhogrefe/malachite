@@ -1,11 +1,11 @@
 use std::mem::swap;
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
@@ -35,7 +35,7 @@ use platform::{
 ///
 /// where k = `k`
 ///
-/// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c.
+/// This is mpn_toom_interpolate_5pts in mpn/generic/toom_interpolate_5pts.c, GMP 6.1.2.
 pub(crate) fn _limbs_mul_toom_interpolate_5_points(
     c: &mut [Limb],
     v_2: &mut [Limb],
@@ -241,7 +241,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
 /// where n = `n`
 ///
 /// This is mpn_toom_interpolate_6pts from mpn/generic/toom_interpolate_6pts.c, but the argument
-/// w0n == `n_high` is moved to immediately after `n`.
+/// w0n == `n_high` is moved to immediately after `n`, GMP 6.1.2.
 pub(crate) fn _limbs_mul_toom_interpolate_6_points(
     out: &mut [Limb],
     n: usize,
@@ -459,8 +459,8 @@ const WANT_ASSERT: bool = true;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_7pts from mpn/generic/toom_interpolate_7pts.c, but the argument
-/// w6n == `n_high` is moved to immediately after `n`.
+/// This is mpn_toom_interpolate_7pts from mpn/generic/toom_interpolate_7pts.c, GMP 6.1.2, but the
+/// argument w6n == `n_high` is moved to immediately after `n`.
 pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     out: &mut [Limb],
     n: usize,
@@ -624,7 +624,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
             w5_hi_lo,
         ));
         if WANT_ASSERT && n + n_high < m {
-            limbs_test_zero(w5_hi_hi);
+            slice_test_zero(w5_hi_hi);
         }
     }
 }
@@ -635,7 +635,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
 ///
 /// where n = `ys.len()`
 ///
-/// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c.
+/// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
 pub fn _limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -656,7 +656,7 @@ pub fn _limbs_shl_and_sub_same_length(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is DO_mpn_subrsh from mpn/generic/toom_interpolate_8pts.c.
+/// This is DO_mpn_subrsh from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
 fn _limbs_shl_and_sub(xs: &mut [Limb], ys: &[Limb], shift: u64, scratch: &mut [Limb]) {
     assert!(!limbs_sub_limb_in_place(xs, ys[0] >> shift));
     let carry = _limbs_shl_and_sub_same_length(xs, &ys[1..], Limb::WIDTH - shift, scratch);
@@ -709,8 +709,8 @@ fn _limbs_shl_and_sub_special(
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_8pts from mpn/generic/toom_interpolate_8pts.c, but the argument
-/// spt == `s_plus_t` is moved to immediately after `n`.
+/// This is mpn_toom_interpolate_8pts from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2, but the
+/// argument spt == `s_plus_t` is moved to immediately after `n`.
 pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     out: &mut [Limb],
     n: usize,
@@ -859,7 +859,7 @@ fn limbs_div_255_in_place(xs: &mut [Limb]) {
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c.
+/// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c, GMP 6.1.2.
 pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     out: &mut [Limb],
     mut r1: &'a mut [Limb],
@@ -1107,7 +1107,7 @@ const CORRECTED_WIDTH: u64 = 42;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c.
+/// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c, GMP 6.1.2.
 pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     out: &mut [Limb],
     r1: &mut [Limb],

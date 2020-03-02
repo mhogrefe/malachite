@@ -41,7 +41,7 @@ macro_rules! floor_log_two_fail {
 
 floor_log_two_fail!(u8, floor_log_two_u8_fail);
 floor_log_two_fail!(u16, floor_log_two_u16_fail);
-floor_log_two_fail!(u32, floor_log_two_limb_fail);
+floor_log_two_fail!(u32, floor_log_two_u32_fail);
 floor_log_two_fail!(u64, floor_log_two_u64_fail);
 floor_log_two_fail!(u128, floor_log_two_u128_fail);
 floor_log_two_fail!(usize, floor_log_two_usize_fail);
@@ -83,7 +83,7 @@ macro_rules! ceiling_log_two_fail {
 
 ceiling_log_two_fail!(u8, ceiling_log_two_u8_fail);
 ceiling_log_two_fail!(u16, ceiling_log_two_u16_fail);
-ceiling_log_two_fail!(u32, ceiling_log_two_limb_fail);
+ceiling_log_two_fail!(u32, ceiling_log_two_u32_fail);
 ceiling_log_two_fail!(u64, ceiling_log_two_u64_fail);
 ceiling_log_two_fail!(u128, ceiling_log_two_u128_fail);
 ceiling_log_two_fail!(usize, ceiling_log_two_usize_fail);

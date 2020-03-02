@@ -1,12 +1,12 @@
 use std::cmp::Ordering;
 
-use malachite_base::limbs::limbs_trailing_zero_limbs;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::slice_trailing_zeros;
 
 use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::divisible_by::{
@@ -39,7 +39,7 @@ pub fn limbs_limb_mod_exact_odd_limb(limb: Limb, divisor: Limb, carry: Limb) -> 
 
 /// divisor must be odd. //TODO test
 ///
-/// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c.
+/// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c.
 pub fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
     let len = limbs.len();
     if len == 1 {
@@ -76,7 +76,7 @@ pub fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) 
 ///
 /// limbs.len() must be greater than 1; modulus must be nonzero.
 ///
-/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is non-negative.
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is non-negative.
 pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
     if limbs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
         limbs_mod_limb(limbs, modulus) == limb % modulus
@@ -108,8 +108,8 @@ pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Lim
 /// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1_238, 10), true);
 /// ```
 ///
-/// This is mpz_congruent_ui_p from mpz/cong_ui.c where a is positive and the ABOVE_THRESHOLD branch
-/// is excluded.
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is positive and the
+/// ABOVE_THRESHOLD branch is excluded.
 pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
     assert_ne!(modulus, 0);
     assert!(limbs.len() > 1);
@@ -189,8 +189,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
 /// assert_eq!(limbs_eq_limb_mod_ref_ref(&[0, 1], 1, &[0, 1]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and d are longer than
-/// one limb, and c is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
+/// longer than one limb, and c is one limb long.
 pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
         return equal;
@@ -198,7 +198,7 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - y|
     assert!(!limbs_sub_limb_to_out(&mut scratch, xs, y));
-    scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
+    scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
 }
 
@@ -227,8 +227,8 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool
 /// assert_eq!(limbs_eq_limb_mod_ref_val(&[0, 1], 1, &mut [0, 1]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and d are longer than
-/// one limb, and c is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
+/// longer than one limb, and c is one limb long.
 pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
         return equal;
@@ -236,7 +236,7 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> 
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - y|
     assert!(!limbs_sub_limb_to_out(&mut scratch, xs, y));
-    scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
+    scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
 }
 
@@ -265,15 +265,15 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> 
 /// assert_eq!(limbs_eq_limb_mod_val_ref(&mut [0, 1], 1, &[0, 1]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and d are longer than
-/// one limb, and c is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
+/// longer than one limb, and c is one limb long.
 pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
         return equal;
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
-    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
+    let new_len = xs.len() - slice_trailing_zeros(xs);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
 }
 
@@ -301,8 +301,8 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> 
 /// assert_eq!(limbs_eq_limb_mod(&mut [0, 1], 1, &mut [0, 1]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and d are longer than
-/// one limb, and c is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
+/// longer than one limb, and c is one limb long.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, modulus: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
@@ -310,7 +310,7 @@ pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, modulus: &mut [Limb]) -> bool
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
-    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
+    let new_len = xs.len() - slice_trailing_zeros(xs);
     new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
 }
 
@@ -357,8 +357,8 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<b
 /// assert_eq!(limbs_eq_mod_limb_ref_ref(&[0, 1], &[3, 4], 5), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and c are longer than
-/// one limb, and m is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
+/// longer than one limb, and m is one limb long.
 pub fn limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_ref_greater(xs, ys, modulus)
@@ -379,7 +379,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
-    scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
+    scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     // scratch is non-empty here because xs != ys
     if scratch.len() == 1 {
         scratch[0].divisible_by(modulus)
@@ -413,8 +413,8 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
 /// assert_eq!(limbs_eq_mod_limb_ref_val(&[0, 1], &mut [3, 4], 5), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and c are longer than
-/// one limb, and m is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
+/// longer than one limb, and m is one limb long.
 pub fn limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], modulus: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_val_greater(xs, ys, modulus)
@@ -438,7 +438,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
+    let new_len = scratch.len() - slice_trailing_zeros(scratch);
     // scratch is non-empty here because xs != ys
     if new_len == 1 {
         scratch[0].divisible_by(modulus)
@@ -472,8 +472,8 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
 /// assert_eq!(limbs_eq_mod_limb_val_ref(&mut [0, 1], &[3, 4], 5), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive, a and c are longer than
-/// one limb, and m is one limb long.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
+/// longer than one limb, and m is one limb long.
 pub fn limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], modulus: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_val_ref_greater(xs, ys, modulus)
@@ -493,7 +493,7 @@ fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], modulus: Limb
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
+    let new_len = xs.len() - slice_trailing_zeros(xs);
     // xs is non-empty here because xs != ys
     if new_len == 1 {
         xs[0].divisible_by(modulus)
@@ -551,8 +551,8 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
 /// assert_eq!(limbs_eq_mod_ref_ref_ref(&[0, 1, 1], &[1, 0, 3], &[0, 7]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive and each is longer than
-/// one limb.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
+/// longer than one limb.
 pub fn limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_ref(xs, ys, modulus)
@@ -573,7 +573,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) 
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
-    scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
+    scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
 }
 
@@ -602,8 +602,8 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) 
 /// assert_eq!(limbs_eq_mod_ref_ref_val(&[0, 1, 1], &[1, 0, 3], &mut [0, 7]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive and each is longer than
-/// one limb.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
+/// longer than one limb.
 pub fn limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_val(xs, ys, modulus)
@@ -624,7 +624,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Lim
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
-    scratch.truncate(scratch.len() - limbs_trailing_zero_limbs(&scratch));
+    scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
 }
 
@@ -653,8 +653,8 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Lim
 /// assert_eq!(limbs_eq_mod_ref_val_ref(&[0, 1, 1], &mut [1, 0, 3], &[0, 7]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive and each is longer than
-/// one limb.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
+/// longer than one limb.
 pub fn limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_ref(xs, ys, modulus)
@@ -678,7 +678,7 @@ fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Lim
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
+    let new_len = scratch.len() - slice_trailing_zeros(scratch);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch[..new_len], modulus)
 }
 
@@ -693,7 +693,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
+    let new_len = xs.len() - slice_trailing_zeros(xs);
     new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
 }
 
@@ -722,8 +722,8 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
 /// assert_eq!(limbs_eq_mod_ref_val_val(&[0, 1, 1], &mut [1, 0, 3], &mut [0, 7]), false);
 /// ```
 ///
-/// This is mpz_congruent_p from mpz/cong.c, where a, c, and d are positive and each is longer than
-/// one limb.
+/// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
+/// longer than one limb.
 pub fn limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_val(xs, ys, modulus)
@@ -747,7 +747,7 @@ fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut 
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
         ys
     };
-    let new_len = scratch.len() - limbs_trailing_zero_limbs(scratch);
+    let new_len = scratch.len() - slice_trailing_zeros(scratch);
     new_len >= modulus.len() && limbs_divisible_by(&mut scratch[..new_len], modulus)
 }
 
@@ -762,7 +762,7 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], modulus: &mut 
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
-    let new_len = xs.len() - limbs_trailing_zero_limbs(xs);
+    let new_len = xs.len() - slice_trailing_zeros(xs);
     new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
 }
 
@@ -774,13 +774,13 @@ pub fn _limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, modulus: &[Limb]) -> boo
     } else {
         xs.to_vec()
     };
-    xs_mod.truncate(xs_mod.len() - limbs_trailing_zero_limbs(&xs_mod));
+    xs_mod.truncate(xs_mod.len() - slice_trailing_zeros(&xs_mod));
     xs_mod == [y]
 }
 
 pub fn _limbs_eq_limb_mod_naive_2(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
     let mut difference = limbs_sub_limb(xs, y).0;
-    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
     difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
 }
 
@@ -800,7 +800,7 @@ pub fn _limbs_eq_mod_limb_naive_2(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bo
         limbs_sub(ys, xs)
     }
     .0;
-    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
     if difference.len() == 1 {
         difference[0].divisible_by(modulus)
     } else {
@@ -819,8 +819,8 @@ pub fn _limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool
     } else {
         ys.to_vec()
     };
-    xs_mod.truncate(xs_mod.len() - limbs_trailing_zero_limbs(&xs_mod));
-    ys_mod.truncate(ys_mod.len() - limbs_trailing_zero_limbs(&ys_mod));
+    xs_mod.truncate(xs_mod.len() - slice_trailing_zeros(&xs_mod));
+    ys_mod.truncate(ys_mod.len() - slice_trailing_zeros(&ys_mod));
     limbs_cmp(&xs_mod, &ys_mod) == Ordering::Equal
 }
 
@@ -834,7 +834,7 @@ pub fn _limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool
         limbs_sub(ys, xs)
     }
     .0;
-    difference.truncate(difference.len() - limbs_trailing_zero_limbs(&difference));
+    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
     difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
 }
 

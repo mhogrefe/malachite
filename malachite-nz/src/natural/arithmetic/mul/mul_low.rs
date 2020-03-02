@@ -20,7 +20,7 @@ use platform::{
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, MULLO_VARIANT == 2
+/// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 2.
 pub fn _limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);
@@ -86,7 +86,7 @@ fn get_n_lo(n: usize) -> usize {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, where rp == tp.
+/// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp == tp.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     out: &mut [Limb],
@@ -197,7 +197,7 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, where rp != tp.
+/// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp != tp.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mul_low_same_length_divide_and_conquer(
     out: &mut [Limb],
@@ -244,7 +244,7 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_mullo_n_itch from mpn/generic/mullo_n.c.
+/// This is mpn_mullo_n_itch from mpn/generic/mullo_n.c, GMP 6.1.2.
 pub const fn _limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
     n << 1
 }
@@ -276,7 +276,7 @@ pub fn _limbs_mul_low_same_length_large(
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_mullo_n from mpn/generic/mullo_n.c.
+/// This is mpn_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
@@ -306,7 +306,7 @@ pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, MULLO_VARIANT == 1
+/// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 1.
 pub fn _limbs_mul_low_same_length_basecase_alt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);

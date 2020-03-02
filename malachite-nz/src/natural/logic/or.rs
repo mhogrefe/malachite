@@ -87,7 +87,7 @@ pub fn limbs_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_ior_n from gmp-impl.h where rp is returned.
+/// This is mpn_ior_n from gmp-impl.h, GMP 6.1.2, where rp is returned.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -108,7 +108,8 @@ pub fn limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// a `Vec` of the limbs of the bitwise or of the `Natural`s. The length of the result is the length
 /// of the longer input slice.
 ///
-/// This is mpz_ior from mpz/ior.c where res is returned and both inputs are non-negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res is returned and both inputs are non-
+/// negative.
 ///
 /// Time: worst case O(n)
 ///
@@ -147,7 +148,7 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_ior_n from gmp-impl.h.
+/// This is mpn_ior_n from gmp-impl.h, GMP 6.1.2.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
@@ -183,7 +184,7 @@ pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_ior from mpz/ior.c where both inputs are non-negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are non-negative.
 ///
 /// # Panics
 /// Panics if `out` is too short.
@@ -223,7 +224,7 @@ pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_ior_n from gmp-impl.h where rp == up.
+/// This is mpn_ior_n from gmp-impl.h, GMP 6.1.2, where rp == up.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -257,7 +258,7 @@ pub fn limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// where n = `ys.len()`
 ///
-/// This is mpz_ior from mpz/ior.c where res == op1 and both inputs are non-negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -297,8 +298,8 @@ pub fn limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = min(`xs.len`, `ys.len()`)
 ///
-/// This is mpz_ior from mpz/ior.c where both inputs are non-negative and the result is written to
-/// the longer input slice.
+/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are non-negative and the result is
+/// written to the longer input slice.
 ///
 /// # Example
 /// ```

@@ -24,7 +24,7 @@ use natural::Natural;
 ///
 /// where n = `bits`
 ///
-/// This is mpn_random2 from mpn/generic/random2.c.
+/// This is mpn_random2 from mpn/generic/random2.c, GMP 6.1.2.
 ///
 /// # Panics
 /// Panics if `bits` is zero.

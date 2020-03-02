@@ -621,7 +621,7 @@ macro_rules! impl_logic_traits {
             /// trailing false bits going forward, or leading falses going backward.
             ///
             /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
-            /// `to_limbs_desc` instead.
+            /// `to_bits_desc` instead.
             ///
             /// Time: worst case O(1)
             ///
@@ -771,7 +771,8 @@ macro_rules! impl_logic_traits {
                     ///
                     /// # Panics
                     /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
-                    /// zero, or if the digits represent a value that isn't representable by $t.
+                    /// zero, if the digits represent a value that isn't representable by $t, or if
+                    /// some digit is greater than 2<sup>`log_base`.</sup>
                     ///
                     /// # Examples
                     /// ```
@@ -821,7 +822,8 @@ macro_rules! impl_logic_traits {
                     ///
                     /// # Panics
                     /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
-                    /// zero, or if the digits represent a value that isn't representable by $t.
+                    /// zero, if the digits represent a value that isn't representable by $t, or if
+                    /// some digit is greater than 2<sup>`log_base`.</sup>
                     ///
                     /// # Examples
                     /// ```

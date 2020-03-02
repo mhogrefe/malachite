@@ -1,7 +1,7 @@
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::slices::slice_test_zero;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -29,11 +29,11 @@ use platform::Limb;
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 13), false);
 /// ```
 ///
-/// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, where a is non-negative.
+/// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, GMP 6.1.2, where a is non-negative.
 pub fn limbs_divisible_by_power_of_two(limbs: &[Limb], pow: u64) -> bool {
     let zero_limbs = usize::exact_from(pow >> Limb::LOG_WIDTH);
     zero_limbs < limbs.len()
-        && limbs_test_zero(&limbs[..zero_limbs])
+        && slice_test_zero(&limbs[..zero_limbs])
         && limbs[zero_limbs].divisible_by_power_of_two(pow & Limb::WIDTH_MASK)
 }
 

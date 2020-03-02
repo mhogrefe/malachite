@@ -1,7 +1,7 @@
-use malachite_base::limbs::{limbs_set_zero, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{
     NextPowerOfTwo, NextPowerOfTwoAssign, TrueCheckedShl,
 };
+use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -34,7 +34,7 @@ pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
     let mut result_limbs;
     if let Some(limb) = last_limb.checked_next_power_of_two() {
         result_limbs = vec![0; limbs.len() - 1];
-        if limb == *last_limb && !limbs_test_zero(&limbs[..limbs.len() - 1]) {
+        if limb == *last_limb && !slice_test_zero(&limbs[..limbs.len() - 1]) {
             if let Some(limb) = limb.true_checked_shl(1) {
                 result_limbs.push(limb)
             } else {
@@ -86,8 +86,8 @@ pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
 pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
     let (last_limb, init) = limbs.split_last_mut().unwrap();
     if let Some(limb) = last_limb.checked_next_power_of_two() {
-        if limb == *last_limb && !limbs_test_zero(init) {
-            limbs_set_zero(init);
+        if limb == *last_limb && !slice_test_zero(init) {
+            slice_set_zero(init);
             if let Some(limb) = limb.true_checked_shl(1) {
                 *last_limb = limb;
                 false
@@ -96,12 +96,12 @@ pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
                 true
             }
         } else {
-            limbs_set_zero(init);
+            slice_set_zero(init);
             *last_limb = limb;
             false
         }
     } else {
-        limbs_set_zero(init);
+        slice_set_zero(init);
         *last_limb = 0;
         true
     }

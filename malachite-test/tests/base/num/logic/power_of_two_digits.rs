@@ -1,10 +1,10 @@
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_trailing_zero_limbs};
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
 use malachite_base::round::RoundingMode;
+use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -196,7 +196,7 @@ where
             let n = T::from_power_of_two_digits_asc(log_base, &digits);
             let digits_rev: Vec<U> = digits.iter().rev().cloned().collect();
             assert_eq!(T::from_power_of_two_digits_desc(log_base, &digits_rev), n);
-            let trailing_zeros = limbs_trailing_zero_limbs(&digits);
+            let trailing_zeros = slice_trailing_zeros(&digits);
             let trimmed_digits = digits[..digits.len() - trailing_zeros].to_vec();
             assert_eq!(
                 PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(&n, log_base),
@@ -266,7 +266,7 @@ where
             let n = T::from_power_of_two_digits_desc(log_base, &digits);
             let digits_rev: Vec<U> = digits.iter().rev().cloned().collect();
             assert_eq!(T::from_power_of_two_digits_asc(log_base, &digits_rev), n);
-            let leading_zeros = limbs_leading_zero_limbs(&digits);
+            let leading_zeros = slice_leading_zeros(&digits);
             let trimmed_digits = digits[leading_zeros..].to_vec();
             assert_eq!(
                 PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(&n, log_base),

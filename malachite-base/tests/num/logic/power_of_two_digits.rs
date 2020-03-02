@@ -526,7 +526,7 @@ pub fn test_from_power_of_two_digits_asc() {
 }
 
 macro_rules! from_power_of_two_digits_asc_fail_helper {
-    ($t:ident, $u:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident) => {
+    ($t:ident, $u:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident, $fail_4:ident) => {
         #[test]
         #[should_panic]
         fn $fail_1() {
@@ -547,6 +547,13 @@ macro_rules! from_power_of_two_digits_asc_fail_helper {
             let digits: &[$u] = &[1; 100];
             $t::from_power_of_two_digits_asc(4, digits);
         }
+
+        #[test]
+        #[should_panic]
+        fn $fail_4() {
+            let digits: &[$u] = &[2];
+            $t::from_power_of_two_digits_asc(1, digits);
+        }
     };
 }
 
@@ -555,252 +562,288 @@ from_power_of_two_digits_asc_fail_helper!(
     u8,
     from_power_of_two_digits_asc_u8_u8_fail_1,
     from_power_of_two_digits_asc_u8_u8_fail_2,
-    from_power_of_two_digits_asc_u8_u8_fail_3
+    from_power_of_two_digits_asc_u8_u8_fail_3,
+    from_power_of_two_digits_asc_u8_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u8,
     u16,
     from_power_of_two_digits_asc_u8_u16_fail_1,
     from_power_of_two_digits_asc_u8_u16_fail_2,
-    from_power_of_two_digits_asc_u8_u16_fail_3
+    from_power_of_two_digits_asc_u8_u16_fail_3,
+    from_power_of_two_digits_asc_u8_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u8,
     u32,
     from_power_of_two_digits_asc_u8_u32_fail_1,
     from_power_of_two_digits_asc_u8_u32_fail_2,
-    from_power_of_two_digits_asc_u8_u32_fail_3
+    from_power_of_two_digits_asc_u8_u32_fail_3,
+    from_power_of_two_digits_asc_u8_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u8,
     u64,
     from_power_of_two_digits_asc_u8_u64_fail_1,
     from_power_of_two_digits_asc_u8_u64_fail_2,
-    from_power_of_two_digits_asc_u8_u64_fail_3
+    from_power_of_two_digits_asc_u8_u64_fail_3,
+    from_power_of_two_digits_asc_u8_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u8,
     u128,
     from_power_of_two_digits_asc_u8_u128_fail_1,
     from_power_of_two_digits_asc_u8_u128_fail_2,
-    from_power_of_two_digits_asc_u8_u128_fail_3
+    from_power_of_two_digits_asc_u8_u128_fail_3,
+    from_power_of_two_digits_asc_u8_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u8,
     usize,
     from_power_of_two_digits_asc_u8_usize_fail_1,
     from_power_of_two_digits_asc_u8_usize_fail_2,
-    from_power_of_two_digits_asc_u8_usize_fail_3
+    from_power_of_two_digits_asc_u8_usize_fail_3,
+    from_power_of_two_digits_asc_u8_usize_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     u8,
     from_power_of_two_digits_asc_u16_u8_fail_1,
     from_power_of_two_digits_asc_u16_u8_fail_2,
-    from_power_of_two_digits_asc_u16_u8_fail_3
+    from_power_of_two_digits_asc_u16_u8_fail_3,
+    from_power_of_two_digits_asc_u16_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     u16,
     from_power_of_two_digits_asc_u16_u16_fail_1,
     from_power_of_two_digits_asc_u16_u16_fail_2,
-    from_power_of_two_digits_asc_u16_u16_fail_3
+    from_power_of_two_digits_asc_u16_u16_fail_3,
+    from_power_of_two_digits_asc_u16_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     u32,
     from_power_of_two_digits_asc_u16_u32_fail_1,
     from_power_of_two_digits_asc_u16_u32_fail_2,
-    from_power_of_two_digits_asc_u16_u32_fail_3
+    from_power_of_two_digits_asc_u16_u32_fail_3,
+    from_power_of_two_digits_asc_u16_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     u64,
     from_power_of_two_digits_asc_u16_u64_fail_1,
     from_power_of_two_digits_asc_u16_u64_fail_2,
-    from_power_of_two_digits_asc_u16_u64_fail_3
+    from_power_of_two_digits_asc_u16_u64_fail_3,
+    from_power_of_two_digits_asc_u16_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     u128,
     from_power_of_two_digits_asc_u16_u128_fail_1,
     from_power_of_two_digits_asc_u16_u128_fail_2,
-    from_power_of_two_digits_asc_u16_u128_fail_3
+    from_power_of_two_digits_asc_u16_u128_fail_3,
+    from_power_of_two_digits_asc_u16_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u16,
     usize,
     from_power_of_two_digits_asc_u16_usize_fail_1,
     from_power_of_two_digits_asc_u16_usize_fail_2,
-    from_power_of_two_digits_asc_u16_usize_fail_3
+    from_power_of_two_digits_asc_u16_usize_fail_3,
+    from_power_of_two_digits_asc_u16_usize_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     u8,
     from_power_of_two_digits_asc_u32_u8_fail_1,
     from_power_of_two_digits_asc_u32_u8_fail_2,
-    from_power_of_two_digits_asc_u32_u8_fail_3
+    from_power_of_two_digits_asc_u32_u8_fail_3,
+    from_power_of_two_digits_asc_u32_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     u16,
     from_power_of_two_digits_asc_u32_u16_fail_1,
     from_power_of_two_digits_asc_u32_u16_fail_2,
-    from_power_of_two_digits_asc_u32_u16_fail_3
+    from_power_of_two_digits_asc_u32_u16_fail_3,
+    from_power_of_two_digits_asc_u32_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     u32,
     from_power_of_two_digits_asc_u32_u32_fail_1,
     from_power_of_two_digits_asc_u32_u32_fail_2,
-    from_power_of_two_digits_asc_u32_u32_fail_3
+    from_power_of_two_digits_asc_u32_u32_fail_3,
+    from_power_of_two_digits_asc_u32_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     u64,
     from_power_of_two_digits_asc_u32_u64_fail_1,
     from_power_of_two_digits_asc_u32_u64_fail_2,
-    from_power_of_two_digits_asc_u32_u64_fail_3
+    from_power_of_two_digits_asc_u32_u64_fail_3,
+    from_power_of_two_digits_asc_u32_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     u128,
     from_power_of_two_digits_asc_u32_u128_fail_1,
     from_power_of_two_digits_asc_u32_u128_fail_2,
-    from_power_of_two_digits_asc_u32_u128_fail_3
+    from_power_of_two_digits_asc_u32_u128_fail_3,
+    from_power_of_two_digits_asc_u32_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u32,
     usize,
     from_power_of_two_digits_asc_u32_usize_fail_1,
     from_power_of_two_digits_asc_u32_usize_fail_2,
-    from_power_of_two_digits_asc_u32_usize_fail_3
+    from_power_of_two_digits_asc_u32_usize_fail_3,
+    from_power_of_two_digits_asc_u32_usize_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     u8,
     from_power_of_two_digits_asc_u64_u8_fail_1,
     from_power_of_two_digits_asc_u64_u8_fail_2,
-    from_power_of_two_digits_asc_u64_u8_fail_3
+    from_power_of_two_digits_asc_u64_u8_fail_3,
+    from_power_of_two_digits_asc_u64_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     u16,
     from_power_of_two_digits_asc_u64_u16_fail_1,
     from_power_of_two_digits_asc_u64_u16_fail_2,
-    from_power_of_two_digits_asc_u64_u16_fail_3
+    from_power_of_two_digits_asc_u64_u16_fail_3,
+    from_power_of_two_digits_asc_u64_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     u32,
     from_power_of_two_digits_asc_u64_u32_fail_1,
     from_power_of_two_digits_asc_u64_u32_fail_2,
-    from_power_of_two_digits_asc_u64_u32_fail_3
+    from_power_of_two_digits_asc_u64_u32_fail_3,
+    from_power_of_two_digits_asc_u64_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     u64,
     from_power_of_two_digits_asc_u64_u64_fail_1,
     from_power_of_two_digits_asc_u64_u64_fail_2,
-    from_power_of_two_digits_asc_u64_u64_fail_3
+    from_power_of_two_digits_asc_u64_u64_fail_3,
+    from_power_of_two_digits_asc_u64_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     u128,
     from_power_of_two_digits_asc_u64_u128_fail_1,
     from_power_of_two_digits_asc_u64_u128_fail_2,
-    from_power_of_two_digits_asc_u64_u128_fail_3
+    from_power_of_two_digits_asc_u64_u128_fail_3,
+    from_power_of_two_digits_asc_u64_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u64,
     usize,
     from_power_of_two_digits_asc_u64_usize_fail_1,
     from_power_of_two_digits_asc_u64_usize_fail_2,
-    from_power_of_two_digits_asc_u64_usize_fail_3
+    from_power_of_two_digits_asc_u64_usize_fail_3,
+    from_power_of_two_digits_asc_u64_usize_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     u8,
     from_power_of_two_digits_asc_u128_u8_fail_1,
     from_power_of_two_digits_asc_u128_u8_fail_2,
-    from_power_of_two_digits_asc_u128_u8_fail_3
+    from_power_of_two_digits_asc_u128_u8_fail_3,
+    from_power_of_two_digits_asc_u128_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     u16,
     from_power_of_two_digits_asc_u128_u16_fail_1,
     from_power_of_two_digits_asc_u128_u16_fail_2,
-    from_power_of_two_digits_asc_u128_u16_fail_3
+    from_power_of_two_digits_asc_u128_u16_fail_3,
+    from_power_of_two_digits_asc_u128_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     u32,
     from_power_of_two_digits_asc_u128_u32_fail_1,
     from_power_of_two_digits_asc_u128_u32_fail_2,
-    from_power_of_two_digits_asc_u128_u32_fail_3
+    from_power_of_two_digits_asc_u128_u32_fail_3,
+    from_power_of_two_digits_asc_u128_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     u64,
     from_power_of_two_digits_asc_u128_u64_fail_1,
     from_power_of_two_digits_asc_u128_u64_fail_2,
-    from_power_of_two_digits_asc_u128_u64_fail_3
+    from_power_of_two_digits_asc_u128_u64_fail_3,
+    from_power_of_two_digits_asc_u128_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     u128,
     from_power_of_two_digits_asc_u128_u128_fail_1,
     from_power_of_two_digits_asc_u128_u128_fail_2,
-    from_power_of_two_digits_asc_u128_u128_fail_3
+    from_power_of_two_digits_asc_u128_u128_fail_3,
+    from_power_of_two_digits_asc_u128_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     u128,
     usize,
     from_power_of_two_digits_asc_u128_usize_fail_1,
     from_power_of_two_digits_asc_u128_usize_fail_2,
-    from_power_of_two_digits_asc_u128_usize_fail_3
+    from_power_of_two_digits_asc_u128_usize_fail_3,
+    from_power_of_two_digits_asc_u128_usize_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     u8,
     from_power_of_two_digits_asc_usize_u8_fail_1,
     from_power_of_two_digits_asc_usize_u8_fail_2,
-    from_power_of_two_digits_asc_usize_u8_fail_3
+    from_power_of_two_digits_asc_usize_u8_fail_3,
+    from_power_of_two_digits_asc_usize_u8_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     u16,
     from_power_of_two_digits_asc_usize_u16_fail_1,
     from_power_of_two_digits_asc_usize_u16_fail_2,
-    from_power_of_two_digits_asc_usize_u16_fail_3
+    from_power_of_two_digits_asc_usize_u16_fail_3,
+    from_power_of_two_digits_asc_usize_u16_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     u32,
     from_power_of_two_digits_asc_usize_u32_fail_1,
     from_power_of_two_digits_asc_usize_u32_fail_2,
-    from_power_of_two_digits_asc_usize_u32_fail_3
+    from_power_of_two_digits_asc_usize_u32_fail_3,
+    from_power_of_two_digits_asc_usize_u32_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     u64,
     from_power_of_two_digits_asc_usize_u64_fail_1,
     from_power_of_two_digits_asc_usize_u64_fail_2,
-    from_power_of_two_digits_asc_usize_u64_fail_3
+    from_power_of_two_digits_asc_usize_u64_fail_3,
+    from_power_of_two_digits_asc_usize_u64_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     u128,
     from_power_of_two_digits_asc_usize_u128_fail_1,
     from_power_of_two_digits_asc_usize_u128_fail_2,
-    from_power_of_two_digits_asc_usize_u128_fail_3
+    from_power_of_two_digits_asc_usize_u128_fail_3,
+    from_power_of_two_digits_asc_usize_u128_fail_4
 );
 from_power_of_two_digits_asc_fail_helper!(
     usize,
     usize,
     from_power_of_two_digits_asc_usize_usize_fail_1,
     from_power_of_two_digits_asc_usize_usize_fail_2,
-    from_power_of_two_digits_asc_usize_usize_fail_3
+    from_power_of_two_digits_asc_usize_usize_fail_3,
+    from_power_of_two_digits_asc_usize_usize_fail_4
 );
 
 #[test]
@@ -821,7 +864,7 @@ pub fn test_from_power_of_two_digits_desc() {
 }
 
 macro_rules! from_power_of_two_digits_desc_fail_helper {
-    ($t:ident, $u:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident) => {
+    ($t:ident, $u:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident, $fail_4:ident) => {
         #[test]
         #[should_panic]
         fn $fail_1() {
@@ -842,6 +885,13 @@ macro_rules! from_power_of_two_digits_desc_fail_helper {
             let digits: &[$u] = &[1; 100];
             $t::from_power_of_two_digits_desc(4, digits);
         }
+
+        #[test]
+        #[should_panic]
+        fn $fail_4() {
+            let digits: &[$u] = &[2];
+            $t::from_power_of_two_digits_desc(1, digits);
+        }
     };
 }
 
@@ -850,250 +900,286 @@ from_power_of_two_digits_desc_fail_helper!(
     u8,
     from_power_of_two_digits_desc_u8_u8_fail_1,
     from_power_of_two_digits_desc_u8_u8_fail_2,
-    from_power_of_two_digits_desc_u8_u8_fail_3
+    from_power_of_two_digits_desc_u8_u8_fail_3,
+    from_power_of_two_digits_desc_u8_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u8,
     u16,
     from_power_of_two_digits_desc_u8_u16_fail_1,
     from_power_of_two_digits_desc_u8_u16_fail_2,
-    from_power_of_two_digits_desc_u8_u16_fail_3
+    from_power_of_two_digits_desc_u8_u16_fail_3,
+    from_power_of_two_digits_desc_u8_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u8,
     u32,
     from_power_of_two_digits_desc_u8_u32_fail_1,
     from_power_of_two_digits_desc_u8_u32_fail_2,
-    from_power_of_two_digits_desc_u8_u32_fail_3
+    from_power_of_two_digits_desc_u8_u32_fail_3,
+    from_power_of_two_digits_desc_u8_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u8,
     u64,
     from_power_of_two_digits_desc_u8_u64_fail_1,
     from_power_of_two_digits_desc_u8_u64_fail_2,
-    from_power_of_two_digits_desc_u8_u64_fail_3
+    from_power_of_two_digits_desc_u8_u64_fail_3,
+    from_power_of_two_digits_desc_u8_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u8,
     u128,
     from_power_of_two_digits_desc_u8_u128_fail_1,
     from_power_of_two_digits_desc_u8_u128_fail_2,
-    from_power_of_two_digits_desc_u8_u128_fail_3
+    from_power_of_two_digits_desc_u8_u128_fail_3,
+    from_power_of_two_digits_desc_u8_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u8,
     usize,
     from_power_of_two_digits_desc_u8_usize_fail_1,
     from_power_of_two_digits_desc_u8_usize_fail_2,
-    from_power_of_two_digits_desc_u8_usize_fail_3
+    from_power_of_two_digits_desc_u8_usize_fail_3,
+    from_power_of_two_digits_desc_u8_usize_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     u8,
     from_power_of_two_digits_desc_u16_u8_fail_1,
     from_power_of_two_digits_desc_u16_u8_fail_2,
-    from_power_of_two_digits_desc_u16_u8_fail_3
+    from_power_of_two_digits_desc_u16_u8_fail_3,
+    from_power_of_two_digits_desc_u16_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     u16,
     from_power_of_two_digits_desc_u16_u16_fail_1,
     from_power_of_two_digits_desc_u16_u16_fail_2,
-    from_power_of_two_digits_desc_u16_u16_fail_3
+    from_power_of_two_digits_desc_u16_u16_fail_3,
+    from_power_of_two_digits_desc_u16_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     u32,
     from_power_of_two_digits_desc_u16_u32_fail_1,
     from_power_of_two_digits_desc_u16_u32_fail_2,
-    from_power_of_two_digits_desc_u16_u32_fail_3
+    from_power_of_two_digits_desc_u16_u32_fail_3,
+    from_power_of_two_digits_desc_u16_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     u64,
     from_power_of_two_digits_desc_u16_u64_fail_1,
     from_power_of_two_digits_desc_u16_u64_fail_2,
-    from_power_of_two_digits_desc_u16_u64_fail_3
+    from_power_of_two_digits_desc_u16_u64_fail_3,
+    from_power_of_two_digits_desc_u16_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     u128,
     from_power_of_two_digits_desc_u16_u128_fail_1,
     from_power_of_two_digits_desc_u16_u128_fail_2,
-    from_power_of_two_digits_desc_u16_u128_fail_3
+    from_power_of_two_digits_desc_u16_u128_fail_3,
+    from_power_of_two_digits_desc_u16_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u16,
     usize,
     from_power_of_two_digits_desc_u16_usize_fail_1,
     from_power_of_two_digits_desc_u16_usize_fail_2,
-    from_power_of_two_digits_desc_u16_usize_fail_3
+    from_power_of_two_digits_desc_u16_usize_fail_3,
+    from_power_of_two_digits_desc_u16_usize_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     u8,
     from_power_of_two_digits_desc_u32_u8_fail_1,
     from_power_of_two_digits_desc_u32_u8_fail_2,
-    from_power_of_two_digits_desc_u32_u8_fail_3
+    from_power_of_two_digits_desc_u32_u8_fail_3,
+    from_power_of_two_digits_desc_u32_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     u16,
     from_power_of_two_digits_desc_u32_u16_fail_1,
     from_power_of_two_digits_desc_u32_u16_fail_2,
-    from_power_of_two_digits_desc_u32_u16_fail_3
+    from_power_of_two_digits_desc_u32_u16_fail_3,
+    from_power_of_two_digits_desc_u32_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     u32,
     from_power_of_two_digits_desc_u32_u32_fail_1,
     from_power_of_two_digits_desc_u32_u32_fail_2,
-    from_power_of_two_digits_desc_u32_u32_fail_3
+    from_power_of_two_digits_desc_u32_u32_fail_3,
+    from_power_of_two_digits_desc_u32_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     u64,
     from_power_of_two_digits_desc_u32_u64_fail_1,
     from_power_of_two_digits_desc_u32_u64_fail_2,
-    from_power_of_two_digits_desc_u32_u64_fail_3
+    from_power_of_two_digits_desc_u32_u64_fail_3,
+    from_power_of_two_digits_desc_u32_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     u128,
     from_power_of_two_digits_desc_u32_u128_fail_1,
     from_power_of_two_digits_desc_u32_u128_fail_2,
-    from_power_of_two_digits_desc_u32_u128_fail_3
+    from_power_of_two_digits_desc_u32_u128_fail_3,
+    from_power_of_two_digits_desc_u32_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u32,
     usize,
     from_power_of_two_digits_desc_u32_usize_fail_1,
     from_power_of_two_digits_desc_u32_usize_fail_2,
-    from_power_of_two_digits_desc_u32_usize_fail_3
+    from_power_of_two_digits_desc_u32_usize_fail_3,
+    from_power_of_two_digits_desc_u32_usize_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     u8,
     from_power_of_two_digits_desc_u64_u8_fail_1,
     from_power_of_two_digits_desc_u64_u8_fail_2,
-    from_power_of_two_digits_desc_u64_u8_fail_3
+    from_power_of_two_digits_desc_u64_u8_fail_3,
+    from_power_of_two_digits_desc_u64_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     u16,
     from_power_of_two_digits_desc_u64_u16_fail_1,
     from_power_of_two_digits_desc_u64_u16_fail_2,
-    from_power_of_two_digits_desc_u64_u16_fail_3
+    from_power_of_two_digits_desc_u64_u16_fail_3,
+    from_power_of_two_digits_desc_u64_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     u32,
     from_power_of_two_digits_desc_u64_u32_fail_1,
     from_power_of_two_digits_desc_u64_u32_fail_2,
-    from_power_of_two_digits_desc_u64_u32_fail_3
+    from_power_of_two_digits_desc_u64_u32_fail_3,
+    from_power_of_two_digits_desc_u64_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     u64,
     from_power_of_two_digits_desc_u64_u64_fail_1,
     from_power_of_two_digits_desc_u64_u64_fail_2,
-    from_power_of_two_digits_desc_u64_u64_fail_3
+    from_power_of_two_digits_desc_u64_u64_fail_3,
+    from_power_of_two_digits_desc_u64_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     u128,
     from_power_of_two_digits_desc_u64_u128_fail_1,
     from_power_of_two_digits_desc_u64_u128_fail_2,
-    from_power_of_two_digits_desc_u64_u128_fail_3
+    from_power_of_two_digits_desc_u64_u128_fail_3,
+    from_power_of_two_digits_desc_u64_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u64,
     usize,
     from_power_of_two_digits_desc_u64_usize_fail_1,
     from_power_of_two_digits_desc_u64_usize_fail_2,
-    from_power_of_two_digits_desc_u64_usize_fail_3
+    from_power_of_two_digits_desc_u64_usize_fail_3,
+    from_power_of_two_digits_desc_u64_usize_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     u8,
     from_power_of_two_digits_desc_u128_u8_fail_1,
     from_power_of_two_digits_desc_u128_u8_fail_2,
-    from_power_of_two_digits_desc_u128_u8_fail_3
+    from_power_of_two_digits_desc_u128_u8_fail_3,
+    from_power_of_two_digits_desc_u128_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     u16,
     from_power_of_two_digits_desc_u128_u16_fail_1,
     from_power_of_two_digits_desc_u128_u16_fail_2,
-    from_power_of_two_digits_desc_u128_u16_fail_3
+    from_power_of_two_digits_desc_u128_u16_fail_3,
+    from_power_of_two_digits_desc_u128_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     u32,
     from_power_of_two_digits_desc_u128_u32_fail_1,
     from_power_of_two_digits_desc_u128_u32_fail_2,
-    from_power_of_two_digits_desc_u128_u32_fail_3
+    from_power_of_two_digits_desc_u128_u32_fail_3,
+    from_power_of_two_digits_desc_u128_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     u64,
     from_power_of_two_digits_desc_u128_u64_fail_1,
     from_power_of_two_digits_desc_u128_u64_fail_2,
-    from_power_of_two_digits_desc_u128_u64_fail_3
+    from_power_of_two_digits_desc_u128_u64_fail_3,
+    from_power_of_two_digits_desc_u128_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     u128,
     from_power_of_two_digits_desc_u128_u128_fail_1,
     from_power_of_two_digits_desc_u128_u128_fail_2,
-    from_power_of_two_digits_desc_u128_u128_fail_3
+    from_power_of_two_digits_desc_u128_u128_fail_3,
+    from_power_of_two_digits_desc_u128_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     u128,
     usize,
     from_power_of_two_digits_desc_u128_usize_fail_1,
     from_power_of_two_digits_desc_u128_usize_fail_2,
-    from_power_of_two_digits_desc_u128_usize_fail_3
+    from_power_of_two_digits_desc_u128_usize_fail_3,
+    from_power_of_two_digits_desc_u128_usize_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     u8,
     from_power_of_two_digits_desc_usize_u8_fail_1,
     from_power_of_two_digits_desc_usize_u8_fail_2,
-    from_power_of_two_digits_desc_usize_u8_fail_3
+    from_power_of_two_digits_desc_usize_u8_fail_3,
+    from_power_of_two_digits_desc_usize_u8_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     u16,
     from_power_of_two_digits_desc_usize_u16_fail_1,
     from_power_of_two_digits_desc_usize_u16_fail_2,
-    from_power_of_two_digits_desc_usize_u16_fail_3
+    from_power_of_two_digits_desc_usize_u16_fail_3,
+    from_power_of_two_digits_desc_usize_u16_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     u32,
     from_power_of_two_digits_desc_usize_u32_fail_1,
     from_power_of_two_digits_desc_usize_u32_fail_2,
-    from_power_of_two_digits_desc_usize_u32_fail_3
+    from_power_of_two_digits_desc_usize_u32_fail_3,
+    from_power_of_two_digits_desc_usize_u32_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     u64,
     from_power_of_two_digits_desc_usize_u64_fail_1,
     from_power_of_two_digits_desc_usize_u64_fail_2,
-    from_power_of_two_digits_desc_usize_u64_fail_3
+    from_power_of_two_digits_desc_usize_u64_fail_3,
+    from_power_of_two_digits_desc_usize_u64_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     u128,
     from_power_of_two_digits_desc_usize_u128_fail_1,
     from_power_of_two_digits_desc_usize_u128_fail_2,
-    from_power_of_two_digits_desc_usize_u128_fail_3
+    from_power_of_two_digits_desc_usize_u128_fail_3,
+    from_power_of_two_digits_desc_usize_u128_fail_4
 );
 from_power_of_two_digits_desc_fail_helper!(
     usize,
     usize,
     from_power_of_two_digits_desc_usize_usize_fail_1,
     from_power_of_two_digits_desc_usize_usize_fail_2,
-    from_power_of_two_digits_desc_usize_usize_fail_3
+    from_power_of_two_digits_desc_usize_usize_fail_3,
+    from_power_of_two_digits_desc_usize_usize_fail_4
 );

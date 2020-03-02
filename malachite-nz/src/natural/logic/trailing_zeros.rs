@@ -1,7 +1,7 @@
-use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::slice_leading_zeros;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -28,7 +28,7 @@ use platform::Limb;
 /// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
 /// ```
 pub fn limbs_trailing_zeros(limbs: &[Limb]) -> u64 {
-    let zero_limbs = limbs_leading_zero_limbs(limbs);
+    let zero_limbs = slice_leading_zeros(limbs);
     let remaining_zeros = TrailingZeros::trailing_zeros(limbs[zero_limbs]);
     (u64::wrapping_from(zero_limbs) << Limb::LOG_WIDTH) + remaining_zeros
 }

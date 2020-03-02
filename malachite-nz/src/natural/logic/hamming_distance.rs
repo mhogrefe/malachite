@@ -40,8 +40,8 @@ pub fn limbs_hamming_distance_limb(limbs: &[Limb], other_limb: Limb) -> u64 {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpz_hamdist from mpz/hamdist.c, where both arguments are non-negative and have the same
-/// length.
+/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative and
+/// have the same length.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -70,7 +70,7 @@ pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_hamdist from mpz/hamdist.c, where both arguments are non-negative.
+/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
 ///
 /// # Example
 /// ```

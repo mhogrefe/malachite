@@ -1,11 +1,12 @@
 use std::ops::{Shr, ShrAssign};
 
-use malachite_base::limbs::{limbs_delete_left, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
+use malachite_base::slices::slice_test_zero;
+use malachite_base::vecs::vec_delete_left;
 
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
@@ -40,7 +41,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shr(&[4_294_967_295, 4_294_967_295], 32), &[4_294_967_295]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, where the result is returned.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the result is returned.
 pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
@@ -81,14 +82,14 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_round_up(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
 ///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and the result
-/// is returned.
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
+/// the result is returned.
 pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         vec![1]
     } else {
-        let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
+        let mut exact = slice_test_zero(&limbs[..limbs_to_delete]);
         let small_bits = bits & Limb::WIDTH_MASK;
         let mut result_limbs = limbs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
@@ -261,7 +262,7 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 /// assert_eq!(out, &[2_147_483_709, 227, 0]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2.
 pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb {
     let len = in_limbs.len();
     assert_ne!(len, 0);
@@ -308,7 +309,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb 
 /// assert_eq!(limbs, &[2_147_483_709, 227]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, where the rp == up.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the rp == up.
 pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -385,15 +386,15 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, where rp == up and if cnt is sufficiently large,
-/// limbs are removed from rp.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where rp == up and if cnt is
+/// sufficiently large, limbs are removed from rp.
 pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         limbs.clear();
     } else {
         let small_shift = bits & Limb::WIDTH_MASK;
-        limbs_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(limbs, limbs_to_delete);
         if small_shift != 0 {
             limbs_slice_shr_in_place(limbs, small_shift);
         }
@@ -459,16 +460,17 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
 ///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, where u is non-negative, dir == 1, and w == u.
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
+/// w == u.
 pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if limbs_to_delete >= limbs.len() {
         limbs.truncate(1);
         limbs[0] = 1;
     } else {
-        let mut exact = limbs_test_zero(&limbs[..limbs_to_delete]);
+        let mut exact = slice_test_zero(&limbs[..limbs_to_delete]);
         let small_bits = bits & Limb::WIDTH_MASK;
-        limbs_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(limbs, small_bits) == 0;
         }
@@ -484,7 +486,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits
         limbs.clear();
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
-        limbs_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(limbs, limbs_to_delete);
         if small_bits != 0 {
             limbs_slice_shr_in_place(limbs, small_bits);
         }

@@ -59,7 +59,7 @@ macro_rules! increment_fail {
 
 increment_fail!(u8, increment_u8_fail);
 increment_fail!(u16, increment_u16_fail);
-increment_fail!(u32, increment_limb_fail);
+increment_fail!(u32, increment_u32_fail);
 increment_fail!(u64, increment_u64_fail);
 increment_fail!(u128, increment_u128_fail);
 increment_fail!(usize, increment_usize_fail);
@@ -126,7 +126,7 @@ macro_rules! decrement_fail {
 
 decrement_fail!(u8, decrement_u8_fail);
 decrement_fail!(u16, decrement_u16_fail);
-decrement_fail!(u32, decrement_limb_fail);
+decrement_fail!(u32, decrement_u32_fail);
 decrement_fail!(u64, decrement_u64_fail);
 decrement_fail!(u128, decrement_u128_fail);
 decrement_fail!(usize, decrement_usize_fail);

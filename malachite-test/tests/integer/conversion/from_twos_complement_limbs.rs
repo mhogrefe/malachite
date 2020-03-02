@@ -1,9 +1,9 @@
 use std::cmp::Ordering;
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_delete_left;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::vecs::vec_delete_left;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 
@@ -101,7 +101,7 @@ fn trim_be_limbs(xs: &mut Vec<Limb>) {
             None => *xs = vec![Limb::MAX],
             Some(i) => {
                 let i = if !xs[i].get_highest_bit() { i - 1 } else { i };
-                limbs_delete_left(xs, i);
+                vec_delete_left(xs, i);
             }
         }
     } else {
@@ -109,7 +109,7 @@ fn trim_be_limbs(xs: &mut Vec<Limb>) {
             None => xs.clear(),
             Some(i) => {
                 let i = if xs[i].get_highest_bit() { i - 1 } else { i };
-                limbs_delete_left(xs, i);
+                vec_delete_left(xs, i);
             }
         }
     }

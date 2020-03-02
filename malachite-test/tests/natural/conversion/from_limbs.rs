@@ -1,4 +1,4 @@
-use malachite_base::limbs::limbs_test_zero;
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -75,7 +75,7 @@ fn from_limbs_asc_properties() {
         if !limbs.is_empty() && *limbs.last().unwrap() != 0 {
             assert_eq!(x.to_limbs_asc(), *limbs);
         }
-        assert_eq!(limbs_test_zero(limbs), x == 0);
+        assert_eq!(slice_test_zero(limbs), x == 0);
     });
 }
 
@@ -100,6 +100,6 @@ fn from_limbs_desc_properties() {
         if !limbs.is_empty() && limbs[0] != 0 {
             assert_eq!(x.to_limbs_desc(), *limbs);
         }
-        assert_eq!(limbs_test_zero(limbs), x == 0);
+        assert_eq!(slice_test_zero(limbs), x == 0);
     });
 }

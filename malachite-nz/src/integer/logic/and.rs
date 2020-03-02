@@ -1,9 +1,9 @@
 use std::cmp::{max, Ordering};
 use std::ops::{BitAnd, BitAndAssign};
 
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_set_zero};
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
 use integer::Integer;
 use natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
@@ -297,8 +297,8 @@ pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
 pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -362,19 +362,19 @@ pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(&mut out[..xs_len]);
+        slice_set_zero(&mut out[..xs_len]);
         return;
     } else if x_i >= ys_len {
         out[..xs_len].copy_from_slice(xs);
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut out[..max_i]);
+    slice_set_zero(&mut out[..max_i]);
     out[max_i] = xs[max_i]
         & if x_i <= y_i {
             ys[max_i].wrapping_neg()
@@ -423,18 +423,18 @@ pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        limbs_set_zero(xs);
+        slice_set_zero(xs);
         return;
     } else if x_i >= ys_len {
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut xs[..max_i]);
+    slice_set_zero(&mut xs[..max_i]);
     xs[max_i] &= if x_i <= y_i {
         ys[max_i].wrapping_neg()
     } else {
@@ -479,16 +479,16 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len || x_i >= ys_len {
-        limbs_set_zero(ys);
+        slice_set_zero(ys);
         return;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut ys[..max_i]);
+    slice_set_zero(&mut ys[..max_i]);
     {
         let ys_max_i = &mut ys[max_i];
         if x_i <= y_i {
@@ -588,8 +588,8 @@ fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb 
 pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
@@ -672,25 +672,25 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 pub fn limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         out[..ys_len].copy_from_slice(ys);
         if xs_len > ys_len {
-            limbs_set_zero(&mut out[ys_len..xs_len]);
+            slice_set_zero(&mut out[ys_len..xs_len]);
         }
         return true;
     } else if x_i >= ys_len {
         out[..xs_len].copy_from_slice(xs);
         if ys_len > xs_len {
-            limbs_set_zero(&mut out[xs_len..ys_len]);
+            slice_set_zero(&mut out[xs_len..ys_len]);
         }
         return true;
     }
     let max_i = max(x_i, y_i);
-    limbs_set_zero(&mut out[..max_i]);
+    slice_set_zero(&mut out[..max_i]);
     let x = if x_i >= y_i {
         xs[max_i].wrapping_sub(1)
     } else {
@@ -765,8 +765,8 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let x_i = limbs_leading_zero_limbs(xs);
-    let y_i = limbs_leading_zero_limbs(ys);
+    let x_i = slice_leading_zeros(xs);
+    let y_i = slice_leading_zeros(ys);
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if x_i >= ys_len {
@@ -774,7 +774,7 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
     }
     let max_i = max(x_i, y_i);
     if y_i > x_i {
-        limbs_set_zero(&mut xs[x_i..y_i]);
+        slice_set_zero(&mut xs[x_i..y_i]);
     }
     let x = if x_i >= y_i {
         xs[max_i].wrapping_sub(1)
@@ -842,7 +842,7 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let y_i = limbs_leading_zero_limbs(ys);
+    let y_i = slice_leading_zeros(ys);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         xs.resize(ys_len, 0);

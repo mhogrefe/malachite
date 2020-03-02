@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::slices::slice_test_zero;
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -428,7 +428,7 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
         false
     } else {
         assert!(!limbs_sub_in_place_left(xs, &product));
-        !limbs_test_zero(xs)
+        !slice_test_zero(xs)
     }
 }
 

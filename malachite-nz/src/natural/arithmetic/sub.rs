@@ -25,7 +25,7 @@ use platform::Limb;
 /// assert_eq!(limbs_sub_limb(&[1], 2), (vec![4_294_967_295], true));
 /// ```
 ///
-/// This is mpn_sub_1 from gmp.h, where the result is returned.
+/// This is mpn_sub_1 from gmp.h, GMP 6.1.2, where the result is returned.
 pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
     let len = limbs.len();
     let mut result_limbs = Vec::with_capacity(len);
@@ -74,7 +74,7 @@ pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
 /// assert_eq!(out, &[4_294_967_295, 0, 0]);
 /// ```
 ///
-/// This is mpn_sub_1 from gmp.h.
+/// This is mpn_sub_1 from gmp.h, GMP 6.1.2.
 pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
     let len = in_limbs.len();
     assert!(out.len() >= len);
@@ -118,7 +118,7 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 /// assert_eq!(limbs, &[4_294_967_295]);
 /// ```
 ///
-/// This is mpn_add_1 from gmp.h, where the result is written to the input slice.
+/// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.
 pub fn limbs_sub_limb_in_place(limbs: &mut [Limb], mut limb: Limb) -> bool {
     for x in limbs.iter_mut() {
         if x.overflowing_sub_assign(limb) {
@@ -163,7 +163,7 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 /// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4_294_966_963, 4_294_966_962], true));
 /// ```
 ///
-/// This is mpn_sub from gmp.h, where the output is returned.
+/// This is mpn_sub from gmp.h, GMP 6.1.2, where the output is returned.
 pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -210,7 +210,7 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2.
 pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -250,7 +250,7 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
 /// ```
 ///
-/// This is mpn_sub from gmp.h.
+/// This is mpn_sub from gmp.h, GMP 6.1.2.
 pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -294,7 +294,7 @@ pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h, where the output is written to the first input.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the first input.
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -333,7 +333,7 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 /// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
 /// ```
 ///
-/// This is mpn_sub from gmp.h, where the output is written to the first input.
+/// This is mpn_sub from gmp.h, GMP 6.1.2, where the output is written to the first input.
 pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -375,7 +375,7 @@ pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 /// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h, where the output is written to the second input.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the second input.
 pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len);
@@ -413,8 +413,8 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 /// assert_eq!(ys, &[4_294_966_630, 455]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h, where the output is written to the second input (which has `len`
-/// limbs) and the second input has enough space past `len` to accomodate the output.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the second input (which
+/// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
 pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -504,8 +504,8 @@ pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
 /// assert_eq!(xs, &[3, 3, 2, 1]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h, where the output is written to the first input, and the two inputs
-/// are possibly-overlapping subslices of a single slice.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the first input, and the
+/// two inputs are possibly-overlapping subslices of a single slice.
 pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start: usize) -> bool {
     let len = xs.len() - right_start;
     let mut borrow = false;
@@ -539,8 +539,8 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
 /// assert_eq!(xs, &[0, 1, 2, 4]);
 /// ```
 ///
-/// This is mpn_sub_n from gmp.h, where the output is a prefix of a slice and the left operand of
-/// the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
+/// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is a prefix of a slice and the left
+/// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
 pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -567,7 +567,7 @@ pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
-/// This is mpn_sub_nc from gmp-impl.h, where rp and up are disjoint.
+/// This is mpn_sub_nc from gmp-impl.h, GMP 6.1.2, where rp and up are disjoint.
 pub fn _limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -595,7 +595,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// This is mpn_sub_nc from gmp-impl.h, where rp is the same as up.
+/// This is mpn_sub_nc from gmp-impl.h, GMP 6.1.2, where rp is the same as up.
 pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -622,7 +622,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// This is mpn_sub_nc from gmp-impl.h, where rp is the same as vp.
+/// This is mpn_sub_nc from gmp-impl.h, GMP 6.1.2, where rp is the same as vp.
 pub fn _limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],

@@ -13,7 +13,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_cmp from gmp.h.
+/// This is mpn_cmp from gmp.h, GMP 6.1.2.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.

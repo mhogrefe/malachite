@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 
-use malachite_base::limbs::{limbs_leading_zero_limbs, limbs_test_zero};
 use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -44,7 +44,7 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
         // We're indexing into the infinite suffix of 1s
         true
     } else {
-        let limb = if limbs_test_zero(&limbs[..limb_index]) {
+        let limb = if slice_test_zero(&limbs[..limb_index]) {
             limbs[limb_index].wrapping_neg()
         } else {
             !limbs[limb_index]
@@ -83,7 +83,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
         return;
     }
     let reduced_index = index & Limb::WIDTH_MASK;
-    let zero_bound = limbs_leading_zero_limbs(limbs);
+    let zero_bound = slice_leading_zeros(limbs);
     match limb_index.cmp(&zero_bound) {
         Ordering::Equal => {
             let boundary_limb = &mut limbs[limb_index];
@@ -106,7 +106,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
 }
 
 fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
-    let zero_bound = limbs_leading_zero_limbs(limbs);
+    let zero_bound = slice_leading_zeros(limbs);
     match limb_index.cmp(&zero_bound) {
         Ordering::Equal => {
             // limbs[limb_index] != 0 here

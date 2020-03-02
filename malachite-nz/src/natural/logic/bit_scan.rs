@@ -1,8 +1,8 @@
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_leading_zero_limbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
+use malachite_base::slices::slice_leading_zeros;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -17,7 +17,7 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_scan0 from mpn/generic/scan0.c.
+/// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
 ///
 /// # Example
 /// ```
@@ -70,7 +70,7 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], start: u64) -> u64 {
 ///
 /// where n = `limbs.len()`
 ///
-/// This is mpn_scan1 from mpn/generic/scan1.c.
+/// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
 ///
 /// # Example
 /// ```
@@ -100,7 +100,7 @@ pub fn limbs_index_of_next_true_bit(limbs: &[Limb], start: u64) -> Option<u64> {
         return None;
     }
     let true_index =
-        starting_limb_index + 1 + limbs_leading_zero_limbs(&limbs[starting_limb_index + 1..]);
+        starting_limb_index + 1 + slice_leading_zeros(&limbs[starting_limb_index + 1..]);
     if true_index == limbs.len() {
         None
     } else {

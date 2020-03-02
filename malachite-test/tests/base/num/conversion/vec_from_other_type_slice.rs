@@ -1,7 +1,7 @@
-use malachite_base::limbs::limbs_test_zero;
 use malachite_base::num::arithmetic::traits::NegModPowerOfTwo;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
+use malachite_base::slices::slice_test_zero;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
@@ -24,7 +24,7 @@ where
             let (xs_alt_lo, xs_alt_hi) = xs_alt.split_at(xs.len());
             assert_eq!(xs_alt_hi.len(), number_of_extra_zeros);
             assert_eq!(xs_alt_lo, xs);
-            assert!(limbs_test_zero(xs_alt_hi));
+            assert!(slice_test_zero(xs_alt_hi));
         }
     });
 }

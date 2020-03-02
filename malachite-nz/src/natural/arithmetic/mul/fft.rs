@@ -1,13 +1,13 @@
 use std::cmp::{max, Ordering};
 
 use malachite_base::comparison::Max;
-use malachite_base::limbs::limbs_set_zero;
 use malachite_base::num::arithmetic::traits::{
     Parity, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
+use malachite_base::slices::slice_set_zero;
 
 use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -45,7 +45,7 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_fft_next_size from mpn/generic/mul-fft.c.
+/// This is mpn_fft_next_size from mpn/generic/mul-fft.c, GMP 6.1.2.
 pub(crate) fn _limbs_fft_next_size(pl: usize, k: usize) -> usize {
     pl.shr_round(u64::wrapping_from(k), RoundingMode::Ceiling) << k
 }
@@ -509,7 +509,7 @@ const SQR_FFT_TABLE3: [FFTTableNK; SQR_FFT_TABLE3_SIZE] = [
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_fft_best_k from mpn/generic/mul_fft.c, the mpn_fft_table3 variant.
+/// This is mpn_fft_best_k from mpn/generic/mul_fft.c, GMP 6.1.2, the mpn_fft_table3 variant.
 pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     let fft_table: &[FFTTableNK] = if square {
         &SQR_FFT_TABLE3
@@ -533,8 +533,8 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_mul from gmp-impl.h and mpn_nussbaumer_mul from
-///     mpn/generic/mpn_nussbaumer_mul.c.
+/// This is mpn_fft_mul from gmp-impl.h, GMP 6.1.2, and mpn_nussbaumer_mul from
+/// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.1.2.
 #[inline]
 pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -554,7 +554,7 @@ pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_fft_initl from mpn/generic/mul_fft.c.
+/// This is mpn_fft_initl from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<&[usize]> {
     let mut table = Vec::with_capacity(k + 1);
     for i in 0..=k {
@@ -581,7 +581,7 @@ fn _limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c.
+/// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
     a << k.saturating_sub(usize::exact_from(a.trailing_zeros()))
 }
@@ -598,13 +598,13 @@ fn _limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_normalize from mpn/generic/mul_fft.c.
+/// This is mpn_fft_normalize from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_normalize(xs: &mut [Limb]) {
     if *xs.last().unwrap() != 0 {
         assert!(!limbs_sub_limb_in_place(xs, 1));
         let (xs_last, xs_init) = xs.split_last_mut().unwrap();
         if *xs_last == 0 {
-            limbs_set_zero(xs_init);
+            slice_set_zero(xs_init);
             *xs_last = 1;
         } else {
             *xs_last = 0;
@@ -618,7 +618,7 @@ fn _limbs_mul_fft_normalize(xs: &mut [Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, where r == a.
+/// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, GMP 6.1.2, where r == a.
 fn _limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let sub;
     let mut carry;
@@ -650,7 +650,7 @@ fn _limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c.
+/// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len() - 1;
     let mut carry = xs[n].wrapping_sub(ys[n]);
@@ -675,7 +675,7 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c.
+/// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
     let small_bits = u64::exact_from(bits) & Limb::WIDTH_MASK;
@@ -782,7 +782,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c.
+/// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
 fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     _limbs_mul_fft_shl_mod_f_to_out(out, xs, ((xs.len() - 1) << (Limb::LOG_WIDTH + 1)) - bits);
     // 1 / 2 ^ bits = 2 ^ (2 * n' * L - bits) mod 2 ^ (n' * Limb::WIDTH) + 1 where n' = xs.len() - 1
@@ -800,8 +800,8 @@ fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 ///
 /// where a = `xs.len()`
 ///
-/// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c. nl is omitted as it is just the length
-/// of n (here, xs). nprime is `width` - 1.
+/// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c, GMP 6.1.2. nl is omitted as it is just
+/// the length of n (here, xs). nprime is `width` - 1.
 fn _limbs_mul_fft_decompose<'a>(
     a_limbs: &'a mut [Limb],
     k: usize,
@@ -844,7 +844,7 @@ fn _limbs_mul_fft_decompose<'a>(
         // store the next m bits of xs into a[0..width_minus_one]
         // len is the number of remaining limbs
         if len == 0 {
-            limbs_set_zero(a_lo);
+            slice_set_zero(a_lo);
         } else {
             let j = if n <= len && i < k - 1 { n } else { len }; // store j next limbs
             len -= j;
@@ -853,7 +853,7 @@ fn _limbs_mul_fft_decompose<'a>(
             }
             let scratch = &mut scratch[..width];
             scratch[..j].copy_from_slice(&source[..j]);
-            limbs_set_zero(&mut scratch[j..]);
+            slice_set_zero(&mut scratch[j..]);
             _limbs_mul_fft_shl_mod_f_to_out(a_lo, scratch, i * m);
         }
         a_table.push(a_lo);
@@ -873,7 +873,7 @@ fn _limbs_mul_fft_decompose<'a>(
 ///
 /// where n = `xss[0].len()`
 ///
-/// This is mpn_fft_fft from mpn/generic/mul_fft.c.
+/// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.1.2.
 pub fn _limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
     k: usize,
@@ -968,7 +968,7 @@ pub fn _limbs_mul_fft_fft(
 ///
 /// where n = `xss[0].len()`
 ///
-/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c.
+/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.1.2.
 pub fn _limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
     k: usize,
@@ -1024,7 +1024,7 @@ pub fn _limbs_mul_fft_inverse(
 ///
 /// where n = `n`
 ///
-/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c.
+/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
 pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
@@ -1052,8 +1052,8 @@ pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap != bp. K is omitted because it
-/// is unused; it is just the length of `xss` and `yss`.
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.1.2, where ap != bp. K is omitted
+/// because it is unused; it is just the length of `xss` and `yss`.
 fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= MUL_FFT_MODF_THRESHOLD {
@@ -1152,8 +1152,8 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, where ap == bp. K is omitted because it
-/// is unused; it is just the length of `xss`.
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.1.2, where ap == bp. K is omitted
+/// because it is unused; it is just the length of `xss`.
 fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
     if n >= SQR_FFT_MODF_THRESHOLD {
@@ -1250,8 +1250,8 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c. A is excluded as it is unused. nprime
-/// is `xss[0].len()` - 1.
+/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.1.2. A is excluded as it is
+/// unused. nprime is `xss[0].len()` - 1.
 pub fn _limbs_mul_fft_internal(
     out: &mut [Limb],
     p: usize,
@@ -1316,11 +1316,11 @@ pub fn _limbs_mul_fft_internal(
     yss.extend(xss.drain(..two_pow_k - 1));
 
     // addition of terms in result p
-    limbs_set_zero(scratch_lo);
+    slice_set_zero(scratch_lo);
     let q = a * (two_pow_k - 1) + width; // number of required limbs for p
     let ys = &mut ys[..q];
     // B has k * width limbs, which is >= q, i.e. enough
-    limbs_set_zero(ys);
+    slice_set_zero(ys);
     let mut carry = 0i64; // will accumulate the (signed) carry at p[q]
     let mut sh = a * two_pow_k;
     let mut lo = sh + width_minus_one;
@@ -1380,7 +1380,7 @@ pub fn _limbs_mul_fft_internal(
 ///
 /// assuming k = O(log(p)), xs.len() = O(p).
 ///
-// This is mpn_mul_fft from mpn/generic/mul_fft.c.
+// This is mpn_mul_fft from mpn/generic/mul_fft.c, GMP 6.1.2.
 pub(crate) fn _limbs_mul_fft(
     out: &mut [Limb],
     p: usize,

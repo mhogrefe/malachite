@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 use platform::Limb;
 
-// This is mpn_toom4_sqr_itch from gmp-impl.h.
+// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.1.2.
 fn _limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
@@ -15,7 +15,7 @@ pub(crate) const SQR_TOOM3_THRESHOLD: usize = 93;
 const SQR_TOOM6_THRESHOLD: usize = 351;
 const SQR_TOOM8_THRESHOLD: usize = 454;
 
-// This is mpn_toom6_sqr_itch from gmp-impl.h.
+// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     let itch = (isize::exact_from(n) - isize::exact_from(SQR_TOOM6_THRESHOLD)) * 2
         + isize::exact_from(max(
@@ -25,7 +25,7 @@ pub(crate) fn _limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     usize::exact_from(itch)
 }
 
-// This is mpn_toom8_sqr_itch from gmp-impl.h.
+// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     let itch = ((isize::exact_from(n) * 15) >> 3)
         - ((isize::exact_from(SQR_TOOM8_THRESHOLD) * 15) >> 3)

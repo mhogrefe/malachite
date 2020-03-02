@@ -87,7 +87,7 @@ pub fn limbs_xor_limb_in_place(limbs: &mut [Limb], limb: Limb) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_xor_n from gmp-impl.h where rp is returned.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2, where rp is returned.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -114,7 +114,8 @@ pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// This is mpz_xor from mpz/xor.c where res is returned and both inputs are non-negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are non-
+/// negative.
 ///
 /// # Example
 /// ```
@@ -150,7 +151,7 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
-/// This is mpn_xor_n from gmp-impl.h.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2.
 ///
 /// # Example
 /// ```
@@ -186,7 +187,7 @@ pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// # Panics
 /// Panics if `out` is too short.
 ///
-/// This is mpz_xor from mpz/xor.c where both inputs are non-negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -223,7 +224,7 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_xor_n from gmp-impl.h where rp == up.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2, where rp == up.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -257,7 +258,7 @@ pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// where n = `ys.len()`
 ///
-/// This is mpz_xor from mpz/xor.c where res == op1 and both inputs are non-negative.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
 ///
 /// # Example
 /// ```
@@ -297,8 +298,8 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = min(`xs.len`, `ys.len()`)
 ///
-/// This is mpz_xor from mpz/xor.c where both inputs are non-negative and the result is written to
-/// the longer input slice.
+/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative and the result is
+/// written to the longer input slice.
 ///
 /// # Example
 /// ```

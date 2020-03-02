@@ -16,7 +16,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpz_sizeinbase from mpz/sizeinbase.c where base == 2.
+/// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where base == 2.
 ///
 /// # Panics
 /// Panics if `limbs` is empty.
@@ -29,7 +29,7 @@ use platform::Limb;
 /// assert_eq!(limbs_significant_bits(&[0, 0b1101]), 36);
 /// ```
 ///
-/// This is mpz_sizeinbase from mpz/sizeinbase.c, where x is non-negative and base is 2.
+/// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where x is non-negative and base is 2.
 pub fn limbs_significant_bits(limbs: &[Limb]) -> u64 {
     ((u64::wrapping_from(limbs.len()) - 1) << Limb::LOG_WIDTH)
         + limbs.last().unwrap().significant_bits()

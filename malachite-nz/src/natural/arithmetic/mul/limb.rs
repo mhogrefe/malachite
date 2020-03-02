@@ -23,7 +23,7 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_mul_limb(&[0xffff_ffff], 2), &[4_294_967_294, 1]);
 /// ```
 ///
-/// This is mpn_mul_1 from mpn/generic/mul_1.c, where the result is returned.
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
 pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let limb = DoubleLimb::from(limb);
@@ -65,7 +65,7 @@ pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[1, 0, 0]);
 /// ```
 ///
-/// This is mul_1c from gmp-impl.h.
+/// This is mul_1c from gmp-impl.h, GMP 6.1.2.
 pub fn limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
     in_limbs: &[Limb],
@@ -109,7 +109,7 @@ pub fn limbs_mul_limb_with_carry_to_out(
 /// assert_eq!(out, &[4_294_967_294, 0, 0]);
 /// ```
 ///
-/// This is mpn_mul_1 from mpn/generic/mul_1.c.
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
 #[inline]
 pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
     limbs_mul_limb_with_carry_to_out(out, in_limbs, limb, 0)
@@ -138,7 +138,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) ->
 /// assert_eq!(limbs, &[1]);
 /// ```
 ///
-/// This is mul_1c from gmp-impl.h, where the output is the same as the input.
+/// This is mul_1c from gmp-impl.h, GMP 6.1.2, where the output is the same as the input.
 pub fn limbs_slice_mul_limb_with_carry_in_place(
     limbs: &mut [Limb],
     limb: Limb,
@@ -173,7 +173,7 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(
 /// assert_eq!(limbs, &[4_294_967_294]);
 /// ```
 ///
-/// This is mpn_mul_1 from mpn/generic/mul_1.c, where rp == up.
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
 #[inline]
 pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
     limbs_slice_mul_limb_with_carry_in_place(limbs, limb, 0)
@@ -199,8 +199,8 @@ pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
 /// assert_eq!(limbs, &[4_294_967_294, 1]);
 /// ```
 ///
-/// This is mpn_mul_1 from mpn/generic/mul_1.c, where the rp == up and instead of returning the
-/// carry, it is appended to rp.
+/// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of
+/// returning the carry, it is appended to rp.
 pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
     let carry = limbs_slice_mul_limb_in_place(limbs, limb);
     if carry != 0 {

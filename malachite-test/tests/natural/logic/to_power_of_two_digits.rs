@@ -106,33 +106,33 @@ macro_rules! to_power_of_two_digits_asc_fail_helper {
 
 to_power_of_two_digits_asc_fail_helper!(
     u8,
-    u8_to_power_of_two_digits_asc_fail_1,
-    u8_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_u8_fail_1,
+    to_power_of_two_digits_asc_u8_fail_2
 );
 to_power_of_two_digits_asc_fail_helper!(
     u16,
-    u16_to_power_of_two_digits_asc_fail_1,
-    u16_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_u16_fail_1,
+    to_power_of_two_digits_asc_u16_fail_2
 );
 to_power_of_two_digits_asc_fail_helper!(
     u32,
-    u32_to_power_of_two_digits_asc_fail_1,
-    u32_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_u32_fail_1,
+    to_power_of_two_digits_asc_u32_fail_2
 );
 to_power_of_two_digits_asc_fail_helper!(
     u64,
-    u64_to_power_of_two_digits_asc_fail_1,
-    u64_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_u64_fail_1,
+    to_power_of_two_digits_asc_u64_fail_2
 );
 to_power_of_two_digits_asc_fail_helper!(
     u128,
-    u128_to_power_of_two_digits_asc_fail_1,
-    u128_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_u128_fail_1,
+    to_power_of_two_digits_asc_u128_fail_2
 );
 to_power_of_two_digits_asc_fail_helper!(
     usize,
-    usize_to_power_of_two_digits_asc_fail_1,
-    usize_to_power_of_two_digits_asc_fail_2
+    to_power_of_two_digits_asc_usize_fail_1,
+    to_power_of_two_digits_asc_usize_fail_2
 );
 
 #[test]
@@ -193,33 +193,33 @@ macro_rules! to_power_of_two_digits_desc_fail_helper {
 
 to_power_of_two_digits_desc_fail_helper!(
     u8,
-    u8_to_power_of_two_digits_desc_fail_1,
-    u8_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_u8_fail_1,
+    to_power_of_two_digits_desc_u8_fail_2
 );
 to_power_of_two_digits_desc_fail_helper!(
     u16,
-    u16_to_power_of_two_digits_desc_fail_1,
-    u16_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_u16_fail_1,
+    to_power_of_two_digits_desc_u16_fail_2
 );
 to_power_of_two_digits_desc_fail_helper!(
     u32,
-    u32_to_power_of_two_digits_desc_fail_1,
-    u32_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_u32_fail_1,
+    to_power_of_two_digits_desc_u32_fail_2
 );
 to_power_of_two_digits_desc_fail_helper!(
     u64,
-    u64_to_power_of_two_digits_desc_fail_1,
-    u64_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_u64_fail_1,
+    to_power_of_two_digits_desc_u64_fail_2
 );
 to_power_of_two_digits_desc_fail_helper!(
     u128,
-    u128_to_power_of_two_digits_desc_fail_1,
-    u128_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_u128_fail_1,
+    to_power_of_two_digits_desc_u128_fail_2
 );
 to_power_of_two_digits_desc_fail_helper!(
     usize,
-    usize_to_power_of_two_digits_desc_fail_1,
-    usize_to_power_of_two_digits_desc_fail_2
+    to_power_of_two_digits_desc_usize_fail_1,
+    to_power_of_two_digits_desc_usize_fail_2
 );
 
 #[test]
@@ -321,7 +321,10 @@ fn to_power_of_two_digits_desc_natural_fail() {
     PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(&Natural::trillion(), 0);
 }
 
-fn to_power_of_two_digits_asc_helper<T: PrimitiveUnsigned, F: Fn(&Natural, u64) -> Vec<T>>(
+fn to_power_of_two_digits_asc_properties_helper<
+    T: PrimitiveUnsigned,
+    F: Fn(&Natural, u64) -> Vec<T>,
+>(
     to_power_of_two_digits_asc_naive: F,
 ) where
     Natural: From<T> + PowerOfTwoDigits<T>,
@@ -332,6 +335,7 @@ fn to_power_of_two_digits_asc_helper<T: PrimitiveUnsigned, F: Fn(&Natural, u64) 
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_asc(log_base);
             assert_eq!(to_power_of_two_digits_asc_naive(n, log_base), digits);
+            assert_eq!(Natural::from_power_of_two_digits_asc(log_base, &digits), *n);
             if *n != 0 {
                 assert_ne!(*digits.last().unwrap(), T::ZERO);
             }
@@ -389,7 +393,36 @@ fn to_power_of_two_digits_asc_helper<T: PrimitiveUnsigned, F: Fn(&Natural, u64) 
     );
 }
 
-fn to_power_of_two_digits_desc_helper<T: PrimitiveUnsigned>()
+#[test]
+fn to_power_of_two_digits_asc_properties() {
+    to_power_of_two_digits_asc_properties_helper::<u8, _>(
+        Natural::_to_power_of_two_digits_asc_u8_naive,
+    );
+    to_power_of_two_digits_asc_properties_helper::<u16, _>(
+        Natural::_to_power_of_two_digits_asc_u16_naive,
+    );
+    to_power_of_two_digits_asc_properties_helper::<u32, _>(
+        Natural::_to_power_of_two_digits_asc_u32_naive,
+    );
+    to_power_of_two_digits_asc_properties_helper::<u64, _>(
+        Natural::_to_power_of_two_digits_asc_u64_naive,
+    );
+    to_power_of_two_digits_asc_properties_helper::<u128, _>(
+        Natural::_to_power_of_two_digits_asc_u128_naive,
+    );
+    to_power_of_two_digits_asc_properties_helper::<usize, _>(
+        Natural::_to_power_of_two_digits_asc_usize_naive,
+    );
+
+    test_properties(naturals, |n| {
+        assert_eq!(
+            PowerOfTwoDigits::<Limb>::to_power_of_two_digits_asc(n, Limb::WIDTH),
+            n.to_limbs_asc()
+        );
+    });
+}
+
+fn to_power_of_two_digits_desc_properties_helper<T: PrimitiveUnsigned>()
 where
     Natural: From<T> + PowerOfTwoDigits<T>,
     Limb: PowerOfTwoDigits<T>,
@@ -398,6 +431,10 @@ where
         pairs_of_natural_and_small_u64_var_3::<T>,
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_desc(log_base);
+            assert_eq!(
+                Natural::from_power_of_two_digits_desc(log_base, &digits),
+                *n
+            );
             if *n != 0 {
                 assert_ne!(digits[0], T::ZERO);
             }
@@ -456,30 +493,13 @@ where
 }
 
 #[test]
-fn to_power_of_two_digits_asc_properties() {
-    to_power_of_two_digits_asc_helper::<u8, _>(Natural::_to_power_of_two_digits_asc_u8_naive);
-    to_power_of_two_digits_asc_helper::<u16, _>(Natural::_to_power_of_two_digits_asc_u16_naive);
-    to_power_of_two_digits_asc_helper::<u32, _>(Natural::_to_power_of_two_digits_asc_u32_naive);
-    to_power_of_two_digits_asc_helper::<u64, _>(Natural::_to_power_of_two_digits_asc_u64_naive);
-    to_power_of_two_digits_asc_helper::<u128, _>(Natural::_to_power_of_two_digits_asc_u128_naive);
-    to_power_of_two_digits_asc_helper::<usize, _>(Natural::_to_power_of_two_digits_asc_usize_naive);
-
-    test_properties(naturals, |n| {
-        assert_eq!(
-            PowerOfTwoDigits::<Limb>::to_power_of_two_digits_asc(n, Limb::WIDTH),
-            n.to_limbs_asc()
-        );
-    });
-}
-
-#[test]
 fn to_power_of_two_digits_desc_properties() {
-    to_power_of_two_digits_desc_helper::<u8>();
-    to_power_of_two_digits_desc_helper::<u16>();
-    to_power_of_two_digits_desc_helper::<u32>();
-    to_power_of_two_digits_desc_helper::<u64>();
-    to_power_of_two_digits_desc_helper::<u128>();
-    to_power_of_two_digits_desc_helper::<usize>();
+    to_power_of_two_digits_desc_properties_helper::<u8>();
+    to_power_of_two_digits_desc_properties_helper::<u16>();
+    to_power_of_two_digits_desc_properties_helper::<u32>();
+    to_power_of_two_digits_desc_properties_helper::<u64>();
+    to_power_of_two_digits_desc_properties_helper::<u128>();
+    to_power_of_two_digits_desc_properties_helper::<usize>();
 
     test_properties(naturals, |n| {
         assert_eq!(
@@ -499,6 +519,7 @@ fn to_power_of_two_digits_asc_natural_properties() {
                 n._to_power_of_two_digits_asc_natural_naive(log_base),
                 digits
             );
+            assert_eq!(Natural::from_power_of_two_digits_asc(log_base, &digits), *n);
             if *n != 0 {
                 assert_ne!(*digits.last().unwrap(), 0);
             }
@@ -543,6 +564,10 @@ fn to_power_of_two_digits_desc_natural_properties() {
         pairs_of_natural_and_small_unsigned_var_3,
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_desc(log_base);
+            assert_eq!(
+                Natural::from_power_of_two_digits_desc(log_base, &digits),
+                *n
+            );
             if *n != 0 {
                 assert_ne!(digits[0], 0);
             }

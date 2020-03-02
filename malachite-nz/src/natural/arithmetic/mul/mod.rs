@@ -75,7 +75,7 @@ macro_rules! split_into_chunks_mut {
 ///         &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
-/// This is mpn_mul from mpn/generic/mul.c where prodp is returned.
+/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
 pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut product_limbs = vec![0; xs.len() + ys.len()];
     limbs_mul_greater_to_out(&mut product_limbs, xs, ys);
@@ -106,7 +106,8 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///         &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
-/// This is mpn_mul from mpn/generic/mul.c where un may be less than vn and prodp is returned.
+/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn and prodp is
+/// returned.
 pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mul_greater(xs, ys)
@@ -144,7 +145,7 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
-/// This is mpn_mul_n from mpn/generic/mul_n.c.
+/// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
 pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(ys.len(), len);
@@ -175,7 +176,7 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     }
 }
 
-// This is TOOM44_OK from mpn/generic/mul.c.
+// This is TOOM44_OK from mpn/generic/mul.c, GMP 6.1.2.
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < 4 * ys_len
 }
@@ -209,7 +210,7 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 /// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
-/// This is mpn_mul from mpn/generic/mul.c.
+/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
 pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -380,7 +381,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 /// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
-/// This is mpn_mul from mpn/generic/mul.c where un may be less than vn.
+/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.
 pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     if xs.len() >= ys.len() {
         limbs_mul_greater_to_out(out, xs, ys)
@@ -409,7 +410,7 @@ pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
 /// # Panics
 /// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 ///
-/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c.
+/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c, GMP 6.1.2.
 pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
