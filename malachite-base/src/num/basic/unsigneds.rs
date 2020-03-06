@@ -7,7 +7,7 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice};
-use num::logic::traits::{HammingDistance, PowerOfTwoDigits};
+use num::logic::traits::{HammingDistance, PowerOfTwoDigitIterable, PowerOfTwoDigits};
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
@@ -40,6 +40,12 @@ pub trait PrimitiveUnsigned:
     + PowerOfTwoDigits<u64>
     + PowerOfTwoDigits<u128>
     + PowerOfTwoDigits<usize>
+    + PowerOfTwoDigitIterable<u8>
+    + PowerOfTwoDigitIterable<u16>
+    + PowerOfTwoDigitIterable<u32>
+    + PowerOfTwoDigitIterable<u64>
+    + PowerOfTwoDigitIterable<u128>
+    + PowerOfTwoDigitIterable<usize>
     + PrimitiveInteger
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign

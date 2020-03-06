@@ -13,7 +13,7 @@ use malachite_test::common::{
     LARGE_LIMIT, SMALL_LIMIT,
 };
 use malachite_test::inputs::base::{
-    pairs_of_u64_and_small_usize_var_1, pairs_of_u64_and_unsigned_vec_var_1,
+    pairs_of_u64_and_small_unsigned_var_1, pairs_of_u64_and_unsigned_vec_var_1,
     pairs_of_u64_and_unsigned_vec_var_2, pairs_of_unsigned_and_small_u64_var_1, small_u64s_var_1,
     unsigneds,
 };
@@ -205,12 +205,15 @@ where
         },
     );
 
-    test_properties_no_special(pairs_of_u64_and_small_usize_var_1::<U>, |&(log_base, u)| {
-        assert_eq!(
-            T::from_power_of_two_digits_asc(log_base, &vec![U::ZERO; u]),
-            T::ZERO
-        );
-    });
+    test_properties_no_special(
+        pairs_of_u64_and_small_unsigned_var_1::<U, usize>,
+        |&(log_base, u)| {
+            assert_eq!(
+                T::from_power_of_two_digits_asc(log_base, &vec![U::ZERO; u]),
+                T::ZERO
+            );
+        },
+    );
 }
 
 #[test]
@@ -275,12 +278,15 @@ where
         },
     );
 
-    test_properties_no_special(pairs_of_u64_and_small_usize_var_1::<U>, |&(log_base, u)| {
-        assert_eq!(
-            T::from_power_of_two_digits_desc(log_base, &vec![U::ZERO; u]),
-            T::ZERO
-        );
-    });
+    test_properties_no_special(
+        pairs_of_u64_and_small_unsigned_var_1::<U, usize>,
+        |&(log_base, u)| {
+            assert_eq!(
+                T::from_power_of_two_digits_desc(log_base, &vec![U::ZERO; u]),
+                T::ZERO
+            );
+        },
+    );
 }
 
 #[test]

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::PowerOfTwoDigits;
+use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigits};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -118,164 +118,256 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_usize_from_power_of_two_digits_desc_u64);
     register_ns_demo!(registry, demo_usize_from_power_of_two_digits_desc_usize);
 
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_asc_u8);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_asc_u16);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_asc_u32);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_asc_u64);
     register_bench!(
         registry,
         None,
-        benchmark_u8_to_power_of_two_digits_asc_usize
-    );
-    register_bench!(registry, None, benchmark_u16_to_power_of_two_digits_asc_u8);
-    register_bench!(registry, None, benchmark_u16_to_power_of_two_digits_asc_u16);
-    register_bench!(registry, None, benchmark_u16_to_power_of_two_digits_asc_u32);
-    register_bench!(registry, None, benchmark_u16_to_power_of_two_digits_asc_u64);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u16_to_power_of_two_digits_asc_usize
-    );
-    register_bench!(registry, None, benchmark_u32_to_power_of_two_digits_asc_u8);
-    register_bench!(registry, None, benchmark_u32_to_power_of_two_digits_asc_u16);
-    register_bench!(registry, None, benchmark_u32_to_power_of_two_digits_asc_u32);
-    register_bench!(registry, None, benchmark_u32_to_power_of_two_digits_asc_u64);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u32_to_power_of_two_digits_asc_usize
-    );
-    register_bench!(registry, None, benchmark_u64_to_power_of_two_digits_asc_u8);
-    register_bench!(registry, None, benchmark_u64_to_power_of_two_digits_asc_u16);
-    register_bench!(registry, None, benchmark_u64_to_power_of_two_digits_asc_u32);
-    register_bench!(registry, None, benchmark_u64_to_power_of_two_digits_asc_u64);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u64_to_power_of_two_digits_asc_usize
+        benchmark_u8_to_power_of_two_digits_asc_u8_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_asc_u8
+        benchmark_u8_to_power_of_two_digits_asc_u16_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_asc_u16
+        benchmark_u8_to_power_of_two_digits_asc_u32_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_asc_u32
+        benchmark_u8_to_power_of_two_digits_asc_u64_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_asc_u64
+        benchmark_u8_to_power_of_two_digits_asc_usize_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_asc_usize
+        benchmark_u16_to_power_of_two_digits_asc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u16_to_power_of_two_digits_asc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u16_to_power_of_two_digits_asc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u16_to_power_of_two_digits_asc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u16_to_power_of_two_digits_asc_usize_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u32_to_power_of_two_digits_asc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u32_to_power_of_two_digits_asc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u32_to_power_of_two_digits_asc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u32_to_power_of_two_digits_asc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u32_to_power_of_two_digits_asc_usize_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_asc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_asc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_asc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_asc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_asc_usize_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_asc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_asc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_asc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_asc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_asc_usize_evaluation_strategy
     );
 
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_desc_u8);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_desc_u16);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_desc_u32);
-    register_bench!(registry, None, benchmark_u8_to_power_of_two_digits_desc_u64);
     register_bench!(
         registry,
         None,
-        benchmark_u8_to_power_of_two_digits_desc_usize
-    );
-    register_bench!(registry, None, benchmark_u16_to_power_of_two_digits_desc_u8);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u16_to_power_of_two_digits_desc_u16
+        benchmark_u8_to_power_of_two_digits_desc_u8_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u16_to_power_of_two_digits_desc_u32
+        benchmark_u8_to_power_of_two_digits_desc_u16_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u16_to_power_of_two_digits_desc_u64
+        benchmark_u8_to_power_of_two_digits_desc_u32_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u16_to_power_of_two_digits_desc_usize
-    );
-    register_bench!(registry, None, benchmark_u32_to_power_of_two_digits_desc_u8);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u32_to_power_of_two_digits_desc_u16
+        benchmark_u8_to_power_of_two_digits_desc_u64_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u32_to_power_of_two_digits_desc_u32
+        benchmark_u8_to_power_of_two_digits_desc_usize_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u32_to_power_of_two_digits_desc_u64
+        benchmark_u16_to_power_of_two_digits_desc_u8_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u32_to_power_of_two_digits_desc_usize
-    );
-    register_bench!(registry, None, benchmark_u64_to_power_of_two_digits_desc_u8);
-    register_bench!(
-        registry,
-        None,
-        benchmark_u64_to_power_of_two_digits_desc_u16
+        benchmark_u16_to_power_of_two_digits_desc_u16_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u64_to_power_of_two_digits_desc_u32
+        benchmark_u16_to_power_of_two_digits_desc_u32_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u64_to_power_of_two_digits_desc_u64
+        benchmark_u16_to_power_of_two_digits_desc_u64_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_u64_to_power_of_two_digits_desc_usize
+        benchmark_u16_to_power_of_two_digits_desc_usize_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_desc_u8
+        benchmark_u32_to_power_of_two_digits_desc_u8_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_desc_u16
+        benchmark_u32_to_power_of_two_digits_desc_u16_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_desc_u32
+        benchmark_u32_to_power_of_two_digits_desc_u32_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_desc_u64
+        benchmark_u32_to_power_of_two_digits_desc_u64_evaluation_strategy
     );
     register_bench!(
         registry,
         None,
-        benchmark_usize_to_power_of_two_digits_desc_usize
+        benchmark_u32_to_power_of_two_digits_desc_usize_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_desc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_desc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_desc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_desc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_u64_to_power_of_two_digits_desc_usize_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_desc_u8_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_desc_u16_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_desc_u32_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_desc_u64_evaluation_strategy
+    );
+    register_bench!(
+        registry,
+        None,
+        benchmark_usize_to_power_of_two_digits_desc_usize_evaluation_strategy
     );
 
     register_ns_bench!(registry, None, benchmark_u8_from_power_of_two_digits_asc_u8);
@@ -599,12 +691,16 @@ fn demo_from_power_of_two_digits_desc<
     }
 }
 
-fn benchmark_to_power_of_two_digits_asc<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
+fn benchmark_to_power_of_two_digits_asc_evaluation_strategy<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned,
+>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) where
     T: PowerOfTwoDigits<U>,
+    T: PowerOfTwoDigitIterable<U>,
 {
     m_run_benchmark(
         &format!(
@@ -612,30 +708,49 @@ fn benchmark_to_power_of_two_digits_asc<T: PrimitiveUnsigned + Rand, U: Primitiv
             U::NAME,
             T::NAME
         ),
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         pairs_of_unsigned_and_small_u64_var_1::<T, U>(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, log_base)| {
-                no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(
-                    &n, log_base
-                ))
-            }),
-        )],
+        &mut [
+            (
+                "malachite",
+                &mut (|(n, log_base)| {
+                    no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(
+                        &n, log_base
+                    ))
+                }),
+            ),
+            (
+                &format!(
+                    "{}.power_of_two_digits(u64).collect::<Vec<{}>>()",
+                    T::NAME,
+                    U::NAME
+                ),
+                &mut (|(n, log_base)| {
+                    no_out!(
+                        PowerOfTwoDigitIterable::<U>::power_of_two_digits(n, log_base)
+                            .collect::<Vec<U>>()
+                    )
+                }),
+            ),
+        ],
     );
 }
 
-fn benchmark_to_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
+fn benchmark_to_power_of_two_digits_desc_evaluation_strategy<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned,
+>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) where
     T: PowerOfTwoDigits<U>,
+    T: PowerOfTwoDigitIterable<U>,
 {
     m_run_benchmark(
         &format!(
@@ -643,21 +758,37 @@ fn benchmark_to_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand, U: Primiti
             U::NAME,
             T::NAME
         ),
-        BenchmarkType::Single,
+        BenchmarkType::EvaluationStrategy,
         pairs_of_unsigned_and_small_u64_var_1::<T, U>(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, log_base)| {
-                no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(
-                    &n, log_base
-                ))
-            }),
-        )],
+        &mut [
+            (
+                "malachite",
+                &mut (|(n, log_base)| {
+                    no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(
+                        &n, log_base
+                    ))
+                }),
+            ),
+            (
+                &format!(
+                    "{}.power_of_two_digits(u64).rev().collect::<Vec<{}>>()",
+                    T::NAME,
+                    U::NAME
+                ),
+                &mut (|(n, log_base)| {
+                    no_out!(
+                        PowerOfTwoDigitIterable::<U>::power_of_two_digits(n, log_base)
+                            .rev()
+                            .collect::<Vec<U>>()
+                    )
+                }),
+            ),
+        ],
     );
 }
 
@@ -759,7 +890,9 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            benchmark_to_power_of_two_digits_asc::<$t, $u>(gm, limit, file_name);
+            benchmark_to_power_of_two_digits_asc_evaluation_strategy::<$t, $u>(
+                gm, limit, file_name,
+            );
         }
 
         fn $to_power_of_two_digits_desc_bench_name(
@@ -767,7 +900,9 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            benchmark_to_power_of_two_digits_desc::<$t, $u>(gm, limit, file_name);
+            benchmark_to_power_of_two_digits_desc_evaluation_strategy::<$t, $u>(
+                gm, limit, file_name,
+            );
         }
 
         fn $from_power_of_two_digits_asc_bench_name(
@@ -795,8 +930,8 @@ demo_and_bench!(
     demo_u8_to_power_of_two_digits_desc_u8,
     demo_u8_from_power_of_two_digits_asc_u8,
     demo_u8_from_power_of_two_digits_desc_u8,
-    benchmark_u8_to_power_of_two_digits_asc_u8,
-    benchmark_u8_to_power_of_two_digits_desc_u8,
+    benchmark_u8_to_power_of_two_digits_asc_u8_evaluation_strategy,
+    benchmark_u8_to_power_of_two_digits_desc_u8_evaluation_strategy,
     benchmark_u8_from_power_of_two_digits_asc_u8,
     benchmark_u8_from_power_of_two_digits_desc_u8
 );
@@ -807,8 +942,8 @@ demo_and_bench!(
     demo_u8_to_power_of_two_digits_desc_u16,
     demo_u8_from_power_of_two_digits_asc_u16,
     demo_u8_from_power_of_two_digits_desc_u16,
-    benchmark_u8_to_power_of_two_digits_asc_u16,
-    benchmark_u8_to_power_of_two_digits_desc_u16,
+    benchmark_u8_to_power_of_two_digits_asc_u16_evaluation_strategy,
+    benchmark_u8_to_power_of_two_digits_desc_u16_evaluation_strategy,
     benchmark_u8_from_power_of_two_digits_asc_u16,
     benchmark_u8_from_power_of_two_digits_desc_u16
 );
@@ -819,8 +954,8 @@ demo_and_bench!(
     demo_u8_to_power_of_two_digits_desc_u32,
     demo_u8_from_power_of_two_digits_asc_u32,
     demo_u8_from_power_of_two_digits_desc_u32,
-    benchmark_u8_to_power_of_two_digits_asc_u32,
-    benchmark_u8_to_power_of_two_digits_desc_u32,
+    benchmark_u8_to_power_of_two_digits_asc_u32_evaluation_strategy,
+    benchmark_u8_to_power_of_two_digits_desc_u32_evaluation_strategy,
     benchmark_u8_from_power_of_two_digits_asc_u32,
     benchmark_u8_from_power_of_two_digits_desc_u32
 );
@@ -831,8 +966,8 @@ demo_and_bench!(
     demo_u8_to_power_of_two_digits_desc_u64,
     demo_u8_from_power_of_two_digits_asc_u64,
     demo_u8_from_power_of_two_digits_desc_u64,
-    benchmark_u8_to_power_of_two_digits_asc_u64,
-    benchmark_u8_to_power_of_two_digits_desc_u64,
+    benchmark_u8_to_power_of_two_digits_asc_u64_evaluation_strategy,
+    benchmark_u8_to_power_of_two_digits_desc_u64_evaluation_strategy,
     benchmark_u8_from_power_of_two_digits_asc_u64,
     benchmark_u8_from_power_of_two_digits_desc_u64
 );
@@ -843,8 +978,8 @@ demo_and_bench!(
     demo_u8_to_power_of_two_digits_desc_usize,
     demo_u8_from_power_of_two_digits_asc_usize,
     demo_u8_from_power_of_two_digits_desc_usize,
-    benchmark_u8_to_power_of_two_digits_asc_usize,
-    benchmark_u8_to_power_of_two_digits_desc_usize,
+    benchmark_u8_to_power_of_two_digits_asc_usize_evaluation_strategy,
+    benchmark_u8_to_power_of_two_digits_desc_usize_evaluation_strategy,
     benchmark_u8_from_power_of_two_digits_asc_usize,
     benchmark_u8_from_power_of_two_digits_desc_usize
 );
@@ -856,8 +991,8 @@ demo_and_bench!(
     demo_u16_to_power_of_two_digits_desc_u8,
     demo_u16_from_power_of_two_digits_asc_u8,
     demo_u16_from_power_of_two_digits_desc_u8,
-    benchmark_u16_to_power_of_two_digits_asc_u8,
-    benchmark_u16_to_power_of_two_digits_desc_u8,
+    benchmark_u16_to_power_of_two_digits_asc_u8_evaluation_strategy,
+    benchmark_u16_to_power_of_two_digits_desc_u8_evaluation_strategy,
     benchmark_u16_from_power_of_two_digits_asc_u8,
     benchmark_u16_from_power_of_two_digits_desc_u8
 );
@@ -868,8 +1003,8 @@ demo_and_bench!(
     demo_u16_to_power_of_two_digits_desc_u16,
     demo_u16_from_power_of_two_digits_asc_u16,
     demo_u16_from_power_of_two_digits_desc_u16,
-    benchmark_u16_to_power_of_two_digits_asc_u16,
-    benchmark_u16_to_power_of_two_digits_desc_u16,
+    benchmark_u16_to_power_of_two_digits_asc_u16_evaluation_strategy,
+    benchmark_u16_to_power_of_two_digits_desc_u16_evaluation_strategy,
     benchmark_u16_from_power_of_two_digits_asc_u16,
     benchmark_u16_from_power_of_two_digits_desc_u16
 );
@@ -880,8 +1015,8 @@ demo_and_bench!(
     demo_u16_to_power_of_two_digits_desc_u32,
     demo_u16_from_power_of_two_digits_asc_u32,
     demo_u16_from_power_of_two_digits_desc_u32,
-    benchmark_u16_to_power_of_two_digits_asc_u32,
-    benchmark_u16_to_power_of_two_digits_desc_u32,
+    benchmark_u16_to_power_of_two_digits_asc_u32_evaluation_strategy,
+    benchmark_u16_to_power_of_two_digits_desc_u32_evaluation_strategy,
     benchmark_u16_from_power_of_two_digits_asc_u32,
     benchmark_u16_from_power_of_two_digits_desc_u32
 );
@@ -892,8 +1027,8 @@ demo_and_bench!(
     demo_u16_to_power_of_two_digits_desc_u64,
     demo_u16_from_power_of_two_digits_asc_u64,
     demo_u16_from_power_of_two_digits_desc_u64,
-    benchmark_u16_to_power_of_two_digits_asc_u64,
-    benchmark_u16_to_power_of_two_digits_desc_u64,
+    benchmark_u16_to_power_of_two_digits_asc_u64_evaluation_strategy,
+    benchmark_u16_to_power_of_two_digits_desc_u64_evaluation_strategy,
     benchmark_u16_from_power_of_two_digits_asc_u64,
     benchmark_u16_from_power_of_two_digits_desc_u64
 );
@@ -904,8 +1039,8 @@ demo_and_bench!(
     demo_u16_to_power_of_two_digits_desc_usize,
     demo_u16_from_power_of_two_digits_asc_usize,
     demo_u16_from_power_of_two_digits_desc_usize,
-    benchmark_u16_to_power_of_two_digits_asc_usize,
-    benchmark_u16_to_power_of_two_digits_desc_usize,
+    benchmark_u16_to_power_of_two_digits_asc_usize_evaluation_strategy,
+    benchmark_u16_to_power_of_two_digits_desc_usize_evaluation_strategy,
     benchmark_u16_from_power_of_two_digits_asc_usize,
     benchmark_u16_from_power_of_two_digits_desc_usize
 );
@@ -917,8 +1052,8 @@ demo_and_bench!(
     demo_u32_to_power_of_two_digits_desc_u8,
     demo_u32_from_power_of_two_digits_asc_u8,
     demo_u32_from_power_of_two_digits_desc_u8,
-    benchmark_u32_to_power_of_two_digits_asc_u8,
-    benchmark_u32_to_power_of_two_digits_desc_u8,
+    benchmark_u32_to_power_of_two_digits_asc_u8_evaluation_strategy,
+    benchmark_u32_to_power_of_two_digits_desc_u8_evaluation_strategy,
     benchmark_u32_from_power_of_two_digits_asc_u8,
     benchmark_u32_from_power_of_two_digits_desc_u8
 );
@@ -929,8 +1064,8 @@ demo_and_bench!(
     demo_u32_to_power_of_two_digits_desc_u16,
     demo_u32_from_power_of_two_digits_asc_u16,
     demo_u32_from_power_of_two_digits_desc_u16,
-    benchmark_u32_to_power_of_two_digits_asc_u16,
-    benchmark_u32_to_power_of_two_digits_desc_u16,
+    benchmark_u32_to_power_of_two_digits_asc_u16_evaluation_strategy,
+    benchmark_u32_to_power_of_two_digits_desc_u16_evaluation_strategy,
     benchmark_u32_from_power_of_two_digits_asc_u16,
     benchmark_u32_from_power_of_two_digits_desc_u16
 );
@@ -941,8 +1076,8 @@ demo_and_bench!(
     demo_u32_to_power_of_two_digits_desc_u32,
     demo_u32_from_power_of_two_digits_asc_u32,
     demo_u32_from_power_of_two_digits_desc_u32,
-    benchmark_u32_to_power_of_two_digits_asc_u32,
-    benchmark_u32_to_power_of_two_digits_desc_u32,
+    benchmark_u32_to_power_of_two_digits_asc_u32_evaluation_strategy,
+    benchmark_u32_to_power_of_two_digits_desc_u32_evaluation_strategy,
     benchmark_u32_from_power_of_two_digits_asc_u32,
     benchmark_u32_from_power_of_two_digits_desc_u32
 );
@@ -953,8 +1088,8 @@ demo_and_bench!(
     demo_u32_to_power_of_two_digits_desc_u64,
     demo_u32_from_power_of_two_digits_asc_u64,
     demo_u32_from_power_of_two_digits_desc_u64,
-    benchmark_u32_to_power_of_two_digits_asc_u64,
-    benchmark_u32_to_power_of_two_digits_desc_u64,
+    benchmark_u32_to_power_of_two_digits_asc_u64_evaluation_strategy,
+    benchmark_u32_to_power_of_two_digits_desc_u64_evaluation_strategy,
     benchmark_u32_from_power_of_two_digits_asc_u64,
     benchmark_u32_from_power_of_two_digits_desc_u64
 );
@@ -965,8 +1100,8 @@ demo_and_bench!(
     demo_u32_to_power_of_two_digits_desc_usize,
     demo_u32_from_power_of_two_digits_asc_usize,
     demo_u32_from_power_of_two_digits_desc_usize,
-    benchmark_u32_to_power_of_two_digits_asc_usize,
-    benchmark_u32_to_power_of_two_digits_desc_usize,
+    benchmark_u32_to_power_of_two_digits_asc_usize_evaluation_strategy,
+    benchmark_u32_to_power_of_two_digits_desc_usize_evaluation_strategy,
     benchmark_u32_from_power_of_two_digits_asc_usize,
     benchmark_u32_from_power_of_two_digits_desc_usize
 );
@@ -978,8 +1113,8 @@ demo_and_bench!(
     demo_u64_to_power_of_two_digits_desc_u8,
     demo_u64_from_power_of_two_digits_asc_u8,
     demo_u64_from_power_of_two_digits_desc_u8,
-    benchmark_u64_to_power_of_two_digits_asc_u8,
-    benchmark_u64_to_power_of_two_digits_desc_u8,
+    benchmark_u64_to_power_of_two_digits_asc_u8_evaluation_strategy,
+    benchmark_u64_to_power_of_two_digits_desc_u8_evaluation_strategy,
     benchmark_u64_from_power_of_two_digits_asc_u8,
     benchmark_u64_from_power_of_two_digits_desc_u8
 );
@@ -990,8 +1125,8 @@ demo_and_bench!(
     demo_u64_to_power_of_two_digits_desc_u16,
     demo_u64_from_power_of_two_digits_asc_u16,
     demo_u64_from_power_of_two_digits_desc_u16,
-    benchmark_u64_to_power_of_two_digits_asc_u16,
-    benchmark_u64_to_power_of_two_digits_desc_u16,
+    benchmark_u64_to_power_of_two_digits_asc_u16_evaluation_strategy,
+    benchmark_u64_to_power_of_two_digits_desc_u16_evaluation_strategy,
     benchmark_u64_from_power_of_two_digits_asc_u16,
     benchmark_u64_from_power_of_two_digits_desc_u16
 );
@@ -1002,8 +1137,8 @@ demo_and_bench!(
     demo_u64_to_power_of_two_digits_desc_u32,
     demo_u64_from_power_of_two_digits_asc_u32,
     demo_u64_from_power_of_two_digits_desc_u32,
-    benchmark_u64_to_power_of_two_digits_asc_u32,
-    benchmark_u64_to_power_of_two_digits_desc_u32,
+    benchmark_u64_to_power_of_two_digits_asc_u32_evaluation_strategy,
+    benchmark_u64_to_power_of_two_digits_desc_u32_evaluation_strategy,
     benchmark_u64_from_power_of_two_digits_asc_u32,
     benchmark_u64_from_power_of_two_digits_desc_u32
 );
@@ -1014,8 +1149,8 @@ demo_and_bench!(
     demo_u64_to_power_of_two_digits_desc_u64,
     demo_u64_from_power_of_two_digits_asc_u64,
     demo_u64_from_power_of_two_digits_desc_u64,
-    benchmark_u64_to_power_of_two_digits_asc_u64,
-    benchmark_u64_to_power_of_two_digits_desc_u64,
+    benchmark_u64_to_power_of_two_digits_asc_u64_evaluation_strategy,
+    benchmark_u64_to_power_of_two_digits_desc_u64_evaluation_strategy,
     benchmark_u64_from_power_of_two_digits_asc_u64,
     benchmark_u64_from_power_of_two_digits_desc_u64
 );
@@ -1026,8 +1161,8 @@ demo_and_bench!(
     demo_u64_to_power_of_two_digits_desc_usize,
     demo_u64_from_power_of_two_digits_asc_usize,
     demo_u64_from_power_of_two_digits_desc_usize,
-    benchmark_u64_to_power_of_two_digits_asc_usize,
-    benchmark_u64_to_power_of_two_digits_desc_usize,
+    benchmark_u64_to_power_of_two_digits_asc_usize_evaluation_strategy,
+    benchmark_u64_to_power_of_two_digits_desc_usize_evaluation_strategy,
     benchmark_u64_from_power_of_two_digits_asc_usize,
     benchmark_u64_from_power_of_two_digits_desc_usize
 );
@@ -1039,8 +1174,8 @@ demo_and_bench!(
     demo_usize_to_power_of_two_digits_desc_u8,
     demo_usize_from_power_of_two_digits_asc_u8,
     demo_usize_from_power_of_two_digits_desc_u8,
-    benchmark_usize_to_power_of_two_digits_asc_u8,
-    benchmark_usize_to_power_of_two_digits_desc_u8,
+    benchmark_usize_to_power_of_two_digits_asc_u8_evaluation_strategy,
+    benchmark_usize_to_power_of_two_digits_desc_u8_evaluation_strategy,
     benchmark_usize_from_power_of_two_digits_asc_u8,
     benchmark_usize_from_power_of_two_digits_desc_u8
 );
@@ -1051,8 +1186,8 @@ demo_and_bench!(
     demo_usize_to_power_of_two_digits_desc_u16,
     demo_usize_from_power_of_two_digits_asc_u16,
     demo_usize_from_power_of_two_digits_desc_u16,
-    benchmark_usize_to_power_of_two_digits_asc_u16,
-    benchmark_usize_to_power_of_two_digits_desc_u16,
+    benchmark_usize_to_power_of_two_digits_asc_u16_evaluation_strategy,
+    benchmark_usize_to_power_of_two_digits_desc_u16_evaluation_strategy,
     benchmark_usize_from_power_of_two_digits_asc_u16,
     benchmark_usize_from_power_of_two_digits_desc_u16
 );
@@ -1063,8 +1198,8 @@ demo_and_bench!(
     demo_usize_to_power_of_two_digits_desc_u32,
     demo_usize_from_power_of_two_digits_asc_u32,
     demo_usize_from_power_of_two_digits_desc_u32,
-    benchmark_usize_to_power_of_two_digits_asc_u32,
-    benchmark_usize_to_power_of_two_digits_desc_u32,
+    benchmark_usize_to_power_of_two_digits_asc_u32_evaluation_strategy,
+    benchmark_usize_to_power_of_two_digits_desc_u32_evaluation_strategy,
     benchmark_usize_from_power_of_two_digits_asc_u32,
     benchmark_usize_from_power_of_two_digits_desc_u32
 );
@@ -1075,8 +1210,8 @@ demo_and_bench!(
     demo_usize_to_power_of_two_digits_desc_u64,
     demo_usize_from_power_of_two_digits_asc_u64,
     demo_usize_from_power_of_two_digits_desc_u64,
-    benchmark_usize_to_power_of_two_digits_asc_u64,
-    benchmark_usize_to_power_of_two_digits_desc_u64,
+    benchmark_usize_to_power_of_two_digits_asc_u64_evaluation_strategy,
+    benchmark_usize_to_power_of_two_digits_desc_u64_evaluation_strategy,
     benchmark_usize_from_power_of_two_digits_asc_u64,
     benchmark_usize_from_power_of_two_digits_desc_u64
 );
@@ -1087,8 +1222,8 @@ demo_and_bench!(
     demo_usize_to_power_of_two_digits_desc_usize,
     demo_usize_from_power_of_two_digits_asc_usize,
     demo_usize_from_power_of_two_digits_desc_usize,
-    benchmark_usize_to_power_of_two_digits_asc_usize,
-    benchmark_usize_to_power_of_two_digits_desc_usize,
+    benchmark_usize_to_power_of_two_digits_asc_usize_evaluation_strategy,
+    benchmark_usize_to_power_of_two_digits_desc_usize_evaluation_strategy,
     benchmark_usize_from_power_of_two_digits_asc_usize,
     benchmark_usize_from_power_of_two_digits_desc_usize
 );

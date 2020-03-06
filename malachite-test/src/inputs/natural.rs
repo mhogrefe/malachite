@@ -50,7 +50,7 @@ use rust_wheels::iterators::vecs::{
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{
-    finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomValueAndVecOfBoolVar2,
+    finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomPrimitiveAndVecOfBool,
 };
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
@@ -1211,8 +1211,8 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
 fn random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomValueAndVecOfBoolVar2<Natural> {
-    RandomValueAndVecOfBoolVar2 {
+) -> RandomPrimitiveAndVecOfBool<Natural> {
+    RandomPrimitiveAndVecOfBool {
         xs: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -1221,8 +1221,8 @@ fn random_pairs_of_natural_and_vec_of_bool_var_2(
 fn special_random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomValueAndVecOfBoolVar2<Natural> {
-    RandomValueAndVecOfBoolVar2 {
+) -> RandomPrimitiveAndVecOfBool<Natural> {
+    RandomPrimitiveAndVecOfBool {
         xs: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }

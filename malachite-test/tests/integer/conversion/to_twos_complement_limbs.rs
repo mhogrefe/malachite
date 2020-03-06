@@ -342,10 +342,10 @@ fn twos_complement_limbs_properties() {
     );
 
     test_properties(pairs_of_integer_and_small_unsigned, |&(ref n, u)| {
-        if u < usize::exact_from(n.unsigned_abs_ref().limb_count()) {
+        if u < n.unsigned_abs_ref().limb_count() {
             assert_eq!(
                 n.twos_complement_limbs().get(u),
-                n.to_twos_complement_limbs_asc()[u]
+                n.to_twos_complement_limbs_asc()[usize::exact_from(u)]
             );
         } else {
             assert_eq!(

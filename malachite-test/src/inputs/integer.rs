@@ -47,7 +47,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
-use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It, RandomValueAndVecOfBoolVar2};
+use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It, RandomPrimitiveAndVecOfBool};
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
@@ -1289,8 +1289,8 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer
 fn random_pairs_of_integer_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomValueAndVecOfBoolVar2<Integer> {
-    RandomValueAndVecOfBoolVar2 {
+) -> RandomPrimitiveAndVecOfBool<Integer> {
+    RandomPrimitiveAndVecOfBool {
         xs: Box::new(random_integers(&scramble(seed, "integers"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -1299,8 +1299,8 @@ fn random_pairs_of_integer_and_vec_of_bool_var_2(
 fn special_random_pairs_of_integer_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomValueAndVecOfBoolVar2<Integer> {
-    RandomValueAndVecOfBoolVar2 {
+) -> RandomPrimitiveAndVecOfBool<Integer> {
+    RandomPrimitiveAndVecOfBool {
         xs: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }

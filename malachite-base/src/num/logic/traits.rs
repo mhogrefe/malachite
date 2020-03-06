@@ -213,3 +213,15 @@ pub trait PowerOfTwoDigits<T> {
     /// least-significant. The base is 2<sup>`log_base`</sup>.
     fn from_power_of_two_digits_desc(log_base: u64, digits: &[T]) -> Self;
 }
+
+pub trait PowerOfTwoDigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
+    fn get(&self, index: u64) -> T;
+}
+
+pub trait PowerOfTwoDigitIterable<T> {
+    type PowerOfTwoDigitIterator: PowerOfTwoDigitIterator<T>;
+
+    /// Returns a double-ended iterator over a value's digits in base 2<sup>`log_base`</sup>. The
+    /// iterator ends after the value's most-significant digit.
+    fn power_of_two_digits(self, log_base: u64) -> Self::PowerOfTwoDigitIterator;
+}

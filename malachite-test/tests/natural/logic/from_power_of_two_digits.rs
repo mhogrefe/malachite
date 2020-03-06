@@ -11,7 +11,7 @@ use rust_wheels::io::readers::parse_vec;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
-    pairs_of_small_u64_and_small_usize_var_2, pairs_of_u64_and_small_usize_var_1,
+    pairs_of_small_u64_and_small_usize_var_2, pairs_of_u64_and_small_unsigned_var_1,
     pairs_of_u64_and_unsigned_vec_var_1, pairs_of_u64_and_unsigned_vec_var_2,
     pairs_of_u64_and_unsigned_vec_var_3, vecs_of_unsigned,
 };
@@ -381,12 +381,15 @@ fn from_power_of_two_digits_asc_properties_helper<
         },
     );
 
-    test_properties_no_special(pairs_of_u64_and_small_usize_var_1::<T>, |&(log_base, u)| {
-        assert_eq!(
-            Natural::from_power_of_two_digits_asc(log_base, &vec![T::ZERO; u]),
-            0
-        );
-    });
+    test_properties_no_special(
+        pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
+        |&(log_base, u)| {
+            assert_eq!(
+                Natural::from_power_of_two_digits_asc(log_base, &vec![T::ZERO; u]),
+                0
+            );
+        },
+    );
 
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_1::<Limb, T>,
@@ -449,12 +452,15 @@ where
         },
     );
 
-    test_properties_no_special(pairs_of_u64_and_small_usize_var_1::<T>, |&(log_base, u)| {
-        assert_eq!(
-            Natural::from_power_of_two_digits_desc(log_base, &vec![T::ZERO; u]),
-            0
-        );
-    });
+    test_properties_no_special(
+        pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
+        |&(log_base, u)| {
+            assert_eq!(
+                Natural::from_power_of_two_digits_desc(log_base, &vec![T::ZERO; u]),
+                0
+            );
+        },
+    );
 
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_2::<Limb, T>,

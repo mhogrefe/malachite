@@ -8,8 +8,8 @@ use rand::Rand;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_small_unsigned, pairs_of_signed_and_vec_of_bool_var_2,
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_and_vec_of_bool_var_2, small_unsigneds,
+    pairs_of_signed_and_small_unsigned, pairs_of_signed_and_vec_of_bool_var_1,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_and_vec_of_bool_var_1, small_unsigneds,
     unsigneds,
 };
 
@@ -26,7 +26,7 @@ where
     });
 
     test_properties(
-        pairs_of_unsigned_and_vec_of_bool_var_2::<T>,
+        pairs_of_unsigned_and_vec_of_bool_var_1::<T>,
         |&(ref n, ref bs)| {
             let mut bits = n.bits();
             let mut bit_vec = Vec::new();
@@ -65,7 +65,7 @@ where
     <T as BitIterable>::BitIterator: Index<u64, Output = bool>,
 {
     test_properties(
-        pairs_of_signed_and_vec_of_bool_var_2::<T>,
+        pairs_of_signed_and_vec_of_bool_var_1::<T>,
         |&(ref n, ref bs)| {
             let mut bits = n.bits();
             let mut bit_vec = Vec::new();

@@ -377,6 +377,7 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
             (
                 "Integer.into_twos_complement_limbs_asc()[u]",
                 &mut (|(n, u)| {
+                    let u = usize::exact_from(u);
                     let non_negative = n >= 0;
                     let limbs = n.into_twos_complement_limbs_asc();
                     if u >= limbs.len() {

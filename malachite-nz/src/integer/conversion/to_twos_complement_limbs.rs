@@ -136,7 +136,8 @@ pub struct NegativeLimbIterator<'a> {
 }
 
 impl<'a> NegativeLimbIterator<'a> {
-    fn get(&self, index: usize) -> Limb {
+    fn get(&self, index: u64) -> Limb {
+        let index = usize::exact_from(index);
         if index >= self.limbs.len() {
             // We're indexing into the infinite suffix of Limb::MAXs
             Limb::MAX
@@ -324,10 +325,10 @@ impl<'a> TwosComplementLimbIterator<'a> {
     /// assert_eq!(limbs.get(2), u32::MAX);
     /// assert_eq!(limbs.get(100), u32::MAX);
     /// ```
-    pub fn get(&self, index: usize) -> Limb {
+    pub fn get(&self, index: u64) -> Limb {
         match *self {
             TwosComplementLimbIterator::Zero => 0,
-            TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[index],
+            TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[usize::exact_from(index)],
             TwosComplementLimbIterator::Negative(ref limbs, _) => limbs.get(index),
         }
     }

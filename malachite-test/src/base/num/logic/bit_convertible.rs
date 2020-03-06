@@ -1,8 +1,6 @@
-use std::ops::Index;
-
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::integers::{
     _from_bits_asc_alt, _from_bits_desc_alt, _to_bits_asc_alt, _to_bits_desc_alt,
 };
@@ -10,7 +8,6 @@ use malachite_base::num::logic::signeds::{
     _from_bits_asc_signed_naive, _from_bits_desc_signed_naive, _to_bits_asc_signed_naive,
     _to_bits_desc_signed_naive,
 };
-use malachite_base::num::logic::traits::BitIterable;
 use malachite_base::num::logic::unsigneds::{
     _from_bits_asc_unsigned_naive, _from_bits_desc_unsigned_naive, _to_bits_asc_unsigned_naive,
     _to_bits_desc_unsigned_naive,
@@ -19,8 +16,8 @@ use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
-    pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned, signeds, unsigneds,
-    vecs_of_bool_var_2, vecs_of_bool_var_3, vecs_of_bool_var_4, vecs_of_bool_var_5,
+    signeds, unsigneds, vecs_of_bool_var_2, vecs_of_bool_var_3, vecs_of_bool_var_4,
+    vecs_of_bool_var_5,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -67,40 +64,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_i32_from_bits_desc);
     register_demo!(registry, demo_i64_from_bits_desc);
     register_demo!(registry, demo_isize_from_bits_desc);
-
-    register_demo!(registry, demo_u8_bits);
-    register_demo!(registry, demo_u16_bits);
-    register_demo!(registry, demo_u32_bits);
-    register_demo!(registry, demo_u64_bits);
-    register_demo!(registry, demo_usize_bits);
-    register_demo!(registry, demo_i8_bits);
-    register_demo!(registry, demo_i16_bits);
-    register_demo!(registry, demo_i32_bits);
-    register_demo!(registry, demo_i64_bits);
-    register_demo!(registry, demo_isize_bits);
-
-    register_demo!(registry, demo_u8_bits_rev);
-    register_demo!(registry, demo_u16_bits_rev);
-    register_demo!(registry, demo_u32_bits_rev);
-    register_demo!(registry, demo_u64_bits_rev);
-    register_demo!(registry, demo_usize_bits_rev);
-    register_demo!(registry, demo_i8_bits_rev);
-    register_demo!(registry, demo_i16_bits_rev);
-    register_demo!(registry, demo_i32_bits_rev);
-    register_demo!(registry, demo_i64_bits_rev);
-    register_demo!(registry, demo_isize_bits_rev);
-
-    register_demo!(registry, demo_u8_bits_size_hint);
-    register_demo!(registry, demo_u16_bits_size_hint);
-    register_demo!(registry, demo_u32_bits_size_hint);
-    register_demo!(registry, demo_u64_bits_size_hint);
-    register_demo!(registry, demo_usize_bits_size_hint);
-
-    register_demo!(registry, demo_i8_bits_index);
-    register_demo!(registry, demo_i16_bits_index);
-    register_demo!(registry, demo_i32_bits_index);
-    register_demo!(registry, demo_i64_bits_index);
-    register_demo!(registry, demo_isize_bits_index);
 
     register_bench!(registry, None, benchmark_u8_to_bits_asc_algorithms);
     register_bench!(registry, None, benchmark_u16_to_bits_asc_algorithms);
@@ -239,23 +202,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_i32_from_bits_desc_algorithms);
     register_bench!(registry, None, benchmark_i64_from_bits_desc_algorithms);
     register_bench!(registry, None, benchmark_isize_from_bits_desc_algorithms);
-
-    register_bench!(registry, None, benchmark_u8_bits_size_hint);
-    register_bench!(registry, None, benchmark_u16_bits_size_hint);
-    register_bench!(registry, None, benchmark_u32_bits_size_hint);
-    register_bench!(registry, None, benchmark_u64_bits_size_hint);
-    register_bench!(registry, None, benchmark_usize_bits_size_hint);
-
-    register_bench!(registry, None, benchmark_u8_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_u16_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_u32_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_u64_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_usize_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_i8_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_i16_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_i32_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_i64_bits_get_algorithms);
-    register_bench!(registry, None, benchmark_isize_bits_get_algorithms);
 }
 
 fn demo_unsigned_to_bits_asc<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
@@ -339,63 +285,6 @@ where
             bits,
             T::from_bits_desc(&bits)
         );
-    }
-}
-
-fn demo_unsigned_bits<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for u in unsigneds::<T>(gm).take(limit) {
-        println!("bits({}) = {:?}", u, u.bits().collect::<Vec<bool>>());
-    }
-}
-
-fn demo_signed_bits<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    for i in signeds::<T>(gm).take(limit) {
-        println!("bits({}) = {:?}", i, i.bits().collect::<Vec<bool>>());
-    }
-}
-
-fn demo_unsigned_bits_rev<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for u in unsigneds::<T>(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            u,
-            u.bits().rev().collect::<Vec<bool>>()
-        );
-    }
-}
-
-fn demo_signed_bits_rev<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    for i in signeds::<T>(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            i,
-            i.bits().rev().collect::<Vec<bool>>()
-        );
-    }
-}
-
-fn demo_unsigned_bits_size_hint<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for u in unsigneds::<T>(gm).take(limit) {
-        println!("bits({}).size_hint() = {:?}", u, u.bits().size_hint());
-    }
-}
-
-fn demo_signed_bits_index<T: PrimitiveSigned + Rand>(gm: GenerationMode, limit: usize)
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-    <T as BitIterable>::BitIterator: Index<u64, Output = bool>,
-{
-    for (n, i) in pairs_of_signed_and_small_unsigned::<T, u64>(gm).take(limit) {
-        println!("bits({})[{}] = {:?}", n, i, n.bits()[i]);
     }
 }
 
@@ -731,103 +620,6 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
     );
 }
 
-fn benchmark_unsigned_bits_size_hint<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    m_run_benchmark(
-        &format!("{}.bits().size_hint()", T::NAME),
-        BenchmarkType::Single,
-        unsigneds::<T>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|n| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [(
-            &format!("{}.bits().size_hint()", T::NAME),
-            &mut (|n| no_out!(n.bits().size_hint())),
-        )],
-    );
-}
-
-fn benchmark_unsigned_bits_get_algorithms<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) where
-    <T as BitIterable>::BitIterator: Index<u64, Output = bool>,
-{
-    m_run_benchmark(
-        &format!("{}.bits()[u64]", T::NAME),
-        BenchmarkType::Algorithms,
-        pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [
-            (
-                &format!("{}.bits()[u]", T::NAME),
-                &mut (|(n, u)| no_out!(n.bits()[u])),
-            ),
-            (
-                &format!("{}.to_bits_asc()[u]", T::NAME),
-                &mut (|(n, u)| {
-                    let bits = n.to_bits_asc();
-                    let u = usize::exact_from(u);
-                    if u >= bits.len() {
-                        n < T::ZERO
-                    } else {
-                        bits[u]
-                    };
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_signed_bits_get_algorithms<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-    <T as BitIterable>::BitIterator: Index<u64, Output = bool>,
-{
-    m_run_benchmark(
-        &format!("{}.bits()[u64]", T::NAME),
-        BenchmarkType::Algorithms,
-        pairs_of_signed_and_small_unsigned::<T, u64>(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [
-            (
-                &format!("{}.bits()[u]", T::NAME),
-                &mut (|(n, u)| no_out!(n.bits()[u])),
-            ),
-            (
-                &format!("{}.to_bits_asc()[u]", T::NAME),
-                &mut (|(n, u)| {
-                    let bits = n.to_bits_asc();
-                    let u = usize::exact_from(u);
-                    if u >= bits.len() {
-                        n < T::ZERO
-                    } else {
-                        bits[u]
-                    };
-                }),
-            ),
-        ],
-    );
-}
-
 macro_rules! unsigned {
     (
         $t:ident,
@@ -841,11 +633,6 @@ macro_rules! unsigned {
         $from_bits_asc_bench_name:ident,
         $from_bits_desc_demo_name:ident,
         $from_bits_desc_bench_name:ident,
-        $bits_demo_name:ident,
-        $bits_rev_demo_name:ident,
-        $bits_size_hint_demo_name:ident,
-        $bits_size_hint_bench_name:ident,
-        $bits_get_bench_name:ident
     ) => {
         fn $to_bits_asc_demo_name(gm: GenerationMode, limit: usize) {
             demo_unsigned_to_bits_asc::<$t>(gm, limit);
@@ -886,26 +673,6 @@ macro_rules! unsigned {
         fn $from_bits_desc_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_unsigned_from_bits_desc_algorithms::<$t>(gm, limit, file_name);
         }
-
-        fn $bits_demo_name(gm: GenerationMode, limit: usize) {
-            demo_unsigned_bits::<$t>(gm, limit);
-        }
-
-        fn $bits_rev_demo_name(gm: GenerationMode, limit: usize) {
-            demo_unsigned_bits_rev::<$t>(gm, limit);
-        }
-
-        fn $bits_size_hint_demo_name(gm: GenerationMode, limit: usize) {
-            demo_unsigned_bits_size_hint::<$t>(gm, limit);
-        }
-
-        fn $bits_size_hint_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            benchmark_unsigned_bits_size_hint::<$t>(gm, limit, file_name);
-        }
-
-        fn $bits_get_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            benchmark_unsigned_bits_get_algorithms::<$t>(gm, limit, file_name);
-        }
     };
 }
 
@@ -922,10 +689,6 @@ macro_rules! signed {
         $from_bits_asc_bench_name:ident,
         $from_bits_desc_demo_name:ident,
         $from_bits_desc_bench_name:ident,
-        $bits_demo_name:ident,
-        $bits_rev_demo_name:ident,
-        $bits_index_demo_name:ident,
-        $bits_get_bench_name:ident
     ) => {
         fn $to_bits_asc_demo_name(gm: GenerationMode, limit: usize) {
             demo_signed_to_bits_asc::<$t>(gm, limit);
@@ -966,22 +729,6 @@ macro_rules! signed {
         fn $from_bits_desc_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             benchmark_signed_from_bits_desc_algorithms::<$t>(gm, limit, file_name);
         }
-
-        fn $bits_demo_name(gm: GenerationMode, limit: usize) {
-            demo_signed_bits::<$t>(gm, limit);
-        }
-
-        fn $bits_rev_demo_name(gm: GenerationMode, limit: usize) {
-            demo_signed_bits_rev::<$t>(gm, limit);
-        }
-
-        fn $bits_index_demo_name(gm: GenerationMode, limit: usize) {
-            demo_signed_bits_index::<$t>(gm, limit);
-        }
-
-        fn $bits_get_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            benchmark_signed_bits_get_algorithms::<$t>(gm, limit, file_name);
-        }
     };
 }
 
@@ -997,11 +744,6 @@ unsigned!(
     benchmark_u8_from_bits_asc_algorithms,
     demo_u8_from_bits_desc,
     benchmark_u8_from_bits_desc_algorithms,
-    demo_u8_bits,
-    demo_u8_bits_rev,
-    demo_u8_bits_size_hint,
-    benchmark_u8_bits_size_hint,
-    benchmark_u8_bits_get_algorithms
 );
 unsigned!(
     u16,
@@ -1015,11 +757,6 @@ unsigned!(
     benchmark_u16_from_bits_asc_algorithms,
     demo_u16_from_bits_desc,
     benchmark_u16_from_bits_desc_algorithms,
-    demo_u16_bits,
-    demo_u16_bits_rev,
-    demo_u16_bits_size_hint,
-    benchmark_u16_bits_size_hint,
-    benchmark_u16_bits_get_algorithms
 );
 unsigned!(
     u32,
@@ -1033,11 +770,6 @@ unsigned!(
     benchmark_u32_from_bits_asc_algorithms,
     demo_u32_from_bits_desc,
     benchmark_u32_from_bits_desc_algorithms,
-    demo_u32_bits,
-    demo_u32_bits_rev,
-    demo_u32_bits_size_hint,
-    benchmark_u32_bits_size_hint,
-    benchmark_u32_bits_get_algorithms
 );
 unsigned!(
     u64,
@@ -1051,11 +783,6 @@ unsigned!(
     benchmark_u64_from_bits_asc_algorithms,
     demo_u64_from_bits_desc,
     benchmark_u64_from_bits_desc_algorithms,
-    demo_u64_bits,
-    demo_u64_bits_rev,
-    demo_u64_bits_size_hint,
-    benchmark_u64_bits_size_hint,
-    benchmark_u64_bits_get_algorithms
 );
 unsigned!(
     usize,
@@ -1069,11 +796,6 @@ unsigned!(
     benchmark_usize_from_bits_asc_algorithms,
     demo_usize_from_bits_desc,
     benchmark_usize_from_bits_desc_algorithms,
-    demo_usize_bits,
-    demo_usize_bits_rev,
-    demo_usize_bits_size_hint,
-    benchmark_usize_bits_size_hint,
-    benchmark_usize_bits_get_algorithms
 );
 signed!(
     i8,
@@ -1087,10 +809,6 @@ signed!(
     benchmark_i8_from_bits_asc_algorithms,
     demo_i8_from_bits_desc,
     benchmark_i8_from_bits_desc_algorithms,
-    demo_i8_bits,
-    demo_i8_bits_rev,
-    demo_i8_bits_index,
-    benchmark_i8_bits_get_algorithms
 );
 signed!(
     i16,
@@ -1104,10 +822,6 @@ signed!(
     benchmark_i16_from_bits_asc_algorithms,
     demo_i16_from_bits_desc,
     benchmark_i16_from_bits_desc_algorithms,
-    demo_i16_bits,
-    demo_i16_bits_rev,
-    demo_i16_bits_index,
-    benchmark_i16_bits_get_algorithms
 );
 signed!(
     i32,
@@ -1121,10 +835,6 @@ signed!(
     benchmark_i32_from_bits_asc_algorithms,
     demo_i32_from_bits_desc,
     benchmark_i32_from_bits_desc_algorithms,
-    demo_i32_bits,
-    demo_i32_bits_rev,
-    demo_i32_bits_index,
-    benchmark_i32_bits_get_algorithms
 );
 signed!(
     i64,
@@ -1138,10 +848,6 @@ signed!(
     benchmark_i64_from_bits_asc_algorithms,
     demo_i64_from_bits_desc,
     benchmark_i64_from_bits_desc_algorithms,
-    demo_i64_bits,
-    demo_i64_bits_rev,
-    demo_i64_bits_index,
-    benchmark_i64_bits_get_algorithms
 );
 signed!(
     isize,
@@ -1155,8 +861,4 @@ signed!(
     benchmark_isize_from_bits_asc_algorithms,
     demo_isize_from_bits_desc,
     benchmark_isize_from_bits_desc_algorithms,
-    demo_isize_bits,
-    demo_isize_bits_rev,
-    demo_isize_bits_index,
-    benchmark_isize_bits_get_algorithms
 );
