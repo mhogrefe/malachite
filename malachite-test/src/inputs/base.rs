@@ -1,6 +1,5 @@
 use std::char;
 use std::iter::repeat;
-use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
@@ -13,7 +12,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros,
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
 };
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
@@ -702,13 +701,31 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub(crate) fn pairs_of_small_usizes(gm: NoSpecialGenerationMode) -> It<(usize, usize)> {
+pub(crate) fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, T)> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => {
             Box::new(exhaustive_pairs_from_single(exhaustive_unsigned()))
         }
         NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            u32s_geometric(&EXAMPLE_SEED, scale).map(usize::wrapping_from),
+            u32s_geometric(&EXAMPLE_SEED, scale).map(T::wrapping_from),
+        )),
+    }
+}
+
+pub fn pairs_of_small_unsigneds<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, U)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| u32s_geometric(seed, scale).map(T::wrapping_from)),
+            &(|seed| u32s_geometric(seed, scale).map(U::wrapping_from)),
         )),
     }
 }
@@ -5298,12 +5315,12 @@ where
     )
 }
 
-pub(crate) struct RandomPrimitiveAndVecOfBool<T: BitConvertible> {
+pub(crate) struct RandomValueAndVecOfBool<T> {
     pub(crate) xs: It<T>,
     pub(crate) rng: Box<IsaacRng>,
 }
 
-impl<T: BitConvertible> Iterator for RandomPrimitiveAndVecOfBool<T> {
+impl<T: BitConvertible> Iterator for RandomValueAndVecOfBool<T> {
     type Item = (T, Vec<bool>);
 
     fn next(&mut self) -> Option<(T, Vec<bool>)> {
@@ -5318,8 +5335,8 @@ impl<T: BitConvertible> Iterator for RandomPrimitiveAndVecOfBool<T> {
 
 fn random_pairs_of_primitive_and_vec_of_bool_var_1<T: PrimitiveInteger + Rand>(
     seed: &[u32],
-) -> RandomPrimitiveAndVecOfBool<T> {
-    RandomPrimitiveAndVecOfBool {
+) -> RandomValueAndVecOfBool<T> {
+    RandomValueAndVecOfBool {
         xs: Box::new(random(&scramble(seed, "naturals"))),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -5327,8 +5344,8 @@ fn random_pairs_of_primitive_and_vec_of_bool_var_1<T: PrimitiveInteger + Rand>(
 
 fn special_random_pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
     seed: &[u32],
-) -> RandomPrimitiveAndVecOfBool<T> {
-    RandomPrimitiveAndVecOfBool {
+) -> RandomValueAndVecOfBool<T> {
+    RandomValueAndVecOfBool {
         xs: Box::new(special_random_unsigned(&scramble(seed, "naturals"))),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -5357,12 +5374,12 @@ pub fn pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
 
 fn special_random_pairs_of_signed_and_vec_of_bool_var_1<T: PrimitiveSigned + Rand>(
     seed: &[u32],
-) -> RandomPrimitiveAndVecOfBool<T>
+) -> RandomValueAndVecOfBool<T>
 where
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    RandomPrimitiveAndVecOfBool {
+    RandomValueAndVecOfBool {
         xs: Box::new(special_random_signed(&scramble(seed, "naturals"))),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -5396,15 +5413,12 @@ where
     }
 }
 
-pub(crate) struct RandomPrimitiveSmallU64AndVecOfBool<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+pub(crate) struct RandomValueSmallU64AndVecOfBool<T> {
     pub(crate) ps: It<(T, u64)>,
     pub(crate) rng: Box<IsaacRng>,
-    boo: PhantomData<U>,
 }
 
-impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
-    for RandomPrimitiveSmallU64AndVecOfBool<T, U>
-{
+impl<T: Copy + SignificantBits> Iterator for RandomValueSmallU64AndVecOfBool<T> {
     type Item = (T, u64, Vec<bool>);
 
     fn next(&mut self) -> Option<(T, u64, Vec<bool>)> {
@@ -5425,15 +5439,14 @@ fn random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
     U: PrimitiveUnsigned,
 >(
     seed: &[u32],
-) -> RandomPrimitiveSmallU64AndVecOfBool<T, U> {
-    RandomPrimitiveSmallU64AndVecOfBool {
+) -> RandomValueSmallU64AndVecOfBool<T> {
+    RandomValueSmallU64AndVecOfBool {
         ps: Box::new(
             random_pairs_of_primitive_and_small_unsigned_var_1_with_seed::<T, U>(&scramble(
                 seed, "pairs",
             )),
         ),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-        boo: PhantomData,
     }
 }
 
@@ -5442,15 +5455,14 @@ fn special_random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
     U: PrimitiveUnsigned,
 >(
     seed: &[u32],
-) -> RandomPrimitiveSmallU64AndVecOfBool<T, U> {
-    RandomPrimitiveSmallU64AndVecOfBool {
+) -> RandomValueSmallU64AndVecOfBool<T> {
+    RandomValueSmallU64AndVecOfBool {
         ps: Box::new(
             special_random_pairs_of_unsigned_and_small_unsigned_var_1_with_seed::<T, U>(&scramble(
                 seed, "pairs",
             )),
         ),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-        boo: PhantomData,
     }
 }
 

@@ -1,8 +1,14 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
+use malachite_base::num::logic::traits::{
+    PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
+};
 
 #[test]
 pub fn test_power_of_two_digits() {
+    assert_eq!(
+        PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&107u32, 2),
+        &[3, 2, 2, 1]
+    );
     let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
     assert_eq!(digits.next(), Some(3));
     assert_eq!(digits.next_back(), Some(1));
@@ -30,6 +36,10 @@ pub fn test_power_of_two_digits() {
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
+    assert_eq!(
+        PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&105u32, 1),
+        &[1, 0, 0, 1, 0, 1, 1]
+    );
     let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(105u32, 1);
     assert_eq!(digits.next(), Some(1));
     assert_eq!(digits.next_back(), Some(1));

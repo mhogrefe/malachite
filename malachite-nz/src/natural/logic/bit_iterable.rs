@@ -147,7 +147,8 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
                 self.some_remaining = false;
             }
             let bit = self.current_limb_back & self.j_mask != 0;
-            if self.j_mask == 1 {
+            self.j_mask >>= 1;
+            if self.j_mask == 0 {
                 self.j_mask = 1 << (Limb::WIDTH - 1);
                 if let Some(next_back) = self.limbs.next_back() {
                     self.current_limb_back = next_back;
@@ -155,8 +156,6 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
                     self.current_limb_back = self.current_limb_forward;
                     self.indices_are_in_same_limb = true;
                 }
-            } else {
-                self.j_mask >>= 1;
             }
             Some(bit)
         } else {

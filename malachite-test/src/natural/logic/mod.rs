@@ -23,6 +23,7 @@ pub mod index_of_next_true_bit;
 pub mod limb_count;
 pub mod not;
 pub mod or;
+pub mod power_of_two_digits;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod to_bits;
@@ -75,6 +76,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     limb_count::register(registry);
     not::register(registry);
     or::register(registry);
+    power_of_two_digits::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     to_bits::register(registry);

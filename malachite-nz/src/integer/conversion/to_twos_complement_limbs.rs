@@ -126,16 +126,19 @@ pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub struct NegativeLimbIterator<'a>(NLIterator<'a>);
+
 /// A double-ended iterator over the two's complement limbs of the negative of a `Natural`. The
 /// forward order is ascending (least-significant first). There may be at most one implicit
 /// most-significant `Limb::MAX` limb.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct NegativeLimbIterator<'a> {
+struct NLIterator<'a> {
     pub(crate) limbs: LimbIterator<'a>,
     first_nonzero_index: Option<usize>,
 }
 
-impl<'a> NegativeLimbIterator<'a> {
+impl<'a> NLIterator<'a> {
     fn get(&self, index: u64) -> Limb {
         let index = usize::exact_from(index);
         if index >= self.limbs.len() {
@@ -152,7 +155,7 @@ impl<'a> NegativeLimbIterator<'a> {
     }
 }
 
-impl<'a> Iterator for NegativeLimbIterator<'a> {
+impl<'a> Iterator for NLIterator<'a> {
     type Item = Limb;
 
     /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
@@ -191,7 +194,7 @@ impl<'a> Iterator for NegativeLimbIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for NegativeLimbIterator<'a> {
+impl<'a> DoubleEndedIterator for NLIterator<'a> {
     /// A function to iterate through the two's complement limbs of the negative of a `Natural` in
     /// descending order (most-significant first). This is worst-case linear since the first
     /// `next_back` call needs to determine the index of the least-significant nonzero limb.
@@ -263,7 +266,7 @@ impl<'a> SignExtendedLimbIterator for LimbIterator<'a> {
     }
 }
 
-impl<'a> SignExtendedLimbIterator for NegativeLimbIterator<'a> {
+impl<'a> SignExtendedLimbIterator for NLIterator<'a> {
     const EXTENSION: Limb = Limb::MAX;
 
     fn needs_sign_extension(&self) -> bool {
@@ -329,7 +332,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
         match *self {
             TwosComplementLimbIterator::Zero => 0,
             TwosComplementLimbIterator::Positive(ref limbs, _) => limbs[usize::exact_from(index)],
-            TwosComplementLimbIterator::Negative(ref limbs, _) => limbs.get(index),
+            TwosComplementLimbIterator::Negative(ref limbs, _) => limbs.0.get(index),
         }
     }
 }
@@ -368,7 +371,7 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
                 limbs.iterate_forward(extension_checked)
             }
             TwosComplementLimbIterator::Negative(ref mut limbs, ref mut extension_checked) => {
-                limbs.iterate_forward(extension_checked)
+                limbs.0.iterate_forward(extension_checked)
             }
         }
     }
@@ -408,7 +411,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
                 limbs.iterate_backward(extension_checked)
             }
             TwosComplementLimbIterator::Negative(ref mut limbs, ref mut extension_checked) => {
-                limbs.iterate_backward(extension_checked)
+                limbs.0.iterate_backward(extension_checked)
             }
         }
     }
@@ -666,9 +669,9 @@ impl Natural {
     /// Additional memory: worst case O(1)
     fn negative_limbs(&self) -> NegativeLimbIterator {
         assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
-        NegativeLimbIterator {
+        NegativeLimbIterator(NLIterator {
             limbs: self.limbs(),
             first_nonzero_index: None,
-        }
+        })
     }
 }

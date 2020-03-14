@@ -55,8 +55,8 @@ use common::{
     ScaleType,
 };
 use inputs::base::{
-    pairs_of_small_usizes, pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_4,
-    pairs_of_unsigned_vec_var_5,
+    pairs_of_small_unsigneds_single, pairs_of_unsigned_vec_and_unsigned,
+    pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
     quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_10,
@@ -462,7 +462,7 @@ fn demo_limbs_mul_greater_to_out_toom_22_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_22_input_sizes_valid({}, {}) = {}",
             x,
@@ -476,7 +476,7 @@ fn demo_limbs_mul_greater_to_out_toom_32_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_32_input_sizes_valid({}, {}) = {}",
             x,
@@ -490,7 +490,7 @@ fn demo_limbs_mul_greater_to_out_toom_33_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_33_input_sizes_valid({}, {}) = {}",
             x,
@@ -504,7 +504,7 @@ fn demo_limbs_mul_greater_to_out_toom_42_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_42_input_sizes_valid({}, {}) = {}",
             x,
@@ -518,7 +518,7 @@ fn demo_limbs_mul_greater_to_out_toom_43_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_43_input_sizes_valid({}, {}) = {}",
             x,
@@ -532,7 +532,7 @@ fn demo_limbs_mul_greater_to_out_toom_44_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_44_input_sizes_valid({}, {}) = {}",
             x,
@@ -546,7 +546,7 @@ fn demo_limbs_mul_greater_to_out_toom_52_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_52_input_sizes_valid({}, {}) = {}",
             x,
@@ -560,7 +560,7 @@ fn demo_limbs_mul_greater_to_out_toom_53_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_53_input_sizes_valid({}, {}) = {}",
             x,
@@ -574,7 +574,7 @@ fn demo_limbs_mul_greater_to_out_toom_54_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_54_input_sizes_valid({}, {}) = {}",
             x,
@@ -588,7 +588,7 @@ fn demo_limbs_mul_greater_to_out_toom_62_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_62_input_sizes_valid({}, {}) = {}",
             x,
@@ -602,7 +602,7 @@ fn demo_limbs_mul_greater_to_out_toom_63_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_63_input_sizes_valid({}, {}) = {}",
             x,
@@ -616,7 +616,7 @@ fn demo_limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_6h_input_sizes_valid({}, {}) = {}",
             x,
@@ -630,7 +630,7 @@ fn demo_limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_toom_8h_input_sizes_valid({}, {}) = {}",
             x,
@@ -644,7 +644,7 @@ fn demo_limbs_mul_greater_to_out_fft_input_sizes_threshold(
     gm: NoSpecialGenerationMode,
     limit: usize,
 ) {
-    for (x, y) in pairs_of_small_usizes(gm).take(limit) {
+    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
         println!(
             "_limbs_mul_greater_to_out_fft_input_sizes_threshold({}, {}) = {}",
             x,

@@ -2,7 +2,7 @@ use std::ops::{Shl, Shr};
 
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
+    DivRound, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -50,7 +50,7 @@ use rust_wheels::iterators::vecs::{
 
 use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{
-    finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomPrimitiveAndVecOfBool,
+    finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomValueAndVecOfBool,
 };
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
@@ -653,6 +653,32 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUn
     )
 }
 
+// All pairs of `Natural`, `u64`, and small `u64`, where the first `u64` is between 1 and
+// `T::WIDTH`, inclusive.
+pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(Natural, u64, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            range_increasing(1, T::WIDTH),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
+        )),
+    }
+}
+
 fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInteger + Rand>(
     scale: u32,
 ) -> It<(Natural, T, Natural)> {
@@ -1211,8 +1237,8 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
 fn random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomPrimitiveAndVecOfBool<Natural> {
-    RandomPrimitiveAndVecOfBool {
+) -> RandomValueAndVecOfBool<Natural> {
+    RandomValueAndVecOfBool {
         xs: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -1221,8 +1247,8 @@ fn random_pairs_of_natural_and_vec_of_bool_var_2(
 fn special_random_pairs_of_natural_and_vec_of_bool_var_2(
     seed: &[u32],
     scale: u32,
-) -> RandomPrimitiveAndVecOfBool<Natural> {
-    RandomPrimitiveAndVecOfBool {
+) -> RandomValueAndVecOfBool<Natural> {
+    RandomValueAndVecOfBool {
         xs: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
         rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
     }
@@ -1374,5 +1400,85 @@ pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Na
             range_up_geometric_u32(&EXAMPLE_SEED, scale, 1).map(u64::from),
             pairs_of_u64_and_natural_vec_var_1_special_random_helper,
         )),
+    }
+}
+
+pub(crate) struct RandomNaturalSmallU64AndVecOfBool {
+    pub(crate) ps: It<(Natural, u64)>,
+    pub(crate) rng: Box<IsaacRng>,
+}
+
+impl Iterator for RandomNaturalSmallU64AndVecOfBool {
+    type Item = (Natural, u64, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, u64, Vec<bool>)> {
+        let (n, log_base) = self.ps.next().unwrap();
+        let mut bools = Vec::new();
+        for _ in 0..n
+            .significant_bits()
+            .div_round(log_base, RoundingMode::Ceiling)
+        {
+            bools.push(self.rng.gen::<bool>());
+        }
+        Some((n, log_base, bools))
+    }
+}
+
+fn random_triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalSmallU64AndVecOfBool {
+    RandomNaturalSmallU64AndVecOfBool {
+        ps: Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+        )),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalSmallU64AndVecOfBool {
+    RandomNaturalSmallU64AndVecOfBool {
+        ps: Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| random_range(seed, 1, T::WIDTH)),
+        )),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Natural`, `u64` and `Vec<bool>`, where the length of the `Vec` is equal to the
+// significant base-2<sup>`log_base`</sup>-digit count of the `Natural`.
+pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(Natural, u64, Vec<bool>)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |(n, log_base): &(Natural, u64)| {
+                exhaustive_fixed_size_vecs_from_single(
+                    n.significant_bits()
+                        .div_round(*log_base, RoundingMode::Ceiling),
+                    exhaustive_bools(),
+                )
+            };
+            reshape_2_1_to_3(Box::new(dependent_pairs(
+                lex_pairs(exhaustive_naturals(), range_increasing(1, T::WIDTH)),
+                f,
+            )))
+        }
+        GenerationMode::Random(scale) => Box::new(
+            random_triples_of_natural_small_u64_and_vec_of_bool_var_1::<T>(&EXAMPLE_SEED, scale),
+        ),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_triples_of_natural_small_u64_and_vec_of_bool_var_1::<T>(
+                &EXAMPLE_SEED,
+                scale,
+            ),
+        ),
     }
 }

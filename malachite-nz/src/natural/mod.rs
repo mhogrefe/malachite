@@ -244,6 +244,7 @@ pub mod logic {
     pub mod hamming_distance;
     pub mod not;
     pub mod or;
+    pub mod power_of_two_digit_iterable;
     pub mod power_of_two_digits;
     pub mod significant_bits;
     pub mod trailing_zeros;
