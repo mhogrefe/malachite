@@ -220,6 +220,15 @@ fn benchmark_to_power_of_two_digits_asc_algorithms<
                 "naive",
                 &mut (|(n, log_base)| no_out!(to_power_of_two_digits_asc_naive(&n, log_base))),
             ),
+            (
+                "using iterator",
+                &mut (|(n, log_base)| {
+                    no_out!(
+                        PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                            .collect::<Vec<Natural>>()
+                    )
+                }),
+            ),
         ],
     );
 }
@@ -251,6 +260,16 @@ fn benchmark_natural_to_power_of_two_digits_asc_natural_algorithms(
                 "naive",
                 &mut (|(n, log_base)| {
                     no_out!(n._to_power_of_two_digits_asc_natural_naive(log_base))
+                }),
+            ),
+            (
+                "using iterator",
+                &mut (|(n, log_base)| {
+                    no_out!(
+                        PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                            .rev()
+                            .collect::<Vec<Natural>>()
+                    )
                 }),
             ),
         ],

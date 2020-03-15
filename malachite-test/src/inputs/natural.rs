@@ -653,7 +653,7 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUn
     )
 }
 
-// All pairs of `Natural`, `u64`, and small `u64`, where the first `u64` is between 1 and
+// All triples of `Natural`, `u64`, and small `u64`, where the first `u64` is between 1 and
 // `T::WIDTH`, inclusive.
 pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -674,6 +674,31 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
             &(|seed| random_range(seed, 1, T::WIDTH)),
+            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
+        )),
+    }
+}
+
+// All triples of `Natural`, `u64`, and small `u64`, where the first `u64` is positive.
+pub fn triples_of_natural_small_u64_and_small_u64_var_3(
+    gm: GenerationMode,
+) -> It<(Natural, u64, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_positive(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
+            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
             &(|seed| u32s_geometric(seed, scale).map(u64::from)),
         )),
     }
@@ -1452,8 +1477,9 @@ fn special_random_triples_of_natural_small_u64_and_vec_of_bool_var_1<T: Primitiv
     }
 }
 
-// All pairs of `Natural`, `u64` and `Vec<bool>`, where the length of the `Vec` is equal to the
-// significant base-2<sup>`log_base`</sup>-digit count of the `Natural`.
+// All pairs of `Natural`, `u64` and `Vec<bool>`, where `T` is unsigned, the length of the `Vec` is
+// equal to the significant base-2<sup>`log_base`</sup>-digit count of the `Natural`, and the `u64`
+// is between 1 and `T::WIDTH`, inclusive.
 pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> It<(Natural, u64, Vec<bool>)> {
@@ -1479,6 +1505,62 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
                 &EXAMPLE_SEED,
                 scale,
             ),
+        ),
+    }
+}
+
+fn random_triples_of_natural_small_u64_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalSmallU64AndVecOfBool {
+    RandomNaturalSmallU64AndVecOfBool {
+        ps: Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
+        )),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+fn special_random_triples_of_natural_small_u64_and_vec_of_bool_var_2(
+    seed: &[u32],
+    scale: u32,
+) -> RandomNaturalSmallU64AndVecOfBool {
+    RandomNaturalSmallU64AndVecOfBool {
+        ps: Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
+        )),
+        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
+    }
+}
+
+// All pairs of `Natural`, `u64` and `Vec<bool>`, where the length of the `Vec` is equal to the
+// significant base-2<sup>`log_base`</sup>-digit count of the `Natural`.
+pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
+    gm: GenerationMode,
+) -> It<(Natural, u64, Vec<bool>)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            let f = move |(n, log_base): &(Natural, u64)| {
+                exhaustive_fixed_size_vecs_from_single(
+                    n.significant_bits()
+                        .div_round(*log_base, RoundingMode::Ceiling),
+                    exhaustive_bools(),
+                )
+            };
+            reshape_2_1_to_3(Box::new(dependent_pairs(
+                log_pairs(exhaustive_naturals(), exhaustive_positive()),
+                f,
+            )))
+        }
+        GenerationMode::Random(scale) => Box::new(
+            random_triples_of_natural_small_u64_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
+        ),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            special_random_triples_of_natural_small_u64_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
     }
 }

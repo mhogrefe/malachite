@@ -714,6 +714,13 @@ pub(crate) fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+// All pairs of small `T`s, where `T` is unsigned and the first `T` is positive.
+pub fn pairs_of_small_unsigneds_single_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, T)> {
+    Box::new(pairs_of_small_unsigneds_single(gm).filter(|&(x, _)| x != T::ZERO))
+}
+
 pub fn pairs_of_small_unsigneds<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
     gm: NoSpecialGenerationMode,
 ) -> It<(T, U)> {

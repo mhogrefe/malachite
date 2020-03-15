@@ -1,12 +1,16 @@
 use malachite_base::named::Named;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits, SignificantBits,
 };
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{
-    pairs_of_natural_and_small_u64_var_3, triples_of_natural_small_u64_and_small_u64_var_2,
+    pairs_of_natural_and_small_u64_var_3, pairs_of_natural_and_small_unsigned_var_3,
+    triples_of_natural_small_u64_and_small_u64_var_2,
+    triples_of_natural_small_u64_and_small_u64_var_3,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -37,6 +41,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_power_of_two_digits_get_u64);
     register_demo!(registry, demo_natural_power_of_two_digits_get_u128);
     register_demo!(registry, demo_natural_power_of_two_digits_get_usize);
+
+    register_demo!(registry, demo_natural_power_of_two_digits_natural);
+    register_demo!(registry, demo_natural_power_of_two_digits_rev_natural);
+    register_demo!(registry, demo_natural_power_of_two_digits_size_hint_natural);
+    register_demo!(registry, demo_natural_power_of_two_digits_get_natural);
 
     register_bench!(
         registry,
@@ -98,6 +107,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_natural_power_of_two_digits_get_algorithms_usize
+    );
+
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_power_of_two_digits_size_hint_natural
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_natural_power_of_two_digits_get_natural
     );
 }
 
@@ -197,7 +217,7 @@ macro_rules! demo_and_bench {
         fn $power_of_two_digits_get_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
             m_run_benchmark(
                 &format!(
-                    "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&Natural, u64).size_hint()",
+                    "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&Natural, u64).get(u64)",
                     $t::NAME
                 ),
                 BenchmarkType::Algorithms,
@@ -290,3 +310,119 @@ demo_and_bench!(
     benchmark_natural_power_of_two_digits_size_hint_usize,
     benchmark_natural_power_of_two_digits_get_algorithms_usize
 );
+
+fn demo_natural_power_of_two_digits_natural(gm: GenerationMode, limit: usize) {
+    for (n, log_base) in pairs_of_natural_and_small_unsigned_var_3(gm).take(limit) {
+        println!(
+            "power_of_two_digits({}, {}) = {:?}",
+            n,
+            log_base,
+            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                .collect::<Vec<Natural>>()
+        );
+    }
+}
+
+fn demo_natural_power_of_two_digits_rev_natural(gm: GenerationMode, limit: usize) {
+    for (n, log_base) in pairs_of_natural_and_small_unsigned_var_3(gm).take(limit) {
+        println!(
+            "power_of_two_digits({}, {}).rev() = {:?}",
+            n,
+            log_base,
+            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                .rev()
+                .collect::<Vec<Natural>>()
+        );
+    }
+}
+
+fn demo_natural_power_of_two_digits_size_hint_natural(gm: GenerationMode, limit: usize) {
+    for (n, log_base) in pairs_of_natural_and_small_unsigned_var_3(gm).take(limit) {
+        println!(
+            "power_of_two_digits({}, {}).size_hint() = {:?}",
+            n,
+            log_base,
+            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base).size_hint()
+        );
+    }
+}
+
+fn demo_natural_power_of_two_digits_get_natural(gm: GenerationMode, limit: usize) {
+    for (n, log_base, i) in triples_of_natural_small_u64_and_small_u64_var_3(gm).take(limit) {
+        println!(
+            "power_of_two_digits({}, {}).get({}) = {:?}",
+            n,
+            log_base,
+            i,
+            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base).get(i)
+        );
+    }
+}
+
+fn benchmark_natural_power_of_two_digits_size_hint_natural(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&Natural, u64).size_hint()",
+        BenchmarkType::Single,
+        pairs_of_natural_and_small_unsigned_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|(n, _)| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [(
+            "PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&Natural, u64).size_hint()",
+            &mut (|(n, log_base)| {
+                no_out!(
+                    PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                        .size_hint()
+                )
+            }),
+        )],
+    );
+}
+
+#[allow(path_statements)]
+fn benchmark_natural_power_of_two_digits_get_natural(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&Natural, u64).get(u64)",
+        BenchmarkType::Algorithms,
+        triples_of_natural_small_u64_and_small_u64_var_3(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref n, _, _)| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [
+            (
+                "power_of_two_digits(&Natural, u64).get(u64)",
+                &mut (|(n, log_base, i)| {
+                    no_out!(
+                        PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
+                            .get(i)
+                    )
+                }),
+            ),
+            (
+                "Natural.to_power_of_two_digits_asc(u64)[u64]",
+                &mut (|(n, log_base, i)| {
+                    let digits =
+                        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, log_base);
+                    let i = usize::exact_from(i);
+                    if i >= digits.len() {
+                        Natural::ZERO;
+                    } else {
+                        let _ = digits[i];
+                    }
+                }),
+            ),
+        ],
+    );
+}
