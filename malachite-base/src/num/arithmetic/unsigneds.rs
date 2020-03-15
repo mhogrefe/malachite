@@ -1,9 +1,9 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
-    RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    ModIsReduced, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, NegMod, NegModAssign,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
+    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
@@ -12,10 +12,58 @@ use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
+        impl ModPowerOfTwoIsReduced for $t {
+            /// Returns whether `self` is reduced mod 2<pow>`log_base`</pow>; in other words,
+            /// whether it has no more than `log_base` significant bits.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoIsReduced;
+            ///
+            /// assert_eq!(0u8.mod_power_of_two_is_reduced(5), true);
+            /// assert_eq!(100u64.mod_power_of_two_is_reduced(5), false);
+            /// assert_eq!(100u16.mod_power_of_two_is_reduced(8), true);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_is_reduced(&self, log_base: u64) -> bool {
+                self.significant_bits() <= log_base
+            }
+        }
+
+        impl ModIsReduced for $t {
+            /// Returns whether `self` is reduced mod `modulus`; in other words whether it is less
+            /// than `modulus`. `modulus` cannot be zero.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `modulus` is 0.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModIsReduced;
+            ///
+            /// assert_eq!(0u8.mod_is_reduced(&5), true);
+            /// assert_eq!(100u64.mod_is_reduced(&100), false);
+            /// assert_eq!(100u16.mod_is_reduced(&101), true);
+            /// ```
+            #[inline]
+            fn mod_is_reduced(&self, modulus: &$t) -> bool {
+                assert_ne!(*modulus, 0);
+                self < modulus
+            }
+        }
+
         impl IsPowerOfTwo for $t {
             #[inline]
-            fn is_power_of_two(self) -> bool {
-                $t::is_power_of_two(self)
+            fn is_power_of_two(&self) -> bool {
+                $t::is_power_of_two(*self)
             }
         }
 
@@ -36,8 +84,6 @@ macro_rules! impl_arithmetic_traits {
                 $t::checked_next_power_of_two(self)
             }
         }
-
-        // nontrivial implementations start here
 
         impl NextPowerOfTwoAssign for $t {
             #[inline]

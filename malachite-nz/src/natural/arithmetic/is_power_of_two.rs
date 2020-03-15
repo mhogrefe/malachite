@@ -33,7 +33,7 @@ pub fn limbs_is_power_of_two(limbs: &[Limb]) -> bool {
     slice_test_zero(limbs_init) && limbs_last.is_power_of_two()
 }
 
-impl<'a> IsPowerOfTwo for &'a Natural {
+impl IsPowerOfTwo for Natural {
     /// Determines whether a `Natural` is an integer power of 2.
     ///
     /// Time: worst case O(n)
@@ -58,7 +58,7 @@ impl<'a> IsPowerOfTwo for &'a Natural {
     /// assert_eq!(Natural::trillion().is_power_of_two(), false);
     /// assert_eq!(Natural::from_str("1099511627776").unwrap().is_power_of_two(), true);
     /// ```
-    fn is_power_of_two(self) -> bool {
+    fn is_power_of_two(&self) -> bool {
         match *self {
             Natural(Small(small)) => small.is_power_of_two(),
             Natural(Large(ref limbs)) => limbs_is_power_of_two(limbs),

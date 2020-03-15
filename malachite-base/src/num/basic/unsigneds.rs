@@ -1,8 +1,8 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    FloorLogTwo, IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
-    RemPowerOfTwoAssign,
+    FloorLogTwo, IsPowerOfTwo, ModIsReduced, ModPowerOfTwo, ModPowerOfTwoAssign,
+    ModPowerOfTwoIsReduced, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
+    NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -26,8 +26,10 @@ pub trait PrimitiveUnsigned:
     + FromOtherTypeSlice<usize>
     + HammingDistance
     + IsPowerOfTwo
+    + ModIsReduced<Self>
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAssign
+    + ModPowerOfTwoIsReduced
     + NegMod
     + NegModAssign
     + NegModPowerOfTwo<Output = Self>

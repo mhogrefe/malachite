@@ -2,6 +2,16 @@ use std::cmp::Ordering;
 
 use round::RoundingMode;
 
+/// Checks whether `self` is reduced mod 2<pow>`log_base`</pow>.
+pub trait ModPowerOfTwoIsReduced {
+    fn mod_power_of_two_is_reduced(&self, log_base: u64) -> bool;
+}
+
+/// Checks whether `self` is reduced mod `modulus`.
+pub trait ModIsReduced<MOD = Self> {
+    fn mod_is_reduced(&self, modulus: &MOD) -> bool;
+}
+
 /// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
 pub trait CheckedAdd<RHS = Self> {
     type Output;
@@ -246,7 +256,7 @@ pub trait Abs {
 
 /// Returns `true` iff `self == 2^k` for some integer `k`.
 pub trait IsPowerOfTwo {
-    fn is_power_of_two(self) -> bool;
+    fn is_power_of_two(&self) -> bool;
 }
 
 /// Returns the smallest power of two greater than or equal to `self`.
@@ -583,12 +593,12 @@ pub trait ShrRound<RHS> {
     fn shr_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
 }
 
-pub trait ShlRoundAssign<Rhs = Self> {
-    fn shl_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+pub trait ShlRoundAssign<RHS = Self> {
+    fn shl_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
 }
 
-pub trait ShrRoundAssign<Rhs = Self> {
-    fn shr_round_assign(&mut self, rhs: Rhs, rm: RoundingMode);
+pub trait ShrRoundAssign<RHS = Self> {
+    fn shr_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
 }
 
 /// Checked shift left. Computes `self << rhs`, returning `None` if there is no valid result.

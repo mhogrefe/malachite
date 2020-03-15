@@ -402,6 +402,10 @@ pub fn pairs_of_unsigneds_var_3<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
     Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x <= y))
 }
 
+pub fn pairs_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    Box::new(pairs_of_unsigneds(gm).filter(|&(_, y)| y != T::ZERO))
+}
+
 pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
     match gm {
         GenerationMode::Exhaustive => {

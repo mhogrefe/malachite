@@ -53,7 +53,7 @@ fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
         limit,
         file_name,
         &(|&n| usize::exact_from(n.significant_bits())),
-        "index",
+        "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
 }
@@ -71,7 +71,7 @@ fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
         limit,
         file_name,
         &(|&n| usize::exact_from(n.significant_bits())),
-        "index",
+        "n.significant_bits()",
         &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );
 }

@@ -5,6 +5,8 @@ pub mod chars;
 pub mod num {
     pub mod arithmetic {
         pub mod log_two;
+        pub mod mod_is_reduced;
+        pub mod mod_power_of_two_is_reduced;
     }
     pub mod basic {
         pub mod constants;

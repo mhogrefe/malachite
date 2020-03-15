@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
+    CeilingDivNegMod, DivMod, Mod, ModAssign, ModIsReduced, NegMod, NegModAssign,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
@@ -9887,6 +9887,7 @@ fn test_mod() {
         let mut x = Natural::from_str(u).unwrap();
         x.mod_assign(Natural::from_str(v).unwrap());
         assert!(x.is_valid());
+        assert!(x.mod_is_reduced(&Natural::from_str(v).unwrap()));
         assert_eq!(x.to_string(), remainder);
 
         let mut x = Natural::from_str(u).unwrap();
@@ -10109,6 +10110,7 @@ fn test_neg_mod() {
         let mut x = Natural::from_str(u).unwrap();
         x.neg_mod_assign(Natural::from_str(v).unwrap());
         assert!(x.is_valid());
+        assert!(x.mod_is_reduced(&Natural::from_str(v).unwrap()));
         assert_eq!(x.to_string(), remainder);
 
         let mut x = Natural::from_str(u).unwrap();
@@ -10422,6 +10424,7 @@ fn mod_properties_helper(x: &Natural, y: &Natural) {
     mut_x.mod_assign(y);
     assert!(mut_x.is_valid());
     let remainder = mut_x;
+    assert!(remainder.mod_is_reduced(y));
 
     let mut mut_x = x.clone();
     mut_x.mod_assign(y.clone());
@@ -10534,6 +10537,7 @@ fn neg_mod_properties_helper(x: &Natural, y: &Natural) {
     mut_x.neg_mod_assign(y);
     assert!(mut_x.is_valid());
     let remainder = mut_x;
+    assert!(remainder.mod_is_reduced(y));
 
     let mut mut_x = x.clone();
     mut_x.neg_mod_assign(y.clone());

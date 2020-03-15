@@ -2,8 +2,8 @@ use std::cmp::min;
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
+    DivisibleByPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
@@ -81,6 +81,7 @@ fn test_mod_power_of_two_and_rem_power_of_two() {
         n.mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
+        assert!(n.mod_power_of_two_is_reduced(v));
 
         let n = Natural::from_str(u).unwrap().mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
@@ -133,6 +134,7 @@ fn test_neg_mod_power_of_two() {
         n.neg_mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
+        assert!(n.mod_power_of_two_is_reduced(v));
 
         let n = Natural::from_str(u).unwrap().neg_mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
@@ -227,6 +229,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         mut_n.mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
         let result = mut_n;
+        assert!(result.mod_power_of_two_is_reduced(u));
 
         let result_alt = n.mod_power_of_two(u);
         assert!(result_alt.is_valid());
@@ -319,6 +322,7 @@ fn neg_mod_power_of_two_properties() {
         mut_n.neg_mod_power_of_two_assign(u);
         assert!(mut_n.is_valid());
         let result = mut_n;
+        assert!(result.mod_power_of_two_is_reduced(u));
 
         let result_alt = n.neg_mod_power_of_two(u);
         assert!(result_alt.is_valid());
