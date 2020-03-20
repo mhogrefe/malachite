@@ -60,7 +60,8 @@ fn neg_properties() {
         );
 
         assert_eq!(negative == *x, *x == 0);
-        assert_eq!(-negative, *x);
+        assert_eq!(-&negative, *x);
+        assert_eq!(x + negative, 0);
     });
 
     test_properties(signeds::<SignedLimb>, |&x| {

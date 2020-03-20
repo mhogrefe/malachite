@@ -7,10 +7,10 @@ use malachite_nz::platform::SignedLimb;
 use num::BigInt;
 use rug;
 
-use malachite_test::common::test_properties;
+use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, test_properties};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
-use malachite_test::integer::comparison::sign::num_sign;
+use malachite_test::integer::arithmetic::sign::num_sign;
 
 #[test]
 fn test_sign() {
@@ -30,7 +30,9 @@ fn test_sign() {
 fn sign_properties() {
     test_properties(integers, |n| {
         let sign = n.sign();
-        assert_eq!(n.partial_cmp(&(0)), Some(sign));
+        assert_eq!(integer_to_rug_integer(n).cmp0(), sign);
+        assert_eq!(num_sign(&integer_to_bigint(n)), sign);
+        assert_eq!(n.partial_cmp(&0), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });
 

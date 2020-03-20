@@ -20,9 +20,18 @@ pub mod base {
 
     pub mod num {
         pub mod arithmetic {
+            pub mod abs;
             pub mod log_two;
             pub mod mod_is_reduced;
             pub mod mod_power_of_two_is_reduced;
+            pub mod neg;
+            pub mod overflowing_abs;
+            pub mod overflowing_neg;
+            pub mod saturating_abs;
+            pub mod saturating_neg;
+            pub mod sign;
+            pub mod wrapping_abs;
+            pub mod wrapping_neg;
         }
 
         pub mod basic {
@@ -116,6 +125,7 @@ pub mod integer {
         pub mod shl_u;
         pub mod shr_i;
         pub mod shr_u;
+        pub mod sign;
         pub mod sub;
         pub mod sub_mul;
     }
@@ -138,7 +148,6 @@ pub mod integer {
         pub mod partial_ord_abs_primitive_integer_and_comparators;
         pub mod partial_ord_natural;
         pub mod partial_ord_primitive_integer;
-        pub mod sign;
     }
 
     pub mod conversion {
@@ -209,6 +218,7 @@ pub mod natural {
         pub mod shl_u;
         pub mod shr_i;
         pub mod shr_u;
+        pub mod sign;
         pub mod sub;
         pub mod sub_mul;
     }

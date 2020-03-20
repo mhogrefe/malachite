@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use comparison::Min;
 use num::arithmetic::traits::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem, CheckedSub,
@@ -7,7 +9,7 @@ use num::arithmetic::traits::{
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
     OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow, SaturatingAdd,
     SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
-    SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
+    SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, UnsignedAbs,
     WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
     WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub,
     WrappingSubAssign,
@@ -18,6 +20,127 @@ use round::RoundingMode;
 /// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
+        impl Sign for $t {
+            /// Returns `Greater`, `Equal`, or `Less`, depending on whether `self` is positive,
+            /// zero, or negative, respectively.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::Sign;
+            /// use std::cmp::Ordering;
+            ///
+            /// assert_eq!(0u8.sign(), Ordering::Equal);
+            /// assert_eq!(100u64.sign(), Ordering::Greater);
+            /// assert_eq!((-100i16).sign(), Ordering::Less);
+            /// ```
+            #[inline]
+            fn sign(&self) -> Ordering {
+                self.cmp(&0)
+            }
+        }
+
+        impl CheckedNeg for $t {
+            type Output = $t;
+
+            #[inline]
+            fn checked_neg(self) -> Option<$t> {
+                $t::checked_neg(self)
+            }
+        }
+
+        impl WrappingNeg for $t {
+            type Output = $t;
+
+            #[inline]
+            fn wrapping_neg(self) -> $t {
+                $t::wrapping_neg(self)
+            }
+        }
+
+        impl WrappingNegAssign for $t {
+            /// Replaces `self` with its negative, wrapping around at the boundary of the type.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+            ///
+            /// let mut x = 0i8;
+            /// x.wrapping_neg_assign();
+            /// assert_eq!(x, 0);
+            ///
+            /// let mut x = 100u64;
+            /// x.wrapping_neg_assign();
+            /// assert_eq!(x, 18446744073709551516);
+            ///
+            /// let mut x = -100i64;
+            /// x.wrapping_neg_assign();
+            /// assert_eq!(x, 100);
+            ///
+            /// let mut x = -128i8;
+            /// x.wrapping_neg_assign();
+            /// assert_eq!(x, -128);
+            /// ```
+            #[inline]
+            fn wrapping_neg_assign(&mut self) {
+                *self = self.wrapping_neg();
+            }
+        }
+
+        impl OverflowingNeg for $t {
+            type Output = $t;
+
+            #[inline]
+            fn overflowing_neg(self) -> ($t, bool) {
+                $t::overflowing_neg(self)
+            }
+        }
+
+        impl OverflowingNegAssign for $t {
+            /// Replaces `self` with its negative.
+            ///
+            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
+            /// overflow would have occurred then the wrapped value is assigned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::OverflowingNegAssign;
+            ///
+            /// let mut x = 0i8;
+            /// assert_eq!(x.overflowing_neg_assign(), false);
+            /// assert_eq!(x, 0);
+            ///
+            /// let mut x = 100u64;
+            /// assert_eq!(x.overflowing_neg_assign(), true);
+            /// assert_eq!(x, 18446744073709551516);
+            ///
+            /// let mut x = -100i64;
+            /// assert_eq!(x.overflowing_neg_assign(), false);
+            /// assert_eq!(x, 100);
+            ///
+            /// let mut x = -128i8;
+            /// assert_eq!(x.overflowing_neg_assign(), true);
+            /// assert_eq!(x, -128);
+            /// ```
+            #[inline]
+            fn overflowing_neg_assign(&mut self) -> bool {
+                let (result, overflow) = self.overflowing_neg();
+                *self = result;
+                overflow
+            }
+        }
+
         impl CheckedAdd<$t> for $t {
             type Output = $t;
 
@@ -60,15 +183,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn checked_rem(self, rhs: $t) -> Option<$t> {
                 $t::checked_rem(self, rhs)
-            }
-        }
-
-        impl CheckedNeg for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_neg(self) -> Option<$t> {
-                $t::checked_neg(self)
             }
         }
 
@@ -162,15 +276,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl WrappingNeg for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_neg(self) -> $t {
-                $t::wrapping_neg(self)
-            }
-        }
-
         impl WrappingPow<u64> for $t {
             type Output = $t;
 
@@ -222,15 +327,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn overflowing_rem(self, rhs: $t) -> ($t, bool) {
                 $t::overflowing_rem(self, rhs)
-            }
-        }
-
-        impl OverflowingNeg for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_neg(self) -> ($t, bool) {
-                $t::overflowing_neg(self)
             }
         }
 
@@ -334,15 +430,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl OverflowingNegAssign for $t {
-            #[inline]
-            fn overflowing_neg_assign(&mut self) -> bool {
-                let (result, overflow) = self.overflowing_neg();
-                *self = result;
-                overflow
-            }
-        }
-
         impl SaturatingAddAssign for $t {
             #[inline]
             fn saturating_add_assign(&mut self, rhs: $t) {
@@ -361,13 +448,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn saturating_mul_assign(&mut self, rhs: $t) {
                 *self = self.saturating_mul(rhs);
-            }
-        }
-
-        impl WrappingNegAssign for $t {
-            #[inline]
-            fn wrapping_neg_assign(&mut self) {
-                *self = self.wrapping_neg();
             }
         }
 

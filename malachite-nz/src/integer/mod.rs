@@ -164,6 +164,7 @@ pub mod arithmetic {
     pub mod shl_u;
     pub mod shr_i;
     pub mod shr_u;
+    pub mod sign;
     pub mod sub;
     pub mod sub_mul;
 }
@@ -177,7 +178,6 @@ pub mod comparison {
     pub mod partial_ord_abs_primitive_integer;
     pub mod partial_ord_natural;
     pub mod partial_ord_primitive_integer;
-    pub mod sign;
 }
 
 pub mod conversion;

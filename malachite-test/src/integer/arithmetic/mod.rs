@@ -20,6 +20,7 @@ pub mod shl_i;
 pub mod shl_u;
 pub mod shr_i;
 pub mod shr_u;
+pub mod sign;
 pub mod sub;
 pub mod sub_mul;
 
@@ -44,6 +45,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shl_u::register(registry);
     shr_i::register(registry);
     shr_u::register(registry);
+    sign::register(registry);
     sub::register(registry);
     sub_mul::register(registry);
 }

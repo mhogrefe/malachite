@@ -4,9 +4,20 @@ pub mod bools;
 pub mod chars;
 pub mod num {
     pub mod arithmetic {
+        pub mod abs;
+        pub mod checked_abs;
+        pub mod checked_neg;
         pub mod log_two;
         pub mod mod_is_reduced;
         pub mod mod_power_of_two_is_reduced;
+        pub mod neg;
+        pub mod overflowing_abs;
+        pub mod overflowing_neg;
+        pub mod saturating_abs;
+        pub mod saturating_neg;
+        pub mod sign;
+        pub mod wrapping_abs;
+        pub mod wrapping_neg;
     }
     pub mod basic {
         pub mod constants;
@@ -22,7 +33,7 @@ pub mod num {
         pub mod bit_scan;
         pub mod get_highest_bit;
         pub mod hamming_distance;
-        pub mod not_assign;
+        pub mod not;
         pub mod power_of_two_digit_iterable;
         pub mod power_of_two_digits;
         pub mod rotate;

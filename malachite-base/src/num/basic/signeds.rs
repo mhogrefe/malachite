@@ -1,8 +1,9 @@
 use std::ops::Neg;
 
 use num::arithmetic::traits::{
-    Abs, CeilingMod, CeilingModAssign, CheckedAbs, NegAssign, OverflowingAbs, Sign, UnsignedAbs,
-    WrappingAbs,
+    Abs, AbsAssign, CeilingMod, CeilingModAssign, CheckedAbs, NegAssign, OverflowingAbs,
+    OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
+    UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
@@ -12,6 +13,7 @@ use num::logic::traits::CheckedHammingDistance;
 /// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:
     Abs<Output = Self>
+    + AbsAssign
     + CeilingMod
     + CeilingModAssign
     + CheckedAbs<Output = Self>
@@ -21,10 +23,15 @@ pub trait PrimitiveSigned:
     + NegAssign
     + NegativeOne
     + OverflowingAbs<Output = Self>
+    + OverflowingAbsAssign
     + PrimitiveInteger
-    + Sign
+    + SaturatingAbs<Output = Self>
+    + SaturatingAbsAssign
+    + SaturatingNeg<Output = Self>
+    + SaturatingNegAssign
     + UnsignedAbs
     + WrappingAbs<Output = Self>
+    + WrappingAbsAssign
 {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
 }

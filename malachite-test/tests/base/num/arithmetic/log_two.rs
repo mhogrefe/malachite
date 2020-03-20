@@ -7,7 +7,7 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::positive_unsigneds;
 
 fn floor_log_two_properties_helper<T: PrimitiveUnsigned + Rand>() {
-    test_properties(positive_unsigneds, |&n: &T| {
+    test_properties(positive_unsigneds::<T>, |&n| {
         let floor_log_two = n.floor_log_two();
         assert_eq!(floor_log_two, n.significant_bits() - 1);
         assert!(floor_log_two < T::WIDTH);
@@ -25,7 +25,7 @@ fn floor_log_two_properties() {
 }
 
 fn ceiling_log_two_properties_helper<T: PrimitiveUnsigned + Rand>() {
-    test_properties(positive_unsigneds, |&n: &T| {
+    test_properties(positive_unsigneds::<T>, |&n| {
         let ceiling_log_two = n.ceiling_log_two();
         assert!(ceiling_log_two <= T::WIDTH);
         assert_eq!(ceiling_log_two == 0, n == T::ONE);

@@ -12,6 +12,140 @@ pub trait ModIsReduced<MOD = Self> {
     fn mod_is_reduced(&self, modulus: &MOD) -> bool;
 }
 
+/// Returns `Greater`, `Equal`, or `Less`, depending on whether `self` is positive, zero, or
+/// negative, respectively.
+pub trait Sign {
+    fn sign(&self) -> Ordering;
+}
+
+/// Replaces `self` with its negative. Assumes that `self` can be negated.
+pub trait NegAssign {
+    fn neg_assign(&mut self);
+}
+
+/// Checked negation. Computes `-self`, returning `None` if there is no valid result.
+pub trait CheckedNeg {
+    type Output;
+
+    fn checked_neg(self) -> Option<Self::Output>;
+}
+
+/// Checked negation. Computes `-self`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingNeg {
+    type Output;
+
+    fn saturating_neg(self) -> Self::Output;
+}
+
+/// Checked negation. Replaces `self` with its negative, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingNegAssign {
+    fn saturating_neg_assign(&mut self);
+}
+
+/// Wrapping (modular) negation. Computes `-self`, wrapping around at the boundary of the type.
+pub trait WrappingNeg {
+    type Output;
+
+    fn wrapping_neg(self) -> Self::Output;
+}
+
+/// Wrapping (modular) negation. Replaces `self` with its negative, wrapping around at the boundary
+/// of the type.
+pub trait WrappingNegAssign {
+    fn wrapping_neg_assign(&mut self);
+}
+
+/// Calculates -`self`.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingNeg {
+    type Output;
+
+    fn overflowing_neg(self) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with its negative.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingNegAssign {
+    fn overflowing_neg_assign(&mut self) -> bool;
+}
+
+/// Computes the absolute value of `self`. Inputs are assumed to be valid.
+pub trait Abs {
+    type Output;
+
+    fn abs(self) -> Self::Output;
+}
+
+/// Replaces `self` with its absolute value. Assumes that `self` has a representable absolute value.
+pub trait AbsAssign {
+    fn abs_assign(&mut self);
+}
+
+/// Computes the absolute value of `self` and converts to the unsigned equivalent.
+pub trait UnsignedAbs {
+    type Output;
+
+    fn unsigned_abs(self) -> Self::Output;
+}
+
+/// Checked absolute value. Computes `self.abs()`, returning `None` if there is no valid result.
+pub trait CheckedAbs {
+    type Output;
+
+    fn checked_abs(self) -> Option<Self::Output>;
+}
+
+/// Checked absolute value. Computes `self.abs()`, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingAbs {
+    type Output;
+
+    fn saturating_abs(self) -> Self::Output;
+}
+
+/// Checked absolute value. Replaces `self` with its absolute value, saturating at the numeric
+/// bounds instead of overflowing.
+pub trait SaturatingAbsAssign {
+    fn saturating_abs_assign(&mut self);
+}
+
+/// Wrapping (modular) absolute value. Computes `self.abs()`, wrapping around at the boundary of the
+/// type.
+pub trait WrappingAbs {
+    type Output;
+
+    fn wrapping_abs(self) -> Self::Output;
+}
+
+/// Wrapping (modular) absolute value. Replaces `self` with its absolute value, wrapping around at
+/// the boundary of the type.
+pub trait WrappingAbsAssign {
+    fn wrapping_abs_assign(&mut self);
+}
+
+/// Calculates `self.abs()`.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingAbs {
+    type Output;
+
+    fn overflowing_abs(self) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with its absolute value.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingAbsAssign {
+    fn overflowing_abs_assign(&mut self) -> bool;
+}
+
 /// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
 pub trait CheckedAdd<RHS = Self> {
     type Output;
@@ -45,20 +179,6 @@ pub trait CheckedRem<RHS = Self> {
     type Output;
 
     fn checked_rem(self, rhs: RHS) -> Option<Self::Output>;
-}
-
-/// Checked negation. Computes `-self`, returning `None` if there is no valid result.
-pub trait CheckedNeg {
-    type Output;
-
-    fn checked_neg(self) -> Option<Self::Output>;
-}
-
-/// Checked absolute value. Computes `self.abs()`, returning `None` if there is no valid result.
-pub trait CheckedAbs {
-    type Output;
-
-    fn abs(self) -> Option<Self::Output>;
 }
 
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
@@ -137,21 +257,6 @@ pub trait WrappingRem<RHS = Self> {
     fn wrapping_rem(self, rhs: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) negation. Computes `-self`, wrapping around at the boundary of the type.
-pub trait WrappingNeg {
-    type Output;
-
-    fn wrapping_neg(self) -> Self::Output;
-}
-
-/// Wrapping (modular) absolute value. Computes `self.abs()`, wrapping around at the boundary of the
-/// type.
-pub trait WrappingAbs {
-    type Output;
-
-    fn abs(self) -> Self::Output;
-}
-
 /// Wrapping (modular) exponentiation. Raises `self` to the power of `exp`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingPow<RHS> {
@@ -210,26 +315,6 @@ pub trait OverflowingRem<RHS = Self> {
     fn overflowing_rem(self, rhs: RHS) -> (Self::Output, bool);
 }
 
-/// Calculates -`self`.
-///
-/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingNeg {
-    type Output;
-
-    fn overflowing_neg(self) -> (Self::Output, bool);
-}
-
-/// Calculates `self.abs()`.
-///
-/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingAbs {
-    type Output;
-
-    fn abs(self) -> (Self::Output, bool);
-}
-
 /// Calculates `self.pow(exp)`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
@@ -245,13 +330,6 @@ pub trait Pow<RHS> {
     type Output;
 
     fn pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Computes the absolute value of `self`.
-pub trait Abs {
-    type Output;
-
-    fn abs(self) -> Self::Output;
 }
 
 /// Returns `true` iff `self == 2^k` for some integer `k`.
@@ -275,8 +353,6 @@ pub trait CheckedNextPowerOfTwo {
     fn checked_next_power_of_two(self) -> Option<Self::Output>;
 }
 
-// Nontrivial traits start here
-
 pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
@@ -287,10 +363,6 @@ pub trait EqModPowerOfTwo<Rhs = Self> {
 
 pub trait EqMod<Rhs = Self, Mod = Self> {
     fn eq_mod(self, other: Rhs, modulus: Mod) -> bool;
-}
-
-pub trait WrappingNegAssign {
-    fn wrapping_neg_assign(&mut self);
 }
 
 pub trait Parity {
@@ -349,10 +421,6 @@ pub trait OverflowingMulAssign<RHS = Self> {
 
 pub trait OverflowingRemAssign<RHS = Self> {
     fn overflowing_rem_assign(&mut self, rhs: RHS) -> bool;
-}
-
-pub trait OverflowingNegAssign {
-    fn overflowing_neg_assign(&mut self) -> bool;
 }
 
 pub trait DivisibleByPowerOfTwo {
@@ -506,18 +574,6 @@ pub trait DivisibleBy<RHS = Self> {
     fn divisible_by(self, rhs: RHS) -> bool;
 }
 
-pub trait Sign {
-    fn sign(&self) -> Ordering;
-}
-
-pub trait AbsAssign {
-    fn abs_assign(&mut self);
-}
-
-pub trait NegAssign {
-    fn neg_assign(&mut self);
-}
-
 pub trait AddMulAssign<B, C> {
     // Equivalent to self += b * c
     fn add_mul_assign(&mut self, b: B, c: C);
@@ -572,13 +628,6 @@ pub trait FloorLogTwo {
 pub trait CeilingLogTwo {
     /// ceiling(log<sub>2</sub>(`self`))
     fn ceiling_log_two(self) -> u64;
-}
-
-/// Computes the absolute value of `self` and converts to the unsigned equivalent.
-pub trait UnsignedAbs {
-    type Output;
-
-    fn unsigned_abs(self) -> Self::Output;
 }
 
 pub trait ShlRound<RHS> {

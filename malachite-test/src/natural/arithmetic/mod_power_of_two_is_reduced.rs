@@ -1,6 +1,8 @@
-use malachite_base::num::arithmetic::traits::ModPowerOfTwoIsReduced;
+use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOfTwoIsReduced};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::pairs_of_natural_and_small_unsigned;
@@ -31,16 +33,22 @@ fn benchmark_natural_mod_power_of_two_is_reduced(
 ) {
     m_run_benchmark(
         "Natural.mod_power_of_two_is_reduced(u64)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, log_base)| no_out!(n.mod_power_of_two_is_reduced(log_base))),
-        )],
+        &mut [
+            (
+                "default",
+                &mut (|(n, log_base)| no_out!(n.mod_power_of_two_is_reduced(log_base))),
+            ),
+            (
+                "using mod_is_reduced",
+                &mut (|(n, log_base)| no_out!(n.mod_is_reduced(&(Natural::ONE << log_base)))),
+            ),
+        ],
     );
 }

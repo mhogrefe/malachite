@@ -18,7 +18,7 @@ use num::arithmetic::traits::{
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
     OverflowingRemAssign, OverflowingSub, Parity, Pow, SaturatingAdd, SaturatingAddAssign,
     SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign,
-    ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, TrueCheckedShl, TrueCheckedShr,
     WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
     WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub,
     WrappingSubAssign,
@@ -304,6 +304,7 @@ pub trait PrimitiveInteger:
     + ShrRoundAssign<i64>
     + ShrRoundAssign<i128>
     + ShrRoundAssign<isize>
+    + Sign
     + SignificantBits
     + Sized
     + Sub<Output = Self>
