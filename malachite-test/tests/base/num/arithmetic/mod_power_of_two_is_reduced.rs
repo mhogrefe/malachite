@@ -7,10 +7,10 @@ use malachite_test::inputs::base::pairs_of_unsigned_and_small_unsigned;
 fn mod_power_of_two_is_reduced_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(
         pairs_of_unsigned_and_small_unsigned::<T, u64>,
-        |&(n, log_base)| {
+        |&(n, pow)| {
             assert_eq!(
-                n.mod_power_of_two_is_reduced(log_base),
-                n.mod_power_of_two(log_base) == n
+                n.mod_power_of_two_is_reduced(pow),
+                n.mod_power_of_two(pow) == n
             );
         },
     );

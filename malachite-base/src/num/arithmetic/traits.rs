@@ -2,9 +2,9 @@ use std::cmp::Ordering;
 
 use round::RoundingMode;
 
-/// Checks whether `self` is reduced mod 2<pow>`log_base`</pow>.
+/// Checks whether `self` is reduced mod 2<pow>`pow`</pow>.
 pub trait ModPowerOfTwoIsReduced {
-    fn mod_power_of_two_is_reduced(&self, log_base: u64) -> bool;
+    fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool;
 }
 
 /// Checks whether `self` is reduced mod `modulus`.
@@ -144,6 +144,32 @@ pub trait OverflowingAbs {
 /// have occurred then the wrapped value is assigned.
 pub trait OverflowingAbsAssign {
     fn overflowing_abs_assign(&mut self) -> bool;
+}
+
+/// Computes `-self` mod 2<pow>`pow`</pow>. Assumes the input is already reduced mod
+/// 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoNeg {
+    type Output;
+
+    fn mod_power_of_two_neg(self, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `-self` mod 2<pow>`pow`</pow>. Assumes the input is already reduced mod
+/// 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoNegAssign {
+    fn mod_power_of_two_neg_assign(&mut self, pow: u64);
+}
+
+/// Computes `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
+pub trait ModNeg<MOD = Self> {
+    type Output;
+
+    fn mod_neg(self, modulus: MOD) -> Self::Output;
+}
+
+/// Replaces `self` with `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
+pub trait ModNegAssign<MOD = Self> {
+    fn mod_neg_assign(&mut self, modulus: MOD);
 }
 
 /// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
@@ -357,12 +383,12 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
-pub trait EqModPowerOfTwo<Rhs = Self> {
-    fn eq_mod_power_of_two(self, other: Rhs, pow: u64) -> bool;
+pub trait EqModPowerOfTwo<RHS = Self> {
+    fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
 }
 
-pub trait EqMod<Rhs = Self, Mod = Self> {
-    fn eq_mod(self, other: Rhs, modulus: Mod) -> bool;
+pub trait EqMod<RHS = Self, MOD = Self> {
+    fn eq_mod(self, other: RHS, modulus: MOD) -> bool;
 }
 
 pub trait Parity {

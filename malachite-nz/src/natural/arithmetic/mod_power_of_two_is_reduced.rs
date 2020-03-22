@@ -4,8 +4,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 use natural::Natural;
 
 impl ModPowerOfTwoIsReduced for Natural {
-    /// Returns whether `self` is reduced mod 2<pow>`log_base`</pow>; in other words, whether it has
-    /// no more than `log_base` significant bits.
+    /// Returns whether `self` is reduced mod 2<pow>`pow`</pow>; in other words, whether it has no
+    /// more than `pow` significant bits.
     ///
     /// Time: worst case O(1)
     ///
@@ -25,7 +25,7 @@ impl ModPowerOfTwoIsReduced for Natural {
     /// assert_eq!(Natural::trillion().mod_power_of_two_is_reduced(40), true);
     /// ```
     #[inline]
-    fn mod_power_of_two_is_reduced(&self, log_base: u64) -> bool {
-        self.significant_bits() <= log_base
+    fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool {
+        self.significant_bits() <= pow
     }
 }

@@ -23,7 +23,9 @@ pub mod base {
             pub mod abs;
             pub mod log_two;
             pub mod mod_is_reduced;
+            pub mod mod_neg;
             pub mod mod_power_of_two_is_reduced;
+            pub mod mod_power_of_two_neg;
             pub mod neg;
             pub mod overflowing_abs;
             pub mod overflowing_neg;
@@ -205,9 +207,11 @@ pub mod natural {
         pub mod is_power_of_two;
         pub mod log_two;
         pub mod mod_is_reduced;
+        pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_two;
         pub mod mod_power_of_two_is_reduced;
+        pub mod mod_power_of_two_neg;
         pub mod mul;
         pub mod neg;
         pub mod next_power_of_two;

@@ -1,9 +1,11 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModIsReduced, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, NegMod, NegModAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
-    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
+    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
+    RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    WrappingNegAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
@@ -13,8 +15,8 @@ use round::RoundingMode;
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
         impl ModPowerOfTwoIsReduced for $t {
-            /// Returns whether `self` is reduced mod 2<pow>`log_base`</pow>; in other words,
-            /// whether it has no more than `log_base` significant bits.
+            /// Returns whether `self` is reduced mod 2<pow>`pow`</pow>; in other words, whether it]
+            /// has no more than `pow` significant bits.
             ///
             /// Time: worst case O(1)
             ///
@@ -29,8 +31,8 @@ macro_rules! impl_arithmetic_traits {
             /// assert_eq!(100u16.mod_power_of_two_is_reduced(8), true);
             /// ```
             #[inline]
-            fn mod_power_of_two_is_reduced(&self, log_base: u64) -> bool {
-                self.significant_bits() <= log_base
+            fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool {
+                self.significant_bits() <= pow
             }
         }
 
@@ -57,6 +59,122 @@ macro_rules! impl_arithmetic_traits {
             fn mod_is_reduced(&self, modulus: &$t) -> bool {
                 assert_ne!(*modulus, 0);
                 self < modulus
+            }
+        }
+
+        impl ModPowerOfTwoNeg for $t {
+            type Output = $t;
+
+            /// Computes `-self` mod 2<pow>`pow`</pow>. Assumes the input is already reduced mod
+            /// 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoNeg;
+            ///
+            /// assert_eq!(0u8.mod_power_of_two_neg(5), 0);
+            /// assert_eq!(10u32.mod_power_of_two_neg(4), 6);
+            /// assert_eq!(100u16.mod_power_of_two_neg(8), 156);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_neg(self, pow: u64) -> $t {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_neg().mod_power_of_two(pow)
+            }
+        }
+
+        impl ModPowerOfTwoNegAssign for $t {
+            /// Replaces `self` with `-self` mod 2<pow>`pow`</pow>. Assumes the input is already
+            /// reduced mod 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoNegAssign;
+            ///
+            /// let mut n = 0u8;
+            /// n.mod_power_of_two_neg_assign(5);
+            /// assert_eq!(n, 0);
+            ///
+            /// let mut n = 10u32;
+            /// n.mod_power_of_two_neg_assign(4);
+            /// assert_eq!(n, 6);
+            ///
+            /// let mut n = 100u16;
+            /// n.mod_power_of_two_neg_assign(8);
+            /// assert_eq!(n, 156);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_neg_assign(&mut self, pow: u64) {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_neg_assign();
+                self.mod_power_of_two_assign(pow);
+            }
+        }
+
+        impl ModNeg for $t {
+            type Output = $t;
+
+            /// Computes `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModNeg;
+            ///
+            /// assert_eq!(0u8.mod_neg(5), 0);
+            /// assert_eq!(7u32.mod_neg(10), 3);
+            /// assert_eq!(100u16.mod_neg(101), 1);
+            /// ```
+            #[inline]
+            fn mod_neg(self, modulus: $t) -> $t {
+                if self == 0 {
+                    0
+                } else {
+                    modulus - self
+                }
+            }
+        }
+
+        impl ModNegAssign for $t {
+            /// Replaces `self` with `-self` mod `modulus`. Assumes the input is already reduced mod
+            /// `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModNegAssign;
+            ///
+            /// let mut n = 0u8;
+            /// n.mod_neg_assign(5);
+            /// assert_eq!(n, 0);
+            ///
+            /// let mut n = 7u32;
+            /// n.mod_neg_assign(10);
+            /// assert_eq!(n, 3);
+            ///
+            /// let mut n = 100u16;
+            /// n.mod_neg_assign(101);
+            /// assert_eq!(n, 1);
+            /// ```
+            #[inline]
+            fn mod_neg_assign(&mut self, modulus: $t) {
+                if *self != 0 {
+                    *self = modulus - *self;
+                }
             }
         }
 

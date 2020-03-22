@@ -1,8 +1,8 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_power_of_two_is_reduced_helper<T: PrimitiveUnsigned>() {
-    let test = |n: T, log_base, out| {
-        assert_eq!(n.mod_power_of_two_is_reduced(log_base), out);
+    let test = |n: T, pow, out| {
+        assert_eq!(n.mod_power_of_two_is_reduced(pow), out);
     };
 
     test(T::ZERO, 5, true);

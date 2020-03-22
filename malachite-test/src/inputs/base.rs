@@ -402,8 +402,15 @@ pub fn pairs_of_unsigneds_var_3<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
     Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x <= y))
 }
 
+// All pairs of `T`s where `T` is unsigned and the second `T` is nonzero.
 pub fn pairs_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
     Box::new(pairs_of_unsigneds(gm).filter(|&(_, y)| y != T::ZERO))
+}
+
+//TODO use subset_pairs
+// All pairs of `T`s where `T` is unsigned and the first `T` is smaller than the second.
+pub fn pairs_of_unsigneds_var_5<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x < y))
 }
 
 pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
@@ -681,6 +688,32 @@ pub fn pairs_of_unsigned_and_small_u64_var_1<T: PrimitiveUnsigned + Rand, U: Pri
             &(|seed| special_random_unsigned(seed)),
             &(|seed| random_range(seed, 1, U::WIDTH)),
         )),
+    }
+}
+
+// All pairs of unsigned `T` and `u64`, where the `u64` is between the number of significant bits of
+// the `T` and `T::WIDTH`, inclusive.
+pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + SampleRange>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(dependent_pairs(exhaustive_unsigned(), |&u: &T| {
+                Box::new(range_increasing(u.significant_bits(), T::WIDTH))
+            }))
+        }
+        NoSpecialGenerationMode::Random(_) => permute_2_1(Box::new(random_dependent_pairs(
+            (),
+            random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+            |_, &pow| {
+                let limit = if pow == T::WIDTH {
+                    T::MAX
+                } else {
+                    (T::ONE << pow) - T::ONE
+                };
+                random_range::<T>(&scramble(&EXAMPLE_SEED, "u"), T::ZERO, limit)
+            },
+        ))),
     }
 }
 

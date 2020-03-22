@@ -19,11 +19,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_mod_power_of_two_is_reduced<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for (n, log_base) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
-        if n.mod_power_of_two_is_reduced(log_base) {
-            println!("{} is reduced mod 2^{}", n, log_base);
+    for (n, pow) in pairs_of_unsigned_and_small_unsigned::<T, u64>(gm).take(limit) {
+        if n.mod_power_of_two_is_reduced(pow) {
+            println!("{} is reduced mod 2^{}", n, pow);
         } else {
-            println!("{} is not reduced mod 2^{}", n, log_base);
+            println!("{} is not reduced mod 2^{}", n, pow);
         }
     }
 }
@@ -44,7 +44,7 @@ fn benchmark_mod_power_of_two_is_reduced<T: PrimitiveUnsigned + Rand>(
         "n.significant_bits()",
         &mut [(
             "malachite",
-            &mut (|(n, log_base)| no_out!(n.mod_power_of_two_is_reduced(log_base))),
+            &mut (|(n, pow)| no_out!(n.mod_power_of_two_is_reduced(pow))),
         )],
     );
 }

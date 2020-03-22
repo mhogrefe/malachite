@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -184,8 +184,8 @@ impl ModPowerOfTwo for Natural {
     /// assert_eq!(Natural::from(1611u32).mod_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
-    fn mod_power_of_two(mut self, other: u64) -> Natural {
-        self.mod_power_of_two_assign(other);
+    fn mod_power_of_two(mut self, pow: u64) -> Natural {
+        self.mod_power_of_two_assign(pow);
         self
     }
 }
@@ -213,11 +213,11 @@ impl<'a> ModPowerOfTwo for &'a Natural {
     /// // 100 * 2^4 + 11 = 1611
     /// assert_eq!((&Natural::from(1611u32)).mod_power_of_two(4).to_string(), "11");
     /// ```
-    fn mod_power_of_two(self, other: u64) -> Natural {
+    fn mod_power_of_two(self, pow: u64) -> Natural {
         match *self {
-            Natural(Small(ref small)) => Natural(Small(small.mod_power_of_two(other))),
+            Natural(Small(ref small)) => Natural(Small(small.mod_power_of_two(pow))),
             Natural(Large(ref limbs)) => {
-                let mut result = Natural(Large(limbs_mod_power_of_two(limbs, other)));
+                let mut result = Natural(Large(limbs_mod_power_of_two(limbs, pow)));
                 result.trim();
                 result
             }
@@ -251,13 +251,13 @@ impl ModPowerOfTwoAssign for Natural {
     /// x.mod_power_of_two_assign(4);
     /// assert_eq!(x.to_string(), "11");
     /// ```
-    fn mod_power_of_two_assign(&mut self, other: u64) {
+    fn mod_power_of_two_assign(&mut self, pow: u64) {
         match *self {
             Natural(Small(ref mut small)) => {
-                small.mod_power_of_two_assign(other);
+                small.mod_power_of_two_assign(pow);
                 return;
             }
-            Natural(Large(ref mut limbs)) => limbs_mod_power_of_two_in_place(limbs, other),
+            Natural(Large(ref mut limbs)) => limbs_mod_power_of_two_in_place(limbs, pow),
         }
         self.trim();
     }
@@ -288,8 +288,8 @@ impl RemPowerOfTwo for Natural {
     /// assert_eq!(Natural::from(1611u32).rem_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
-    fn rem_power_of_two(self, other: u64) -> Natural {
-        self.mod_power_of_two(other)
+    fn rem_power_of_two(self, pow: u64) -> Natural {
+        self.mod_power_of_two(pow)
     }
 }
 
@@ -317,8 +317,8 @@ impl<'a> RemPowerOfTwo for &'a Natural {
     /// assert_eq!((&Natural::from(1611u32)).rem_power_of_two(4).to_string(), "11");
     /// ```
     #[inline]
-    fn rem_power_of_two(self, other: u64) -> Natural {
-        self.mod_power_of_two(other)
+    fn rem_power_of_two(self, pow: u64) -> Natural {
+        self.mod_power_of_two(pow)
     }
 }
 
@@ -348,8 +348,8 @@ impl RemPowerOfTwoAssign for Natural {
     /// assert_eq!(x.to_string(), "11");
     /// ```
     #[inline]
-    fn rem_power_of_two_assign(&mut self, other: u64) {
-        self.mod_power_of_two_assign(other);
+    fn rem_power_of_two_assign(&mut self, pow: u64) {
+        self.mod_power_of_two_assign(pow);
     }
 }
 
@@ -409,29 +409,18 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
     /// // 101 * 2^4 - 5 = 1611
     /// assert_eq!((&Natural::from(1611u32)).neg_mod_power_of_two(4).to_string(), "5");
     /// ```
-    fn neg_mod_power_of_two(self, other: u64) -> Natural {
-        if other == 0 {
+    fn neg_mod_power_of_two(self, pow: u64) -> Natural {
+        if *self == 0 {
             Natural::ZERO
+        } else if pow <= Limb::WIDTH {
+            Natural::from(Limb::wrapping_from(self).neg_mod_power_of_two(pow))
         } else {
-            match *self {
-                Natural(Small(small)) => {
-                    if small == 0 {
-                        Natural::ZERO
-                    } else if other < Limb::WIDTH {
-                        Natural(Small(small.wrapping_neg().mod_power_of_two(other)))
-                    } else {
-                        let mut result =
-                            Natural(Large(limbs_neg_mod_power_of_two(&[small], other)));
-                        result.trim();
-                        result
-                    }
-                }
-                Natural(Large(ref limbs)) => {
-                    let mut result = Natural(Large(limbs_neg_mod_power_of_two(limbs, other)));
-                    result.trim();
-                    result
-                }
-            }
+            let mut result = Natural(Large(match *self {
+                Natural(Small(small)) => limbs_neg_mod_power_of_two(&[small], pow),
+                Natural(Large(ref limbs)) => limbs_neg_mod_power_of_two(limbs, pow),
+            }));
+            result.trim();
+            result
         }
     }
 }
@@ -462,28 +451,14 @@ impl NegModPowerOfTwoAssign for Natural {
     /// x.neg_mod_power_of_two_assign(4);
     /// assert_eq!(x.to_string(), "5");
     /// ```
-    fn neg_mod_power_of_two_assign(&mut self, other: u64) {
-        if other == 0 {
-            *self = Natural::ZERO;
-            return;
+    fn neg_mod_power_of_two_assign(&mut self, pow: u64) {
+        if *self == 0 {
+        } else if pow <= Limb::WIDTH {
+            *self = Natural::from(Limb::wrapping_from(&*self).neg_mod_power_of_two(pow));
+        } else {
+            let limbs = self.promote_in_place();
+            limbs_neg_mod_power_of_two_in_place(limbs, pow);
+            self.trim();
         }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
-                if *small == 0 {
-                    Some(0)
-                } else if other < Limb::WIDTH {
-                    Some(small.wrapping_neg().mod_power_of_two(other))
-                } else {
-                    None
-                }
-            },
-            {
-                limbs_neg_mod_power_of_two_in_place(limbs, other);
-            }
-        );
-        self.trim();
     }
 }

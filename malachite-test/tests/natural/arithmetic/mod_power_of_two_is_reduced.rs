@@ -13,11 +13,11 @@ use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 
 #[test]
 fn test_mod_power_of_two_is_reduced() {
-    let test = |u, log_base, out| {
+    let test = |u, pow, out| {
         assert_eq!(
             Natural::from_str(u)
                 .unwrap()
-                .mod_power_of_two_is_reduced(log_base),
+                .mod_power_of_two_is_reduced(pow),
             out
         );
     };
@@ -31,18 +31,18 @@ fn test_mod_power_of_two_is_reduced() {
 
 #[test]
 fn mod_power_of_two_is_reduced_properties() {
-    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, log_base)| {
-        let is_reduced = n.mod_power_of_two_is_reduced(log_base);
-        assert_eq!(is_reduced, n.mod_power_of_two(log_base) == *n);
-        assert_eq!(is_reduced, n.mod_is_reduced(&(Natural::ONE << log_base)));
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
+        let is_reduced = n.mod_power_of_two_is_reduced(pow);
+        assert_eq!(is_reduced, n.mod_power_of_two(pow) == *n);
+        assert_eq!(is_reduced, n.mod_is_reduced(&(Natural::ONE << pow)));
     });
 
     test_properties(
         pairs_of_unsigned_and_small_unsigned::<Limb, u64>,
-        |&(n, log_base)| {
+        |&(n, pow)| {
             assert_eq!(
-                n.mod_power_of_two_is_reduced(log_base),
-                Natural::from(n).mod_power_of_two_is_reduced(log_base)
+                n.mod_power_of_two_is_reduced(pow),
+                Natural::from(n).mod_power_of_two_is_reduced(pow)
             );
         },
     );

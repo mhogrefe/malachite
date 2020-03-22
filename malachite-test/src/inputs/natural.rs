@@ -1,3 +1,4 @@
+use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 use malachite_base::crement::Crementable;
@@ -21,7 +22,8 @@ use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
-    dependent_pairs, exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
+    dependent_pairs, exhaustive_dependent_pairs_infinite_log,
+    exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
 };
 use rust_wheels::iterators::general::{random, range_increasing};
 use rust_wheels::iterators::integers_geometric::{
@@ -29,8 +31,8 @@ use rust_wheels::iterators::integers_geometric::{
 };
 use rust_wheels::iterators::naturals::{
     exhaustive_naturals, exhaustive_positive_naturals, random_naturals, random_positive_naturals,
-    random_range_up_natural, range_up_increasing_natural, special_random_naturals,
-    special_random_positive_naturals, special_random_range_natural,
+    random_range_natural, random_range_up_natural, range_up_increasing_natural,
+    special_random_naturals, special_random_positive_naturals, special_random_range_natural,
     special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
@@ -52,7 +54,9 @@ use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
 use inputs::base::{
     finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomValueAndVecOfBool,
 };
-use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
+use inputs::common::{
+    permute_1_3_4_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4,
+};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
     match gm {
@@ -171,6 +175,12 @@ pub(crate) fn nrm_pairs_of_naturals_var_1(
             (x, y),
         )
     }))
+}
+
+//TODO use subset_pairs
+// All pairs of `Natural`s where the first is smaller than the second.
+pub fn pairs_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural)> {
+    Box::new(pairs_of_naturals(gm).filter(|&(ref x, ref y)| x < y))
 }
 
 pub fn triples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
@@ -294,6 +304,52 @@ pub(crate) fn nrm_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
             (x, y),
         )
     }))
+}
+
+// All pairs of `Natural` and `u64`, where the `u64` is greater than or equal to the number of
+// significant bits of the `Natural`.
+pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> {
+    let ps: It<(u64, Natural)> = match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_dependent_pairs_infinite_log((), exhaustive_unsigned(), |_, &pow| {
+                Box::new(
+                    range_increasing(Natural::ZERO, (Natural::ONE << pow) - Natural::ONE)
+                        .map(Option::Some)
+                        .chain(repeat(None)),
+                )
+            })
+            .flat_map(|(pow, n)| {
+                if let Some(n) = n {
+                    Some((pow, n))
+                } else {
+                    None
+                }
+            }),
+        ),
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    (Natural::ONE << pow) - Natural::ONE,
+                )
+            },
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                special_random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    (Natural::ONE << pow) - Natural::ONE,
+                )
+            },
+        )),
+    };
+    permute_2_1(ps)
 }
 
 pub(crate) fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
