@@ -689,3 +689,8 @@ pub trait TrueCheckedShr {
 
     fn true_checked_shr(self, rhs: u64) -> Option<Self::Output>;
 }
+
+/// Calculates 2<sup>pow</sup>.
+pub trait PowerOfTwo {
+    fn power_of_two(pow: u64) -> Self;
+}

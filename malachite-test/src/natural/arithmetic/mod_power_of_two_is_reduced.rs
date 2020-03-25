@@ -1,5 +1,4 @@
-use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOfTwoIsReduced};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOfTwoIsReduced, PowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
@@ -47,7 +46,7 @@ fn benchmark_natural_mod_power_of_two_is_reduced(
             ),
             (
                 "using mod_is_reduced",
-                &mut (|(n, log_base)| no_out!(n.mod_is_reduced(&(Natural::ONE << log_base)))),
+                &mut (|(n, log_base)| no_out!(n.mod_is_reduced(&Natural::power_of_two(log_base)))),
             ),
         ],
     );

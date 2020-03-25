@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -1319,7 +1319,6 @@ macro_rules! tests_and_properties {
 
         #[test]
         fn $shr_round_u_properties() {
-            // TODO n.shr_round(u, rm) == n.div_round(1 << u)
             test_properties(
                 triples_of_integer_small_unsigned_and_rounding_mode_var_1::<$t>,
                 |&(ref n, u, rm)| {
@@ -1337,6 +1336,7 @@ macro_rules! tests_and_properties {
 
                     assert!(n.shr_round(u, rm).le_abs(n));
                     assert_eq!(-(-n).shr_round(u, -rm), shifted);
+                    assert_eq!(n.div_round(Integer::ONE << u, rm), shifted);
                 },
             );
 

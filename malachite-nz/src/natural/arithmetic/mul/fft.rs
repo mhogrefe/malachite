@@ -1264,7 +1264,7 @@ pub fn _limbs_mul_fft_internal(
     scratch: &mut [Limb],
     square: bool,
 ) -> bool {
-    let two_pow_k = 1usize << k;
+    let two_pow_k: usize = 1 << k;
     let twice_omega = omega << 1;
     let width = xss[0].len();
     let width_minus_one = width - 1;

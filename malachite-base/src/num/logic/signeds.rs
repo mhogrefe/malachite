@@ -3,13 +3,13 @@ use std::cmp::Ordering;
 use std::ops::Index;
 
 use comparison::Max;
-use num::arithmetic::traits::{ModPowerOfTwo, Sign, UnsignedAbs};
+use num::arithmetic::traits::{ModPowerOfTwo, PowerOfTwo, Sign, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CheckedHammingDistance,
-    CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
+    CountOnes, LeadingZeros, LowMask, SignificantBits, TrailingZeros,
 };
 use num::logic::unsigneds::PrimitiveUnsignedBitIterator;
 
@@ -168,6 +168,39 @@ macro_rules! impl_logic_traits {
                     Some(CountOnes::count_ones(self ^ other))
                 } else {
                     None
+                }
+            }
+        }
+
+        impl LowMask for $t {
+            /// Returns a value with the least significant `bits` bits on and the remaining bits
+            /// off.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `pow` is greater than the width of `$t`.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::LowMask;
+            ///
+            /// assert_eq!(u16::low_mask(0), 0);
+            /// assert_eq!(u8::low_mask(3), 0x7);
+            /// assert_eq!(u8::low_mask(8), 0xff);
+            /// assert_eq!(u64::low_mask(40), 0xff_ffff_ffff);
+            /// ```
+            #[inline]
+            fn low_mask(bits: u64) -> $t {
+                assert!(bits <= $t::WIDTH);
+                if bits == $t::WIDTH {
+                    -1
+                } else if bits == $t::WIDTH - 1 {
+                    $t::MAX
+                } else {
+                    $t::power_of_two(bits) - 1
                 }
             }
         }
@@ -376,7 +409,7 @@ macro_rules! impl_logic_traits {
                         None
                     }
                 } else {
-                    let index = u64::from((!(self | ((1 << start) - 1))).trailing_zeros());
+                    let index = u64::from((!(self | $t::low_mask(start))).trailing_zeros());
                     if index == $t::WIDTH {
                         None
                     } else {
@@ -419,7 +452,7 @@ macro_rules! impl_logic_traits {
                         Some(start)
                     }
                 } else {
-                    let index = TrailingZeros::trailing_zeros(self & !((1 << start) - 1));
+                    let index = TrailingZeros::trailing_zeros(self & !$t::low_mask(start));
                     if index == $t::WIDTH {
                         None
                     } else {
@@ -612,7 +645,8 @@ macro_rules! impl_logic_traits {
                     if *self == 1 {
                         return bits;
                     }
-                    let mut mask = 1 << ($t::WIDTH - u64::from(self.leading_zeros()) - 2);
+                    let mut mask =
+                        $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
                     while mask != 0 {
                         bits.push(*self & mask != 0);
                         mask >>= 1;
@@ -626,7 +660,8 @@ macro_rules! impl_logic_traits {
                     if *self == -2 {
                         return bits;
                     }
-                    let mut mask = 1 << ($t::WIDTH - LeadingZeros::leading_zeros(!*self) - 2);
+                    let mut mask =
+                        $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(!*self) - 2);
                     while mask != 0 {
                         bits.push(*self & mask != 0);
                         mask >>= 1;
@@ -668,7 +703,7 @@ macro_rules! impl_logic_traits {
                     let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
                     let significant_bits = bits.len() - trailing_trues;
                     assert!(significant_bits < usize::exact_from($t::WIDTH));
-                    let mut u: $u = !((1 << significant_bits) - 1);
+                    let mut u = !$u::low_mask(u64::exact_from(significant_bits));
                     let mut mask = 1;
                     for &bit in &bits[..significant_bits] {
                         if bit {
@@ -711,9 +746,9 @@ macro_rules! impl_logic_traits {
                     $t::exact_from($u::from_bits_desc(bits))
                 } else {
                     let leading_trues = bits.iter().take_while(|&&bit| bit).count();
-                    let significant_bits = bits.len() - leading_trues;
-                    assert!(significant_bits < usize::exact_from($t::WIDTH));
-                    let mut mask: $u = 1 << significant_bits;
+                    let significant_bits = u64::exact_from(bits.len() - leading_trues);
+                    assert!(significant_bits < $t::WIDTH);
+                    let mut mask = $u::power_of_two(significant_bits);
                     let mut u = !(mask - 1);
                     for &bit in &bits[leading_trues..] {
                         mask >>= 1;
@@ -771,7 +806,7 @@ macro_rules! impl_logic_traits {
                     value: unsigned,
                     some_remaining: significant_bits != 0,
                     i_mask: 1,
-                    j_mask: 1 << significant_bits.saturating_sub(1),
+                    j_mask: $u::power_of_two(significant_bits.saturating_sub(1)),
                 })
             }
         }

@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
@@ -133,8 +133,8 @@ fn floor_log_two_properties() {
         assert_eq!(*x <= Limb::MAX, floor_log_two < Limb::WIDTH);
         assert_eq!(floor_log_two, x.significant_bits() - 1);
         assert_eq!(floor_log_two, limbs_floor_log_two(&x.to_limbs_asc()));
-        assert!(Natural::ONE << floor_log_two <= *x);
-        assert!(*x < Natural::ONE << (floor_log_two + 1));
+        assert!(Natural::power_of_two(floor_log_two) <= *x);
+        assert!(*x < Natural::power_of_two(floor_log_two + 1));
     });
 
     test_properties(positive_unsigneds::<Limb>, |&u| {
@@ -149,9 +149,9 @@ fn ceiling_log_two_properties() {
         assert_eq!(*x <= Limb::MAX, ceiling_log_two <= Limb::WIDTH);
         assert_eq!(ceiling_log_two, limbs_ceiling_log_two(&x.to_limbs_asc()));
         if ceiling_log_two != 0 {
-            assert!(Natural::ONE << (ceiling_log_two - 1) < *x);
+            assert!(Natural::power_of_two(ceiling_log_two - 1) < *x);
         }
-        assert!(*x <= Natural::ONE << ceiling_log_two);
+        assert!(*x <= Natural::power_of_two(ceiling_log_two));
     });
 
     test_properties(positive_unsigneds::<Limb>, |&u| {

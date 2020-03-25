@@ -9,6 +9,7 @@ pub mod mod_power_of_two_neg;
 pub mod neg;
 pub mod overflowing_abs;
 pub mod overflowing_neg;
+pub mod power_of_two;
 pub mod saturating_abs;
 pub mod saturating_neg;
 pub mod sign;
@@ -25,6 +26,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     neg::register(registry);
     overflowing_abs::register(registry);
     overflowing_neg::register(registry);
+    power_of_two::register(registry);
     saturating_abs::register(registry);
     saturating_neg::register(registry);
     sign::register(registry);

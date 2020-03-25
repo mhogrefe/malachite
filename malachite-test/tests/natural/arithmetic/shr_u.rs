@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::arithmetic::traits::{DivRound, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -1282,6 +1282,7 @@ macro_rules! tests_and_properties {
                     assert_eq!(shifted_alt, shifted);
 
                     assert!(shifted <= *n);
+                    assert_eq!(n.div_round(Natural::ONE << u, rm), shifted);
                 },
             );
 

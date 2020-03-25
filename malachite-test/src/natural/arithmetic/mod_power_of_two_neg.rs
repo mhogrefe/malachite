@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
-    ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign,
+    ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, PowerOfTwo,
 };
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
 
@@ -84,8 +83,8 @@ fn benchmark_natural_mod_power_of_two_neg_assign_algorithms(
                 &mut (|(mut n, pow)| n.mod_power_of_two_neg_assign(pow)),
             ),
             (
-                "Natural.mod_neg_assign(Natural::ONE << u64)",
-                &mut (|(mut n, pow)| n.mod_neg_assign(Natural::ONE << pow)),
+                "Natural.mod_neg_assign(Natural::power_of_two(u64))",
+                &mut (|(mut n, pow)| n.mod_neg_assign(Natural::power_of_two(pow))),
             ),
         ],
     );
@@ -142,8 +141,8 @@ fn benchmark_natural_mod_power_of_two_neg_algorithms(
                 &mut (|(n, pow)| no_out!((-n).mod_power_of_two(pow))),
             ),
             (
-                "Natural.mod_neg(Natural::ONE << u64)",
-                &mut (|(n, pow)| no_out!(n.mod_neg(Natural::ONE << pow))),
+                "Natural.mod_neg(Natural::power_of_two(u64))",
+                &mut (|(n, pow)| no_out!(n.mod_neg(Natural::power_of_two(pow)))),
             ),
         ],
     );

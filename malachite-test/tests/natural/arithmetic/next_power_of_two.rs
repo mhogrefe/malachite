@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogTwo, IsPowerOfTwo, NextPowerOfTwo, NextPowerOfTwoAssign,
+    CeilingLogTwo, IsPowerOfTwo, NextPowerOfTwo, NextPowerOfTwoAssign, PowerOfTwo,
 };
-use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
     limbs_vec_next_power_of_two_in_place,
@@ -172,7 +171,7 @@ fn next_power_of_two_properties() {
         assert!(result >= *n);
         if *n != 0 {
             assert!(&result >> 1 < *n);
-            assert_eq!(Natural::ONE << n.ceiling_log_two(), result);
+            assert_eq!(Natural::power_of_two(n.ceiling_log_two()), result);
         }
     });
 

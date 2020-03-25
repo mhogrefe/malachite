@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
+use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
 
 use integer::Integer;
@@ -207,8 +207,9 @@ impl Natural {
                 if starting_index >= Limb::WIDTH {
                     None
                 } else {
-                    let index =
-                        TrailingZeros::trailing_zeros((small - 1) & !((1 << starting_index) - 1));
+                    let index = TrailingZeros::trailing_zeros(
+                        (small - 1) & !Limb::low_mask(starting_index),
+                    );
                     if index == Limb::WIDTH {
                         None
                     } else {
@@ -227,7 +228,7 @@ impl Natural {
                 if starting_index >= Limb::WIDTH {
                     starting_index
                 } else {
-                    TrailingZeros::trailing_zeros(!((small - 1) | ((1 << starting_index) - 1)))
+                    TrailingZeros::trailing_zeros(!((small - 1) | Limb::low_mask(starting_index)))
                 }
             }
             Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),

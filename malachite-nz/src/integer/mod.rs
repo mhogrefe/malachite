@@ -160,6 +160,7 @@ pub mod arithmetic {
     pub mod mul;
     pub mod neg;
     pub mod parity;
+    pub mod power_of_two;
     pub mod shl_i;
     pub mod shl_u;
     pub mod shr_i;
@@ -192,6 +193,7 @@ pub mod logic {
     pub mod checked_count_ones;
     pub mod checked_count_zeros;
     pub mod checked_hamming_distance;
+    pub mod low_mask;
     pub mod not;
     pub mod or;
     pub mod significant_bits;

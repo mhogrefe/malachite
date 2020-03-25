@@ -2,13 +2,15 @@ use std::cmp::{min, Ordering};
 
 use malachite_base::comparison::Max;
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{CheckedLogTwo, DivRound, ModPowerOfTwo, Parity};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogTwo, DivRound, ModPowerOfTwo, Parity, PowerOfTwo,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, FromOtherTypeSlice, WrappingFrom};
 use malachite_base::num::logic::traits::{
-    BitAccess, BitBlockAccess, PowerOfTwoDigits, SignificantBits,
+    BitAccess, BitBlockAccess, LowMask, PowerOfTwoDigits, SignificantBits,
 };
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -138,8 +140,8 @@ macro_rules! power_of_two_digits_primitive {
                         }
                         Ordering::Less => {
                             for mut limb in limbs.iter().cloned() {
-                                let mask = (1 << log_base) - 1;
-                                for _ in 0..1 << (Limb::LOG_WIDTH - log_log_base) {
+                                let mask = Limb::low_mask(log_base);
+                                for _ in 0..u64::power_of_two(Limb::LOG_WIDTH - log_log_base) {
                                     digits.push($t::wrapping_from(limb & mask));
                                     limb >>= log_base;
                                 }
@@ -147,7 +149,7 @@ macro_rules! power_of_two_digits_primitive {
                         }
                         Ordering::Greater => digits.extend(
                             limbs
-                                .chunks(1 << (log_log_base - Limb::LOG_WIDTH))
+                                .chunks(usize::power_of_two(log_log_base - Limb::LOG_WIDTH))
                                 .map($t::from_other_type_slice),
                         ),
                     }
@@ -264,7 +266,7 @@ macro_rules! power_of_two_digits_primitive {
                         Ordering::Greater => {
                             for mut digit in digits.iter().cloned() {
                                 let mask = $t::MAX.mod_power_of_two(Limb::WIDTH);
-                                for _ in 0..1 << (log_log_base - Limb::LOG_WIDTH) {
+                                for _ in 0..u64::power_of_two(log_log_base - Limb::LOG_WIDTH) {
                                     limbs.push(Limb::wrapping_from(digit & mask));
                                     digit >>= Limb::WIDTH;
                                 }
@@ -339,7 +341,7 @@ macro_rules! power_of_two_digits_primitive {
                         Ordering::Greater => {
                             for mut digit in digits.iter().rev().cloned() {
                                 let mask = $t::MAX.mod_power_of_two(Limb::WIDTH);
-                                for _ in 0..1 << (log_log_base - Limb::LOG_WIDTH) {
+                                for _ in 0..u64::power_of_two(log_log_base - Limb::LOG_WIDTH) {
                                     limbs.push(Limb::wrapping_from(digit & mask));
                                     digit >>= Limb::WIDTH;
                                 }
@@ -497,7 +499,7 @@ impl PowerOfTwoDigits<Natural> for Natural {
             assert!(log_log_base > Limb::LOG_WIDTH);
             digits.extend(
                 limbs
-                    .chunks(1 << (log_log_base - Limb::LOG_WIDTH))
+                    .chunks(usize::power_of_two(log_log_base - Limb::LOG_WIDTH))
                     .map(Natural::from_limbs_asc),
             );
         } else {

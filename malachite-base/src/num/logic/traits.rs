@@ -61,6 +61,11 @@ pub trait CheckedHammingDistance<RHS = Self> {
     fn checked_hamming_distance(self, rhs: RHS) -> Option<u64>;
 }
 
+/// Returns a value with the least significant `bits` bits on and the remaining bits off.
+pub trait LowMask {
+    fn low_mask(bits: u64) -> Self;
+}
+
 /// This trait defines functions that access or modify individual bits in a value, indexed by a
 /// `u64`.
 pub trait BitAccess {

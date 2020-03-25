@@ -3,13 +3,13 @@ use num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
     ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
-    RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, PowerOfTwo,
+    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
     WrappingNegAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
-use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
+use num::logic::traits::{LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -136,6 +136,8 @@ macro_rules! impl_arithmetic_traits {
             /// assert_eq!(7u32.mod_neg(10), 3);
             /// assert_eq!(100u16.mod_neg(101), 1);
             /// ```
+            ///
+            /// This is nmod_neg from nmod_vec.h, FLINT 2.5.2.
             #[inline]
             fn mod_neg(self, modulus: $t) -> $t {
                 if self == 0 {
@@ -296,7 +298,7 @@ macro_rules! impl_arithmetic_traits {
                 if self == 0 || pow >= $t::WIDTH {
                     self
                 } else {
-                    self & ((1 << pow) - 1)
+                    self & $t::low_mask(pow)
                 }
             }
         }
@@ -305,7 +307,7 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
                 if *self != 0 && pow < $t::WIDTH {
-                    *self &= (1 << pow) - 1;
+                    *self &= $t::low_mask(pow)
                 }
             }
         }
@@ -482,6 +484,31 @@ macro_rules! impl_arithmetic_traits {
                 unimplemented!();
             }
         }
+
+        impl PowerOfTwo for $t {
+            /// Computes 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `pow` is greater than or equal to the width of `$t`.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::PowerOfTwo;
+            ///
+            /// assert_eq!(u16::power_of_two(0), 1);
+            /// assert_eq!(u8::power_of_two(3), 8);
+            /// assert_eq!(u64::power_of_two(40), 1 << 40);
+            /// ```
+            #[inline]
+            fn power_of_two(pow: u64) -> $t {
+                assert!(pow < $t::WIDTH);
+                1 << pow
+            }
+        }
     };
 }
 
@@ -514,7 +541,11 @@ macro_rules! round_shift_unsigned_unsigned {
                             shifted + 1
                         }
                     }
-                    RoundingMode::Nearest if other == width && self > (1 << ($t::WIDTH - 1)) => 1,
+                    RoundingMode::Nearest
+                        if other == width && self > $t::power_of_two($t::WIDTH - 1) =>
+                    {
+                        1
+                    }
                     RoundingMode::Nearest if other >= width => 0,
                     RoundingMode::Nearest => {
                         let mostly_shifted = self >> (other - 1);
@@ -565,7 +596,9 @@ macro_rules! round_shift_unsigned_unsigned {
                             *self += 1;
                         }
                     }
-                    RoundingMode::Nearest if other == width && *self > (1 << ($t::WIDTH - 1)) => {
+                    RoundingMode::Nearest
+                        if other == width && *self > $t::power_of_two($t::WIDTH - 1) =>
+                    {
                         *self = 1;
                     }
                     RoundingMode::Nearest if other >= width => *self = 0,

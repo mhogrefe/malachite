@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, EqModPowerOfTwo, NegMod};
+use malachite_base::num::arithmetic::traits::{
+    DivisibleBy, EqMod, EqModPowerOfTwo, NegMod, PowerOfTwo,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::logic::traits::TrailingZeros;
 
@@ -103,7 +105,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> O
     // (would involve borrow if x_0, y_0 != 0).
     if m_len == 2 && m_0 != 0 {
         let m_1 = modulus[1];
-        if m_1 < 1 << twos {
+        if m_1 < Limb::power_of_two(twos) {
             let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
             let y = quick_neg_mod(y, m_0);
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {

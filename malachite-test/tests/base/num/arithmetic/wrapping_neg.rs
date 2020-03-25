@@ -12,7 +12,7 @@ fn unsigned_wrapping_neg_assign_properties_helper<T: PrimitiveUnsigned + Rand>()
         neg.wrapping_neg_assign();
         assert_eq!(neg, n.wrapping_neg());
         assert_eq!(neg.wrapping_neg(), n);
-        assert_eq!(neg == n, n == T::ZERO || n == T::ONE << (T::WIDTH - 1));
+        assert_eq!(neg == n, n == T::ZERO || n == T::power_of_two(T::WIDTH - 1));
         assert_eq!(n.wrapping_add(neg), T::ZERO);
     });
 }

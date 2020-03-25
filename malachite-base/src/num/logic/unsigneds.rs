@@ -5,14 +5,14 @@ use std::ops::Index;
 use comparison::Max;
 use named::Named;
 use num::arithmetic::traits::{
-    DivRound, ModPowerOfTwo, Parity, SaturatingSubAssign, TrueCheckedShl,
+    DivRound, ModPowerOfTwo, Parity, PowerOfTwo, SaturatingSubAssign, TrueCheckedShl,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, HammingDistance,
-    LeadingZeros, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
+    LeadingZeros, LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
     SignificantBits, TrailingZeros,
 };
 use round::RoundingMode;
@@ -383,6 +383,37 @@ macro_rules! impl_logic_traits {
             }
         }
 
+        impl LowMask for $t {
+            /// Returns a value with the least significant `bits` bits on and the remaining bits
+            /// off.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `pow` is greater than the width of `$t`.
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::LowMask;
+            ///
+            /// assert_eq!(u16::low_mask(0), 0);
+            /// assert_eq!(u8::low_mask(3), 0x7);
+            /// assert_eq!(u8::low_mask(8), 0xff);
+            /// assert_eq!(u64::low_mask(40), 0xff_ffff_ffff);
+            /// ```
+            #[inline]
+            fn low_mask(bits: u64) -> $t {
+                assert!(bits <= $t::WIDTH);
+                if bits == $t::WIDTH {
+                    $t::MAX
+                } else {
+                    $t::power_of_two(bits) - 1
+                }
+            }
+        }
+
         /// Provides functions for accessing and modifying the `index`th bit of a primitive unsigned
         /// integer, or the coefficient of 2^<pow>`index`</pow> in its binary expansion.
         ///
@@ -429,7 +460,7 @@ macro_rules! impl_logic_traits {
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                index < Self::WIDTH && *self & (1 << index) != 0
+                index < Self::WIDTH && *self & $t::power_of_two(index) != 0
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
@@ -457,7 +488,7 @@ macro_rules! impl_logic_traits {
             #[inline]
             fn set_bit(&mut self, index: u64) {
                 if index < Self::WIDTH {
-                    *self |= 1 << index;
+                    *self |= $t::power_of_two(index);
                 } else {
                     panic!(
                         "Cannot set bit {} in non-negative value of width {}",
@@ -491,7 +522,7 @@ macro_rules! impl_logic_traits {
             #[inline]
             fn clear_bit(&mut self, index: u64) {
                 if index < Self::WIDTH {
-                    *self &= !(1 << index);
+                    *self &= !$t::power_of_two(index);
                 }
             }
         }
@@ -525,7 +556,7 @@ macro_rules! impl_logic_traits {
                 Some(if start >= Self::WIDTH {
                     start
                 } else {
-                    TrailingZeros::trailing_zeros(!(self | ((1 << start) - 1)))
+                    TrailingZeros::trailing_zeros(!(self | $t::low_mask(start)))
                 })
             }
 
@@ -558,7 +589,7 @@ macro_rules! impl_logic_traits {
                 if start >= Self::WIDTH {
                     None
                 } else {
-                    let index = TrailingZeros::trailing_zeros(self & !((1 << start) - 1));
+                    let index = TrailingZeros::trailing_zeros(self & !$t::low_mask(start));
                     if index == Self::WIDTH {
                         None
                     } else {
@@ -702,7 +733,7 @@ macro_rules! impl_logic_traits {
                 if *self == 1 {
                     return bits;
                 }
-                let mut mask = 1 << ($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
+                let mut mask = $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
                 while mask != 0 {
                     bits.push(*self & mask != 0);
                     mask >>= 1;
@@ -820,7 +851,7 @@ macro_rules! impl_logic_traits {
                     value: self,
                     some_remaining: significant_bits != 0,
                     i_mask: 1,
-                    j_mask: 1 << significant_bits.saturating_sub(1),
+                    j_mask: $t::power_of_two(significant_bits.saturating_sub(1)),
                 }
             }
         }
@@ -877,11 +908,7 @@ macro_rules! impl_logic_traits {
                             digits.push($u::wrapping_from(*self));
                         } else {
                             let mut x = *self;
-                            let mask = if log_base == $u::WIDTH {
-                                $u::MAX
-                            } else {
-                                (1 << log_base) - 1
-                            };
+                            let mask = $u::low_mask(log_base);
                             while x != 0 {
                                 digits.push($u::wrapping_from(x) & mask);
                                 x >>= log_base;

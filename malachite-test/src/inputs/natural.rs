@@ -7,13 +7,13 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
 use num::BigUint;
@@ -313,7 +313,7 @@ pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> 
         GenerationMode::Exhaustive => Box::new(
             exhaustive_dependent_pairs_infinite_log((), exhaustive_unsigned(), |_, &pow| {
                 Box::new(
-                    range_increasing(Natural::ZERO, (Natural::ONE << pow) - Natural::ONE)
+                    range_increasing(Natural::ZERO, Natural::low_mask(pow))
                         .map(Option::Some)
                         .chain(repeat(None)),
                 )
@@ -333,7 +333,7 @@ pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> 
                 random_range_natural(
                     &scramble(&EXAMPLE_SEED, "n"),
                     Natural::ZERO,
-                    (Natural::ONE << pow) - Natural::ONE,
+                    Natural::low_mask(pow),
                 )
             },
         )),
@@ -344,7 +344,7 @@ pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> 
                 special_random_range_natural(
                     &scramble(&EXAMPLE_SEED, "n"),
                     Natural::ZERO,
-                    (Natural::ONE << pow) - Natural::ONE,
+                    Natural::low_mask(pow),
                 )
             },
         )),
@@ -1425,13 +1425,7 @@ fn pairs_of_u64_and_natural_vec_var_1_random_helper(
     Box::new(random_vecs(
         &EXAMPLE_SEED,
         scale,
-        &(|seed| {
-            special_random_range_natural(
-                seed,
-                Natural::ZERO,
-                (Natural::ONE << log_base) - Natural::ONE,
-            )
-        }),
+        &(|seed| special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(log_base))),
     ))
 }
 
@@ -1442,13 +1436,7 @@ fn pairs_of_u64_and_natural_vec_var_1_special_random_helper(
     Box::new(random_vecs(
         &EXAMPLE_SEED,
         scale,
-        &(|seed| {
-            special_random_range_natural(
-                seed,
-                Natural::ZERO,
-                (Natural::ONE << log_base) - Natural::ONE,
-            )
-        }),
+        &(|seed| special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(log_base))),
     ))
 }
 
@@ -1458,7 +1446,7 @@ pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Na
     match gm {
         GenerationMode::Exhaustive => {
             let f = |_: &(), &log_base: &u64| -> It<Vec<Natural>> {
-                let digits = range_down_increasing((Natural::ONE << log_base) - Natural::ONE);
+                let digits = range_down_increasing(Natural::low_mask(log_base));
                 if log_base == 1 {
                     exhaustive_vecs_shortlex(digits)
                 } else {

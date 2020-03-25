@@ -15,6 +15,7 @@ pub mod num {
         pub mod neg;
         pub mod overflowing_abs;
         pub mod overflowing_neg;
+        pub mod power_of_two;
         pub mod saturating_abs;
         pub mod saturating_neg;
         pub mod sign;
@@ -35,6 +36,7 @@ pub mod num {
         pub mod bit_scan;
         pub mod get_highest_bit;
         pub mod hamming_distance;
+        pub mod low_mask;
         pub mod not;
         pub mod power_of_two_digit_iterable;
         pub mod power_of_two_digits;

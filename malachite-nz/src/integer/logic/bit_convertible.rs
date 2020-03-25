@@ -1,6 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::logic::traits::{BitConvertible, LeadingZeros, NotAssign};
+use malachite_base::num::logic::traits::{BitConvertible, LeadingZeros, LowMask, NotAssign};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
@@ -108,7 +108,7 @@ fn limbs_asc_from_negative_twos_complement_limbs_asc(mut limbs: Vec<Limb>) -> Ve
         let most_significant_limb = limbs.last_mut().unwrap();
         let leading_zeros = LeadingZeros::leading_zeros(*most_significant_limb);
         if leading_zeros != 0 {
-            *most_significant_limb |= !((1 << (Limb::WIDTH - leading_zeros)) - 1);
+            *most_significant_limb |= !Limb::low_mask(Limb::WIDTH - leading_zeros);
         }
     }
     assert!(!limbs_twos_complement_in_place(&mut limbs));

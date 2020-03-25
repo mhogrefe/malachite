@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -1824,7 +1825,7 @@ fn benchmark_limbs_mul_low_same_length_large_algorithms(
     m_run_benchmark(
         "limbs_mul_low_same_length_large(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_52(gm.with_scale(1 << 15)),
+        triples_of_unsigned_vec_var_52(gm.with_scale(u32::power_of_two(15))),
         gm.name(),
         limit,
         file_name,

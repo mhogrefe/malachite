@@ -24,6 +24,7 @@ pub mod mul;
 pub mod neg;
 pub mod next_power_of_two;
 pub mod parity;
+pub mod power_of_two;
 pub mod saturating_sub;
 pub mod saturating_sub_mul;
 pub mod shl_i;
@@ -59,6 +60,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     neg::register(registry);
     next_power_of_two::register(registry);
     parity::register(registry);
+    power_of_two::register(registry);
     saturating_sub::register(registry);
     saturating_sub_mul::register(registry);
     shl_i::register(registry);

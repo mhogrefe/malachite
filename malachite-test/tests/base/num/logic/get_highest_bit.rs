@@ -8,7 +8,7 @@ use malachite_test::inputs::base::{signeds, unsigneds};
 
 fn get_highest_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(unsigneds::<T>, |u| {
-        assert_eq!(u.get_highest_bit(), u >= &(T::ONE << (T::WIDTH - 1)));
+        assert_eq!(u.get_highest_bit(), u >= &(T::power_of_two(T::WIDTH - 1)));
     });
 }
 

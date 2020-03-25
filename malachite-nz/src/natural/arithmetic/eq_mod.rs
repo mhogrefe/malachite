@@ -1,7 +1,8 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, WrappingAddAssign,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, PowerOfTwo,
+    WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
@@ -140,14 +141,13 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
     }
     let m_0 = modulus[0];
     // Check xs == ys mod low zero bits of m_0.
-    let m_trailing_zeros = m_0.trailing_zeros();
-    if !xs[0].eq_mod_power_of_two(y, u64::from(m_trailing_zeros)) {
+    let m_0_trailing_zeros = TrailingZeros::trailing_zeros(m_0);
+    if !xs[0].eq_mod_power_of_two(y, m_0_trailing_zeros) {
         return Some(false);
     }
     if m_len == 2 && m_0 != 0 {
         let m_1 = modulus[1];
-        if m_1 < 1 << m_trailing_zeros {
-            let m_0_trailing_zeros = TrailingZeros::trailing_zeros(m_0);
+        if m_1 < Limb::power_of_two(m_0_trailing_zeros) {
             let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
                 let r = limbs_mod_limb(xs, m_0);

@@ -3,10 +3,11 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, DivisibleByPowerOfTwo, ModPowerOfTwo,
-    ModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign,
+    ModPowerOfTwoAssign, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign,
 };
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -280,10 +281,10 @@ fn mod_power_of_two_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!((n >> u << u) + &result, *n);
-        assert!(result < (Natural::ONE << u));
+        assert!(result < Natural::power_of_two(u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
-        assert_eq!(n & ((Integer::ONE << u) - Integer::ONE), result);
+        assert_eq!(n & Integer::low_mask(u), result);
     });
 
     test_properties(
@@ -305,7 +306,7 @@ fn mod_power_of_two_properties() {
         assert_ne!(n.mod_power_of_two(u), 0);
         assert_eq!(
             Integer::from(n.mod_power_of_two(u)) - n.ceiling_mod_power_of_two(u),
-            Natural::ONE << u
+            Natural::power_of_two(u)
         );
     });
 
@@ -344,7 +345,7 @@ fn rem_power_of_two_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
-        assert!(result.lt_abs(&(Natural::ONE << u)));
+        assert!(result.lt_abs(&Natural::power_of_two(u)));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((&result).rem_power_of_two(u), result);
         assert_eq!(n.abs().mod_power_of_two(u), result.abs());
@@ -395,7 +396,7 @@ fn ceiling_mod_power_of_two_properties() {
 
         assert_eq!(((n.shr_round(u, RoundingMode::Ceiling) << u) + &result), *n);
         assert!(result <= 0);
-        assert!(-&result <= Natural::ONE << u);
+        assert!(-&result <= Natural::power_of_two(u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), -result);
     });

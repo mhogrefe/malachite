@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    ModIsReduced, ModPowerOfTwo, ModPowerOfTwoIsReduced,
+    ModIsReduced, ModPowerOfTwo, ModPowerOfTwoIsReduced, PowerOfTwo,
 };
-use malachite_base::num::basic::traits::One;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -34,7 +33,7 @@ fn mod_power_of_two_is_reduced_properties() {
     test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
         let is_reduced = n.mod_power_of_two_is_reduced(pow);
         assert_eq!(is_reduced, n.mod_power_of_two(pow) == *n);
-        assert_eq!(is_reduced, n.mod_is_reduced(&(Natural::ONE << pow)));
+        assert_eq!(is_reduced, n.mod_is_reduced(&Natural::power_of_two(pow)));
     });
 
     test_properties(

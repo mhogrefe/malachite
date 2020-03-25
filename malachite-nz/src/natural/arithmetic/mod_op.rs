@@ -4,7 +4,7 @@ use std::ops::{Rem, RemAssign};
 
 use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, WrappingAddAssign,
+    Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, PowerOfTwo, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
@@ -2120,8 +2120,9 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(limbs: &[Limb], divisor: Limb) -> Lim
     let divisor_inverse = limbs_invert_limb(divisor);
     let mut base_mod_divisor = divisor.wrapping_neg();
     if shift != 0 {
-        base_mod_divisor
-            .wrapping_mul_assign((divisor_inverse >> (Limb::WIDTH - shift)) | (1 << shift));
+        base_mod_divisor.wrapping_mul_assign(
+            (divisor_inverse >> (Limb::WIDTH - shift)) | Limb::power_of_two(shift),
+        );
     }
     assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
     let base_pow_2_mod_divisor = DoubleLimb::from(
@@ -2166,7 +2167,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_2(limbs: &[Limb], divisor: Limb) -> Lim
     } else {
         let base_mod_divisor = divisor
             .wrapping_neg()
-            .wrapping_mul((divisor_inverse >> (Limb::WIDTH - shift)) | (1 << shift));
+            .wrapping_mul((divisor_inverse >> (Limb::WIDTH - shift)) | Limb::power_of_two(shift));
         assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
         DoubleLimb::from(base_mod_divisor >> shift)
     };
@@ -2232,7 +2233,7 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(limbs: &[Limb], divisor: Limb) ->
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = divisor
         .wrapping_neg()
-        .wrapping_mul((divisor_inverse >> co_shift) | (1 << shift));
+        .wrapping_mul((divisor_inverse >> co_shift) | Limb::power_of_two(shift));
     assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
     let base_pow_2_mod_divisor =
         mod_by_preinversion_special(base_mod_divisor, 0, divisor, divisor_inverse);
@@ -2289,14 +2290,14 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(limbs: &[Limb], divisor: Limb) ->
 pub fn _limbs_mod_limb_at_least_2_leading_zeros(limbs: &[Limb], divisor: Limb) -> Limb {
     let mut len = limbs.len();
     assert_ne!(len, 0);
-    let shift = divisor.leading_zeros();
+    let shift = LeadingZeros::leading_zeros(divisor);
     assert!(shift >= 2);
-    let co_shift = Limb::WIDTH - u64::from(shift);
+    let co_shift = Limb::WIDTH - shift;
     let divisor = divisor << shift;
     let divisor_inverse = limbs_invert_limb(divisor);
     let base_mod_divisor = divisor
         .wrapping_neg()
-        .wrapping_mul((divisor_inverse >> co_shift) | (1 << shift));
+        .wrapping_mul((divisor_inverse >> co_shift) | Limb::power_of_two(shift));
     assert!(base_mod_divisor <= divisor); // not fully reduced mod divisor
     let base_pow_2_mod_divisor =
         mod_by_preinversion_special(base_mod_divisor, 0, divisor, divisor_inverse);

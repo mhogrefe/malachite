@@ -19,7 +19,7 @@ fn mod_power_of_two_neg_properties_helper<T: PrimitiveUnsigned + Rand + SampleRa
         assert_eq!(neg.mod_power_of_two_neg(pow), n);
         //TODO use mod_add
         assert!(n.wrapping_add(neg).divisible_by_power_of_two(pow));
-        assert_eq!(n == neg, n == T::ZERO || n == T::ONE << (pow - 1));
+        assert_eq!(n == neg, n == T::ZERO || n == T::power_of_two(pow - 1));
     });
 }
 

@@ -9,7 +9,7 @@ use std::str::FromStr;
 use comparison::{Max, Min};
 use crement::Crementable;
 use named::Named;
-use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, NegAssign};
+use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, NegAssign, PowerOfTwo};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
@@ -217,7 +217,7 @@ macro_rules! float_traits {
                     panic!("float cannot be NaN.");
                 }
                 if self >= 0.0 {
-                    (1 << ($u::WIDTH - 1)) + self.abs_negative_zeros().to_bits()
+                    $u::power_of_two($u::WIDTH - 1) + self.abs_negative_zeros().to_bits()
                 } else {
                     (-self).to_bits().mod_power_of_two_neg($u::WIDTH - 1)
                 }
@@ -225,7 +225,7 @@ macro_rules! float_traits {
 
             fn from_ordered_representation(n: $u) -> $t {
                 let f = if n.get_highest_bit() {
-                    $t::from_bits(n - (1 << ($u::WIDTH - 1)))
+                    $t::from_bits(n - $u::power_of_two($u::WIDTH - 1))
                 } else {
                     -$t::from_bits(n.mod_power_of_two_neg($u::WIDTH - 1))
                 };

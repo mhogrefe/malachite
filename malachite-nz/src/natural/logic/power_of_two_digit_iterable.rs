@@ -4,13 +4,15 @@ use std::slice::Chunks;
 
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogTwo, DivRound, FloorLogTwo, ModPowerOfTwo, SaturatingSubAssign, ShrRound,
+    CheckedLogTwo, DivRound, FloorLogTwo, ModPowerOfTwo, PowerOfTwo, SaturatingSubAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
+use malachite_base::num::logic::traits::{
+    LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator,
+};
 use malachite_base::num::logic::unsigneds::PrimitivePowerOfTwoDigitIterator;
 use malachite_base::round::RoundingMode;
 
@@ -206,7 +208,10 @@ impl<'a, T: PrimitiveUnsigned> PowerOfTwoDigitIterator<T> for MOLIterator<'a, T>
         if start_index >= self.limbs.len() {
             T::ZERO
         } else {
-            let end_index = min(self.limbs.len(), start_index + (1 << self.log_ratio));
+            let end_index = min(
+                self.limbs.len(),
+                start_index + usize::power_of_two(self.log_ratio),
+            );
             T::from_other_type_slice(&self.limbs[start_index..end_index])
         }
     }
@@ -510,7 +515,7 @@ macro_rules! iterables {
                 i: 0,
                 j: (significant_digits - 1).mod_power_of_two(Limb::LOG_WIDTH - log_log_base)
                     << log_log_base,
-                mask: (1 << log_base) - 1,
+                mask: Limb::low_mask(log_base),
                 boo: PhantomData,
             })
         }
@@ -533,7 +538,7 @@ macro_rules! iterables {
                 significant_digits,
                 log_ratio,
                 limbs,
-                chunks: limbs.chunks(1 << log_ratio),
+                chunks: limbs.chunks(usize::power_of_two(log_ratio)),
                 boo: PhantomData,
             })
         }
@@ -729,7 +734,10 @@ impl<'a> PowerOfTwoDigitIterator<Natural> for NMOLIterator<'a> {
         if start_index >= self.limbs.len() {
             Natural::ZERO
         } else {
-            let end_index = min(self.limbs.len(), start_index + (1 << self.log_ratio));
+            let end_index = min(
+                self.limbs.len(),
+                start_index + usize::power_of_two(self.log_ratio),
+            );
             Natural::from_limbs_asc(&self.limbs[start_index..end_index])
         }
     }
@@ -996,7 +1004,7 @@ fn multiple_of_limb_fn(limbs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbIt
         significant_digits,
         log_ratio,
         limbs,
-        chunks: limbs.chunks(1 << log_ratio),
+        chunks: limbs.chunks(usize::power_of_two(log_ratio)),
     })
 }
 

@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
@@ -81,7 +81,7 @@ fn get_bit_properties() {
             bit
         );
 
-        assert_eq!(n & (Natural::ONE << index) != 0, bit);
+        assert_eq!(n & Natural::power_of_two(index) != 0, bit);
         assert_ne!((!n).get_bit(index), bit);
     });
 

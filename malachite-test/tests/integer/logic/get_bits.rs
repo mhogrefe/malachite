@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::integers::_get_bits_naive;
-use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
 };
@@ -210,12 +210,12 @@ fn get_bits_properties() {
                 if *n >= 0 {
                     Natural::ZERO
                 } else {
-                    (Natural::ONE << (end - start)) - Natural::ONE
+                    Natural::low_mask(end - start)
                 }
             );
             assert_eq!(
                 (!n).get_bits(start, end),
-                (Natural::ONE << (end - start)) - &bits - Natural::ONE
+                Natural::low_mask(end - start) - &bits
             );
             let mut mut_n = n.clone();
             mut_n.assign_bits(start, end, &bits);

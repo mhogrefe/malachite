@@ -217,6 +217,7 @@ pub mod arithmetic {
     pub mod neg;
     pub mod next_power_of_two;
     pub mod parity;
+    pub mod power_of_two;
     pub mod saturating_sub;
     pub mod saturating_sub_mul;
     pub mod shl_i;
@@ -247,6 +248,7 @@ pub mod logic {
     pub mod bit_scan;
     pub mod count_ones;
     pub mod hamming_distance;
+    pub mod low_mask;
     pub mod not;
     pub mod or;
     pub mod power_of_two_digit_iterable;

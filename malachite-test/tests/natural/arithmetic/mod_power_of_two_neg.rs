@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, ModNeg, ModPowerOfTwo, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg,
-    ModPowerOfTwoNegAssign,
+    ModPowerOfTwoNegAssign, PowerOfTwo,
 };
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -62,13 +62,13 @@ fn mod_power_of_two_neg_properties() {
         assert_eq!(neg_alt, neg);
 
         assert_eq!(neg, (-n).mod_power_of_two(pow));
-        assert_eq!(neg, n.mod_neg(Natural::ONE << pow));
+        assert_eq!(neg, n.mod_neg(Natural::power_of_two(pow)));
         assert_eq!((&neg).mod_power_of_two_neg(pow), *n);
         //TODO use mod_add
         assert!((n + &neg).divisible_by_power_of_two(pow));
         assert_eq!(
             *n == neg,
-            *n == Natural::ZERO || *n == Natural::ONE << (pow - 1)
+            *n == Natural::ZERO || *n == Natural::power_of_two(pow - 1)
         );
     });
 

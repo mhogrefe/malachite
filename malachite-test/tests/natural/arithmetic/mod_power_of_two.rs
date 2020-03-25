@@ -3,9 +3,11 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign,
+    ShrRound,
 };
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_mod_power_of_two_in_place, limbs_neg_mod_power_of_two,
@@ -254,10 +256,10 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!((n >> u << u) + &result, *n);
-        assert!(result < (Natural::ONE << u));
+        assert!(result < Natural::power_of_two(u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((&result).mod_power_of_two(u), result);
-        assert_eq!(n & ((Natural::ONE << u) - Natural::ONE), result);
+        assert_eq!(n & Natural::low_mask(u), result);
     });
 
     test_properties(
@@ -282,7 +284,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert_ne!(n.mod_power_of_two(u), 0);
         assert_eq!(
             n.mod_power_of_two(u) + n.neg_mod_power_of_two(u),
-            Natural::ONE << u
+            Natural::power_of_two(u)
         );
     });
 
@@ -333,7 +335,7 @@ fn neg_mod_power_of_two_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!((n.shr_round(u, RoundingMode::Ceiling) << u) - &result, *n);
-        assert!(result < (Natural::ONE << u));
+        assert!(result < Natural::power_of_two(u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
         assert_eq!((&result).neg_mod_power_of_two(u), n.mod_power_of_two(u));
         assert_eq!((-n).mod_power_of_two(u), result);
@@ -361,7 +363,7 @@ fn neg_mod_power_of_two_properties() {
         let m = n.neg_mod_power_of_two(u);
         assert_ne!(m, 0);
         assert_eq!((((n >> u) + Natural::ONE) << u) - &m, *n);
-        assert_eq!(n.mod_power_of_two(u) + m, Natural::ONE << u);
+        assert_eq!(n.mod_power_of_two(u) + m, Natural::power_of_two(u));
     });
 
     test_properties(naturals, |n| {

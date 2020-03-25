@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::FloorLogTwo;
+use malachite_base::num::arithmetic::traits::{FloorLogTwo, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::log_two::limbs_floor_log_two;
@@ -90,8 +89,8 @@ fn significant_bits_properties() {
         if *x != 0 {
             assert_eq!(significant_bits, x.floor_log_two() + 1);
             assert_eq!(significant_bits, limbs_significant_bits(&x.to_limbs_asc()));
-            assert!(Natural::ONE << (significant_bits - 1) <= *x);
-            assert!(*x < Natural::ONE << significant_bits);
+            assert!(Natural::power_of_two(significant_bits - 1) <= *x);
+            assert!(*x < Natural::power_of_two(significant_bits));
         }
     });
 

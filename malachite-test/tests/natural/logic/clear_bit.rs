@@ -1,7 +1,7 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
@@ -84,7 +84,7 @@ fn clear_bit_properties() {
         mut_n.assign_bit(index, false);
         assert_eq!(mut_n, result);
 
-        assert_eq!(Integer::from(n) & !(Natural::ONE << index), result);
+        assert_eq!(Integer::from(n) & !Natural::power_of_two(index), result);
 
         assert!(result <= *n);
         if n.get_bit(index) {

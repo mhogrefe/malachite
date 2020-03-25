@@ -29,6 +29,7 @@ pub mod base {
             pub mod neg;
             pub mod overflowing_abs;
             pub mod overflowing_neg;
+            pub mod power_of_two;
             pub mod saturating_abs;
             pub mod saturating_neg;
             pub mod sign;
@@ -67,6 +68,7 @@ pub mod base {
             pub mod bit_scan;
             pub mod get_highest_bit;
             pub mod hamming_distance;
+            pub mod low_mask;
             pub mod not_assign;
             pub mod power_of_two_digit_iterable;
             pub mod power_of_two_digits;
@@ -123,6 +125,7 @@ pub mod integer {
         pub mod mul;
         pub mod neg;
         pub mod parity;
+        pub mod power_of_two;
         pub mod shl_i;
         pub mod shl_u;
         pub mod shr_i;
@@ -180,6 +183,7 @@ pub mod integer {
         pub mod get_bits;
         pub mod index_of_next_false_bit;
         pub mod index_of_next_true_bit;
+        pub mod low_mask;
         pub mod not;
         pub mod or;
         pub mod set_bit;
@@ -216,6 +220,7 @@ pub mod natural {
         pub mod neg;
         pub mod next_power_of_two;
         pub mod parity;
+        pub mod power_of_two;
         pub mod saturating_sub;
         pub mod saturating_sub_mul;
         pub mod shl_i;
@@ -270,6 +275,7 @@ pub mod natural {
         pub mod index_of_next_false_bit;
         pub mod index_of_next_true_bit;
         pub mod limb_count;
+        pub mod low_mask;
         pub mod not;
         pub mod or;
         pub mod power_of_two_digits;

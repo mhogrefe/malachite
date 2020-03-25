@@ -2,9 +2,10 @@ use std::str::FromStr;
 
 use malachite_base::comparison::Max;
 use malachite_base::crement::Crementable;
+use malachite_base::num::arithmetic::traits::{ModPowerOfTwoNeg, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
@@ -985,9 +986,9 @@ fn limbs_sub_properties() {
         if borrow {
             assert_eq!(
                 n,
-                Integer::from(Natural::from_limbs_asc(xs))
-                    - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+                Natural::from_limbs_asc(xs)
+                    + Natural::from_limbs_asc(ys)
+                        .mod_power_of_two_neg(u64::exact_from(len) << Limb::LOG_WIDTH)
             );
         } else {
             assert_eq!(n, Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys));
@@ -1005,10 +1006,10 @@ fn limbs_sub_to_out_helper(
     let old_out = out.clone();
     let len = xs.len();
     let mut limbs = if f(&mut out, xs, ys) {
-        let n = Integer::from(Natural::from_limbs_asc(xs))
-            - Integer::from(Natural::from_limbs_asc(ys))
-            + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
-        Natural::exact_from(n).into_limbs_asc()
+        let n = Natural::from_limbs_asc(xs)
+            + Natural::from_limbs_asc(ys)
+                .mod_power_of_two_neg(u64::exact_from(len) << Limb::LOG_WIDTH);
+        n.into_limbs_asc()
     } else {
         let n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
         n.into_limbs_asc()
@@ -1051,9 +1052,9 @@ fn limbs_sub_in_place_left_helper(
     if borrow {
         assert_eq!(
             n,
-            Integer::from(Natural::from_owned_limbs_asc(xs_old))
-                - Integer::from(Natural::from_limbs_asc(ys))
-                + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+            Natural::from_owned_limbs_asc(xs_old)
+                + Natural::from_limbs_asc(ys)
+                    .mod_power_of_two_neg(u64::exact_from(len) << Limb::LOG_WIDTH)
         );
     } else {
         assert_eq!(
@@ -1092,8 +1093,7 @@ fn limbs_slice_sub_in_place_right_properties() {
             if borrow {
                 assert_eq!(
                     n,
-                    Integer::from(x) - Integer::from(y)
-                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * xs_len))
+                    x + y.mod_power_of_two_neg(u64::exact_from(xs_len) << Limb::LOG_WIDTH)
                 );
             } else {
                 assert_eq!(n, x - y);
@@ -1119,9 +1119,9 @@ macro_rules! limbs_vec_sub_in_place_right_helper {
             if borrow {
                 assert_eq!(
                     n,
-                    Integer::from(Natural::from_limbs_asc($xs))
-                        - Integer::from(Natural::from_owned_limbs_asc(ys_old))
-                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * $xs.len()))
+                    Natural::from_limbs_asc($xs)
+                        + Natural::from_owned_limbs_asc(ys_old)
+                            .mod_power_of_two_neg(u64::exact_from($xs.len()) << Limb::LOG_WIDTH)
                 );
             } else {
                 assert_eq!(
@@ -1159,13 +1159,16 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             let len = xs.len();
             let limbs = if _limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in)
             {
-                let mut n = Integer::from(Natural::from_limbs_asc(xs))
-                    - Integer::from(Natural::from_limbs_asc(ys))
-                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len));
+                let bit_len = u64::exact_from(len) << Limb::LOG_WIDTH;
+                let mut neg_y = Natural::from_limbs_asc(ys).mod_power_of_two_neg(bit_len);
+                if neg_y == 0 {
+                    neg_y = Natural::power_of_two(bit_len);
+                }
+                let mut n = Natural::from_limbs_asc(xs) + neg_y;
                 if borrow_in {
                     n.decrement();
                 }
-                let mut limbs = Natural::exact_from(n).into_limbs_asc();
+                let mut limbs = n.into_limbs_asc();
                 limbs.resize(len, Limb::MAX);
                 limbs
             } else {
@@ -1195,11 +1198,12 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in);
             let n = Natural::from_owned_limbs_asc(xs);
             let mut expected_result = if borrow {
-                Natural::exact_from(
-                    Integer::from(Natural::from_owned_limbs_asc(xs_old))
-                        - Integer::from(Natural::from_limbs_asc(ys))
-                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len)),
-                )
+                let bit_len = u64::exact_from(len) << Limb::LOG_WIDTH;
+                let mut neg_y = Natural::from_limbs_asc(ys).mod_power_of_two_neg(bit_len);
+                if neg_y == 0 {
+                    neg_y = Natural::power_of_two(bit_len);
+                }
+                Natural::from_owned_limbs_asc(xs_old) + neg_y
             } else {
                 Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
             };
@@ -1226,8 +1230,7 @@ fn limbs_sub_same_length_in_place_with_overlap_properties() {
             if borrow {
                 assert_eq!(
                     n,
-                    Integer::from(x) - Integer::from(y)
-                        + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+                    x + y.mod_power_of_two_neg(u64::exact_from(len) << Limb::LOG_WIDTH)
                 );
             } else {
                 assert_eq!(n, x - y);
@@ -1271,8 +1274,7 @@ fn limbs_sub_same_length_to_out_with_overlap_properties() {
         if borrow {
             assert_eq!(
                 n,
-                Integer::from(x) - Integer::from(y)
-                    + (Integer::ONE << (usize::wrapping_from(Limb::WIDTH) * len))
+                x + y.mod_power_of_two_neg(u64::exact_from(len) << Limb::LOG_WIDTH)
             );
         } else {
             assert_eq!(n, x - y);

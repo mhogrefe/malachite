@@ -73,7 +73,7 @@ where
             if u >= T::WIDTH {
                 n >= T::ZERO
             } else {
-                n | (T::ONE << u).wrapping_sub(T::ONE) != T::NEGATIVE_ONE
+                n | T::low_mask(u) != T::NEGATIVE_ONE
             }
         );
         if let Some(result) = result {

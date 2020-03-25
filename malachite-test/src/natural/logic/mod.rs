@@ -21,6 +21,7 @@ pub mod hamming_distance;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod limb_count;
+pub mod low_mask;
 pub mod not;
 pub mod or;
 pub mod power_of_two_digits;
@@ -74,6 +75,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     index_of_next_false_bit::register(registry);
     index_of_next_true_bit::register(registry);
     limb_count::register(registry);
+    low_mask::register(registry);
     not::register(registry);
     or::register(registry);
     power_of_two_digits::register(registry);

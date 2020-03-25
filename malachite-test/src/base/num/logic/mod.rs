@@ -7,6 +7,7 @@ pub mod bit_iterable;
 pub mod bit_scan;
 pub mod get_highest_bit;
 pub mod hamming_distance;
+pub mod low_mask;
 pub mod not;
 pub mod power_of_two_digit_iterable;
 pub mod power_of_two_digits;
@@ -21,6 +22,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     bit_scan::register(registry);
     get_highest_bit::register(registry);
     hamming_distance::register(registry);
+    low_mask::register(registry);
     not::register(registry);
     power_of_two_digits::register(registry);
     power_of_two_digit_iterable::register(registry);

@@ -16,12 +16,12 @@ use num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
     OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
-    OverflowingRemAssign, OverflowingSub, Parity, Pow, SaturatingAdd, SaturatingAddAssign,
-    SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign,
-    ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, TrueCheckedShl, TrueCheckedShr,
-    WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
-    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub,
-    WrappingSubAssign,
+    OverflowingRemAssign, OverflowingSub, Parity, Pow, PowerOfTwo, SaturatingAdd,
+    SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
+    SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, TrueCheckedShl,
+    TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul,
+    WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign,
+    WrappingSub, WrappingSubAssign,
 };
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -31,7 +31,7 @@ use num::conversion::traits::{
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
-    LeadingZeros, NotAssign, Rotate, SignificantBits, TrailingZeros,
+    LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
@@ -132,6 +132,7 @@ pub trait PrimitiveInteger:
     + Hash
     + LeadingZeros
     + LowerHex
+    + LowMask
     + Min
     + Max
     + Mod
@@ -187,6 +188,7 @@ pub trait PrimitiveInteger:
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
     + Pow<u64>
+    + PowerOfTwo
     + Product
     + Rem<Output = Self>
     + RemAssign<Self>
@@ -313,6 +315,7 @@ pub trait PrimitiveInteger:
     + TrailingZeros
     + TrueCheckedShl<Output = Self>
     + TrueCheckedShr<Output = Self>
+    + Two
     + UpperHex
     + Crementable
     + WrappingAdd<Output = Self>

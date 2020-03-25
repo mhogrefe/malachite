@@ -2,13 +2,14 @@ use comparison::{Max, Min};
 use num::arithmetic::traits::{
     Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod,
     CeilingModAssign, CheckedAbs, DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod,
-    ModPowerOfTwo, NegAssign, NegMod, OverflowingAbs, OverflowingAbsAssign, SaturatingAbs,
-    SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign, TrueCheckedShl, TrueCheckedShr,
-    UnsignedAbs, WrappingAbs, WrappingAbsAssign,
+    ModPowerOfTwo, NegAssign, NegMod, OverflowingAbs, OverflowingAbsAssign, PowerOfTwo,
+    SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign, TrueCheckedShl,
+    TrueCheckedShr, UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::logic::traits::LowMask;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -358,7 +359,7 @@ macro_rules! impl_arithmetic_traits {
                 if x == 0 || pow >= $t::WIDTH {
                     x
                 } else {
-                    x & ((1 << pow) - 1)
+                    x & Self::Output::low_mask(pow)
                 }
             }
         }
@@ -511,6 +512,31 @@ macro_rules! impl_arithmetic_traits {
 
             fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
                 unimplemented!();
+            }
+        }
+
+        impl PowerOfTwo for $t {
+            /// Computes 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if `pow` is greater than or equal to the width of `$t` minus 1.
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::PowerOfTwo;
+            ///
+            /// assert_eq!(i16::power_of_two(0), 1);
+            /// assert_eq!(i8::power_of_two(3), 8);
+            /// assert_eq!(i64::power_of_two(40), 1 << 40);
+            /// ```
+            #[inline]
+            fn power_of_two(pow: u64) -> $t {
+                assert!(pow < $t::WIDTH - 1);
+                1 << pow
             }
         }
     };

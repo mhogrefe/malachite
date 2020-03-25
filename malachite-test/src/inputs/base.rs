@@ -3,7 +3,7 @@ use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::num::arithmetic::traits::{DivRound, EqMod, Parity, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{DivRound, EqMod, Parity, PowerOfTwo, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
@@ -202,7 +202,7 @@ where
 // All `T`s, where `T` is unsigned and its most-significant bit is set.
 pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(range_up_increasing(T::ONE << (T::WIDTH - 1))),
+        GenerationMode::Exhaustive => Box::new(range_up_increasing(T::power_of_two(T::WIDTH - 1))),
         GenerationMode::Random(_) => Box::new(random::<T>(&EXAMPLE_SEED).map(|mut u| {
             u.set_bit(T::WIDTH - 1);
             u
@@ -373,7 +373,7 @@ fn pairs_of_unsigneds_var_2_with_seed<T: PrimitiveUnsigned + Rand>(
 ) -> It<(T, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+            range_up_increasing(T::power_of_two(T::WIDTH - 1)),
             exhaustive_unsigned(),
         )),
         GenerationMode::Random(_) => Box::new(random_pairs_from_single(random::<T>(seed)).map(
@@ -505,7 +505,7 @@ pub fn u32s_range_1(gm: NoSpecialGenerationMode) -> It<u32> {
 
 // All `Limb`s smaller than 2<sup>Limb::WIDTH - 1<sup>.
 fn limbs_range_2(gm: GenerationMode) -> It<Limb> {
-    let upper = 1 << (Limb::WIDTH - 1);
+    let upper = Limb::power_of_two(Limb::WIDTH - 1);
     match gm {
         GenerationMode::Exhaustive => Box::new(range_down_increasing(upper)),
         GenerationMode::Random(_) => Box::new(random_range_down(&EXAMPLE_SEED, upper)),
@@ -584,12 +584,13 @@ pub fn small_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenerationMode)
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
         NoSpecialGenerationMode::Random(scale) => {
+            println!("scale: {}", scale);
             Box::new(u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
         }
     }
 }
 
-pub fn small_positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenerationMode) -> It<T> {
+pub fn small_positive_unsigneds<T: PrimitiveInteger + Rand>(gm: NoSpecialGenerationMode) -> It<T> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_positive()),
         NoSpecialGenerationMode::Random(scale) => {
@@ -599,10 +600,38 @@ pub fn small_positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenera
 }
 
 // All `u64`s where the `u64` is between 1 and T::WIDTH, inclusive.
-pub fn small_u64s_var_1<T: PrimitiveUnsigned>(gm: NoSpecialGenerationMode) -> It<u64> {
+pub fn small_u64s_var_1<T: PrimitiveInteger>(gm: NoSpecialGenerationMode) -> It<u64> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(1, T::WIDTH)),
         NoSpecialGenerationMode::Random(_) => Box::new(random_range(&EXAMPLE_SEED, 1, T::WIDTH)),
+    }
+}
+
+// All `u64`s where the `u64` is between 0 and T::WIDTH - 1, inclusive.
+pub fn small_u64s_var_2<T: PrimitiveInteger>(gm: NoSpecialGenerationMode) -> It<u64> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(0, T::WIDTH - 1)),
+        NoSpecialGenerationMode::Random(_) => {
+            Box::new(random_range(&EXAMPLE_SEED, 0, T::WIDTH - 1))
+        }
+    }
+}
+
+// All `u64`s where the `u64` is between 0 and T::WIDTH - 2, inclusive.
+pub fn small_u64s_var_3<T: PrimitiveInteger>(gm: NoSpecialGenerationMode) -> It<u64> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(0, T::WIDTH - 2)),
+        NoSpecialGenerationMode::Random(_) => {
+            Box::new(random_range(&EXAMPLE_SEED, 0, T::WIDTH - 2))
+        }
+    }
+}
+
+// All `u64`s where the `u64` is between 0 and T::WIDTH, inclusive.
+pub fn small_u64s_var_4<T: PrimitiveInteger>(gm: NoSpecialGenerationMode) -> It<u64> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(range_increasing(0, T::WIDTH)),
+        NoSpecialGenerationMode::Random(_) => Box::new(random_range(&EXAMPLE_SEED, 0, T::WIDTH)),
     }
 }
 
@@ -1763,19 +1792,19 @@ pub fn triples_of_two_limb_vecs_and_limb_var_1(
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(ts.filter(|(n, d_init, _)| n.len() >= d_init.len() + 1).map(
@@ -2344,21 +2373,21 @@ pub fn triples_of_limb_vec_var_38(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
             exhaustive_vecs(exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -2382,21 +2411,21 @@ pub fn triples_of_limb_vec_var_39(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(10, exhaustive_unsigned()),
             exhaustive_vecs_min_length(4, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 10, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 10)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -2422,21 +2451,21 @@ pub(crate) fn triples_of_limb_vec_var_40(
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(9, exhaustive_unsigned()),
             exhaustive_vecs_min_length(5, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 9, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 5, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 9)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 5)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -2468,21 +2497,21 @@ pub fn triples_of_limb_vec_var_41(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -2505,21 +2534,21 @@ pub fn triples_of_limb_vec_var_42(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -3002,7 +3031,7 @@ pub fn quadruples_of_limb_vec_var_1(
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quintuples(
             &EXAMPLE_SEED,
@@ -3010,7 +3039,7 @@ pub fn quadruples_of_limb_vec_var_1(
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quintuples(
             &EXAMPLE_SEED,
@@ -3018,7 +3047,7 @@ pub fn quadruples_of_limb_vec_var_1(
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 1)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -3431,21 +3460,21 @@ pub fn quadruples_of_three_limb_vecs_and_limb_var_1(
             exhaustive_vecs(exhaustive_unsigned()),
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -3472,21 +3501,21 @@ pub fn quadruples_of_three_limb_vecs_and_limb_var_2(
             exhaustive_vecs_min_length(3, exhaustive_unsigned()),
             exhaustive_vecs_min_length(9, exhaustive_unsigned()),
             exhaustive_vecs_min_length(5, exhaustive_unsigned()),
-            range_up_increasing(1 << (Limb::WIDTH - 1)),
+            range_up_increasing(Limb::power_of_two(Limb::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 3, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 9, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs_min_length(seed, scale, 5, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 3)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 9)),
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 5)),
-            &(|seed| random_range_up(seed, 1 << (Limb::WIDTH - 1))),
+            &(|seed| random_range_up(seed, Limb::power_of_two(Limb::WIDTH - 1))),
         )),
     };
     Box::new(
@@ -3736,7 +3765,7 @@ pub(crate) fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Ra
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
-            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+            range_up_increasing(T::power_of_two(T::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -3775,7 +3804,7 @@ pub fn pairs_of_nonempty_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + 
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_up_increasing(T::ONE << (T::WIDTH - 1)),
+            range_up_increasing(T::power_of_two(T::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -3810,12 +3839,12 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1<
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE),
+            range_increasing(T::ONE, T::low_mask(T::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE)),
+            &(|seed| random_range::<T>(seed, T::ONE, T::low_mask(T::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -3842,12 +3871,12 @@ pub fn pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2<
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs_min_length(1, exhaustive_unsigned()),
-            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 2)) - T::ONE),
+            range_increasing(T::ONE, T::low_mask(T::WIDTH - 2)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 1, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 2)) - T::ONE)),
+            &(|seed| random_range::<T>(seed, T::ONE, T::low_mask(T::WIDTH - 2))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -3929,12 +3958,12 @@ pub(crate) fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_vecs_min_length(2, exhaustive_unsigned()),
-            range_increasing(T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE),
+            range_increasing(T::ONE, T::low_mask(T::WIDTH - 1)),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
-            &(|seed| random_range::<T>(seed, T::ONE, (T::ONE << (T::WIDTH - 1)) - T::ONE)),
+            &(|seed| random_range::<T>(seed, T::ONE, T::low_mask(T::WIDTH - 1))),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -4999,16 +5028,7 @@ fn pairs_of_u64_and_unsigned_vec_var_1_helper<
         random_vecs(
             &EXAMPLE_SEED,
             scale,
-            &(|seed| {
-                random_range_down(
-                    seed,
-                    if log_base == U::WIDTH {
-                        U::MAX
-                    } else {
-                        (U::ONE << log_base) - U::ONE
-                    },
-                )
-            }),
+            &(|seed| random_range_down(seed, U::low_mask(log_base))),
         )
         .map(move |digits| (log_base, digits))
         .filter_map(|(log_base, digits)| {
@@ -5028,16 +5048,7 @@ fn pairs_of_u64_and_unsigned_vec_var_3_helper<T: PrimitiveUnsigned + Rand + Samp
     Box::new(random_vecs(
         &EXAMPLE_SEED,
         scale,
-        &(|seed| {
-            random_range_down(
-                seed,
-                if log_base == T::WIDTH {
-                    T::MAX
-                } else {
-                    (T::ONE << log_base) - T::ONE
-                },
-            )
-        }),
+        &(|seed| random_range_down(seed, T::low_mask(log_base))),
     ))
 }
 
@@ -5055,11 +5066,7 @@ pub fn pairs_of_u64_and_unsigned_vec_var_1<
                 if log_base > U::WIDTH {
                     Box::new(repeat(None))
                 } else {
-                    let digits = range_down_increasing(if log_base == U::WIDTH {
-                        U::MAX
-                    } else {
-                        (U::ONE << log_base) - U::ONE
-                    });
+                    let digits = range_down_increasing(U::low_mask(log_base));
                     let digit_vecs = if log_base == 1 {
                         exhaustive_vecs_shortlex(digits)
                     } else {
@@ -5119,11 +5126,7 @@ pub fn pairs_of_u64_and_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand + SampleR
                 if log_base > T::WIDTH {
                     Box::new(repeat(None))
                 } else {
-                    let digits = range_down_increasing(if log_base == T::WIDTH {
-                        T::MAX
-                    } else {
-                        (T::ONE << log_base) - T::ONE
-                    });
+                    let digits = range_down_increasing(T::low_mask(log_base));
                     let digit_vecs = if log_base == 1 {
                         exhaustive_vecs_shortlex(digits)
                     } else {

@@ -21,6 +21,7 @@ pub mod get_bit;
 pub mod get_bits;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
+pub mod low_mask;
 pub mod not;
 pub mod or;
 pub mod set_bit;
@@ -82,6 +83,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     get_bits::register(registry);
     index_of_next_false_bit::register(registry);
     index_of_next_true_bit::register(registry);
+    low_mask::register(registry);
     not::register(registry);
     or::register(registry);
     set_bit::register(registry);

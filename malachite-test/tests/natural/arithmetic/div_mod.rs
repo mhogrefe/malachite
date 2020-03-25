@@ -2,11 +2,12 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod,
+    NegMod, PowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
@@ -225,8 +226,8 @@ fn limbs_div_limb_to_out_mod_fail_3() {
 }
 
 fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
-    let b = Natural::ONE << Limb::WIDTH;
-    let b_cubed_minus_1 = (Natural::ONE << (Limb::WIDTH * 3)) - Natural::ONE;
+    let b = Natural::power_of_two(Limb::WIDTH);
+    let b_cubed_minus_1 = Natural::low_mask(Limb::WIDTH * 3);
     let x = Natural::from(DoubleLimb::join_halves(hi, lo));
     let expected_result = &b_cubed_minus_1 / &x - &b;
     assert_eq!(result, expected_result);

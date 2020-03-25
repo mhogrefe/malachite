@@ -1,9 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::arithmetic::traits::{Abs, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
@@ -51,8 +50,8 @@ fn significant_bits_properties() {
         let x_abs = x.abs();
         assert_eq!(x_abs <= Limb::MAX, significant_bits <= Limb::WIDTH);
         if x_abs != 0 {
-            assert!(Natural::ONE << (significant_bits - 1) <= x_abs);
-            assert!(x_abs < Natural::ONE << significant_bits);
+            assert!(Natural::power_of_two(significant_bits - 1) <= x_abs);
+            assert!(x_abs < Natural::power_of_two(significant_bits));
         }
     });
 

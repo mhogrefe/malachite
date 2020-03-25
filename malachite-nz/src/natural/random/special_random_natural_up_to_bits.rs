@@ -24,8 +24,6 @@ use natural::Natural;
 ///
 /// where n = `bits`
 ///
-/// This is mpn_random2 from mpn/generic/random2.c, GMP 6.1.2.
-///
 /// # Panics
 /// Panics if `bits` is zero.
 ///
@@ -44,6 +42,8 @@ use natural::Natural;
 /// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 100),
 ///     &[3940351, 4294965248, 4292870144, 15]);
 /// ```
+///
+/// This is mpn_random2 from mpn/generic/random2.c, GMP 6.1.2.
 pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     rng: &mut R,
     bits: u64,
@@ -71,7 +71,7 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
         i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
             &mut limbs[usize::exact_from(i >> T::LOG_WIDTH)..],
-            T::ONE << (i & T::WIDTH_MASK),
+            T::power_of_two(i & T::WIDTH_MASK),
         );
         if i == 0 {
             break;

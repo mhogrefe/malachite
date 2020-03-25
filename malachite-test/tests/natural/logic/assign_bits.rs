@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, NegModPowerOfTwo};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::integers::_assign_bits_naive;
-use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
 use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -181,7 +181,7 @@ fn assign_bits_properties() {
             //TODO use sub_mod_power_of_two
             let mut not_bits = bits.neg_mod_power_of_two(bits_width);
             if not_bits == 0 {
-                not_bits = (Natural::ONE << bits_width) - Natural::ONE;
+                not_bits = Natural::low_mask(bits_width);
             } else {
                 not_bits -= Natural::ONE;
             }

@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingNegAssign};
+use malachite_base::num::arithmetic::traits::{PowerOfTwo, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
@@ -96,7 +96,7 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
         Ordering::Less => {
             assert!(!limbs_sub_limb_in_place(
                 &mut limbs[limb_index..],
-                1 << reduced_index,
+                Limb::power_of_two(reduced_index),
             ));
         }
         Ordering::Greater => {
@@ -192,7 +192,7 @@ pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
         }
     } else {
         limbs.resize(limb_index, 0);
-        limbs.push(1 << reduced_index);
+        limbs.push(Limb::power_of_two(reduced_index));
     }
 }
 
