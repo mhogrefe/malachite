@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -67,7 +67,7 @@ fn benchmark_unsigned_checked_hamming_distance<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(u, v)| usize::wrapping_from(max(u.significant_bits(), v.significant_bits()))),
+        &(|(u, v)| usize::exact_from(max(u.significant_bits(), v.significant_bits()))),
         "max(u.significant_bits(), v.significant_bits())",
         &mut [("malachite", &mut (|(u, v)| no_out!(u.hamming_distance(v))))],
     );
@@ -88,7 +88,7 @@ fn benchmark_signed_checked_hamming_distance<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(i, j)| usize::wrapping_from(max(i.significant_bits(), j.significant_bits()))),
+        &(|(i, j)| usize::exact_from(max(i.significant_bits(), j.significant_bits()))),
         "max(i.significant_bits(), j.significant_bits())",
         &mut [(
             "malachite",

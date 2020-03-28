@@ -16,12 +16,12 @@ use num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
     OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
-    OverflowingRemAssign, OverflowingSub, Parity, Pow, PowerOfTwo, SaturatingAdd,
-    SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
-    SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, TrueCheckedShl,
-    TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul,
-    WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign,
-    WrappingSub, WrappingSubAssign,
+    OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow, PowerOfTwo,
+    SaturatingAdd, SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
+    SaturatingSub, SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign,
+    TrueCheckedShl, TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign,
+    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem,
+    WrappingRemAssign, WrappingSub, WrappingSubAssign,
 };
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -37,22 +37,22 @@ use num::logic::traits::{
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInteger:
     'static
-    + Add<Output = Self>
+    + Add<Self, Output = Self>
     + AddAssign<Self>
     + Binary
     + BitAccess
-    + BitAnd<Output = Self>
+    + BitAnd<Self, Output = Self>
     + BitAndAssign<Self>
     + BitBlockAccess
     + BitConvertible
     + BitIterable
-    + BitOr<Output = Self>
+    + BitOr<Self, Output = Self>
     + BitOrAssign<Self>
     + BitScan
-    + BitXor<Output = Self>
+    + BitXor<Self, Output = Self>
     + BitXorAssign<Self>
-    + CheckedAdd<Output = Self>
-    + CheckedDiv<Output = Self>
+    + CheckedAdd<Self, Output = Self>
+    + CheckedDiv<Self, Output = Self>
     + CheckedFrom<u8>
     + CheckedFrom<u16>
     + CheckedFrom<u32>
@@ -77,11 +77,11 @@ pub trait PrimitiveInteger:
     + CheckedInto<i64>
     + CheckedInto<i128>
     + CheckedInto<isize>
-    + CheckedMul<Output = Self>
+    + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedPow<u64, Output = Self>
-    + CheckedRem<Output = Self>
-    + CheckedSub<Output = Self>
+    + CheckedRem<Self, Output = Self>
+    + CheckedSub<Self, Output = Self>
     + Clone
     + Copy
     + CountOnes
@@ -89,17 +89,17 @@ pub trait PrimitiveInteger:
     + Debug
     + Default
     + Display
-    + Div<Output = Self>
+    + Div<Self, Output = Self>
     + DivAssign
-    + DivAssignMod<ModOutput = Self>
-    + DivAssignRem<RemOutput = Self>
+    + DivAssignMod<Self, ModOutput = Self>
+    + DivAssignRem<Self, RemOutput = Self>
     + DivExact
     + DivExactAssign
     + DivisibleBy
     + DivisibleByPowerOfTwo
     + DivMod
-    + DivRem<DivOutput = Self, RemOutput = Self>
-    + DivRound<Output = Self>
+    + DivRem<Self, DivOutput = Self, RemOutput = Self>
+    + DivRound<Self, Output = Self>
     + DivRoundAssign
     + Eq
     + EqMod<Self, Self>
@@ -136,9 +136,9 @@ pub trait PrimitiveInteger:
     + Min
     + Max
     + Mod
-    + ModAssign
+    + ModAssign<Self>
     + ModPowerOfTwo
-    + Mul<Output = Self>
+    + Mul<Self, Output = Self>
     + MulAssign<Self>
     + Named
     + Not<Output = Self>
@@ -147,10 +147,10 @@ pub trait PrimitiveInteger:
     + One
     + Ord
     + OrdAbs
-    + OverflowingAdd<Output = Self>
-    + OverflowingAddAssign
-    + OverflowingDiv<Output = Self>
-    + OverflowingDivAssign
+    + OverflowingAdd<Self, Output = Self>
+    + OverflowingAddAssign<Self>
+    + OverflowingDiv<Self, Output = Self>
+    + OverflowingDivAssign<Self>
     + OverflowingFrom<u8>
     + OverflowingFrom<u16>
     + OverflowingFrom<u32>
@@ -175,14 +175,15 @@ pub trait PrimitiveInteger:
     + OverflowingInto<i64>
     + OverflowingInto<i128>
     + OverflowingInto<isize>
-    + OverflowingMul<Output = Self>
-    + OverflowingMulAssign
+    + OverflowingMul<Self, Output = Self>
+    + OverflowingMulAssign<Self>
     + OverflowingNeg<Output = Self>
     + OverflowingNegAssign
     + OverflowingPow<u64, Output = Self>
-    + OverflowingRem<Output = Self>
-    + OverflowingRemAssign
-    + OverflowingSub<Output = Self>
+    + OverflowingRem<Self, Output = Self>
+    + OverflowingRemAssign<Self>
+    + OverflowingSub<Self, Output = Self>
+    + OverflowingSubAssign<Self>
     + Parity
     + PartialEq<Self>
     + PartialOrd<Self>
@@ -190,11 +191,11 @@ pub trait PrimitiveInteger:
     + Pow<u64>
     + PowerOfTwo
     + Product
-    + Rem<Output = Self>
+    + Rem<Self, Output = Self>
     + RemAssign<Self>
     + Rotate
-    + SaturatingAdd<Output = Self>
-    + SaturatingAddAssign
+    + SaturatingAdd<Self, Output = Self>
+    + SaturatingAddAssign<Self>
     + SaturatingFrom<u8>
     + SaturatingFrom<u16>
     + SaturatingFrom<u32>
@@ -219,11 +220,11 @@ pub trait PrimitiveInteger:
     + SaturatingInto<i64>
     + SaturatingInto<i128>
     + SaturatingInto<isize>
-    + SaturatingMul<Output = Self>
-    + SaturatingMulAssign
+    + SaturatingMul<Self, Output = Self>
+    + SaturatingMulAssign<Self>
     + SaturatingPow<u64, Output = Self>
-    + SaturatingSub<Output = Self>
-    + SaturatingSubAssign
+    + SaturatingSub<Self, Output = Self>
+    + SaturatingSubAssign<Self>
     + Shl<i8, Output = Self>
     + Shl<i16, Output = Self>
     + Shl<i32, Output = Self>
@@ -309,7 +310,7 @@ pub trait PrimitiveInteger:
     + Sign
     + SignificantBits
     + Sized
-    + Sub<Output = Self>
+    + Sub<Self, Output = Self>
     + SubAssign<Self>
     + Sum<Self>
     + TrailingZeros
@@ -318,10 +319,10 @@ pub trait PrimitiveInteger:
     + Two
     + UpperHex
     + Crementable
-    + WrappingAdd<Output = Self>
-    + WrappingAddAssign
-    + WrappingDiv<Output = Self>
-    + WrappingDivAssign
+    + WrappingAdd<Self, Output = Self>
+    + WrappingAddAssign<Self>
+    + WrappingDiv<Self, Output = Self>
+    + WrappingDivAssign<Self>
     + WrappingFrom<u8>
     + WrappingFrom<u16>
     + WrappingFrom<u32>
@@ -346,15 +347,15 @@ pub trait PrimitiveInteger:
     + WrappingInto<i64>
     + WrappingInto<i128>
     + WrappingInto<isize>
-    + WrappingMul<Output = Self>
-    + WrappingMulAssign
+    + WrappingMul<Self, Output = Self>
+    + WrappingMulAssign<Self>
     + WrappingNeg<Output = Self>
     + WrappingNegAssign
     + WrappingPow<u64, Output = Self>
-    + WrappingRem<Output = Self>
-    + WrappingRemAssign
-    + WrappingSub<Output = Self>
-    + WrappingSubAssign
+    + WrappingRem<Self, Output = Self>
+    + WrappingRemAssign<Self>
+    + WrappingSub<Self, Output = Self>
+    + WrappingSubAssign<Self>
     + Zero
 {
     /// The number of bits of `Self`.

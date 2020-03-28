@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::integer::Integer;
@@ -119,7 +119,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(f, _)| usize::wrapping_from(f.adjusted_exponent())),
+                &(|&(f, _)| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [(
                     "malachite",
@@ -136,7 +136,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
+                &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [("malachite", &mut (|f| no_out!(Integer::from(f))))],
             );
@@ -154,7 +154,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
+                &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [("malachite", &mut (|f| no_out!(Integer::checked_from(f))))],
             );
@@ -168,7 +168,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
+                &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [("malachite", &mut (|f| no_out!(Integer::exact_from(f))))],
             );
@@ -186,7 +186,7 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::wrapping_from(f.adjusted_exponent())),
+                &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [
                     ("standard", &mut (|f| no_out!(Integer::convertible_from(f)))),

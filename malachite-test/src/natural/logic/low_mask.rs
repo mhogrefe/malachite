@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
@@ -37,7 +37,7 @@ fn benchmark_limbs_low_mask(gm: NoSpecialGenerationMode, limit: usize, file_name
         gm.name(),
         limit,
         file_name,
-        &(|&bits| usize::wrapping_from(bits)),
+        &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [("malachite", &mut (|bits| no_out!(limbs_low_mask(bits))))],
     );
@@ -55,7 +55,7 @@ fn benchmark_natural_low_mask_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&bits| usize::wrapping_from(bits)),
+        &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [
             (

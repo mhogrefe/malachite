@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::shr_u::{
     limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
     limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
@@ -528,7 +528,7 @@ fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
         limit,
         file_name,
         &(|&(ref limbs, bits)| {
-            usize::wrapping_from(max(
+            usize::exact_from(max(
                 1,
                 isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
@@ -550,7 +550,7 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
         limit,
         file_name,
         &(|&(ref limbs, bits)| {
-            usize::wrapping_from(max(
+            usize::exact_from(max(
                 1,
                 isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
@@ -572,7 +572,7 @@ fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_n
         limit,
         file_name,
         &(|&(ref limbs, bits)| {
-            usize::wrapping_from(max(
+            usize::exact_from(max(
                 1,
                 isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
@@ -594,7 +594,7 @@ fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) 
         limit,
         file_name,
         &(|&(ref limbs, bits)| {
-            usize::wrapping_from(max(
+            usize::exact_from(max(
                 1,
                 isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))
@@ -616,7 +616,7 @@ fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) 
         limit,
         file_name,
         &(|&(ref limbs, bits, _)| {
-            usize::wrapping_from(max(
+            usize::exact_from(max(
                 1,
                 isize::exact_from(limbs.len()) - isize::exact_from(bits >> Limb::LOG_WIDTH),
             ))

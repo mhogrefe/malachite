@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -105,7 +105,7 @@ fn benchmark_unsigned_cmp_abs<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(x, y)| usize::wrapping_from(max(x.significant_bits(), y.significant_bits()))),
+        &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.cmp_abs(&y))))],
     );
@@ -126,7 +126,7 @@ fn benchmark_signed_cmp_abs<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(x, y)| usize::wrapping_from(max(x.significant_bits(), y.significant_bits()))),
+        &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.cmp_abs(&y))))],
     );
@@ -144,7 +144,7 @@ fn benchmark_unsigned_partial_cmp_abs<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(x, y)| usize::wrapping_from(max(x.significant_bits(), y.significant_bits()))),
+        &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
@@ -165,7 +165,7 @@ fn benchmark_signed_partial_cmp_abs<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|(x, y)| usize::wrapping_from(max(x.significant_bits(), y.significant_bits()))),
+        &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );

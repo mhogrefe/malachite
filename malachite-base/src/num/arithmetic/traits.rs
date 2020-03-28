@@ -179,11 +179,102 @@ pub trait CheckedAdd<RHS = Self> {
     fn checked_add(self, rhs: RHS) -> Option<Self::Output>;
 }
 
+/// Saturating addition. Computes `self + rhs`, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingAdd<RHS = Self> {
+    type Output;
+
+    fn saturating_add(self, rhs: RHS) -> Self::Output;
+}
+
+/// Saturating addition. Replaces `self` with `self + rhs`, saturating at the numeric bounds instead
+/// of overflowing.
+pub trait SaturatingAddAssign<RHS = Self> {
+    fn saturating_add_assign(&mut self, rhs: RHS);
+}
+
+/// Wrapping (modular) addition. Computes `self + rhs`, wrapping around at the boundary of the type.
+pub trait WrappingAdd<RHS = Self> {
+    type Output;
+
+    fn wrapping_add(self, rhs: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) addition. Replaces `self` with `self + rhs`, wrapping around at the boundary
+/// of the type.
+pub trait WrappingAddAssign<RHS = Self> {
+    fn wrapping_add_assign(&mut self, rhs: RHS);
+}
+
+/// Calculates `self` + `rhs`.
+///
+/// Returns a tuple of the addition along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingAdd<RHS = Self> {
+    type Output;
+
+    fn overflowing_add(self, rhs: RHS) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self` + `rhs`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingAddAssign<RHS = Self> {
+    fn overflowing_add_assign(&mut self, rhs: RHS) -> bool;
+}
+
 /// Checked subtraction. Computes `self - rhs`, returning `None` if there is no valid result.
 pub trait CheckedSub<RHS = Self> {
     type Output;
 
     fn checked_sub(self, rhs: RHS) -> Option<Self::Output>;
+}
+
+/// Saturating subtraction. Computes `self - rhs`, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingSub<RHS = Self> {
+    type Output;
+
+    fn saturating_sub(self, rhs: RHS) -> Self::Output;
+}
+
+/// Saturating subtraction. Replaces `self` with `self - rhs`, saturating at the numeric bounds
+/// instead of overflowing.
+pub trait SaturatingSubAssign<RHS = Self> {
+    fn saturating_sub_assign(&mut self, rhs: RHS);
+}
+
+/// Wrapping (modular) subtraction. Computes `self - rhs`, wrapping around at the boundary of the
+/// type.
+pub trait WrappingSub<RHS = Self> {
+    type Output;
+
+    fn wrapping_sub(self, rhs: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) subtraction. Replaces `self` with `self - rhs`, wrapping around at the
+/// boundary of the type.
+pub trait WrappingSubAssign<RHS = Self> {
+    fn wrapping_sub_assign(&mut self, rhs: RHS);
+}
+
+/// Calculates `self` - `rhs`.
+///
+/// Returns a tuple of the subtraction along with a boolean indicating whether an arithmetic
+/// overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingSub<RHS = Self> {
+    type Output;
+
+    fn overflowing_sub(self, rhs: RHS) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self` - `rhs`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingSubAssign<RHS = Self> {
+    fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
 }
 
 /// Checked multiplication. Computes `self * rhs`, returning `None` if there is no valid result.
@@ -214,22 +305,6 @@ pub trait CheckedPow<RHS> {
     fn checked_pow(self, exp: RHS) -> Option<Self::Output>;
 }
 
-/// Saturating addition. Computes `self + rhs`, saturating at the numeric bounds instead of
-/// overflowing.
-pub trait SaturatingAdd<RHS = Self> {
-    type Output;
-
-    fn saturating_add(self, rhs: RHS) -> Self::Output;
-}
-
-/// Saturating subtraction. Computes `self - rhs`, saturating at the numeric bounds instead of
-/// overflowing.
-pub trait SaturatingSub<RHS = Self> {
-    type Output;
-
-    fn saturating_sub(self, rhs: RHS) -> Self::Output;
-}
-
 /// Saturating multiplication. Computes `self * rhs`, saturating at the numeric bounds instead of
 /// overflowing.
 pub trait SaturatingMul<RHS = Self> {
@@ -243,21 +318,6 @@ pub trait SaturatingPow<RHS> {
     type Output;
 
     fn saturating_pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) addition. Computes `self + rhs`, wrapping around at the boundary of the type.
-pub trait WrappingAdd<RHS = Self> {
-    type Output;
-
-    fn wrapping_add(self, rhs: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) subtraction. Computes `self - rhs`, wrapping around at the boundary of the
-/// type.
-pub trait WrappingSub<RHS = Self> {
-    type Output;
-
-    fn wrapping_sub(self, rhs: RHS) -> Self::Output;
 }
 
 /// Wrapping (modular) multiplication. Computes `self * rhs`, wrapping around at the boundary of the
@@ -289,26 +349,6 @@ pub trait WrappingPow<RHS> {
     type Output;
 
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Calculates `self` + `rhs`.
-///
-/// Returns a tuple of the addition along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingAdd<RHS = Self> {
-    type Output;
-
-    fn overflowing_add(self, rhs: RHS) -> (Self::Output, bool);
-}
-
-/// Calculates `self` - `rhs`.
-///
-/// Returns a tuple of the subtraction along with a boolean indicating whether an arithmetic
-/// overflow would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingSub<RHS = Self> {
-    type Output;
-
-    fn overflowing_sub(self, rhs: RHS) -> (Self::Output, bool);
 }
 
 /// Calculates `self` * `rhs`.
@@ -397,14 +437,6 @@ pub trait Parity {
     fn odd(self) -> bool;
 }
 
-pub trait WrappingAddAssign<RHS = Self> {
-    fn wrapping_add_assign(&mut self, rhs: RHS);
-}
-
-pub trait WrappingSubAssign<RHS = Self> {
-    fn wrapping_sub_assign(&mut self, rhs: RHS);
-}
-
 pub trait WrappingDivAssign<RHS = Self> {
     fn wrapping_div_assign(&mut self, rhs: RHS);
 }
@@ -417,24 +449,8 @@ pub trait WrappingRemAssign<RHS = Self> {
     fn wrapping_rem_assign(&mut self, rhs: RHS);
 }
 
-pub trait SaturatingAddAssign<RHS = Self> {
-    fn saturating_add_assign(&mut self, rhs: RHS);
-}
-
 pub trait SaturatingMulAssign<RHS = Self> {
     fn saturating_mul_assign(&mut self, rhs: RHS);
-}
-
-pub trait SaturatingSubAssign<RHS = Self> {
-    fn saturating_sub_assign(&mut self, rhs: RHS);
-}
-
-pub trait OverflowingAddAssign<RHS = Self> {
-    fn overflowing_add_assign(&mut self, rhs: RHS) -> bool;
-}
-
-pub trait OverflowingSubAssign<RHS = Self> {
-    fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
 }
 
 pub trait OverflowingDivAssign<RHS = Self> {

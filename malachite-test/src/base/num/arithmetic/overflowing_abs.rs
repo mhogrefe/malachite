@@ -1,11 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::signeds;
 
-//TODO add unsigned overflowing_abs
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_i8_overflowing_abs_assign);
     register_demo!(registry, demo_i16_overflowing_abs_assign);
@@ -49,7 +48,7 @@ fn benchmark_overflowing_abs_assign<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|i| usize::wrapping_from(i.significant_bits())),
+        &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [(
             "malachite",

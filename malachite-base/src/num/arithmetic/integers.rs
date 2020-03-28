@@ -150,12 +150,228 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
+        impl SaturatingAdd<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn saturating_add(self, rhs: $t) -> $t {
+                $t::saturating_add(self, rhs)
+            }
+        }
+
+        impl SaturatingAddAssign for $t {
+            /// Replaces `self` with `self + rhs`, saturating at the numeric bounds instead of
+            /// overflowing.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::SaturatingAddAssign;
+            ///
+            /// let mut x = 123u16;
+            /// x.saturating_add_assign(456);
+            /// assert_eq!(x, 579);
+            ///
+            /// let mut x = 123u8;
+            /// x.saturating_add_assign(200);
+            /// assert_eq!(x, 255);
+            /// ```
+            #[inline]
+            fn saturating_add_assign(&mut self, rhs: $t) {
+                *self = self.saturating_add(rhs);
+            }
+        }
+
+        impl WrappingAdd<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn wrapping_add(self, rhs: $t) -> $t {
+                $t::wrapping_add(self, rhs)
+            }
+        }
+
+        impl WrappingAddAssign for $t {
+            /// Replaces `self` with `self + rhs`, wrapping around at the boundary of the type.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::WrappingAddAssign;
+            ///
+            /// let mut x = 123u16;
+            /// x.wrapping_add_assign(456);
+            /// assert_eq!(x, 579);
+            ///
+            /// let mut x = 123u8;
+            /// x.wrapping_add_assign(200);
+            /// assert_eq!(x, 67);
+            /// ```
+            #[inline]
+            fn wrapping_add_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_add(rhs);
+            }
+        }
+
+        impl OverflowingAdd<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn overflowing_add(self, rhs: $t) -> ($t, bool) {
+                $t::overflowing_add(self, rhs)
+            }
+        }
+
+        impl OverflowingAddAssign for $t {
+            /// Replaces `self` with `self + rhs`.
+            ///
+            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
+            /// overflow would have occurred then the wrapped value is assigned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
+            ///
+            /// let mut x = 123u16;
+            /// assert_eq!(x.overflowing_add_assign(456), false);
+            /// assert_eq!(x, 579);
+            ///
+            /// let mut x = 123u8;
+            /// assert_eq!(x.overflowing_add_assign(200), true);
+            /// assert_eq!(x, 67);
+            /// ```
+            #[inline]
+            fn overflowing_add_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_add(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
         impl CheckedSub<$t> for $t {
             type Output = $t;
 
             #[inline]
             fn checked_sub(self, rhs: $t) -> Option<$t> {
                 $t::checked_sub(self, rhs)
+            }
+        }
+
+        impl SaturatingSub<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn saturating_sub(self, rhs: $t) -> $t {
+                $t::saturating_sub(self, rhs)
+            }
+        }
+
+        impl SaturatingSubAssign for $t {
+            /// Replaces `self` with `self - rhs`, saturating at the numeric bounds instead of
+            /// overflowing.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
+            ///
+            /// let mut x = 456u16;
+            /// x.saturating_sub_assign(123);
+            /// assert_eq!(x, 333);
+            ///
+            /// let mut x = 123u16;
+            /// x.saturating_sub_assign(456);
+            /// assert_eq!(x, 0);
+            /// ```
+            #[inline]
+            fn saturating_sub_assign(&mut self, rhs: $t) {
+                *self = self.saturating_sub(rhs);
+            }
+        }
+
+        impl WrappingSub<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn wrapping_sub(self, rhs: $t) -> $t {
+                $t::wrapping_sub(self, rhs)
+            }
+        }
+
+        impl WrappingSubAssign for $t {
+            /// Replaces `self` with `self - rhs`, wrapping around at the boundary of the type.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::WrappingSubAssign;
+            ///
+            /// let mut x = 456u16;
+            /// x.wrapping_sub_assign(123);
+            /// assert_eq!(x, 333);
+            ///
+            /// let mut x = 123u16;
+            /// x.wrapping_sub_assign(456);
+            /// assert_eq!(x, 65_203);
+            /// ```
+            #[inline]
+            fn wrapping_sub_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_sub(rhs);
+            }
+        }
+
+        impl OverflowingSub<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn overflowing_sub(self, rhs: $t) -> ($t, bool) {
+                $t::overflowing_sub(self, rhs)
+            }
+        }
+
+        impl OverflowingSubAssign for $t {
+            /// Replaces `self` with `self - rhs`.
+            ///
+            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
+            /// overflow would have occurred then the wrapped value is assigned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::OverflowingSubAssign;
+            ///
+            /// let mut x = 456u16;
+            /// assert_eq!(x.overflowing_sub_assign(123), false);
+            /// assert_eq!(x, 333);
+            ///
+            /// let mut x = 123u16;
+            /// assert_eq!(x.overflowing_sub_assign(456), true);
+            /// assert_eq!(x, 65_203);
+            /// ```
+            #[inline]
+            fn overflowing_sub_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_sub(rhs);
+                *self = result;
+                overflow
             }
         }
 
@@ -195,24 +411,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl SaturatingAdd<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn saturating_add(self, rhs: $t) -> $t {
-                $t::saturating_add(self, rhs)
-            }
-        }
-
-        impl SaturatingSub<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn saturating_sub(self, rhs: $t) -> $t {
-                $t::saturating_sub(self, rhs)
-            }
-        }
-
         impl SaturatingMul<$t> for $t {
             type Output = $t;
 
@@ -228,24 +426,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn saturating_pow(self, rhs: u64) -> $t {
                 $t::saturating_pow(self, u32::exact_from(rhs))
-            }
-        }
-
-        impl WrappingAdd<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_add(self, rhs: $t) -> $t {
-                $t::wrapping_add(self, rhs)
-            }
-        }
-
-        impl WrappingSub<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_sub(self, rhs: $t) -> $t {
-                $t::wrapping_sub(self, rhs)
             }
         }
 
@@ -282,24 +462,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_pow(self, rhs: u64) -> $t {
                 $t::wrapping_pow(self, u32::exact_from(rhs))
-            }
-        }
-
-        impl OverflowingAdd<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_add(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_add(self, rhs)
-            }
-        }
-
-        impl OverflowingSub<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_sub(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_sub(self, rhs)
             }
         }
 
@@ -348,22 +510,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        // nontrivial implementations start here
-
-        impl WrappingAddAssign for $t {
-            #[inline]
-            fn wrapping_add_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_add(rhs);
-            }
-        }
-
-        impl WrappingSubAssign for $t {
-            #[inline]
-            fn wrapping_sub_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_sub(rhs);
-            }
-        }
-
         impl WrappingMulAssign for $t {
             #[inline]
             fn wrapping_mul_assign(&mut self, rhs: $t) {
@@ -382,24 +528,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_rem_assign(&mut self, rhs: $t) {
                 *self = self.wrapping_rem(rhs);
-            }
-        }
-
-        impl OverflowingAddAssign for $t {
-            #[inline]
-            fn overflowing_add_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_add(rhs);
-                *self = result;
-                overflow
-            }
-        }
-
-        impl OverflowingSubAssign for $t {
-            #[inline]
-            fn overflowing_sub_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_sub(rhs);
-                *self = result;
-                overflow
             }
         }
 
@@ -427,20 +555,6 @@ macro_rules! impl_arithmetic_traits {
                 let (result, overflow) = self.overflowing_rem(rhs);
                 *self = result;
                 overflow
-            }
-        }
-
-        impl SaturatingAddAssign for $t {
-            #[inline]
-            fn saturating_add_assign(&mut self, rhs: $t) {
-                *self = self.saturating_add(rhs);
-            }
-        }
-
-        impl SaturatingSubAssign for $t {
-            #[inline]
-            fn saturating_sub_assign(&mut self, rhs: $t) {
-                *self = self.saturating_sub(rhs);
             }
         }
 

@@ -1,5 +1,5 @@
 use malachite_base::chars::char_to_contiguous_range;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
@@ -29,7 +29,7 @@ fn benchmark_char_to_contiguous_range(gm: NoSpecialGenerationMode, limit: usize,
         gm.name(),
         limit,
         file_name,
-        &(|&c| usize::wrapping_from(char_to_contiguous_range(c))),
+        &(|&c| usize::exact_from(char_to_contiguous_range(c))),
         "char_to_contiguous_range(char)",
         &mut [("malachite", &mut (|c| no_out!(char_to_contiguous_range(c))))],
     );

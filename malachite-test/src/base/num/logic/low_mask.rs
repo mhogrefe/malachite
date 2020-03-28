@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
@@ -59,7 +59,7 @@ fn benchmark_unsigned_low_mask<T: PrimitiveUnsigned>(
         gm.name(),
         limit,
         file_name,
-        &(|&bits| usize::wrapping_from(bits)),
+        &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [("malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
     );
@@ -77,7 +77,7 @@ fn benchmark_signed_low_mask<T: PrimitiveSigned>(
         gm.name(),
         limit,
         file_name,
-        &(|&bits| usize::wrapping_from(bits)),
+        &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [("malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
     );

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
@@ -59,7 +59,7 @@ fn benchmark_unsigned_power_of_two<T: PrimitiveUnsigned>(
         gm.name(),
         limit,
         file_name,
-        &(|&pow| usize::wrapping_from(pow)),
+        &(|&pow| usize::exact_from(pow)),
         "pow",
         &mut [("malachite", &mut (|pow| no_out!(T::power_of_two(pow))))],
     );
@@ -77,7 +77,7 @@ fn benchmark_signed_power_of_two<T: PrimitiveSigned>(
         gm.name(),
         limit,
         file_name,
-        &(|&pow| usize::wrapping_from(pow)),
+        &(|&pow| usize::exact_from(pow)),
         "pow",
         &mut [("malachite", &mut (|pow| no_out!(T::power_of_two(pow))))],
     );

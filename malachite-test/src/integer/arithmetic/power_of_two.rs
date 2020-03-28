@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 
 use common::{
@@ -26,7 +26,7 @@ fn benchmark_integer_power_of_two(gm: NoSpecialGenerationMode, limit: usize, fil
         gm.name(),
         limit,
         file_name,
-        &(|&pow| usize::wrapping_from(pow)),
+        &(|&pow| usize::exact_from(pow)),
         "pow",
         &mut [(
             "malachite",

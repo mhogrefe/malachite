@@ -1,5 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -45,7 +45,7 @@ fn benchmark_neg_assign<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|i| usize::wrapping_from(i.significant_bits())),
+        &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [("malachite", &mut (|mut i| i.neg_assign()))],
     );

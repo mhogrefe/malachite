@@ -1,4 +1,4 @@
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_nz::integer::Integer;
 
@@ -26,7 +26,7 @@ fn benchmark_integer_low_mask(gm: NoSpecialGenerationMode, limit: usize, file_na
         gm.name(),
         limit,
         file_name,
-        &(|&bits| usize::wrapping_from(bits)),
+        &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [("malachite", &mut (|bits| no_out!(Integer::low_mask(bits))))],
     );

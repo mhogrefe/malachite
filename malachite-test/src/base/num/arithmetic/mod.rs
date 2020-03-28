@@ -8,13 +8,19 @@ pub mod mod_power_of_two_is_reduced;
 pub mod mod_power_of_two_neg;
 pub mod neg;
 pub mod overflowing_abs;
+pub mod overflowing_add;
 pub mod overflowing_neg;
+pub mod overflowing_sub;
 pub mod power_of_two;
 pub mod saturating_abs;
+pub mod saturating_add;
 pub mod saturating_neg;
+pub mod saturating_sub;
 pub mod sign;
 pub mod wrapping_abs;
+pub mod wrapping_add;
 pub mod wrapping_neg;
+pub mod wrapping_sub;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
@@ -25,11 +31,17 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_power_of_two_is_reduced::register(registry);
     neg::register(registry);
     overflowing_abs::register(registry);
+    overflowing_add::register(registry);
     overflowing_neg::register(registry);
+    overflowing_sub::register(registry);
     power_of_two::register(registry);
     saturating_abs::register(registry);
+    saturating_add::register(registry);
     saturating_neg::register(registry);
+    saturating_sub::register(registry);
     sign::register(registry);
     wrapping_abs::register(registry);
+    wrapping_add::register(registry);
     wrapping_neg::register(registry);
+    wrapping_sub::register(registry);
 }

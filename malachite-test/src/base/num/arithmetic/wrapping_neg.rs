@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -65,7 +65,7 @@ fn benchmark_unsigned_wrapping_neg_assign<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [("malachite", &mut (|mut u| u.wrapping_neg_assign()))],
     );
@@ -86,7 +86,7 @@ fn benchmark_signed_wrapping_neg_assign<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|i| usize::wrapping_from(i.significant_bits())),
+        &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [("malachite", &mut (|mut i| i.wrapping_neg_assign()))],
     );

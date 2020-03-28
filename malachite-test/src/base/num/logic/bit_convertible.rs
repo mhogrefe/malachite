@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::integers::{
     _from_bits_asc_alt, _from_bits_desc_alt, _to_bits_asc_alt, _to_bits_desc_alt,
 };
@@ -300,7 +300,7 @@ fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             ("malachite", &mut (|u| no_out!(u.to_bits_asc()))),
@@ -325,7 +325,7 @@ fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|i| usize::wrapping_from(i.significant_bits())),
+        &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
             ("malachite", &mut (|i| no_out!(i.to_bits_asc()))),
@@ -347,7 +347,7 @@ fn benchmark_unsigned_to_bits_asc_evaluation_strategy<T: PrimitiveUnsigned + Ran
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             (
@@ -377,7 +377,7 @@ fn benchmark_signed_to_bits_asc_evaluation_strategy<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             (
@@ -404,7 +404,7 @@ fn benchmark_unsigned_to_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             ("default", &mut (|u| no_out!(u.to_bits_asc()))),
@@ -429,7 +429,7 @@ fn benchmark_signed_to_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|i| usize::wrapping_from(i.significant_bits())),
+        &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
             ("default", &mut (|i| no_out!(i.to_bits_asc()))),
@@ -451,7 +451,7 @@ fn benchmark_unsigned_to_bits_desc_evaluation_strategy<T: PrimitiveUnsigned + Ra
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             (
@@ -481,7 +481,7 @@ fn benchmark_signed_to_bits_desc_evaluation_strategy<T: PrimitiveSigned + Rand>(
         gm.name(),
         limit,
         file_name,
-        &(|u| usize::wrapping_from(u.significant_bits())),
+        &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
             (
