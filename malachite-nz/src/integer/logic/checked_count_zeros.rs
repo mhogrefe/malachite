@@ -23,10 +23,10 @@ use platform::Limb;
 /// assert_eq!(limbs_count_zeros_neg(&[0, 1, 2]), 33);
 /// assert_eq!(limbs_count_zeros_neg(&[1, 0xffff_ffff]), 32);
 /// ```
-pub fn limbs_count_zeros_neg(limbs: &[Limb]) -> u64 {
+pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_limb_seen = false;
-    for &limb in limbs.iter() {
+    for &limb in xs.iter() {
         sum += if nonzero_limb_seen {
             CountOnes::count_ones(limb)
         } else if limb == 0 {

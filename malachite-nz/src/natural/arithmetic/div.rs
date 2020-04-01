@@ -57,13 +57,13 @@ use platform::{
 pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
     out: &mut [Limb],
     xs: &[Limb],
-    divisor: Limb,
+    d: Limb,
     mut carry: Limb,
 ) -> Limb {
     assert!(out.len() >= xs.len());
-    let divisor = DoubleLimb::from(divisor);
+    let d = DoubleLimb::from(d);
     for (out_limb, &x) in out.iter_mut().zip(xs.iter()) {
-        let (hi, lo) = (DoubleLimb::from(x) * divisor).split_in_half();
+        let (hi, lo) = (DoubleLimb::from(x) * d).split_in_half();
         let inner_carry = carry < lo;
         carry.wrapping_sub_assign(lo);
         *out_limb = carry;
@@ -86,12 +86,12 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
 /// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, GMP 6.1.2, where qp == ap.
 pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
     xs: &mut [Limb],
-    divisor: Limb,
+    d: Limb,
     mut carry: Limb,
 ) -> Limb {
-    let divisor = DoubleLimb::from(divisor);
+    let d = DoubleLimb::from(d);
     for x in xs.iter_mut() {
-        let (hi, lo) = (DoubleLimb::from(*x) * divisor).split_in_half();
+        let (hi, lo) = (DoubleLimb::from(*x) * d).split_in_half();
         let inner_carry = carry < lo;
         carry.wrapping_sub_assign(lo);
         *x = carry;
@@ -108,20 +108,19 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
 /// Additional memory: O(1)
 ///
 /// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2, but not computing the remainder.
-fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse: Limb) -> Limb {
-    let (mut quotient_high, quotient_low) = (DoubleLimb::from(n_high)
-        * DoubleLimb::from(divisor_inverse))
-    .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
-    .split_in_half();
-    let mut remainder = n_low.wrapping_sub(quotient_high.wrapping_mul(divisor));
-    if remainder > quotient_low {
-        quotient_high.wrapping_sub_assign(1);
-        remainder.wrapping_add_assign(divisor);
+fn div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inverse: Limb) -> Limb {
+    let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inverse))
+        .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
+        .split_in_half();
+    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    if r > q_low {
+        q_high.wrapping_sub_assign(1);
+        r.wrapping_add_assign(d);
     }
-    if remainder >= divisor {
-        quotient_high.wrapping_add_assign(1);
+    if r >= d {
+        q_high.wrapping_add_assign(1);
     }
-    quotient_high
+    q_high
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -135,7 +134,7 @@ fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `d` is zero.
 ///
 /// # Example
 /// ```
@@ -147,10 +146,10 @@ fn div_by_preinversion(n_high: Limb, n_low: Limb, divisor: Limb, divisor_inverse
 ///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where the quotient is returned, but
 /// not computing the remainder.
-pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
-    let mut quotient_limbs = vec![0; limbs.len()];
-    limbs_div_limb_to_out(&mut quotient_limbs, limbs, divisor);
-    quotient_limbs
+pub fn limbs_div_limb(xs: &[Limb], d: Limb) -> Vec<Limb> {
+    let mut qs = vec![0; xs.len()];
+    limbs_div_limb_to_out(&mut qs, xs, d);
+    qs
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -165,8 +164,8 @@ pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if
-/// `divisor` is zero.
+/// Panics if `out` is shorter than `in_limbs`, the length of `in_limbs` is less than 2, or if `d`
+/// is zero.
 ///
 /// # Example
 /// ```
@@ -183,58 +182,56 @@ pub fn limbs_div_limb(limbs: &[Limb], divisor: Limb) -> Vec<Limb> {
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1, but not
 /// computing the remainder.
-pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
-    assert_ne!(divisor, 0);
-    let len = in_limbs.len();
+pub fn limbs_div_limb_to_out(out: &mut [Limb], xs: &[Limb], d: Limb) {
+    assert_ne!(d, 0);
+    let len = xs.len();
     assert!(len > 1);
     let out = &mut out[..len];
-    let bits = LeadingZeros::leading_zeros(divisor);
+    let bits = LeadingZeros::leading_zeros(d);
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
-        let (remainder, in_limbs_init) = in_limbs.split_last().unwrap();
-        let mut remainder = *remainder;
+        let (r, in_limbs_init) = xs.split_last().unwrap();
+        let mut r = *r;
         let (out_last, out_init) = out.split_last_mut().unwrap();
-        *out_last = if remainder >= divisor {
-            remainder -= divisor;
+        *out_last = if r >= d {
+            r -= d;
             1
         } else {
             0
         };
         // Multiply-by-inverse, divisor already normalized.
-        let inverse = limbs_invert_limb(divisor);
+        let d_inverse = limbs_invert_limb(d);
         for (out_limb, &limb) in out_init.iter_mut().zip(in_limbs_init.iter()).rev() {
-            let (quotient, new_remainder) =
-                div_mod_by_preinversion(remainder, limb, divisor, inverse);
-            *out_limb = quotient;
-            remainder = new_remainder;
+            let (q, new_r) = div_mod_by_preinversion(r, limb, d, d_inverse);
+            *out_limb = q;
+            r = new_r;
         }
     } else {
         // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
         // still skip as often as possible.
-        let (in_limbs_last, in_limbs_init) = in_limbs.split_last().unwrap();
-        let (in_limbs, mut remainder) = if *in_limbs_last < divisor {
+        let (in_limbs_last, in_limbs_init) = xs.split_last().unwrap();
+        let (in_limbs, mut r) = if *in_limbs_last < d {
             *out.last_mut().unwrap() = 0;
             (in_limbs_init, *in_limbs_last)
         } else {
-            (in_limbs, 0)
+            (xs, 0)
         };
-        let divisor = divisor << bits;
-        remainder <<= bits;
-        let inverse = limbs_invert_limb(divisor);
+        let d = d << bits;
+        r <<= bits;
+        let d_inverse = limbs_invert_limb(d);
         let (previous_limb, in_limbs_init) = in_limbs.split_last().unwrap();
         let mut previous_limb = *previous_limb;
         let cobits = Limb::WIDTH - bits;
-        remainder |= previous_limb >> cobits;
+        r |= previous_limb >> cobits;
         let (out_first, out_tail) = out.split_first_mut().unwrap();
         for (out_limb, &limb) in out_tail.iter_mut().zip(in_limbs_init.iter()).rev() {
             let shifted_limb = (previous_limb << bits) | (limb >> cobits);
-            let (quotient, new_remainder) =
-                div_mod_by_preinversion(remainder, shifted_limb, divisor, inverse);
-            *out_limb = quotient;
-            remainder = new_remainder;
+            let (q, new_r) = div_mod_by_preinversion(r, shifted_limb, d, d_inverse);
+            *out_limb = q;
+            r = new_r;
             previous_limb = limb;
         }
-        *out_first = div_by_preinversion(remainder, previous_limb << bits, divisor, inverse);
+        *out_first = div_by_preinversion(r, previous_limb << bits, d, d_inverse);
     }
 }
 
@@ -249,7 +246,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb)
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or if `divisor` is zero.
+/// Panics if the length of `limbs` is less than 2 or if `d` is zero.
 ///
 /// # Example
 /// ```
@@ -266,56 +263,54 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb)
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qp == up, qxn is 0, and
 /// un > 1, but not computing the remainder.
-pub fn limbs_div_limb_in_place(limbs: &mut [Limb], divisor: Limb) {
-    assert_ne!(divisor, 0);
-    let len = limbs.len();
+pub fn limbs_div_limb_in_place(xs: &mut [Limb], d: Limb) {
+    assert_ne!(d, 0);
+    let len = xs.len();
     assert!(len > 1);
-    let bits = LeadingZeros::leading_zeros(divisor);
-    let (limbs_last, limbs_init) = limbs.split_last_mut().unwrap();
+    let bits = LeadingZeros::leading_zeros(d);
+    let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     if bits == 0 {
         // High quotient limb is 0 or 1, skip a divide step.
-        let mut remainder = *limbs_last;
-        *limbs_last = if remainder >= divisor {
-            remainder -= divisor;
+        let mut r = *xs_last;
+        *xs_last = if r >= d {
+            r -= d;
             1
         } else {
             0
         };
         // Multiply-by-inverse, divisor already normalized.
-        let inverse = limbs_invert_limb(divisor);
-        for limb in limbs_init.iter_mut().rev() {
-            let (quotient, new_remainder) =
-                div_mod_by_preinversion(remainder, *limb, divisor, inverse);
-            *limb = quotient;
-            remainder = new_remainder;
+        let d_inverse = limbs_invert_limb(d);
+        for limb in xs_init.iter_mut().rev() {
+            let (q, new_r) = div_mod_by_preinversion(r, *limb, d, d_inverse);
+            *limb = q;
+            r = new_r;
         }
     } else {
         // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
         // still skip as often as possible.
-        let (limbs, mut remainder) = if *limbs_last < divisor {
-            let remainder = *limbs_last;
-            *limbs_last = 0;
-            (limbs_init, remainder)
+        let (xs, mut r) = if *xs_last < d {
+            let r = *xs_last;
+            *xs_last = 0;
+            (xs_init, r)
         } else {
-            (limbs, 0)
+            (xs, 0)
         };
-        let divisor = divisor << bits;
-        remainder <<= bits;
-        let inverse = limbs_invert_limb(divisor);
-        let last_index = limbs.len() - 1;
-        let mut previous_limb = limbs[last_index];
+        let d = d << bits;
+        r <<= bits;
+        let d_inverse = limbs_invert_limb(d);
+        let last_index = xs.len() - 1;
+        let mut previous_limb = xs[last_index];
         let cobits = Limb::WIDTH - bits;
-        remainder |= previous_limb >> cobits;
+        r |= previous_limb >> cobits;
         for i in (0..last_index).rev() {
-            let limb = limbs[i];
+            let limb = xs[i];
             let shifted_limb = (previous_limb << bits) | (limb >> cobits);
-            let (quotient, new_remainder) =
-                div_mod_by_preinversion(remainder, shifted_limb, divisor, inverse);
-            limbs[i + 1] = quotient;
-            remainder = new_remainder;
+            let (q, new_r) = div_mod_by_preinversion(r, shifted_limb, d, d_inverse);
+            xs[i + 1] = q;
+            r = new_r;
             previous_limb = limb;
         }
-        limbs[0] = div_by_preinversion(remainder, previous_limb << bits, divisor, inverse);
+        xs[0] = div_by_preinversion(r, previous_limb << bits, d, d_inverse);
     }
 }
 
@@ -368,10 +363,10 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
     let mut n_1 = ns[n_len - 1];
     for i in (d_sum - 1..n_len).rev() {
         let ns = &mut ns[i - d_len_s..i];
-        let mut quotient;
+        let mut q;
         if n_1 == d_1 && ns[d_len_s_m_1] == d_2 {
-            quotient = Limb::MAX;
-            limbs_sub_mul_limb_same_length_in_place_left(ns, ds_s, quotient);
+            q = Limb::MAX;
+            limbs_sub_mul_limb_same_length_in_place_left(ns, ds_s, q);
             n_1 = ns[d_len_s_m_1]; // update n_1; last loop's value will now be invalid
         } else {
             let (new_q, n) = limbs_div_mod_three_limb_by_two_limb(
@@ -382,13 +377,13 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
                 d_2,
                 inverse,
             );
-            quotient = new_q;
+            q = new_q;
             let (new_n_1, mut n_0) = n.split_in_half();
             n_1 = new_n_1;
             let carry = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut ns[..d_len_s - 2],
                 &ds_s[..d_len_s - 2],
-                quotient,
+                q,
             );
             let carry_2 = n_0 < carry;
             n_0.wrapping_sub_assign(carry);
@@ -405,23 +400,23 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
                 ) {
                     n_1.wrapping_add_assign(1);
                 }
-                quotient.wrapping_sub_assign(1);
+                q.wrapping_sub_assign(1);
             }
         }
-        qs[i - d_len] = quotient;
+        qs[i - d_len] = q;
     }
     let mut flag = true;
     let offset = if d_len_s >= 2 {
         let mut ds_suffix = &ds[d_diff..];
         for i in (1..d_len_s_m_1).rev() {
             let ns = &mut ns[d_len_m_2..d_len + i];
-            let mut quotient;
+            let mut q;
             if !flag || n_1 >= d_1 {
-                quotient = Limb::MAX;
-                let carry = limbs_sub_mul_limb_same_length_in_place_left(ns, ds_suffix, quotient);
+                q = Limb::MAX;
+                let carry = limbs_sub_mul_limb_same_length_in_place_left(ns, ds_suffix, q);
                 if n_1 != carry {
                     if flag && n_1 < carry {
-                        quotient.wrapping_sub_assign(1);
+                        q.wrapping_sub_assign(1);
                         limbs_slice_add_same_length_in_place_left(ns, ds_suffix);
                     } else {
                         // TODO This branch is untested!
@@ -430,15 +425,15 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
                 }
                 n_1 = ns[i + 1];
             } else {
-                let (new_quotient, new_n) =
+                let (new_q, new_n) =
                     limbs_div_mod_three_limb_by_two_limb(n_1, ns[i + 1], ns[i], d_1, d_2, inverse);
-                quotient = new_quotient;
+                q = new_q;
                 let (new_n_1, mut n_0) = new_n.split_in_half();
                 n_1 = new_n_1;
                 let carry = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut ns[..i],
                     &ds_suffix[..ds_suffix.len() - 2],
-                    quotient,
+                    q,
                 );
                 let carry_2 = n_0 < carry;
                 n_0.wrapping_sub_assign(carry);
@@ -455,21 +450,21 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
                     ) {
                         n_1.wrapping_add_assign(1);
                     }
-                    quotient.wrapping_sub_assign(1);
+                    q.wrapping_sub_assign(1);
                 }
             }
-            qs[i] = quotient;
+            qs[i] = q;
             ds_suffix = &ds_suffix[1..];
         }
-        let mut quotient;
+        let mut q;
         let ns = &mut ns[d_len_m_2..d_len];
         if !flag || n_1 >= d_1 {
-            quotient = Limb::MAX;
+            q = Limb::MAX;
             let ds_hi = &ds[d_len_m_2..];
-            let carry = limbs_sub_mul_limb_same_length_in_place_left(ns, &ds_hi[..2], quotient);
+            let carry = limbs_sub_mul_limb_same_length_in_place_left(ns, &ds_hi[..2], q);
             if n_1 != carry {
                 if flag && n_1 < carry {
-                    quotient.wrapping_sub_assign(1);
+                    q.wrapping_sub_assign(1);
                     let (new_n_1, new_n_0) = DoubleLimb::join_halves(ns[1], ns[0])
                         .wrapping_add(DoubleLimb::join_halves(d_2, ds_hi[0]))
                         .split_in_half();
@@ -481,15 +476,15 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inve
             }
             n_1 = ns[1];
         } else {
-            let (new_quotient, new_n) =
+            let (new_q, new_n) =
                 limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_2, inverse);
-            quotient = new_quotient;
+            q = new_q;
             let (new_n_1, n_0) = new_n.split_in_half();
             n_1 = new_n_1;
             ns[0] = n_0;
             ns[1] = n_1;
         }
-        qs[0] = quotient;
+        qs[0] = q;
         d_len
     } else {
         d_sum - 1
@@ -2025,9 +2020,9 @@ impl Natural {
             match *self {
                 Natural(Small(small)) => Natural(Small(small / other)),
                 Natural(Large(ref limbs)) => {
-                    let mut quotient = Natural(Large(limbs_div_limb(limbs, other)));
-                    quotient.trim();
-                    quotient
+                    let mut q = Natural(Large(limbs_div_limb(limbs, other)));
+                    q.trim();
+                    q
                 }
             }
         }
@@ -2368,10 +2363,10 @@ impl<'a> DivAssign<&'a Natural> for Natural {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-fn _limbs_div_in_place_naive(limbs: &mut [Limb], limb: Limb) {
-    let limb = DoubleLimb::from(limb);
+fn _limbs_div_in_place_naive(xs: &mut [Limb], y: Limb) {
+    let limb = DoubleLimb::from(y);
     let mut upper = 0;
-    for x in limbs.iter_mut().rev() {
+    for x in xs.iter_mut().rev() {
         let lower = *x;
         let (q, r) = DoubleLimb::join_halves(upper, lower).div_rem(limb);
         *x = q.lower_half();
@@ -2401,7 +2396,7 @@ impl Natural {
     }
 }
 
-/// The high bit of `divisor` must be set.
+/// The high bit of `d` must be set.
 ///
 /// Time: worst case O(n)
 ///
@@ -2411,74 +2406,61 @@ impl Natural {
 ///
 /// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.1.2, with
 /// DIV_QR_1N_METHOD == 2, where qp == up, but not computing the remainder.
-fn limbs_div_limb_normalized_in_place(
-    limbs: &mut [Limb],
-    high_limb: Limb,
-    divisor: Limb,
-    divisor_inverse: Limb,
-) {
-    let len = limbs.len();
+fn limbs_div_limb_normalized_in_place(xs: &mut [Limb], xs_high: Limb, d: Limb, d_inverse: Limb) {
+    let len = xs.len();
     if len == 1 {
-        limbs[0] = div_by_preinversion(high_limb, limbs[0], divisor, divisor_inverse);
+        xs[0] = div_by_preinversion(xs_high, xs[0], d, d_inverse);
         return;
     }
-    let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
-    let (mut quotient_high, mut quotient_low) =
-        (DoubleLimb::from(divisor_inverse) * DoubleLimb::from(high_limb)).split_in_half();
-    quotient_high.wrapping_add_assign(high_limb);
-    let second_highest_limb = limbs[len - 1];
-    limbs[len - 1] = quotient_high;
-    let (sum, mut big_carry) = DoubleLimb::join_halves(second_highest_limb, limbs[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(high_limb));
+    let power_of_two = d.wrapping_neg().wrapping_mul(d_inverse);
+    let (mut q_high, mut q_low) =
+        (DoubleLimb::from(d_inverse) * DoubleLimb::from(xs_high)).split_in_half();
+    q_high.wrapping_add_assign(xs_high);
+    let second_highest_limb = xs[len - 1];
+    xs[len - 1] = q_high;
+    let (sum, mut big_carry) = DoubleLimb::join_halves(second_highest_limb, xs[len - 2])
+        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(xs_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
-        let (temp, remainder) =
-            (DoubleLimb::from(sum_high) * DoubleLimb::from(divisor_inverse)).split_in_half();
-        let mut quotient =
-            DoubleLimb::from(sum_high) + DoubleLimb::from(temp) + DoubleLimb::from(quotient_low);
-        quotient_low = remainder;
+        let (t, r) = (DoubleLimb::from(sum_high) * DoubleLimb::from(d_inverse)).split_in_half();
+        let mut q = DoubleLimb::from(sum_high) + DoubleLimb::from(t) + DoubleLimb::from(q_low);
+        q_low = r;
         if big_carry {
-            quotient.wrapping_add_assign(DoubleLimb::join_halves(1, divisor_inverse));
+            q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inverse));
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low.wrapping_sub_assign(divisor);
-                quotient.wrapping_add_assign(1);
+                sum_low.wrapping_sub_assign(d);
+                q.wrapping_add_assign(1);
             }
         }
-        let (quotient_higher, quotient_high) = quotient.split_in_half();
-        limbs[j + 1] = quotient_high;
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut limbs[j + 2..],
-            quotient_higher,
-        ));
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, limbs[j])
+        let (q_higher, q_high) = q.split_in_half();
+        xs[j + 1] = q_high;
+        assert!(!limbs_slice_add_limb_in_place(&mut xs[j + 2..], q_higher,));
+        let (sum, carry) = DoubleLimb::join_halves(sum_low, xs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;
     }
-    let mut quotient_high = 0;
+    let mut q_high = 0;
     if big_carry {
-        quotient_high += 1;
-        sum_high.wrapping_sub_assign(divisor);
+        q_high += 1;
+        sum_high.wrapping_sub_assign(d);
     }
-    if sum_high >= divisor {
-        quotient_high += 1;
-        sum_high.wrapping_sub_assign(divisor);
+    if sum_high >= d {
+        q_high += 1;
+        sum_high.wrapping_sub_assign(d);
     }
-    let temp = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
-    let (quotient_high, quotient_low) = DoubleLimb::join_halves(quotient_high, quotient_low)
-        .wrapping_add(DoubleLimb::from(temp))
+    let t = div_by_preinversion(sum_high, sum_low, d, d_inverse);
+    let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
+        .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut limbs[1..],
-        quotient_high,
-    ));
-    limbs[0] = quotient_low;
+    assert!(!limbs_slice_add_limb_in_place(&mut xs[1..], q_high));
+    xs[0] = q_low;
 }
 
-/// The high bit of `divisor` must be set.
+/// The high bit of `d` must be set.
 ///
 /// Time: worst case O(n)
 ///
@@ -2490,144 +2472,116 @@ fn limbs_div_limb_normalized_in_place(
 /// DIV_QR_1N_METHOD == 2, but not computing the remainder.
 fn limbs_div_limb_normalized_to_out(
     out: &mut [Limb],
-    in_limbs: &[Limb],
-    high_limb: Limb,
-    divisor: Limb,
-    divisor_inverse: Limb,
+    xs: &[Limb],
+    xs_high: Limb,
+    d: Limb,
+    d_inverse: Limb,
 ) {
-    let len = in_limbs.len();
+    let len = xs.len();
     if len == 1 {
-        out[0] = div_by_preinversion(high_limb, in_limbs[0], divisor, divisor_inverse);
+        out[0] = div_by_preinversion(xs_high, xs[0], d, d_inverse);
         return;
     }
-    let power_of_two = divisor.wrapping_neg().wrapping_mul(divisor_inverse);
-    let (mut quotient_high, mut quotient_low) =
-        (DoubleLimb::from(divisor_inverse) * DoubleLimb::from(high_limb)).split_in_half();
-    quotient_high.wrapping_add_assign(high_limb);
-    out[len - 1] = quotient_high;
-    let (sum, mut big_carry) = DoubleLimb::join_halves(in_limbs[len - 1], in_limbs[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(high_limb));
+    let power_of_two = d.wrapping_neg().wrapping_mul(d_inverse);
+    let (mut q_high, mut q_low) =
+        (DoubleLimb::from(d_inverse) * DoubleLimb::from(xs_high)).split_in_half();
+    q_high.wrapping_add_assign(xs_high);
+    out[len - 1] = q_high;
+    let (sum, mut big_carry) = DoubleLimb::join_halves(xs[len - 1], xs[len - 2])
+        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(xs_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
-        let (temp, remainder) =
-            (DoubleLimb::from(sum_high) * DoubleLimb::from(divisor_inverse)).split_in_half();
-        let mut quotient =
-            DoubleLimb::from(sum_high) + DoubleLimb::from(temp) + DoubleLimb::from(quotient_low);
-        quotient_low = remainder;
+        let (t, r) = (DoubleLimb::from(sum_high) * DoubleLimb::from(d_inverse)).split_in_half();
+        let mut q = DoubleLimb::from(sum_high) + DoubleLimb::from(t) + DoubleLimb::from(q_low);
+        q_low = r;
         if big_carry {
-            quotient.wrapping_add_assign(DoubleLimb::join_halves(1, divisor_inverse));
+            q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inverse));
             let (sum, carry) = sum_low.overflowing_add(power_of_two);
             sum_low = sum;
             if carry {
-                sum_low.wrapping_sub_assign(divisor);
-                quotient.wrapping_add_assign(1);
+                sum_low.wrapping_sub_assign(d);
+                q.wrapping_add_assign(1);
             }
         }
-        let (quotient_higher, quotient_high) = quotient.split_in_half();
-        out[j + 1] = quotient_high;
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut out[j + 2..],
-            quotient_higher,
-        ));
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, in_limbs[j])
+        let (q_higher, q_high) = q.split_in_half();
+        out[j + 1] = q_high;
+        assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher,));
+        let (sum, carry) = DoubleLimb::join_halves(sum_low, xs[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;
     }
-    let mut quotient_high = 0;
+    let mut q_high = 0;
     if big_carry {
-        quotient_high += 1;
-        sum_high.wrapping_sub_assign(divisor);
+        q_high += 1;
+        sum_high.wrapping_sub_assign(d);
     }
-    if sum_high >= divisor {
-        quotient_high += 1;
-        sum_high.wrapping_sub_assign(divisor);
+    if sum_high >= d {
+        q_high += 1;
+        sum_high.wrapping_sub_assign(d);
     }
-    let temp = div_by_preinversion(sum_high, sum_low, divisor, divisor_inverse);
-    let (quotient_high, quotient_low) = DoubleLimb::join_halves(quotient_high, quotient_low)
-        .wrapping_add(DoubleLimb::from(temp))
+    let t = div_by_preinversion(sum_high, sum_low, d, d_inverse);
+    let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
+        .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
-    assert!(!limbs_slice_add_limb_in_place(&mut out[1..], quotient_high));
-    out[0] = quotient_low;
+    assert!(!limbs_slice_add_limb_in_place(&mut out[1..], q_high));
+    out[0] = q_low;
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, but not computing the remainder.
 /// Experiments show that this is always slower than `_limbs_div_limb_to_out`.
-pub fn _limbs_div_limb_to_out_alt(out: &mut [Limb], in_limbs: &[Limb], divisor: Limb) {
-    assert_ne!(divisor, 0);
-    let len = in_limbs.len();
+pub fn _limbs_div_limb_to_out_alt(out: &mut [Limb], xs: &[Limb], d: Limb) {
+    assert_ne!(d, 0);
+    let len = xs.len();
     assert!(len > 1);
     assert!(out.len() >= len);
     let len_minus_1 = len - 1;
-    let mut highest_limb = in_limbs[len_minus_1];
-    let bits = LeadingZeros::leading_zeros(divisor);
+    let mut highest_limb = xs[len_minus_1];
+    let bits = LeadingZeros::leading_zeros(d);
     if bits == 0 {
-        out[len_minus_1] = if highest_limb >= divisor {
-            highest_limb -= divisor;
+        out[len_minus_1] = if highest_limb >= d {
+            highest_limb -= d;
             1
         } else {
             0
         };
-        let limb_inverse = limbs_invert_limb(divisor);
-        limbs_div_limb_normalized_to_out(
-            out,
-            &in_limbs[..len_minus_1],
-            highest_limb,
-            divisor,
-            limb_inverse,
-        )
+        let d_inverse = limbs_invert_limb(d);
+        limbs_div_limb_normalized_to_out(out, &xs[..len_minus_1], highest_limb, d, d_inverse)
     } else {
-        let divisor = divisor << bits;
-        let highest_limb = limbs_shl_to_out(out, in_limbs, bits);
-        let limb_inverse = limbs_invert_limb(divisor);
-        let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, out[len_minus_1], divisor, limb_inverse);
-        out[len_minus_1] = quotient;
-        limbs_div_limb_normalized_in_place(
-            &mut out[..len_minus_1],
-            remainder,
-            divisor,
-            limb_inverse,
-        )
+        let d = d << bits;
+        let xs_high = limbs_shl_to_out(out, xs, bits);
+        let d_inverse = limbs_invert_limb(d);
+        let (q, r) = div_mod_by_preinversion(xs_high, out[len_minus_1], d, d_inverse);
+        out[len_minus_1] = q;
+        limbs_div_limb_normalized_in_place(&mut out[..len_minus_1], r, d, d_inverse)
     }
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where qp == up, but not computing
 /// the remainder. Experiments show that this is always slower than `_limbs_div_limb_in_place`.
-pub fn _limbs_div_limb_in_place_alt(limbs: &mut [Limb], divisor: Limb) {
-    assert_ne!(divisor, 0);
-    let len = limbs.len();
+pub fn _limbs_div_limb_in_place_alt(xs: &mut [Limb], d: Limb) {
+    assert_ne!(d, 0);
+    let len = xs.len();
     assert!(len > 1);
     let len_minus_1 = len - 1;
-    let mut highest_limb = limbs[len_minus_1];
-    let bits = LeadingZeros::leading_zeros(divisor);
+    let mut highest_limb = xs[len_minus_1];
+    let bits = LeadingZeros::leading_zeros(d);
     if bits == 0 {
-        limbs[len_minus_1] = if highest_limb >= divisor {
-            highest_limb -= divisor;
+        xs[len_minus_1] = if highest_limb >= d {
+            highest_limb -= d;
             1
         } else {
             0
         };
-        let limb_inverse = limbs_invert_limb(divisor);
-        limbs_div_limb_normalized_in_place(
-            &mut limbs[..len_minus_1],
-            highest_limb,
-            divisor,
-            limb_inverse,
-        )
+        let d_inverse = limbs_invert_limb(d);
+        limbs_div_limb_normalized_in_place(&mut xs[..len_minus_1], highest_limb, d, d_inverse)
     } else {
-        let divisor = divisor << bits;
-        let highest_limb = limbs_slice_shl_in_place(limbs, bits);
-        let limb_inverse = limbs_invert_limb(divisor);
-        let (quotient, remainder) =
-            div_mod_by_preinversion(highest_limb, limbs[len_minus_1], divisor, limb_inverse);
-        limbs[len_minus_1] = quotient;
-        limbs_div_limb_normalized_in_place(
-            &mut limbs[..len_minus_1],
-            remainder,
-            divisor,
-            limb_inverse,
-        )
+        let d = d << bits;
+        let xs_high = limbs_slice_shl_in_place(xs, bits);
+        let d_inverse = limbs_invert_limb(d);
+        let (q, r) = div_mod_by_preinversion(xs_high, xs[len_minus_1], d, d_inverse);
+        xs[len_minus_1] = q;
+        limbs_div_limb_normalized_in_place(&mut xs[..len_minus_1], r, d, d_inverse)
     }
 }

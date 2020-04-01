@@ -25,8 +25,8 @@ use platform::Limb;
 /// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
 /// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
 /// ```
-pub const fn limbs_and_limb(limbs: &[Limb], limb: Limb) -> Limb {
-    limbs[0] & limb
+pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
+    xs[0] & y
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns

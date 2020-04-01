@@ -28,27 +28,42 @@ pub(crate) enum InnerNatural {
     Large(Vec<Limb>),
 }
 
+macro_rules! natural_zero {
+    () => {
+        Natural(Small(0))
+    };
+}
+
+macro_rules! natural_one {
+    () => {
+        Natural(Small(1))
+    };
+}
+
+macro_rules! natural_two {
+    () => {
+        Natural(Small(2))
+    };
+}
+
 impl Natural {
+    // If a `Natural` is `Large` but is small enough to be `Small`, make it `Small`.
     fn demote_if_small(&mut self) {
-        let demoted_value = if let Natural(Large(ref limbs)) = *self {
+        if let Natural(Large(ref limbs)) = self {
             match limbs.len() {
-                0 => Some(0),
-                1 => Some(limbs[0]),
-                _ => None,
+                0 => *self = natural_zero!(),
+                1 => *self = Natural(Small(limbs[0])),
+                _ => {}
             }
-        } else {
-            None
-        };
-        if let Some(small) = demoted_value {
-            *self = Natural(Small(small));
         }
     }
 
+    // If a `Natural` is `Small`, make it `Large`. Return a reference to the `Limb` vector.
     pub(crate) fn promote_in_place(&mut self) -> &mut Vec<Limb> {
-        if let Natural(Small(x)) = *self {
-            *self = Natural(Large(vec![x]));
+        if let Natural(Small(x)) = self {
+            *self = Natural(Large(vec![*x]));
         }
-        if let Natural(Large(ref mut xs)) = *self {
+        if let Natural(Large(ref mut xs)) = self {
             xs
         } else {
             unreachable!();
@@ -88,7 +103,7 @@ impl Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Zero for Natural {
-    const ZERO: Natural = Natural(Small(0));
+    const ZERO: Natural = natural_zero!();
 }
 
 /// The constant 1.
@@ -97,7 +112,7 @@ impl Zero for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl One for Natural {
-    const ONE: Natural = Natural(Small(1));
+    const ONE: Natural = natural_one!();
 }
 
 /// The constant 2.
@@ -106,7 +121,7 @@ impl One for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Two for Natural {
-    const TWO: Natural = Natural(Small(2));
+    const TWO: Natural = natural_two!();
 }
 
 /// The minimum value of a `Natural`, 0.
@@ -115,7 +130,7 @@ impl Two for Natural {
 ///
 /// Additional memory: worst case O(1)
 impl Min for Natural {
-    const MIN: Natural = Natural::ZERO;
+    const MIN: Natural = natural_zero!();
 }
 
 // Implement `Named` for `Natural`.
@@ -211,6 +226,7 @@ pub mod arithmetic {
     pub mod mod_neg;
     pub mod mod_op;
     pub mod mod_power_of_two;
+    pub mod mod_power_of_two_add;
     pub mod mod_power_of_two_is_reduced;
     pub mod mod_power_of_two_neg;
     pub mod mul;

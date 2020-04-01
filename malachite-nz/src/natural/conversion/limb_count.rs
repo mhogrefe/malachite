@@ -25,7 +25,7 @@ impl Natural {
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {
-            Natural(Small(0)) => 0,
+            natural_zero!() => 0,
             Natural(Small(_)) => 1,
             Natural(Large(ref limbs)) => u64::wrapping_from(limbs.len()),
         }

@@ -26,22 +26,22 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is returned.
-pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
-    let len = limbs.len();
+pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
+    let len = xs.len();
     let mut result_limbs = Vec::with_capacity(len);
     for i in 0..len {
-        let (sum, overflow) = limbs[i].overflowing_add(limb);
+        let (sum, overflow) = xs[i].overflowing_add(y);
         result_limbs.push(sum);
         if overflow {
-            limb = 1;
+            y = 1;
         } else {
-            limb = 0;
-            result_limbs.extend_from_slice(&limbs[i + 1..]);
+            y = 0;
+            result_limbs.extend_from_slice(&xs[i + 1..]);
             break;
         }
     }
-    if limb != 0 {
-        result_limbs.push(limb);
+    if y != 0 {
+        result_limbs.push(y);
     }
     result_limbs
 }
@@ -73,22 +73,22 @@ pub fn limbs_add_limb(limbs: &[Limb], mut limb: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2.
-pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
-    let len = in_limbs.len();
+pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+    let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
-        let (sum, overflow) = in_limbs[i].overflowing_add(limb);
+        let (sum, overflow) = xs[i].overflowing_add(y);
         out[i] = sum;
         if overflow {
-            limb = 1;
+            y = 1;
         } else {
-            limb = 0;
+            y = 0;
             let copy_index = i + 1;
-            out[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
+            out[copy_index..len].copy_from_slice(&xs[copy_index..]);
             break;
         }
     }
-    limb != 0
+    y != 0
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -115,15 +115,15 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.
-pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut limb: T) -> bool {
-    for x in limbs.iter_mut() {
-        if x.overflowing_add_assign(limb) {
-            limb = T::ONE;
+pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
+    for x in xs.iter_mut() {
+        if x.overflowing_add_assign(y) {
+            y = T::ONE;
         } else {
             return false;
         }
     }
-    limb != T::ZERO
+    y != T::ZERO
 }
 
 /// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
@@ -152,10 +152,10 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(limbs: &mut [T], mut 
 /// ```
 ///
 /// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.1.2 where the input is non-negative.
-pub fn limbs_vec_add_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
-    assert!(!limbs.is_empty());
-    if limbs_slice_add_limb_in_place(limbs, limb) {
-        limbs.push(1);
+pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+    assert!(!xs.is_empty());
+    if limbs_slice_add_limb_in_place(xs, y) {
+        xs.push(1);
     }
 }
 
@@ -682,80 +682,85 @@ impl Natural {
     }
 
     pub(crate) fn add_assign_limb(&mut self, other: Limb) {
-        if other == 0 {
-            return;
+        match (&mut *self, other) {
+            (_, 0) => {}
+            (&mut natural_zero!(), _) => *self = Natural::from(other),
+            (&mut Natural(Small(ref mut small)), other) => {
+                let (sum, overflow) = small.overflowing_add(other);
+                if overflow {
+                    *self = Natural(Large(vec![sum, 1]));
+                } else {
+                    *small = sum;
+                }
+            }
+            (&mut Natural(Large(ref mut limbs)), other) => {
+                limbs_vec_add_limb_in_place(limbs, other);
+            }
         }
-        if *self == 0 {
-            *self = Natural::from(other);
-            return;
-        }
-        mutate_with_possible_promotion!(self, small, limbs, { small.checked_add(other) }, {
-            limbs_vec_add_limb_in_place(limbs, other);
-        });
     }
 }
 
-/// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-/// assert_eq!(
-///     (Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
-///     "3000000000000"
-/// );
-/// ```
 impl Add<Natural> for Natural {
     type Output = Natural;
 
+    /// Adds a `Natural` to a `Natural`, taking both `Natural`s by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::ZERO + Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) + Natural::ZERO).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(
+    ///     (Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
+    ///     "3000000000000"
+    /// );
+    /// ```
     fn add(mut self, other: Natural) -> Natural {
         self += other;
         self
     }
 }
 
-/// Adds a `Natural` to a `Natural`, taking the left `Natural` by value and the right `Natural` by
-/// reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
-/// assert_eq!(
-///     (Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
-///     "3000000000000"
-/// );
-/// ```
 impl<'a> Add<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Adds a `Natural` to a `Natural`, taking the left `Natural` by value and the right `Natural`
+    /// by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(
+    ///     (Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
+    ///     "3000000000000"
+    /// );
+    /// ```
     #[inline]
     fn add(mut self, other: &'a Natural) -> Natural {
         self += other;
@@ -763,34 +768,34 @@ impl<'a> Add<&'a Natural> for Natural {
     }
 }
 
-/// Adds a `Natural` to a `Natural`, taking the left `Natural` by reference and the right `Natural`
-/// by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
-/// assert_eq!(
-///     (&Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
-///     "3000000000000"
-/// );
-/// ```
 impl<'a> Add<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Adds a `Natural` to a `Natural`, taking the left `Natural` by reference and the right
+    /// `Natural` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::ZERO + Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) + Natural::ZERO).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) + Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(
+    ///     (&Natural::trillion() + Natural::trillion() * Natural::from(2u32)).to_string(),
+    ///     "3000000000000"
+    /// );
+    /// ```
     #[inline]
     fn add(self, mut other: Natural) -> Natural {
         other += self;
@@ -798,120 +803,112 @@ impl<'a> Add<Natural> for &'a Natural {
     }
 }
 
-/// Adds a `Natural` to a `Natural`, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
-/// assert_eq!(
-///     (&Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
-///     "3000000000000"
-/// );
-/// ```
 impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Adds a `Natural` to a `Natural`, taking both `Natural`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!(
+    ///     (&Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
+    ///     "3000000000000"
+    /// );
+    /// ```
     fn add(self, other: &'a Natural) -> Natural {
-        if self as *const Natural == other as *const Natural {
-            self << 1
-        } else {
-            match (self, other) {
-                (x, &Natural(Small(y))) => x.add_limb_ref(y),
-                (&Natural(Small(x)), y) => y.add_limb_ref(x),
-                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                    Natural(Large(limbs_add(xs, ys)))
-                }
-            }
+        match (self, other) {
+            (x, y) if x as *const Natural == y as *const Natural => self << 1,
+            (x, &Natural(Small(y))) => x.add_limb_ref(y),
+            (&Natural(Small(x)), y) => y.add_limb_ref(x),
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => Natural(Large(limbs_add(xs, ys))),
         }
     }
 }
 
-/// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x += Natural::trillion();
-/// x += Natural::trillion() * Natural::from(2u32);
-/// x += Natural::trillion() * Natural::from(3u32);
-/// x += Natural::trillion() * Natural::from(4u32);
-/// assert_eq!(x.to_string(), "10000000000000");
-/// ```
 impl AddAssign<Natural> for Natural {
-    fn add_assign(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.add_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.add_limb(x);
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_vec_add_in_place_either(xs, &mut ys) {
-                    *xs = ys;
+    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x += Natural::trillion();
+    /// x += Natural::trillion() * Natural::from(2u32);
+    /// x += Natural::trillion() * Natural::from(3u32);
+    /// x += Natural::trillion() * Natural::from(4u32);
+    /// assert_eq!(x.to_string(), "10000000000000");
+    /// ```
+    fn add_assign(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (x, &mut Natural(Small(y))) => x.add_assign_limb(y),
+            (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
+            (&mut Natural(Large(ref mut xs)), _) => {
+                if let Natural(Large(mut ys)) = other {
+                    if limbs_vec_add_in_place_either(xs, &mut ys) {
+                        *xs = ys;
+                    }
                 }
             }
         }
     }
 }
 
-/// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x += &Natural::trillion();
-/// x += &(Natural::trillion() * Natural::from(2u32));
-/// x += &(Natural::trillion() * Natural::from(3u32));
-/// x += &(Natural::trillion() * Natural::from(4u32));
-/// assert_eq!(x.to_string(), "10000000000000");
-/// ```
 impl<'a> AddAssign<&'a Natural> for Natural {
+    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x += &Natural::trillion();
+    /// x += &(Natural::trillion() * Natural::from(2u32));
+    /// x += &(Natural::trillion() * Natural::from(3u32));
+    /// x += &(Natural::trillion() * Natural::from(4u32));
+    /// assert_eq!(x.to_string(), "10000000000000");
+    /// ```
     fn add_assign(&mut self, other: &'a Natural) {
-        if self as *const Natural == other as *const Natural {
-            *self <<= 1;
-        } else if let Natural(Small(y)) = *other {
-            self.add_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.add_limb_ref(x);
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (x, y) if x as *const Natural == y as *const Natural => *self <<= 1,
+            (x, &Natural(Small(y))) => x.add_assign_limb(y),
+            (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
+            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                 limbs_vec_add_in_place_left(xs, ys);
             }
         }

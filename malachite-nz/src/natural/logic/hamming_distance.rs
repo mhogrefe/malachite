@@ -27,8 +27,8 @@ use platform::Limb;
 /// assert_eq!(limbs_hamming_distance_limb(&[2], 3), 1);
 /// assert_eq!(limbs_hamming_distance_limb(&[1, 1, 1], 1), 2);
 /// ```
-pub fn limbs_hamming_distance_limb(limbs: &[Limb], other_limb: Limb) -> u64 {
-    limbs[0].hamming_distance(other_limb) + limbs_count_ones(&limbs[1..])
+pub fn limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
+    xs[0].hamming_distance(y) + limbs_count_ones(&xs[1..])
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,

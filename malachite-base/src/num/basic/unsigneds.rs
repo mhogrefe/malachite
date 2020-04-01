@@ -1,9 +1,11 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    FloorLogTwo, IsPowerOfTwo, ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo,
-    ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, NegMod,
-    NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign,
-    RemPowerOfTwo, RemPowerOfTwoAssign,
+    FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModNeg, ModNegAssign,
+    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign,
+    ModPowerOfTwoIsReduced, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub,
+    ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
+    RemPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -28,13 +30,21 @@ pub trait PrimitiveUnsigned:
     + HammingDistance
     + IsPowerOfTwo
     + ModIsReduced<Self>
+    + ModAdd<Self, Self, Output = Self>
+    + ModAddAssign<Self, Self>
     + ModNeg<Self, Output = Self>
     + ModNegAssign<Self>
     + ModPowerOfTwo<Output = Self>
+    + ModPowerOfTwoAdd<Self, Output = Self>
+    + ModPowerOfTwoAddAssign<Self>
     + ModPowerOfTwoAssign
     + ModPowerOfTwoIsReduced
     + ModPowerOfTwoNeg<Output = Self>
     + ModPowerOfTwoNegAssign
+    + ModPowerOfTwoSub<Self, Output = Self>
+    + ModPowerOfTwoSubAssign<Self>
+    + ModSub<Self, Self, Output = Self>
+    + ModSubAssign<Self, Self>
     + NegMod
     + NegModAssign
     + NegModPowerOfTwo<Output = Self>

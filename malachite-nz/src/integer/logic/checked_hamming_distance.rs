@@ -34,17 +34,14 @@ use platform::Limb;
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[2], 2), 0);
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
 /// ```
-pub fn limbs_hamming_distance_limb_neg(limbs: &[Limb], other_limb: Limb) -> u64 {
-    let least_significant_limb = limbs[0].wrapping_neg();
-    limbs_count_zeros_neg(limbs) - CountZeros::count_zeros(least_significant_limb)
-        + least_significant_limb.hamming_distance(other_limb.wrapping_neg())
+pub fn limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
+    let least_significant_limb = xs[0].wrapping_neg();
+    limbs_count_zeros_neg(xs) - CountZeros::count_zeros(least_significant_limb)
+        + least_significant_limb.hamming_distance(y.wrapping_neg())
 }
 
-fn limbs_count_zeros(limbs: &[Limb]) -> u64 {
-    limbs
-        .iter()
-        .map(|&limb| CountZeros::count_zeros(limb))
-        .sum()
+fn limbs_count_zeros(xs: &[Limb]) -> u64 {
+    xs.iter().map(|&limb| CountZeros::count_zeros(limb)).sum()
 }
 
 fn limbs_hamming_distance_neg_leading_limbs_helper(xs: &[Limb], ys: &[Limb], i: usize) -> u64 {

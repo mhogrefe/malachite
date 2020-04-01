@@ -4,6 +4,7 @@ use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
+use natural::InnerNatural::Small;
 use natural::Natural;
 
 /// An integer.
@@ -32,16 +33,49 @@ impl Integer {
     }
 }
 
+macro_rules! integer_zero {
+    () => {
+        Integer {
+            sign: true,
+            abs: natural_zero!(),
+        }
+    };
+}
+
+macro_rules! integer_one {
+    () => {
+        Integer {
+            sign: true,
+            abs: natural_one!(),
+        }
+    };
+}
+
+macro_rules! integer_two {
+    () => {
+        Integer {
+            sign: true,
+            abs: natural_two!(),
+        }
+    };
+}
+
+macro_rules! integer_negative_one {
+    () => {
+        Integer {
+            sign: false,
+            abs: natural_one!(),
+        }
+    };
+}
+
 /// The constant 0.
 ///
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 impl Zero for Integer {
-    const ZERO: Integer = Integer {
-        sign: true,
-        abs: Natural::ZERO,
-    };
+    const ZERO: Integer = integer_zero!();
 }
 
 /// The constant 1.
@@ -50,10 +84,7 @@ impl Zero for Integer {
 ///
 /// Additional memory: worst case O(1)
 impl One for Integer {
-    const ONE: Integer = Integer {
-        sign: true,
-        abs: Natural::ONE,
-    };
+    const ONE: Integer = integer_one!();
 }
 
 /// The constant 2.
@@ -62,10 +93,7 @@ impl One for Integer {
 ///
 /// Additional memory: worst case O(1)
 impl Two for Integer {
-    const TWO: Integer = Integer {
-        sign: true,
-        abs: Natural::TWO,
-    };
+    const TWO: Integer = integer_two!();
 }
 
 /// The constant -1.
@@ -74,10 +102,7 @@ impl Two for Integer {
 ///
 /// Additional memory: worst case O(1)
 impl NegativeOne for Integer {
-    const NEGATIVE_ONE: Integer = Integer {
-        sign: false,
-        abs: Natural::ONE,
-    };
+    const NEGATIVE_ONE: Integer = integer_negative_one!();
 }
 
 // Implement `Named` for `Integer`.

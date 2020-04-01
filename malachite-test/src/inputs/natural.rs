@@ -43,8 +43,9 @@ use rust_wheels::iterators::primitive_ints::{
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
-    random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
+    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
+    random_pairs_from_single, random_quadruples, random_triples, random_triples_from_single,
+    sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs,
@@ -56,6 +57,7 @@ use inputs::base::{
 };
 use inputs::common::{
     permute_1_3_4_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4,
+    reshape_3_1_to_4,
 };
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
@@ -933,6 +935,41 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
     )
 }
 
+// All triples of `Natural`, `Natural` and `u64`, where the `u64` is greater than or equal n, where
+// n is the maximum number of significant bits of the `Natural`s.
+pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, Natural, u64)> {
+    let ps: It<(u64, (Natural, Natural))> = match gm {
+        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigned(), |&pow| {
+            let range = range_increasing(Natural::ZERO, Natural::low_mask(pow));
+            //TODO use lex_pairs_from_single
+            lex_pairs(range.clone(), range)
+        })),
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                random_pairs_from_single(random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    Natural::low_mask(pow),
+                ))
+            },
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                random_pairs_from_single(special_random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    Natural::low_mask(pow),
+                ))
+            },
+        )),
+    };
+    reshape_2_1_to_3(permute_2_1(ps))
+}
+
 pub fn triples_of_natural_small_u64_and_bool(gm: GenerationMode) -> It<(Natural, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
@@ -1353,6 +1390,43 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Natural
             special_random_pairs_of_natural_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
     }
+}
+
+// All quadruples of `Natural`, `Natural`, `Natural` and `u64`, where the `u64` is greater than or
+// equal n, where n is the maximum number of significant bits of the `Natural`s.
+pub fn quadruples_of_three_naturals_and_u64_var_1(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, Natural, u64)> {
+    let ps: It<(u64, (Natural, Natural, Natural))> = match gm {
+        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigned(), |&pow| {
+            let range = range_increasing(Natural::ZERO, Natural::low_mask(pow));
+            //TODO use lex_triples_from_single
+            lex_triples(range.clone(), range.clone(), range)
+        })),
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                random_triples_from_single(random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    Natural::low_mask(pow),
+                ))
+            },
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            (),
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |_, &pow| {
+                random_triples_from_single(special_random_range_natural(
+                    &scramble(&EXAMPLE_SEED, "n"),
+                    Natural::ZERO,
+                    Natural::low_mask(pow),
+                ))
+            },
+        )),
+    };
+    reshape_3_1_to_4(permute_2_1(ps))
 }
 
 pub fn quadruples_of_natural_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(

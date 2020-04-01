@@ -32,30 +32,29 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 35), 36);
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
-pub fn limbs_index_of_next_false_bit(limbs: &[Limb], start: u64) -> u64 {
+pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if starting_limb_index >= limbs.len() {
+    if starting_limb_index >= xs.len() {
         return start;
     }
-    if let Some(result) =
-        limbs[starting_limb_index].index_of_next_false_bit(start & Limb::WIDTH_MASK)
+    if let Some(result) = xs[starting_limb_index].index_of_next_false_bit(start & Limb::WIDTH_MASK)
     {
         if result != Limb::WIDTH {
             return (u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result;
         }
     }
-    if starting_limb_index == limbs.len() - 1 {
-        return u64::wrapping_from(limbs.len()) << Limb::LOG_WIDTH;
+    if starting_limb_index == xs.len() - 1 {
+        return u64::wrapping_from(xs.len()) << Limb::LOG_WIDTH;
     }
     let false_index = starting_limb_index
         + 1
-        + limbs[starting_limb_index + 1..]
+        + xs[starting_limb_index + 1..]
             .iter()
             .take_while(|&&y| y == Limb::MAX)
             .count();
     let mut result_offset = false_index << Limb::LOG_WIDTH;
-    if false_index != limbs.len() {
-        result_offset += usize::wrapping_from((!limbs[false_index]).trailing_zeros());
+    if false_index != xs.len() {
+        result_offset += usize::wrapping_from((!xs[false_index]).trailing_zeros());
     }
     u64::wrapping_from(result_offset)
 }
@@ -86,28 +85,25 @@ pub fn limbs_index_of_next_false_bit(limbs: &[Limb], start: u64) -> u64 {
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 36), None);
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
-pub fn limbs_index_of_next_true_bit(limbs: &[Limb], start: u64) -> Option<u64> {
+pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if starting_limb_index >= limbs.len() {
+    if starting_limb_index >= xs.len() {
         return None;
     }
-    if let Some(result) =
-        limbs[starting_limb_index].index_of_next_true_bit(start & Limb::WIDTH_MASK)
-    {
+    if let Some(result) = xs[starting_limb_index].index_of_next_true_bit(start & Limb::WIDTH_MASK) {
         return Some((u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result);
     }
-    if starting_limb_index == limbs.len() - 1 {
+    if starting_limb_index == xs.len() - 1 {
         return None;
     }
-    let true_index =
-        starting_limb_index + 1 + slice_leading_zeros(&limbs[starting_limb_index + 1..]);
-    if true_index == limbs.len() {
+    let true_index = starting_limb_index + 1 + slice_leading_zeros(&xs[starting_limb_index + 1..]);
+    if true_index == xs.len() {
         None
     } else {
         let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
         Some(
             result_offset
-                .checked_add(TrailingZeros::trailing_zeros(limbs[true_index]))
+                .checked_add(TrailingZeros::trailing_zeros(xs[true_index]))
                 .unwrap(),
         )
     }

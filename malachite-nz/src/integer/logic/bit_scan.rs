@@ -37,9 +37,9 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpz_scan0 from mpz/scan0.c, GMP 6.1.2.
-pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64) -> Option<u64> {
-    let n = limbs.len();
-    let i = slice_leading_zeros(limbs);
+pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
+    let n = xs.len();
+    let i = slice_leading_zeros(xs);
     assert!(i < n);
     let starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {
@@ -49,7 +49,7 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
     match starting_limb_index.cmp(&i) {
         Ordering::Equal => {
             let within_limb_index = starting_index & Limb::WIDTH_MASK;
-            if let Some(result) = limbs[i]
+            if let Some(result) = xs[i]
                 .wrapping_neg()
                 .index_of_next_false_bit(within_limb_index)
             {
@@ -67,7 +67,7 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
             starting_index -= after_boundary_offset;
         }
     }
-    limbs_index_of_next_true_bit(&limbs[i + 1..], starting_index)
+    limbs_index_of_next_true_bit(&xs[i + 1..], starting_index)
         .map(|result| result + after_boundary_offset)
 }
 
@@ -97,9 +97,9 @@ pub fn limbs_index_of_next_false_bit_neg(limbs: &[Limb], mut starting_index: u64
 /// ```
 ///
 /// This is mpz_scan1 from mpz/scan1.c, GMP 6.1.2.
-pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64) -> u64 {
-    let n = limbs.len();
-    let i = slice_leading_zeros(limbs);
+pub fn limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
+    let n = xs.len();
+    let i = slice_leading_zeros(xs);
     assert!(i < n);
     let mut starting_limb_index = usize::exact_from(starting_index >> Limb::LOG_WIDTH);
     if starting_limb_index >= n {
@@ -112,7 +112,7 @@ pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64)
     }
     if starting_limb_index == i {
         let within_limb_index = starting_index & Limb::WIDTH_MASK;
-        if let Some(result) = limbs[i]
+        if let Some(result) = xs[i]
             .wrapping_neg()
             .index_of_next_true_bit(within_limb_index)
         {
@@ -123,7 +123,7 @@ pub fn limbs_index_of_next_true_bit_neg(limbs: &[Limb], mut starting_index: u64)
     } else {
         starting_index -= after_boundary_offset;
     }
-    limbs_index_of_next_false_bit(&limbs[i + 1..], starting_index) + after_boundary_offset
+    limbs_index_of_next_false_bit(&xs[i + 1..], starting_index) + after_boundary_offset
 }
 
 impl<'a> BitScan for &'a Integer {

@@ -1,9 +1,13 @@
 use std::char;
+use std::cmp::max;
 use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
+use itertools::Itertools;
 use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::num::arithmetic::traits::{DivRound, EqMod, Parity, PowerOfTwo, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{
+    DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo, UnsignedAbs,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
@@ -32,6 +36,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
     limbs_eq_mod_ref_ref_ref,
 };
+use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
@@ -87,10 +92,11 @@ use rust_wheels::iterators::strings::{
     exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
 };
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_quintuples,
-    exhaustive_triples, exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs,
-    random_pairs, random_pairs_from_single, random_quadruples, random_quintuples, random_triples,
-    random_triples_from_single, sqrt_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
+    exhaustive_quadruples_from_single, exhaustive_quintuples, exhaustive_triples,
+    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
+    random_pairs_from_single, random_quadruples, random_quadruples_from_single, random_quintuples,
+    random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
@@ -425,6 +431,13 @@ pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> 
     }
 }
 
+// All triples of unsigned `T` where the first and the second `T`s are smaller than the third.
+pub fn triples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    Box::new(triples_of_unsigneds(gm).filter(|&(x, y, modulus)| x < modulus && y < modulus))
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -734,14 +747,7 @@ pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + Sampl
         NoSpecialGenerationMode::Random(_) => permute_2_1(Box::new(random_dependent_pairs(
             (),
             random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
-            |_, &pow| {
-                let limit = if pow == T::WIDTH {
-                    T::MAX
-                } else {
-                    (T::ONE << pow) - T::ONE
-                };
-                random_range::<T>(&scramble(&EXAMPLE_SEED, "u"), T::ZERO, limit)
-            },
+            |_, &pow| random_range::<T>(&scramble(&EXAMPLE_SEED, "u"), T::ZERO, T::low_mask(pow)),
         ))),
     }
 }
@@ -3240,6 +3246,30 @@ pub(crate) fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
     )
 }
 
+pub fn quadruples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_quadruples_from_single(exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_quadruples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_quadruples_from_single(
+            special_random_unsigned(&EXAMPLE_SEED),
+        )),
+    }
+}
+
+// All quadruples of unsigned `T` where the first three `T`s are smaller than the fourth.
+pub fn quadruples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T)> {
+    Box::new(
+        quadruples_of_unsigneds(gm)
+            .filter(|&(x, y, z, modulus)| x < modulus && y < modulus && z < modulus),
+    )
+}
+
 fn quadruples_of_unsigned_small_unsigned_small_unsigned_and_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -4469,6 +4499,41 @@ pub fn triples_of_limb_vec_limb_vec_and_limb_var_12(
     )
 }
 
+// All triples of `Vec<Limb>`, `Vec<Limb>`, and `u64` such that the number of significant bits of
+// either `Vec` does not exceed the `u64`.
+pub fn triples_of_limb_vec_limb_vec_and_u64_var_13(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).map(
+        |(mut xs, mut ys, pow)| {
+            limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+            limbs_slice_mod_power_of_two_in_place(&mut ys, pow);
+            (xs, ys, pow)
+        },
+    );
+    if gm == GenerationMode::Exhaustive {
+        Box::new(ts.unique())
+    } else {
+        Box::new(ts)
+    }
+}
+
+// All triples of `Vec<Limb>`, `Vec<Limb>`, and `u64` such that the first `Vec` is at least as long
+// as the second and the number of significant bits of either `Vec` does not exceed the `u64`.
+pub fn triples_of_limb_vec_limb_vec_and_u64_var_14(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        triples_of_limb_vec_limb_vec_and_u64_var_13(gm).map(|(xs, ys, pow)| {
+            if xs.len() >= ys.len() {
+                (xs, ys, pow)
+            } else {
+                (ys, xs, pow)
+            }
+        }),
+    )
+}
+
 // All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as
 // long as the second, and the length of the second `Vec` is greater than 1.
 pub fn triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1<
@@ -4565,6 +4630,61 @@ pub fn triples_of_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand
             &(|seed| special_random_unsigned(seed)),
             &(|seed| special_random_unsigned(seed)),
         )),
+    }
+}
+
+// All triples of `Vec<Limb>`, `Limb`, and `u64` such that the number of significant bits of neither
+// the `Vec` nor the `Limb` exceeds the `u64`.
+pub fn triples_of_limb_vec_limb_and_u64_var_1(gm: GenerationMode) -> It<(Vec<Limb>, Limb, u64)> {
+    let ts = triples_of_unsigned_vec_unsigned_and_small_unsigned::<Limb, u64>(gm).map(
+        |(mut xs, y, pow)| {
+            limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+            (xs, y.mod_power_of_two(pow), pow)
+        },
+    );
+    if gm == GenerationMode::Exhaustive {
+        Box::new(ts.unique())
+    } else {
+        Box::new(ts)
+    }
+}
+
+// All triples of nonempty `Vec<Limb>`, `Limb`, and `u64` such that the number of significant bits
+// of neither the `Vec` nor the `Limb` exceeds the `u64`.
+pub fn triples_of_limb_vec_limb_and_u64_var_2(gm: GenerationMode) -> It<(Vec<Limb>, Limb, u64)> {
+    Box::new(triples_of_limb_vec_limb_and_u64_var_1(gm).filter(|&(ref xs, _, _)| !xs.is_empty()))
+}
+
+// All triples of `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between the number of
+// n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the two `T`s.
+pub fn triples_of_unsigned_unsigned_and_small_u64_var_1<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, T, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(dependent_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            |&(x, y): &(T, T)| {
+                Box::new(range_increasing(
+                    max(x.significant_bits(), y.significant_bits()),
+                    T::WIDTH,
+                ))
+            },
+        ))),
+        NoSpecialGenerationMode::Random(_) => {
+            reshape_2_1_to_3(permute_2_1(Box::new(random_dependent_pairs(
+                (),
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |_, &pow| {
+                    random_pairs_from_single(random_range::<T>(
+                        &scramble(&EXAMPLE_SEED, "u"),
+                        T::ZERO,
+                        T::low_mask(pow),
+                    ))
+                },
+            ))))
+        }
     }
 }
 
@@ -4759,6 +4879,33 @@ pub fn triples_of_limb_vec_limb_and_positive_limb_var_4(
     )
 }
 
+pub(crate) fn triples_of_unsigned_vec_unsigned_and_small_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
 // All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` is
 // non-empty, and its last element is nonzero.
 pub(crate) fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1<
@@ -4951,6 +5098,44 @@ pub fn triples_of_limb_vec_limb_and_limb_vec_var_5(
             },
         ),
     )
+}
+
+// All quadruples of `T`, `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between the
+// number of n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the
+// three `T`s.
+pub fn quadruples_of_three_unsigneds_and_small_u64_var_1<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, T, T, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_3_1_to_4(Box::new(dependent_pairs(
+            exhaustive_triples_from_single(exhaustive_unsigned()),
+            |&(x, y, z): &(T, T, T)| {
+                Box::new(range_increasing(
+                    max!(
+                        x.significant_bits(),
+                        y.significant_bits(),
+                        z.significant_bits()
+                    ),
+                    T::WIDTH,
+                ))
+            },
+        ))),
+        NoSpecialGenerationMode::Random(_) => {
+            reshape_3_1_to_4(permute_2_1(Box::new(random_dependent_pairs(
+                (),
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |_, &pow| {
+                    random_triples_from_single(random_range::<T>(
+                        &scramble(&EXAMPLE_SEED, "u"),
+                        T::ZERO,
+                        T::low_mask(pow),
+                    ))
+                },
+            ))))
+        }
+    }
 }
 
 fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec<

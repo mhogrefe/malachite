@@ -24,11 +24,11 @@ use platform::{DoubleLimb, Limb};
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
-pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
+pub fn limbs_mul_limb(xs: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let limb = DoubleLimb::from(limb);
-    let mut result_limbs = Vec::with_capacity(limbs.len());
-    for &x in limbs {
+    let mut result_limbs = Vec::with_capacity(xs.len());
+    for &x in xs {
         let limb_result = DoubleLimb::from(x) * limb + DoubleLimb::from(carry);
         result_limbs.push(limb_result.lower_half());
         carry = limb_result.upper_half();
@@ -68,15 +68,15 @@ pub fn limbs_mul_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// This is mul_1c from gmp-impl.h, GMP 6.1.2.
 pub fn limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
-    in_limbs: &[Limb],
-    limb: Limb,
+    xs: &[Limb],
+    y: Limb,
     mut carry: Limb,
 ) -> Limb {
-    let len = in_limbs.len();
+    let len = xs.len();
     assert!(out.len() >= len);
-    let limb = DoubleLimb::from(limb);
+    let y = DoubleLimb::from(y);
     for i in 0..len {
-        let limb_result = DoubleLimb::from(in_limbs[i]) * limb + DoubleLimb::from(carry);
+        let limb_result = DoubleLimb::from(xs[i]) * y + DoubleLimb::from(carry);
         out[i] = limb_result.lower_half();
         carry = limb_result.upper_half();
     }
@@ -111,8 +111,8 @@ pub fn limbs_mul_limb_with_carry_to_out(
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
 #[inline]
-pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> Limb {
-    limbs_mul_limb_with_carry_to_out(out, in_limbs, limb, 0)
+pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
+    limbs_mul_limb_with_carry_to_out(out, xs, y, 0)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -139,13 +139,9 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) ->
 /// ```
 ///
 /// This is mul_1c from gmp-impl.h, GMP 6.1.2, where the output is the same as the input.
-pub fn limbs_slice_mul_limb_with_carry_in_place(
-    limbs: &mut [Limb],
-    limb: Limb,
-    mut carry: Limb,
-) -> Limb {
-    let limb = DoubleLimb::from(limb);
-    for x in limbs.iter_mut() {
+pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut carry: Limb) -> Limb {
+    let limb = DoubleLimb::from(y);
+    for x in xs.iter_mut() {
         let limb_result = DoubleLimb::from(*x) * limb + DoubleLimb::from(carry);
         *x = limb_result.lower_half();
         carry = limb_result.upper_half();
@@ -175,8 +171,8 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
 #[inline]
-pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
-    limbs_slice_mul_limb_with_carry_in_place(limbs, limb, 0)
+pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
+    limbs_slice_mul_limb_with_carry_in_place(xs, y, 0)
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -201,49 +197,52 @@ pub fn limbs_slice_mul_limb_in_place(limbs: &mut [Limb], limb: Limb) -> Limb {
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of
 /// returning the carry, it is appended to rp.
-pub fn limbs_vec_mul_limb_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
-    let carry = limbs_slice_mul_limb_in_place(limbs, limb);
+pub fn limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+    let carry = limbs_slice_mul_limb_in_place(xs, y);
     if carry != 0 {
-        limbs.push(carry);
+        xs.push(carry);
     }
 }
 
 impl Natural {
     pub(crate) fn mul_assign_limb(&mut self, other: Limb) {
-        if *self == 0 || other == 0 {
-            *self = Natural::ZERO;
-            return;
+        match (&mut *self, other) {
+            (&mut natural_zero!(), _) | (_, 1) => {}
+            (_, 0) => *self = natural_zero!(),
+            (&mut natural_one!(), _) => *self = Natural::from(other),
+            (&mut Natural(Small(ref mut small)), other) => {
+                let product = DoubleLimb::from(*small) * DoubleLimb::from(other);
+                let (upper, lower) = product.split_in_half();
+                if upper == 0 {
+                    *small = lower;
+                } else {
+                    *self = Natural(Large(vec![lower, upper]));
+                }
+            }
+            (&mut Natural(Large(ref mut limbs)), other) => {
+                limbs_vec_mul_limb_in_place(limbs, other);
+            }
         }
-        if other == 1 {
-            return;
-        }
-        if *self == 1 {
-            *self = Natural::from(other);
-            return;
-        }
-        mutate_with_possible_promotion!(self, small, limbs, { small.checked_mul(other) }, {
-            limbs_vec_mul_limb_in_place(limbs, other);
-        });
     }
 
     pub(crate) fn mul_limb_ref(&self, other: Limb) -> Natural {
         if *self == 0 || other == 0 {
-            return Natural::ZERO;
-        }
-        if other == 1 {
-            return self.clone();
-        }
-        Natural(match *self {
-            Natural(Small(small)) => {
-                let product = DoubleLimb::from(small) * DoubleLimb::from(other);
-                let (upper, lower) = product.split_in_half();
-                if upper == 0 {
-                    Small(lower)
-                } else {
-                    Large(vec![lower, upper])
+            Natural::ZERO
+        } else if other == 1 {
+            self.clone()
+        } else {
+            Natural(match *self {
+                Natural(Small(small)) => {
+                    let product = DoubleLimb::from(small) * DoubleLimb::from(other);
+                    let (upper, lower) = product.split_in_half();
+                    if upper == 0 {
+                        Small(lower)
+                    } else {
+                        Large(vec![lower, upper])
+                    }
                 }
-            }
-            Natural(Large(ref limbs)) => Large(limbs_mul_limb(limbs, other)),
-        })
+                Natural(Large(ref limbs)) => Large(limbs_mul_limb(limbs, other)),
+            })
+        }
     }
 }

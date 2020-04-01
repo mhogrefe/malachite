@@ -1,11 +1,12 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
-    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, PowerOfTwo,
-    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
-    WrappingNegAssign,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModAdd,
+    ModAddAssign, ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAdd,
+    ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg,
+    ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod,
+    NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign,
+    Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign,
+    TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
@@ -137,7 +138,7 @@ macro_rules! impl_arithmetic_traits {
             /// assert_eq!(100u16.mod_neg(101), 1);
             /// ```
             ///
-            /// This is nmod_neg from nmod_vec.h, FLINT 2.5.2.
+            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1.
             #[inline]
             fn mod_neg(self, modulus: $t) -> $t {
                 if self == 0 {
@@ -172,11 +173,238 @@ macro_rules! impl_arithmetic_traits {
             /// n.mod_neg_assign(101);
             /// assert_eq!(n, 1);
             /// ```
+            ///
+            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assign to a.
             #[inline]
             fn mod_neg_assign(&mut self, modulus: $t) {
                 if *self != 0 {
                     *self = modulus - *self;
                 }
+            }
+        }
+
+        impl ModPowerOfTwoAdd for $t {
+            type Output = $t;
+
+            /// Computes `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
+            /// mod 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoAdd;
+            ///
+            /// assert_eq!(0u8.mod_power_of_two_add(2, 5), 2);
+            /// assert_eq!(10u32.mod_power_of_two_add(14, 4), 8);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_add(self, rhs: $t, pow: u64) -> $t {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_add(rhs).mod_power_of_two(pow)
+            }
+        }
+
+        impl ModPowerOfTwoAddAssign for $t {
+            /// Replaces `self` with `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are
+            /// already reduced mod 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoAddAssign;
+            ///
+            /// let mut n = 0u8;
+            /// n.mod_power_of_two_add_assign(2, 5);
+            /// assert_eq!(n, 2);
+            ///
+            /// let mut n = 10u32;
+            /// n.mod_power_of_two_add_assign(14, 4);
+            /// assert_eq!(n, 8);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_add_assign(&mut self, rhs: $t, pow: u64) {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_add_assign(rhs);
+                self.mod_power_of_two_assign(pow);
+            }
+        }
+
+        impl ModAdd for $t {
+            type Output = $t;
+
+            /// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
+            /// `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModAdd;
+            ///
+            /// assert_eq!(0u8.mod_add(3, 5), 3);
+            /// assert_eq!(7u32.mod_add(5, 10), 2);
+            /// ```
+            ///
+            /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
+            #[inline]
+            fn mod_add(self, rhs: $t, modulus: $t) -> $t {
+                let neg = modulus - self;
+                if neg > rhs {
+                    self + rhs
+                } else {
+                    rhs - neg
+                }
+            }
+        }
+
+        impl ModAddAssign for $t {
+            /// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
+            /// `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModAddAssign;
+            ///
+            /// let mut n = 0u8;
+            /// n.mod_add_assign(3, 5);
+            /// assert_eq!(n, 3);
+            ///
+            /// let mut n = 7u32;
+            /// n.mod_add_assign(5, 10);
+            /// assert_eq!(n, 2);
+            /// ```
+            ///
+            /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
+            #[inline]
+            fn mod_add_assign(&mut self, rhs: $t, modulus: $t) {
+                let neg = modulus - *self;
+                if neg > rhs {
+                    *self += rhs;
+                } else {
+                    *self = rhs - neg;
+                }
+            }
+        }
+
+        impl ModPowerOfTwoSub for $t {
+            type Output = $t;
+
+            /// Computes `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
+            /// mod 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSub;
+            ///
+            /// assert_eq!(5u8.mod_power_of_two_sub(2, 5), 3);
+            /// assert_eq!(10u32.mod_power_of_two_sub(14, 4), 12);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_sub(self, rhs: $t, pow: u64) -> $t {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_sub(rhs).mod_power_of_two(pow)
+            }
+        }
+
+        impl ModPowerOfTwoSubAssign for $t {
+            /// Replaces `self` with `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are
+            /// already reduced mod 2<pow>`pow`</pow>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSubAssign;
+            ///
+            /// let mut n = 5u8;
+            /// n.mod_power_of_two_sub_assign(2, 5);
+            /// assert_eq!(n, 3);
+            ///
+            /// let mut n = 10u32;
+            /// n.mod_power_of_two_sub_assign(14, 4);
+            /// assert_eq!(n, 12);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_sub_assign(&mut self, rhs: $t, pow: u64) {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_sub_assign(rhs);
+                self.mod_power_of_two_assign(pow);
+            }
+        }
+
+        impl ModSub for $t {
+            type Output = $t;
+
+            /// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
+            /// `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModSub;
+            ///
+            /// assert_eq!(4u8.mod_sub(3, 5), 1);
+            /// assert_eq!(7u32.mod_sub(9, 10), 8);
+            /// ```
+            ///
+            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
+            #[inline]
+            fn mod_sub(self, rhs: $t, modulus: $t) -> $t {
+                let diff = self.wrapping_sub(rhs);
+                if self < rhs {
+                    modulus.wrapping_add(diff)
+                } else {
+                    diff
+                }
+            }
+        }
+
+        impl ModSubAssign for $t {
+            /// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
+            /// `modulus`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModSubAssign;
+            ///
+            /// let mut n = 4u8;
+            /// n.mod_sub_assign(3, 5);
+            /// assert_eq!(n, 1);
+            ///
+            /// let mut n = 7u32;
+            /// n.mod_sub_assign(9, 10);
+            /// assert_eq!(n, 8);
+            /// ```
+            ///
+            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
+            #[inline]
+            fn mod_sub_assign(&mut self, rhs: $t, modulus: $t) {
+                *self = self.mod_sub(rhs, modulus);
             }
         }
 

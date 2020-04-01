@@ -32,14 +32,14 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 36), false);
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 100), false);
 /// ```
-pub fn limbs_eq_limb_mod_power_of_two(limbs: &[Limb], limb: Limb, pow: u64) -> bool {
+pub fn limbs_eq_limb_mod_power_of_two(xs: &[Limb], limb: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    if i >= limbs.len() {
+    if i >= xs.len() {
         false
     } else if i == 0 {
-        limbs[0].eq_mod_power_of_two(limb, pow)
+        xs[0].eq_mod_power_of_two(limb, pow)
     } else {
-        limbs[0] == limb && limbs_divisible_by_power_of_two(&limbs[1..], pow - Limb::WIDTH)
+        xs[0] == limb && limbs_divisible_by_power_of_two(&xs[1..], pow - Limb::WIDTH)
     }
 }
 

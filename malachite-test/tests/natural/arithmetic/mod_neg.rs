@@ -18,39 +18,35 @@ fn test_mod_neg() {
         assert!(Natural::from_str(u)
             .unwrap()
             .mod_is_reduced(&Natural::from_str(v).unwrap()));
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .mod_neg(Natural::from_str(v).unwrap())
-                .to_string(),
-            out
-        );
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .mod_neg(&Natural::from_str(v).unwrap())
-                .to_string(),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(u).unwrap())
-                .mod_neg(Natural::from_str(v).unwrap())
-                .to_string(),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(u).unwrap())
-                .mod_neg(&Natural::from_str(v).unwrap())
-                .to_string(),
-            out
-        );
+        let n = Natural::from_str(u)
+            .unwrap()
+            .mod_neg(Natural::from_str(v).unwrap());
+        assert!(n.is_valid());
+        assert!(n.mod_is_reduced(&Natural::from_str(v).unwrap()));
+        assert_eq!(n.to_string(), out);
+
+        let n = Natural::from_str(u)
+            .unwrap()
+            .mod_neg(&Natural::from_str(v).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = (&Natural::from_str(u).unwrap()).mod_neg(Natural::from_str(v).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        let n = (&Natural::from_str(u).unwrap()).mod_neg(&Natural::from_str(v).unwrap());
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
         let mut n = Natural::from_str(u).unwrap();
         n.mod_neg_assign(Natural::from_str(v).unwrap());
+        assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
         let mut n = Natural::from_str(u).unwrap();
         n.mod_neg_assign(&Natural::from_str(v).unwrap());
+        assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
     };
     test("0", "5", "0");

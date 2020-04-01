@@ -26,13 +26,13 @@ use platform::Limb;
 /// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
 /// assert_eq!(limbs_twos_complement(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
 /// ```
-pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
-    let i = slice_leading_zeros(limbs);
+pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
+    let i = slice_leading_zeros(xs);
     let mut result_limbs = vec![0; i];
-    if i != limbs.len() {
-        result_limbs.push(limbs[i].wrapping_neg());
-        for limb in &limbs[i + 1..] {
-            result_limbs.push(!limb);
+    if i != xs.len() {
+        result_limbs.push(xs[i].wrapping_neg());
+        for x in &xs[i + 1..] {
+            result_limbs.push(!x);
         }
     }
     result_limbs
@@ -58,10 +58,10 @@ pub fn limbs_twos_complement(limbs: &[Limb]) -> Vec<Limb> {
 /// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
 /// ```
-pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<Limb>) {
-    if !limbs.is_empty() && limbs.last().unwrap().get_highest_bit() {
+pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
+    if !xs.is_empty() && xs.last().unwrap().get_highest_bit() {
         // Sign-extend with an extra 0 limb to indicate a positive Integer
-        limbs.push(0);
+        xs.push(0);
     }
 }
 
@@ -87,9 +87,9 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(limbs: &mut Vec<Limb>) {
 /// assert!(limbs_twos_complement_in_place(limbs));
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
-pub fn limbs_twos_complement_in_place(limbs: &mut [Limb]) -> bool {
-    limbs_not_in_place(limbs);
-    limbs_slice_add_limb_in_place(limbs, 1)
+pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
+    limbs_not_in_place(xs);
+    limbs_slice_add_limb_in_place(xs, 1)
 }
 
 /// Given the limbs of the absolute value of a negative `Integer`, in ascending order, converts the
@@ -118,11 +118,11 @@ pub fn limbs_twos_complement_in_place(limbs: &mut [Limb]) -> bool {
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
 /// ```
-pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(limbs: &mut Vec<Limb>) {
-    assert!(!limbs_twos_complement_in_place(limbs));
-    if !limbs.last().unwrap().get_highest_bit() {
+pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
+    assert!(!limbs_twos_complement_in_place(xs));
+    if !xs.last().unwrap().get_highest_bit() {
         // Sign-extend with an extra !0 limb to indicate a negative Integer
-        limbs.push(Limb::MAX);
+        xs.push(Limb::MAX);
     }
 }
 

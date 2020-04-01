@@ -39,8 +39,8 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 /// ```
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is negative.
-pub fn limbs_eq_neg_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
-    limbs_eq_limb_mod_limb(limbs, limb.neg_mod(modulus), modulus)
+pub fn limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, modulus: Limb) -> bool {
+    limbs_eq_limb_mod_limb(xs, y.neg_mod(modulus), modulus)
 }
 
 /// Set r to -n mod d. n >= d is allowed. Can give r > d. d cannot equal 0.
@@ -362,9 +362,9 @@ impl Natural {
 
     fn pos_eq_neg_mod(&self, other: &Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
-            (_, _, Natural(Small(0))) => false,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (_, _, natural_zero!()) => false,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_neg_limb_mod_limb(y, modulus),
             (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_neg_limb_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), Natural(Large(ref modulus))) => {
@@ -387,9 +387,9 @@ impl Natural {
 
     fn pos_eq_neg_mod_ref(&self, other: &Natural, modulus: &Natural) -> bool {
         match (self, other, modulus) {
-            (_, _, &Natural(Small(0))) => false,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (_, _, &natural_zero!()) => false,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_neg_limb_mod_limb(y, modulus),
             (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_neg_limb_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref modulus))) => {

@@ -125,7 +125,7 @@ pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natu
     if bits == 0 {
         Natural::ZERO
     } else {
-        let limbs: Vec<u32> = limbs_special_random_up_to_bits(rng, bits);
-        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&limbs))
+        let xs: Vec<u32> = limbs_special_random_up_to_bits(rng, bits);
+        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&xs))
     }
 }

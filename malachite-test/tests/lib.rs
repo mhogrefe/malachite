@@ -22,10 +22,14 @@ pub mod base {
         pub mod arithmetic {
             pub mod abs;
             pub mod log_two;
+            pub mod mod_add;
             pub mod mod_is_reduced;
             pub mod mod_neg;
+            pub mod mod_power_of_two_add;
             pub mod mod_power_of_two_is_reduced;
             pub mod mod_power_of_two_neg;
+            pub mod mod_power_of_two_sub;
+            pub mod mod_sub;
             pub mod neg;
             pub mod overflowing_abs;
             pub mod overflowing_add;
@@ -220,6 +224,7 @@ pub mod natural {
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_power_of_two;
+        pub mod mod_power_of_two_add;
         pub mod mod_power_of_two_is_reduced;
         pub mod mod_power_of_two_neg;
         pub mod mul;

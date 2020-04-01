@@ -25,8 +25,8 @@ use platform::Limb;
 /// assert_eq!(limbs_floor_log_two(&[0b11]), 1);
 /// assert_eq!(limbs_floor_log_two(&[0, 0b1101]), 35);
 /// ```
-pub fn limbs_floor_log_two(limbs: &[Limb]) -> u64 {
-    limbs_significant_bits(limbs) - 1
+pub fn limbs_floor_log_two(xs: &[Limb]) -> u64 {
+    limbs_significant_bits(xs) - 1
 }
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
@@ -50,9 +50,9 @@ pub fn limbs_floor_log_two(limbs: &[Limb]) -> u64 {
 /// assert_eq!(limbs_ceiling_log_two(&[0b11]), 2);
 /// assert_eq!(limbs_ceiling_log_two(&[0, 0b1101]), 36);
 /// ```
-pub fn limbs_ceiling_log_two(limbs: &[Limb]) -> u64 {
-    let floor_log_two = limbs_floor_log_two(limbs);
-    if limbs_is_power_of_two(limbs) {
+pub fn limbs_ceiling_log_two(xs: &[Limb]) -> u64 {
+    let floor_log_two = limbs_floor_log_two(xs);
+    if limbs_is_power_of_two(xs) {
         floor_log_two
     } else {
         floor_log_two + 1

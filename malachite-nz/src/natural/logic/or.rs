@@ -22,9 +22,9 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_or_limb(&[123, 456], 789), &[895, 456]);
 /// ```
-pub fn limbs_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
-    let mut result = limbs.to_vec();
-    limbs_or_limb_in_place(&mut result, limb);
+pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+    let mut result = xs.to_vec();
+    limbs_or_limb_in_place(&mut result, y);
     result
 }
 
@@ -49,9 +49,9 @@ pub fn limbs_or_limb(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// limbs_or_limb_to_out(&mut out, &[123, 456], 789);
 /// assert_eq!(out, &[895, 456, 0]);
 /// ```
-pub fn limbs_or_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
-    out[..in_limbs.len()].copy_from_slice(in_limbs);
-    limbs_or_limb_in_place(out, limb);
+pub fn limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+    out[..xs.len()].copy_from_slice(xs);
+    limbs_or_limb_in_place(out, y);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -73,8 +73,8 @@ pub fn limbs_or_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
 /// limbs_or_limb_in_place(&mut limbs, 789);
 /// assert_eq!(limbs, &[895, 456]);
 /// ```
-pub fn limbs_or_limb_in_place(limbs: &mut [Limb], limb: Limb) {
-    limbs[0] |= limb;
+pub fn limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
+    xs[0] |= y;
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two

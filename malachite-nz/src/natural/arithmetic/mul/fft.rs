@@ -803,7 +803,7 @@ fn _limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 /// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c, GMP 6.1.2. nl is omitted as it is just
 /// the length of n (here, xs). nprime is `width` - 1.
 fn _limbs_mul_fft_decompose<'a>(
-    a_limbs: &'a mut [Limb],
+    a_s: &'a mut [Limb],
     k: usize,
     width: usize,
     xs: &[Limb],
@@ -836,7 +836,7 @@ fn _limbs_mul_fft_decompose<'a>(
         xs
     };
     let mut a_table = Vec::with_capacity(k);
-    let mut remainder: &mut [Limb] = a_limbs;
+    let mut remainder: &mut [Limb] = a_s;
     for i in 0..k {
         // force remainder to move rather than be borrowed
         let (a_lo, a_hi) = { remainder }.split_at_mut(width);

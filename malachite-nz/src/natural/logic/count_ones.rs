@@ -20,8 +20,8 @@ use platform::Limb;
 /// assert_eq!(limbs_count_ones(&[0, 1, 2]), 2);
 /// assert_eq!(limbs_count_ones(&[1, 0xffff_ffff]), 33);
 /// ```
-pub fn limbs_count_ones(limbs: &[Limb]) -> u64 {
-    limbs.iter().map(|limb| CountOnes::count_ones(*limb)).sum()
+pub fn limbs_count_ones(xs: &[Limb]) -> u64 {
+    xs.iter().map(|x| CountOnes::count_ones(*x)).sum()
 }
 
 impl CountOnes for &Natural {

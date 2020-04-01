@@ -42,13 +42,13 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the result is returned.
-pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
+    if limbs_to_delete >= xs.len() {
         Vec::new()
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut result_limbs = limbs[limbs_to_delete..].to_vec();
+        let mut result_limbs = xs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
         }
@@ -84,14 +84,14 @@ pub fn limbs_shr(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
 /// the result is returned.
-pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
+    if limbs_to_delete >= xs.len() {
         vec![1]
     } else {
-        let mut exact = slice_test_zero(&limbs[..limbs_to_delete]);
+        let mut exact = slice_test_zero(&xs[..limbs_to_delete]);
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut result_limbs = limbs[limbs_to_delete..].to_vec();
+        let mut result_limbs = xs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(&mut result_limbs, small_bits) == 0;
         }
@@ -102,13 +102,13 @@ pub fn limbs_shr_round_up(limbs: &[Limb], bits: u64) -> Vec<Limb> {
     }
 }
 
-fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
+    if limbs_to_delete >= xs.len() {
         Vec::new()
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut result_limbs = limbs[limbs_to_delete..].to_vec();
+        let mut result_limbs = xs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
             limbs_slice_shr_in_place(&mut result_limbs, small_bits);
         }
@@ -146,15 +146,15 @@ fn limbs_shr_round_half_integer_to_even(limbs: &[Limb], bits: u64) -> Vec<Limb> 
 /// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
-pub fn limbs_shr_round_to_nearest(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+pub fn limbs_shr_round_to_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
-        limbs.to_vec()
-    } else if !limbs_get_bit(limbs, bits - 1) {
-        limbs_shr(limbs, bits)
-    } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
-        limbs_shr_round_up(limbs, bits)
+        xs.to_vec()
+    } else if !limbs_get_bit(xs, bits - 1) {
+        limbs_shr(xs, bits)
+    } else if !limbs_divisible_by_power_of_two(xs, bits - 1) {
+        limbs_shr_round_up(xs, bits)
     } else {
-        limbs_shr_round_half_integer_to_even(limbs, bits)
+        limbs_shr_round_half_integer_to_even(xs, bits)
     }
 }
 
@@ -184,9 +184,9 @@ pub fn limbs_shr_round_to_nearest(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_exact(&[4_294_967_295, 1], 1), None);
 /// assert_eq!(limbs_shr_exact(&[4_294_967_295, 4_294_967_295], 32), None);
 /// ```
-pub fn limbs_shr_exact(limbs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
-    if limbs_divisible_by_power_of_two(limbs, bits) {
-        Some(limbs_shr(limbs, bits))
+pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
+    if limbs_divisible_by_power_of_two(xs, bits) {
+        Some(limbs_shr(xs, bits))
     } else {
         None
     }
@@ -224,12 +224,12 @@ pub fn limbs_shr_exact(limbs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 /// assert_eq!(limbs_shr_round(&[4_294_967_295, 4_294_967_295], 32, RoundingMode::Down),
 ///     Some(vec![4_294_967_295]));
 /// ```
-pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
+pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
-        RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(limbs, bits)),
-        RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(limbs, bits)),
-        RoundingMode::Nearest => Some(limbs_shr_round_to_nearest(limbs, bits)),
-        RoundingMode::Exact => limbs_shr_exact(limbs, bits),
+        RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
+        RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(xs, bits)),
+        RoundingMode::Nearest => Some(limbs_shr_round_to_nearest(xs, bits)),
+        RoundingMode::Exact => limbs_shr_exact(xs, bits),
     }
 }
 
@@ -263,18 +263,18 @@ pub fn limbs_shr_round(limbs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Ve
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2.
-pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb {
-    let len = in_limbs.len();
+pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+    let len = xs.len();
     assert_ne!(len, 0);
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     assert!(out.len() >= len);
     let cobits = Limb::WIDTH - bits;
-    let mut high_limb = in_limbs[0];
+    let mut high_limb = xs[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
     for i in 1..len {
-        high_limb = in_limbs[i];
+        high_limb = xs[i];
         out[i - 1] = low_limb | (high_limb << cobits);
         low_limb = high_limb >> bits;
     }
@@ -310,21 +310,21 @@ pub fn limbs_shr_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb 
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the rp == up.
-pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
+pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
-    let len = limbs.len();
+    let len = xs.len();
     assert_ne!(len, 0);
     let cobits = Limb::WIDTH - bits;
-    let mut high_limb = limbs[0];
+    let mut high_limb = xs[0];
     let remaining_bits = high_limb << cobits;
     let mut low_limb = high_limb >> bits;
-    for i in 1..limbs.len() {
-        high_limb = limbs[i];
-        limbs[i - 1] = low_limb | (high_limb << cobits);
+    for i in 1..xs.len() {
+        high_limb = xs[i];
+        xs[i - 1] = low_limb | (high_limb << cobits);
         low_limb = high_limb >> bits;
     }
-    *limbs.last_mut().unwrap() = low_limb;
+    *xs.last_mut().unwrap() = low_limb;
     remaining_bits
 }
 
@@ -388,15 +388,15 @@ pub fn limbs_slice_shr_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where rp == up and if cnt is
 /// sufficiently large, limbs are removed from rp.
-pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
-        limbs.clear();
+    if limbs_to_delete >= xs.len() {
+        xs.clear();
     } else {
         let small_shift = bits & Limb::WIDTH_MASK;
-        vec_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(xs, limbs_to_delete);
         if small_shift != 0 {
-            limbs_slice_shr_in_place(limbs, small_shift);
+            limbs_slice_shr_in_place(xs, small_shift);
         }
     }
 }
@@ -462,36 +462,36 @@ pub fn limbs_vec_shr_in_place(limbs: &mut Vec<Limb>, bits: u64) {
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
 /// w == u.
-pub fn limbs_vec_shr_round_up_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
-        limbs.truncate(1);
-        limbs[0] = 1;
+    if limbs_to_delete >= xs.len() {
+        xs.truncate(1);
+        xs[0] = 1;
     } else {
-        let mut exact = slice_test_zero(&limbs[..limbs_to_delete]);
+        let mut exact = slice_test_zero(&xs[..limbs_to_delete]);
         let small_bits = bits & Limb::WIDTH_MASK;
-        vec_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(xs, limbs_to_delete);
         if small_bits != 0 {
-            exact &= limbs_slice_shr_in_place(limbs, small_bits) == 0;
+            exact &= limbs_slice_shr_in_place(xs, small_bits) == 0;
         }
         if !exact {
-            limbs_vec_add_limb_in_place(limbs, 1);
+            limbs_vec_add_limb_in_place(xs, 1);
         }
     }
 }
 
-fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= limbs.len() {
-        limbs.clear();
+    if limbs_to_delete >= xs.len() {
+        xs.clear();
     } else {
         let small_bits = bits & Limb::WIDTH_MASK;
-        vec_delete_left(limbs, limbs_to_delete);
+        vec_delete_left(xs, limbs_to_delete);
         if small_bits != 0 {
-            limbs_slice_shr_in_place(limbs, small_bits);
+            limbs_slice_shr_in_place(xs, small_bits);
         }
-        if !limbs.is_empty() && limbs[0].odd() {
-            limbs_vec_add_limb_in_place(limbs, 1);
+        if !xs.is_empty() && xs[0].odd() {
+            limbs_vec_add_limb_in_place(xs, 1);
         }
     }
 }
@@ -555,14 +555,14 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(limbs: &mut Vec<Limb>, bits
 /// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
-pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+pub fn limbs_vec_shr_round_to_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
-    } else if !limbs_get_bit(limbs, bits - 1) {
-        limbs_vec_shr_in_place(limbs, bits)
-    } else if !limbs_divisible_by_power_of_two(limbs, bits - 1) {
-        limbs_vec_shr_round_up_in_place(limbs, bits)
+    } else if !limbs_get_bit(xs, bits - 1) {
+        limbs_vec_shr_in_place(xs, bits)
+    } else if !limbs_divisible_by_power_of_two(xs, bits - 1) {
+        limbs_vec_shr_round_up_in_place(xs, bits)
     } else {
-        limbs_vec_shr_round_half_integer_to_even_in_place(limbs, bits)
+        limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
     }
 }
 
@@ -616,9 +616,9 @@ pub fn limbs_vec_shr_round_to_nearest_in_place(limbs: &mut Vec<Limb>, bits: u64)
 /// let mut limbs = vec![4_294_967_295, 4_294_967_295];
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut limbs, 32), false);
 /// ```
-pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<Limb>, bits: u64) -> bool {
-    if limbs_divisible_by_power_of_two(limbs, bits) {
-        limbs_vec_shr_in_place(limbs, bits);
+pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
+    if limbs_divisible_by_power_of_two(xs, bits) {
+        limbs_vec_shr_in_place(xs, bits);
         true
     } else {
         false
@@ -688,21 +688,21 @@ pub fn limbs_vec_shr_exact_in_place(limbs: &mut Vec<Limb>, bits: u64) -> bool {
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut limbs, 32, RoundingMode::Down), true);
 /// assert_eq!(limbs, vec![4_294_967_295]);
 /// ```
-pub fn limbs_vec_shr_round_in_place(limbs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
+pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {
-            limbs_vec_shr_in_place(limbs, bits);
+            limbs_vec_shr_in_place(xs, bits);
             true
         }
         RoundingMode::Up | RoundingMode::Ceiling => {
-            limbs_vec_shr_round_up_in_place(limbs, bits);
+            limbs_vec_shr_round_up_in_place(xs, bits);
             true
         }
         RoundingMode::Nearest => {
-            limbs_vec_shr_round_to_nearest_in_place(limbs, bits);
+            limbs_vec_shr_round_to_nearest_in_place(xs, bits);
             true
         }
-        RoundingMode::Exact => limbs_vec_shr_exact_in_place(limbs, bits),
+        RoundingMode::Exact => limbs_vec_shr_exact_in_place(xs, bits),
     }
 }
 

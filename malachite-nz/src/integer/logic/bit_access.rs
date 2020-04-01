@@ -38,16 +38,16 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where d is negative.
-pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
+pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= limbs.len() {
+    if limb_index >= xs.len() {
         // We're indexing into the infinite suffix of 1s
         true
     } else {
-        let limb = if slice_test_zero(&limbs[..limb_index]) {
-            limbs[limb_index].wrapping_neg()
+        let limb = if slice_test_zero(&xs[..limb_index]) {
+            xs[limb_index].wrapping_neg()
         } else {
-            !limbs[limb_index]
+            !xs[limb_index]
         };
         limb.get_bit(index & Limb::WIDTH_MASK)
     }
@@ -77,16 +77,16 @@ pub fn limbs_get_bit_neg(limbs: &[Limb], index: u64) -> bool {
 /// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is negative.
-pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
+pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= limbs.len() {
+    if limb_index >= xs.len() {
         return;
     }
     let reduced_index = index & Limb::WIDTH_MASK;
-    let zero_bound = slice_leading_zeros(limbs);
+    let zero_bound = slice_leading_zeros(xs);
     match limb_index.cmp(&zero_bound) {
         Ordering::Equal => {
-            let boundary_limb = &mut limbs[limb_index];
+            let boundary_limb = &mut xs[limb_index];
             // boundary limb != 0 here
             *boundary_limb -= 1;
             boundary_limb.clear_bit(reduced_index);
@@ -95,32 +95,31 @@ pub fn limbs_set_bit_neg(limbs: &mut [Limb], index: u64) {
         }
         Ordering::Less => {
             assert!(!limbs_sub_limb_in_place(
-                &mut limbs[limb_index..],
+                &mut xs[limb_index..],
                 Limb::power_of_two(reduced_index),
             ));
         }
         Ordering::Greater => {
-            limbs[limb_index].clear_bit(reduced_index);
+            xs[limb_index].clear_bit(reduced_index);
         }
     }
 }
 
-fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
-    let zero_bound = slice_leading_zeros(limbs);
+fn limbs_clear_bit_neg_helper(xs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
+    let zero_bound = slice_leading_zeros(xs);
     match limb_index.cmp(&zero_bound) {
         Ordering::Equal => {
-            // limbs[limb_index] != 0 here
-            let mut boundary_limb = limbs[limb_index] - 1;
+            // xs[limb_index] != 0 here
+            let mut boundary_limb = xs[limb_index] - 1;
             boundary_limb.set_bit(reduced_index);
             boundary_limb.wrapping_add_assign(1);
-            limbs[limb_index] = boundary_limb;
-            if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut limbs[limb_index + 1..], 1)
-            {
+            xs[limb_index] = boundary_limb;
+            if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut xs[limb_index + 1..], 1) {
                 return true;
             }
         }
         Ordering::Greater => {
-            limbs[limb_index].set_bit(reduced_index);
+            xs[limb_index].set_bit(reduced_index);
         }
         _ => {}
     }
@@ -152,10 +151,10 @@ fn limbs_clear_bit_neg_helper(limbs: &mut [Limb], limb_index: usize, reduced_ind
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative and bit_idx small enough
 /// that no additional memory needs to be given to d.
-pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
+pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
-    if limb_index >= limbs.len() || limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
+    if limb_index >= xs.len() || limbs_clear_bit_neg_helper(xs, limb_index, reduced_index) {
         panic!("Setting bit cannot be done within existing slice");
     }
 }
@@ -183,16 +182,16 @@ pub fn limbs_slice_clear_bit_neg(limbs: &mut [Limb], index: u64) {
 /// ```
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative.
-pub fn limbs_vec_clear_bit_neg(limbs: &mut Vec<Limb>, index: u64) {
+pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
-    if limb_index < limbs.len() {
-        if limbs_clear_bit_neg_helper(limbs, limb_index, reduced_index) {
-            limbs.push(1);
+    if limb_index < xs.len() {
+        if limbs_clear_bit_neg_helper(xs, limb_index, reduced_index) {
+            xs.push(1);
         }
     } else {
-        limbs.resize(limb_index, 0);
-        limbs.push(Limb::power_of_two(reduced_index));
+        xs.resize(limb_index, 0);
+        xs.push(Limb::power_of_two(reduced_index));
     }
 }
 

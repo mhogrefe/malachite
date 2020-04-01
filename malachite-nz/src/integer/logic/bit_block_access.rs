@@ -9,7 +9,7 @@ use malachite_base::vecs::vec_delete_left;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
+use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_limb_in_place;
 use natural::logic::bit_block_access::limbs_assign_bits_helper;
@@ -61,7 +61,7 @@ pub fn limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64) -> Vec<Limb> {
                 Limb::MAX;
                 usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
             ];
-        limbs_mod_power_of_two_in_place(&mut result_limbs, bit_len);
+        limbs_vec_mod_power_of_two_in_place(&mut result_limbs, bit_len);
         return result_limbs;
     }
     let mut result_limbs = vec![limb >> start];
@@ -71,7 +71,7 @@ pub fn limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64) -> Vec<Limb> {
     } else {
         limbs_not_in_place(&mut result_limbs);
     }
-    limbs_mod_power_of_two_in_place(&mut result_limbs, bit_len);
+    limbs_vec_mod_power_of_two_in_place(&mut result_limbs, bit_len);
     result_limbs
 }
 
@@ -105,14 +105,14 @@ pub fn limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64) -> Vec<Limb> {
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 10, 10), empty);
 /// ```
-pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let trailing_zeros = limbs_trailing_zeros(limbs);
+    let trailing_zeros = limbs_trailing_zeros(xs);
     if trailing_zeros >= end {
         return Vec::new();
     }
     let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let len = limbs.len();
+    let len = xs.len();
     let bit_len = end - start;
     if limb_start >= len {
         let mut result_limbs =
@@ -120,14 +120,14 @@ pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Lim
                 Limb::MAX;
                 usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
             ];
-        limbs_mod_power_of_two_in_place(&mut result_limbs, bit_len);
+        limbs_vec_mod_power_of_two_in_place(&mut result_limbs, bit_len);
         return result_limbs;
     }
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
     let mut result_limbs = (if limb_end >= len {
-        &limbs[limb_start..]
+        &xs[limb_start..]
     } else {
-        &limbs[limb_start..limb_end]
+        &xs[limb_start..limb_end]
     })
     .to_vec();
     let offset = start & Limb::WIDTH_MASK;
@@ -140,7 +140,7 @@ pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Lim
     } else {
         limbs_not_in_place(&mut result_limbs);
     }
-    limbs_mod_power_of_two_in_place(&mut result_limbs, bit_len);
+    limbs_vec_mod_power_of_two_in_place(&mut result_limbs, bit_len);
     result_limbs
 }
 
@@ -174,38 +174,38 @@ pub fn limbs_slice_neg_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Lim
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 10, 10), empty);
 /// ```
-pub fn limbs_vec_neg_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let trailing_zeros = limbs_trailing_zeros(&limbs);
+    let trailing_zeros = limbs_trailing_zeros(&xs);
     if trailing_zeros >= end {
         return Vec::new();
     }
     let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let len = limbs.len();
+    let len = xs.len();
     let bit_len = end - start;
     if limb_start >= len {
-        limbs = vec![
+        xs = vec![
             Limb::MAX;
             usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
         ];
-        limbs_mod_power_of_two_in_place(&mut limbs, bit_len);
-        return limbs;
+        limbs_vec_mod_power_of_two_in_place(&mut xs, bit_len);
+        return xs;
     }
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
-    limbs.truncate(limb_end);
-    vec_delete_left(&mut limbs, limb_start);
+    xs.truncate(limb_end);
+    vec_delete_left(&mut xs, limb_start);
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
-        limbs_slice_shr_in_place(&mut limbs, offset);
+        limbs_slice_shr_in_place(&mut xs, offset);
     }
-    limbs.resize(limb_end - limb_start, 0);
+    xs.resize(limb_end - limb_start, 0);
     if trailing_zeros >= start {
-        limbs_twos_complement_in_place(&mut limbs);
+        limbs_twos_complement_in_place(&mut xs);
     } else {
-        limbs_not_in_place(&mut limbs);
+        limbs_not_in_place(&mut xs);
     }
-    limbs_mod_power_of_two_in_place(&mut limbs, bit_len);
-    limbs
+    limbs_vec_mod_power_of_two_in_place(&mut xs, bit_len);
+    xs
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural` n, writes the
@@ -242,11 +242,11 @@ pub fn limbs_vec_neg_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec
 /// limbs_neg_assign_bits(&mut limbs, 80, 100, &[789, 321]);
 /// assert_eq!(limbs, &[123, 456, 4243193856, 15]);
 /// ```
-pub fn limbs_neg_assign_bits(limbs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+pub fn limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
-    assert!(!limbs_sub_limb_in_place(limbs, 1));
-    limbs_assign_bits_helper(limbs, start, end, bits, true);
-    limbs_vec_add_limb_in_place(limbs, 1);
+    assert!(!limbs_sub_limb_in_place(xs, 1));
+    limbs_assign_bits_helper(xs, start, end, bits, true);
+    limbs_vec_add_limb_in_place(xs, 1);
 }
 
 impl Natural {

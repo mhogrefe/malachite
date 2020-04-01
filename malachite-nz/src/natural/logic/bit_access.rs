@@ -26,14 +26,13 @@ use platform::Limb;
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 35), true);
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 100), false);
 /// ```
-pub fn limbs_get_bit(limbs: &[Limb], index: u64) -> bool {
-    limbs
-        .get(usize::exact_from(index >> Limb::LOG_WIDTH))
-        .map_or(false, |limb| limb.get_bit(index & Limb::WIDTH_MASK))
+pub fn limbs_get_bit(xs: &[Limb], index: u64) -> bool {
+    xs.get(usize::exact_from(index >> Limb::LOG_WIDTH))
+        .map_or(false, |x| x.get_bit(index & Limb::WIDTH_MASK))
 }
 
-fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
-    limbs[limb_index].set_bit(index & Limb::WIDTH_MASK);
+fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
+    xs[limb_index].set_bit(index & Limb::WIDTH_MASK);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -62,8 +61,8 @@ fn limbs_set_bit_helper(limbs: &mut [Limb], index: u64, limb_index: usize) {
 /// limbs_slice_set_bit(limbs, 33);
 /// assert_eq!(limbs, &[3, 3]);
 /// ```
-pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
-    limbs_set_bit_helper(limbs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
+pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
+    limbs_set_bit_helper(xs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -90,12 +89,12 @@ pub fn limbs_slice_set_bit(limbs: &mut [Limb], index: u64) {
 /// limbs_vec_set_bit(&mut limbs, 128);
 /// assert_eq!(limbs, &[3, 3, 0, 0, 1]);
 /// ```
-pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
+pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= limbs.len() {
-        limbs.resize(limb_index + 1, 0);
+    if limb_index >= xs.len() {
+        xs.resize(limb_index + 1, 0);
     }
-    limbs_set_bit_helper(limbs, index, limb_index);
+    limbs_set_bit_helper(xs, index, limb_index);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -118,10 +117,10 @@ pub fn limbs_vec_set_bit(limbs: &mut Vec<Limb>, index: u64) {
 /// limbs_clear_bit(limbs, 1);
 /// assert_eq!(limbs, &[1, 1]);
 /// ```
-pub fn limbs_clear_bit(limbs: &mut [Limb], index: u64) {
+pub fn limbs_clear_bit(xs: &mut [Limb], index: u64) {
     let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index < limbs.len() {
-        limbs[limb_index].clear_bit(index & Limb::WIDTH_MASK);
+    if limb_index < xs.len() {
+        xs[limb_index].clear_bit(index & Limb::WIDTH_MASK);
     }
 }
 

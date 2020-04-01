@@ -10,8 +10,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
-    limbs_mod_power_of_two, limbs_mod_power_of_two_in_place, limbs_neg_mod_power_of_two,
-    limbs_neg_mod_power_of_two_in_place,
+    limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
+    limbs_vec_mod_power_of_two_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -28,12 +28,12 @@ use malachite_test::inputs::natural::{
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_mod_power_of_two_and_limbs_mod_power_of_two_in_place() {
+fn test_limbs_mod_power_of_two_and_limbs_vec_mod_power_of_two_in_place() {
     let test = |limbs: &[Limb], pow: u64, out: &[Limb]| {
         assert_eq!(limbs_mod_power_of_two(limbs, pow), out);
 
         let mut limbs = limbs.to_vec();
-        limbs_mod_power_of_two_in_place(&mut limbs, pow);
+        limbs_vec_mod_power_of_two_in_place(&mut limbs, pow);
         assert_eq!(limbs, out);
     };
     test(&[], 0, &[]);
@@ -184,13 +184,13 @@ fn limbs_mod_power_of_two_properties() {
 }
 
 #[test]
-fn limbs_mod_power_of_two_in_place_properties() {
+fn limbs_vec_mod_power_of_two_in_place_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_unsigned,
         |&(ref limbs, pow)| {
             let mut limbs = limbs.to_vec();
             let old_limbs = limbs.clone();
-            limbs_mod_power_of_two_in_place(&mut limbs, pow);
+            limbs_vec_mod_power_of_two_in_place(&mut limbs, pow);
             let n = Natural::from_limbs_asc(&old_limbs).mod_power_of_two(pow);
             assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
         },

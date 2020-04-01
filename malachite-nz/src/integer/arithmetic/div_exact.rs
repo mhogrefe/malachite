@@ -137,10 +137,10 @@ impl<'a> DivExact<Integer> for &'a Integer {
     /// );
     /// ```
     fn div_exact(self, other: Integer) -> Integer {
-        let quotient_abs = (&self.abs).div_exact(other.abs);
+        let q_abs = (&self.abs).div_exact(other.abs);
         Integer {
-            sign: self.sign == other.sign || quotient_abs == 0,
-            abs: quotient_abs,
+            sign: self.sign == other.sign || q_abs == 0,
+            abs: q_abs,
         }
     }
 }
@@ -186,10 +186,10 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     /// );
     /// ```
     fn div_exact(self, other: &'b Integer) -> Integer {
-        let quotient_abs = (&self.abs).div_exact(&other.abs);
+        let q_abs = (&self.abs).div_exact(&other.abs);
         Integer {
-            sign: self.sign == other.sign || quotient_abs == 0,
-            abs: quotient_abs,
+            sign: self.sign == other.sign || q_abs == 0,
+            abs: q_abs,
         }
     }
 }

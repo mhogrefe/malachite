@@ -34,19 +34,19 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_mod_power_of_two_neg_limb(&[1, 1], u32::MAX, 33), true);
 /// assert_eq!(limbs_eq_mod_power_of_two_neg_limb(&[1, 2], u32::MAX, 33), false);
 /// ```
-pub fn limbs_eq_mod_power_of_two_neg_limb(limbs: &[Limb], limb: Limb, pow: u64) -> bool {
-    if limb == 0 {
-        return limbs_divisible_by_power_of_two(limbs, pow);
+pub fn limbs_eq_mod_power_of_two_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
+    if y == 0 {
+        return limbs_divisible_by_power_of_two(xs, pow);
     }
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    if i >= limbs.len() {
+    if i >= xs.len() {
         false
     } else if i == 0 {
-        limbs[0].eq_mod_power_of_two(limb.wrapping_neg(), pow)
+        xs[0].eq_mod_power_of_two(y.wrapping_neg(), pow)
     } else {
-        limbs[0] == limb.wrapping_neg()
-            && limbs[1..i].iter().all(|&x| x == Limb::MAX)
-            && limbs[i].eq_mod_power_of_two(Limb::MAX, pow & Limb::WIDTH_MASK)
+        xs[0] == y.wrapping_neg()
+            && xs[1..i].iter().all(|&x| x == Limb::MAX)
+            && xs[i].eq_mod_power_of_two(Limb::MAX, pow & Limb::WIDTH_MASK)
     }
 }
 

@@ -28,15 +28,15 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where the result is returned.
-pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
+pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut shifted_limbs = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
     if small_bits == 0 {
-        shifted_limbs.extend_from_slice(limbs);
+        shifted_limbs.extend_from_slice(xs);
     } else {
         let cobits = Limb::WIDTH - small_bits;
         let mut remaining_bits = 0;
-        for limb in limbs {
+        for limb in xs {
             shifted_limbs.push((limb << small_bits) | remaining_bits);
             remaining_bits = limb >> cobits;
         }
@@ -76,15 +76,15 @@ pub fn limbs_shl(limbs: &[Limb], bits: u64) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2.
-pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb {
-    let len = in_limbs.len();
+pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+    let len = xs.len();
     assert!(out.len() >= len);
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
     for i in 0..len {
-        let limb = in_limbs[i];
+        let limb = xs[i];
         out[i] = (limb << bits) | remaining_bits;
         remaining_bits = limb >> cobits;
     }
@@ -116,12 +116,12 @@ pub fn limbs_shl_to_out(out: &mut [Limb], in_limbs: &[Limb], bits: u64) -> Limb 
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up.
-pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
+pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
-    for limb in limbs.iter_mut() {
+    for limb in xs.iter_mut() {
         let old_limb = *limb;
         *limb = (old_limb << bits) | remaining_bits;
         remaining_bits = old_limb >> cobits;
@@ -156,16 +156,16 @@ pub fn limbs_slice_shl_in_place(limbs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up and the carry is
 /// appended to rp.
-pub fn limbs_vec_shl_in_place(limbs: &mut Vec<Limb>, bits: u64) {
+pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
         0
     } else {
-        limbs_slice_shl_in_place(limbs, small_bits)
+        limbs_slice_shl_in_place(xs, small_bits)
     };
-    vec_pad_left(limbs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
+    vec_pad_left(xs, usize::exact_from(bits >> Limb::LOG_WIDTH), 0);
     if remaining_bits != 0 {
-        limbs.push(remaining_bits);
+        xs.push(remaining_bits);
     }
 }
 

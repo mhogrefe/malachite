@@ -29,12 +29,12 @@ use platform::Limb;
 /// assert_eq!(limbs_next_power_of_two(&[123, 456]), &[0, 512]);
 /// assert_eq!(limbs_next_power_of_two(&[123, 456, 0xffff_ffff]), &[0, 0, 0, 1]);
 /// ```
-pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
-    let last_limb = limbs.last().unwrap();
+pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
+    let xs_last = xs.last().unwrap();
     let mut result_limbs;
-    if let Some(limb) = last_limb.checked_next_power_of_two() {
-        result_limbs = vec![0; limbs.len() - 1];
-        if limb == *last_limb && !slice_test_zero(&limbs[..limbs.len() - 1]) {
+    if let Some(limb) = xs_last.checked_next_power_of_two() {
+        result_limbs = vec![0; xs.len() - 1];
+        if limb == *xs_last && !slice_test_zero(&xs[..xs.len() - 1]) {
             if let Some(limb) = limb.true_checked_shl(1) {
                 result_limbs.push(limb)
             } else {
@@ -45,7 +45,7 @@ pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
             result_limbs.push(limb);
         }
     } else {
-        result_limbs = vec![0; limbs.len()];
+        result_limbs = vec![0; xs.len()];
         result_limbs.push(1);
     }
     result_limbs
@@ -83,26 +83,26 @@ pub fn limbs_next_power_of_two(limbs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), true);
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
-pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
-    let (last_limb, init) = limbs.split_last_mut().unwrap();
-    if let Some(limb) = last_limb.checked_next_power_of_two() {
-        if limb == *last_limb && !slice_test_zero(init) {
-            slice_set_zero(init);
+pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
+    let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+    if let Some(limb) = xs_last.checked_next_power_of_two() {
+        if limb == *xs_last && !slice_test_zero(xs_init) {
+            slice_set_zero(xs_init);
             if let Some(limb) = limb.true_checked_shl(1) {
-                *last_limb = limb;
+                *xs_last = limb;
                 false
             } else {
-                *last_limb = 0;
+                *xs_last = 0;
                 true
             }
         } else {
-            slice_set_zero(init);
-            *last_limb = limb;
+            slice_set_zero(xs_init);
+            *xs_last = limb;
             false
         }
     } else {
-        slice_set_zero(init);
-        *last_limb = 0;
+        slice_set_zero(xs_init);
+        *xs_last = 0;
         true
     }
 }
@@ -138,9 +138,9 @@ pub fn limbs_slice_next_power_of_two_in_place(limbs: &mut [Limb]) -> bool {
 /// limbs_vec_next_power_of_two_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```
-pub fn limbs_vec_next_power_of_two_in_place(limbs: &mut Vec<Limb>) {
-    if limbs_slice_next_power_of_two_in_place(limbs) {
-        limbs.push(1);
+pub fn limbs_vec_next_power_of_two_in_place(xs: &mut Vec<Limb>) {
+    if limbs_slice_next_power_of_two_in_place(xs) {
+        xs.push(1);
     }
 }
 
@@ -244,14 +244,17 @@ impl NextPowerOfTwoAssign for Natural {
     /// assert_eq!(x.to_string(), "1099511627776");
     /// ```
     fn next_power_of_two_assign(&mut self) {
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            { small.checked_next_power_of_two() },
-            {
+        match *self {
+            Natural(Small(ref mut small)) => {
+                if let Some(pow) = small.checked_next_power_of_two() {
+                    *small = pow;
+                } else {
+                    *self = Natural(Large(vec![0, 1]));
+                }
+            }
+            Natural(Large(ref mut limbs)) => {
                 limbs_vec_next_power_of_two_in_place(limbs);
             }
-        );
+        }
     }
 }

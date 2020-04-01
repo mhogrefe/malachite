@@ -52,7 +52,7 @@ use platform::Limb;
 /// assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_fffd, 1],
 ///     RoundingMode::Nearest), Some(1));
 /// ```
-pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) -> Option<Limb> {
+pub fn limbs_limb_div_round_limbs(limb: Limb, xs: &[Limb], rm: RoundingMode) -> Option<Limb> {
     if limb == 0 {
         Some(0)
     } else {
@@ -62,11 +62,7 @@ pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) 
             RoundingMode::Exact => None,
             // 1 if 2 * limb > Natural::from_limbs_asc(limbs); otherwise, 0
             RoundingMode::Nearest => Some(
-                if limbs.len() == 2
-                    && limbs[1] == 1
-                    && limb.get_highest_bit()
-                    && (limb << 1) > limbs[0]
-                {
+                if xs.len() == 2 && xs[1] == 1 && limb.get_highest_bit() && (limb << 1) > xs[0] {
                     1
                 } else {
                     0
@@ -76,19 +72,19 @@ pub fn limbs_limb_div_round_limbs(limb: Limb, limbs: &[Limb], rm: RoundingMode) 
     }
 }
 
-fn div_round_nearest(quotient: Natural, remainder: Natural, denominator: &Natural) -> Natural {
-    let compare = (remainder << 1u64).cmp(denominator);
-    if compare == Ordering::Greater || compare == Ordering::Equal && quotient.odd() {
-        quotient.add_limb(1)
+fn div_round_nearest(q: Natural, r: Natural, d: &Natural) -> Natural {
+    let compare = (r << 1u64).cmp(d);
+    if compare == Ordering::Greater || compare == Ordering::Equal && q.odd() {
+        q.add_limb(1)
     } else {
-        quotient
+        q
     }
 }
 
-fn div_round_assign_nearest(quotient: &mut Natural, remainder: Natural, denominator: &Natural) {
-    let compare = (remainder << 1u64).cmp(denominator);
-    if compare == Ordering::Greater || compare == Ordering::Equal && quotient.odd() {
-        quotient.increment();
+fn div_round_assign_nearest(q: &mut Natural, r: Natural, d: &Natural) {
+    let compare = (r << 1u64).cmp(d);
+    if compare == Ordering::Greater || compare == Ordering::Equal && q.odd() {
+        q.increment();
     }
 }
 

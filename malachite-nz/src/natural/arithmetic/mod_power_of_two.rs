@@ -5,6 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::slices::slice_set_zero;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -30,21 +31,42 @@ use platform::Limb;
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is non-negative and the
 /// result is returned.
-pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
+pub fn limbs_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
     }
     let result_limb_count = pow >> Limb::LOG_WIDTH;
     let leftover_bits = pow & Limb::WIDTH_MASK;
     let result_limb_count = usize::exact_from(result_limb_count);
-    if result_limb_count >= limbs.len() {
-        return limbs.to_vec();
+    if result_limb_count >= xs.len() {
+        return xs.to_vec();
     }
-    let mut result = limbs[..result_limb_count].to_vec();
+    let mut result = xs[..result_limb_count].to_vec();
     if leftover_bits != 0 {
-        result.push(limbs[result_limb_count].mod_power_of_two(leftover_bits));
+        result.push(xs[result_limb_count].mod_power_of_two(leftover_bits));
     }
     result
+}
+
+//TODO test
+pub fn limbs_slice_mod_power_of_two_in_place(xs: &mut [Limb], pow: u64) {
+    if pow == 0 {
+        slice_set_zero(xs);
+        return;
+    }
+    let mut new_limb_count = pow >> Limb::LOG_WIDTH;
+    let leftover_bits = pow & Limb::WIDTH_MASK;
+    if leftover_bits != 0 {
+        new_limb_count += 1;
+    }
+    let new_limb_count = usize::exact_from(new_limb_count);
+    if new_limb_count > xs.len() {
+        return;
+    }
+    slice_set_zero(&mut xs[new_limb_count..]);
+    if leftover_bits != 0 {
+        xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
+    }
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -57,26 +79,26 @@ pub fn limbs_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
+/// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_mod_power_of_two_in_place(&mut limbs, 10);
+/// limbs_vec_mod_power_of_two_in_place(&mut limbs, 10);
 /// assert_eq!(limbs, &[123]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_mod_power_of_two_in_place(&mut limbs, 33);
+/// limbs_vec_mod_power_of_two_in_place(&mut limbs, 33);
 /// assert_eq!(limbs, &[123, 0]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_mod_power_of_two_in_place(&mut limbs, 40);
+/// limbs_vec_mod_power_of_two_in_place(&mut limbs, 40);
 /// assert_eq!(limbs, &[123, 200]);
 /// ```
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is non-negative and
 /// res == in.
-pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
+pub fn limbs_vec_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
-        limbs.clear();
+        xs.clear();
         return;
     }
     let mut new_limb_count = pow >> Limb::LOG_WIDTH;
@@ -85,12 +107,12 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
         new_limb_count += 1;
     }
     let new_limb_count = usize::exact_from(new_limb_count);
-    if new_limb_count > limbs.len() {
+    if new_limb_count > xs.len() {
         return;
     }
-    limbs.truncate(new_limb_count);
+    xs.truncate(new_limb_count);
     if leftover_bits != 0 {
-        limbs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
+        xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
     }
 }
 
@@ -113,8 +135,8 @@ pub fn limbs_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and the result
 /// is returned. `limbs` are the limbs of -in.
-pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
-    let mut result_limbs = limbs.to_vec();
+pub fn limbs_neg_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
+    let mut result_limbs = xs.to_vec();
     limbs_neg_mod_power_of_two_in_place(&mut result_limbs, pow);
     result_limbs
 }
@@ -146,16 +168,16 @@ pub fn limbs_neg_mod_power_of_two(limbs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and res == in.
 /// `limbs` are the limbs of -in.
-pub fn limbs_neg_mod_power_of_two_in_place(limbs: &mut Vec<Limb>, pow: u64) {
+pub fn limbs_neg_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let mut new_limb_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         new_limb_count += 1;
     }
-    limbs.resize(new_limb_count, 0);
-    limbs_twos_complement_in_place(limbs);
+    xs.resize(new_limb_count, 0);
+    limbs_twos_complement_in_place(xs);
     if leftover_bits != 0 {
-        limbs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
+        xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
     }
 }
 
@@ -257,7 +279,7 @@ impl ModPowerOfTwoAssign for Natural {
                 small.mod_power_of_two_assign(pow);
                 return;
             }
-            Natural(Large(ref mut limbs)) => limbs_mod_power_of_two_in_place(limbs, pow),
+            Natural(Large(ref mut limbs)) => limbs_vec_mod_power_of_two_in_place(limbs, pow),
         }
         self.trim();
     }

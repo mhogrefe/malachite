@@ -136,13 +136,13 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_same_length_to_out;
 /// use malachite_nz::platform::Limb;
 ///
-/// let limbs: &mut [Limb] = &mut [10; 4];
-/// limbs_mul_same_length_to_out(limbs, &[1, 2], &[6, 7]);
-/// assert_eq!(limbs, &[6, 19, 14, 0]);
+/// let xs: &mut [Limb] = &mut [10; 4];
+/// limbs_mul_same_length_to_out(xs, &[1, 2], &[6, 7]);
+/// assert_eq!(xs, &[6, 19, 14, 0]);
 ///
-/// let limbs: &mut [Limb] = &mut [10; 6];
-/// limbs_mul_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]);
-/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// let xs: &mut [Limb] = &mut [10; 6];
+/// limbs_mul_same_length_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]);
+/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
 /// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
@@ -201,13 +201,13 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 /// use malachite_nz::platform::Limb;
 ///
-/// let limbs: &mut [Limb] = &mut [10; 5];
-/// assert_eq!(limbs_mul_greater_to_out(limbs, &[1, 2, 3], &[6, 7]), 0);
-/// assert_eq!(limbs, &[6, 19, 32, 21, 0]);
+/// let xs: &mut [Limb] = &mut [10; 5];
+/// assert_eq!(limbs_mul_greater_to_out(xs, &[1, 2, 3], &[6, 7]), 0);
+/// assert_eq!(xs, &[6, 19, 32, 21, 0]);
 ///
-/// let limbs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_greater_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
-/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// let xs: &mut [Limb] = &mut [10; 6];
+/// assert_eq!(limbs_mul_greater_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
@@ -372,13 +372,13 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_to_out;
 /// use malachite_nz::platform::Limb;
 ///
-/// let limbs: &mut [Limb] = &mut [10; 5];
-/// assert_eq!(limbs_mul_to_out(limbs, &[6, 7], &[1, 2, 3]), 0);
-/// assert_eq!(limbs, &[6, 19, 32, 21, 0]);
+/// let xs: &mut [Limb] = &mut [10; 5];
+/// assert_eq!(limbs_mul_to_out(xs, &[6, 7], &[1, 2, 3]), 0);
+/// assert_eq!(xs, &[6, 19, 32, 21, 0]);
 ///
-/// let limbs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
-/// assert_eq!(limbs, &[10200, 20402, 10299, 203, 99, 2]);
+/// let xs: &mut [Limb] = &mut [10; 6];
+/// assert_eq!(limbs_mul_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.

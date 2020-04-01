@@ -39,13 +39,13 @@ impl Integer {
     /// assert_eq!(Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_twos_complement_limbs_asc(limbs: &[Limb]) -> Integer {
-        if limbs.is_empty() {
+    pub fn from_twos_complement_limbs_asc(xs: &[Limb]) -> Integer {
+        if xs.is_empty() {
             Integer::ZERO
-        } else if !limbs.last().unwrap().get_highest_bit() {
-            Integer::from(Natural::from_limbs_asc(limbs))
+        } else if !xs.last().unwrap().get_highest_bit() {
+            Integer::from(Natural::from_limbs_asc(xs))
         } else {
-            -Natural::from_owned_limbs_asc(limbs_twos_complement(limbs))
+            -Natural::from_owned_limbs_asc(limbs_twos_complement(xs))
         }
     }
 
@@ -79,9 +79,9 @@ impl Integer {
     /// assert_eq!(Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]).to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_twos_complement_limbs_desc(limbs: &[Limb]) -> Integer {
+    pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Integer {
         Integer::from_owned_twos_complement_limbs_asc(
-            limbs.iter().cloned().rev().collect::<Vec<Limb>>(),
+            xs.iter().cloned().rev().collect::<Vec<Limb>>(),
         )
     }
 
@@ -117,14 +117,14 @@ impl Integer {
     ///     .to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_owned_twos_complement_limbs_asc(mut limbs: Vec<Limb>) -> Integer {
-        if limbs.is_empty() {
+    pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Integer {
+        if xs.is_empty() {
             Integer::ZERO
-        } else if !limbs.last().unwrap().get_highest_bit() {
-            Integer::from(Natural::from_owned_limbs_asc(limbs))
+        } else if !xs.last().unwrap().get_highest_bit() {
+            Integer::from(Natural::from_owned_limbs_asc(xs))
         } else {
-            assert!(!limbs_twos_complement_in_place(&mut limbs));
-            -Natural::from_owned_limbs_asc(limbs)
+            assert!(!limbs_twos_complement_in_place(&mut xs));
+            -Natural::from_owned_limbs_asc(xs)
         }
     }
 
@@ -161,8 +161,8 @@ impl Integer {
     ///     .to_string(),
     ///     "-1000000000000");
     /// ```
-    pub fn from_owned_twos_complement_limbs_desc(mut limbs: Vec<Limb>) -> Integer {
-        limbs.reverse();
-        Integer::from_owned_twos_complement_limbs_asc(limbs)
+    pub fn from_owned_twos_complement_limbs_desc(mut xs: Vec<Limb>) -> Integer {
+        xs.reverse();
+        Integer::from_owned_twos_complement_limbs_asc(xs)
     }
 }

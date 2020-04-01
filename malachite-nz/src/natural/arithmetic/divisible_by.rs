@@ -21,11 +21,11 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
-    if limbs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_divisible_by_limb(limbs, divisor)
+pub fn _combined_limbs_divisible_by_limb(xs: &[Limb], d: Limb) -> bool {
+    if xs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_divisible_by_limb(xs, d)
     } else {
-        limbs_mod_limb(limbs, divisor) == 0
+        limbs_mod_limb(xs, d) == 0
     }
 }
 
@@ -50,14 +50,13 @@ pub fn _combined_limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool 
 ///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative and the
 /// ABOVE_THRESHOLD branch is excluded.
-pub fn limbs_divisible_by_limb(limbs: &[Limb], divisor: Limb) -> bool {
-    assert!(limbs.len() > 1);
-    if divisor.even() {
-        let twos = TrailingZeros::trailing_zeros(divisor);
-        limbs[0].divisible_by_power_of_two(twos)
-            && limbs_mod_exact_odd_limb(limbs, divisor >> twos, 0) == 0
+pub fn limbs_divisible_by_limb(xs: &[Limb], d: Limb) -> bool {
+    assert!(xs.len() > 1);
+    if d.even() {
+        let twos = TrailingZeros::trailing_zeros(d);
+        xs[0].divisible_by_power_of_two(twos) && limbs_mod_exact_odd_limb(xs, d >> twos, 0) == 0
     } else {
-        limbs_mod_exact_odd_limb(limbs, divisor, 0) == 0
+        limbs_mod_exact_odd_limb(xs, d, 0) == 0
     }
 }
 
@@ -499,7 +498,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
 impl Natural {
     fn divisible_by_limb(&self, other: Limb) -> bool {
         match (self, other) {
-            (&Natural(Small(0)), _) => true,
+            (&natural_zero!(), _) => true,
             (_, 0) => false,
             (&Natural(Small(small)), y) => small.divisible_by(y),
             (&Natural(Large(ref limbs)), y) => limbs_divisible_by_limb(limbs, y),
@@ -510,7 +509,7 @@ impl Natural {
     fn limb_divisible_by_natural(&self, other: Limb) -> bool {
         match (other, self) {
             (0, _) => true,
-            (_, Natural(Small(0))) | (_, &Natural(Large(_))) => false,
+            (_, natural_zero!()) | (_, &Natural(Large(_))) => false,
             (x, &Natural(Small(small))) => x.divisible_by(small),
         }
     }

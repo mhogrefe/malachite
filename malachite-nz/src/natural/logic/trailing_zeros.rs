@@ -27,9 +27,9 @@ use platform::Limb;
 /// assert_eq!(limbs_trailing_zeros(&[4]), 2);
 /// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
 /// ```
-pub fn limbs_trailing_zeros(limbs: &[Limb]) -> u64 {
-    let zero_limbs = slice_leading_zeros(limbs);
-    let remaining_zeros = TrailingZeros::trailing_zeros(limbs[zero_limbs]);
+pub fn limbs_trailing_zeros(xs: &[Limb]) -> u64 {
+    let zero_limbs = slice_leading_zeros(xs);
+    let remaining_zeros = TrailingZeros::trailing_zeros(xs[zero_limbs]);
     (u64::wrapping_from(zero_limbs) << Limb::LOG_WIDTH) + remaining_zeros
 }
 
@@ -59,7 +59,7 @@ impl Natural {
     /// ```
     pub fn trailing_zeros(&self) -> Option<u64> {
         match *self {
-            Natural(Small(0)) => None,
+            natural_zero!() => None,
             Natural(Small(small)) => Some(TrailingZeros::trailing_zeros(small)),
             Natural(Large(ref limbs)) => Some(limbs_trailing_zeros(limbs)),
         }

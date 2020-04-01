@@ -277,6 +277,60 @@ pub trait OverflowingSubAssign<RHS = Self> {
     fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
 }
 
+/// Computes `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced mod
+/// 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoAdd<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_two_add(self, rhs: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
+/// mod 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoAddAssign<RHS = Self> {
+    fn mod_power_of_two_add_assign(&mut self, rhs: RHS, pow: u64);
+}
+
+/// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod `modulus`.
+pub trait ModAdd<RHS = Self, MOD = Self> {
+    type Output;
+
+    fn mod_add(self, rhs: RHS, modulus: MOD) -> Self::Output;
+}
+
+/// Replaces `self` with `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
+/// `modulus`.
+pub trait ModAddAssign<RHS = Self, MOD = Self> {
+    fn mod_add_assign(&mut self, rhs: RHS, modulus: MOD);
+}
+
+/// Computes `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced mod
+/// 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoSub<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_two_sub(self, rhs: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
+/// mod 2<pow>`pow`</pow>.
+pub trait ModPowerOfTwoSubAssign<RHS = Self> {
+    fn mod_power_of_two_sub_assign(&mut self, rhs: RHS, pow: u64);
+}
+
+/// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod `modulus`.
+pub trait ModSub<RHS = Self, MOD = Self> {
+    type Output;
+
+    fn mod_sub(self, rhs: RHS, modulus: MOD) -> Self::Output;
+}
+
+/// Replaces `self` with `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
+/// `modulus`.
+pub trait ModSubAssign<RHS = Self, MOD = Self> {
+    fn mod_sub_assign(&mut self, rhs: RHS, modulus: MOD);
+}
+
 /// Checked multiplication. Computes `self * rhs`, returning `None` if there is no valid result.
 pub trait CheckedMul<RHS = Self> {
     type Output;

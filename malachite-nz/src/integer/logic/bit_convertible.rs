@@ -103,16 +103,16 @@ pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     }
 }
 
-fn limbs_asc_from_negative_twos_complement_limbs_asc(mut limbs: Vec<Limb>) -> Vec<Limb> {
+fn limbs_asc_from_negative_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Vec<Limb> {
     {
-        let most_significant_limb = limbs.last_mut().unwrap();
+        let most_significant_limb = xs.last_mut().unwrap();
         let leading_zeros = LeadingZeros::leading_zeros(*most_significant_limb);
         if leading_zeros != 0 {
             *most_significant_limb |= !Limb::low_mask(Limb::WIDTH - leading_zeros);
         }
     }
-    assert!(!limbs_twos_complement_in_place(&mut limbs));
-    limbs
+    assert!(!limbs_twos_complement_in_place(&mut xs));
+    xs
 }
 
 fn limbs_asc_from_negative_twos_complement_bits_asc(bits: &[bool]) -> Vec<Limb> {

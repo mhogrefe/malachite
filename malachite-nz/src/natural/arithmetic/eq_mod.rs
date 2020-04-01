@@ -25,47 +25,47 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 /// divisor must be odd. //TODO test
-pub fn limbs_limb_mod_exact_odd_limb(limb: Limb, divisor: Limb, carry: Limb) -> Limb {
-    if limb > carry {
-        let result = (limb - carry) % divisor;
+pub fn limbs_limb_mod_exact_odd_limb(x: Limb, d: Limb, carry: Limb) -> Limb {
+    if x > carry {
+        let result = (x - carry) % d;
         if result == 0 {
             0
         } else {
-            divisor - result
+            d - result
         }
     } else {
-        (carry - limb) % divisor
+        (carry - x) % d
     }
 }
 
 /// divisor must be odd. //TODO test
 ///
 /// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c.
-pub fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) -> Limb {
-    let len = limbs.len();
+pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
+    let len = xs.len();
     if len == 1 {
-        return limbs_limb_mod_exact_odd_limb(limbs[0], divisor, carry);
+        return limbs_limb_mod_exact_odd_limb(xs[0], d, carry);
     }
-    let inverse = limbs_modular_invert_limb(divisor);
-    let divisor_double = DoubleLimb::from(divisor);
+    let inverse = limbs_modular_invert_limb(d);
+    let d_double = DoubleLimb::from(d);
     let last_index = len - 1;
-    for &limb in &limbs[..last_index] {
+    for &limb in &xs[..last_index] {
         let (difference, small_carry) = limb.overflowing_sub(carry);
-        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * divisor_double).upper_half();
+        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
     }
-    let last = limbs[last_index];
-    if last <= divisor {
+    let last = xs[last_index];
+    if last <= d {
         if carry >= last {
             carry - last
         } else {
-            carry.wrapping_add(divisor - last)
+            carry.wrapping_add(d - last)
         }
     } else {
         let (difference, small_carry) = last.overflowing_sub(carry);
-        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * divisor_double).upper_half();
+        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
@@ -78,11 +78,11 @@ pub fn limbs_mod_exact_odd_limb(limbs: &[Limb], divisor: Limb, mut carry: Limb) 
 /// limbs.len() must be greater than 1; modulus must be nonzero.
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is non-negative.
-pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
-    if limbs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_mod_limb(limbs, modulus) == limb % modulus
+pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+    if xs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_mod_limb(xs, modulus) == limb % modulus
     } else {
-        limbs_eq_limb_mod_limb(limbs, limb, modulus)
+        limbs_eq_limb_mod_limb(xs, limb, modulus)
     }
 }
 
@@ -111,19 +111,19 @@ pub fn _combined_limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Lim
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is positive and the
 /// ABOVE_THRESHOLD branch is excluded.
-pub fn limbs_eq_limb_mod_limb(limbs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, modulus: Limb) -> bool {
     assert_ne!(modulus, 0);
-    assert!(limbs.len() > 1);
-    let remainder = if modulus.even() {
+    assert!(xs.len() > 1);
+    let r = if modulus.even() {
         let twos = TrailingZeros::trailing_zeros(modulus);
-        if !limbs[0].wrapping_sub(limb).divisible_by_power_of_two(twos) {
+        if !xs[0].wrapping_sub(y).divisible_by_power_of_two(twos) {
             return false;
         }
-        limbs_mod_exact_odd_limb(limbs, modulus >> twos, limb)
+        limbs_mod_exact_odd_limb(xs, modulus >> twos, y)
     } else {
-        limbs_mod_exact_odd_limb(limbs, modulus, limb)
+        limbs_mod_exact_odd_limb(xs, modulus, y)
     };
-    remainder == 0 || remainder == modulus
+    r == 0 || r == modulus
 }
 
 #[allow(clippy::absurd_extreme_comparisons)]
@@ -890,9 +890,9 @@ impl EqMod<Natural, Natural> for Natural {
     /// ```
     fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, Natural(Small(0))) => x == y,
-            (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, natural_zero!()) => x == y,
+            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
+            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (ref x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -956,9 +956,9 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     /// ```
     fn eq_mod(self, other: Natural, modulus: &'a Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, &Natural(Small(0))) => x == y,
-            (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, &natural_zero!()) => x == y,
+            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
+            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (ref x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -1020,9 +1020,9 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     /// ```
     fn eq_mod(self, other: &'a Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, Natural(Small(0))) => x == *y,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, natural_zero!()) => x == *y,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (ref x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -1086,9 +1086,9 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     /// ```
     fn eq_mod(self, other: &'a Natural, modulus: &'b Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, &Natural(Small(0))) => x == *y,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, &natural_zero!()) => x == *y,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (ref x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -1150,9 +1150,9 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, Natural(Small(0))) => *x == y,
-            (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, natural_zero!()) => *x == y,
+            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (&Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -1216,9 +1216,9 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: Natural, modulus: &'b Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, &Natural(Small(0))) => *x == y,
-            (x, Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, &natural_zero!()) => *x == y,
+            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (&Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
@@ -1280,9 +1280,9 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: &'b Natural, modulus: Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, Natural(Small(0))) => x == y,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, natural_zero!()) => x == y,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
@@ -1344,9 +1344,9 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     /// ```
     fn eq_mod(self, other: &'b Natural, modulus: &'c Natural) -> bool {
         match (self, other, modulus) {
-            (x, y, &Natural(Small(0))) => x == y,
-            (x, &Natural(Small(0)), modulus) => x.divisible_by(modulus),
-            (&Natural(Small(0)), y, modulus) => y.divisible_by(modulus),
+            (x, y, &natural_zero!()) => x == y,
+            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
+            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
             (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
             (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,

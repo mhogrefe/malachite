@@ -23,8 +23,8 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_not(&[0, 1, 2]), [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
-pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
-    limbs.iter().map(|limb| !limb).collect()
+pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
+    xs.iter().map(|x| !x).collect()
 }
 
 /// Writes the bitwise not of a slice of limbs to the lowest `in_limbs.len()` limbs of `out`.
@@ -49,9 +49,9 @@ pub fn limbs_not(limbs: &[Limb]) -> Vec<Limb> {
 /// limbs_not_to_out(&mut out, &[0xffff0000, 0xf0f0f0f0]);
 /// assert_eq!(out, [0x0000ffff, 0x0f0f0f0f, 2]);
 /// ```
-pub fn limbs_not_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
-    assert!(out.len() >= in_limbs.len());
-    for (x, y) in out.iter_mut().zip(in_limbs.iter()) {
+pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
+    assert!(out.len() >= xs.len());
+    for (x, y) in out.iter_mut().zip(xs.iter()) {
         *x = !y;
     }
 }
@@ -75,8 +75,8 @@ pub fn limbs_not_to_out(out: &mut [Limb], in_limbs: &[Limb]) {
 /// limbs_not_in_place(&mut limbs);
 /// assert_eq!(limbs, [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
-pub fn limbs_not_in_place(limbs: &mut [Limb]) {
-    for limb in limbs.iter_mut() {
+pub fn limbs_not_in_place(xs: &mut [Limb]) {
+    for limb in xs.iter_mut() {
         limb.not_assign();
     }
 }

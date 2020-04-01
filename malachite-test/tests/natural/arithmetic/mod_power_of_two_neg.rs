@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, ModNeg, ModPowerOfTwo, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg,
+    ModNeg, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg,
     ModPowerOfTwoNegAssign, PowerOfTwo,
 };
 use malachite_base::num::basic::traits::Zero;
@@ -18,19 +18,14 @@ fn test_mod_power_of_two_neg() {
         assert!(Natural::from_str(u)
             .unwrap()
             .mod_power_of_two_is_reduced(pow));
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .mod_power_of_two_neg(pow)
-                .to_string(),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(u).unwrap())
-                .mod_power_of_two_neg(pow)
-                .to_string(),
-            out
-        );
+        let n = Natural::from_str(u).unwrap().mod_power_of_two_neg(pow);
+        assert!(n.is_valid());
+        assert_eq!(n.to_string(), out);
+        assert!(n.mod_power_of_two_is_reduced(pow));
+
+        let n = (&Natural::from_str(u).unwrap()).mod_power_of_two_neg(pow);
+        assert!(n.is_valid());
+        assert_eq!(n.to_string(), out);
 
         let mut n = Natural::from_str(u).unwrap();
         n.mod_power_of_two_neg_assign(pow);
@@ -64,8 +59,7 @@ fn mod_power_of_two_neg_properties() {
         assert_eq!(neg, (-n).mod_power_of_two(pow));
         assert_eq!(neg, n.mod_neg(Natural::power_of_two(pow)));
         assert_eq!((&neg).mod_power_of_two_neg(pow), *n);
-        //TODO use mod_add
-        assert!((n + &neg).divisible_by_power_of_two(pow));
+        assert_eq!(n.mod_power_of_two_add(&neg, pow), 0);
         assert_eq!(
             *n == neg,
             *n == Natural::ZERO || *n == Natural::power_of_two(pow - 1)

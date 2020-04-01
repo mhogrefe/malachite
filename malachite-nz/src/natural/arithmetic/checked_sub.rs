@@ -228,7 +228,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
             Some(Natural::ZERO)
         } else {
             match (self, other) {
-                (x, &Natural(Small(0))) => Some(x.clone()),
+                (x, &natural_zero!()) => Some(x.clone()),
                 (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
                 (&Natural(Small(_)), _) => None,
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {

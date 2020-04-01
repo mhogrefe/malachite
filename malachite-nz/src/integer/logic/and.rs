@@ -31,9 +31,9 @@ use platform::Limb;
 /// assert_eq!(limbs_pos_and_limb_neg(&[0, 2], 3), &[0, 2]);
 /// assert_eq!(limbs_pos_and_limb_neg(&[123, 456], 789), &[17, 456]);
 /// ```
-pub fn limbs_pos_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
-    let mut result_limbs = limbs.to_vec();
-    result_limbs[0] &= limb;
+pub fn limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+    let mut result_limbs = xs.to_vec();
+    result_limbs[0] &= y;
     result_limbs
 }
 
@@ -63,11 +63,11 @@ pub fn limbs_pos_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 /// limbs_pos_and_limb_neg_to_out(&mut result, &[123, 456], 789);
 /// assert_eq!(result, &[17, 456, 10, 10]);
 /// ```
-pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) {
-    let len = in_limbs.len();
+pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+    let len = xs.len();
     assert!(out.len() >= len);
-    out[0] = in_limbs[0] & limb;
-    out[1..len].copy_from_slice(&in_limbs[1..]);
+    out[0] = xs[0] & y;
+    out[1..len].copy_from_slice(&xs[1..]);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
@@ -94,8 +94,8 @@ pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: 
 /// limbs_pos_and_limb_neg_in_place(&mut limbs, 789);
 /// assert_eq!(limbs, &[17, 456]);
 /// ```
-pub fn limbs_pos_and_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) {
-    limbs[0] &= limb;
+pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
+    xs[0] &= ys;
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
@@ -121,10 +121,10 @@ pub fn limbs_pos_and_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) {
 /// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
 /// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
 /// ```
-pub fn limbs_neg_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
-    let mut result_limbs = limbs.to_vec();
-    limbs_vec_neg_and_limb_neg_in_place(&mut result_limbs, limb);
-    result_limbs
+pub fn limbs_neg_and_limb_neg(xs: &[Limb], ys: Limb) -> Vec<Limb> {
+    let mut out = xs.to_vec();
+    limbs_vec_neg_and_limb_neg_in_place(&mut out, ys);
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
@@ -163,19 +163,19 @@ pub fn limbs_neg_and_limb_neg(limbs: &[Limb], limb: Limb) -> Vec<Limb> {
 ///         true);
 /// assert_eq!(result, &[0, 0]);
 /// ```
-pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: Limb) -> bool {
-    assert!(out.len() >= in_limbs.len());
-    if in_limbs[0] == 0 {
-        out[..in_limbs.len()].copy_from_slice(in_limbs);
+pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+    assert!(out.len() >= xs.len());
+    if xs[0] == 0 {
+        out[..xs.len()].copy_from_slice(xs);
         false
     } else {
-        let result_head = in_limbs[0].wrapping_neg() & limb;
+        let result_head = xs[0].wrapping_neg() & y;
         if result_head == 0 {
             out[0] = 0;
-            limbs_add_limb_to_out(&mut out[1..], &in_limbs[1..], 1)
+            limbs_add_limb_to_out(&mut out[1..], &xs[1..], 1)
         } else {
             out[0] = result_head.wrapping_neg();
-            out[1..in_limbs.len()].copy_from_slice(&in_limbs[1..]);
+            out[1..xs.len()].copy_from_slice(&xs[1..]);
             false
         }
     }
@@ -215,13 +215,13 @@ pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], in_limbs: &[Limb], limb: 
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 1), true);
 /// assert_eq!(limbs, &[0, 0]);
 /// ```
-pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) -> bool {
-    let (head, tail) = limbs.split_at_mut(1);
+pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
+    let (head, tail) = xs.split_at_mut(1);
     let head = &mut head[0];
     if *head == 0 {
         false
     } else {
-        *head = head.wrapping_neg() & limb;
+        *head = head.wrapping_neg() & y;
         if *head == 0 {
             limbs_slice_add_limb_in_place(tail, 1)
         } else {
@@ -265,9 +265,9 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(limbs: &mut [Limb], limb: Limb) -> 
 /// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[0, 0, 1]);
 /// ```
-pub fn limbs_vec_neg_and_limb_neg_in_place(limbs: &mut Vec<Limb>, limb: Limb) {
-    if limbs_slice_neg_and_limb_neg_in_place(limbs, limb) {
-        limbs.push(1)
+pub fn limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
+    if limbs_slice_neg_and_limb_neg_in_place(xs, y) {
+        xs.push(1)
     }
 }
 

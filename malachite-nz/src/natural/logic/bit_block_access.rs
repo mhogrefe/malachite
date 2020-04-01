@@ -6,7 +6,7 @@ use malachite_base::round::RoundingMode;
 use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 
-use natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two_in_place;
+use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 use natural::arithmetic::shl_u::limbs_slice_shl_in_place;
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::logic::not::limbs_not_in_place;
@@ -43,25 +43,25 @@ use platform::Limb;
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_slice_get_bits(&[0x1234_5678, 0xabcd_ef01], 10, 10), empty);
 /// ```
-pub fn limbs_slice_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let len = limbs.len();
+    let len = xs.len();
     if limb_start >= len {
         return Vec::new();
     }
     let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
     let mut result_limbs = (if limb_end >= len {
-        &limbs[limb_start..]
+        &xs[limb_start..]
     } else {
-        &limbs[limb_start..limb_end]
+        &xs[limb_start..limb_end]
     })
     .to_vec();
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut result_limbs, offset);
     }
-    limbs_mod_power_of_two_in_place(&mut result_limbs, end - start);
+    limbs_vec_mod_power_of_two_in_place(&mut result_limbs, end - start);
     result_limbs
 }
 
@@ -93,19 +93,19 @@ pub fn limbs_slice_get_bits(limbs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 /// );
 /// assert_eq!(limbs_vec_get_bits(vec![0x1234_5678, 0xabcd_ef01], 10, 10), &[0]);
 /// ```
-pub fn limbs_vec_get_bits(mut limbs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if limb_start >= limbs.len() {
+    if limb_start >= xs.len() {
         return Vec::new();
     }
-    limbs_mod_power_of_two_in_place(&mut limbs, end);
-    vec_delete_left(&mut limbs, limb_start);
+    limbs_vec_mod_power_of_two_in_place(&mut xs, end);
+    vec_delete_left(&mut xs, limb_start);
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
-        limbs_slice_shr_in_place(&mut limbs, offset);
+        limbs_slice_shr_in_place(&mut xs, offset);
     }
-    limbs
+    xs
 }
 
 /// Copy values from `ys` into `xs`.
@@ -133,7 +133,7 @@ fn copy_from_diff_len_slice(xs: &mut [Limb], ys: &[Limb]) {
 }
 
 pub(crate) fn limbs_assign_bits_helper(
-    limbs: &mut Vec<Limb>,
+    xs: &mut Vec<Limb>,
     start: u64,
     end: u64,
     mut bits: &[Limb],
@@ -148,11 +148,11 @@ pub(crate) fn limbs_assign_bits_helper(
     }
     let start_remainder = start & Limb::WIDTH_MASK;
     let end_remainder = end & Limb::WIDTH_MASK;
-    if end_limb > limbs.len() {
+    if end_limb > xs.len() {
         // Possible inefficiency here: we might write many zeros only to delete them later.
-        limbs.resize(end_limb, 0);
+        xs.resize(end_limb, 0);
     }
-    let limbs = &mut limbs[start_limb..end_limb];
+    let limbs = &mut xs[start_limb..end_limb];
     assert!(!limbs.is_empty());
     let original_first_limb = limbs[0];
     let original_last_limb = *limbs.last().unwrap();
@@ -206,9 +206,9 @@ pub(crate) fn limbs_assign_bits_helper(
 /// limbs_assign_bits(&mut limbs, 80, 100, &[789, 321]);
 /// assert_eq!(limbs, &[123, 456, 51707904, 0]);
 /// ```
-pub fn limbs_assign_bits(limbs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+pub fn limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
-    limbs_assign_bits_helper(limbs, start, end, bits, false);
+    limbs_assign_bits_helper(xs, start, end, bits, false);
 }
 
 impl BitBlockAccess for Natural {

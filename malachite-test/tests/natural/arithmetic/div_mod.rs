@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use malachite_base::num::conversion::traits::JoinHalves;
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
@@ -1612,11 +1612,11 @@ fn verify_limbs_invert_approx(
 ) {
     let d = Natural::from_limbs_asc(ds);
     let n = ds.len();
-    let bits = n << Limb::LOG_WIDTH;
-    let product = Natural::ONE << (bits << 1);
+    let bits = u64::exact_from(n << Limb::LOG_WIDTH);
+    let product = Natural::power_of_two(bits << 1);
     //TODO compare to limbs_invert
     let mut expected_i = (&product - Natural::ONE) / &d;
-    let offset = Natural::ONE << bits;
+    let offset = Natural::power_of_two(bits);
     expected_i -= &offset;
     let i = Natural::from_limbs_asc(&is_out[..n]);
     let x = (&i + &offset) * &d;

@@ -46,17 +46,16 @@ pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
     assert_ne!(bits, 0);
     let remainder_bits = bits.mod_power_of_two(T::LOG_WIDTH);
     let limb_count = bits.shr_round(T::LOG_WIDTH, RoundingMode::Ceiling);
-    let mut limbs: Vec<T> = Vec::with_capacity(usize::exact_from(limb_count));
+    let mut xs: Vec<T> = Vec::with_capacity(usize::exact_from(limb_count));
     for _ in 0..limb_count {
-        limbs.push(rng.gen());
+        xs.push(rng.gen());
     }
     if remainder_bits != 0 {
-        limbs
-            .last_mut()
+        xs.last_mut()
             .unwrap()
             .mod_power_of_two_assign(remainder_bits);
     }
-    limbs
+    xs
 }
 
 /// Returns a random `Natural` with up to `bits` bits; equivalently, returns a random `Natural`
@@ -97,7 +96,7 @@ pub fn random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {
     if bits == 0 {
         Natural::ZERO
     } else {
-        let limbs: Vec<u32> = limbs_random_up_to_bits(rng, bits);
-        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&limbs))
+        let xs: Vec<u32> = limbs_random_up_to_bits(rng, bits);
+        Natural::from_owned_limbs_asc(u64::vec_from_other_type_slice(&xs))
     }
 }

@@ -500,18 +500,18 @@ macro_rules! iterables {
         $multiple_of_limb_fn: ident,
         $irregular_fn: ident
     ) => {
-        fn $fits_in_limb_fn(limbs: &[Limb], log_base: u64) -> FitsInLimbIterator<'_, $t> {
-            let significant_bits = limbs_significant_bits(limbs);
+        fn $fits_in_limb_fn(xs: &[Limb], log_base: u64) -> FitsInLimbIterator<'_, $t> {
+            let significant_bits = limbs_significant_bits(xs);
             let log_log_base = log_base.floor_log_two();
             let significant_digits =
                 significant_bits.shr_round(log_log_base, RoundingMode::Ceiling);
             FitsInLimbIterator(FILIterator {
                 significant_digits: usize::exact_from(significant_digits),
-                limbs,
+                limbs: xs,
                 log_base,
                 some_remaining: true,
                 limb_i: 0,
-                limb_j: limbs.len() - 1,
+                limb_j: xs.len() - 1,
                 i: 0,
                 j: (significant_digits - 1).mod_power_of_two(Limb::LOG_WIDTH - log_log_base)
                     << log_log_base,
@@ -520,35 +520,35 @@ macro_rules! iterables {
             })
         }
 
-        const fn $size_of_limb_fn(limbs: &[Limb]) -> SizeOfLimbIterator<'_, $t> {
+        const fn $size_of_limb_fn(xs: &[Limb]) -> SizeOfLimbIterator<'_, $t> {
             SizeOfLimbIterator(SOLIterator {
-                limbs,
+                limbs: xs,
                 some_remaining: true,
                 i: 0,
-                j: limbs.len() - 1,
+                j: xs.len() - 1,
                 boo: PhantomData,
             })
         }
 
-        fn $multiple_of_limb_fn(limbs: &[Limb], log_base: u64) -> MultipleOfLimbIterator<'_, $t> {
+        fn $multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> MultipleOfLimbIterator<'_, $t> {
             let log_log_base = log_base.floor_log_two();
             let log_ratio = log_log_base - Limb::LOG_WIDTH;
-            let significant_digits = limbs.len().shr_round(log_ratio, RoundingMode::Ceiling);
+            let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
             MultipleOfLimbIterator(MOLIterator {
                 significant_digits,
                 log_ratio,
-                limbs,
-                chunks: limbs.chunks(usize::power_of_two(log_ratio)),
+                limbs: xs,
+                chunks: xs.chunks(usize::power_of_two(log_ratio)),
                 boo: PhantomData,
             })
         }
 
-        fn $irregular_fn(limbs: &[Limb], log_base: u64) -> IrregularIterator<'_, $t> {
+        fn $irregular_fn(xs: &[Limb], log_base: u64) -> IrregularIterator<'_, $t> {
             let significant_digits =
-                limbs_significant_bits(limbs).div_round(log_base, RoundingMode::Ceiling);
+                limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
             IrregularIterator(IIterator {
                 significant_digits: usize::exact_from(significant_digits),
-                limbs,
+                limbs: xs,
                 log_base,
                 some_remaining: true,
                 i: 0,
@@ -996,24 +996,23 @@ impl<'a> PowerOfTwoDigitIterator<Natural> for NaturalPowerOfTwoDigitIterator<'a>
     }
 }
 
-fn multiple_of_limb_fn(limbs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbIterator<'_> {
+fn multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> NaturalMultipleOfLimbIterator<'_> {
     let log_log_base = log_base.floor_log_two();
     let log_ratio = log_log_base - Limb::LOG_WIDTH;
-    let significant_digits = limbs.len().shr_round(log_ratio, RoundingMode::Ceiling);
+    let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
     NaturalMultipleOfLimbIterator(NMOLIterator {
         significant_digits,
         log_ratio,
-        limbs,
-        chunks: limbs.chunks(usize::power_of_two(log_ratio)),
+        limbs: xs,
+        chunks: xs.chunks(usize::power_of_two(log_ratio)),
     })
 }
 
-fn irregular_fn(limbs: &[Limb], log_base: u64) -> NaturalIrregularIterator<'_> {
-    let significant_digits =
-        limbs_significant_bits(limbs).div_round(log_base, RoundingMode::Ceiling);
+fn irregular_fn(xs: &[Limb], log_base: u64) -> NaturalIrregularIterator<'_> {
+    let significant_digits = limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
     NaturalIrregularIterator(NIIterator {
         significant_digits: usize::exact_from(significant_digits),
-        limbs,
+        limbs: xs,
         log_base,
         some_remaining: true,
         i: 0,

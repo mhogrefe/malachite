@@ -5,12 +5,11 @@ use natural::Natural;
 use platform::Limb;
 
 // Returns the length of `limbs`, excluding trailing zeros.
-fn limbs_significant_length(limbs: &[Limb]) -> usize {
-    limbs
-        .iter()
+fn limbs_significant_length(xs: &[Limb]) -> usize {
+    xs.iter()
         .enumerate()
         .rev()
-        .find(|&(_, &limb)| limb != 0)
+        .find(|&(_, &x)| x != 0)
         .map_or(0, |(i, _)| i + 1)
 }
 
@@ -38,12 +37,12 @@ impl Natural {
     /// // 10^12 = 232 * 2^32 + 3567587328
     /// assert_eq!(Natural::from_limbs_asc(&[3_567_587_328, 232]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_asc(limbs: &[Limb]) -> Natural {
-        let significant_length = limbs_significant_length(limbs);
+    pub fn from_limbs_asc(xs: &[Limb]) -> Natural {
+        let significant_length = limbs_significant_length(xs);
         match significant_length {
             0 => Natural::ZERO,
-            1 => Natural(Small(limbs[0])),
-            _ => Natural(Large(limbs[..significant_length].to_vec())),
+            1 => Natural(Small(xs[0])),
+            _ => Natural(Large(xs[..significant_length].to_vec())),
         }
     }
 
@@ -70,8 +69,8 @@ impl Natural {
     /// // 10^12 = 232 * 2^32 + 3567587328
     /// assert_eq!(Natural::from_limbs_desc(&[232, 3_567_587_328]).to_string(), "1000000000000");
     /// ```
-    pub fn from_limbs_desc(limbs: &[Limb]) -> Natural {
-        Natural::from_limbs_asc(&limbs.iter().cloned().rev().collect::<Vec<Limb>>())
+    pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
+        Natural::from_limbs_asc(&xs.iter().cloned().rev().collect::<Vec<Limb>>())
     }
 
     /// Converts a `Vec` of limbs to a `Natural`, in ascending
@@ -98,14 +97,14 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_asc(vec![3567587328, 232]).to_string(),
     ///     "1000000000000");
     /// ```
-    pub fn from_owned_limbs_asc(mut limbs: Vec<Limb>) -> Natural {
-        let significant_length = limbs_significant_length(&limbs);
+    pub fn from_owned_limbs_asc(mut xs: Vec<Limb>) -> Natural {
+        let significant_length = limbs_significant_length(&xs);
         match significant_length {
             0 => Natural::ZERO,
-            1 => Natural(Small(limbs[0])),
+            1 => Natural(Small(xs[0])),
             _ => {
-                limbs.truncate(significant_length);
-                Natural(Large(limbs))
+                xs.truncate(significant_length);
+                Natural(Large(xs))
             }
         }
     }
@@ -134,8 +133,8 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_desc(vec![232, 3_567_587_328]).to_string(),
     ///     "1000000000000");
     /// ```
-    pub fn from_owned_limbs_desc(mut limbs: Vec<Limb>) -> Natural {
-        limbs.reverse();
-        Natural::from_owned_limbs_asc(limbs)
+    pub fn from_owned_limbs_desc(mut xs: Vec<Limb>) -> Natural {
+        xs.reverse();
+        Natural::from_owned_limbs_asc(xs)
     }
 }

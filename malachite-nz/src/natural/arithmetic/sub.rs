@@ -26,21 +26,21 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.1.2, where the result is returned.
-pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
-    let len = limbs.len();
+pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
+    let len = xs.len();
     let mut result_limbs = Vec::with_capacity(len);
     for i in 0..len {
-        let (difference, overflow) = limbs[i].overflowing_sub(limb);
+        let (difference, overflow) = xs[i].overflowing_sub(y);
         result_limbs.push(difference);
         if overflow {
-            limb = 1;
+            y = 1;
         } else {
-            limb = 0;
-            result_limbs.extend_from_slice(&limbs[i + 1..]);
+            y = 0;
+            result_limbs.extend_from_slice(&xs[i + 1..]);
             break;
         }
     }
-    (result_limbs, limb != 0)
+    (result_limbs, y != 0)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
@@ -75,22 +75,22 @@ pub fn limbs_sub_limb(limbs: &[Limb], mut limb: Limb) -> (Vec<Limb>, bool) {
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.1.2.
-pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb) -> bool {
-    let len = in_limbs.len();
+pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+    let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
-        let (difference, overflow) = in_limbs[i].overflowing_sub(limb);
+        let (difference, overflow) = xs[i].overflowing_sub(y);
         out[i] = difference;
         if overflow {
-            limb = 1;
+            y = 1;
         } else {
-            limb = 0;
+            y = 0;
             let copy_index = i + 1;
-            out[copy_index..len].copy_from_slice(&in_limbs[copy_index..]);
+            out[copy_index..len].copy_from_slice(&xs[copy_index..]);
             break;
         }
     }
-    limb != 0
+    y != 0
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
@@ -119,15 +119,15 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], in_limbs: &[Limb], mut limb: Limb
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.
-pub fn limbs_sub_limb_in_place(limbs: &mut [Limb], mut limb: Limb) -> bool {
-    for x in limbs.iter_mut() {
-        if x.overflowing_sub_assign(limb) {
-            limb = 1;
+pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
+    for x in xs.iter_mut() {
+        if x.overflowing_sub_assign(y) {
+            y = 1;
         } else {
             return false;
         }
     }
-    limb != 0
+    y != 0
 }
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
