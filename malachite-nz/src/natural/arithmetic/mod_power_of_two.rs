@@ -1,10 +1,11 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
-    RemPowerOfTwoAssign,
+    RemPowerOfTwoAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::round::RoundingMode;
 use malachite_base::slices::slice_set_zero;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -48,22 +49,45 @@ pub fn limbs_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
     result
 }
 
-//TODO test
+/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only
+/// the least-significant `pow` bits. If the upper limbs of the input slice are no longer needed,
+/// they are set to zero.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Example
+/// ```
+/// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
+///
+/// let limbs = &mut [123, 456];
+/// limbs_slice_mod_power_of_two_in_place(limbs, 10);
+/// assert_eq!(limbs, &[123, 0]);
+///
+/// let limbs = &mut [123, 456];
+/// limbs_slice_mod_power_of_two_in_place(limbs, 33);
+/// assert_eq!(limbs, &[123, 0]);
+///
+/// let limbs = &mut [123, 456];
+/// limbs_slice_mod_power_of_two_in_place(limbs, 40);
+/// assert_eq!(limbs, &[123, 200]);
+/// ```
+///
+/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is non-negative, res == in,
+/// and instead of possibly being truncated, the high limbs of res are possibly filled with zeros.
 pub fn limbs_slice_mod_power_of_two_in_place(xs: &mut [Limb], pow: u64) {
     if pow == 0 {
         slice_set_zero(xs);
         return;
     }
-    let mut new_limb_count = pow >> Limb::LOG_WIDTH;
-    let leftover_bits = pow & Limb::WIDTH_MASK;
-    if leftover_bits != 0 {
-        new_limb_count += 1;
-    }
-    let new_limb_count = usize::exact_from(new_limb_count);
+    let new_limb_count = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     if new_limb_count > xs.len() {
         return;
     }
     slice_set_zero(&mut xs[new_limb_count..]);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
     }
@@ -101,16 +125,12 @@ pub fn limbs_vec_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
         xs.clear();
         return;
     }
-    let mut new_limb_count = pow >> Limb::LOG_WIDTH;
-    let leftover_bits = pow & Limb::WIDTH_MASK;
-    if leftover_bits != 0 {
-        new_limb_count += 1;
-    }
-    let new_limb_count = usize::exact_from(new_limb_count);
+    let new_limb_count = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     if new_limb_count > xs.len() {
         return;
     }
     xs.truncate(new_limb_count);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
     }
@@ -169,13 +189,10 @@ pub fn limbs_neg_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and res == in.
 /// `limbs` are the limbs of -in.
 pub fn limbs_neg_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
-    let mut new_limb_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    let leftover_bits = pow & Limb::WIDTH_MASK;
-    if leftover_bits != 0 {
-        new_limb_count += 1;
-    }
+    let new_limb_count = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     xs.resize(new_limb_count, 0);
     limbs_twos_complement_in_place(xs);
+    let leftover_bits = pow & Limb::WIDTH_MASK;
     if leftover_bits != 0 {
         xs[new_limb_count - 1].mod_power_of_two_assign(leftover_bits);
     }

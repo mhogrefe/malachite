@@ -30,16 +30,16 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_mod_neg<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_unsigneds_var_5::<T>(gm).take(limit) {
-        println!("-{} === {} mod {}", n, n.mod_neg(modulus), modulus);
+    for (n, m) in pairs_of_unsigneds_var_5::<T>(gm).take(limit) {
+        println!("-{} === {} mod {}", n, n.mod_neg(m), m);
     }
 }
 
 fn demo_mod_neg_assign<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for (mut n, modulus) in pairs_of_unsigneds_var_5::<T>(gm).take(limit) {
+    for (mut n, m) in pairs_of_unsigneds_var_5::<T>(gm).take(limit) {
         let old_n = n;
-        n.mod_neg_assign(modulus);
-        println!("n := {}; n.mod_neg_assign({}); n = {}", old_n, modulus, n);
+        n.mod_neg_assign(m);
+        println!("n := {}; n.mod_neg_assign({}); n = {}", old_n, m, n);
     }
 }
 
@@ -57,10 +57,7 @@ fn benchmark_mod_neg<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, modulus)| no_out!(n.mod_neg(modulus))),
-        )],
+        &mut [("malachite", &mut (|(n, m)| no_out!(n.mod_neg(m))))],
     );
 }
 
@@ -78,10 +75,7 @@ fn benchmark_mod_neg_assign<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(mut n, modulus)| n.mod_neg_assign(modulus)),
-        )],
+        &mut [("malachite", &mut (|(mut n, m)| n.mod_neg_assign(m)))],
     );
 }
 

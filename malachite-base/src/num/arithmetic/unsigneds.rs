@@ -38,15 +38,15 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModIsReduced for $t {
-            /// Returns whether `self` is reduced mod `modulus`; in other words whether it is less
-            /// than `modulus`. `modulus` cannot be zero.
+            /// Returns whether `self` is reduced mod `m`; in other words whether it is less than
+            /// `m`. `m` cannot be zero.
             ///
             /// Time: worst case O(1)
             ///
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `modulus` is 0.
+            /// Panics if `m` is 0.
             ///
             /// # Example
             /// ```
@@ -57,9 +57,9 @@ macro_rules! impl_arithmetic_traits {
             /// assert_eq!(100u16.mod_is_reduced(&101), true);
             /// ```
             #[inline]
-            fn mod_is_reduced(&self, modulus: &$t) -> bool {
-                assert_ne!(*modulus, 0);
-                self < modulus
+            fn mod_is_reduced(&self, m: &$t) -> bool {
+                assert_ne!(*m, 0);
+                self < m
             }
         }
 
@@ -123,7 +123,7 @@ macro_rules! impl_arithmetic_traits {
         impl ModNeg for $t {
             type Output = $t;
 
-            /// Computes `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
+            /// Computes `-self` mod `m`. Assumes the input is already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -140,18 +140,17 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_neg from nmod_vec.h, FLINT Dev 1.
             #[inline]
-            fn mod_neg(self, modulus: $t) -> $t {
+            fn mod_neg(self, m: $t) -> $t {
                 if self == 0 {
                     0
                 } else {
-                    modulus - self
+                    m - self
                 }
             }
         }
 
         impl ModNegAssign for $t {
-            /// Replaces `self` with `-self` mod `modulus`. Assumes the input is already reduced mod
-            /// `modulus`.
+            /// Replaces `self` with `-self` mod `m`. Assumes the input is already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -176,9 +175,9 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assign to a.
             #[inline]
-            fn mod_neg_assign(&mut self, modulus: $t) {
+            fn mod_neg_assign(&mut self, m: $t) {
                 if *self != 0 {
-                    *self = modulus - *self;
+                    *self = m - *self;
                 }
             }
         }
@@ -238,8 +237,7 @@ macro_rules! impl_arithmetic_traits {
         impl ModAdd for $t {
             type Output = $t;
 
-            /// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
-            /// `modulus`.
+            /// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -255,8 +253,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
             #[inline]
-            fn mod_add(self, rhs: $t, modulus: $t) -> $t {
-                let neg = modulus - self;
+            fn mod_add(self, rhs: $t, m: $t) -> $t {
+                let neg = m - self;
                 if neg > rhs {
                     self + rhs
                 } else {
@@ -266,8 +264,7 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModAddAssign for $t {
-            /// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
-            /// `modulus`.
+            /// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -288,8 +285,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
-            fn mod_add_assign(&mut self, rhs: $t, modulus: $t) {
-                let neg = modulus - *self;
+            fn mod_add_assign(&mut self, rhs: $t, m: $t) {
+                let neg = m - *self;
                 if neg > rhs {
                     *self += rhs;
                 } else {
@@ -353,8 +350,7 @@ macro_rules! impl_arithmetic_traits {
         impl ModSub for $t {
             type Output = $t;
 
-            /// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
-            /// `modulus`.
+            /// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -370,10 +366,10 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
             #[inline]
-            fn mod_sub(self, rhs: $t, modulus: $t) -> $t {
+            fn mod_sub(self, rhs: $t, m: $t) -> $t {
                 let diff = self.wrapping_sub(rhs);
                 if self < rhs {
-                    modulus.wrapping_add(diff)
+                    m.wrapping_add(diff)
                 } else {
                     diff
                 }
@@ -381,8 +377,7 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModSubAssign for $t {
-            /// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
-            /// `modulus`.
+            /// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -403,8 +398,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// This is nmod_sub from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
-            fn mod_sub_assign(&mut self, rhs: $t, modulus: $t) {
-                *self = self.mod_sub(rhs, modulus);
+            fn mod_sub_assign(&mut self, rhs: $t, m: $t) {
+                *self = self.mod_sub(rhs, m);
             }
         }
 

@@ -10,31 +10,31 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`, b,
-/// and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)), 22);
-/// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
-///     -Integer::trillion()).to_string(), "-65537000000000000");
-/// ```
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking
+    /// `self`, b, and c by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), Integer::from(4u32)), 22);
+    /// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
+    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: Integer, c: Integer) -> Integer {
         self.add_mul_assign(b, c);
@@ -42,31 +42,31 @@ impl<'a> AddMul<Integer, Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self` and
-/// b by value and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)), 22);
-/// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
-///     &(-Integer::trillion())).to_string(), "-65537000000000000");
-/// ```
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
+    /// and b by value and c by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(10u32).add_mul(Integer::from(3u32), &Integer::from(4u32)), 22);
+    /// assert_eq!((-Integer::trillion()).add_mul(Integer::from(0x1_0000),
+    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: Integer, c: &'a Integer) -> Integer {
         self.add_mul_assign(b, c);
@@ -74,31 +74,31 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self` and
-/// c by value and b by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)), 22);
-/// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
-///     -Integer::trillion()).to_string(), "-65537000000000000");
-/// ```
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
+    /// and c by value and b by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), Integer::from(4u32)), 22);
+    /// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
+    ///     -Integer::trillion()).to_string(), "-65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: &'a Integer, c: Integer) -> Integer {
         self.add_mul_assign(b, c);
@@ -106,31 +106,31 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self` by
-/// value and b and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-/// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
-///     &(-Integer::trillion())).to_string(), "-65537000000000000");
-/// ```
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
+    /// by value and b and c by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(Integer::from(10u32).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
+    /// assert_eq!((-Integer::trillion()).add_mul(&Integer::from(0x1_0000),
+    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: &'a Integer, c: &'b Integer) -> Integer {
         self.add_mul_assign(b, c);
@@ -138,31 +138,31 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`, b,
-/// and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(m + n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
-/// assert_eq!((&(-Integer::trillion())).add_mul(&Integer::from(0x1_0000),
-///     &(-Integer::trillion())).to_string(), "-65537000000000000");
-/// ```
 impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     type Output = Integer;
 
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking
+    /// `self`, b, and c by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(m + n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((&Integer::from(10u32)).add_mul(&Integer::from(3u32), &Integer::from(4u32)), 22);
+    /// assert_eq!((&(-Integer::trillion())).add_mul(&Integer::from(0x1_0000),
+    ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
+    /// ```
     fn add_mul(self, b: &'a Integer, c: &'b Integer) -> Integer {
         if self.sign == (b.sign == c.sign) {
             Integer {
@@ -179,33 +179,33 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place, taking
-/// b and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(Integer::from(3u32), Integer::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = -Integer::trillion();
-/// x.add_mul_assign(Integer::from(0x1_0000), -Integer::trillion());
-/// assert_eq!(x.to_string(), "-65537000000000000");
-/// ```
 impl AddMulAssign<Integer, Integer> for Integer {
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
+    /// taking b and c by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(10u32);
+    /// x.add_mul_assign(Integer::from(3u32), Integer::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = -Integer::trillion();
+    /// x.add_mul_assign(Integer::from(0x1_0000), -Integer::trillion());
+    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: Integer, c: Integer) {
         if self.sign == (b.sign == c.sign) {
             self.abs.add_mul_assign(b.abs, c.abs);
@@ -216,33 +216,33 @@ impl AddMulAssign<Integer, Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place, taking
-/// b by value and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(Integer::from(3u32), &Integer::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = -Integer::trillion();
-/// x.add_mul_assign(Integer::from(0x1_0000), &(-Integer::trillion()));
-/// assert_eq!(x.to_string(), "-65537000000000000");
-/// ```
 impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
+    /// taking b by value and c by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(10u32);
+    /// x.add_mul_assign(Integer::from(3u32), &Integer::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = -Integer::trillion();
+    /// x.add_mul_assign(Integer::from(0x1_0000), &(-Integer::trillion()));
+    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: Integer, c: &'a Integer) {
         if self.sign == (b.sign == c.sign) {
             self.abs.add_mul_assign(b.abs, &c.abs);
@@ -253,33 +253,33 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place, taking
-/// b by reference and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(&Integer::from(3u32), Integer::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = -Integer::trillion();
-/// x.add_mul_assign(&Integer::from(0x1_0000), -Integer::trillion());
-/// assert_eq!(x.to_string(), "-65537000000000000");
-/// ```
 impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
+    /// taking b by reference and c by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(10u32);
+    /// x.add_mul_assign(&Integer::from(3u32), Integer::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = -Integer::trillion();
+    /// x.add_mul_assign(&Integer::from(0x1_0000), -Integer::trillion());
+    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: &'a Integer, c: Integer) {
         if self.sign == (b.sign == c.sign) {
             self.abs.add_mul_assign(&b.abs, c.abs);
@@ -290,33 +290,33 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
     }
 }
 
-/// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place, taking
-/// b and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(10u32);
-/// x.add_mul_assign(&Integer::from(3u32), &Integer::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = -Integer::trillion();
-/// x.add_mul_assign(&Integer::from(0x1_0000), &(-Integer::trillion()));
-/// assert_eq!(x.to_string(), "-65537000000000000");
-/// ```
 impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
+    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
+    /// taking b and c by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
+    ///       m = `a.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(10u32);
+    /// x.add_mul_assign(&Integer::from(3u32), &Integer::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = -Integer::trillion();
+    /// x.add_mul_assign(&Integer::from(0x1_0000), &(-Integer::trillion()));
+    /// assert_eq!(x.to_string(), "-65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: &'a Integer, c: &'b Integer) {
         if self.sign == (b.sign == c.sign) {
             self.abs.add_mul_assign(&b.abs, &c.abs);
@@ -330,192 +330,171 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
 impl Natural {
     // self - b * c, returns sign (true means non-negative)
     fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
-        if c == 0 || *b == 0 {
-            return (self.clone(), true);
-        }
-        if c == 1 {
-            return if self >= b {
-                (self - b, true)
-            } else {
-                (b - self, false)
-            };
-        }
-        if let (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) = (self, b) {
-            let (limbs, sign) = limbs_overflowing_sub_mul_limb(a_limbs, b_limbs, c);
-            let mut result = Natural(Large(limbs));
-            result.trim();
-            (result, sign)
-        } else {
-            let bc = b * Natural::from(c);
-            if *self >= bc {
-                (self - bc, true)
-            } else {
-                (bc - self, false)
+        match (self, b, c) {
+            (x, natural_zero!(), _) | (x, _, 0) => (x.clone(), true),
+            (x, y, 1) if x >= y => (x - y, true),
+            (x, y, 1) => (y - x, false),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
+                let (out_limbs, sign) = limbs_overflowing_sub_mul_limb(xs, ys, z);
+                let mut out = Natural(Large(out_limbs));
+                out.trim();
+                (out, sign)
+            }
+            (x, y, z) => {
+                let yz = y * Natural::from(z);
+                if *x >= yz {
+                    (x - yz, true)
+                } else {
+                    (yz - x, false)
+                }
             }
         }
     }
 
     // self -= b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
-        if c == 0 || b == 0 {
-            return true;
-        }
-        if c == 1 {
-            let sign = *self >= b;
-            if sign {
+        match (&mut *self, &mut b, c) {
+            (_, &mut natural_zero!(), _) | (_, _, 0) => true,
+            (x, y, 1) if *x >= *y => {
                 self.sub_assign_no_panic(b);
-            } else {
-                self.sub_right_assign_no_panic(&b);
+                true
             }
-            return sign;
-        }
-        let (fallback, (right, mut sign)) = match (&mut *self, &mut b) {
-            (&mut Natural(Large(ref mut a_limbs)), &mut Natural(Large(ref mut b_limbs))) => (
-                false,
-                limbs_overflowing_sub_mul_limb_in_place_either(a_limbs, b_limbs, c),
-            ),
-            _ => (true, (false, false)),
-        };
-        if fallback {
-            let bc = b * Natural::from(c);
-            sign = *self >= bc;
-            if sign {
-                self.sub_assign_no_panic(bc);
-            } else {
-                self.sub_right_assign_no_panic(&bc);
+            (x, y, 1) => {
+                x.sub_right_assign_no_panic(&*y);
+                false
             }
-        } else if right {
-            b.trim();
-            *self = b;
-        } else {
-            self.trim();
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
+                let (right, sign) = limbs_overflowing_sub_mul_limb_in_place_either(xs, ys, z);
+                if right {
+                    b.trim();
+                    *self = b;
+                } else {
+                    self.trim();
+                }
+                sign
+            }
+            (x, _, z) => {
+                let yz = b * Natural(Small(z));
+                let sign = *x >= yz;
+                if sign {
+                    x.sub_assign_no_panic(yz);
+                } else {
+                    x.sub_right_assign_no_panic(&yz);
+                }
+                sign
+            }
         }
-        sign
     }
 
     // self -= &b * c, returns sign (true means non-negative)
     fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
-        if c == 0 || *b == 0 {
-            return true;
-        }
-        if c == 1 {
-            let sign = *self >= *b;
-            if sign {
-                self.sub_assign_ref_no_panic(b);
-            } else {
-                self.sub_right_assign_no_panic(b);
+        match (&mut *self, b, c) {
+            (_, &natural_zero!(), _) | (_, _, 0) => true,
+            (x, y, 1) if *x >= *y => {
+                self.sub_assign_ref_no_panic(y);
+                true
             }
-            return sign;
-        }
-        let (mut sign, fallback) = match (&mut *self, b) {
-            (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => (
-                limbs_overflowing_sub_mul_limb_in_place_left(a_limbs, b_limbs, c),
-                false,
-            ),
-            _ => (false, true),
-        };
-        if fallback {
-            let bc = b * Natural::from(c);
-            sign = *self >= bc;
-            if sign {
-                self.sub_assign_no_panic(bc);
-            } else {
-                self.sub_right_assign_no_panic(&bc);
+            (x, y, 1) => {
+                x.sub_right_assign_no_panic(y);
+                false
             }
-        } else {
-            self.trim();
-        }
-        sign
-    }
-
-    fn add_mul_assign_neg_large(&mut self, b: &Natural, c: &Natural) -> bool {
-        let mut sign = false;
-        if let Natural(Large(ref b_limbs)) = *b {
-            if let Natural(Large(ref c_limbs)) = c {
-                let self_limbs = self.promote_in_place();
-                sign = limbs_overflowing_sub_mul_in_place_left(self_limbs, b_limbs, c_limbs);
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
+                let sign = limbs_overflowing_sub_mul_limb_in_place_left(xs, ys, z);
+                self.trim();
+                sign
+            }
+            (x, _, z) => {
+                let yz = b * Natural(Small(z));
+                let sign = *x >= yz;
+                if sign {
+                    x.sub_assign_no_panic(yz);
+                } else {
+                    x.sub_right_assign_no_panic(&yz);
+                }
+                sign
             }
         }
-        self.trim();
-        sign
     }
 
     // self - &b * c, returns sign (true means non-negative)
     pub(crate) fn add_mul_neg(&self, b: &Natural, c: &Natural) -> (Natural, bool) {
-        if let Natural(Small(small_b)) = *b {
-            self.add_mul_limb_neg(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_limb_neg(b, small_c)
-        } else if let Natural(Small(small_a)) = *self {
-            ((b * c).sub_limb(small_a), false)
-        } else {
-            if let Natural(Large(ref a_limbs)) = *self {
-                if let Natural(Large(ref b_limbs)) = *b {
-                    if let Natural(Large(ref c_limbs)) = *c {
-                        let (limbs, sign) = limbs_overflowing_sub_mul(a_limbs, b_limbs, c_limbs);
-                        let mut result = Natural(Large(limbs));
-                        result.trim();
-                        return (result, sign);
-                    }
-                }
+        match (self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_limb_neg(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_limb_neg(y, z),
+            (&Natural(Small(x)), y, z) => ((y * z).sub_limb(x), false),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                let (out_limbs, sign) = limbs_overflowing_sub_mul(xs, ys, zs);
+                let mut out = Natural(Large(out_limbs));
+                out.trim();
+                (out, sign)
             }
-            unreachable!();
         }
+    }
+
+    fn add_mul_assign_neg_large(&mut self, ys: &[Limb], zs: &[Limb]) -> bool {
+        let xs = self.promote_in_place();
+        let sign = limbs_overflowing_sub_mul_in_place_left(xs, ys, zs);
+        self.trim();
+        sign
     }
 
     // self -= b * c, returns sign (true means non-negative)
     fn add_mul_assign_neg(&mut self, b: Natural, c: Natural) -> bool {
-        if let Natural(Small(small_b)) = b {
-            self.add_mul_assign_limb_neg(c, small_b)
-        } else if let Natural(Small(small_c)) = c {
-            self.add_mul_assign_limb_neg(b, small_c)
-        } else if *self == 0 {
-            *self = b * c;
-            false
-        } else {
-            self.add_mul_assign_neg_large(&b, &c)
+        match (&mut *self, b, c) {
+            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
+            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
         }
     }
 
     // self -= b * &c, returns sign (true means non-negative)
     fn add_mul_assign_neg_val_ref(&mut self, b: Natural, c: &Natural) -> bool {
-        if let Natural(Small(small_b)) = b {
-            self.add_mul_assign_limb_neg_ref(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_assign_limb_neg(b, small_c)
-        } else if *self == 0 {
-            *self = b * c;
-            false
-        } else {
-            self.add_mul_assign_neg_large(&b, c)
+        match (&mut *self, b, c) {
+            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
         }
     }
 
     // self -= &b * c, returns sign (true means non-negative)
     fn add_mul_assign_neg_ref_val(&mut self, b: &Natural, c: Natural) -> bool {
-        if let Natural(Small(small_b)) = *b {
-            self.add_mul_assign_limb_neg(c, small_b)
-        } else if let Natural(Small(small_c)) = c {
-            self.add_mul_assign_limb_neg_ref(b, small_c)
-        } else if *self == 0 {
-            *self = b * c;
-            false
-        } else {
-            self.add_mul_assign_neg_large(b, &c)
+        match (&mut *self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
+            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, &Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
         }
     }
 
     // self -= &b * &c, returns sign (true means non-negative)
     fn add_mul_assign_neg_ref_ref(&mut self, b: &Natural, c: &Natural) -> bool {
-        if let Natural(Small(small_b)) = *b {
-            self.add_mul_assign_limb_neg_ref(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_assign_limb_neg_ref(b, small_c)
-        } else if *self == 0 {
-            *self = b * c;
-            false
-        } else {
-            self.add_mul_assign_neg_large(b, c)
+        match (&mut *self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, &Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
         }
     }
 }

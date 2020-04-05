@@ -1691,8 +1691,8 @@ pub(crate) fn _limbs_div_mod_balanced(
                 assert!(*ns_shifted_last >= carry_2);
                 ns_shifted_last.wrapping_sub_assign(carry_2);
             } else {
-                let (difference, overflow) = carry_1.overflowing_sub(carry_2);
-                *ns_shifted_last = difference;
+                let (diff, overflow) = carry_1.overflowing_sub(carry_2);
+                *ns_shifted_last = diff;
                 q_too_large = overflow;
                 r_len += 1;
             }

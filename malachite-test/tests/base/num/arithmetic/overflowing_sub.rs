@@ -8,12 +8,12 @@ use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds};
 
 fn unsigned_overflowing_sub_assign_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigneds::<T>, |&(x, y)| {
-        let mut difference = x;
-        let overflow = difference.overflowing_sub_assign(y);
-        assert_eq!((difference, overflow), x.overflowing_sub(y));
-        assert_eq!(x.wrapping_sub(y), difference);
+        let mut diff = x;
+        let overflow = diff.overflowing_sub_assign(y);
+        assert_eq!((diff, overflow), x.overflowing_sub(y));
+        assert_eq!(x.wrapping_sub(y), diff);
         if !overflow {
-            assert_eq!(difference, x - y);
+            assert_eq!(diff, x - y);
         }
     });
 }
@@ -24,12 +24,12 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(pairs_of_signeds::<T>, |&(x, y)| {
-        let mut difference = x;
-        let overflow = difference.overflowing_sub_assign(y);
-        assert_eq!((difference, overflow), x.overflowing_sub(y));
-        assert_eq!(x.wrapping_sub(y), difference);
+        let mut diff = x;
+        let overflow = diff.overflowing_sub_assign(y);
+        assert_eq!((diff, overflow), x.overflowing_sub(y));
+        assert_eq!(x.wrapping_sub(y), diff);
         if !overflow {
-            assert_eq!(difference, x - y);
+            assert_eq!(diff, x - y);
         }
     });
 }

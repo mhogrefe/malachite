@@ -31,8 +31,8 @@ use malachite_test::inputs::integer::{
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_eq_neg_limb_mod_limb() {
-    let test = |limbs: &[Limb], limb: Limb, modulus: Limb, equal: bool| {
-        assert_eq!(limbs_eq_neg_limb_mod_limb(limbs, limb, modulus), equal);
+    let test = |limbs: &[Limb], limb: Limb, m: Limb, equal: bool| {
+        assert_eq!(limbs_eq_neg_limb_mod_limb(limbs, limb, m), equal);
     };
     test(&[6, 7], 4, 2, true);
     test(&[7, 7], 4, 2, false);
@@ -59,18 +59,18 @@ fn limbs_eq_neg_limb_mod_limb_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_limb_eq_neg_limb_mod() {
-    let test = |x: Limb, y: Limb, modulus: &[Limb], equal: bool| {
-        assert_eq!(limbs_pos_limb_eq_neg_limb_mod(x, y, modulus), equal);
+    let test = |x: Limb, y: Limb, ms: &[Limb], equal: bool| {
+        assert_eq!(limbs_pos_limb_eq_neg_limb_mod(x, y, ms), equal);
         let x = Integer::from(x);
         let y = -Natural::from(y);
-        let modulus = Natural::from_limbs_asc(modulus);
-        assert_eq!((&x).eq_mod(&y, &modulus), equal);
-        let modulus = Integer::from(modulus);
+        let m = Natural::from_limbs_asc(ms);
+        assert_eq!((&x).eq_mod(&y, &m), equal);
+        let m = Integer::from(m);
         assert_eq!(
-            x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+            x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
             equal
         );
-        assert_eq!((x - y).divisible_by(modulus), equal);
+        assert_eq!((x - y).divisible_by(m), equal);
     };
     test(1, 1, &[1, 1], false);
     test(1, 1, &[2, 1], false);
@@ -84,20 +84,20 @@ fn test_limbs_pos_limb_eq_neg_limb_mod() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_eq_neg_limb_mod() {
-    let test = |xs: &[Limb], y: Limb, modulus: &[Limb], equal: bool| {
-        let mut mut_modulus = modulus.to_vec();
-        assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus), equal);
-        assert_eq!(limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus), equal);
+    let test = |xs: &[Limb], y: Limb, ms: &[Limb], equal: bool| {
+        let mut mut_ms = ms.to_vec();
+        assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_ms), equal);
+        assert_eq!(limbs_pos_eq_neg_limb_mod_ref(xs, y, ms), equal);
         let x = Integer::from(Natural::from_limbs_asc(xs));
         let y = -Natural::from(y);
-        let modulus = Natural::from_limbs_asc(modulus);
-        assert_eq!((&x).eq_mod(&y, &modulus), equal);
-        let modulus = Integer::from(modulus);
+        let m = Natural::from_limbs_asc(ms);
+        assert_eq!((&x).eq_mod(&y, &m), equal);
+        let m = Integer::from(m);
         assert_eq!(
-            x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+            x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
             equal
         );
-        assert_eq!((x - y).divisible_by(modulus), equal);
+        assert_eq!((x - y).divisible_by(m), equal);
     };
     // !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos))
     test(&[1, 2], 2, &[2, 1], false);
@@ -196,25 +196,25 @@ fn limbs_pos_eq_neg_limb_mod_ref_fail_5() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_eq_neg_mod_limb() {
-    let test = |xs: &[Limb], ys: &[Limb], modulus: Limb, equal: bool| {
-        assert_eq!(limbs_pos_eq_neg_mod_limb(xs, ys, modulus), equal);
+    let test = |xs: &[Limb], ys: &[Limb], m: Limb, equal: bool| {
+        assert_eq!(limbs_pos_eq_neg_mod_limb(xs, ys, m), equal);
         let x = Integer::from(Natural::from_limbs_asc(xs));
         let y = -Natural::from_limbs_asc(ys);
-        let modulus = Natural::from(modulus);
-        assert_eq!((&x).eq_mod(&y, &modulus), equal);
-        let modulus = Integer::from(modulus);
+        let m = Natural::from(m);
+        assert_eq!((&x).eq_mod(&y, &m), equal);
+        let m = Integer::from(m);
         assert_eq!(
-            x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+            x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
             equal
         );
-        assert_eq!((x - y).divisible_by(modulus), equal);
+        assert_eq!((x - y).divisible_by(m), equal);
     };
-    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros()))
+    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros()))
     //      in limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[0, 1], 1, true);
     test(&[0, 1], &[0, 1], 2, true);
     test(&[0, 1], &[6, 1], 2, true);
-    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros()))
+    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros()))
     //      in limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[7, 1], 2, false);
 }
@@ -257,26 +257,26 @@ fn limbs_pos_eq_neg_mod_limb_fail_5() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_pos_eq_neg_mod() {
-    let test = |xs: &[Limb], ys: &[Limb], modulus: &[Limb], equal: bool| {
-        let mut mut_modulus = modulus.to_vec();
-        assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_modulus), equal);
-        assert_eq!(limbs_pos_eq_neg_mod_ref(xs, ys, modulus), equal);
+    let test = |xs: &[Limb], ys: &[Limb], ms: &[Limb], equal: bool| {
+        let mut mut_ms = ms.to_vec();
+        assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_ms), equal);
+        assert_eq!(limbs_pos_eq_neg_mod_ref(xs, ys, ms), equal);
         let x = Integer::from(Natural::from_limbs_asc(xs));
         let y = -Natural::from_limbs_asc(ys);
-        let modulus = Natural::from_limbs_asc(modulus);
-        assert_eq!((&x).eq_mod(&y, &modulus), equal);
-        let modulus = Integer::from(modulus);
+        let m = Natural::from_limbs_asc(ms);
+        assert_eq!((&x).eq_mod(&y, &m), equal);
+        let m = Integer::from(m);
         assert_eq!(
-            x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+            x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
             equal
         );
-        assert_eq!((x - y).divisible_by(modulus), equal);
+        assert_eq!((x - y).divisible_by(m), equal);
     };
-    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros()))
     //      in limbs_pos_eq_neg_mod_greater
     test(&[1, 2], &[3, 4], &[0, 1], false);
     test(&[0, 0, 1], &[0, 1], &[1, 1], true);
-    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(modulus[0].trailing_zeros()))
+    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros()))
     //      in limbs_pos_eq_neg_mod_greater
     test(
         &[
@@ -380,75 +380,71 @@ fn limbs_pos_eq_neg_mod_ref_fail_6() {
 
 #[test]
 fn test_eq_mod() {
-    let test = |x, y, modulus, out| {
+    let test = |x, y, m, out| {
         assert_eq!(
-            Integer::from_str(x).unwrap().eq_mod(
-                Integer::from_str(y).unwrap(),
-                Natural::from_str(modulus).unwrap()
-            ),
+            Integer::from_str(x)
+                .unwrap()
+                .eq_mod(Integer::from_str(y).unwrap(), Natural::from_str(m).unwrap()),
             out
         );
         assert_eq!(
             Integer::from_str(x).unwrap().eq_mod(
                 Integer::from_str(y).unwrap(),
-                &Natural::from_str(modulus).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            Integer::from_str(x).unwrap().eq_mod(
-                &Integer::from_str(y).unwrap(),
-                Natural::from_str(modulus).unwrap()
+                &Natural::from_str(m).unwrap()
             ),
             out
         );
         assert_eq!(
             Integer::from_str(x).unwrap().eq_mod(
                 &Integer::from_str(y).unwrap(),
-                &Natural::from_str(modulus).unwrap()
+                Natural::from_str(m).unwrap()
             ),
+            out
+        );
+        assert_eq!(
+            Integer::from_str(x).unwrap().eq_mod(
+                &Integer::from_str(y).unwrap(),
+                &Natural::from_str(m).unwrap()
+            ),
+            out
+        );
+        assert_eq!(
+            (&Integer::from_str(x).unwrap())
+                .eq_mod(Integer::from_str(y).unwrap(), Natural::from_str(m).unwrap()),
             out
         );
         assert_eq!(
             (&Integer::from_str(x).unwrap()).eq_mod(
                 Integer::from_str(y).unwrap(),
-                Natural::from_str(modulus).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            (&Integer::from_str(x).unwrap()).eq_mod(
-                Integer::from_str(y).unwrap(),
-                &Natural::from_str(modulus).unwrap()
+                &Natural::from_str(m).unwrap()
             ),
             out
         );
         assert_eq!(
             (&Integer::from_str(x).unwrap()).eq_mod(
                 &Integer::from_str(y).unwrap(),
-                Natural::from_str(modulus).unwrap()
+                Natural::from_str(m).unwrap()
             ),
             out
         );
         assert_eq!(
             (&Integer::from_str(x).unwrap()).eq_mod(
                 &Integer::from_str(y).unwrap(),
-                &Natural::from_str(modulus).unwrap()
+                &Natural::from_str(m).unwrap()
             ),
             out
         );
 
         assert_eq!(
-            Integer::from_str(y).unwrap().eq_mod(
-                Integer::from_str(x).unwrap(),
-                Natural::from_str(modulus).unwrap()
-            ),
+            Integer::from_str(y)
+                .unwrap()
+                .eq_mod(Integer::from_str(x).unwrap(), Natural::from_str(m).unwrap()),
             out
         );
         assert_eq!(
             rug::Integer::from_str(x).unwrap().is_congruent(
                 &rug::Integer::from_str(y).unwrap(),
-                &rug::Integer::from_str(modulus).unwrap()
+                &rug::Integer::from_str(m).unwrap()
             ),
             out
         );
@@ -556,11 +552,10 @@ fn test_eq_mod() {
 fn limbs_eq_neg_limb_mod_limb_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
-        |&(ref limbs, limb, modulus)| {
-            let equal = limbs_eq_neg_limb_mod_limb(limbs, limb, modulus);
+        |&(ref limbs, limb, m)| {
+            let equal = limbs_eq_neg_limb_mod_limb(limbs, limb, m);
             assert_eq!(
-                (-Natural::from_limbs_asc(limbs))
-                    .eq_mod(Integer::from(limb), Natural::from(modulus)),
+                (-Natural::from_limbs_asc(limbs)).eq_mod(Integer::from(limb), Natural::from(m)),
                 equal
             );
         },
@@ -571,32 +566,32 @@ fn limbs_eq_neg_limb_mod_limb_properties() {
 fn limbs_pos_limb_eq_neg_limb_mod_properties() {
     test_properties(
         triples_of_unsigned_unsigned_and_unsigned_vec_var_1,
-        |&(x, y, ref modulus)| {
-            let equal = limbs_pos_limb_eq_neg_limb_mod(x, y, modulus);
+        |&(x, y, ref ms)| {
+            let equal = limbs_pos_limb_eq_neg_limb_mod(x, y, ms);
             let x = Integer::from(x);
             let y = -Natural::from(y);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert_eq!((&x).eq_mod(&y, &modulus), equal);
-            let modulus = Integer::from(modulus);
+            let m = Natural::from_limbs_asc(ms);
+            assert_eq!((&x).eq_mod(&y, &m), equal);
+            let m = Integer::from(m);
             assert_eq!(
-                x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
-            assert_eq!((x - y).divisible_by(modulus), equal);
+            assert_eq!((x - y).divisible_by(m), equal);
         },
     );
 
     test_properties(
         triples_of_limb_limb_and_limb_vec_var_2,
-        |&(x, y, ref modulus)| {
-            assert!(!limbs_pos_limb_eq_neg_limb_mod(x, y, modulus));
+        |&(x, y, ref ms)| {
+            assert!(!limbs_pos_limb_eq_neg_limb_mod(x, y, ms));
             let x = Integer::from(x);
             let y = -Natural::from(y);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert!(!(&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x != y && (modulus == 0 || (&x).mod_op(&modulus) != (&y).mod_op(&modulus)));
-            assert!(!(x - y).divisible_by(modulus));
+            let m = Natural::from_limbs_asc(ms);
+            assert!(!(&x).eq_mod(&y, &m));
+            let m = Integer::from(m);
+            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(!(x - y).divisible_by(m));
         },
     );
 }
@@ -605,52 +600,52 @@ fn limbs_pos_limb_eq_neg_limb_mod_properties() {
 fn limbs_pos_eq_neg_limb_mod_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
-        |&(ref xs, y, ref modulus)| {
-            let equal = limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus);
-            let mut mut_modulus = modulus.clone();
-            assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus), equal);
+        |&(ref xs, y, ref ms)| {
+            let equal = limbs_pos_eq_neg_limb_mod_ref(xs, y, ms);
+            let mut mut_ms = ms.clone();
+            assert_eq!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_ms), equal);
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert_eq!((&x).eq_mod(&y, &modulus), equal);
-            let modulus = Integer::from(modulus);
+            let m = Natural::from_limbs_asc(ms);
+            assert_eq!((&x).eq_mod(&y, &m), equal);
+            let m = Integer::from(m);
             assert_eq!(
-                x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
-            assert_eq!((x - y).divisible_by(modulus), equal);
+            assert_eq!((x - y).divisible_by(m), equal);
         },
     );
 
     test_properties(
         triples_of_limb_vec_limb_and_limb_vec_var_4,
-        |&(ref xs, y, ref modulus)| {
-            assert!(limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus));
-            let mut mut_modulus = modulus.clone();
-            assert!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus));
+        |&(ref xs, y, ref ms)| {
+            assert!(limbs_pos_eq_neg_limb_mod_ref(xs, y, ms));
+            let mut mut_ms = ms.clone();
+            assert!(limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_ms));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert!((&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus));
-            assert!((x - y).divisible_by(modulus));
+            let m = Natural::from_limbs_asc(ms);
+            assert!((&x).eq_mod(&y, &m));
+            let m = Integer::from(m);
+            assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+            assert!((x - y).divisible_by(m));
         },
     );
 
     test_properties(
         triples_of_limb_vec_limb_and_limb_vec_var_5,
-        |&(ref xs, y, ref modulus)| {
-            assert!(!limbs_pos_eq_neg_limb_mod_ref(xs, y, modulus));
-            let mut mut_modulus = modulus.clone();
-            assert!(!limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_modulus));
+        |&(ref xs, y, ref ms)| {
+            assert!(!limbs_pos_eq_neg_limb_mod_ref(xs, y, ms));
+            let mut mut_ms = ms.clone();
+            assert!(!limbs_pos_eq_neg_limb_mod(xs, y, &mut mut_ms));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from(y);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert!(!(&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x != y && (modulus == 0 || (&x).mod_op(&modulus) != (&y).mod_op(&modulus)));
-            assert!(!(x - y).divisible_by(modulus));
+            let m = Natural::from_limbs_asc(ms);
+            assert!(!(&x).eq_mod(&y, &m));
+            let m = Integer::from(m);
+            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(!(x - y).divisible_by(m));
         },
     );
 }
@@ -659,46 +654,46 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
 fn limbs_pos_eq_neg_mod_limb_properties() {
     test_properties(
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8,
-        |&(ref xs, ref ys, modulus)| {
-            let equal = limbs_pos_eq_neg_mod_limb(xs, ys, modulus);
+        |&(ref xs, ref ys, m)| {
+            let equal = limbs_pos_eq_neg_mod_limb(xs, ys, m);
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from(modulus);
-            assert_eq!((&x).eq_mod(&y, &modulus), equal);
-            let modulus = Integer::from(modulus);
+            let m = Natural::from(m);
+            assert_eq!((&x).eq_mod(&y, &m), equal);
+            let m = Integer::from(m);
             assert_eq!(
-                x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
-            assert_eq!((x - y).divisible_by(modulus), equal);
+            assert_eq!((x - y).divisible_by(m), equal);
         },
     );
 
     test_properties(
         triples_of_limb_vec_limb_vec_and_limb_var_11,
-        |&(ref xs, ref ys, modulus)| {
-            assert!(limbs_pos_eq_neg_mod_limb(xs, ys, modulus));
+        |&(ref xs, ref ys, m)| {
+            assert!(limbs_pos_eq_neg_mod_limb(xs, ys, m));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from(modulus);
-            assert!((&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus));
-            assert!((x - y).divisible_by(modulus));
+            let m = Natural::from(m);
+            assert!((&x).eq_mod(&y, &m));
+            let m = Integer::from(m);
+            assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+            assert!((x - y).divisible_by(m));
         },
     );
 
     test_properties(
         triples_of_limb_vec_limb_vec_and_limb_var_12,
-        |&(ref xs, ref ys, modulus)| {
-            assert!(!limbs_pos_eq_neg_mod_limb(xs, ys, modulus));
+        |&(ref xs, ref ys, m)| {
+            assert!(!limbs_pos_eq_neg_mod_limb(xs, ys, m));
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from(modulus);
-            assert!(!(&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x != y && (modulus == 0 || (&x).mod_op(&modulus) != (&y).mod_op(&modulus)));
-            assert!(!(x - y).divisible_by(modulus));
+            let m = Natural::from(m);
+            assert!(!(&x).eq_mod(&y, &m));
+            let m = Integer::from(m);
+            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(!(x - y).divisible_by(m));
         },
     );
 }
@@ -707,78 +702,72 @@ fn limbs_pos_eq_neg_mod_limb_properties() {
 fn limbs_pos_eq_neg_mod_properties() {
     test_properties(
         triples_of_unsigned_vec_var_55,
-        |&(ref xs, ref ys, ref modulus)| {
-            let equal = limbs_pos_eq_neg_mod_ref(xs, ys, modulus);
-            let mut mut_modulus = modulus.clone();
-            assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_modulus), equal);
+        |&(ref xs, ref ys, ref ms)| {
+            let equal = limbs_pos_eq_neg_mod_ref(xs, ys, ms);
+            let mut mut_ms = ms.clone();
+            assert_eq!(limbs_pos_eq_neg_mod(xs, ys, &mut mut_ms), equal);
             let x = Integer::from(Natural::from_limbs_asc(xs));
             let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert_eq!((&x).eq_mod(&y, &modulus), equal);
-            let modulus = Integer::from(modulus);
+            let m = Natural::from_limbs_asc(ms);
+            assert_eq!((&x).eq_mod(&y, &m), equal);
+            let m = Integer::from(m);
             assert_eq!(
-                x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus),
+                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
-            assert_eq!((x - y).divisible_by(modulus), equal);
+            assert_eq!((x - y).divisible_by(m), equal);
         },
     );
 
-    test_properties(
-        triples_of_limb_vec_var_58,
-        |&(ref xs, ref ys, ref modulus)| {
-            assert!(limbs_pos_eq_neg_mod_ref(xs, ys, modulus));
-            let mut mut_modulus = modulus.clone();
-            assert!(limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_modulus));
-            let x = Integer::from(Natural::from_limbs_asc(xs));
-            let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert!((&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x == y || modulus != 0 && (&x).mod_op(&modulus) == (&y).mod_op(&modulus));
-            assert!((x - y).divisible_by(modulus));
-        },
-    );
+    test_properties(triples_of_limb_vec_var_58, |&(ref xs, ref ys, ref ms)| {
+        assert!(limbs_pos_eq_neg_mod_ref(xs, ys, ms));
+        let mut mut_ms = ms.clone();
+        assert!(limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_ms));
+        let x = Integer::from(Natural::from_limbs_asc(xs));
+        let y = -Natural::from_limbs_asc(ys);
+        let m = Natural::from_limbs_asc(ms);
+        assert!((&x).eq_mod(&y, &m));
+        let m = Integer::from(m);
+        assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+        assert!((x - y).divisible_by(m));
+    });
 
-    test_properties(
-        triples_of_limb_vec_var_59,
-        |&(ref xs, ref ys, ref modulus)| {
-            assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, modulus));
-            let mut mut_modulus = modulus.clone();
-            assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_modulus));
-            let x = Integer::from(Natural::from_limbs_asc(xs));
-            let y = -Natural::from_limbs_asc(ys);
-            let modulus = Natural::from_limbs_asc(modulus);
-            assert!(!(&x).eq_mod(&y, &modulus));
-            let modulus = Integer::from(modulus);
-            assert!(x != y && (modulus == 0 || (&x).mod_op(&modulus) != (&y).mod_op(&modulus)));
-            assert!(!(x - y).divisible_by(modulus));
-        },
-    );
+    test_properties(triples_of_limb_vec_var_59, |&(ref xs, ref ys, ref ms)| {
+        assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, ms));
+        let mut mut_ms = ms.clone();
+        assert!(!limbs_pos_eq_neg_mod_ref(xs, ys, &mut mut_ms));
+        let x = Integer::from(Natural::from_limbs_asc(xs));
+        let y = -Natural::from_limbs_asc(ys);
+        let m = Natural::from_limbs_asc(ms);
+        assert!(!(&x).eq_mod(&y, &m));
+        let m = Integer::from(m);
+        assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+        assert!(!(x - y).divisible_by(m));
+    });
 }
 
 #[test]
 fn eq_mod_properties() {
     test_properties(
         triples_of_integer_integer_and_natural,
-        |&(ref x, ref y, ref modulus)| {
-            let equal = x.eq_mod(y, modulus);
-            assert_eq!(y.eq_mod(x, modulus), equal);
+        |&(ref x, ref y, ref m)| {
+            let equal = x.eq_mod(y, m);
+            assert_eq!(y.eq_mod(x, m), equal);
 
-            assert_eq!(x.eq_mod(y, modulus.clone()), equal);
-            assert_eq!(x.eq_mod(y.clone(), modulus), equal);
-            assert_eq!(x.eq_mod(y.clone(), modulus.clone()), equal);
-            assert_eq!(x.clone().eq_mod(y, modulus), equal);
-            assert_eq!(x.clone().eq_mod(y, modulus.clone()), equal);
-            assert_eq!(x.clone().eq_mod(y.clone(), modulus), equal);
-            assert_eq!(x.clone().eq_mod(y.clone(), modulus.clone()), equal);
+            assert_eq!(x.eq_mod(y, m.clone()), equal);
+            assert_eq!(x.eq_mod(y.clone(), m), equal);
+            assert_eq!(x.eq_mod(y.clone(), m.clone()), equal);
+            assert_eq!(x.clone().eq_mod(y, m), equal);
+            assert_eq!(x.clone().eq_mod(y, m.clone()), equal);
+            assert_eq!(x.clone().eq_mod(y.clone(), m), equal);
+            assert_eq!(x.clone().eq_mod(y.clone(), m.clone()), equal);
 
-            assert_eq!((-x).eq_mod(-y, modulus), equal);
-            assert_eq!((x - y).divisible_by(Integer::from(modulus)), equal);
-            assert_eq!((y - x).divisible_by(Integer::from(modulus)), equal);
+            assert_eq!((-x).eq_mod(-y, m), equal);
+            assert_eq!((x - y).divisible_by(Integer::from(m)), equal);
+            assert_eq!((y - x).divisible_by(Integer::from(m)), equal);
             assert_eq!(
                 integer_to_rug_integer(x)
-                    .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(modulus)),
+                    .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)),
                 equal
             );
         },
@@ -786,21 +775,21 @@ fn eq_mod_properties() {
 
     test_properties(
         triples_of_integer_integer_and_natural_var_1,
-        |&(ref x, ref y, ref modulus)| {
-            assert!(x.eq_mod(y, modulus));
-            assert!(y.eq_mod(x, modulus));
+        |&(ref x, ref y, ref m)| {
+            assert!(x.eq_mod(y, m));
+            assert!(y.eq_mod(x, m));
             assert!(integer_to_rug_integer(x)
-                .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(modulus)));
+                .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)));
         },
     );
 
     test_properties(
         triples_of_integer_integer_and_natural_var_2,
-        |&(ref x, ref y, ref modulus)| {
-            assert!(!x.eq_mod(y, modulus));
-            assert!(!y.eq_mod(x, modulus));
+        |&(ref x, ref y, ref m)| {
+            assert!(!x.eq_mod(y, m));
+            assert!(!y.eq_mod(x, m));
             assert!(!integer_to_rug_integer(x)
-                .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(modulus)));
+                .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)));
         },
     );
 

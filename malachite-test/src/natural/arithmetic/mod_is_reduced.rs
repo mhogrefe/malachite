@@ -11,11 +11,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_mod_is_reduced(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_natural_and_positive_natural(gm).take(limit) {
-        if n.mod_is_reduced(&modulus) {
-            println!("{} is reduced mod {}", n, modulus);
+    for (n, m) in pairs_of_natural_and_positive_natural(gm).take(limit) {
+        if n.mod_is_reduced(&m) {
+            println!("{} is reduced mod {}", n, m);
         } else {
-            println!("{} is not reduced mod {}", n, modulus);
+            println!("{} is not reduced mod {}", n, m);
         }
     }
 }
@@ -30,9 +30,6 @@ fn benchmark_natural_mod_is_reduced(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, modulus)| no_out!(n.mod_is_reduced(&modulus))),
-        )],
+        &mut [("malachite", &mut (|(n, m)| no_out!(n.mod_is_reduced(&m))))],
     );
 }

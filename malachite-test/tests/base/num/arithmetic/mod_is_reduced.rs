@@ -5,8 +5,8 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::pairs_of_unsigneds_var_4;
 
 fn mod_is_reduced_properties_helper<T: PrimitiveUnsigned + Rand>() {
-    test_properties(pairs_of_unsigneds_var_4::<T>, |&(n, modulus)| {
-        assert_eq!(n.mod_is_reduced(&modulus), n % modulus == n);
+    test_properties(pairs_of_unsigneds_var_4::<T>, |&(n, m)| {
+        assert_eq!(n.mod_is_reduced(&m), n % m == n);
     });
 }
 

@@ -16,7 +16,7 @@ use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is
-/// nonempty and already reduced mod 2<sup>`pow`</sup>.
+/// already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -46,8 +46,7 @@ pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Li
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input slice.
-/// Returns whether there is a carry. Assumes the input is nonempty and already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Returns whether there is a carry. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -59,17 +58,17 @@ pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Li
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut limbs, 789, 41), false);
-/// assert_eq!(limbs, &[912, 456]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 789, 41), false);
+/// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut limbs, 2, 33), true);
-/// assert_eq!(limbs, &[1]);
+/// let mut xs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 2, 33), true);
+/// assert_eq!(xs, &[1]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut limbs, 2, 32), false);
-/// assert_eq!(limbs, &[1]);
+/// let mut xs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 2, 32), false);
+/// assert_eq!(xs, &[1]);
 /// ```
 pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, pow: u64) -> bool {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
@@ -84,7 +83,7 @@ pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, 
 
 /// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
 /// writes the limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input
-/// `Vec`. Assumes the input is nonempty and already reduced mod 2<sup>`pow`</sup>.
+/// `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -99,17 +98,17 @@ pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, 
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, 789, 41);
-/// assert_eq!(limbs, &[912, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 789, 41);
+/// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, 2, 33);
-/// assert_eq!(limbs, &[1, 1]);
+/// let mut xs = vec![0xffff_ffff];
+/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 2, 33);
+/// assert_eq!(xs, &[1, 1]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, 2, 32);
-/// assert_eq!(limbs, &[1]);
+/// let mut xs = vec![0xffff_ffff];
+/// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 2, 32);
+/// assert_eq!(xs, &[1]);
 /// ```
 pub fn limbs_vec_mod_power_of_two_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
     assert!(!xs.is_empty());
@@ -120,7 +119,7 @@ pub fn limbs_vec_mod_power_of_two_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb,
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
 /// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
-/// the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are nonempty and already reduced mod
+/// the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
@@ -155,8 +154,8 @@ pub fn limbs_mod_power_of_two_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) ->
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
-/// nonempty and already reduced mod 2<sup>`pow`</sup>.
+/// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
+/// already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -189,8 +188,8 @@ pub fn limbs_mod_power_of_two_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Lim
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
 /// the length of the first slice is greater than or equal to the length of the second, writes the
 /// `xs.len()` least-significant limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the
-/// first (left) slice. Returns whether there is a carry. Assumes the inputs are nonempty and
-/// already reduced mod 2<sup>`pow`</sup>.
+/// first (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod
+/// 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -240,7 +239,7 @@ pub fn limbs_slice_mod_power_of_two_add_greater_in_place_left(
 
 /// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the first
-/// (left) slice. Assumes the inputs are nonempty and already reduced mod 2<sup>`pow`</sup>.
+/// (left) slice. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -248,7 +247,6 @@ pub fn limbs_slice_mod_power_of_two_add_greater_in_place_left(
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
 ///
-/// # Example
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
@@ -292,8 +290,8 @@ pub fn limbs_vec_mod_power_of_two_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Li
 /// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the longer slice (or the first
 /// one, if they are equally long). Returns a `bool` which is `false` when the output is to the
-/// first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are nonempty and
-/// already reduced mod 2<sup>`pow`</sup>.
+/// first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod
+/// 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
 ///
@@ -374,7 +372,7 @@ impl Natural {
     fn mod_power_of_two_add_assign_limb(&mut self, other: Limb, pow: u64) {
         match (&mut *self, other, pow) {
             (_, 0, _) => {}
-            (&mut natural_zero!(), _, _) => *self = Natural::from(other),
+            (&mut natural_zero!(), _, _) => *self = Natural(Small(other)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_two_add_assign(other, pow)
             }

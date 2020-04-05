@@ -227,12 +227,12 @@ pub fn triples_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural, Na
 
 // All triples of `Natural`s, where the first `Natural` is equal to the second mod the third.
 pub fn triples_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
-    Box::new(triples_of_naturals(gm).map(|(x, y, modulus)| (x * &modulus + &y, y, modulus)))
+    Box::new(triples_of_naturals(gm).map(|(x, y, m)| (x * &m + &y, y, m)))
 }
 
 // All triples of `Natural`s, where the first `Natural` is not equal to the second mod the third.
 pub fn triples_of_naturals_var_3(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
-    Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref modulus)| !x.eq_mod(y, modulus)))
+    Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)))
 }
 
 pub fn triples_of_natural_natural_and_positive_natural(

@@ -35,14 +35,14 @@ fn mod_is_reduced_fail() {
 
 #[test]
 fn mod_is_reduced_properties() {
-    test_properties(pairs_of_natural_and_positive_natural, |(n, modulus)| {
-        assert_eq!(n.mod_is_reduced(modulus), n % modulus == *n);
+    test_properties(pairs_of_natural_and_positive_natural, |(n, m)| {
+        assert_eq!(n.mod_is_reduced(m), n % m == *n);
     });
 
-    test_properties(pairs_of_unsigneds_var_4::<Limb>, |&(n, modulus)| {
+    test_properties(pairs_of_unsigneds_var_4::<Limb>, |&(n, m)| {
         assert_eq!(
-            n.mod_is_reduced(&modulus),
-            Natural::from(n).mod_is_reduced(&Natural::from(modulus))
+            n.mod_is_reduced(&m),
+            Natural::from(n).mod_is_reduced(&Natural::from(m))
         );
     });
 }

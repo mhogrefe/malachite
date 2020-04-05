@@ -158,8 +158,8 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
             let in_limb = xs[i];
             let shifted_in_limb = (previous_in_limb >> shift) | (in_limb << shift_complement);
             previous_in_limb = in_limb;
-            let (difference, carry) = shifted_in_limb.overflowing_sub(upper_half);
-            let out_limb = difference.wrapping_mul(inverse);
+            let (diff, carry) = shifted_in_limb.overflowing_sub(upper_half);
+            let out_limb = diff.wrapping_mul(inverse);
             out[i - 1] = out_limb;
             upper_half = (DoubleLimb::from(out_limb) * DoubleLimb::from(shifted_d)).upper_half();
             if carry {
@@ -179,9 +179,9 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
             if previous_carry {
                 upper_half += 1;
             }
-            let (difference, carry) = xs[i].overflowing_sub(upper_half);
+            let (diff, carry) = xs[i].overflowing_sub(upper_half);
             previous_carry = carry;
-            out_limb = difference.wrapping_mul(inverse);
+            out_limb = diff.wrapping_mul(inverse);
             out[i] = out_limb;
         }
     }
@@ -213,8 +213,8 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
             let in_limb = xs[i];
             let shifted_in_limb = (previous_in_limb >> shift) | (in_limb << shift_complement);
             previous_in_limb = in_limb;
-            let (difference, carry) = shifted_in_limb.overflowing_sub(upper_half);
-            let out_limb = difference.wrapping_mul(inverse);
+            let (diff, carry) = shifted_in_limb.overflowing_sub(upper_half);
+            let out_limb = diff.wrapping_mul(inverse);
             xs[i - 1] = out_limb;
             upper_half = (DoubleLimb::from(out_limb) * shifted_d).upper_half();
             if carry {
@@ -235,9 +235,9 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
             if previous_carry {
                 upper_half += 1;
             }
-            let (difference, carry) = limb.overflowing_sub(upper_half);
+            let (diff, carry) = limb.overflowing_sub(upper_half);
             previous_carry = carry;
-            out_limb = difference.wrapping_mul(inverse);
+            out_limb = diff.wrapping_mul(inverse);
             *limb = out_limb;
         }
     }
@@ -2217,9 +2217,9 @@ pub fn _limbs_div_exact_3_to_out_alt(out: &mut [Limb], xs: &[Limb]) {
     let last_index = len - 1;
     let mut big_carry = 0;
     for i in 0..last_index {
-        let (difference, carry) = xs[i].overflowing_sub(big_carry);
+        let (diff, carry) = xs[i].overflowing_sub(big_carry);
         big_carry = if carry { 1 } else { 0 };
-        let out_limb = difference.wrapping_mul(MODLIMB_INVERSE_3);
+        let out_limb = diff.wrapping_mul(MODLIMB_INVERSE_3);
         out[i] = out_limb;
         if out_limb >= CEIL_MAX_OVER_3 {
             big_carry += 1;
@@ -2243,9 +2243,9 @@ pub fn _limbs_div_exact_3_in_place_alt(xs: &mut [Limb]) {
     let last_index = len - 1;
     let mut big_carry = 0;
     for limb in xs[..last_index].iter_mut() {
-        let (difference, carry) = limb.overflowing_sub(big_carry);
+        let (diff, carry) = limb.overflowing_sub(big_carry);
         big_carry = if carry { 1 } else { 0 };
-        let out_limb = difference.wrapping_mul(MODLIMB_INVERSE_3);
+        let out_limb = diff.wrapping_mul(MODLIMB_INVERSE_3);
         *limb = out_limb;
         if out_limb >= CEIL_MAX_OVER_3 {
             big_carry += 1;

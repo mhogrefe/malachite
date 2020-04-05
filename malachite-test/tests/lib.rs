@@ -227,6 +227,7 @@ pub mod natural {
         pub mod mod_power_of_two_add;
         pub mod mod_power_of_two_is_reduced;
         pub mod mod_power_of_two_neg;
+        pub mod mod_power_of_two_sub;
         pub mod mul;
         pub mod neg;
         pub mod next_power_of_two;

@@ -68,39 +68,39 @@ fn saturating_sub_properties() {
         let mut mut_x = x.clone();
         mut_x.saturating_sub_assign(y);
         assert!(mut_x.is_valid());
-        let difference = mut_x;
+        let diff = mut_x;
 
         let mut mut_x = x.clone();
         mut_x.saturating_sub_assign(y.clone());
         assert!(mut_x.is_valid());
-        assert_eq!(mut_x, difference);
+        assert_eq!(mut_x, diff);
 
-        let difference_alt = x.clone().saturating_sub(y.clone());
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x.clone().saturating_sub(y.clone());
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let difference_alt = x.clone().saturating_sub(y);
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x.clone().saturating_sub(y);
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let difference_alt = x.saturating_sub(y.clone());
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x.saturating_sub(y.clone());
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let difference_alt = x.saturating_sub(y);
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x.saturating_sub(y);
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let reverse_difference = y.saturating_sub(x);
-        if difference > 0 {
-            assert_eq!(reverse_difference, 0);
+        let reverse_diff = y.saturating_sub(x);
+        if diff > 0 {
+            assert_eq!(reverse_diff, 0);
         }
-        if reverse_difference > 0 {
-            assert_eq!(difference, 0);
+        if reverse_diff > 0 {
+            assert_eq!(diff, 0);
         }
 
-        assert!(difference <= *x);
-        assert!(difference + y >= *x);
+        assert!(diff <= *x);
+        assert!(diff + y >= *x);
     });
 
     test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {

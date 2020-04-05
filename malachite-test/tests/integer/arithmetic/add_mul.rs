@@ -299,7 +299,7 @@ fn add_mul_properties() {
         let mut mut_a = a.clone();
         mut_a.add_mul_assign(b, c);
         assert!(mut_a.is_valid());
-        assert_eq!(mut_a, result, "{} {} {}", a, b, c);
+        assert_eq!(mut_a, result);
 
         let result_alt = a.clone().add_mul(b.clone(), c.clone());
         assert!(result_alt.is_valid());

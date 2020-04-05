@@ -79,56 +79,53 @@ fn test_checked_sub_natural() {
 #[test]
 fn checked_sub_properties() {
     test_properties(pairs_of_naturals, |&(ref x, ref y)| {
-        let difference = if *x >= *y {
+        let diff = if *x >= *y {
             let mut mut_x = x.clone();
             mut_x -= y;
             assert!(mut_x.is_valid());
-            let difference = mut_x;
+            let diff = mut_x;
 
             let mut rug_x = natural_to_rug_integer(x);
             rug_x -= natural_to_rug_integer(y);
-            assert_eq!(rug_integer_to_natural(&rug_x), difference);
-            Some(difference)
+            assert_eq!(rug_integer_to_natural(&rug_x), diff);
+            Some(diff)
         } else {
             None
         };
 
-        let difference_alt = x.clone().checked_sub(y.clone());
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
+        let diff_alt = x.clone().checked_sub(y.clone());
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.as_ref().map_or(true, |x| x.is_valid()));
 
-        let difference_alt = x.clone().checked_sub(y);
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
+        let diff_alt = x.clone().checked_sub(y);
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.as_ref().map_or(true, |x| x.is_valid()));
 
-        let difference_alt = x.checked_sub(y.clone());
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
+        let diff_alt = x.checked_sub(y.clone());
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.as_ref().map_or(true, |x| x.is_valid()));
 
-        let difference_alt = x.checked_sub(y);
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.as_ref().map_or(true, |x| x.is_valid()));
+        let diff_alt = x.checked_sub(y);
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.as_ref().map_or(true, |x| x.is_valid()));
 
-        let reverse_difference = y.checked_sub(x);
-        assert_eq!(
-            reverse_difference.is_some(),
-            *x == *y || difference.is_none()
-        );
+        let reverse_diff = y.checked_sub(x);
+        assert_eq!(reverse_diff.is_some(), *x == *y || diff.is_none());
 
         assert_eq!(
             checked_sub(natural_to_biguint(x), natural_to_biguint(y))
                 .map(|x| biguint_to_natural(&x)),
-            difference
+            diff
         );
         assert_eq!(
             checked_sub(natural_to_rug_integer(x), natural_to_rug_integer(y))
                 .map(|x| rug_integer_to_natural(&x)),
-            difference
+            diff
         );
 
-        if let Some(difference) = difference {
-            assert!(difference <= *x);
-            assert_eq!(difference + y, *x);
+        if let Some(diff) = diff {
+            assert!(diff <= *x);
+            assert_eq!(diff + y, *x);
         }
     });
 

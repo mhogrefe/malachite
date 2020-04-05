@@ -116,14 +116,12 @@ fn demo_limbs_slice_mod_power_of_two_add_limb_in_place(gm: GenerationMode, limit
 }
 
 fn demo_limbs_vec_mod_power_of_two_add_limb_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, limb, pow) in triples_of_limb_vec_limb_and_u64_var_2(gm).take(limit) {
-        let mut limbs = limbs.to_vec();
-        let limbs_old = limbs.clone();
-        limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, limb, pow);
+    for (mut xs, y, pow) in triples_of_limb_vec_limb_and_u64_var_2(gm).take(limit) {
+        let xs_old = xs.clone();
+        limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, y, pow);
         println!(
-            "limbs := {:?}; limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, {}, {}); \
-            limbs = {:?}",
-            limbs_old, limb, pow, limbs
+            "xs := {:?}; limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, {}, {}); xs = {:?}",
+            xs_old, y, pow, xs
         );
     }
 }

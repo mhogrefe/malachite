@@ -1,11 +1,11 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_neg_helper<T: PrimitiveUnsigned>() {
-    let test = |n: T, modulus, out| {
-        assert_eq!(n.mod_neg(modulus), out);
+    let test = |n: T, m, out| {
+        assert_eq!(n.mod_neg(m), out);
 
         let mut n = n;
-        n.mod_neg_assign(modulus);
+        n.mod_neg_assign(m);
         assert_eq!(n, out);
     };
 

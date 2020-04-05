@@ -275,9 +275,9 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 }
 
 /// Given the limbs of two `Natural`s a and b, and a limb c, calculates a - b * c, writing the limbs
-/// of the absolute value to whichever input is longer. The first `bool` returned is the sign of the
-/// result (true means non-negative). The second `bool` is `false` if the result is written to the
-/// first input, and `true` if it is written to the second. `xs` and `ys` should be nonempty and
+/// of the absolute value to whichever input is longer. The first `bool` returned is `false` if the
+/// result is written to the first input, and `true` if it is written to the second. The second
+/// `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be nonempty and
 /// have no trailing zeros, and `limb` should be nonzero.
 ///
 /// Time: worst case O(n)

@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
-    limbs_vec_mod_power_of_two_in_place,
+    limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -14,6 +14,7 @@ use inputs::natural::pairs_of_natural_and_small_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_power_of_two);
+    register_demo!(registry, demo_limbs_slice_mod_power_of_two_in_place);
     register_demo!(registry, demo_limbs_vec_mod_power_of_two_in_place);
     register_demo!(registry, demo_limbs_neg_mod_power_of_two);
     register_demo!(registry, demo_limbs_neg_mod_power_of_two_in_place);
@@ -27,6 +28,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_neg_mod_power_of_two);
     register_demo!(registry, demo_natural_neg_mod_power_of_two_ref);
     register_bench!(registry, Small, benchmark_limbs_mod_power_of_two);
+    register_bench!(
+        registry,
+        Small,
+        benchmark_limbs_slice_mod_power_of_two_in_place
+    );
     register_bench!(
         registry,
         Small,
@@ -69,6 +75,18 @@ fn demo_limbs_mod_power_of_two(gm: GenerationMode, limit: usize) {
             limbs,
             pow,
             limbs_mod_power_of_two(&limbs, pow)
+        );
+    }
+}
+
+fn demo_limbs_slice_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
+        let mut limbs = limbs.to_vec();
+        let limbs_old = limbs.clone();
+        limbs_slice_mod_power_of_two_in_place(&mut limbs, pow);
+        println!(
+            "limbs := {:?}; limbs_slice_mod_power_of_two_in_place(&mut limbs, {}); limbs = {:?}",
+            limbs_old, pow, limbs
         );
     }
 }
@@ -223,6 +241,27 @@ fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name:
         &mut [(
             "malachite",
             &mut (|(limbs, bits)| no_out!(limbs_mod_power_of_two(&limbs, bits))),
+        )],
+    );
+}
+
+fn benchmark_limbs_slice_mod_power_of_two_in_place(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "limbs_slice_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_and_small_unsigned(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, pow)| usize::exact_from(pow)),
+        "pow",
+        &mut [(
+            "malachite",
+            &mut (|(mut limbs, bits)| limbs_slice_mod_power_of_two_in_place(&mut limbs, bits)),
         )],
     );
 }

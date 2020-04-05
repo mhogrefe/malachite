@@ -60,45 +60,42 @@ fn test_mod_neg() {
 
 #[test]
 fn mod_neg_properties() {
-    test_properties(pairs_of_naturals_var_2, |(n, modulus)| {
-        assert!(n.mod_is_reduced(modulus));
-        let neg = n.mod_neg(modulus);
+    test_properties(pairs_of_naturals_var_2, |(n, m)| {
+        assert!(n.mod_is_reduced(m));
+        let neg = n.mod_neg(m);
         assert!(neg.is_valid());
-        assert!(neg.mod_is_reduced(modulus));
+        assert!(neg.mod_is_reduced(m));
 
-        let neg_alt = n.mod_neg(modulus.clone());
+        let neg_alt = n.mod_neg(m.clone());
         assert!(neg_alt.is_valid());
         assert_eq!(neg_alt, neg);
 
-        let neg_alt = n.clone().mod_neg(modulus);
+        let neg_alt = n.clone().mod_neg(m);
         assert!(neg_alt.is_valid());
         assert_eq!(neg_alt, neg);
 
-        let neg_alt = n.clone().mod_neg(modulus.clone());
-        assert!(neg_alt.is_valid());
-        assert_eq!(neg_alt, neg);
-
-        let mut n_alt = n.clone();
-        n_alt.mod_neg_assign(modulus);
+        let neg_alt = n.clone().mod_neg(m.clone());
         assert!(neg_alt.is_valid());
         assert_eq!(neg_alt, neg);
 
         let mut n_alt = n.clone();
-        n_alt.mod_neg_assign(modulus.clone());
+        n_alt.mod_neg_assign(m);
         assert!(neg_alt.is_valid());
         assert_eq!(neg_alt, neg);
 
-        assert_eq!(neg, (-n).mod_op(Integer::from(modulus)));
-        assert_eq!((&neg).mod_neg(modulus), *n);
+        let mut n_alt = n.clone();
+        n_alt.mod_neg_assign(m.clone());
+        assert!(neg_alt.is_valid());
+        assert_eq!(neg_alt, neg);
+
+        assert_eq!(neg, (-n).mod_op(Integer::from(m)));
+        assert_eq!((&neg).mod_neg(m), *n);
         //TODO use mod_add
-        assert!((n + &neg).divisible_by(modulus));
-        assert_eq!(*n == neg, *n == Natural::ZERO || n << 1 == *modulus);
+        assert!((n + &neg).divisible_by(m));
+        assert_eq!(*n == neg, *n == Natural::ZERO || n << 1 == *m);
     });
 
-    test_properties(pairs_of_unsigneds_var_5::<Limb>, |&(n, modulus)| {
-        assert_eq!(
-            n.mod_neg(modulus),
-            Natural::from(n).mod_neg(Natural::from(modulus))
-        );
+    test_properties(pairs_of_unsigneds_var_5::<Limb>, |&(n, m)| {
+        assert_eq!(n.mod_neg(m), Natural::from(n).mod_neg(Natural::from(m)));
     });
 }

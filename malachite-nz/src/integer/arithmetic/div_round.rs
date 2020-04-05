@@ -566,10 +566,10 @@ impl DivRoundAssign<Integer> for Integer {
     /// assert_eq!(n.to_string(), "4");
     /// ```
     fn div_round_assign(&mut self, other: Integer, rm: RoundingMode) {
-        let result_sign = self.sign == other.sign;
+        let q_sign = self.sign == other.sign;
         self.abs
-            .div_round_assign(other.abs, if result_sign { rm } else { -rm });
-        self.sign = result_sign || self.abs == 0;
+            .div_round_assign(other.abs, if q_sign { rm } else { -rm });
+        self.sign = q_sign || self.abs == 0;
     }
 }
 
@@ -669,9 +669,9 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// assert_eq!(n.to_string(), "4");
     /// ```
     fn div_round_assign(&mut self, other: &'a Integer, rm: RoundingMode) {
-        let result_sign = self.sign == other.sign;
+        let q_sign = self.sign == other.sign;
         self.abs
-            .div_round_assign(&other.abs, if result_sign { rm } else { -rm });
-        self.sign = result_sign || self.abs == 0;
+            .div_round_assign(&other.abs, if q_sign { rm } else { -rm });
+        self.sign = q_sign || self.abs == 0;
     }
 }

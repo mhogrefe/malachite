@@ -643,8 +643,8 @@ macro_rules! impl_arithmetic_traits {
 
         impl EqMod for $t {
             #[inline]
-            fn eq_mod(self, other: $t, modulus: $t) -> bool {
-                self == other || modulus != 0 && self.mod_op(modulus) == other.mod_op(modulus)
+            fn eq_mod(self, other: $t, m: $t) -> bool {
+                self == other || m != 0 && self.mod_op(m) == other.mod_op(m)
             }
         }
     };

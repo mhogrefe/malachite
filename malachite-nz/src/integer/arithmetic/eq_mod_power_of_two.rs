@@ -9,6 +9,8 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+//TODO clean
+
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
 /// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb

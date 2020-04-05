@@ -1309,45 +1309,45 @@ fn sub_properties() {
         let mut mut_x = x.clone();
         mut_x -= y.clone();
         assert!(mut_x.is_valid());
-        let difference = mut_x;
+        let diff = mut_x;
 
         let mut mut_x = x.clone();
         mut_x -= y;
         assert!(mut_x.is_valid());
-        let difference_alt = mut_x;
-        assert_eq!(difference_alt, difference);
+        let diff_alt = mut_x;
+        assert_eq!(diff_alt, diff);
 
         let mut rug_x = natural_to_rug_integer(x);
         rug_x -= natural_to_rug_integer(y);
-        assert_eq!(rug_integer_to_natural(&rug_x), difference);
+        assert_eq!(rug_integer_to_natural(&rug_x), diff);
 
-        let difference_alt = x.clone() - y.clone();
-        assert!(difference_alt.is_valid());
-        assert_eq!(difference_alt, difference);
+        let diff_alt = x.clone() - y.clone();
+        assert!(diff_alt.is_valid());
+        assert_eq!(diff_alt, diff);
 
-        let difference_alt = x.clone() - y;
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x.clone() - y;
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let difference_alt = x - y.clone();
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x - y.clone();
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
-        let difference_alt = x - y;
-        assert_eq!(difference_alt, difference);
-        assert!(difference_alt.is_valid());
+        let diff_alt = x - y;
+        assert_eq!(diff_alt, diff);
+        assert!(diff_alt.is_valid());
 
         assert_eq!(
             biguint_to_natural(&(natural_to_biguint(x) - natural_to_biguint(y))),
-            difference
+            diff
         );
         assert_eq!(
             rug_integer_to_natural(&(natural_to_rug_integer(x) - natural_to_rug_integer(y))),
-            difference
+            diff
         );
 
-        assert!(difference <= *x);
-        assert_eq!(difference + y, *x);
+        assert!(diff <= *x);
+        assert_eq!(diff + y, *x);
     });
 
     test_properties(pairs_of_unsigneds_var_1::<Limb>, |&(x, y)| {

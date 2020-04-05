@@ -19,11 +19,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_mod_is_reduced<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_unsigneds_var_4::<T>(gm).take(limit) {
-        if n.mod_is_reduced(&modulus) {
-            println!("{} is reduced mod {}", n, modulus);
+    for (n, m) in pairs_of_unsigneds_var_4::<T>(gm).take(limit) {
+        if n.mod_is_reduced(&m) {
+            println!("{} is reduced mod {}", n, m);
         } else {
-            println!("{} is not reduced mod {}", n, modulus);
+            println!("{} is not reduced mod {}", n, m);
         }
     }
 }
@@ -42,10 +42,7 @@ fn benchmark_mod_is_reduced<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(n, modulus)| no_out!(n.mod_is_reduced(&modulus))),
-        )],
+        &mut [("malachite", &mut (|(n, m)| no_out!(n.mod_is_reduced(&m))))],
     );
 }
 

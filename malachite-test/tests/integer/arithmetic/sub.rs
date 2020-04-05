@@ -67,42 +67,42 @@ fn test_sub() {
 #[test]
 fn sub_properties() {
     test_properties(pairs_of_integers, |&(ref x, ref y)| {
-        let difference_val_val = x.clone() - y.clone();
-        let difference_val_ref = x.clone() - y;
-        let difference_ref_val = x - y.clone();
-        let difference = x - y;
-        assert!(difference_val_val.is_valid());
-        assert!(difference_val_ref.is_valid());
-        assert!(difference_ref_val.is_valid());
-        assert!(difference.is_valid());
-        assert_eq!(difference_val_val, difference);
-        assert_eq!(difference_val_ref, difference);
-        assert_eq!(difference_ref_val, difference);
+        let diff_val_val = x.clone() - y.clone();
+        let diff_val_ref = x.clone() - y;
+        let diff_ref_val = x - y.clone();
+        let diff = x - y;
+        assert!(diff_val_val.is_valid());
+        assert!(diff_val_ref.is_valid());
+        assert!(diff_ref_val.is_valid());
+        assert!(diff.is_valid());
+        assert_eq!(diff_val_val, diff);
+        assert_eq!(diff_val_ref, diff);
+        assert_eq!(diff_ref_val, diff);
 
         let mut mut_x = x.clone();
         mut_x -= y.clone();
         assert!(mut_x.is_valid());
-        assert_eq!(mut_x, difference);
+        assert_eq!(mut_x, diff);
         let mut mut_x = x.clone();
         mut_x -= y;
         assert!(mut_x.is_valid());
-        assert_eq!(mut_x, difference);
+        assert_eq!(mut_x, diff);
 
         let mut mut_x = integer_to_rug_integer(x);
         mut_x -= integer_to_rug_integer(y);
-        assert_eq!(rug_integer_to_integer(&mut_x), difference);
+        assert_eq!(rug_integer_to_integer(&mut_x), diff);
 
         assert_eq!(
             bigint_to_integer(&(integer_to_bigint(x) - integer_to_bigint(y))),
-            difference
+            diff
         );
         assert_eq!(
             rug_integer_to_integer(&(integer_to_rug_integer(x) - integer_to_rug_integer(y))),
-            difference
+            diff
         );
-        assert_eq!(y - x, -&difference);
-        assert_eq!(&difference + y, *x);
-        assert_eq!(x - difference, *y);
+        assert_eq!(y - x, -&diff);
+        assert_eq!(&diff + y, *x);
+        assert_eq!(x - diff, *y);
     });
 
     #[allow(unknown_lints, eq_op)]

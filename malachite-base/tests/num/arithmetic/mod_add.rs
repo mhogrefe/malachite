@@ -1,11 +1,11 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_add_helper<T: PrimitiveUnsigned>() {
-    let test = |x: T, y: T, modulus, out| {
-        assert_eq!(x.mod_add(y, modulus), out);
+    let test = |x: T, y: T, m, out| {
+        assert_eq!(x.mod_add(y, m), out);
 
         let mut x = x;
-        x.mod_add_assign(y, modulus);
+        x.mod_add_assign(y, m);
         assert_eq!(x, out);
     };
     test(T::ZERO, T::ZERO, T::ONE, T::ZERO);

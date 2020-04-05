@@ -30,8 +30,8 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
     let mut result_limbs = Vec::with_capacity(len);
     for i in 0..len {
-        let (difference, overflow) = xs[i].overflowing_sub(y);
-        result_limbs.push(difference);
+        let (diff, overflow) = xs[i].overflowing_sub(y);
+        result_limbs.push(diff);
         if overflow {
             y = 1;
         } else {
@@ -79,8 +79,8 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
-        let (difference, overflow) = xs[i].overflowing_sub(y);
-        out[i] = difference;
+        let (diff, overflow) = xs[i].overflowing_sub(y);
+        out[i] = diff;
         if overflow {
             y = 1;
         } else {
@@ -131,14 +131,14 @@ pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
 }
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
-    let (mut difference, overflow) = x.overflowing_sub(y);
+    let (mut diff, overflow) = x.overflowing_sub(y);
     if *borrow {
         *borrow = overflow;
-        *borrow |= difference.overflowing_sub_assign(1);
+        *borrow |= diff.overflowing_sub_assign(1);
     } else {
         *borrow = overflow;
     }
-    difference
+    diff
 }
 
 /// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
@@ -168,18 +168,18 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let mut difference_limbs = Vec::with_capacity(xs_len);
+    let mut diff_limbs = Vec::with_capacity(xs_len);
     let mut borrow = false;
     for i in 0..ys_len {
-        difference_limbs.push(sub_and_borrow(xs[i], ys[i], &mut borrow));
+        diff_limbs.push(sub_and_borrow(xs[i], ys[i], &mut borrow));
     }
     if xs_len != ys_len {
-        difference_limbs.extend_from_slice(&xs[ys_len..]);
+        diff_limbs.extend_from_slice(&xs[ys_len..]);
         if borrow {
-            borrow = limbs_sub_limb_in_place(&mut difference_limbs[ys_len..], 1);
+            borrow = limbs_sub_limb_in_place(&mut diff_limbs[ys_len..], 1);
         }
     }
-    (difference_limbs, borrow)
+    (diff_limbs, borrow)
 }
 
 /// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two

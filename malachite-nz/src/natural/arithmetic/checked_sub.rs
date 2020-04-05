@@ -28,9 +28,9 @@ impl Natural {
                 if *self < other {
                     None
                 } else {
-                    let mut difference = Natural(Large(limbs_sub_limb(limbs, other).0));
-                    difference.trim();
-                    Some(difference)
+                    let mut diff = Natural(Large(limbs_sub_limb(limbs, other).0));
+                    diff.trim();
+                    Some(diff)
                 }
             }
         }
@@ -44,8 +44,8 @@ impl Natural {
         match *self {
             Natural(Small(ref mut small)) => {
                 return match small.checked_sub(other) {
-                    Some(difference) => {
-                        *small = difference;
+                    Some(diff) => {
+                        *small = diff;
                         false
                     }
                     None => true,
@@ -235,9 +235,9 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
                     if self < other {
                         None
                     } else {
-                        let mut difference = Natural(Large(limbs_sub(xs, ys).0));
-                        difference.trim();
-                        Some(difference)
+                        let mut diff = Natural(Large(limbs_sub(xs, ys).0));
+                        diff.trim();
+                        Some(diff)
                     }
                 }
             }

@@ -3,8 +3,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn mod_is_reduced_helper<T: PrimitiveUnsigned>() {
-    let test = |n: T, modulus, out| {
-        assert_eq!(n.mod_is_reduced(&modulus), out);
+    let test = |n: T, m, out| {
+        assert_eq!(n.mod_is_reduced(&m), out);
     };
 
     test(T::ZERO, T::exact_from(5), true);

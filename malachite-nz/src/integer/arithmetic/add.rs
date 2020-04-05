@@ -310,39 +310,44 @@ impl<'a> AddAssign<&'a Integer> for Integer {
     /// assert_eq!(x.to_string(), "2000000000000");
     /// ```
     fn add_assign(&mut self, other: &'a Integer) {
-        if *other == 0 {
-            return;
-        } else if *self == 0 {
-            *self = other.clone();
-            return;
-        }
-        let add_strategy = match (&mut (*self), other) {
+        match (&mut *self, other) {
+            (_, &integer_zero!()) => {}
+            (&mut integer_zero!(), _) => {
+                *self = other.clone();
+            }
+            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
             (
-                &mut Integer { sign: sx, .. },
+                &mut Integer {
+                    sign: sx,
+                    abs: ref mut ax,
+                },
                 &Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) => 0,
+            ) if sx == (sy && *ay != 0) => *ax += ay,
+            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
             (
                 &mut Integer {
                     sign: sx,
                     abs: ref mut ax,
                 },
                 &Integer { abs: ref ay, .. },
-            ) if sx && *ax == *ay || *ax > *ay => 1,
-            _ => 2,
-        };
-        match add_strategy {
-            // e.g. 10 + 5 or -10 + -5; sign of self is unchanged
-            0 => self.abs += &other.abs,
-            // e.g. 10 + -5, -10 + 5, or 5 + -5; sign of self is unchanged
-            1 => self.abs -= &other.abs,
+            ) if sx && *ax == *ay || *ax > *ay => *ax -= ay,
             // e.g. 5 + -10, -5 + 10, or -5 + 5; sign of self is flipped
-            _ => {
-                self.sign = other.sign;
-                self.abs.sub_right_assign_no_panic(&other.abs);
+            (
+                &mut Integer {
+                    sign: ref mut sx,
+                    abs: ref mut ax,
+                },
+                &Integer {
+                    sign: sy,
+                    abs: ref ay,
+                },
+            ) => {
+                *sx = sy;
+                ax.sub_right_assign_no_panic(ay);
             }
-        }
+        };
     }
 }

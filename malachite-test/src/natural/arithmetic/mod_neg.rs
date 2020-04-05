@@ -28,50 +28,47 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_natural_mod_neg_assign(gm: GenerationMode, limit: usize) {
-    for (mut n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
+    for (mut n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
-        let modulus_old = modulus.clone();
-        n.mod_neg_assign(modulus);
-        println!(
-            "x := {}; x.mod_neg_assign({}); x = {}",
-            n_old, modulus_old, n
-        );
+        let m_old = m.clone();
+        n.mod_neg_assign(m);
+        println!("x := {}; x.mod_neg_assign({}); x = {}", n_old, m_old, n);
     }
 }
 
 fn demo_natural_mod_neg_assign_ref(gm: GenerationMode, limit: usize) {
-    for (mut n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
+    for (mut n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
-        n.mod_neg_assign(&modulus);
-        println!("x := {}; x.mod_neg_assign(&{}); x = {}", n_old, modulus, n);
+        n.mod_neg_assign(&m);
+        println!("x := {}; x.mod_neg_assign(&{}); x = {}", n_old, m, n);
     }
 }
 
 fn demo_natural_mod_neg(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
+    for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
-        let modulus_old = modulus.clone();
-        println!("{} === {} mod {}", n_old, n.mod_neg(modulus), modulus_old);
+        let m_old = m.clone();
+        println!("{} === {} mod {}", n_old, n.mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_val_ref(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
+    for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
-        println!("{} === {} mod &{}", n_old, n.mod_neg(&modulus), modulus);
+        println!("{} === {} mod &{}", n_old, n.mod_neg(&m), m);
     }
 }
 
 fn demo_natural_mod_neg_ref_val(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
-        let modulus_old = modulus.clone();
-        println!("&{} === {} mod {}", n, (&n).mod_neg(modulus), modulus_old);
+    for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
+        let m_old = m.clone();
+        println!("&{} === {} mod {}", n, (&n).mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_ref_ref(gm: GenerationMode, limit: usize) {
-    for (n, modulus) in pairs_of_naturals_var_2(gm).take(limit) {
-        println!("&{} === {} mod &{}", n, (&n).mod_neg(&modulus), modulus);
+    for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
+        println!("&{} === {} mod &{}", n, (&n).mod_neg(&m), m);
     }
 }
 
@@ -87,16 +84,16 @@ fn benchmark_natural_mod_neg_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|(_, modulus)| usize::exact_from(modulus.significant_bits())),
-        "modulus.significant_bits()",
+        &(|(_, m)| usize::exact_from(m.significant_bits())),
+        "m.significant_bits()",
         &mut [
             (
                 "Natural.mod_neg_assign(Natural)",
-                &mut (|(mut n, modulus)| n.mod_neg_assign(modulus)),
+                &mut (|(mut n, m)| n.mod_neg_assign(m)),
             ),
             (
                 "Natural.mod_neg_assign(&Natural)",
-                &mut (|(mut n, modulus)| n.mod_neg_assign(&modulus)),
+                &mut (|(mut n, m)| n.mod_neg_assign(&m)),
             ),
         ],
     );
@@ -114,24 +111,24 @@ fn benchmark_natural_mod_neg_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|(_, modulus)| usize::exact_from(modulus.significant_bits())),
-        "modulus.significant_bits()",
+        &(|(_, m)| usize::exact_from(m.significant_bits())),
+        "m.significant_bits()",
         &mut [
             (
                 "Natural.mod_neg(Natural)",
-                &mut (|(n, modulus)| no_out!(n.mod_neg(modulus))),
+                &mut (|(n, m)| no_out!(n.mod_neg(m))),
             ),
             (
                 "Natural.mod_neg(&Natural)",
-                &mut (|(n, modulus)| no_out!(n.mod_neg(&modulus))),
+                &mut (|(n, m)| no_out!(n.mod_neg(&m))),
             ),
             (
                 "(&Natural).mod_neg(Natural)",
-                &mut (|(n, modulus)| no_out!((&n).mod_neg(modulus))),
+                &mut (|(n, m)| no_out!((&n).mod_neg(m))),
             ),
             (
                 "(&Natural).mod_neg(&Natural)",
-                &mut (|(n, modulus)| no_out!((&n).mod_neg(&modulus))),
+                &mut (|(n, m)| no_out!((&n).mod_neg(&m))),
             ),
         ],
     );
@@ -145,18 +142,16 @@ fn benchmark_natural_mod_neg_algorithms(gm: GenerationMode, limit: usize, file_n
         gm.name(),
         limit,
         file_name,
-        &(|(_, modulus)| usize::exact_from(modulus.significant_bits())),
-        "modulus.significant_bits()",
+        &(|(_, m)| usize::exact_from(m.significant_bits())),
+        "m.significant_bits()",
         &mut [
             (
                 "Natural.mod_neg(Natural)",
-                &mut (|(n, modulus)| no_out!(n.mod_neg(modulus))),
+                &mut (|(n, m)| no_out!(n.mod_neg(m))),
             ),
             (
                 "(-Natural).mod(Natural)",
-                &mut (|(n, modulus)| {
-                    no_out!(Natural::exact_from((-n).mod_op(Integer::from(modulus))))
-                }),
+                &mut (|(n, m)| no_out!(Natural::exact_from((-n).mod_op(Integer::from(m))))),
             ),
         ],
     );

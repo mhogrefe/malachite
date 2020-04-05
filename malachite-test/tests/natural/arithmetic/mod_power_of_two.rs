@@ -11,7 +11,7 @@ use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
-    limbs_vec_mod_power_of_two_in_place,
+    limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -44,6 +44,27 @@ fn test_limbs_mod_power_of_two_and_limbs_vec_mod_power_of_two_in_place() {
     test(&[123, 456], 0, &[]);
     test(&[123, 456], 1, &[1]);
     test(&[123, 456], 10, &[123]);
+    test(&[123, 456], 33, &[123, 0]);
+    test(&[123, 456], 40, &[123, 200]);
+    test(&[123, 456], 100, &[123, 456]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_slice_mod_power_of_two_in_place() {
+    let test = |limbs: &[Limb], pow: u64, out: &[Limb]| {
+        let mut limbs = limbs.to_vec();
+        limbs_slice_mod_power_of_two_in_place(&mut limbs, pow);
+        assert_eq!(limbs, out);
+    };
+    test(&[], 0, &[]);
+    test(&[], 5, &[]);
+    test(&[], 100, &[]);
+    test(&[6, 7], 2, &[2, 0]);
+    test(&[100, 101, 102], 10, &[100, 0, 0]);
+    test(&[123, 456], 0, &[0, 0]);
+    test(&[123, 456], 1, &[1, 0]);
+    test(&[123, 456], 10, &[123, 0]);
     test(&[123, 456], 33, &[123, 0]);
     test(&[123, 456], 40, &[123, 200]);
     test(&[123, 456], 100, &[123, 456]);
@@ -183,16 +204,40 @@ fn limbs_mod_power_of_two_properties() {
     );
 }
 
+macro_rules! limbs_slice_mod_power_of_two_in_place_helper {
+    ($f: ident, $xs: ident, $pow: ident) => {
+        let mut xs = $xs.to_vec();
+        let old_xs = xs.clone();
+        $f(&mut xs, $pow);
+        let n = Natural::from_limbs_asc(&old_xs).mod_power_of_two($pow);
+        assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+    };
+}
+
+#[test]
+fn limbs_slice_mod_power_of_two_in_place_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned,
+        |&(ref xs, pow)| {
+            limbs_slice_mod_power_of_two_in_place_helper!(
+                limbs_slice_mod_power_of_two_in_place,
+                xs,
+                pow
+            );
+        },
+    );
+}
+
 #[test]
 fn limbs_vec_mod_power_of_two_in_place_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_unsigned,
-        |&(ref limbs, pow)| {
-            let mut limbs = limbs.to_vec();
-            let old_limbs = limbs.clone();
-            limbs_vec_mod_power_of_two_in_place(&mut limbs, pow);
-            let n = Natural::from_limbs_asc(&old_limbs).mod_power_of_two(pow);
-            assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
+        |&(ref xs, pow)| {
+            limbs_slice_mod_power_of_two_in_place_helper!(
+                limbs_vec_mod_power_of_two_in_place,
+                xs,
+                pow
+            );
         },
     );
 }

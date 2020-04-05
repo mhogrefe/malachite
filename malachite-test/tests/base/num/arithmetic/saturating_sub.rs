@@ -8,12 +8,12 @@ use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds};
 
 fn unsigned_saturating_sub_assign_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigneds::<T>, |&(x, y)| {
-        let mut difference = x;
-        difference.saturating_sub_assign(y);
-        assert_eq!(difference, x.saturating_sub(y));
-        assert!(difference <= x);
-        if difference > T::ZERO {
-            assert_eq!(difference, x - y);
+        let mut diff = x;
+        diff.saturating_sub_assign(y);
+        assert_eq!(diff, x.saturating_sub(y));
+        assert!(diff <= x);
+        if diff > T::ZERO {
+            assert_eq!(diff, x - y);
         }
     });
 }
@@ -24,11 +24,11 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(pairs_of_signeds::<T>, |&(x, y)| {
-        let mut difference = x;
-        difference.saturating_sub_assign(y);
-        assert_eq!(difference, x.saturating_sub(y));
-        if difference > T::MIN && difference < T::MAX {
-            assert_eq!(difference, x - y);
+        let mut diff = x;
+        diff.saturating_sub_assign(y);
+        assert_eq!(diff, x.saturating_sub(y));
+        if diff > T::MIN && diff < T::MAX {
+            assert_eq!(diff, x - y);
         }
     });
 }

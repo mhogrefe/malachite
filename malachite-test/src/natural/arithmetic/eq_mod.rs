@@ -68,169 +68,159 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_limbs_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
-    for (limbs, limb, modulus) in
+    for (limbs, limb, m) in
         triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm).take(limit)
     {
         println!(
             "limbs_eq_limb_mod_limb({:?}, {}, {}) = {}",
             limbs,
             limb,
-            modulus,
-            limbs_eq_limb_mod_limb(&limbs, limb, modulus)
+            m,
+            limbs_eq_limb_mod_limb(&limbs, limb, m)
         );
     }
 }
 
 fn demo_limbs_eq_limb_mod(gm: GenerationMode, limit: usize) {
-    for (mut xs, y, mut modulus) in
+    for (mut xs, y, mut m) in
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
     {
         let old_xs = xs.clone();
-        let old_modulus = modulus.clone();
+        let old_m = m.clone();
         println!(
             "limbs_eq_limb_mod({:?}, {}, {:?}) = {}",
             old_xs,
             y,
-            old_modulus,
-            limbs_eq_limb_mod(&mut xs, y, &mut modulus)
+            old_m,
+            limbs_eq_limb_mod(&mut xs, y, &mut m)
         );
     }
 }
 
 fn demo_limbs_eq_limb_mod_val_ref(gm: GenerationMode, limit: usize) {
-    for (mut xs, y, modulus) in
-        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
-    {
+    for (mut xs, y, m) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit) {
         let old_xs = xs.clone();
         println!(
             "limbs_eq_limb_mod_val_ref({:?}, {}, {:?}) = {}",
             old_xs,
             y,
-            modulus,
-            limbs_eq_limb_mod_val_ref(&mut xs, y, &modulus)
+            m,
+            limbs_eq_limb_mod_val_ref(&mut xs, y, &m)
         );
     }
 }
 
 fn demo_limbs_eq_limb_mod_ref_val(gm: GenerationMode, limit: usize) {
-    for (xs, y, mut modulus) in
-        triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
-    {
-        let old_modulus = modulus.clone();
+    for (xs, y, mut m) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit) {
+        let old_m = m.clone();
         println!(
             "limbs_eq_limb_mod_ref_val({:?}, {}, {:?}) = {}",
             xs,
             y,
-            old_modulus,
-            limbs_eq_limb_mod_ref_val(&xs, y, &mut modulus)
+            old_m,
+            limbs_eq_limb_mod_ref_val(&xs, y, &mut m)
         );
     }
 }
 
 fn demo_limbs_eq_limb_mod_ref_ref(gm: GenerationMode, limit: usize) {
-    for (xs, y, modulus) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit)
-    {
+    for (xs, y, m) in triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm).take(limit) {
         println!(
             "limbs_eq_limb_mod_ref_ref({:?}, {}, {:?}) = {}",
             xs,
             y,
-            modulus,
-            limbs_eq_limb_mod_ref_ref(&xs, y, &modulus)
+            m,
+            limbs_eq_limb_mod_ref_ref(&xs, y, &m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_limb_val_ref(gm: GenerationMode, limit: usize) {
-    for (mut xs, ys, modulus) in
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit)
-    {
+    for (mut xs, ys, m) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit) {
         let old_xs = xs.clone();
         println!(
             "limbs_eq_mod_limb_val_ref({:?}, {:?}, {}) = {}",
             old_xs,
             ys,
-            modulus,
-            limbs_eq_mod_limb_val_ref(&mut xs, &ys, modulus)
+            m,
+            limbs_eq_mod_limb_val_ref(&mut xs, &ys, m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_limb_ref_val(gm: GenerationMode, limit: usize) {
-    for (xs, mut ys, modulus) in
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit)
-    {
+    for (xs, mut ys, m) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit) {
         let old_ys = ys.clone();
         println!(
             "limbs_eq_mod_limb_ref_val({:?}, {:?}, {}) = {}",
             xs,
             old_ys,
-            modulus,
-            limbs_eq_mod_limb_ref_val(&xs, &mut ys, modulus)
+            m,
+            limbs_eq_mod_limb_ref_val(&xs, &mut ys, m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_limb_ref_ref(gm: GenerationMode, limit: usize) {
-    for (xs, ys, modulus) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit)
-    {
+    for (xs, ys, m) in triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm).take(limit) {
         println!(
             "limbs_eq_mod_limb_ref_ref({:?}, {:?}, {}) = {}",
             xs,
             ys,
-            modulus,
-            limbs_eq_mod_limb_ref_ref(&xs, &ys, modulus)
+            m,
+            limbs_eq_mod_limb_ref_ref(&xs, &ys, m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_ref_val_val(gm: GenerationMode, limit: usize) {
-    for (xs, mut ys, mut modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+    for (xs, mut ys, mut m) in triples_of_unsigned_vec_var_55(gm).take(limit) {
         let old_ys = ys.clone();
-        let old_modulus = modulus.clone();
+        let old_m = m.clone();
         println!(
             "limbs_eq_mod_ref_val_val({:?}, {:?}, {:?}) = {}",
             xs,
             old_ys,
-            old_modulus,
-            limbs_eq_mod_ref_val_val(&xs, &mut ys, &mut modulus)
+            old_m,
+            limbs_eq_mod_ref_val_val(&xs, &mut ys, &mut m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_ref_val_ref(gm: GenerationMode, limit: usize) {
-    for (xs, mut ys, modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+    for (xs, mut ys, m) in triples_of_unsigned_vec_var_55(gm).take(limit) {
         let old_ys = ys.clone();
         println!(
             "limbs_eq_mod_ref_val_ref({:?}, {:?}, {:?}) = {}",
             xs,
             old_ys,
-            modulus,
-            limbs_eq_mod_ref_val_ref(&xs, &mut ys, &modulus)
+            m,
+            limbs_eq_mod_ref_val_ref(&xs, &mut ys, &m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_ref_ref_val(gm: GenerationMode, limit: usize) {
-    for (xs, ys, mut modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
-        let old_modulus = modulus.clone();
+    for (xs, ys, mut m) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+        let old_m = m.clone();
         println!(
             "limbs_eq_mod_ref_ref_val({:?}, {:?}, {:?}) = {}",
             xs,
             ys,
-            old_modulus,
-            limbs_eq_mod_ref_ref_val(&xs, &ys, &mut modulus)
+            old_m,
+            limbs_eq_mod_ref_ref_val(&xs, &ys, &mut m)
         );
     }
 }
 
 fn demo_limbs_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
-    for (xs, ys, modulus) in triples_of_unsigned_vec_var_55(gm).take(limit) {
+    for (xs, ys, m) in triples_of_unsigned_vec_var_55(gm).take(limit) {
         println!(
             "limbs_eq_mod_ref_ref_ref({:?}, {:?}, {:?}) = {}",
             xs,
             ys,
-            modulus,
-            limbs_eq_mod_ref_ref_ref(&xs, &ys, &modulus)
+            m,
+            limbs_eq_mod_ref_ref_ref(&xs, &ys, &m)
         );
     }
 }
@@ -340,20 +330,16 @@ fn benchmark_limbs_eq_limb_mod_limb_algorithms(gm: GenerationMode, limit: usize,
         &mut [
             (
                 "limbs_eq_limb_mod_limb",
-                &mut (|(ref limbs, limb, modulus)| {
-                    no_out!(limbs_eq_limb_mod_limb(limbs, limb, modulus))
-                }),
+                &mut (|(ref limbs, limb, m)| no_out!(limbs_eq_limb_mod_limb(limbs, limb, m))),
             ),
             (
                 "limbs_mod_limb",
-                &mut (|(ref limbs, limb, modulus)| {
-                    no_out!(limbs_mod_limb(limbs, modulus) == limb % modulus)
-                }),
+                &mut (|(ref limbs, limb, m)| no_out!(limbs_mod_limb(limbs, m) == limb % m)),
             ),
             (
                 "_combined_limbs_eq_limb_mod_limb",
-                &mut (|(ref limbs, limb, modulus)| {
-                    no_out!(_combined_limbs_eq_limb_mod_limb(limbs, limb, modulus))
+                &mut (|(ref limbs, limb, m)| {
+                    no_out!(_combined_limbs_eq_limb_mod_limb(limbs, limb, m))
                 }),
             ),
         ],
@@ -377,27 +363,19 @@ fn benchmark_limbs_eq_limb_mod_evaluation_strategy(
         &mut [
             (
                 "limbs_eq_limb_mod",
-                &mut (|(ref mut xs, y, ref mut modulus)| {
-                    no_out!(limbs_eq_limb_mod(xs, y, modulus))
-                }),
+                &mut (|(ref mut xs, y, ref mut m)| no_out!(limbs_eq_limb_mod(xs, y, m))),
             ),
             (
                 "limbs_eq_limb_mod_val_ref",
-                &mut (|(ref mut xs, y, ref modulus)| {
-                    no_out!(limbs_eq_limb_mod_val_ref(xs, y, modulus))
-                }),
+                &mut (|(ref mut xs, y, ref m)| no_out!(limbs_eq_limb_mod_val_ref(xs, y, m))),
             ),
             (
                 "limbs_eq_limb_mod_ref_val",
-                &mut (|(ref xs, y, ref mut modulus)| {
-                    no_out!(limbs_eq_limb_mod_ref_val(xs, y, modulus))
-                }),
+                &mut (|(ref xs, y, ref mut m)| no_out!(limbs_eq_limb_mod_ref_val(xs, y, m))),
             ),
             (
                 "limbs_eq_limb_mod_ref_ref",
-                &mut (|(ref xs, y, ref modulus)| {
-                    no_out!(limbs_eq_limb_mod_ref_ref(xs, y, modulus))
-                }),
+                &mut (|(ref xs, y, ref m)| no_out!(limbs_eq_limb_mod_ref_ref(xs, y, m))),
             ),
         ],
     );
@@ -416,21 +394,15 @@ fn benchmark_limbs_eq_limb_mod_algorithms(gm: GenerationMode, limit: usize, file
         &mut [
             (
                 "standard",
-                &mut (|(ref xs, y, ref modulus)| {
-                    no_out!(limbs_eq_limb_mod_ref_ref(xs, y, modulus))
-                }),
+                &mut (|(ref xs, y, ref m)| no_out!(limbs_eq_limb_mod_ref_ref(xs, y, m))),
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, y, ref modulus)| {
-                    no_out!(_limbs_eq_limb_mod_naive_1(xs, y, modulus))
-                }),
+                &mut (|(ref xs, y, ref m)| no_out!(_limbs_eq_limb_mod_naive_1(xs, y, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, y, ref modulus)| {
-                    no_out!(_limbs_eq_limb_mod_naive_2(xs, y, modulus))
-                }),
+                &mut (|(ref xs, y, ref m)| no_out!(_limbs_eq_limb_mod_naive_2(xs, y, m))),
             ),
         ],
     );
@@ -453,21 +425,15 @@ fn benchmark_limbs_eq_mod_limb_evaluation_strategy(
         &mut [
             (
                 "limbs_eq_mod_limb_val_ref",
-                &mut (|(ref mut xs, ref ys, modulus)| {
-                    no_out!(limbs_eq_mod_limb_val_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref mut xs, ref ys, m)| no_out!(limbs_eq_mod_limb_val_ref(xs, ys, m))),
             ),
             (
                 "limbs_eq_mod_limb_ref_val",
-                &mut (|(ref xs, ref mut ys, modulus)| {
-                    no_out!(limbs_eq_mod_limb_ref_val(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref mut ys, m)| no_out!(limbs_eq_mod_limb_ref_val(xs, ys, m))),
             ),
             (
                 "limbs_eq_mod_limb_ref_ref",
-                &mut (|(ref xs, ref ys, modulus)| {
-                    no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, m)| no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, m))),
             ),
         ],
     );
@@ -486,21 +452,15 @@ fn benchmark_limbs_eq_mod_limb_algorithms(gm: GenerationMode, limit: usize, file
         &mut [
             (
                 "standard",
-                &mut (|(ref xs, ref ys, modulus)| {
-                    no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, m)| no_out!(limbs_eq_mod_limb_ref_ref(xs, ys, m))),
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, ref ys, modulus)| {
-                    no_out!(_limbs_eq_mod_limb_naive_1(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, m)| no_out!(_limbs_eq_mod_limb_naive_1(xs, ys, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, ref ys, modulus)| {
-                    no_out!(_limbs_eq_mod_limb_naive_2(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, m)| no_out!(_limbs_eq_mod_limb_naive_2(xs, ys, m))),
             ),
         ],
     );
@@ -519,27 +479,21 @@ fn benchmark_limbs_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, 
         &mut [
             (
                 "limbs_eq_mod_ref_val_val",
-                &mut (|(ref xs, ref mut ys, ref mut modulus)| {
-                    no_out!(limbs_eq_mod_ref_val_val(xs, ys, modulus))
+                &mut (|(ref xs, ref mut ys, ref mut m)| {
+                    no_out!(limbs_eq_mod_ref_val_val(xs, ys, m))
                 }),
             ),
             (
                 "limbs_eq_mod_ref_val_ref",
-                &mut (|(ref xs, ref mut ys, ref modulus)| {
-                    no_out!(limbs_eq_mod_ref_val_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref mut ys, ref m)| no_out!(limbs_eq_mod_ref_val_ref(xs, ys, m))),
             ),
             (
                 "limbs_eq_mod_ref_ref_val",
-                &mut (|(ref xs, ref ys, ref mut modulus)| {
-                    no_out!(limbs_eq_mod_ref_ref_val(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, ref mut m)| no_out!(limbs_eq_mod_ref_ref_val(xs, ys, m))),
             ),
             (
                 "limbs_eq_mod_ref_ref_ref",
-                &mut (|(ref xs, ref ys, ref modulus)| {
-                    no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, m))),
             ),
         ],
     );
@@ -558,21 +512,15 @@ fn benchmark_limbs_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name
         &mut [
             (
                 "standard",
-                &mut (|(ref xs, ref ys, ref modulus)| {
-                    no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(limbs_eq_mod_ref_ref_ref(xs, ys, m))),
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, ref ys, ref modulus)| {
-                    no_out!(_limbs_eq_mod_naive_1(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(_limbs_eq_mod_naive_1(xs, ys, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, ref ys, ref modulus)| {
-                    no_out!(_limbs_eq_mod_naive_2(xs, ys, modulus))
-                }),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(_limbs_eq_mod_naive_2(xs, ys, m))),
             ),
         ],
     );

@@ -7,9 +7,9 @@ pub trait ModPowerOfTwoIsReduced {
     fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool;
 }
 
-/// Checks whether `self` is reduced mod `modulus`.
-pub trait ModIsReduced<MOD = Self> {
-    fn mod_is_reduced(&self, modulus: &MOD) -> bool;
+/// Checks whether `self` is reduced mod `m`.
+pub trait ModIsReduced<M = Self> {
+    fn mod_is_reduced(&self, m: &M) -> bool;
 }
 
 /// Returns `Greater`, `Equal`, or `Less`, depending on whether `self` is positive, zero, or
@@ -160,16 +160,16 @@ pub trait ModPowerOfTwoNegAssign {
     fn mod_power_of_two_neg_assign(&mut self, pow: u64);
 }
 
-/// Computes `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
-pub trait ModNeg<MOD = Self> {
+/// Computes `-self` mod `m`. Assumes the input is already reduced mod `m`.
+pub trait ModNeg<M = Self> {
     type Output;
 
-    fn mod_neg(self, modulus: MOD) -> Self::Output;
+    fn mod_neg(self, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `-self` mod `modulus`. Assumes the input is already reduced mod `modulus`.
-pub trait ModNegAssign<MOD = Self> {
-    fn mod_neg_assign(&mut self, modulus: MOD);
+/// Replaces `self` with `-self` mod `m`. Assumes the input is already reduced mod `m`.
+pub trait ModNegAssign<M = Self> {
+    fn mod_neg_assign(&mut self, m: M);
 }
 
 /// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
@@ -291,17 +291,17 @@ pub trait ModPowerOfTwoAddAssign<RHS = Self> {
     fn mod_power_of_two_add_assign(&mut self, rhs: RHS, pow: u64);
 }
 
-/// Computes `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod `modulus`.
-pub trait ModAdd<RHS = Self, MOD = Self> {
+/// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModAdd<RHS = Self, M = Self> {
     type Output;
 
-    fn mod_add(self, rhs: RHS, modulus: MOD) -> Self::Output;
+    fn mod_add(self, rhs: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self + rhs` mod `modulus`. Assumes the inputs are already reduced mod
-/// `modulus`.
-pub trait ModAddAssign<RHS = Self, MOD = Self> {
-    fn mod_add_assign(&mut self, rhs: RHS, modulus: MOD);
+/// Replaces `self` with `self + rhs` mod `m`. Assumes the inputs are already reduced mod
+/// `m`.
+pub trait ModAddAssign<RHS = Self, M = Self> {
+    fn mod_add_assign(&mut self, rhs: RHS, m: M);
 }
 
 /// Computes `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced mod
@@ -318,17 +318,16 @@ pub trait ModPowerOfTwoSubAssign<RHS = Self> {
     fn mod_power_of_two_sub_assign(&mut self, rhs: RHS, pow: u64);
 }
 
-/// Computes `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod `modulus`.
-pub trait ModSub<RHS = Self, MOD = Self> {
+/// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModSub<RHS = Self, M = Self> {
     type Output;
 
-    fn mod_sub(self, rhs: RHS, modulus: MOD) -> Self::Output;
+    fn mod_sub(self, rhs: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self - rhs` mod `modulus`. Assumes the inputs are already reduced mod
-/// `modulus`.
-pub trait ModSubAssign<RHS = Self, MOD = Self> {
-    fn mod_sub_assign(&mut self, rhs: RHS, modulus: MOD);
+/// Replaces `self` with `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModSubAssign<RHS = Self, M = Self> {
+    fn mod_sub_assign(&mut self, rhs: RHS, m: M);
 }
 
 /// Checked multiplication. Computes `self * rhs`, returning `None` if there is no valid result.
@@ -481,8 +480,8 @@ pub trait EqModPowerOfTwo<RHS = Self> {
     fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
 }
 
-pub trait EqMod<RHS = Self, MOD = Self> {
-    fn eq_mod(self, other: RHS, modulus: MOD) -> bool;
+pub trait EqMod<RHS = Self, M = Self> {
+    fn eq_mod(self, other: RHS, m: M) -> bool;
 }
 
 pub trait Parity {

@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced,
+    ModPowerOfTwoNeg, ModPowerOfTwoSub,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::BitAccess;
@@ -29,8 +30,8 @@ use malachite_test::inputs::natural::{
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_power_of_two_add_limb() {
-    let test = |limbs: &[Limb], limb: Limb, pow: u64, out: &[Limb]| {
-        assert_eq!(limbs_mod_power_of_two_add_limb(limbs, limb, pow), out);
+    let test = |xs: &[Limb], y: Limb, pow: u64, out: &[Limb]| {
+        assert_eq!(limbs_mod_power_of_two_add_limb(xs, y, pow), out);
     };
     test(&[], 0, 0, &[]);
     test(&[], 0, 5, &[]);
@@ -45,13 +46,13 @@ fn test_limbs_mod_power_of_two_add_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_slice_mod_power_of_two_add_limb_in_place() {
-    let test = |limbs: &[Limb], limb: Limb, pow: u64, out: &[Limb], carry: bool| {
-        let mut limbs = limbs.to_vec();
+    let test = |xs: &[Limb], y: Limb, pow: u64, out: &[Limb], carry: bool| {
+        let mut xs = xs.to_vec();
         assert_eq!(
-            limbs_slice_mod_power_of_two_add_limb_in_place(&mut limbs, limb, pow),
+            limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, y, pow),
             carry
         );
-        assert_eq!(limbs, out);
+        assert_eq!(xs, out);
     };
     test(&[], 0, 0, &[], false);
     test(&[], 0, 5, &[], false);
@@ -66,10 +67,10 @@ fn test_limbs_slice_mod_power_of_two_add_limb_in_place() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_vec_mod_power_of_two_add_limb_in_place() {
-    let test = |limbs: &[Limb], limb: Limb, pow: u64, out: &[Limb]| {
-        let mut limbs = limbs.to_vec();
-        limbs_vec_mod_power_of_two_add_limb_in_place(&mut limbs, limb, pow);
-        assert_eq!(limbs, out);
+    let test = |xs: &[Limb], y: Limb, pow: u64, out: &[Limb]| {
+        let mut xs = xs.to_vec();
+        limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, y, pow);
+        assert_eq!(xs, out);
     };
     test(&[123, 456], 789, 41, &[912, 456]);
     test(&[0xffff_ffff], 2, 33, &[1, 1]);
@@ -487,9 +488,12 @@ fn mod_power_of_two_add_properties() {
             assert!(mut_x.is_valid());
 
             assert_eq!(y.mod_power_of_two_add(x, pow), sum);
-            //TODO x - -y == sum
-            //TODO assert_eq!(&sum - x, *y);
-            //TODO assert_eq!(&sum - y, *x);
+            assert_eq!(
+                x.mod_power_of_two_sub(y.mod_power_of_two_neg(pow), pow),
+                sum
+            );
+            assert_eq!((&sum).mod_power_of_two_sub(x, pow), *y);
+            assert_eq!(sum.mod_power_of_two_sub(y, pow), *x);
         },
     );
 

@@ -8,12 +8,12 @@ use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds};
 
 fn unsigned_wrapping_sub_assign_properties_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigneds::<T>, |&(x, y)| {
-        let mut difference = x;
-        difference.wrapping_sub_assign(y);
-        assert_eq!(difference, x.wrapping_sub(y));
-        assert_eq!(difference, x.wrapping_add(y.wrapping_neg()));
-        assert_eq!(difference.wrapping_add(y), x);
-        assert_eq!(y.wrapping_sub(x), difference.wrapping_neg());
+        let mut diff = x;
+        diff.wrapping_sub_assign(y);
+        assert_eq!(diff, x.wrapping_sub(y));
+        assert_eq!(diff, x.wrapping_add(y.wrapping_neg()));
+        assert_eq!(diff.wrapping_add(y), x);
+        assert_eq!(y.wrapping_sub(x), diff.wrapping_neg());
     });
 }
 
@@ -23,12 +23,12 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     test_properties(pairs_of_signeds::<T>, |&(x, y)| {
-        let mut difference = x;
-        difference.wrapping_sub_assign(y);
-        assert_eq!(difference, x.wrapping_sub(y));
-        assert_eq!(difference, x.wrapping_add(y.wrapping_neg()));
-        assert_eq!(difference.wrapping_add(y), x);
-        assert_eq!(y.wrapping_sub(x), difference.wrapping_neg());
+        let mut diff = x;
+        diff.wrapping_sub_assign(y);
+        assert_eq!(diff, x.wrapping_sub(y));
+        assert_eq!(diff, x.wrapping_add(y.wrapping_neg()));
+        assert_eq!(diff.wrapping_add(y), x);
+        assert_eq!(y.wrapping_sub(x), diff.wrapping_neg());
     });
 }
 

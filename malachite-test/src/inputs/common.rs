@@ -34,6 +34,12 @@ pub(crate) fn permute_1_3_2<A: 'static, B: 'static, C: 'static>(
     Box::new(it.map(|(a, b, c)| (a, c, b)))
 }
 
+pub(crate) fn permute_2_1_3<A: 'static, B: 'static, C: 'static>(
+    it: Box<dyn Iterator<Item = (A, B, C)>>,
+) -> Box<dyn Iterator<Item = (B, A, C)>> {
+    Box::new(it.map(|(a, b, c)| (b, a, c)))
+}
+
 pub(crate) fn permute_1_2_4_3<A: 'static, B: 'static, C: 'static, D: 'static>(
     it: Box<dyn Iterator<Item = (A, B, C, D)>>,
 ) -> Box<dyn Iterator<Item = (A, B, D, C)>> {

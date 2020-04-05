@@ -4,8 +4,7 @@ use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
 
 impl ModIsReduced for Natural {
-    /// Returns whether `self` is reduced mod `modulus`; in other words whether it is less than
-    /// `modulus`.
+    /// Returns whether `self` is reduced mod `m`; in other words whether it is less than `m`.
     ///
     /// Time: worst case O(n)
     ///
@@ -14,7 +13,7 @@ impl ModIsReduced for Natural {
     /// where n = `self.significant_bits()`
     ///
     /// # Panics
-    /// Panics if `modulus` is 0.
+    /// Panics if `m` is 0.
     ///
     /// # Example
     /// ```
@@ -30,8 +29,8 @@ impl ModIsReduced for Natural {
     /// assert_eq!(Natural::trillion().mod_is_reduced(&(Natural::trillion() + Natural::ONE)), true);
     /// ```
     #[inline]
-    fn mod_is_reduced(&self, modulus: &Natural) -> bool {
-        assert_ne!(*modulus, Natural::ZERO);
-        self < modulus
+    fn mod_is_reduced(&self, m: &Natural) -> bool {
+        assert_ne!(*m, Natural::ZERO);
+        self < m
     }
 }

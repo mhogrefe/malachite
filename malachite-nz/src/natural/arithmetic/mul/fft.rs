@@ -816,14 +816,14 @@ fn _limbs_mul_fft_decompose<'a>(
     // normalize xs mod 2 ^ (k * n * Limb::WIDTH) + 1
     let mut scratch2;
     let mut source: &[Limb] = if len > k_times_n {
-        let difference = len - k_times_n;
+        let diff = len - k_times_n;
         scratch2 = vec![0; k_times_n + 1];
         // difference > k_times_n -> len - k * n > k * n -> len > 2 * k * n, which violates the
         // precondition len <= 2 * k * n. So difference > k_times_n cannot happen.
-        assert!(difference <= k_times_n);
+        assert!(diff <= k_times_n);
         // difference <= k_times_n, i.e. len <= 2 * k_times_n
         let (xs_lo, xs_hi) = xs.split_at(k_times_n);
-        scratch2[k_times_n] = if limbs_sub_to_out(&mut scratch2, xs_lo, &xs_hi[..difference])
+        scratch2[k_times_n] = if limbs_sub_to_out(&mut scratch2, xs_lo, &xs_hi[..diff])
             && limbs_slice_add_limb_in_place(&mut scratch2[..k_times_n], 1)
         {
             1

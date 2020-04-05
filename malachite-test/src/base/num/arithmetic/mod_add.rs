@@ -33,14 +33,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 }
 
 fn demo_mod_add<T: PrimitiveUnsigned + Rand + SampleRange>(gm: GenerationMode, limit: usize) {
-    for (x, y, modulus) in triples_of_unsigneds_var_1::<T>(gm).take(limit) {
-        println!(
-            "{} + {} === {} mod {}",
-            x,
-            y,
-            x.mod_add(y, modulus),
-            modulus
-        );
+    for (x, y, m) in triples_of_unsigneds_var_1::<T>(gm).take(limit) {
+        println!("{} + {} === {} mod {}", x, y, x.mod_add(y, m), m);
     }
 }
 
@@ -48,13 +42,10 @@ fn demo_mod_add_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     gm: GenerationMode,
     limit: usize,
 ) {
-    for (mut x, y, modulus) in triples_of_unsigneds_var_1::<T>(gm).take(limit) {
+    for (mut x, y, m) in triples_of_unsigneds_var_1::<T>(gm).take(limit) {
         let old_x = x;
-        x.mod_add_assign(y, modulus);
-        println!(
-            "x := {}; x.mod_add_assign({}, {}); x = {}",
-            old_x, y, modulus, x
-        );
+        x.mod_add_assign(y, m);
+        println!("x := {}; x.mod_add_assign({}, {}); x = {}", old_x, y, m, x);
     }
 }
 
@@ -72,10 +63,7 @@ fn benchmark_mod_add<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [(
-            "malachite",
-            &mut (|(x, y, modulus)| no_out!(x.mod_add(y, modulus))),
-        )],
+        &mut [("malachite", &mut (|(x, y, m)| no_out!(x.mod_add(y, m))))],
     );
 }
 
@@ -93,10 +81,7 @@ fn benchmark_mod_add_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [(
-            "malachite",
-            &mut (|(mut x, y, modulus)| x.mod_add_assign(y, modulus)),
-        )],
+        &mut [("malachite", &mut (|(mut x, y, m)| x.mod_add_assign(y, m)))],
     );
 }
 

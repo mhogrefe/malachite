@@ -50,8 +50,8 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let d_double = DoubleLimb::from(d);
     let last_index = len - 1;
     for &limb in &xs[..last_index] {
-        let (difference, small_carry) = limb.overflowing_sub(carry);
-        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * d_double).upper_half();
+        let (diff, small_carry) = limb.overflowing_sub(carry);
+        carry = (DoubleLimb::from(diff.wrapping_mul(inverse)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
@@ -64,8 +64,8 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
             carry.wrapping_add(d - last)
         }
     } else {
-        let (difference, small_carry) = last.overflowing_sub(carry);
-        carry = (DoubleLimb::from(difference.wrapping_mul(inverse)) * d_double).upper_half();
+        let (diff, small_carry) = last.overflowing_sub(carry);
+        carry = (DoubleLimb::from(diff.wrapping_mul(inverse)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
@@ -75,21 +75,21 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
 
 /// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
 ///
-/// limbs.len() must be greater than 1; modulus must be nonzero.
+/// limbs.len() must be greater than 1; m must be nonzero.
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is non-negative.
-pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, modulus: Limb) -> bool {
+pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, m: Limb) -> bool {
     if xs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_mod_limb(xs, modulus) == limb % modulus
+        limbs_mod_limb(xs, m) == limb % m
     } else {
-        limbs_eq_limb_mod_limb(xs, limb, modulus)
+        limbs_eq_limb_mod_limb(xs, limb, m)
     }
 }
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
-/// whether that `Natural` is equal to a limb mod a given `Limb` modulus.
+/// whether that `Natural` is equal to a limb mod a given `Limb` `m`.
 ///
-/// This function assumes that `modulus` is nonzero, `limbs` has at least two elements, and the last
+/// This function assumes that `m` is nonzero, `limbs` has at least two elements, and the last
 /// element of `limbs` is nonzero.
 ///
 /// Time: worst case O(n)
@@ -99,7 +99,7 @@ pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, modulus: Limb) 
 /// where n = `limbs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or `modulus` is zero.
+/// Panics if the length of `limbs` is less than 2 or `m` is zero.
 ///
 /// # Example
 /// ```
@@ -111,42 +111,42 @@ pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, modulus: Limb) 
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is positive and the
 /// ABOVE_THRESHOLD branch is excluded.
-pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, modulus: Limb) -> bool {
-    assert_ne!(modulus, 0);
+pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
+    assert_ne!(m, 0);
     assert!(xs.len() > 1);
-    let r = if modulus.even() {
-        let twos = TrailingZeros::trailing_zeros(modulus);
+    let r = if m.even() {
+        let twos = TrailingZeros::trailing_zeros(m);
         if !xs[0].wrapping_sub(y).divisible_by_power_of_two(twos) {
             return false;
         }
-        limbs_mod_exact_odd_limb(xs, modulus >> twos, y)
+        limbs_mod_exact_odd_limb(xs, m >> twos, y)
     } else {
-        limbs_mod_exact_odd_limb(xs, modulus, y)
+        limbs_mod_exact_odd_limb(xs, m, y)
     };
-    r == 0 || r == modulus
+    r == 0 || r == m
 }
 
 #[allow(clippy::absurd_extreme_comparisons)]
-fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bool> {
-    let m_len = modulus.len();
+fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
+    let m_len = ms.len();
     assert!(m_len > 1);
     let x_len = xs.len();
     assert!(x_len > 1);
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(y, 0);
-    assert_ne!(*modulus.last().unwrap(), 0);
+    assert_ne!(*ms.last().unwrap(), 0);
     if m_len > x_len {
         // x < m, y < m, and x != y, so x != y mod m
         return Some(false);
     }
-    let m_0 = modulus[0];
+    let m_0 = ms[0];
     // Check xs == ys mod low zero bits of m_0.
     let m_0_trailing_zeros = TrailingZeros::trailing_zeros(m_0);
     if !xs[0].eq_mod_power_of_two(y, m_0_trailing_zeros) {
         return Some(false);
     }
     if m_len == 2 && m_0 != 0 {
-        let m_1 = modulus[1];
+        let m_1 = ms[1];
         if m_1 < Limb::power_of_two(m_0_trailing_zeros) {
             let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
@@ -165,8 +165,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
     None
 }
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
-/// three numbers x, y, and m, determines whether x === y mod m. Both input slices are immutable.
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
+/// numbers x, y, and m, determines whether x === y mod m. Both input slices are immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -178,8 +178,8 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
-/// slices is zero, or if `y` is zero.
+/// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
+/// is zero, or if `y` is zero.
 ///
 /// # Example
 /// ```
@@ -191,20 +191,20 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, modulus: &[Limb]) -> Option<bo
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
-pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
-    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
+pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
+    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - y|
     assert!(!limbs_sub_limb_to_out(&mut scratch, xs, y));
     scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
-    scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
+    scratch.len() >= ms.len() && limbs_divisible_by_val_ref(&mut scratch, ms)
 }
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
-/// three numbers x, y, and m, determines whether x === y mod m. The first input slice is immutable
-/// and the second is mutable.
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
+/// numbers x, y, and m, determines whether x === y mod m. The first input slice is immutable and
+/// the second is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -216,8 +216,8 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
-/// slices is zero, or if `y` is zero.
+/// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
+/// is zero, or if `y` is zero.
 ///
 /// # Example
 /// ```
@@ -229,20 +229,20 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
-pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> bool {
-    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
+pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - y|
     assert!(!limbs_sub_limb_to_out(&mut scratch, xs, y));
     scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
-    scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
+    scratch.len() >= ms.len() && limbs_divisible_by(&mut scratch, ms)
 }
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
-/// three numbers x, y, and m, determines whether x === y mod m. The first input slice is mutable
-/// and the second is immutable.
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
+/// numbers x, y, and m, determines whether x === y mod m. The first input slice is mutable and the
+/// second is immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -254,8 +254,8 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> 
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
-/// slices is zero, or if `y` is zero.
+/// Panics if the length of `xs` or `m` is less than 2, if the last element of either of the slices
+/// is zero, or if `y` is zero.
 ///
 /// # Example
 /// ```
@@ -267,18 +267,18 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, modulus: &mut [Limb]) -> 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
-pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> bool {
-    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
+pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool {
+    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
     let new_len = xs.len() - slice_trailing_zeros(xs);
-    new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], ms)
 }
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `modulus` as
-/// three numbers x, y, and m, determines whether x === y mod m. Both input slices are mutable.
+/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
+/// numbers x, y, and m, determines whether x === y mod m. Both input slices are mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -290,8 +290,8 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> 
 /// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if the length of `xs` or `modulus` is less than 2, if the last element of either of the
-/// slices is zero, or if `y` is zero.
+/// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
+/// is zero, or if `y` is zero.
 ///
 /// # Example
 /// ```
@@ -304,28 +304,28 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, modulus: &[Limb]) -> 
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, modulus: &mut [Limb]) -> bool {
-    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, modulus) {
+pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, ms: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     // calculate |xs - y|
     assert!(!limbs_sub_limb_in_place(xs, y));
     let new_len = xs.len() - slice_trailing_zeros(xs);
-    new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by(&mut xs[..new_len], ms)
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<bool> {
+fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
     let x_len = xs.len();
     let y_len = ys.len();
     assert!(y_len > 1);
     assert!(x_len >= y_len);
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(*ys.last().unwrap(), 0);
-    assert_ne!(modulus, 0);
+    assert_ne!(m, 0);
     if xs == ys {
         Some(true)
-    } else if !xs[0].eq_mod_power_of_two(ys[0], u64::from(modulus.trailing_zeros())) {
+    } else if !xs[0].eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros())) {
         // Check xs == ys mod low zero bits of m.
         Some(false)
     } else {
@@ -333,11 +333,11 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<b
     }
 }
 
-/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
-/// m, determines whether x === y mod m. Both input slices are immutable.
+/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
+/// determines whether x === y mod m. Both input slices are immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `modulus` is nonzero.
+/// elements are nonzero, and `m` is nonzero.
 ///
 /// Time: worst case O(n)
 ///
@@ -347,7 +347,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<b
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
-/// is zero, or if `modulus` is zero.
+/// is zero, or if `m` is zero.
 ///
 /// # Example
 /// ```
@@ -359,17 +359,17 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], modulus: Limb) -> Option<b
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
-pub fn limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+pub fn limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_limb_ref_ref_greater(xs, ys, modulus)
+        limbs_eq_mod_limb_ref_ref_greater(xs, ys, m)
     } else {
-        limbs_eq_mod_limb_ref_ref_greater(ys, xs, modulus)
+        limbs_eq_mod_limb_ref_ref_greater(ys, xs, m)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
-    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, modulus) {
+fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
+    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, m) {
         return equal;
     }
     let mut scratch = vec![0; xs.len()];
@@ -382,18 +382,17 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
     scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
     // scratch is non-empty here because xs != ys
     if scratch.len() == 1 {
-        scratch[0].divisible_by(modulus)
+        scratch[0].divisible_by(m)
     } else {
-        limbs_divisible_by_limb(&scratch, modulus)
+        limbs_divisible_by_limb(&scratch, m)
     }
 }
 
-/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
-/// m, determines whether x === y mod m. The first input slice is immutable and the second is
-/// mutable.
+/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
+/// determines whether x === y mod m. The first input slice is immutable and the second is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `modulus` is nonzero.
+/// elements are nonzero, and `m` is nonzero.
 ///
 /// Time: worst case O(n)
 ///
@@ -403,7 +402,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
-/// is zero, or if `modulus` is zero.
+/// is zero, or if `m` is zero.
 ///
 /// # Example
 /// ```
@@ -415,17 +414,17 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], modulus: Limb) ->
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
-pub fn limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], modulus: Limb) -> bool {
+pub fn limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_limb_ref_val_greater(xs, ys, modulus)
+        limbs_eq_mod_limb_ref_val_greater(xs, ys, m)
     } else {
-        limbs_eq_mod_limb_val_ref_greater(ys, xs, modulus)
+        limbs_eq_mod_limb_val_ref_greater(ys, xs, m)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb) -> bool {
-    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, modulus) {
+fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
+    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, m) {
         return equal;
     }
     let mut scratch;
@@ -441,18 +440,17 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
     let new_len = scratch.len() - slice_trailing_zeros(scratch);
     // scratch is non-empty here because xs != ys
     if new_len == 1 {
-        scratch[0].divisible_by(modulus)
+        scratch[0].divisible_by(m)
     } else {
-        limbs_divisible_by_limb(&scratch[..new_len], modulus)
+        limbs_divisible_by_limb(&scratch[..new_len], m)
     }
 }
 
-/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `modulus` as three numbers x, y, and
-/// m, determines whether x === y mod m. The first input slice is mutable and the second is
-/// immutable.
+/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
+/// determines whether x === y mod m. The first input slice is mutable and the second is immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `modulus` is nonzero. Both input slices are immutable.
+/// elements are nonzero, and `m` is nonzero. Both input slices are immutable.
 ///
 /// Time: worst case O(n)
 ///
@@ -462,7 +460,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
 ///
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
-/// is zero, or if `modulus` is zero.
+/// is zero, or if `m` is zero.
 ///
 /// # Example
 /// ```
@@ -474,17 +472,17 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], modulus: Limb
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
-pub fn limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], modulus: Limb) -> bool {
+pub fn limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_limb_val_ref_greater(xs, ys, modulus)
+        limbs_eq_mod_limb_val_ref_greater(xs, ys, m)
     } else {
-        limbs_eq_mod_limb_ref_val_greater(ys, xs, modulus)
+        limbs_eq_mod_limb_ref_val_greater(ys, xs, m)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], modulus: Limb) -> bool {
-    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, modulus) {
+fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
+    if let Some(equal) = limbs_eq_mod_limb_helper(xs, ys, m) {
         return equal;
     }
     // calculate |xs - ys|
@@ -496,15 +494,15 @@ fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], modulus: Limb
     let new_len = xs.len() - slice_trailing_zeros(xs);
     // xs is non-empty here because xs != ys
     if new_len == 1 {
-        xs[0].divisible_by(modulus)
+        xs[0].divisible_by(m)
     } else {
-        limbs_divisible_by_limb(&xs[..new_len], modulus)
+        limbs_divisible_by_limb(&xs[..new_len], m)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<bool> {
-    let m_len = modulus.len();
+fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
+    let m_len = m.len();
     assert!(m_len > 1);
     let x_len = xs.len();
     let y_len = ys.len();
@@ -512,11 +510,11 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
     assert!(x_len >= y_len);
     assert_ne!(*xs.last().unwrap(), 0);
     assert_ne!(*ys.last().unwrap(), 0);
-    assert_ne!(*modulus.last().unwrap(), 0);
+    assert_ne!(*m.last().unwrap(), 0);
     if xs == ys {
         Some(true)
     } else if m_len > x_len
-        || !xs[0].eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(modulus[0]))
+        || !xs[0].eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(m[0]))
     {
         // Either: x < m, y < m, and x != y, so x != y mod m
         // Or: xs != ys mod low zero bits of m_0
@@ -540,8 +538,8 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
-/// of the slices is zero.
+/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+/// slices is zero.
 ///
 /// # Example
 /// ```
@@ -553,17 +551,17 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> Option<boo
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
 /// longer than one limb.
-pub fn limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+pub fn limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_greater_ref_ref_ref(xs, ys, modulus)
+        limbs_eq_mod_greater_ref_ref_ref(xs, ys, ms)
     } else {
-        limbs_eq_mod_greater_ref_ref_ref(ys, xs, modulus)
+        limbs_eq_mod_greater_ref_ref_ref(ys, xs, ms)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     let mut scratch = vec![0; xs.len()];
@@ -574,7 +572,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) 
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
     scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
-    scratch.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch, modulus)
+    scratch.len() >= ms.len() && limbs_divisible_by_val_ref(&mut scratch, ms)
 }
 
 /// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
@@ -591,7 +589,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) 
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
 /// # Example
@@ -604,17 +602,17 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
 /// longer than one limb.
-pub fn limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
+pub fn limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_greater_ref_ref_val(xs, ys, modulus)
+        limbs_eq_mod_greater_ref_ref_val(xs, ys, ms)
     } else {
-        limbs_eq_mod_greater_ref_ref_val(ys, xs, modulus)
+        limbs_eq_mod_greater_ref_ref_val(ys, xs, ms)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     let mut scratch = vec![0; xs.len()];
@@ -625,7 +623,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Lim
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
     scratch.truncate(scratch.len() - slice_trailing_zeros(&scratch));
-    scratch.len() >= modulus.len() && limbs_divisible_by(&mut scratch, modulus)
+    scratch.len() >= ms.len() && limbs_divisible_by(&mut scratch, ms)
 }
 
 /// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
@@ -642,7 +640,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Lim
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
 /// # Example
@@ -655,17 +653,17 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], modulus: &mut [Lim
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
 /// longer than one limb.
-pub fn limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Limb]) -> bool {
+pub fn limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_greater_ref_val_ref(xs, ys, modulus)
+        limbs_eq_mod_greater_ref_val_ref(xs, ys, ms)
     } else {
-        limbs_eq_mod_greater_val_ref_ref(ys, xs, modulus)
+        limbs_eq_mod_greater_val_ref_ref(ys, xs, ms)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     let mut scratch;
@@ -679,12 +677,12 @@ fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], modulus: &[Lim
         ys
     };
     let new_len = scratch.len() - slice_trailing_zeros(scratch);
-    new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut scratch[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by_val_ref(&mut scratch[..new_len], ms)
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     // calculate |xs - ys|
@@ -694,7 +692,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
     let new_len = xs.len() - slice_trailing_zeros(xs);
-    new_len >= modulus.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by_val_ref(&mut xs[..new_len], ms)
 }
 
 /// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
@@ -711,7 +709,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if the length of `xs`, `ys`, or `modulus` is less than 2, or if the last element of any
+/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
 /// # Example
@@ -724,17 +722,17 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], modulus: &[Lim
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a, c, and d are positive and each is
 /// longer than one limb.
-pub fn limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut [Limb]) -> bool {
+pub fn limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
-        limbs_eq_mod_greater_ref_val_val(xs, ys, modulus)
+        limbs_eq_mod_greater_ref_val_val(xs, ys, ms)
     } else {
-        limbs_eq_mod_greater_val_ref_val(ys, xs, modulus)
+        limbs_eq_mod_greater_val_ref_val(ys, xs, ms)
     }
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut [Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     let mut scratch;
@@ -748,12 +746,12 @@ fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], modulus: &mut 
         ys
     };
     let new_len = scratch.len() - slice_trailing_zeros(scratch);
-    new_len >= modulus.len() && limbs_divisible_by(&mut scratch[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by(&mut scratch[..new_len], ms)
 }
 
 // xs.len() >= ys.len()
-fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], modulus: &mut [Limb]) -> bool {
-    if let Some(equal) = limbs_eq_mod_helper(xs, ys, modulus) {
+fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
+    if let Some(equal) = limbs_eq_mod_helper(xs, ys, ms) {
         return equal;
     }
     // calculate |xs - ys|
@@ -763,14 +761,14 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], modulus: &mut 
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
     let new_len = xs.len() - slice_trailing_zeros(xs);
-    new_len >= modulus.len() && limbs_divisible_by(&mut xs[..new_len], modulus)
+    new_len >= ms.len() && limbs_divisible_by(&mut xs[..new_len], ms)
 }
 
-pub fn _limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
+pub fn _limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     assert!(xs.len() > 1);
-    assert!(modulus.len() > 1);
-    let mut xs_mod = if xs.len() >= modulus.len() {
-        limbs_mod(xs, modulus)
+    assert!(ms.len() > 1);
+    let mut xs_mod = if xs.len() >= ms.len() {
+        limbs_mod(xs, ms)
     } else {
         xs.to_vec()
     };
@@ -778,44 +776,44 @@ pub fn _limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, modulus: &[Limb]) -> boo
     xs_mod == [y]
 }
 
-pub fn _limbs_eq_limb_mod_naive_2(xs: &[Limb], y: Limb, modulus: &[Limb]) -> bool {
-    let mut difference = limbs_sub_limb(xs, y).0;
-    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
-    difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
+pub fn _limbs_eq_limb_mod_naive_2(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
+    let mut diff = limbs_sub_limb(xs, y).0;
+    diff.truncate(diff.len() - slice_trailing_zeros(&diff));
+    diff.len() >= ms.len() && limbs_divisible_by_val_ref(&mut diff, ms)
 }
 
-pub fn _limbs_eq_mod_limb_naive_1(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+pub fn _limbs_eq_mod_limb_naive_1(xs: &[Limb], ys: &[Limb], ms: Limb) -> bool {
     assert!(xs.len() > 1);
     assert!(ys.len() > 1);
-    limbs_mod_limb(xs, modulus) == limbs_mod_limb(ys, modulus)
+    limbs_mod_limb(xs, ms) == limbs_mod_limb(ys, ms)
 }
 
-pub fn _limbs_eq_mod_limb_naive_2(xs: &[Limb], ys: &[Limb], modulus: Limb) -> bool {
+pub fn _limbs_eq_mod_limb_naive_2(xs: &[Limb], ys: &[Limb], ms: Limb) -> bool {
     if xs == ys {
         return true;
     }
-    let mut difference = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let mut diff = if limbs_cmp(xs, ys) >= Ordering::Equal {
         limbs_sub(xs, ys)
     } else {
         limbs_sub(ys, xs)
     }
     .0;
-    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
-    if difference.len() == 1 {
-        difference[0].divisible_by(modulus)
+    diff.truncate(diff.len() - slice_trailing_zeros(&diff));
+    if diff.len() == 1 {
+        diff[0].divisible_by(ms)
     } else {
-        limbs_divisible_by_limb(&difference, modulus)
+        limbs_divisible_by_limb(&diff, ms)
     }
 }
 
-pub fn _limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
-    let mut xs_mod = if xs.len() >= modulus.len() {
-        limbs_mod(xs, modulus)
+pub fn _limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
+    let mut xs_mod = if xs.len() >= ms.len() {
+        limbs_mod(xs, ms)
     } else {
         xs.to_vec()
     };
-    let mut ys_mod = if ys.len() >= modulus.len() {
-        limbs_mod(ys, modulus)
+    let mut ys_mod = if ys.len() >= ms.len() {
+        limbs_mod(ys, ms)
     } else {
         ys.to_vec()
     };
@@ -824,35 +822,34 @@ pub fn _limbs_eq_mod_naive_1(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool
     limbs_cmp(&xs_mod, &ys_mod) == Ordering::Equal
 }
 
-pub fn _limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], modulus: &[Limb]) -> bool {
+pub fn _limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs == ys {
         return true;
     }
-    let mut difference = if limbs_cmp(xs, ys) >= Ordering::Equal {
+    let mut diff = if limbs_cmp(xs, ys) >= Ordering::Equal {
         limbs_sub(xs, ys)
     } else {
         limbs_sub(ys, xs)
     }
     .0;
-    difference.truncate(difference.len() - slice_trailing_zeros(&difference));
-    difference.len() >= modulus.len() && limbs_divisible_by_val_ref(&mut difference, modulus)
+    diff.truncate(diff.len() - slice_trailing_zeros(&diff));
+    diff.len() >= ms.len() && limbs_divisible_by_val_ref(&mut diff, ms)
 }
 
 impl Natural {
-    fn eq_mod_limb(&self, other: Limb, modulus: Limb) -> bool {
+    fn eq_mod_limb(&self, other: Limb, m: Limb) -> bool {
         match *self {
-            Natural(Small(small)) => small.eq_mod(other, modulus),
-            Natural(Large(_)) if modulus == 0 => false,
-            Natural(Large(ref limbs)) => limbs_eq_limb_mod_limb(limbs, other, modulus),
+            Natural(Small(small)) => small.eq_mod(other, m),
+            Natural(Large(_)) if m == 0 => false,
+            Natural(Large(ref limbs)) => limbs_eq_limb_mod_limb(limbs, other, m),
         }
     }
 }
 
 impl EqMod<Natural, Natural> for Natural {
     /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self`, `other`, and `modulus` are all taken
-    /// by value.
+    /// `m`; that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each
+    /// other mod 0 iff they are equal. `self`, `other`, and `m` are all taken by value.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -888,37 +885,35 @@ impl EqMod<Natural, Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: Natural, m: Natural) -> bool {
+        match (self, other, m) {
             (x, y, natural_zero!()) => x == y,
-            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
-            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (ref x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, natural_zero!(), m) => x.divisible_by(m),
+            (natural_zero!(), y, m) => y.divisible_by(m),
+            (ref x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, modulus)
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(xs, ys, m)
             }
-            (Natural(Large(ref mut xs)), Natural(Small(y)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod(xs, y, modulus)
+            (Natural(Large(ref mut xs)), Natural(Small(y)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod(xs, y, m)
             }
-            (Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod(ys, x, modulus)
+            (Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod(ys, x, m)
             }
-            (
-                Natural(Large(ref mut xs)),
-                Natural(Large(ref ys)),
-                Natural(Large(ref mut modulus)),
-            ) => limbs_eq_mod_ref_val_val(ys, xs, modulus),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_mod_ref_val_val(ys, xs, m)
+            }
         }
     }
 }
 
 impl<'a> EqMod<Natural, &'a Natural> for Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self` and `other` are taken by value, and
-    /// `modulus` is taken by reference.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `self` and `other` are taken by value, and `m` is taken by
+    /// reference.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -954,35 +949,35 @@ impl<'a> EqMod<Natural, &'a Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, modulus: &'a Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: Natural, m: &'a Natural) -> bool {
+        match (self, other, m) {
             (x, y, &natural_zero!()) => x == y,
-            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
-            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (ref x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, natural_zero!(), m) => x.divisible_by(m),
+            (natural_zero!(), y, m) => y.divisible_by(m),
+            (ref x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, modulus)
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(xs, ys, m)
             }
-            (Natural(Large(ref mut xs)), Natural(Small(y)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_val_ref(xs, y, modulus)
+            (Natural(Large(ref mut xs)), Natural(Small(y)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_val_ref(xs, y, m)
             }
-            (Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_val_ref(ys, x, modulus)
+            (Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_val_ref(ys, x, m)
             }
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_mod_ref_val_ref(ys, xs, modulus)
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+                limbs_eq_mod_ref_val_ref(ys, xs, m)
             }
         }
     }
 }
 
 impl<'a> EqMod<&'a Natural, Natural> for Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self` and `modulus` are taken by value, and
-    /// `other` is taken by reference.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `self` and `m` are taken by value, and `other` is taken by
+    /// reference.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1018,37 +1013,35 @@ impl<'a> EqMod<&'a Natural, Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Natural, modulus: Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: &'a Natural, m: Natural) -> bool {
+        match (self, other, m) {
             (x, y, natural_zero!()) => x == *y,
-            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
-            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (ref x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, &natural_zero!(), m) => x.divisible_by(m),
+            (natural_zero!(), y, m) => y.divisible_by(m),
+            (ref x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, modulus)
+            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(xs, ys, m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Small(y)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod(xs, y, modulus)
+            (Natural(Large(ref mut xs)), &Natural(Small(y)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod(xs, y, m)
             }
-            (Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod_ref_val(ys, x, modulus)
+            (Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod_ref_val(ys, x, m)
             }
-            (
-                Natural(Large(ref mut xs)),
-                &Natural(Large(ref ys)),
-                Natural(Large(ref mut modulus)),
-            ) => limbs_eq_mod_ref_val_val(ys, xs, modulus),
+            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_mod_ref_val_val(ys, xs, m)
+            }
         }
     }
 }
 
 impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `other` and `modulus` are taken by reference,
-    /// and `self` is taken by value.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `other` and `m` are taken by reference, and `self` is taken by
+    /// value.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1084,35 +1077,35 @@ impl<'a, 'b> EqMod<&'a Natural, &'b Natural> for Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'a Natural, modulus: &'b Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: &'a Natural, m: &'b Natural) -> bool {
+        match (self, other, m) {
             (x, y, &natural_zero!()) => x == *y,
-            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
-            (natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (ref x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, &natural_zero!(), m) => x.divisible_by(m),
+            (natural_zero!(), y, m) => y.divisible_by(m),
+            (ref x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_val_ref(xs, ys, modulus)
+            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Small(m))) => {
+                limbs_eq_mod_limb_val_ref(xs, ys, m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_val_ref(xs, y, modulus)
+            (Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_val_ref(xs, y, m)
             }
-            (Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_ref_ref(ys, x, modulus)
+            (Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_ref_ref(ys, x, m)
             }
-            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_mod_ref_val_ref(ys, xs, modulus)
+            (Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+                limbs_eq_mod_ref_val_ref(ys, xs, m)
             }
         }
     }
 }
 
 impl<'a> EqMod<Natural, Natural> for &'a Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `other` and `modulus` are taken by value, and
-    /// `self` is taken by reference.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `other` and `m` are taken by value, and `self` is taken by
+    /// reference.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1148,37 +1141,35 @@ impl<'a> EqMod<Natural, Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, modulus: Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: Natural, m: Natural) -> bool {
+        match (self, other, m) {
             (x, y, natural_zero!()) => *x == y,
-            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
-            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (x, Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (&Natural(Small(x)), ref y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, natural_zero!(), m) => x.divisible_by(m),
+            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (&Natural(Small(x)), ref y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_ref_val(xs, ys, modulus)
+            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_val(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), Natural(Small(y)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod_ref_val(xs, y, modulus)
+            (&Natural(Large(ref xs)), Natural(Small(y)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod_ref_val(xs, y, m)
             }
-            (&Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod(ys, x, modulus)
+            (&Natural(Small(x)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod(ys, x, m)
             }
-            (
-                &Natural(Large(ref xs)),
-                Natural(Large(ref mut ys)),
-                Natural(Large(ref mut modulus)),
-            ) => limbs_eq_mod_ref_val_val(xs, ys, modulus),
+            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_mod_ref_val_val(xs, ys, m)
+            }
         }
     }
 }
 
 impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self` and `modulus` are taken by reference,
-    /// and `other` is taken by value.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `self` and `m` are taken by reference, and `other` is taken by
+    /// value.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1214,35 +1205,35 @@ impl<'a, 'b> EqMod<Natural, &'b Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: Natural, modulus: &'b Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: Natural, m: &'b Natural) -> bool {
+        match (self, other, m) {
             (x, y, &natural_zero!()) => *x == y,
-            (x, natural_zero!(), modulus) => x.divisible_by(modulus),
-            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (x, Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (&Natural(Small(x)), ref y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, natural_zero!(), m) => x.divisible_by(m),
+            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (&Natural(Small(x)), ref y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_ref_val(xs, ys, modulus)
+            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_val(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), Natural(Small(y)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_ref_ref(xs, y, modulus)
+            (&Natural(Large(ref xs)), Natural(Small(y)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_ref_ref(xs, y, m)
             }
-            (&Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_val_ref(ys, x, modulus)
+            (&Natural(Small(x)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_val_ref(ys, x, m)
             }
-            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_mod_ref_val_ref(xs, ys, modulus)
+            (&Natural(Large(ref xs)), Natural(Large(ref mut ys)), &Natural(Large(ref m))) => {
+                limbs_eq_mod_ref_val_ref(xs, ys, m)
             }
         }
     }
 }
 
 impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self` and `other` are taken by reference,
-    /// and `modulus` is taken by value.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `self` and `other` are taken by reference, and `m` is taken by
+    /// value.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1278,35 +1269,34 @@ impl<'a, 'b> EqMod<&'b Natural, Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Natural, modulus: Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: &'b Natural, m: Natural) -> bool {
+        match (self, other, m) {
             (x, y, natural_zero!()) => x == y,
-            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
-            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (x, &Natural(Small(y)), Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (&Natural(Small(x)), y, Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, &natural_zero!(), m) => x.divisible_by(m),
+            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, &Natural(Small(y)), Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (&Natural(Small(x)), y, Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_ref_ref(xs, ys, modulus)
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_ref(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod_ref_val(xs, y, modulus)
+            (&Natural(Large(ref xs)), &Natural(Small(y)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod_ref_val(xs, y, m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_limb_mod_ref_val(ys, x, modulus)
+            (&Natural(Small(x)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_limb_mod_ref_val(ys, x, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Large(ref mut modulus))) => {
-                limbs_eq_mod_ref_ref_val(xs, ys, modulus)
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), Natural(Large(ref mut m))) => {
+                limbs_eq_mod_ref_ref_val(xs, ys, m)
             }
         }
     }
 }
 
 impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
-    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural`
-    /// `modulus`; that is, whether `self` - `other` is a multiple of `modulus`. Two numbers are
-    /// equal to each other mod 0 iff they are equal. `self`, `other`, and `modulus` are all taken
-    /// by reference.
+    /// Returns whether this `Natural` is equivalent to another `Natural` mod a third `Natural` `m`;
+    /// that is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each other
+    /// mod 0 iff they are equal. `self`, `other`, and `m` are all taken by reference.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -1342,25 +1332,25 @@ impl<'a, 'b, 'c> EqMod<&'b Natural, &'c Natural> for &'a Natural {
     ///     false
     /// );
     /// ```
-    fn eq_mod(self, other: &'b Natural, modulus: &'c Natural) -> bool {
-        match (self, other, modulus) {
+    fn eq_mod(self, other: &'b Natural, m: &'c Natural) -> bool {
+        match (self, other, m) {
             (x, y, &natural_zero!()) => x == y,
-            (x, &natural_zero!(), modulus) => x.divisible_by(modulus),
-            (&natural_zero!(), y, modulus) => y.divisible_by(modulus),
-            (x, &Natural(Small(y)), &Natural(Small(modulus))) => x.eq_mod_limb(y, modulus),
-            (&Natural(Small(x)), y, &Natural(Small(modulus))) => y.eq_mod_limb(x, modulus),
+            (x, &natural_zero!(), m) => x.divisible_by(m),
+            (&natural_zero!(), y, m) => y.divisible_by(m),
+            (x, &Natural(Small(y)), &Natural(Small(m))) => x.eq_mod_limb(y, m),
+            (&Natural(Small(x)), y, &Natural(Small(m))) => y.eq_mod_limb(x, m),
             (&Natural(Small(x)), &Natural(Small(y)), _) => x == y,
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(modulus))) => {
-                limbs_eq_mod_limb_ref_ref(xs, ys, modulus)
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Small(m))) => {
+                limbs_eq_mod_limb_ref_ref(xs, ys, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_ref_ref(xs, y, modulus)
+            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_ref_ref(xs, y, m)
             }
-            (&Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_limb_mod_ref_ref(ys, x, modulus)
+            (&Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+                limbs_eq_limb_mod_ref_ref(ys, x, m)
             }
-            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref modulus))) => {
-                limbs_eq_mod_ref_ref_ref(xs, ys, modulus)
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref m))) => {
+                limbs_eq_mod_ref_ref_ref(xs, ys, m)
             }
         }
     }

@@ -240,7 +240,7 @@ pub fn triples_of_integer_integer_and_natural_var_1(
 ) -> It<(Integer, Integer, Natural)> {
     Box::new(
         triples_of_integer_integer_and_natural(gm)
-            .map(|(x, y, modulus)| (x * Integer::from(&modulus) + &y, y, modulus)),
+            .map(|(x, y, m)| (x * Integer::from(&m) + &y, y, m)),
     )
 }
 
@@ -250,8 +250,7 @@ pub fn triples_of_integer_integer_and_natural_var_2(
     gm: GenerationMode,
 ) -> It<(Integer, Integer, Natural)> {
     Box::new(
-        triples_of_integer_integer_and_natural(gm)
-            .filter(|&(ref x, ref y, ref modulus)| !x.eq_mod(y, modulus)),
+        triples_of_integer_integer_and_natural(gm).filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
     )
 }
 

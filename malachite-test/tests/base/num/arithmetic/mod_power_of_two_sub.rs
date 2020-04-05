@@ -13,25 +13,25 @@ fn mod_power_of_two_sub_properties_helper<T: PrimitiveUnsigned + Rand + SampleRa
         |&(x, y, pow)| {
             assert!(x.mod_power_of_two_is_reduced(pow));
             assert!(y.mod_power_of_two_is_reduced(pow));
-            let difference = x.mod_power_of_two_sub(y, pow);
-            assert!(difference.mod_power_of_two_is_reduced(pow));
+            let diff = x.mod_power_of_two_sub(y, pow);
+            assert!(diff.mod_power_of_two_is_reduced(pow));
 
             let mut x_alt = x;
             x_alt.mod_power_of_two_sub_assign(y, pow);
-            assert_eq!(x_alt, difference);
+            assert_eq!(x_alt, diff);
 
-            assert_eq!(difference.mod_power_of_two_add(y, pow), x);
+            assert_eq!(diff.mod_power_of_two_add(y, pow), x);
             assert_eq!(
-                difference.mod_power_of_two_sub(x, pow),
+                diff.mod_power_of_two_sub(x, pow),
                 y.mod_power_of_two_neg(pow)
             );
             assert_eq!(
                 y.mod_power_of_two_sub(x, pow),
-                difference.mod_power_of_two_neg(pow)
+                diff.mod_power_of_two_neg(pow)
             );
             assert_eq!(
                 x.mod_power_of_two_add(y.mod_power_of_two_neg(pow), pow),
-                difference
+                diff
             );
         },
     );
