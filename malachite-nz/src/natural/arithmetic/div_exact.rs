@@ -68,13 +68,13 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
 /// test_invert_limb_table();
 /// ```
 pub fn test_invert_limb_table() {
-    for (i, &inverse) in INVERT_LIMB_TABLE.iter().enumerate() {
+    for (i, &inv) in INVERT_LIMB_TABLE.iter().enumerate() {
         let value = (u8::exact_from(i) << 1) + 1;
-        let product = value.wrapping_mul(inverse);
+        let product = value.wrapping_mul(inv);
         assert_eq!(
             product, 1,
             "INVERT_LIMB_TABLE gives incorrect inverse, {}, for value {}",
-            inverse, value
+            inv, value
         );
     }
 }
@@ -102,13 +102,13 @@ pub fn test_invert_limb_table() {
 pub fn limbs_modular_invert_limb(limb: Limb) -> Limb {
     assert!(limb.odd());
     let index = (limb >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
-    let mut inverse = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
-    inverse = (inverse << 1).wrapping_sub((inverse * inverse).wrapping_mul(limb));
-    inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
+    let mut inv = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
+    inv = (inv << 1).wrapping_sub((inv * inv).wrapping_mul(limb));
+    inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(limb));
     if !cfg!(feature = "32_bit_limbs") {
-        inverse = (inverse << 1).wrapping_sub(inverse.wrapping_mul(inverse).wrapping_mul(limb));
+        inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(limb));
     }
-    inverse
+    inv
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -151,7 +151,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
         let shift = TrailingZeros::trailing_zeros(d);
         let shift_complement = Limb::WIDTH - shift;
         let shifted_d = d >> shift;
-        let inverse = limbs_modular_invert_limb(shifted_d);
+        let d_inv = limbs_modular_invert_limb(shifted_d);
         let mut upper_half = 0;
         let mut previous_in_limb = xs[0];
         for i in 1..len {
@@ -159,7 +159,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
             let shifted_in_limb = (previous_in_limb >> shift) | (in_limb << shift_complement);
             previous_in_limb = in_limb;
             let (diff, carry) = shifted_in_limb.overflowing_sub(upper_half);
-            let out_limb = diff.wrapping_mul(inverse);
+            let out_limb = diff.wrapping_mul(d_inv);
             out[i - 1] = out_limb;
             upper_half = (DoubleLimb::from(out_limb) * DoubleLimb::from(shifted_d)).upper_half();
             if carry {
@@ -168,10 +168,10 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
         }
         out[len - 1] = (previous_in_limb >> shift)
             .wrapping_sub(upper_half)
-            .wrapping_mul(inverse);
+            .wrapping_mul(d_inv);
     } else {
-        let inverse = limbs_modular_invert_limb(d);
-        let mut out_limb = xs[0].wrapping_mul(inverse);
+        let d_inv = limbs_modular_invert_limb(d);
+        let mut out_limb = xs[0].wrapping_mul(d_inv);
         out[0] = out_limb;
         let mut previous_carry = false;
         for i in 1..len {
@@ -181,7 +181,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], xs: &[Limb], 
             }
             let (diff, carry) = xs[i].overflowing_sub(upper_half);
             previous_carry = carry;
-            out_limb = diff.wrapping_mul(inverse);
+            out_limb = diff.wrapping_mul(d_inv);
             out[i] = out_limb;
         }
     }
@@ -205,7 +205,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
         let shift = TrailingZeros::trailing_zeros(d);
         let shift_complement = Limb::WIDTH - shift;
         let shifted_d = d >> shift;
-        let inverse = limbs_modular_invert_limb(shifted_d);
+        let d_inv = limbs_modular_invert_limb(shifted_d);
         let shifted_d = DoubleLimb::from(shifted_d);
         let mut upper_half = 0;
         let mut previous_in_limb = xs[0];
@@ -214,7 +214,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
             let shifted_in_limb = (previous_in_limb >> shift) | (in_limb << shift_complement);
             previous_in_limb = in_limb;
             let (diff, carry) = shifted_in_limb.overflowing_sub(upper_half);
-            let out_limb = diff.wrapping_mul(inverse);
+            let out_limb = diff.wrapping_mul(d_inv);
             xs[i - 1] = out_limb;
             upper_half = (DoubleLimb::from(out_limb) * shifted_d).upper_half();
             if carry {
@@ -223,11 +223,11 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
         }
         xs[len - 1] = (previous_in_limb >> shift)
             .wrapping_sub(upper_half)
-            .wrapping_mul(inverse);
+            .wrapping_mul(d_inv);
     } else {
-        let inverse = limbs_modular_invert_limb(d);
+        let d_inv = limbs_modular_invert_limb(d);
         let d = DoubleLimb::from(d);
-        let mut out_limb = xs[0].wrapping_mul(inverse);
+        let mut out_limb = xs[0].wrapping_mul(d_inv);
         xs[0] = out_limb;
         let mut previous_carry = false;
         for limb in xs[1..].iter_mut() {
@@ -237,7 +237,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(xs: &mut [Limb], d: Limb) {
             }
             let (diff, carry) = limb.overflowing_sub(upper_half);
             previous_carry = carry;
-            out_limb = diff.wrapping_mul(inverse);
+            out_limb = diff.wrapping_mul(d_inv);
             *limb = out_limb;
         }
     }
@@ -468,12 +468,12 @@ pub fn _limbs_modular_invert_small(
     is: &mut [Limb],
     scratch: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
 ) {
     if size < DC_BDIV_Q_THRESHOLD {
-        _limbs_modular_div_schoolbook(is, scratch, ds, inverse);
+        _limbs_modular_div_schoolbook(is, scratch, ds, d_inv);
     } else {
-        _limbs_modular_div_divide_and_conquer(is, scratch, ds, inverse);
+        _limbs_modular_div_divide_and_conquer(is, scratch, ds, d_inv);
     }
 }
 
@@ -517,8 +517,8 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     let ds_lo = &ds[..size];
     slice_set_zero(scratch_lo);
     scratch_lo[0] = 1;
-    let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-    _limbs_modular_invert_small(size, is, scratch_lo, ds_lo, inverse);
+    let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+    _limbs_modular_invert_small(size, is, scratch_lo, ds_lo, d_inv);
     let mut previous_size = size;
     // Use Newton iterations to get the desired precision.
     for &size in sizes.iter().rev() {
@@ -538,8 +538,8 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     }
 }
 
-/// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `inverse`
-/// is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+/// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `d_inv` is
+/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// Output:
 ///    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
@@ -559,7 +559,7 @@ pub fn _limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -576,7 +576,7 @@ pub fn _limbs_modular_div_mod_schoolbook(
         let q_diff = q_len - q_len_s;
         for i in q_diff..n_len - q_len_s {
             let ns = &mut ns[i..i + d_len];
-            let q = inverse.wrapping_mul(ns[0]);
+            let q = d_inv.wrapping_mul(ns[0]);
             ns[0] = limbs_slice_add_mul_limb_same_length_in_place_left(ns, ds, q);
             qs[i] = !q;
         }
@@ -593,7 +593,7 @@ pub fn _limbs_modular_div_mod_schoolbook(
     let q_diff = q_len - q_len_s;
     for i in q_diff..q_len {
         let ns = &mut ns[i..i + d_len];
-        let q = inverse.wrapping_mul(ns[0]);
+        let q = d_inv.wrapping_mul(ns[0]);
         ns[0] = limbs_slice_add_mul_limb_same_length_in_place_left(ns, ds, q);
         qs[i] = !q;
     }
@@ -624,7 +624,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
     scratch: &mut [Limb],
 ) -> bool {
     let n = ds.len();
@@ -634,9 +634,9 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
     let hi = n - lo; // ceil(n / 2)
     let (ds_lo, ds_hi) = ds.split_at(lo);
     let carry = if lo < DC_BDIV_QR_THRESHOLD {
-        _limbs_modular_div_mod_schoolbook(qs, &mut ns[..lo << 1], ds_lo, inverse)
+        _limbs_modular_div_mod_schoolbook(qs, &mut ns[..lo << 1], ds_lo, d_inv)
     } else {
-        _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, inverse, scratch)
+        _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, scratch)
     };
     let (qs_lo, qs_hi) = qs.split_at_mut(lo);
     limbs_mul_greater_to_out(scratch, ds_hi, qs_lo);
@@ -647,9 +647,9 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
     let highest_r = limbs_sub_in_place_left(ns, scratch);
     let (ds_lo, ds_hi) = ds.split_at(hi);
     let carry = if hi < DC_BDIV_QR_THRESHOLD {
-        _limbs_modular_div_mod_schoolbook(qs_hi, &mut ns[..hi << 1], ds_lo, inverse)
+        _limbs_modular_div_mod_schoolbook(qs_hi, &mut ns[..hi << 1], ds_lo, d_inv)
     } else {
-        _limbs_modular_div_mod_divide_and_conquer_helper(qs_hi, ns, ds_lo, inverse, scratch)
+        _limbs_modular_div_mod_divide_and_conquer_helper(qs_hi, ns, ds_lo, d_inv, scratch)
     };
     limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_hi);
     if carry {
@@ -664,7 +664,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
 }
 
 /// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
-/// `rs.len()`. D must be odd. `inverse` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
+/// `rs.len()`. D must be odd. `d_inv` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
 /// `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// Output:
@@ -685,7 +685,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -708,9 +708,9 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
         let (ds_lo, ds_hi) = ds.split_at(q_len_mod_d_len);
         // Perform the typically smaller block first.
         carry = if q_len_mod_d_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len_mod_d_len << 1], ds_lo, inverse)
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len_mod_d_len << 1], ds_lo, d_inv)
         } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, inverse, &mut scratch)
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
         };
         if q_len_mod_d_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, &qs[..q_len_mod_d_len]);
@@ -735,7 +735,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
                 &mut qs[q_diff..],
                 ns,
                 ds,
-                inverse,
+                d_inv,
                 &mut scratch,
             );
             q_len_s -= d_len;
@@ -743,9 +743,9 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
     } else {
         let (ds_lo, ds_hi) = ds.split_at(q_len);
         carry = if q_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len << 1], ds_lo, inverse)
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len << 1], ds_lo, d_inv)
         } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, inverse, &mut scratch)
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
         };
         if q_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, qs);
@@ -1026,8 +1026,8 @@ pub fn _limbs_modular_div_mod_barrett(
     }
 }
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `inverse`
-/// is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
+/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// The straightforward way to compute Q is to cancel one limb at a time, using
 ///     qs[i] = D ^ (-1) * ns[i] mod 2 ^ `Limb::WIDTH`
@@ -1048,7 +1048,7 @@ pub fn _limbs_modular_div_mod_barrett(
 /// where n = `ns.len()`
 ///
 /// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.1.2.
-pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], inverse: Limb) {
+pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1057,7 +1057,7 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
     let qs = &mut qs[..n_len];
     let diff = n_len - d_len;
     for i in 0..diff {
-        let q = inverse.wrapping_mul(ns[i]);
+        let q = d_inv.wrapping_mul(ns[i]);
         let (ns_lo, ns_hi) = ns[i..].split_at_mut(d_len);
         let carry = limbs_slice_add_mul_limb_same_length_in_place_left(ns_lo, ds, q);
         limbs_slice_add_limb_in_place(ns_hi, carry);
@@ -1067,12 +1067,12 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
     let last_index = n_len - 1;
     for i in diff..last_index {
         let ns_hi = &mut ns[i..];
-        let q = inverse.wrapping_mul(ns_hi[0]);
+        let q = d_inv.wrapping_mul(ns_hi[0]);
         limbs_slice_add_mul_limb_same_length_in_place_left(ns_hi, &ds[..n_len - i], q);
         assert_eq!(ns_hi[0], 0);
         qs[i] = !q;
     }
-    qs[last_index] = !inverse.wrapping_mul(ns[last_index]);
+    qs[last_index] = !d_inv.wrapping_mul(ns[last_index]);
     limbs_slice_add_limb_in_place(qs, 1);
 }
 
@@ -1096,7 +1096,7 @@ fn _limbs_modular_div_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
     scratch: &mut [Limb],
 ) {
     let n = ds.len();
@@ -1108,7 +1108,7 @@ fn _limbs_modular_div_divide_and_conquer_helper(
         let qs = &mut qs[m..];
         let ns = &mut ns[m..];
         let carry_1 =
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], inverse, scratch);
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], d_inv, scratch);
         let qs = &qs[..lo];
         limbs_mul_low_same_length(scratch, qs, &ds[hi..n_rem]);
         limbs_sub_same_length_in_place_left(&mut ns[hi..n_rem], &scratch[..lo]);
@@ -1124,11 +1124,11 @@ fn _limbs_modular_div_divide_and_conquer_helper(
         n_rem = hi;
     }
     let m = n - n_rem;
-    _limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], inverse);
+    _limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], d_inv);
 }
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `inverse`
-/// is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
+/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
 ///
@@ -1141,7 +1141,7 @@ pub fn _limbs_modular_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
-    inverse: Limb,
+    d_inv: Limb,
 ) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1160,9 +1160,9 @@ pub fn _limbs_modular_div_divide_and_conquer(
         // Perform the typically smaller block first.
         let (ds_lo, ds_hi) = ds.split_at(n_len_mod_d_len);
         let mut carry = if n_len_mod_d_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..n_len_mod_d_len << 1], ds_lo, inverse)
+            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..n_len_mod_d_len << 1], ds_lo, d_inv)
         } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, inverse, &mut scratch)
+            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
         };
         if n_len_mod_d_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, &qs[..n_len_mod_d_len]);
@@ -1185,7 +1185,7 @@ pub fn _limbs_modular_div_divide_and_conquer(
                 &mut qs[m..],
                 &mut ns[m..],
                 ds,
-                inverse,
+                d_inv,
                 &mut scratch,
             );
             m += d_len;
@@ -1194,14 +1194,14 @@ pub fn _limbs_modular_div_divide_and_conquer(
             &mut qs[diff..],
             &mut ns[diff..],
             ds,
-            inverse,
+            d_inv,
             &mut scratch,
         );
     } else if n_len < DC_BDIV_Q_THRESHOLD {
-        _limbs_modular_div_schoolbook(qs, ns, ds, inverse);
+        _limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
     } else {
         let mut scratch = vec![0; n_len];
-        _limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, inverse, &mut scratch);
+        _limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, d_inv, &mut scratch);
     }
 }
 
@@ -1436,11 +1436,11 @@ pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
 pub fn _limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_schoolbook(qs, ns, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_divide_and_conquer(qs, ns, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv);
     } else {
         _limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
@@ -1470,13 +1470,13 @@ pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch
     if d_len < DC_BDIV_Q_THRESHOLD {
         let scratch = &mut scratch[..n_len];
         scratch.copy_from_slice(ns);
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_schoolbook(qs, scratch, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_schoolbook(qs, scratch, ds, d_inv);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
         let scratch = &mut scratch[..n_len];
         scratch.copy_from_slice(ns);
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_divide_and_conquer(qs, scratch, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_divide_and_conquer(qs, scratch, ds, d_inv);
     } else {
         _limbs_modular_div_barrett(qs, ns, ds, scratch);
     }

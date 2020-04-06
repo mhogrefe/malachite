@@ -46,12 +46,12 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     if len == 1 {
         return limbs_limb_mod_exact_odd_limb(xs[0], d, carry);
     }
-    let inverse = limbs_modular_invert_limb(d);
+    let d_inv = limbs_modular_invert_limb(d);
     let d_double = DoubleLimb::from(d);
     let last_index = len - 1;
     for &limb in &xs[..last_index] {
         let (diff, small_carry) = limb.overflowing_sub(carry);
-        carry = (DoubleLimb::from(diff.wrapping_mul(inverse)) * d_double).upper_half();
+        carry = (DoubleLimb::from(diff.wrapping_mul(d_inv)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
@@ -65,7 +65,7 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
         }
     } else {
         let (diff, small_carry) = last.overflowing_sub(carry);
-        carry = (DoubleLimb::from(diff.wrapping_mul(inverse)) * d_double).upper_half();
+        carry = (DoubleLimb::from(diff.wrapping_mul(d_inv)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoSub, ModPowerOfTwoSubAssign,
+    ModPowerOfTwo, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
@@ -9,6 +9,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_two_sub::{
     limbs_mod_power_of_two_sub, limbs_mod_power_of_two_sub_in_place_either,
     limbs_mod_power_of_two_sub_in_place_left, limbs_mod_power_of_two_sub_in_place_right,
 };
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -415,6 +416,10 @@ fn benchmark_natural_mod_power_of_two_sub_algorithms(
                 &mut (|(x, y, pow)| {
                     no_out!((Integer::from(x) - Integer::from(y)).mod_power_of_two(pow))
                 }),
+            ),
+            (
+                "using mod_sub",
+                &mut (|(x, y, pow)| no_out!(x.mod_sub(y, Natural::power_of_two(pow)))),
             ),
         ],
     );

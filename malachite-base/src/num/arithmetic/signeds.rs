@@ -516,7 +516,7 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl PowerOfTwo for $t {
-            /// Computes 2<pow>`pow`</pow>.
+            /// Computes 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///

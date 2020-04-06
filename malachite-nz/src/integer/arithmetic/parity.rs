@@ -25,9 +25,7 @@ impl<'a> Parity for &'a Integer {
     /// assert_eq!((-Integer::trillion() - Integer::ONE).even(), false);
     /// ```
     fn even(self) -> bool {
-        match *self {
-            Integer { ref abs, .. } => abs.even(),
-        }
+        self.abs.even()
     }
 
     /// Determines whether `self` is odd.
@@ -52,8 +50,6 @@ impl<'a> Parity for &'a Integer {
     /// assert_eq!((-Integer::trillion() - Integer::ONE).odd(), true);
     /// ```
     fn odd(self) -> bool {
-        match *self {
-            Integer { ref abs, .. } => abs.odd(),
-        }
+        self.abs.odd()
     }
 }

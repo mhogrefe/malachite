@@ -152,12 +152,12 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let r_len = rs.len();
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
         let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
@@ -263,12 +263,12 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let r_len = rs.len();
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
         let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
@@ -370,12 +370,12 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let rs = &mut rs[..r_len];
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
         let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
@@ -479,12 +479,12 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let rs = &mut rs[..r_len];
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
-        let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, inverse);
+        let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
+        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
         let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];

@@ -415,7 +415,7 @@ macro_rules! impl_logic_traits {
         }
 
         /// Provides functions for accessing and modifying the `index`th bit of a primitive unsigned
-        /// integer, or the coefficient of 2^<pow>`index`</pow> in its binary expansion.
+        /// integer, or the coefficient of 2<sup>`index`</sup> in its binary expansion.
         ///
         /// # Examples
         /// ```
@@ -439,7 +439,7 @@ macro_rules! impl_logic_traits {
         /// ```
         impl BitAccess for $t {
             /// Determines whether the `index`th bit of a primitive unsigned integer, or the
-            /// coefficient of 2<pow>`index`</pow> in its binary expansion, is 0 or 1. `false`
+            /// coefficient of 2<sup>`index`</sup> in its binary expansion, is 0 or 1. `false`
             /// means 0, `true` means 1.
             ///
             /// Getting bits beyond the type's width is allowed; those bits are false.
@@ -464,7 +464,7 @@ macro_rules! impl_logic_traits {
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
-            /// 2<pow>`index`</pow> in its binary expansion, to 1.
+            /// 2<sup>`index`</sup> in its binary expansion, to 1.
             ///
             /// Setting bits beyond the type's width is disallowed.
             ///
@@ -499,7 +499,7 @@ macro_rules! impl_logic_traits {
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
-            /// 2<pow>`index`</pow> in its binary expansion, to 0.
+            /// 2<sup>`index`</sup> in its binary expansion, to 0.
             ///
             /// Clearing bits beyond the type's width is allowed; since those bits are already
             /// false, clearing them does nothing.

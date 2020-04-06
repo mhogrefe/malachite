@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced,
-    ModPowerOfTwoNeg, ModPowerOfTwoSub,
+    ModAdd, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced,
+    ModPowerOfTwoNeg, ModPowerOfTwoSub, PowerOfTwo,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::BitAccess;
@@ -477,6 +477,7 @@ fn mod_power_of_two_add_properties() {
             let mut sum_alt = x + y;
             sum_alt.clear_bit(pow);
             assert_eq!(sum_alt, sum);
+            assert_eq!(x.mod_add(y, Natural::power_of_two(pow)), sum);
 
             let mut mut_x = x.clone();
             mut_x.mod_power_of_two_add_assign(y.clone(), pow);

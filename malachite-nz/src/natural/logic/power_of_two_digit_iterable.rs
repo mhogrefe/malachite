@@ -360,7 +360,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOfTwoDigitPrimitiveItera
     }
 
     /// A function that returns the length of the digits iterator; that is, the `Natural`'s
-    /// significant base-2<pow>`log_base`</pow>-digit count. The format is
+    /// significant base-2<sup>`log_base`</sup>-digit count. The format is
     /// (lower bound, Option<upper bound>), but in this case it's trivial to always have an exact
     /// bound.
     ///
@@ -869,7 +869,7 @@ impl<'a> Iterator for NaturalPowerOfTwoDigitIterator<'a> {
     }
 
     /// A function that returns the length of the digits iterator; that is, the `Natural`'s
-    /// significant base-2<pow>`log_base`</pow>-digit count. The format is
+    /// significant base-2<sup>`log_base`</sup>-digit count. The format is
     /// (lower bound, Option<upper bound>), but in this case it's trivial to always have an exact
     /// bound.
     ///

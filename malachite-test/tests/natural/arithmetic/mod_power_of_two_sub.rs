@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg, ModPowerOfTwoSub,
-    ModPowerOfTwoSubAssign,
+    ModPowerOfTwoSubAssign, ModSub, PowerOfTwo,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::BitAccess;
@@ -373,6 +373,7 @@ fn mod_power_of_two_sub_properties() {
                 x - y
             };
             assert_eq!(diff_alt, diff);
+            assert_eq!(x.mod_sub(y, Natural::power_of_two(pow)), diff);
 
             let mut mut_x = x.clone();
             mut_x.mod_power_of_two_sub_assign(y.clone(), pow);

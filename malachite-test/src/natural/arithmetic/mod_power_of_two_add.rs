@@ -1,10 +1,10 @@
 use std::cmp::{max, min};
 
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign,
+    ModAdd, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::arithmetic::mod_power_of_two_add::{
     limbs_mod_power_of_two_add, limbs_mod_power_of_two_add_greater,
     limbs_mod_power_of_two_add_in_place_either, limbs_mod_power_of_two_add_limb,
@@ -12,6 +12,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_two_add::{
     limbs_slice_mod_power_of_two_add_limb_in_place, limbs_vec_mod_power_of_two_add_in_place_left,
     limbs_vec_mod_power_of_two_add_limb_in_place,
 };
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -194,10 +195,11 @@ fn demo_limbs_mod_power_of_two_add_in_place_either(gm: GenerationMode, limit: us
 fn demo_natural_mod_power_of_two_add_assign(gm: GenerationMode, limit: usize) {
     for (mut x, y, pow) in triples_of_natural_natural_and_u64_var_1(gm).take(limit) {
         let x_old = x.clone();
-        x.mod_power_of_two_add_assign(y.clone(), pow);
+        let y_old = y.clone();
+        x.mod_power_of_two_add_assign(y, pow);
         println!(
             "x := {}; x.mod_power_of_two_add_assign({}, {}); x = {}",
-            x_old, y, pow, x
+            x_old, y_old, pow, x
         );
     }
 }
@@ -451,8 +453,8 @@ fn benchmark_natural_mod_power_of_two_add_assign_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
-        "max(x.significant_bits(), y.significant_bits())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [
             (
                 "Natural.mod_power_of_two_add_assign(Natural, u64)",
@@ -478,8 +480,8 @@ fn benchmark_natural_mod_power_of_two_add_algorithms(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
-        "max(x.significant_bits(), y.significant_bits())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [
             (
                 "default",
@@ -495,6 +497,10 @@ fn benchmark_natural_mod_power_of_two_add_algorithms(
             (
                 "naive",
                 &mut (|(x, y, pow)| no_out!((x + y).mod_power_of_two(pow))),
+            ),
+            (
+                "using mod_add",
+                &mut (|(x, y, pow)| no_out!(x.mod_add(y, Natural::power_of_two(pow)))),
             ),
         ],
     );
@@ -512,8 +518,8 @@ fn benchmark_natural_mod_power_of_two_add_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref x, ref y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
-        "max(x.significant_bits(), y.significant_bits())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [
             (
                 "Natural.mod_power_of_two_add(Natural, u64)",

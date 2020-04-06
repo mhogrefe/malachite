@@ -7,8 +7,8 @@ use natural::Natural;
 impl ModPowerOfTwoNeg for Natural {
     type Output = Natural;
 
-    /// Computes `-self` mod 2<pow>`pow`</pow>, taking `self` by value. Assumes the input is already
-    /// reduced mod 2<pow>`pow`</pow>.
+    /// Computes `-self` mod 2<sup>`pow`</sup>, taking `self` by value. Assumes the input is already
+    /// reduced mod 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///
@@ -41,8 +41,8 @@ impl ModPowerOfTwoNeg for Natural {
 impl<'a> ModPowerOfTwoNeg for &'a Natural {
     type Output = Natural;
 
-    /// Computes `-self` mod 2<pow>`pow`</pow>, taking `self` by reference. Assumes the input is
-    /// already reduced mod 2<pow>`pow`</pow>.
+    /// Computes `-self` mod 2<sup>`pow`</sup>, taking `self` by reference. Assumes the input is
+    /// already reduced mod 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///
@@ -72,8 +72,8 @@ impl<'a> ModPowerOfTwoNeg for &'a Natural {
 }
 
 impl ModPowerOfTwoNegAssign for Natural {
-    /// Replaces `self` with `-self` mod 2<pow>`pow`</pow>. Assumes the input is already reduced mod
-    /// 2<pow>`pow`</pow>.
+    /// Replaces `self` with `-self` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
+    /// 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///

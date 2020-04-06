@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, PowerOfTwo,
+    ModNeg, ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
@@ -14,7 +14,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_natural_mod_power_of_two_neg_assign_algorithms
+        benchmark_natural_mod_power_of_two_neg_assign
     );
     register_bench!(
         registry,
@@ -63,30 +63,24 @@ fn demo_natural_mod_power_of_two_neg_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_natural_mod_power_of_two_neg_assign_algorithms(
+fn benchmark_natural_mod_power_of_two_neg_assign(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
         "Natural.mod_power_of_two_neg_assign(u64)",
-        BenchmarkType::Algorithms,
+        BenchmarkType::Single,
         pairs_of_natural_and_u64_var_1(gm),
         gm.name(),
         limit,
         file_name,
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
-        &mut [
-            (
-                "Natural.mod_power_of_two_neg_assign(u64)",
-                &mut (|(mut n, pow)| n.mod_power_of_two_neg_assign(pow)),
-            ),
-            (
-                "Natural.mod_neg_assign(Natural::power_of_two(u64))",
-                &mut (|(mut n, pow)| n.mod_neg_assign(Natural::power_of_two(pow))),
-            ),
-        ],
+        &mut [(
+            "Natural.mod_power_of_two_neg_assign(u64)",
+            &mut (|(mut n, pow)| n.mod_power_of_two_neg_assign(pow)),
+        )],
     );
 }
 

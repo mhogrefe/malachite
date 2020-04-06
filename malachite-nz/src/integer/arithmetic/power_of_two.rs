@@ -4,7 +4,7 @@ use malachite_base::num::basic::traits::One;
 use integer::Integer;
 
 impl PowerOfTwo for Integer {
-    /// Computes 2<pow>`pow`</pow>.
+    /// Computes 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///

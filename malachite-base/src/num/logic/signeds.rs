@@ -206,7 +206,7 @@ macro_rules! impl_logic_traits {
         }
 
         /// Provides functions for accessing and modifying the `index`th bit of a primitive signed
-        /// integer, or the coefficient of 2^<pow>`index`</pow> in its binary expansion.
+        /// integer, or the coefficient of 2<sup>`index`</sup> in its binary expansion.
         ///
         /// Negative integers are represented in two's complement.
         ///
@@ -248,7 +248,7 @@ macro_rules! impl_logic_traits {
         /// ```
         impl BitAccess for $t {
             /// Determines whether the `index`th bit of a primitive signed integer, or the
-            /// coefficient of 2<pow>`index`</pow> in its binary expansion, is 0 or 1. `false` means
+            /// coefficient of 2<sup>`index`</sup> in its binary expansion, is 0 or 1. `false` means
             /// 0, `true` means 1.
             ///
             /// Negative integers are represented in two's complement.
@@ -285,7 +285,7 @@ macro_rules! impl_logic_traits {
             }
 
             /// Sets the `index`th bit of a primitive signed integer, or the coefficient of
-            /// 2<pow>`index`</pow> in its binary expansion, to 1.
+            /// 2<sup>`index`</sup> in its binary expansion, to 1.
             ///
             /// Negative integers are represented in two's complement.
             ///
@@ -329,7 +329,7 @@ macro_rules! impl_logic_traits {
             }
 
             /// Sets the `index`th bit of a primitive signed integer, or the coefficient of
-            /// 2<pow>`index`</pow> in its binary expansion, to 0.
+            /// 2<sup>`index`</sup> in its binary expansion, to 0.
             ///
             /// Negative integers are represented in two's complement.
             ///

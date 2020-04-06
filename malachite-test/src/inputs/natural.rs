@@ -42,10 +42,10 @@ use rust_wheels::iterators::primitive_ints::{
 };
 use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples, random_triples, random_triples_from_single,
-    sqrt_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
+    exhaustive_quadruples_from_single, exhaustive_triples, exhaustive_triples_from_single,
+    lex_pairs, lex_triples, log_pairs, random_pairs, random_pairs_from_single, random_quadruples,
+    random_quadruples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs,
@@ -233,6 +233,11 @@ pub fn triples_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural, Na
 // All triples of `Natural`s, where the first `Natural` is not equal to the second mod the third.
 pub fn triples_of_naturals_var_3(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
     Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)))
+}
+
+// All triples of `Natural`s where the first and the second are smaller than the third.
+pub fn triples_of_naturals_var_4(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
+    Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref m)| x < m && y < m))
 }
 
 pub fn triples_of_natural_natural_and_positive_natural(
@@ -935,8 +940,8 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
     )
 }
 
-// All triples of `Natural`, `Natural` and `u64`, where the `u64` is greater than or equal n, where
-// n is the maximum number of significant bits of the `Natural`s.
+// All triples of `Natural`, `Natural` and `u64`, where the `u64` is greater than or equal to n,
+// where n is the maximum number of significant bits of the `Natural`s.
 pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, Natural, u64)> {
     let ps: It<(u64, (Natural, Natural))> = match gm {
         GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigned(), |&pow| {
@@ -1390,6 +1395,30 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Natural
             special_random_pairs_of_natural_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
         ),
     }
+}
+
+pub fn quadruples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_quadruples_from_single(exhaustive_naturals()))
+        }
+        GenerationMode::Random(scale) => Box::new(random_quadruples_from_single(random_naturals(
+            &EXAMPLE_SEED,
+            scale,
+        ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples_from_single(
+            special_random_naturals(&EXAMPLE_SEED, scale),
+        )),
+    }
+}
+
+// All quadruples of `Natural`s where the first three are smaller than the fourth.
+pub fn quadruples_of_naturals_var_1(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        quadruples_of_naturals(gm).filter(|&(ref x, ref y, ref z, ref m)| x < m && y < m && z < m),
+    )
 }
 
 // All quadruples of `Natural`, `Natural`, `Natural` and `u64`, where the `u64` is greater than or

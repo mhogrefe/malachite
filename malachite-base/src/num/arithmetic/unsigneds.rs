@@ -16,7 +16,7 @@ use round::RoundingMode;
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
         impl ModPowerOfTwoIsReduced for $t {
-            /// Returns whether `self` is reduced mod 2<pow>`pow`</pow>; in other words, whether it]
+            /// Returns whether `self` is reduced mod 2<sup>`pow`</sup>; in other words, whether it]
             /// has no more than `pow` significant bits.
             ///
             /// Time: worst case O(1)
@@ -66,8 +66,8 @@ macro_rules! impl_arithmetic_traits {
         impl ModPowerOfTwoNeg for $t {
             type Output = $t;
 
-            /// Computes `-self` mod 2<pow>`pow`</pow>. Assumes the input is already reduced mod
-            /// 2<pow>`pow`</pow>.
+            /// Computes `-self` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
+            /// 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -89,8 +89,8 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModPowerOfTwoNegAssign for $t {
-            /// Replaces `self` with `-self` mod 2<pow>`pow`</pow>. Assumes the input is already
-            /// reduced mod 2<pow>`pow`</pow>.
+            /// Replaces `self` with `-self` mod 2<sup>`pow`</sup>. Assumes the input is already
+            /// reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -185,8 +185,8 @@ macro_rules! impl_arithmetic_traits {
         impl ModPowerOfTwoAdd for $t {
             type Output = $t;
 
-            /// Computes `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
-            /// mod 2<pow>`pow`</pow>.
+            /// Computes `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+            /// mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -207,8 +207,8 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModPowerOfTwoAddAssign for $t {
-            /// Replaces `self` with `self + rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are
-            /// already reduced mod 2<pow>`pow`</pow>.
+            /// Replaces `self` with `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -298,8 +298,8 @@ macro_rules! impl_arithmetic_traits {
         impl ModPowerOfTwoSub for $t {
             type Output = $t;
 
-            /// Computes `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are already reduced
-            /// mod 2<pow>`pow`</pow>.
+            /// Computes `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+            /// mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -320,8 +320,8 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl ModPowerOfTwoSubAssign for $t {
-            /// Replaces `self` with `self - rhs` mod 2<pow>`pow`</pow>. Assumes the inputs are
-            /// already reduced mod 2<pow>`pow`</pow>.
+            /// Replaces `self` with `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -709,7 +709,7 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl PowerOfTwo for $t {
-            /// Computes 2<pow>`pow`</pow>.
+            /// Computes 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
