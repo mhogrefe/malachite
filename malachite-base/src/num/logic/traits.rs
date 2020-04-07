@@ -219,10 +219,12 @@ pub trait PowerOfTwoDigits<T> {
     fn from_power_of_two_digits_desc(log_base: u64, digits: &[T]) -> Self;
 }
 
+/// An iterator over a value's base-power-of-two digits.
 pub trait PowerOfTwoDigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
     fn get(&self, index: u64) -> T;
 }
 
+/// This trait defines an iterator over a value's base-power-of-two digits.
 pub trait PowerOfTwoDigitIterable<T> {
     type PowerOfTwoDigitIterator: PowerOfTwoDigitIterator<T>;
 

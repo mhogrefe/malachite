@@ -7,21 +7,15 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
+use natural::InnerNatural::Small;
 use natural::Natural;
 use platform::Limb;
 
-//TODO clean
-
 impl Integer {
     pub(crate) fn sub_assign_limb(&mut self, other: Limb) {
-        if other == 0 {
-            return;
-        }
-        if *self == 0 {
-            *self = -Natural::from(other);
-            return;
-        }
         match *self {
+            _ if other == 0 => {}
+            integer_zero!() => *self = -Natural::from(other),
             // e.g. -10 - 5; self stays negative
             Integer {
                 sign: false,
@@ -45,31 +39,33 @@ impl Integer {
     }
 }
 
-/// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
-/// assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
-/// assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
-/// assert_eq!((-Integer::trillion() - -Integer::trillion() * Integer::from(2u32)).to_string(),
-///     "1000000000000");
-/// ```
 impl Sub<Integer> for Integer {
     type Output = Integer;
 
+    /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::ZERO - Integer::from(123)).to_string(), "-123");
+    /// assert_eq!((Integer::from(123) - Integer::ZERO).to_string(), "123");
+    /// assert_eq!((Integer::from(456) - Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(
+    ///     (-Integer::trillion() - -Integer::trillion() * Integer::from(2u32)).to_string(),
+    ///     "1000000000000"
+    /// );
+    /// ```
     #[inline]
     fn sub(mut self, other: Integer) -> Integer {
         self -= other;
@@ -77,34 +73,34 @@ impl Sub<Integer> for Integer {
     }
 }
 
-/// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by value and the right
-/// `Integer` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
-/// assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
-/// assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
-/// assert_eq!(
-///     (-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32))).to_string(),
-///     "1000000000000"
-/// );
-/// ```
 impl<'a> Sub<&'a Integer> for Integer {
     type Output = Integer;
 
+    /// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by value and the right
+    /// `Integer` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::ZERO - &Integer::from(123)).to_string(), "-123");
+    /// assert_eq!((Integer::from(123) - &Integer::ZERO).to_string(), "123");
+    /// assert_eq!((Integer::from(456) - &Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(
+    ///     (-Integer::trillion() - &(-Integer::trillion() * Integer::from(2u32))).to_string(),
+    ///     "1000000000000"
+    /// );
+    /// ```
     #[inline]
     fn sub(mut self, other: &'a Integer) -> Integer {
         self -= other;
@@ -112,39 +108,41 @@ impl<'a> Sub<&'a Integer> for Integer {
     }
 }
 
-/// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by reference and the right
-/// `Integer` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
-/// assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
-/// assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
-/// assert_eq!(
-///     (&(-Integer::trillion()) - -Integer::trillion() * Integer::from(2u32)).to_string(),
-///     "1000000000000"
-/// );
-/// ```
 impl<'a> Sub<Integer> for &'a Integer {
     type Output = Integer;
 
+    /// Subtracts an `Integer` from an `Integer`, taking the left `Integer` by reference and the
+    /// right `Integer` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((&Integer::ZERO - Integer::from(123)).to_string(), "-123");
+    /// assert_eq!((&Integer::from(123) - Integer::ZERO).to_string(), "123");
+    /// assert_eq!((&Integer::from(456) - Integer::from(-123)).to_string(), "579");
+    /// assert_eq!(
+    ///     (&(-Integer::trillion()) - -Integer::trillion() * Integer::from(2u32)).to_string(),
+    ///     "1000000000000"
+    /// );
+    /// ```
     fn sub(self, mut other: Integer) -> Integer {
         other -= self;
         -other
     }
 }
+
+//TODO clean
 
 /// Subtracts an `Integer` from an `Integer`, taking both `Integer`s by reference.
 ///

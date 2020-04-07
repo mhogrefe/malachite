@@ -208,8 +208,8 @@ pub trait WrappingAddAssign<RHS = Self> {
 
 /// Calculates `self` + `rhs`.
 ///
-/// Returns a tuple of the addition along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// Returns a tuple of the sum along with a boolean indicating whether an arithmetic overflow would
+/// occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingAdd<RHS = Self> {
     type Output;
 
@@ -261,8 +261,8 @@ pub trait WrappingSubAssign<RHS = Self> {
 
 /// Calculates `self` - `rhs`.
 ///
-/// Returns a tuple of the subtraction along with a boolean indicating whether an arithmetic
-/// overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+/// Returns a tuple of the difference along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingSub<RHS = Self> {
     type Output;
 
@@ -298,8 +298,7 @@ pub trait ModAdd<RHS = Self, M = Self> {
     fn mod_add(self, rhs: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self + rhs` mod `m`. Assumes the inputs are already reduced mod
-/// `m`.
+/// Replaces `self` with `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModAddAssign<RHS = Self, M = Self> {
     fn mod_add_assign(&mut self, rhs: RHS, m: M);
 }
@@ -337,6 +336,78 @@ pub trait CheckedMul<RHS = Self> {
     fn checked_mul(self, rhs: RHS) -> Option<Self::Output>;
 }
 
+/// Saturating multiplication. Computes `self * rhs`, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingMul<RHS = Self> {
+    type Output;
+
+    fn saturating_mul(self, rhs: RHS) -> Self::Output;
+}
+
+/// Saturating multiplication. Replaces `self` with `self * rhs`, saturating at the numeric bounds
+/// instead of overflowing.
+pub trait SaturatingMulAssign<RHS = Self> {
+    fn saturating_mul_assign(&mut self, rhs: RHS);
+}
+
+/// Wrapping (modular) multiplication. Computes `self * rhs`, wrapping around at the boundary of the
+/// type.
+pub trait WrappingMul<RHS = Self> {
+    type Output;
+
+    fn wrapping_mul(self, rhs: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) multiplication. Replaces `self` with `self * rhs`, wrapping around at the
+/// boundary of the type.
+pub trait WrappingMulAssign<RHS = Self> {
+    fn wrapping_mul_assign(&mut self, rhs: RHS);
+}
+
+/// Calculates `self` * `rhs`.
+///
+/// Returns a tuple of the product along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingMul<RHS = Self> {
+    type Output;
+
+    fn overflowing_mul(self, rhs: RHS) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self` * `rhs`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingMulAssign<RHS = Self> {
+    fn overflowing_mul_assign(&mut self, rhs: RHS) -> bool;
+}
+
+/// Computes `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoMul<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_two_mul(self, rhs: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+/// mod 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoMulAssign<RHS = Self> {
+    fn mod_power_of_two_mul_assign(&mut self, rhs: RHS, pow: u64);
+}
+
+/// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModMul<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_mul(self, rhs: RHS, m: M) -> Self::Output;
+}
+
+/// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModMulAssign<RHS = Self, M = Self> {
+    fn mod_mul_assign(&mut self, rhs: RHS, m: M);
+}
+
 /// Checked division. Computes `self / rhs`, returning `None` if there is no valid result.
 pub trait CheckedDiv<RHS = Self> {
     type Output;
@@ -358,27 +429,11 @@ pub trait CheckedPow<RHS> {
     fn checked_pow(self, exp: RHS) -> Option<Self::Output>;
 }
 
-/// Saturating multiplication. Computes `self * rhs`, saturating at the numeric bounds instead of
-/// overflowing.
-pub trait SaturatingMul<RHS = Self> {
-    type Output;
-
-    fn saturating_mul(self, rhs: RHS) -> Self::Output;
-}
-
 /// Raises `self` to the power of `exp`, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingPow<RHS> {
     type Output;
 
     fn saturating_pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) multiplication. Computes `self * rhs`, wrapping around at the boundary of the
-/// type.
-pub trait WrappingMul<RHS = Self> {
-    type Output;
-
-    fn wrapping_mul(self, rhs: RHS) -> Self::Output;
 }
 
 /// Wrapping (modular) division. Computes `self / rhs`, wrapping around at the boundary of the type.
@@ -402,16 +457,6 @@ pub trait WrappingPow<RHS> {
     type Output;
 
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Calculates `self` * `rhs`.
-///
-/// Returns a tuple of the multiplication along with a boolean indicating whether an arithmetic
-/// overflow would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingMul<RHS = Self> {
-    type Output;
-
-    fn overflowing_mul(self, rhs: RHS) -> (Self::Output, bool);
 }
 
 /// Calculates `self` / `rhs`.
@@ -494,24 +539,12 @@ pub trait WrappingDivAssign<RHS = Self> {
     fn wrapping_div_assign(&mut self, rhs: RHS);
 }
 
-pub trait WrappingMulAssign<RHS = Self> {
-    fn wrapping_mul_assign(&mut self, rhs: RHS);
-}
-
 pub trait WrappingRemAssign<RHS = Self> {
     fn wrapping_rem_assign(&mut self, rhs: RHS);
 }
 
-pub trait SaturatingMulAssign<RHS = Self> {
-    fn saturating_mul_assign(&mut self, rhs: RHS);
-}
-
 pub trait OverflowingDivAssign<RHS = Self> {
     fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
-}
-
-pub trait OverflowingMulAssign<RHS = Self> {
-    fn overflowing_mul_assign(&mut self, rhs: RHS) -> bool;
 }
 
 pub trait OverflowingRemAssign<RHS = Self> {

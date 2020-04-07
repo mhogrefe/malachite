@@ -384,6 +384,114 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
+        impl SaturatingMul<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn saturating_mul(self, rhs: $t) -> $t {
+                $t::saturating_mul(self, rhs)
+            }
+        }
+
+        impl SaturatingMulAssign for $t {
+            /// Replaces `self` with `self * rhs`, saturating at the numeric bounds instead of
+            /// overflowing.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::SaturatingMulAssign;
+            ///
+            /// let mut x = 123u16;
+            /// x.saturating_mul_assign(456);
+            /// assert_eq!(x, 56_088);
+            ///
+            /// let mut x = 123u8;
+            /// x.saturating_mul_assign(200);
+            /// assert_eq!(x, 255);
+            /// ```
+            #[inline]
+            fn saturating_mul_assign(&mut self, rhs: $t) {
+                *self = self.saturating_mul(rhs);
+            }
+        }
+
+        impl WrappingMul<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn wrapping_mul(self, rhs: $t) -> $t {
+                $t::wrapping_mul(self, rhs)
+            }
+        }
+
+        impl WrappingMulAssign for $t {
+            /// Replaces `self` with `self * rhs`, wrapping around at the boundary of the type.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::WrappingMulAssign;
+            ///
+            /// let mut x = 123u16;
+            /// x.wrapping_mul_assign(456);
+            /// assert_eq!(x, 56_088);
+            ///
+            /// let mut x = 123u8;
+            /// x.wrapping_mul_assign(200);
+            /// assert_eq!(x, 24);
+            /// ```
+            #[inline]
+            fn wrapping_mul_assign(&mut self, rhs: $t) {
+                *self = self.wrapping_mul(rhs);
+            }
+        }
+
+        impl OverflowingMul<$t> for $t {
+            type Output = $t;
+
+            #[inline]
+            fn overflowing_mul(self, rhs: $t) -> ($t, bool) {
+                $t::overflowing_mul(self, rhs)
+            }
+        }
+
+        impl OverflowingMulAssign for $t {
+            /// Replaces `self` with `self * rhs`.
+            ///
+            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
+            /// overflow would have occurred then the wrapped value is assigned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::OverflowingMulAssign;
+            ///
+            /// let mut x = 123u16;
+            /// assert_eq!(x.overflowing_mul_assign(456), false);
+            /// assert_eq!(x, 56_088);
+            ///
+            /// let mut x = 123u8;
+            /// assert_eq!(x.overflowing_mul_assign(200), true);
+            /// assert_eq!(x, 24);
+            /// ```
+            #[inline]
+            fn overflowing_mul_assign(&mut self, rhs: $t) -> bool {
+                let (result, overflow) = self.overflowing_mul(rhs);
+                *self = result;
+                overflow
+            }
+        }
+
         impl CheckedDiv<$t> for $t {
             type Output = $t;
 
@@ -411,30 +519,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl SaturatingMul<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn saturating_mul(self, rhs: $t) -> $t {
-                $t::saturating_mul(self, rhs)
-            }
-        }
-
         impl SaturatingPow<u64> for $t {
             type Output = $t;
 
             #[inline]
             fn saturating_pow(self, rhs: u64) -> $t {
                 $t::saturating_pow(self, u32::exact_from(rhs))
-            }
-        }
-
-        impl WrappingMul<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_mul(self, rhs: $t) -> $t {
-                $t::wrapping_mul(self, rhs)
             }
         }
 
@@ -462,15 +552,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_pow(self, rhs: u64) -> $t {
                 $t::wrapping_pow(self, u32::exact_from(rhs))
-            }
-        }
-
-        impl OverflowingMul<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_mul(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_mul(self, rhs)
             }
         }
 
@@ -510,13 +591,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl WrappingMulAssign for $t {
-            #[inline]
-            fn wrapping_mul_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_mul(rhs);
-            }
-        }
-
         impl WrappingDivAssign for $t {
             #[inline]
             fn wrapping_div_assign(&mut self, rhs: $t) {
@@ -528,15 +602,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_rem_assign(&mut self, rhs: $t) {
                 *self = self.wrapping_rem(rhs);
-            }
-        }
-
-        impl OverflowingMulAssign for $t {
-            #[inline]
-            fn overflowing_mul_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_mul(rhs);
-                *self = result;
-                overflow
             }
         }
 
@@ -555,13 +620,6 @@ macro_rules! impl_arithmetic_traits {
                 let (result, overflow) = self.overflowing_rem(rhs);
                 *self = result;
                 overflow
-            }
-        }
-
-        impl SaturatingMulAssign for $t {
-            #[inline]
-            fn saturating_mul_assign(&mut self, rhs: $t) {
-                *self = self.saturating_mul(rhs);
             }
         }
 
