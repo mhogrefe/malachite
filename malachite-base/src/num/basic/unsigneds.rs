@@ -1,11 +1,12 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModNeg, ModNegAssign,
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign,
-    ModPowerOfTwoIsReduced, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub,
-    ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
-    RemPowerOfTwoAssign,
+    FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModMul, ModMulAssign,
+    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPowerOfTwo,
+    ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
+    ModPowerOfTwoMul, ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign,
+    ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
+    RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXSubYYIsZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -32,6 +33,10 @@ pub trait PrimitiveUnsigned:
     + ModIsReduced<Self>
     + ModAdd<Self, Self, Output = Self>
     + ModAddAssign<Self, Self>
+    + ModMul<Self, Self, Output = Self>
+    + ModMulAssign<Self, Self>
+    + ModMulPrecomputed<Self, Self, Self, Output = Self>
+    + ModMulPrecomputedAssign<Self, Self, Self>
     + ModNeg<Self, Output = Self>
     + ModNegAssign<Self>
     + ModPowerOfTwo<Output = Self>
@@ -39,6 +44,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoAddAssign<Self>
     + ModPowerOfTwoAssign
     + ModPowerOfTwoIsReduced
+    + ModPowerOfTwoMul<Self, Output = Self>
+    + ModPowerOfTwoMulAssign<Self>
     + ModPowerOfTwoNeg<Output = Self>
     + ModPowerOfTwoNegAssign
     + ModPowerOfTwoSub<Self, Output = Self>
@@ -78,6 +85,9 @@ pub trait PrimitiveUnsigned:
     + VecFromOtherTypeSlice<u64>
     + VecFromOtherTypeSlice<u128>
     + VecFromOtherTypeSlice<usize>
+    + XXAddYYIsZZ
+    + XXSubYYIsZZ
+    + XMulYIsZZ
 {
     type SignedOfEqualWidth: PrimitiveSigned;
 }

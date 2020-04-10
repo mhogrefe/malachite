@@ -7,6 +7,7 @@ pub mod mod_is_reduced;
 pub mod mod_neg;
 pub mod mod_power_of_two_add;
 pub mod mod_power_of_two_is_reduced;
+pub mod mod_power_of_two_mul;
 pub mod mod_power_of_two_neg;
 pub mod mod_power_of_two_sub;
 pub mod mod_sub;
@@ -28,6 +29,9 @@ pub mod wrapping_add;
 pub mod wrapping_mul;
 pub mod wrapping_neg;
 pub mod wrapping_sub;
+pub mod x_mul_y_is_zz;
+pub mod xx_add_yy_is_zz;
+pub mod xx_sub_yy_is_zz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
@@ -37,6 +41,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_neg::register(registry);
     mod_power_of_two_add::register(registry);
     mod_power_of_two_is_reduced::register(registry);
+    mod_power_of_two_mul::register(registry);
     mod_power_of_two_neg::register(registry);
     mod_power_of_two_sub::register(registry);
     mod_sub::register(registry);
@@ -58,4 +63,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     wrapping_mul::register(registry);
     wrapping_neg::register(registry);
     wrapping_sub::register(registry);
+    x_mul_y_is_zz::register(registry);
+    xx_add_yy_is_zz::register(registry);
+    xx_sub_yy_is_zz::register(registry);
 }

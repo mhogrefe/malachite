@@ -1,22 +1,25 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModAdd,
-    ModAddAssign, ModIsReduced, ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAdd,
-    ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg,
-    ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod,
-    NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign,
-    Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign,
-    TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
+    ModAddAssign, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign,
+    ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
+    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub,
+    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
+    NextPowerOfTwoAssign, Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
+    ShrRoundAssign, TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingMulAssign,
+    WrappingNegAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ, XXSubYYIsZZ,
 };
 use num::basic::integers::PrimitiveInteger;
-use num::conversion::traits::WrappingFrom;
+use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::{LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
         impl ModPowerOfTwoIsReduced for $t {
-            /// Returns whether `self` is reduced mod 2<sup>`pow`</sup>; in other words, whether it]
+            /// Returns whether `self` is reduced mod 2<sup>`pow`</sup>; in other words, whether it
             /// has no more than `pow` significant bits.
             ///
             /// Time: worst case O(1)
@@ -403,6 +406,128 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
+        impl ModPowerOfTwoMul for $t {
+            type Output = $t;
+
+            /// Computes `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+            /// mod 2<sup>`pow`</sup>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoMul;
+            ///
+            /// assert_eq!(3u8.mod_power_of_two_mul(2, 5), 6);
+            /// assert_eq!(10u32.mod_power_of_two_mul(14, 4), 12);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_mul(self, rhs: $t, pow: u64) -> $t {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_mul(rhs).mod_power_of_two(pow)
+            }
+        }
+
+        impl ModPowerOfTwoMulAssign for $t {
+            /// Replaces `self` with `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// already reduced mod 2<sup>`pow`</sup>.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoMulAssign;
+            ///
+            /// let mut n = 3u8;
+            /// n.mod_power_of_two_mul_assign(2, 5);
+            /// assert_eq!(n, 6);
+            ///
+            /// let mut n = 10u32;
+            /// n.mod_power_of_two_mul_assign(14, 4);
+            /// assert_eq!(n, 12);
+            /// ```
+            #[inline]
+            fn mod_power_of_two_mul_assign(&mut self, rhs: $t, pow: u64) {
+                assert!(pow <= $t::WIDTH);
+                self.wrapping_mul_assign(rhs);
+                self.mod_power_of_two_assign(pow);
+            }
+        }
+
+        impl ModMulPrecomputed<$t, $t, $t> for $t {
+            type Output = $t;
+
+            fn precompute_mod_mul_data(_m: $t) -> $t {
+                unimplemented!();
+            }
+
+            fn mod_mul_precomputed(self, _rhs: $t, _m: $t, _data: &$t) -> $t {
+                unimplemented!();
+            }
+        }
+
+        impl ModMulPrecomputedAssign<$t, $t, $t> for $t {
+            #[inline]
+            fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, data: &$t) {
+                *self = self.mod_mul_precomputed(rhs, m, data);
+            }
+        }
+
+        impl ModMul for $t {
+            type Output = $t;
+
+            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// // use malachite_base::num::arithmetic::traits::ModMul;
+            /// //
+            /// // assert_eq!(0u8.mod_mul(3, 5), 3);
+            /// // assert_eq!(7u32.mod_mul(5, 10), 2);
+            /// ```
+            ///
+            /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
+            #[inline]
+            fn mod_mul(self, rhs: $t, m: $t) -> $t {
+                self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m))
+            }
+        }
+
+        impl ModMulAssign for $t {
+            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// // use malachite_base::num::arithmetic::traits::ModMulAssign;
+            /// //
+            /// // let mut n = 0u8;
+            /// // n.mod_mul_assign(3, 5);
+            /// // assert_eq!(n, 3);
+            /// //
+            /// // let mut n = 7u32;
+            /// // n.mod_mul_assign(5, 10);
+            /// // assert_eq!(n, 2);
+            /// ```
+            ///
+            /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
+            #[inline]
+            fn mod_mul_assign(&mut self, rhs: $t, m: $t) {
+                *self = self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m));
+            }
+        }
+
         impl IsPowerOfTwo for $t {
             #[inline]
             fn is_power_of_two(&self) -> bool {
@@ -741,6 +866,268 @@ impl_arithmetic_traits!(u32);
 impl_arithmetic_traits!(u64);
 impl_arithmetic_traits!(u128);
 impl_arithmetic_traits!(usize);
+
+#[inline]
+fn wide_lower_half<T: PrimitiveUnsigned>(x: T) -> T {
+    x.mod_power_of_two(T::WIDTH >> 1)
+}
+
+#[inline]
+fn wide_upper_half<T: PrimitiveUnsigned>(x: T) -> T {
+    x >> (T::WIDTH >> 1)
+}
+
+#[inline]
+fn wide_split_in_half<T: PrimitiveUnsigned>(x: T) -> (T, T) {
+    (wide_upper_half(x), wide_lower_half(x))
+}
+
+pub fn _explicit_xx_add_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
+    let (z_0, carry) = x_0.overflowing_add(y_0);
+    let mut z_1 = x_1.wrapping_add(y_1);
+    if carry {
+        z_1.wrapping_add_assign(T::ONE);
+    }
+    (z_1, z_0)
+}
+
+pub fn _explicit_xx_sub_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
+    let (z_0, borrow) = x_0.overflowing_sub(y_0);
+    let mut z_1 = x_1.wrapping_sub(y_1);
+    if borrow {
+        z_1.wrapping_sub_assign(T::ONE);
+    }
+    (z_1, z_0)
+}
+
+pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
+    let half_width = T::WIDTH >> 1;
+    let (x_1, x_0) = wide_split_in_half(x);
+    let (y_1, y_0) = wide_split_in_half(y);
+    let x_0_y_0 = x_0 * y_0;
+    let mut x_0_y_1 = x_0 * y_1;
+    let x_1_y_0 = x_1 * y_0;
+    let mut x_1_y_1 = x_1 * y_1;
+    let (x_0_y_0_1, x_0_y_0_0) = wide_split_in_half(x_0_y_0);
+    x_0_y_1.wrapping_add_assign(x_0_y_0_1);
+    x_0_y_1.wrapping_add_assign(x_1_y_0);
+    if x_0_y_1 < x_1_y_0 {
+        x_1_y_1.wrapping_add_assign(T::power_of_two(half_width));
+    }
+    let z_1 = x_1_y_1.wrapping_add(wide_upper_half(x_0_y_1));
+    let z_0 = (x_0_y_1 << half_width) | x_0_y_0_0;
+    (z_1, z_0)
+}
+
+macro_rules! implicit_wide_arithmetic {
+    ($t:ident, $dt:ident) => {
+        impl XXAddYYIsZZ for $t {
+            /// Adds two numbers, each composed of two `$t` values. The sum is returned as a pair of
+            /// `$t` values. The more significant value always comes first. Addition is wrapping,
+            /// and overflow is not indicated.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::XXAddYYIsZZ;
+            ///
+            /// assert_eq!(u64::xx_add_yy_is_zz(0x12, 0x34, 0x33, 0x33), (0x45, 0x67));
+            /// assert_eq!(u8::xx_add_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0x35, 0x78));
+            /// ```
+            ///
+            /// This is add_ssaaaa from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+            fn xx_add_yy_is_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
+                $dt::join_halves(x_1, x_0)
+                    .wrapping_add($dt::join_halves(y_1, y_0))
+                    .split_in_half()
+            }
+        }
+
+        impl XXSubYYIsZZ for $t {
+            /// Subtracts two numbers, each composed of two `$t` values. The difference is returned
+            /// as a pair of `$t` values. The more significant value always comes first. Subtraction
+            /// is wrapping, and overflow is not indicated.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::XXSubYYIsZZ;
+            ///
+            /// assert_eq!(u64::xx_sub_yy_is_zz(0x67, 0x89, 0x33, 0x33), (0x34, 0x56));
+            /// assert_eq!(u8::xx_sub_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
+            /// ```
+            ///
+            /// This is sub_ddmmss from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+            fn xx_sub_yy_is_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
+                $dt::join_halves(x_1, x_0)
+                    .wrapping_sub($dt::join_halves(y_1, y_0))
+                    .split_in_half()
+            }
+        }
+
+        impl XMulYIsZZ for $t {
+            /// Multiplies two numbers, returning the product as a pair of `Self` values. The more
+            /// significant value always comes first.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::XMulYIsZZ;
+            ///
+            /// assert_eq!(u64::x_mul_y_is_zz(15, 3), (0, 45));
+            /// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
+            /// ```
+            ///
+            /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+            fn x_mul_y_is_zz(x: $t, y: $t) -> ($t, $t) {
+                ($dt::from(x) * $dt::from(y)).split_in_half()
+            }
+        }
+    };
+}
+
+implicit_wide_arithmetic!(u8, u16);
+implicit_wide_arithmetic!(u16, u32);
+implicit_wide_arithmetic!(u32, u64);
+implicit_wide_arithmetic!(u64, u128);
+
+impl XXAddYYIsZZ for usize {
+    /// Adds two numbers, each composed of two `usize` values. The sum is returned as a pair of
+    /// `usize` values. The more significant value always comes first. Addition is wrapping, and
+    /// overflow is not indicated.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is add_ssaaaa from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+    fn xx_add_yy_is_zz(x_1: usize, x_0: usize, y_1: usize, y_0: usize) -> (usize, usize) {
+        if usize::WIDTH == u32::WIDTH {
+            let (z_1, z_0) = u32::xx_add_yy_is_zz(
+                u32::wrapping_from(x_1),
+                u32::wrapping_from(x_0),
+                u32::wrapping_from(y_1),
+                u32::wrapping_from(y_0),
+            );
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        } else {
+            let (z_1, z_0) = u64::xx_add_yy_is_zz(
+                u64::wrapping_from(x_1),
+                u64::wrapping_from(x_0),
+                u64::wrapping_from(y_1),
+                u64::wrapping_from(y_0),
+            );
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        }
+    }
+}
+
+impl XXSubYYIsZZ for usize {
+    /// Subtracts two numbers, each composed of two `usize` values. The difference is returned as a
+    /// pair of `usize` values. The more significant value always comes first. Subtraction is
+    /// wrapping, and overflow is not indicated.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is sub_ddmmss from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+    fn xx_sub_yy_is_zz(x_1: usize, x_0: usize, y_1: usize, y_0: usize) -> (usize, usize) {
+        if usize::WIDTH == u32::WIDTH {
+            let (z_1, z_0) = u32::xx_sub_yy_is_zz(
+                u32::wrapping_from(x_1),
+                u32::wrapping_from(x_0),
+                u32::wrapping_from(y_1),
+                u32::wrapping_from(y_0),
+            );
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        } else {
+            let (z_1, z_0) = u64::xx_sub_yy_is_zz(
+                u64::wrapping_from(x_1),
+                u64::wrapping_from(x_0),
+                u64::wrapping_from(y_1),
+                u64::wrapping_from(y_0),
+            );
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        }
+    }
+}
+
+impl XMulYIsZZ for usize {
+    /// Multiplies two `usize`s, returning the product as a pair of `usize` values. The more
+    /// significant value always comes first.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+    fn x_mul_y_is_zz(x: usize, y: usize) -> (usize, usize) {
+        if usize::WIDTH == u32::WIDTH {
+            let (z_1, z_0) = u32::x_mul_y_is_zz(u32::wrapping_from(x), u32::wrapping_from(y));
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        } else {
+            let (z_1, z_0) = u64::x_mul_y_is_zz(u64::wrapping_from(x), u64::wrapping_from(y));
+            (usize::wrapping_from(z_1), usize::wrapping_from(z_0))
+        }
+    }
+}
+
+impl XXAddYYIsZZ for u128 {
+    /// Adds two numbers, each composed of two `u128` values. The sum is returned as a pair of
+    /// `u128` values. The more significant value always comes first. Addition is wrapping, and
+    /// overflow is not indicated.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is add_ssaaaa from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+    #[inline]
+    fn xx_add_yy_is_zz(x_1: u128, x_0: u128, y_1: u128, y_0: u128) -> (u128, u128) {
+        _explicit_xx_add_yy_is_zz(x_1, x_0, y_1, y_0)
+    }
+}
+
+impl XXSubYYIsZZ for u128 {
+    /// Subtracts two numbers, each composed of two `u128` values. The difference is returned as a
+    /// pair of `u128` values. The more significant value always comes first. Subtraction is
+    /// wrapping, and overflow is not indicated.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is sub_ddmmss from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
+    #[inline]
+    fn xx_sub_yy_is_zz(x_1: u128, x_0: u128, y_1: u128, y_0: u128) -> (u128, u128) {
+        _explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0)
+    }
+}
+
+impl XMulYIsZZ for u128 {
+    /// Multiplies two `u128`s, returning the product as a pair of `u128` values. The more
+    /// significant value always comes first.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+    #[inline]
+    fn x_mul_y_is_zz(x: u128, y: u128) -> (u128, u128) {
+        _explicit_x_mul_y_is_zz(x, y)
+    }
+}
 
 macro_rules! round_shift_unsigned_unsigned {
     ($t:ident, $u:ident) => {

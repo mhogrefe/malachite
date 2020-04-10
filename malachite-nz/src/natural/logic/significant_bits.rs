@@ -1,14 +1,13 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// smallest number of bits necessary to represent that `Natural`. 0 has zero significant bits. When
-/// the `Natural` is nonzero, this is equal to 1 + floor(log<sub>2<\sub>(`self`)).
+/// the `Natural` is nonzero, this is equal to 1 + floor(log<sub>2</sub>(`self`)).
 ///
 /// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
 ///
@@ -25,19 +24,19 @@ use platform::Limb;
 /// ```
 /// use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 ///
-/// assert_eq!(limbs_significant_bits(&[0b11]), 2);
-/// assert_eq!(limbs_significant_bits(&[0, 0b1101]), 36);
+/// assert_eq!(limbs_significant_bits::<u32>(&[0b11]), 2);
+/// assert_eq!(limbs_significant_bits::<u32>(&[0, 0b1101]), 36);
 /// ```
 ///
 /// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where x is non-negative and base is 2.
-pub fn limbs_significant_bits(xs: &[Limb]) -> u64 {
-    ((u64::wrapping_from(xs.len()) - 1) << Limb::LOG_WIDTH) + xs.last().unwrap().significant_bits()
+pub fn limbs_significant_bits<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
+    ((u64::wrapping_from(xs.len()) - 1) << T::LOG_WIDTH) + xs.last().unwrap().significant_bits()
 }
 
 impl<'a> SignificantBits for &'a Natural {
     /// Returns the smallest number of bits necessary to represent a `Natural`. 0 has zero
     /// significant bits. When `self` is nonzero, this is equal to
-    /// 1 + floor(log<sub>2<\sub>(`self`)).
+    /// 1 + floor(log<sub>2</sub>(`self`)).
     ///
     /// Time: worst case O(1)
     ///

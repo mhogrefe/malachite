@@ -93,10 +93,11 @@ use rust_wheels::iterators::strings::{
 };
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
-    exhaustive_quadruples_from_single, exhaustive_quintuples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs, random_pairs,
-    random_pairs_from_single, random_quadruples, random_quadruples_from_single, random_quintuples,
-    random_triples, random_triples_from_single, sqrt_pairs,
+    exhaustive_quadruples_from_single, exhaustive_quintuples, exhaustive_sextuples_from_single,
+    exhaustive_triples, exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs,
+    random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
+    random_quintuples, random_sextuples_from_single, random_triples, random_triples_from_single,
+    sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
@@ -1407,6 +1408,20 @@ where
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
             &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+pub fn sextuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_sextuples_from_single(exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_sextuples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_sextuples_from_single(
+            special_random_unsigned(&EXAMPLE_SEED),
         )),
     }
 }

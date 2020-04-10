@@ -277,6 +277,20 @@ pub trait OverflowingSubAssign<RHS = Self> {
     fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
 }
 
+/// Adds two numbers, each composed of two `Self` values. The sum is returned as a pair of `Self`
+/// values. The more significant value always comes first. Addition is wrapping, and overflow is not
+/// indicated.
+pub trait XXAddYYIsZZ: Sized {
+    fn xx_add_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
+/// Subtracts two numbers, each composed of two `Self` values. The difference is returned as a pair
+/// of `Self` values. The more significant value always comes first. Subtraction is wrapping, and
+/// overflow is not indicated.
+pub trait XXSubYYIsZZ: Sized {
+    fn xx_sub_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
 /// Computes `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoAdd<RHS = Self> {
@@ -382,6 +396,12 @@ pub trait OverflowingMulAssign<RHS = Self> {
     fn overflowing_mul_assign(&mut self, rhs: RHS) -> bool;
 }
 
+/// Multiplies two numbers, returning the product as a pair of `Self` values. The more significant
+/// value always comes first.
+pub trait XMulYIsZZ: Sized {
+    fn x_mul_y_is_zz(x: Self, y: Self) -> (Self, Self);
+}
+
 /// Computes `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoMul<RHS = Self> {
@@ -406,6 +426,27 @@ pub trait ModMul<RHS = Self, M = Self> {
 /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModMulAssign<RHS = Self, M = Self> {
     fn mod_mul_assign(&mut self, rhs: RHS, m: M);
+}
+
+/// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
+/// modular multiplications with the same modulus are necessary, it can be quicker to precompute
+/// some piece of data and reuse it in the multiplication calls. This trait provides a method for
+/// precomputing the data and a method for using it during multiplication.
+pub trait ModMulPrecomputed<D, RHS = Self, M = Self> {
+    type Output;
+
+    fn precompute_mod_mul_data(m: M) -> D;
+
+    fn mod_mul_precomputed(self, rhs: RHS, m: M, data: &D) -> Self::Output;
+}
+
+/// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. If
+/// multiple modular multiplications with the same modulus are necessary, it can be quicker to
+/// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
+/// method for using precomputed data during multiplication. For precomputing the data, use the
+/// `precompute_mod_mul_data` function in `ModMulPrecomputed`.
+pub trait ModMulPrecomputedAssign<D, RHS = Self, M = Self>: ModMulPrecomputed<D, RHS, M> {
+    fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &D);
 }
 
 /// Checked division. Computes `self / rhs`, returning `None` if there is no valid result.

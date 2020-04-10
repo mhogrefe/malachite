@@ -21,7 +21,7 @@ use malachite_test::inputs::natural::naturals;
 #[test]
 fn test_limbs_significant_bits() {
     let test = |limbs, out| {
-        assert_eq!(limbs_significant_bits(limbs), out);
+        assert_eq!(limbs_significant_bits::<Limb>(limbs), out);
     };
     test(&[0b1], 1);
     test(&[0b10], 2);
@@ -35,7 +35,7 @@ fn test_limbs_significant_bits() {
 #[test]
 #[should_panic]
 fn limbs_significant_bits_fail() {
-    limbs_significant_bits(&[]);
+    limbs_significant_bits::<Limb>(&[]);
 }
 
 #[test]
