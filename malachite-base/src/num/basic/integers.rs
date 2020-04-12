@@ -97,7 +97,7 @@ pub trait PrimitiveInteger:
     + DivExactAssign
     + DivisibleBy
     + DivisibleByPowerOfTwo
-    + DivMod
+    + DivMod<Self, DivOutput = Self, ModOutput = Self>
     + DivRem<Self, DivOutput = Self, RemOutput = Self>
     + DivRound<Self, Output = Self>
     + DivRoundAssign

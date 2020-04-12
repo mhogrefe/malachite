@@ -439,6 +439,13 @@ pub fn triples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
     Box::new(triples_of_unsigneds(gm).filter(|&(x, y, m)| x < m && y < m))
 }
 
+// All triples of unsigned `T` where the first `T` is are smaller than the third.
+pub fn triples_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    Box::new(triples_of_unsigneds(gm).filter(|&(x_1, _, y)| x_1 < y))
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,

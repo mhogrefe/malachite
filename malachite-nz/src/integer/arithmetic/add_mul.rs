@@ -13,15 +13,15 @@ use platform::Limb;
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking
-    /// `self`, b, and c by value.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to a `Integer` (self), taking
+    /// `self`, y, and z by value.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -36,8 +36,8 @@ impl<'a> AddMul<Integer, Integer> for Integer {
     ///     -Integer::trillion()).to_string(), "-65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: Integer, c: Integer) -> Integer {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: Integer, z: Integer) -> Integer {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -45,15 +45,15 @@ impl<'a> AddMul<Integer, Integer> for Integer {
 impl<'a> AddMul<Integer, &'a Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
-    /// and b by value and c by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
+    /// `self` and y by value and z by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -68,8 +68,8 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
     ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: Integer, c: &'a Integer) -> Integer {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: Integer, z: &'a Integer) -> Integer {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -77,15 +77,15 @@ impl<'a> AddMul<Integer, &'a Integer> for Integer {
 impl<'a> AddMul<&'a Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
-    /// and c by value and b by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
+    /// `self` and z by value and y by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -100,8 +100,8 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
     ///     -Integer::trillion()).to_string(), "-65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: &'a Integer, c: Integer) -> Integer {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: &'a Integer, z: Integer) -> Integer {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -109,15 +109,15 @@ impl<'a> AddMul<&'a Integer, Integer> for Integer {
 impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking `self`
-    /// by value and b and c by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
+    /// `self` by value and y and z by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -132,8 +132,8 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
     ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: &'a Integer, c: &'b Integer) -> Integer {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: &'a Integer, z: &'b Integer) -> Integer {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -141,15 +141,15 @@ impl<'a, 'b> AddMul<&'a Integer, &'b Integer> for Integer {
 impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking
-    /// `self`, b, and c by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
+    /// `self`, y, and z by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(m + n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -163,14 +163,14 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
     /// assert_eq!((&(-Integer::trillion())).add_mul(&Integer::from(0x1_0000),
     ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
-    fn add_mul(self, b: &'a Integer, c: &'b Integer) -> Integer {
-        if self.sign == (b.sign == c.sign) {
+    fn add_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
+        if self.sign == (y.sign == z.sign) {
             Integer {
                 sign: self.sign,
-                abs: (&self.abs).add_mul(&b.abs, &c.abs),
+                abs: (&self.abs).add_mul(&y.abs, &z.abs),
             }
         } else {
-            let (abs, abs_result_sign) = self.abs.add_mul_neg(&b.abs, &c.abs);
+            let (abs, abs_result_sign) = self.abs.add_mul_neg(&y.abs, &z.abs);
             Integer {
                 sign: (self.sign == abs_result_sign) || abs == 0,
                 abs,
@@ -180,15 +180,15 @@ impl<'a, 'b, 'c> AddMul<&'a Integer, &'b Integer> for &'c Integer {
 }
 
 impl AddMulAssign<Integer, Integer> for Integer {
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
-    /// taking b and c by value.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
+    /// taking y and z by value.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -206,26 +206,26 @@ impl AddMulAssign<Integer, Integer> for Integer {
     /// x.add_mul_assign(Integer::from(0x1_0000), -Integer::trillion());
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: Integer, c: Integer) {
-        if self.sign == (b.sign == c.sign) {
-            self.abs.add_mul_assign(b.abs, c.abs);
+    fn add_mul_assign(&mut self, y: Integer, z: Integer) {
+        if self.sign == (y.sign == z.sign) {
+            self.abs.add_mul_assign(y.abs, z.abs);
         } else {
-            let sign = self.abs.add_mul_assign_neg(b.abs, c.abs);
+            let sign = self.abs.add_mul_assign_neg(y.abs, z.abs);
             self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
 
 impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
-    /// taking b by value and c by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
+    /// taking y by value and z by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -243,26 +243,26 @@ impl<'a> AddMulAssign<Integer, &'a Integer> for Integer {
     /// x.add_mul_assign(Integer::from(0x1_0000), &(-Integer::trillion()));
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: Integer, c: &'a Integer) {
-        if self.sign == (b.sign == c.sign) {
-            self.abs.add_mul_assign(b.abs, &c.abs);
+    fn add_mul_assign(&mut self, y: Integer, z: &'a Integer) {
+        if self.sign == (y.sign == z.sign) {
+            self.abs.add_mul_assign(y.abs, &z.abs);
         } else {
-            let sign = self.abs.add_mul_assign_neg_val_ref(b.abs, &c.abs);
+            let sign = self.abs.add_mul_assign_neg_val_ref(y.abs, &z.abs);
             self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
 
 impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
-    /// taking b by reference and c by value.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
+    /// taking y by reference and z by value.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -280,26 +280,26 @@ impl<'a> AddMulAssign<&'a Integer, Integer> for Integer {
     /// x.add_mul_assign(&Integer::from(0x1_0000), -Integer::trillion());
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: &'a Integer, c: Integer) {
-        if self.sign == (b.sign == c.sign) {
-            self.abs.add_mul_assign(&b.abs, c.abs);
+    fn add_mul_assign(&mut self, y: &'a Integer, z: Integer) {
+        if self.sign == (y.sign == z.sign) {
+            self.abs.add_mul_assign(&y.abs, z.abs);
         } else {
-            let sign = self.abs.add_mul_assign_neg_ref_val(&b.abs, c.abs);
+            let sign = self.abs.add_mul_assign_neg_ref_val(&y.abs, z.abs);
             self.sign = (self.sign == sign) || self.abs == 0;
         }
     }
 }
 
 impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), in place,
-    /// taking b and c by reference.
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
+    /// taking y and z by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-    ///       m = `a.significant_bits()`
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -317,11 +317,11 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
     /// x.add_mul_assign(&Integer::from(0x1_0000), &(-Integer::trillion()));
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: &'a Integer, c: &'b Integer) {
-        if self.sign == (b.sign == c.sign) {
-            self.abs.add_mul_assign(&b.abs, &c.abs);
+    fn add_mul_assign(&mut self, y: &'a Integer, z: &'b Integer) {
+        if self.sign == (y.sign == z.sign) {
+            self.abs.add_mul_assign(&y.abs, &z.abs);
         } else {
-            let sign = self.abs.add_mul_assign_neg_ref_ref(&b.abs, &c.abs);
+            let sign = self.abs.add_mul_assign_neg_ref_ref(&y.abs, &z.abs);
             self.sign = (self.sign == sign) || self.abs == 0;
         }
     }

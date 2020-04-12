@@ -449,6 +449,12 @@ pub trait ModMulPrecomputedAssign<D, RHS = Self, M = Self>: ModMulPrecomputed<D,
     fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &D);
 }
 
+/// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
+/// and the second of a single one. `x_0` must be less than `y`.
+pub trait XXDivModYIsQR: Sized {
+    fn xx_div_mod_y_is_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self);
+}
+
 /// Checked division. Computes `self / rhs`, returning `None` if there is no valid result.
 pub trait CheckedDiv<RHS = Self> {
     type Output;

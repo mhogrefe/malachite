@@ -10,6 +10,7 @@ pub mod num {
         pub mod log_two;
         pub mod mod_add;
         pub mod mod_is_reduced;
+        pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_power_of_two_add;
         pub mod mod_power_of_two_is_reduced;
@@ -37,6 +38,7 @@ pub mod num {
         pub mod wrapping_sub;
         pub mod x_mul_y_is_zz;
         pub mod xx_add_yy_is_zz;
+        pub mod xx_div_mod_y_is_qr;
         pub mod xx_sub_yy_is_zz;
     }
     pub mod basic {

@@ -8,13 +8,18 @@ use num::arithmetic::traits::{
     ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
     NextPowerOfTwoAssign, Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
     ShrRoundAssign, TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingMulAssign,
-    WrappingNegAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ, XXSubYYIsZZ,
+    WrappingNegAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
+use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::{LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use round::RoundingMode;
+
+pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+    let (product_1, product_0) = T::x_mul_y_is_zz(x, y);
+    T::xx_div_mod_y_is_qr(product_1, product_0, m).1
+}
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
@@ -461,16 +466,91 @@ macro_rules! impl_arithmetic_traits {
         impl ModMulPrecomputed<$t, $t, $t> for $t {
             type Output = $t;
 
+            /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+            /// `mod_mul_precomputed_assign`.
+            ///
+            /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
             fn precompute_mod_mul_data(_m: $t) -> $t {
-                unimplemented!();
+                //TODO real implementation
+                0
             }
 
-            fn mod_mul_precomputed(self, _rhs: $t, _m: $t, _data: &$t) -> $t {
-                unimplemented!();
+            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
+            /// precomputed data is provided; this speeds up computations involving several modular
+            /// multiplications with the same modulus. The precomputed data should be obtained using
+            /// `precompute_mod_mul_data`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+            ///
+            /// let data = u8::precompute_mod_mul_data(7);
+            /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
+            /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
+            /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
+            ///
+            /// let data = u32::precompute_mod_mul_data(10);
+            /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
+            /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
+            /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
+            /// ```
+            ///
+            /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
+            fn mod_mul_precomputed(self, rhs: $t, m: $t, _data: &$t) -> $t {
+                //TODO real implementation
+                _naive_mod_mul(self, rhs, m)
             }
         }
 
         impl ModMulPrecomputedAssign<$t, $t, $t> for $t {
+            /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced
+            /// mod `m`. Some precomputed data is provided; this speeds up computations involving
+            /// several modular multiplications with the same modulus. The precomputed data should
+            /// be obtained using `precompute_mod_mul_data`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::*;
+            ///
+            /// let data = u8::precompute_mod_mul_data(7);
+            ///
+            /// let mut x = 2u8;
+            /// x.mod_mul_precomputed_assign(3, 7, &data);
+            /// assert_eq!(x, 6);
+            ///
+            /// let mut x = 5u8;
+            /// x.mod_mul_precomputed_assign(3, 7, &data);
+            /// assert_eq!(x, 1);
+            ///
+            /// let mut x = 4u8;
+            /// x.mod_mul_precomputed_assign(4, 7, &data);
+            /// assert_eq!(x, 2);
+            ///
+            /// let data = u32::precompute_mod_mul_data(10);
+            ///
+            /// let mut x = 7u32;
+            /// x.mod_mul_precomputed_assign(3, 10, &data);
+            /// assert_eq!(x, 1);
+            ///
+            /// let mut x = 4u32;
+            /// x.mod_mul_precomputed_assign(9, 10, &data);
+            /// assert_eq!(x, 6);
+            ///
+            /// let mut x = 5u32;
+            /// x.mod_mul_precomputed_assign(8, 10, &data);
+            /// assert_eq!(x, 0);
+            /// ```
+            ///
+            /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
+            /// assigned to a.
             #[inline]
             fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, data: &$t) {
                 *self = self.mod_mul_precomputed(rhs, m, data);
@@ -488,10 +568,10 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// # Example
             /// ```
-            /// // use malachite_base::num::arithmetic::traits::ModMul;
-            /// //
-            /// // assert_eq!(0u8.mod_mul(3, 5), 3);
-            /// // assert_eq!(7u32.mod_mul(5, 10), 2);
+            /// use malachite_base::num::arithmetic::traits::ModMul;
+            ///
+            /// assert_eq!(2u8.mod_mul(3, 7), 6);
+            /// assert_eq!(7u32.mod_mul(3, 10), 1);
             /// ```
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
@@ -510,15 +590,15 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// # Example
             /// ```
-            /// // use malachite_base::num::arithmetic::traits::ModMulAssign;
-            /// //
-            /// // let mut n = 0u8;
-            /// // n.mod_mul_assign(3, 5);
-            /// // assert_eq!(n, 3);
-            /// //
-            /// // let mut n = 7u32;
-            /// // n.mod_mul_assign(5, 10);
-            /// // assert_eq!(n, 2);
+            /// use malachite_base::num::arithmetic::traits::ModMulAssign;
+            ///
+            /// let mut n = 2u8;
+            /// n.mod_mul_assign(3, 7);
+            /// assert_eq!(n, 6);
+            ///
+            /// let mut n = 7u32;
+            /// n.mod_mul_assign(3, 10);
+            /// assert_eq!(n, 1);
             /// ```
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
@@ -882,6 +962,56 @@ fn wide_split_in_half<T: PrimitiveUnsigned>(x: T) -> (T, T) {
     (wide_upper_half(x), wide_lower_half(x))
 }
 
+#[inline]
+fn wide_join_halves<T: PrimitiveUnsigned>(hi: T, lo: T) -> T {
+    (hi << (T::WIDTH >> 1)) | lo
+}
+
+fn _implicit_xx_add_yy_is_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+    x_1: DT::Half,
+    x_0: DT::Half,
+    y_1: DT::Half,
+    y_0: DT::Half,
+) -> (DT::Half, DT::Half) {
+    DT::join_halves(x_1, x_0)
+        .wrapping_add(DT::join_halves(y_1, y_0))
+        .split_in_half()
+}
+
+fn _implicit_xx_sub_yy_is_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+    x_1: DT::Half,
+    x_0: DT::Half,
+    y_1: DT::Half,
+    y_0: DT::Half,
+) -> (DT::Half, DT::Half) {
+    DT::join_halves(x_1, x_0)
+        .wrapping_sub(DT::join_halves(y_1, y_0))
+        .split_in_half()
+}
+
+fn _implicit_x_mul_y_is_zz<T, DT: PrimitiveUnsigned + SplitInHalf>(x: T, y: T) -> (T, T)
+where
+    DT: From<T> + HasHalf<Half = T>,
+{
+    (DT::from(x) * DT::from(y)).split_in_half()
+}
+
+fn _implicit_xx_div_mod_y_is_qr<
+    T: PrimitiveUnsigned,
+    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
+    x_1: T,
+    x_0: T,
+    y: T,
+) -> (T, T)
+where
+    DT: From<T> + HasHalf<Half = T>,
+{
+    assert!(x_1 < y);
+    let (q, r) = DT::join_halves(x_1, x_0).div_mod(DT::from(y));
+    (q.lower_half(), r.lower_half())
+}
+
 pub fn _explicit_xx_add_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
     let (z_0, carry) = x_0.overflowing_add(y_0);
     let mut z_1 = x_1.wrapping_add(y_1);
@@ -901,7 +1031,6 @@ pub fn _explicit_xx_sub_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y
 }
 
 pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
-    let half_width = T::WIDTH >> 1;
     let (x_1, x_0) = wide_split_in_half(x);
     let (y_1, y_0) = wide_split_in_half(y);
     let x_0_y_0 = x_0 * y_0;
@@ -910,13 +1039,59 @@ pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
     let mut x_1_y_1 = x_1 * y_1;
     let (x_0_y_0_1, x_0_y_0_0) = wide_split_in_half(x_0_y_0);
     x_0_y_1.wrapping_add_assign(x_0_y_0_1);
-    x_0_y_1.wrapping_add_assign(x_1_y_0);
-    if x_0_y_1 < x_1_y_0 {
-        x_1_y_1.wrapping_add_assign(T::power_of_two(half_width));
+    if x_0_y_1.overflowing_add_assign(x_1_y_0) {
+        x_1_y_1.wrapping_add_assign(T::power_of_two(T::WIDTH >> 1));
     }
     let z_1 = x_1_y_1.wrapping_add(wide_upper_half(x_0_y_1));
-    let z_0 = (x_0_y_1 << half_width) | x_0_y_0_0;
+    let z_0 = wide_join_halves(x_0_y_1, x_0_y_0_0);
     (z_1, z_0)
+}
+
+/// This is udiv_qrnnd_int from longlong.h, FLINT Dev 1, where (q, r) is returned.
+fn _explicit_xx_div_mod_y_is_qr_normalized<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
+    let (d_1, d_0) = wide_split_in_half(y);
+    let (x_0_1, x_0_0) = wide_split_in_half(x_0);
+    let mut q_1 = x_1 / d_1;
+    let mut r_1 = x_1.wrapping_sub(q_1.wrapping_mul(d_1));
+    let product = q_1.wrapping_mul(d_0);
+    r_1 = wide_join_halves(r_1, x_0_1);
+    if r_1 < product {
+        q_1.wrapping_sub_assign(T::ONE);
+        if !r_1.overflowing_add_assign(y) && r_1 < product {
+            q_1.wrapping_sub_assign(T::ONE);
+            r_1.wrapping_add_assign(y);
+        }
+    }
+    r_1.wrapping_sub_assign(product);
+    let mut q_0 = r_1 / d_1;
+    let mut r_0 = r_1.wrapping_sub(q_0.wrapping_mul(d_1));
+    let product = q_0.wrapping_mul(d_0);
+    r_0 = wide_join_halves(r_0, x_0_0);
+    if r_0 < product {
+        q_0.wrapping_sub_assign(T::ONE);
+        if !r_0.overflowing_add_assign(y) && r_0 < product {
+            q_0.wrapping_sub_assign(T::ONE);
+            r_0.wrapping_add_assign(y);
+        }
+    }
+    r_0.wrapping_sub_assign(product);
+    (wide_join_halves(q_1, q_0), r_0)
+}
+
+/// This is udiv_qrnnd from longlong.h, FLINT Dev 1, where (q, r) is returned.
+pub fn _explicit_xx_div_mod_y_is_qr<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
+    assert!(x_1 < y);
+    let shift = LeadingZeros::leading_zeros(y);
+    if shift == 0 {
+        _explicit_xx_div_mod_y_is_qr_normalized(x_1, x_0, y)
+    } else {
+        let (q, r) = _explicit_xx_div_mod_y_is_qr_normalized(
+            x_1 << shift | (x_0 >> (T::WIDTH - shift)),
+            x_0 << shift,
+            y << shift,
+        );
+        (q, r >> shift)
+    }
 }
 
 macro_rules! implicit_wide_arithmetic {
@@ -940,9 +1115,7 @@ macro_rules! implicit_wide_arithmetic {
             ///
             /// This is add_ssaaaa from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
             fn xx_add_yy_is_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
-                $dt::join_halves(x_1, x_0)
-                    .wrapping_add($dt::join_halves(y_1, y_0))
-                    .split_in_half()
+                _implicit_xx_add_yy_is_zz::<$dt>(x_1, x_0, y_1, y_0)
             }
         }
 
@@ -965,9 +1138,7 @@ macro_rules! implicit_wide_arithmetic {
             ///
             /// This is sub_ddmmss from longlong.h, GMP 6.1.2, where (sh, sl) is returned.
             fn xx_sub_yy_is_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
-                $dt::join_halves(x_1, x_0)
-                    .wrapping_sub($dt::join_halves(y_1, y_0))
-                    .split_in_half()
+                _implicit_xx_sub_yy_is_zz::<$dt>(x_1, x_0, y_1, y_0)
             }
         }
 
@@ -989,7 +1160,29 @@ macro_rules! implicit_wide_arithmetic {
             ///
             /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
             fn x_mul_y_is_zz(x: $t, y: $t) -> ($t, $t) {
-                ($dt::from(x) * $dt::from(y)).split_in_half()
+                _implicit_x_mul_y_is_zz::<$t, $dt>(x, y)
+            }
+        }
+
+        impl XXDivModYIsQR for $t {
+            /// Computes the quotient and remainder of two numbers. The first is composed of two
+            /// `Self` values, and the second of a single one. `x_0` must be less than `y`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
+            ///
+            /// assert_eq!(u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33), (0x5a5a5a5a5a5a5a5b, 0x13));
+            /// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
+            /// ```
+            ///
+            /// This is udiv_qrnnd from longlong.h, FLINT Dev 1, where  (q, r) is returned.
+            fn xx_div_mod_y_is_qr(x_1: $t, x_0: $t, y: $t) -> ($t, $t) {
+                _implicit_xx_div_mod_y_is_qr::<$t, $dt>(x_1, x_0, y)
             }
         }
     };
@@ -1082,6 +1275,34 @@ impl XMulYIsZZ for usize {
     }
 }
 
+impl XXDivModYIsQR for usize {
+    /// Computes the quotient and remainder of two numbers. The first is composed of two `usize`
+    /// values, and the second of a single one. `x_0` must be less than `y`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is udiv_qrnnd from longlong.h, FLINT Dev 1, where (q, r) is returned.
+    fn xx_div_mod_y_is_qr(x_1: usize, x_0: usize, y: usize) -> (usize, usize) {
+        if usize::WIDTH == u32::WIDTH {
+            let (q, r) = u32::xx_div_mod_y_is_qr(
+                u32::wrapping_from(x_1),
+                u32::wrapping_from(x_0),
+                u32::wrapping_from(y),
+            );
+            (usize::wrapping_from(q), usize::wrapping_from(r))
+        } else {
+            let (q, r) = u64::xx_div_mod_y_is_qr(
+                u64::wrapping_from(x_1),
+                u64::wrapping_from(x_0),
+                u64::wrapping_from(y),
+            );
+            (usize::wrapping_from(q), usize::wrapping_from(r))
+        }
+    }
+}
+
 impl XXAddYYIsZZ for u128 {
     /// Adds two numbers, each composed of two `u128` values. The sum is returned as a pair of
     /// `u128` values. The more significant value always comes first. Addition is wrapping, and
@@ -1126,6 +1347,21 @@ impl XMulYIsZZ for u128 {
     #[inline]
     fn x_mul_y_is_zz(x: u128, y: u128) -> (u128, u128) {
         _explicit_x_mul_y_is_zz(x, y)
+    }
+}
+
+impl XXDivModYIsQR for u128 {
+    /// Computes the quotient and remainder of two numbers. The first is composed of two `u128`
+    /// values, and the second of a single one. `x_0` must be less than `y`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is udiv_qrnnd from longlong.h, FLINT Dev 1, where (q, r) is returned.
+    #[inline]
+    fn xx_div_mod_y_is_qr(x_1: u128, x_0: u128, y: u128) -> (u128, u128) {
+        _explicit_xx_div_mod_y_is_qr(x_1, x_0, y)
     }
 }
 
