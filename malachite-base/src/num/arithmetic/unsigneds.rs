@@ -1,25 +1,19 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModAdd,
-    ModAddAssign, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
-    ModNeg, ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign,
-    ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
-    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub,
-    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
-    NextPowerOfTwoAssign, Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound,
-    ShrRoundAssign, TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingMulAssign,
-    WrappingNegAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod, ModNeg,
+    ModNegAssign, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign,
+    ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign, ModPowerOfTwoNeg,
+    ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod,
+    NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign,
+    Parity, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign,
+    TrueCheckedShl, TrueCheckedShr, WrappingAddAssign, WrappingMulAssign, WrappingNegAssign,
+    WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::{LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use round::RoundingMode;
-
-pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
-    let (product_1, product_0) = T::x_mul_y_is_zz(x, y);
-    T::xx_div_mod_y_is_qr(product_1, product_0, m).1
-}
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
@@ -42,32 +36,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool {
                 self.significant_bits() <= pow
-            }
-        }
-
-        impl ModIsReduced for $t {
-            /// Returns whether `self` is reduced mod `m`; in other words whether it is less than
-            /// `m`. `m` cannot be zero.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `m` is 0.
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModIsReduced;
-            ///
-            /// assert_eq!(0u8.mod_is_reduced(&5), true);
-            /// assert_eq!(100u64.mod_is_reduced(&100), false);
-            /// assert_eq!(100u16.mod_is_reduced(&101), true);
-            /// ```
-            #[inline]
-            fn mod_is_reduced(&self, m: &$t) -> bool {
-                assert_ne!(*m, 0);
-                self < m
             }
         }
 
@@ -242,67 +210,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl ModAdd for $t {
-            type Output = $t;
-
-            /// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAdd;
-            ///
-            /// assert_eq!(0u8.mod_add(3, 5), 3);
-            /// assert_eq!(7u32.mod_add(5, 10), 2);
-            /// ```
-            ///
-            /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
-            #[inline]
-            fn mod_add(self, rhs: $t, m: $t) -> $t {
-                let neg = m - self;
-                if neg > rhs {
-                    self + rhs
-                } else {
-                    rhs - neg
-                }
-            }
-        }
-
-        impl ModAddAssign for $t {
-            /// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAddAssign;
-            ///
-            /// let mut n = 0u8;
-            /// n.mod_add_assign(3, 5);
-            /// assert_eq!(n, 3);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_add_assign(5, 10);
-            /// assert_eq!(n, 2);
-            /// ```
-            ///
-            /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
-            #[inline]
-            fn mod_add_assign(&mut self, rhs: $t, m: $t) {
-                let neg = m - *self;
-                if neg > rhs {
-                    *self += rhs;
-                } else {
-                    *self = rhs - neg;
-                }
-            }
-        }
-
         impl ModPowerOfTwoSub for $t {
             type Output = $t;
 
@@ -460,151 +367,6 @@ macro_rules! impl_arithmetic_traits {
                 assert!(pow <= $t::WIDTH);
                 self.wrapping_mul_assign(rhs);
                 self.mod_power_of_two_assign(pow);
-            }
-        }
-
-        impl ModMulPrecomputed<$t, $t, $t> for $t {
-            type Output = $t;
-
-            /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
-            /// `mod_mul_precomputed_assign`.
-            ///
-            /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
-            fn precompute_mod_mul_data(_m: $t) -> $t {
-                //TODO real implementation
-                0
-            }
-
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
-            /// precomputed data is provided; this speeds up computations involving several modular
-            /// multiplications with the same modulus. The precomputed data should be obtained using
-            /// `precompute_mod_mul_data`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
-            ///
-            /// let data = u8::precompute_mod_mul_data(7);
-            /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
-            /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
-            /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
-            ///
-            /// let data = u32::precompute_mod_mul_data(10);
-            /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
-            /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
-            /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
-            /// ```
-            ///
-            /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-            fn mod_mul_precomputed(self, rhs: $t, m: $t, _data: &$t) -> $t {
-                //TODO real implementation
-                _naive_mod_mul(self, rhs, m)
-            }
-        }
-
-        impl ModMulPrecomputedAssign<$t, $t, $t> for $t {
-            /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced
-            /// mod `m`. Some precomputed data is provided; this speeds up computations involving
-            /// several modular multiplications with the same modulus. The precomputed data should
-            /// be obtained using `precompute_mod_mul_data`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::*;
-            ///
-            /// let data = u8::precompute_mod_mul_data(7);
-            ///
-            /// let mut x = 2u8;
-            /// x.mod_mul_precomputed_assign(3, 7, &data);
-            /// assert_eq!(x, 6);
-            ///
-            /// let mut x = 5u8;
-            /// x.mod_mul_precomputed_assign(3, 7, &data);
-            /// assert_eq!(x, 1);
-            ///
-            /// let mut x = 4u8;
-            /// x.mod_mul_precomputed_assign(4, 7, &data);
-            /// assert_eq!(x, 2);
-            ///
-            /// let data = u32::precompute_mod_mul_data(10);
-            ///
-            /// let mut x = 7u32;
-            /// x.mod_mul_precomputed_assign(3, 10, &data);
-            /// assert_eq!(x, 1);
-            ///
-            /// let mut x = 4u32;
-            /// x.mod_mul_precomputed_assign(9, 10, &data);
-            /// assert_eq!(x, 6);
-            ///
-            /// let mut x = 5u32;
-            /// x.mod_mul_precomputed_assign(8, 10, &data);
-            /// assert_eq!(x, 0);
-            /// ```
-            ///
-            /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
-            /// assigned to a.
-            #[inline]
-            fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, data: &$t) {
-                *self = self.mod_mul_precomputed(rhs, m, data);
-            }
-        }
-
-        impl ModMul for $t {
-            type Output = $t;
-
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMul;
-            ///
-            /// assert_eq!(2u8.mod_mul(3, 7), 6);
-            /// assert_eq!(7u32.mod_mul(3, 10), 1);
-            /// ```
-            ///
-            /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
-            #[inline]
-            fn mod_mul(self, rhs: $t, m: $t) -> $t {
-                self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m))
-            }
-        }
-
-        impl ModMulAssign for $t {
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMulAssign;
-            ///
-            /// let mut n = 2u8;
-            /// n.mod_mul_assign(3, 7);
-            /// assert_eq!(n, 6);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_mul_assign(3, 10);
-            /// assert_eq!(n, 1);
-            /// ```
-            ///
-            /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
-            #[inline]
-            fn mod_mul_assign(&mut self, rhs: $t, m: $t) {
-                *self = self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m));
             }
         }
 

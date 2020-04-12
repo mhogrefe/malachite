@@ -2,17 +2,16 @@ use std::cmp::Ordering;
 
 use comparison::Min;
 use num::arithmetic::traits::{
-    CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem, CheckedSub,
-    DivAssignRem, DivExact, DivExactAssign, DivRem, DivRound, DivRoundAssign, DivisibleBy,
-    DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, OverflowingAdd,
-    OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
-    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
-    OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow, SaturatingAdd,
-    SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
-    SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, UnsignedAbs,
-    WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
-    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub,
-    WrappingSubAssign,
+    CheckedAdd, CheckedDiv, CheckedMul, CheckedPow, CheckedRem, CheckedSub, DivAssignRem, DivExact,
+    DivExactAssign, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, EqMod,
+    EqModPowerOfTwo, Mod, ModAssign, OverflowingAdd, OverflowingAddAssign, OverflowingDiv,
+    OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
+    OverflowingNegAssign, OverflowingPow, OverflowingRem, OverflowingRemAssign, OverflowingSub,
+    OverflowingSubAssign, Parity, Pow, SaturatingAdd, SaturatingAddAssign, SaturatingMul,
+    SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, ShlRound,
+    ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, UnsignedAbs, WrappingAdd, WrappingAddAssign,
+    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
+    WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign,
 };
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use round::RoundingMode;
@@ -40,15 +39,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn sign(&self) -> Ordering {
                 self.cmp(&0)
-            }
-        }
-
-        impl CheckedNeg for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_neg(self) -> Option<$t> {
-                $t::checked_neg(self)
             }
         }
 

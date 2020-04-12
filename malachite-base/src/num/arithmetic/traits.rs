@@ -432,12 +432,13 @@ pub trait ModMulAssign<RHS = Self, M = Self> {
 /// modular multiplications with the same modulus are necessary, it can be quicker to precompute
 /// some piece of data and reuse it in the multiplication calls. This trait provides a method for
 /// precomputing the data and a method for using it during multiplication.
-pub trait ModMulPrecomputed<D, RHS = Self, M = Self> {
+pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     type Output;
+    type Data;
 
-    fn precompute_mod_mul_data(m: M) -> D;
+    fn precompute_mod_mul_data(m: M) -> Self::Data;
 
-    fn mod_mul_precomputed(self, rhs: RHS, m: M, data: &D) -> Self::Output;
+    fn mod_mul_precomputed(self, rhs: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
 /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. If
@@ -445,8 +446,8 @@ pub trait ModMulPrecomputed<D, RHS = Self, M = Self> {
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
 /// method for using precomputed data during multiplication. For precomputing the data, use the
 /// `precompute_mod_mul_data` function in `ModMulPrecomputed`.
-pub trait ModMulPrecomputedAssign<D, RHS = Self, M = Self>: ModMulPrecomputed<D, RHS, M> {
-    fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &D);
+pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, M> {
+    fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &Self::Data);
 }
 
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,

@@ -1,5 +1,11 @@
 pub mod arithmetic {
+    pub mod abs;
+    pub mod checked_abs;
+    pub mod checked_neg;
     pub mod integers;
+    pub mod mod_add;
+    pub mod mod_is_reduced;
+    pub mod mod_mul;
     pub mod signeds;
     pub mod traits;
     pub mod unsigneds;

@@ -35,8 +35,8 @@ pub trait PrimitiveUnsigned:
     + ModAddAssign<Self, Self>
     + ModMul<Self, Self, Output = Self>
     + ModMulAssign<Self, Self>
-    + ModMulPrecomputed<Self, Self, Self, Output = Self>
-    + ModMulPrecomputedAssign<Self, Self, Self>
+    + ModMulPrecomputed<Self, Self, Output = Self>
+    + ModMulPrecomputedAssign<Self, Self>
     + ModNeg<Self, Output = Self>
     + ModNegAssign<Self>
     + ModPowerOfTwo<Output = Self>
