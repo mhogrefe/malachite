@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
-    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOfTwo, PowerOfTwo,
-    WrappingAddAssign, WrappingSubAssign,
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOfTwo,
+    WrappingSubAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -16,7 +16,7 @@ const INVERT_U32_TABLE_LOG_SIZE: u64 = 9;
 
 const INVERT_U32_TABLE_SIZE: usize = 1 << INVERT_U32_TABLE_LOG_SIZE;
 
-// rec_word_tab[i] = div(2^24 - 2^14 + 2^9, 2^9 + i)
+// INVERT_U32_TABLE[i] = floor((2^24 - 2^14 + 2^9) / (2^9 + i))
 #[allow(clippy::decimal_literal_representation)]
 const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
     32737, 32673, 32609, 32546, 32483, 32420, 32357, 32295, 32233, 32171, 32109, 32048, 31987,
@@ -61,31 +61,51 @@ const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
     16448, 16432, 16416, 16400, 16384,
 ];
 
+/// Tests that `INVERT_U32_TABLE` is correct.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::arithmetic::mod_mul::test_invert_u32_table;
+///
+/// test_invert_u32_table();
+/// ```
+pub fn test_invert_u32_table() {
+    for (i, &x) in INVERT_U32_TABLE.iter().enumerate() {
+        let value = (u32::power_of_two(24) - u32::power_of_two(14) + u32::power_of_two(9))
+            / (u32::power_of_two(9) + u32::exact_from(i));
+        assert_eq!(
+            x, value,
+            "INVERT_U32_TABLE gives incorrect value, {}, for index {}",
+            x, i
+        );
+    }
+}
+
 /// This is invert_limb from ulong_extras.h, FLINT Dev 1, when GMP_LIMB_BITS == 32.
-fn invert_limb_u32(d: u32) -> u32 {
-    assert!(d.get_highest_bit());
-    let _v0 = INVERT_U32_TABLE[usize::exact_from((d >> 22).mod_power_of_two(9))];
-    let _d21 = (d >> 11) + 1;
-    let mut _m0 = _v0 * _v0;
-    let (mut _v1, mut _e) = (u64::from(_m0) * u64::from(_d21)).split_in_half();
-    _v1 = (_v0 << 4).wrapping_sub(_v1).wrapping_sub(1);
-    _e = _v1.wrapping_mul(d >> 1).wrapping_neg();
-    _m0 = (d & 1).wrapping_neg();
-    _e.wrapping_sub_assign(_v1.wrapping_sub(_v1 >> 1) & _m0);
-    let (mut _v2, _m0) = (u64::from(_v1) * u64::from(_e)).split_in_half();
-    _v2 = (_v1 << 15).wrapping_add(_v2 >> 1);
-    let (_v0, _d21) = (u64::from(_v2) * u64::from(d)).split_in_half();
-    let (_v0, _d21) = u64::join_halves(_v0, _d21)
-        .wrapping_add(u64::from(d))
-        .split_in_half();
-    _v2.wrapping_sub(_v0.wrapping_add(d))
+fn invert_limb_u32(x: u32) -> u32 {
+    assert!(x.get_highest_bit());
+    let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
+    let b = (a << 4)
+        .wrapping_sub((u64::from(a * a) * u64::from((x >> 11) + 1)).upper_half())
+        .wrapping_sub(1);
+    let mut c = b.wrapping_mul(x >> 1).wrapping_neg();
+    if x.odd() {
+        c.wrapping_sub_assign(b.wrapping_sub(b >> 1));
+    }
+    let d = (b << 15).wrapping_add((u64::from(b) * u64::from(c)).upper_half() >> 1);
+    d.wrapping_sub(
+        (u64::from(d) * u64::from(x))
+            .wrapping_add(u64::from(x))
+            .upper_half()
+            .wrapping_add(x),
+    )
 }
 
 const INVERT_U64_TABLE_LOG_SIZE: u64 = 8;
 
 const INVERT_U64_TABLE_SIZE: usize = 1 << INVERT_U64_TABLE_LOG_SIZE;
 
-// rec_word_tab[i] = div(2^19 - 3*2^8, 2^8 + i)
+// INVERT_U32_TABLE[i] = floor((2^19 - 3*2^8) / (2^8 + i))
 const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
     2045, 2037, 2029, 2021, 2013, 2005, 1998, 1990, 1983, 1975, 1968, 1960, 1953, 1946, 1938, 1931,
     1924, 1917, 1910, 1903, 1896, 1889, 1883, 1876, 1869, 1863, 1856, 1849, 1843, 1836, 1830, 1824,
@@ -105,102 +125,126 @@ const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
     1055, 1053, 1051, 1049, 1047, 1044, 1042, 1040, 1038, 1036, 1034, 1032, 1030, 1028, 1026, 1024,
 ];
 
-/// This is invert_limb from ulong_extras.h, FLINT Dev 1, when GMP_LIMB_BITS == 64.
-fn invert_limb_u64(d: u64) -> u64 {
-    assert!(d.get_highest_bit());
-    let _d40 = (d >> 24) + 1;
-    let mut _v0 = INVERT_U64_TABLE[usize::exact_from((d >> 55).mod_power_of_two(8))];
-    _v0 = (_v0 << 11)
-        .wrapping_sub((_v0 * _v0).wrapping_mul(_d40) >> 40)
-        .wrapping_sub(1);
-    let mut _v2 =
-        _v0.wrapping_mul(u64::power_of_two(60).wrapping_sub(_v0.wrapping_mul(_d40))) >> 47;
-    _v2.wrapping_add_assign(_v0 << 13);
-    let mut _e = _v2.wrapping_mul(d >> 1).wrapping_neg();
-    let _m0 = (d & 1).wrapping_neg();
-    _e.wrapping_sub_assign(_v2.wrapping_sub(_v2 >> 1) & _m0);
-    let (_v0, _d40) = (u128::from(_v2) * u128::from(_e)).split_in_half();
-    _v2 = (_v2 << 31).wrapping_add(_v0 >> 1);
-    let (_v0, _d40) = (u128::from(_v2) * u128::from(d)).split_in_half();
-    let (_v0, _d40) = u128::join_halves(_v0, _d40)
-        .wrapping_add(u128::from(d))
-        .split_in_half();
-    _v2.wrapping_sub(_v0.wrapping_add(d))
-}
-
-//TODO move this
-fn wrapping_shr<T: PrimitiveUnsigned>(x: T, shift: u64) -> T {
-    if shift >= T::WIDTH {
-        T::ZERO
-    } else {
-        x >> shift
+/// Tests that `INVERT_U64_TABLE` is correct.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::arithmetic::mod_mul::test_invert_u64_table;
+///
+/// test_invert_u64_table();
+/// ```
+pub fn test_invert_u64_table() {
+    for (i, &x) in INVERT_U64_TABLE.iter().enumerate() {
+        let value = (u64::power_of_two(19) - 3 * u64::power_of_two(8))
+            / (u64::power_of_two(8) + u64::exact_from(i));
+        assert_eq!(
+            x, value,
+            "INVERT_U64_TABLE gives incorrect value, {}, for index {}",
+            x, i
+        );
     }
 }
 
+/// This is invert_limb from ulong_extras.h, FLINT Dev 1, when GMP_LIMB_BITS == 64.
+fn invert_limb_u64(x: u64) -> u64 {
+    assert!(x.get_highest_bit());
+    let a = (x >> 24) + 1;
+    let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
+    let c = (b << 11).wrapping_sub(((b * b).wrapping_mul(a) >> 40) + 1);
+    let d = (c.wrapping_mul(u64::power_of_two(60).wrapping_sub(c.wrapping_mul(a))) >> 47)
+        .wrapping_add(c << 13);
+    let mut e = d.wrapping_mul(x >> 1).wrapping_neg();
+    if x.odd() {
+        e.wrapping_sub_assign(d.wrapping_sub(d >> 1));
+    }
+    let f = (d << 31).wrapping_add((u128::from(d) * u128::from(e)).upper_half() >> 1);
+    f.wrapping_sub(
+        (u128::from(f) * u128::from(x))
+            .wrapping_add(u128::from(x))
+            .upper_half()
+            .wrapping_add(x),
+    )
+}
+
 // This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT Dev 1.
-fn n_ll_mod_preinv<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
-    mut a_hi: T,
-    a_lo: T,
-    mut n: T,
-    ninv: T,
+fn _mod_preinverted<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+    mut x_1: T,
+    x_0: T,
+    m: T,
+    inv: T,
 ) -> T
 where
     DT: From<T> + HasHalf<Half = T>,
 {
-    assert_ne!(n, T::ZERO);
-    let norm = LeadingZeros::leading_zeros(n);
-    // reduce a_hi modulo n
-    if a_hi >= n {
-        let u1 = wrapping_shr(a_hi, T::WIDTH - norm);
-        let u0 = a_hi << norm;
-        n <<= norm;
-        let (q1, q0) = (DT::from(ninv) * DT::from(u1)).split_in_half();
-        let (q1, q0) = DT::join_halves(q1, q0)
-            .wrapping_add(DT::join_halves(u1, u0))
+    assert_ne!(m, T::ZERO);
+    let inv = DT::from(inv);
+    let shift = LeadingZeros::leading_zeros(m);
+    if shift == 0 {
+        if x_1 >= m {
+            x_1 -= m;
+        }
+        let (q_1, q_0) = (inv * DT::from(x_1))
+            .wrapping_add(DT::join_halves(x_1, x_0))
             .split_in_half();
-        a_hi = u0.wrapping_sub(q1.wrapping_add(T::ONE).wrapping_mul(n));
-        if a_hi > q0 {
-            a_hi.wrapping_add_assign(n);
+        let mut r = x_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(m));
+        if r > q_0 {
+            r.wrapping_add_assign(m);
         }
-        if a_hi >= n {
-            a_hi -= n;
+        if r < m {
+            r
+        } else {
+            r - m
         }
     } else {
-        n <<= norm;
-        a_hi <<= norm;
-    }
-    // now reduce the rest of the way
-    let u1 = a_hi.wrapping_add(wrapping_shr(a_lo, T::WIDTH - norm));
-    let u0 = a_lo << norm;
-
-    let (q1, q0) = (DT::from(ninv) * DT::from(u1)).split_in_half();
-    let (q1, q0) = DT::join_halves(q1, q0)
-        .wrapping_add(DT::join_halves(u1, u0))
-        .split_in_half();
-    let mut r = u0.wrapping_sub(q1.wrapping_add(T::ONE).wrapping_mul(n));
-    if r > q0 {
-        r.wrapping_add_assign(n);
-    }
-    if r < n {
-        r >> norm
-    } else {
-        (r - n) >> norm
+        let mut m = m;
+        if x_1 >= m {
+            let y_1 = x_1 >> (T::WIDTH - shift);
+            let y_0 = x_1 << shift;
+            m <<= shift;
+            let (q1, q0) = (inv * DT::from(y_1))
+                .wrapping_add(DT::join_halves(y_1, y_0))
+                .split_in_half();
+            x_1 = y_0.wrapping_sub(q1.wrapping_add(T::ONE).wrapping_mul(m));
+            if x_1 > q0 {
+                x_1.wrapping_add_assign(m);
+            }
+            if x_1 >= m {
+                x_1 -= m;
+            }
+        } else {
+            m <<= shift;
+            x_1 <<= shift;
+        }
+        let y_1 = x_1.wrapping_add(x_0 >> (T::WIDTH - shift));
+        let y_0 = x_0 << shift;
+        let (q_1, q_0) = (inv * DT::from(y_1))
+            .wrapping_add(DT::join_halves(y_1, y_0))
+            .split_in_half();
+        let mut r = y_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(m));
+        if r > q_0 {
+            r.wrapping_add_assign(m);
+        }
+        if r < m {
+            r >> shift
+        } else {
+            (r - m) >> shift
+        }
     }
 }
 
 // This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-fn _fast_mul_mod<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
-    a: T,
-    b: T,
-    n: T,
-    ninv: T,
+pub fn _fast_mod_mul<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+    x: T,
+    y: T,
+    m: T,
+    inv: T,
 ) -> T
 where
     DT: From<T> + HasHalf<Half = T>,
 {
-    assert_ne!(n, T::ZERO);
-    let (p1, p2) = (DT::from(a) * DT::from(b)).split_in_half();
-    n_ll_mod_preinv::<T, DT>(p1, p2, n, ninv)
+    assert_ne!(m, T::ZERO);
+    let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
+    _mod_preinverted::<T, DT>(product_1, product_0, m, inv)
 }
 
 macro_rules! impl_mod_mul_precomputed_fast {
@@ -243,7 +287,7 @@ macro_rules! impl_mod_mul_precomputed_fast {
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
             fn mod_mul_precomputed(self, rhs: $t, m: $t, data: &$t) -> $t {
-                _fast_mul_mod::<$t, $dt>(self, rhs, m, *data)
+                _fast_mod_mul::<$t, $dt>(self, rhs, m, *data)
             }
         }
     };
@@ -311,8 +355,6 @@ impl ModMulPrecomputed<u128, u128> for u128 {
 
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// `mod_mul_precomputed_assign`.
-    ///
-    /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
     fn precompute_mod_mul_data(_m: u128) {}
 
     /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
@@ -436,8 +478,8 @@ macro_rules! impl_mod_mul {
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
             /// assigned to a.
             #[inline]
-            fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, data: &Self::Data) {
-                *self = self.mod_mul_precomputed(rhs, m, data);
+            fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, _data: &Self::Data) {
+                *self = _naive_mod_mul(*self, rhs, m);
             }
         }
 
@@ -461,7 +503,7 @@ macro_rules! impl_mod_mul {
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
             #[inline]
             fn mod_mul(self, rhs: $t, m: $t) -> $t {
-                self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m))
+                _naive_mod_mul(self, rhs, m)
             }
         }
 
@@ -488,7 +530,7 @@ macro_rules! impl_mod_mul {
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
             fn mod_mul_assign(&mut self, rhs: $t, m: $t) {
-                *self = self.mod_mul_precomputed(rhs, m, &$t::precompute_mod_mul_data(m));
+                *self = _naive_mod_mul(*self, rhs, m);
             }
         }
     };

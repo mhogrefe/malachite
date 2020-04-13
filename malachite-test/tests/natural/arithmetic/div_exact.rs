@@ -40,7 +40,7 @@ use malachite_test::inputs::natural::{
 };
 
 #[test]
-fn test_invert_limb_table() {
+fn test_test_invert_limb_table() {
     div_exact::test_invert_limb_table();
 }
 

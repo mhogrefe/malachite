@@ -25,7 +25,7 @@
     clippy::type_repetition_in_bounds,
     clippy::unused_self
 )]
-#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::cognitive_complexity, clippy::many_single_char_names)]
 
 pub mod bools;
 pub mod chars;

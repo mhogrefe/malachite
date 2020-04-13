@@ -118,32 +118,35 @@ macro_rules! float_impls {
             }
         }
 
-        //TODO clean
-
-        /// Converts an `Integer` to the nearest `f32` or an `f64`. The `Integer` is taken by value.
-        /// If there are two nearest floats, the one whose least-significant bit is zero is chosen.
-        /// If the input is larger than the maximum finite value representable by the floating-point
-        /// type, the result is the maximum finite float. If the input is smaller than the minimum
-        /// (most negative) finite value, the result is the minimum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::from(Integer::from_str("123").unwrap()), 123.0);
-        /// assert_eq!(f32::from(Integer::from_str("-1000000001").unwrap()), -1.0e9);
-        /// assert_eq!(f32::from(
-        ///     Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), 3.4028235e38);
-        /// ```
         impl From<Integer> for $f {
+            /// Converts an `Integer` to the nearest `f32` or an `f64`. The `Integer` is taken by
+            /// value. If there are two nearest floats, the one whose least-significant bit is zero
+            /// is chosen. If the input is larger than the maximum finite value representable by the
+            /// floating-point type, the result is the maximum finite float. If the input is smaller
+            /// than the minimum (most negative) finite value, the result is the minimum finite
+            /// float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::from(Integer::from_str("123").unwrap()), 123.0);
+            /// assert_eq!(f32::from(Integer::from_str("-1000000001").unwrap()), -1.0e9);
+            /// assert_eq!(
+            ///     f32::from(
+            ///         Integer::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     3.4028235e38
+            /// );
+            /// ```
             fn from(value: Integer) -> $f {
                 let abs = $f::from(value.abs);
                 if value.sign {
@@ -153,6 +156,8 @@ macro_rules! float_impls {
                 }
             }
         }
+
+        //TODO clean
 
         /// Converts an `Integer` to the nearest `f32` or an `f64`. The `Integer` is taken by
         /// reference. If there are two nearest floats, the one whose least-significant bit is zero

@@ -6,6 +6,12 @@ pub mod arithmetic {
     pub mod mod_add;
     pub mod mod_is_reduced;
     pub mod mod_mul;
+    pub mod mod_neg;
+    pub mod mod_power_of_two_add;
+    pub mod mod_power_of_two_is_reduced;
+    pub mod mod_power_of_two_mul;
+    pub mod mod_power_of_two_neg;
+    pub mod mod_power_of_two_sub;
     pub mod signeds;
     pub mod traits;
     pub mod unsigneds;

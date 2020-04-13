@@ -1,4 +1,15 @@
+use malachite_base::num::arithmetic::mod_mul::{test_invert_u32_table, test_invert_u64_table};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+
+#[test]
+fn test_test_invert_u32_table() {
+    test_invert_u32_table();
+}
+
+#[test]
+fn test_test_invert_u64_table() {
+    test_invert_u64_table();
+}
 
 fn mod_mul_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, y: T, m, out| {
