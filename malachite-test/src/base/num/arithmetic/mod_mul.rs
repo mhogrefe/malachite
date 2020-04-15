@@ -1,6 +1,7 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::mod_mul::{_fast_mod_mul, _naive_mod_mul};
+use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf};
 use rand::distributions::range::SampleRange;
@@ -8,7 +9,6 @@ use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_unsigneds_var_1;
-use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_mod_mul);

@@ -17,7 +17,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Examples
 /// ```
@@ -28,14 +28,14 @@ use platform::Limb;
 /// ```
 pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
-    let mut result_limbs = vec![0; i];
+    let mut result = vec![0; i];
     if i != xs.len() {
-        result_limbs.push(xs[i].wrapping_neg());
+        result.push(xs[i].wrapping_neg());
         for x in &xs[i + 1..] {
-            result_limbs.push(!x);
+            result.push(!x);
         }
     }
-    result_limbs
+    result
 }
 
 /// Given the limbs of a non-negative `Integer`, in ascending order, checks whether the most
@@ -50,18 +50,20 @@ pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 /// ```
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 ///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[1, 2, 3]);
+/// let mut xs = vec![1, 2, 3];
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
+/// assert_eq!(xs, &[1, 2, 3]);
 ///
-/// let mut limbs = vec![1, 2, 0xffff_ffff];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[1, 2, 0xffff_ffff, 0]);
+/// let mut xs = vec![1, 2, 0xffff_ffff];
+/// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
+/// assert_eq!(xs, &[1, 2, 0xffff_ffff, 0]);
 /// ```
 pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
-    if !xs.is_empty() && xs.last().unwrap().get_highest_bit() {
-        // Sign-extend with an extra 0 limb to indicate a positive Integer
-        xs.push(0);
+    if let Some(last) = xs.last() {
+        if last.get_highest_bit() {
+            // Sign-extend with an extra 0 limb to indicate a positive Integer
+            xs.push(0);
+        }
     }
 }
 
@@ -73,19 +75,19 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+/// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 ///
-/// let mut limbs = &mut [1, 2, 3];
-/// assert!(!limbs_twos_complement_in_place(limbs));
-/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+/// let mut xs = &mut [1, 2, 3];
+/// assert!(!limbs_twos_complement_in_place(xs));
+/// assert_eq!(xs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
 ///
-/// let mut limbs = &mut [0, 0, 0];
-/// assert!(limbs_twos_complement_in_place(limbs));
-/// assert_eq!(limbs, &[0, 0, 0]);
+/// let mut xs = &mut [0, 0, 0];
+/// assert!(limbs_twos_complement_in_place(xs));
+/// assert_eq!(xs, &[0, 0, 0]);
 /// ```
 pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
@@ -101,28 +103,30 @@ pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` contains only zeros.
+/// Panics if `xs` contains only zeros.
 ///
 /// # Examples
 /// ```
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 ///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+/// let mut xs = vec![1, 2, 3];
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
+/// assert_eq!(xs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
 ///
-/// let mut limbs = vec![0, 0xffff_ffff];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0, 1, 0xffff_ffff]);
+/// let mut xs = vec![0, 0xffff_ffff];
+/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
+/// assert_eq!(xs, &[0, 1, 0xffff_ffff]);
 /// ```
 pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
-    if !xs.last().unwrap().get_highest_bit() {
-        // Sign-extend with an extra !0 limb to indicate a negative Integer
-        xs.push(Limb::MAX);
+    if let Some(last) = xs.last() {
+        if !last.get_highest_bit() {
+            // Sign-extend with an extra !0 limb to indicate a negative Integer
+            xs.push(Limb::MAX);
+        }
     }
 }
 
@@ -418,13 +422,12 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
 }
 
 impl Integer {
-    /// Returns the limbs of an `Integer`, in ascending order,
-    /// so that less significant limbs have lower indices in the output vector. The limbs are in
-    /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
-    /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
-    /// trailing zero limbs if the `Integer` is positive or trailing !0 limbs if `Integer` is
-    /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
-    /// contains no limbs.
+    /// Returns the limbs of an `Integer`, in ascending order, so that less significant limbs have
+    /// lower indices in the output vector. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
+    /// positive, and if the bit is one it is negative. There are no trailing zero limbs if the
+    /// `Integer` is positive or trailing !0 limbs if `Integer` is negative, except as necessary to
+    /// include the correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible,
     /// `into_twos_complement_limbs_asc` is more efficient.
@@ -462,13 +465,12 @@ impl Integer {
         limbs
     }
 
-    /// Returns the limbs of an `Integer`, in descending order, so
-    /// that less significant limbs have higher indices in the output vector. The limbs are in two's
-    /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
-    /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
-    /// leading zero limbs if the `Integer` is non-negative or leading !0 limbs if `Integer` is
-    /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
-    /// contains no limbs.
+    /// Returns the limbs of an `Integer`, in descending order, so that less significant limbs have
+    /// higher indices in the output vector. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
+    /// positive, and if the bit is one it is negative. There are no leading zero limbs if the
+    /// `Integer` is non-negative or leading !0 limbs if `Integer` is negative, except as necessary
+    /// to include the correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This is similar to how BigIntegers in Java are represented.
     ///
@@ -500,18 +502,17 @@ impl Integer {
     ///     &[4294967063, 727379968]);
     /// ```
     pub fn to_twos_complement_limbs_desc(&self) -> Vec<Limb> {
-        let mut limbs = self.to_twos_complement_limbs_asc();
-        limbs.reverse();
-        limbs
+        let mut xs = self.to_twos_complement_limbs_asc();
+        xs.reverse();
+        xs
     }
 
-    /// Returns the limbs of an `Integer`, in ascending order,
-    /// so that less significant limbs have lower indices in the output vector. The limbs are in
-    /// two's complement, and the most significant bit of the limbs indicates the sign; if the bit
-    /// is zero, the `Integer` is positive, and if the bit is one it is negative. There are no
-    /// trailing zero limbs if the `Integer` is positive or trailing !0 limbs if `Integer` is
-    /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
-    /// contains no limbs.
+    /// Returns the limbs of an `Integer`, in ascending order, so that less significant limbs have
+    /// lower indices in the output vector. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
+    /// positive, and if the bit is one it is negative. There are no trailing zero limbs if the
+    /// `Integer` is positive or trailing !0 limbs if `Integer` is negative, except as necessary to
+    /// include the correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// `to_twos_complement_limbs_asc`.
@@ -541,22 +542,21 @@ impl Integer {
     ///     &[727379968, 4294967063]);
     /// ```
     pub fn into_twos_complement_limbs_asc(self) -> Vec<Limb> {
-        let mut limbs = self.abs.into_limbs_asc();
+        let mut xs = self.abs.into_limbs_asc();
         if self.sign {
-            limbs_maybe_sign_extend_non_negative_in_place(&mut limbs);
+            limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
         } else {
-            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut limbs);
+            limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
         }
-        limbs
+        xs
     }
 
-    /// Returns the limbs of an `Integer`, in descending order, so
-    /// that less significant limbs have higher indices in the output vector. The limbs are in two's
-    /// complement, and the most significant bit of the limbs indicates the sign; if the bit is
-    /// zero, the `Integer` is positive, and if the bit is one it is negative. There are no
-    /// leading zero limbs if the `Integer` is non-negative or leading !0 limbs if `Integer` is
-    /// negative, except as necessary to include the correct sign bit. Zero is a special case: it
-    /// contains no limbs.
+    /// Returns the limbs of an `Integer`, in descending order, so that less significant limbs have
+    /// higher indices in the output vector. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
+    /// positive, and if the bit is one it is negative. There are no leading zero limbs if the
+    /// `Integer` is non-negative or leading !0 limbs if `Integer` is negative, except as necessary
+    /// to include the correct sign bit. Zero is a special case: it contains no limbs.
     ///
     /// This is similar to how BigIntegers in Java are represented.
     ///
@@ -589,14 +589,14 @@ impl Integer {
     ///     &[4294967063, 727379968]);
     /// ```
     pub fn into_twos_complement_limbs_desc(self) -> Vec<Limb> {
-        let mut limbs = self.into_twos_complement_limbs_asc();
-        limbs.reverse();
-        limbs
+        let mut xs = self.into_twos_complement_limbs_asc();
+        xs.reverse();
+        xs
     }
 
     /// Returns a double-ended iterator over the twos-complement limbs of an `Integer`. The forward
-    /// order is ascending, so that less significant limbs appear first. There may be a
-    /// most-significant sign-extension limb.
+    /// order is ascending, so that less significant limbs appear first. There may be a most-
+    /// significant sign-extension limb.
     ///
     /// If it's necessary to get a `Vec` of all the twos_complement limbs, consider using
     /// `to_twos_complement_limbs_asc`,

@@ -154,7 +154,7 @@ pub fn limbs_mod_power_of_two_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) ->
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
+/// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
 /// already reduced mod 2<sup>`pow`</sup>.
 ///
 /// Time: worst case O(n)
@@ -346,10 +346,10 @@ pub fn limbs_mod_power_of_two_add_in_place_either(
 }
 
 impl Natural {
-    fn mod_power_of_two_add_limb_ref(&self, other: Limb, pow: u64) -> Natural {
-        match (&*self, other, pow) {
+    fn mod_power_of_two_add_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+        match (&*self, y, pow) {
             (_, 0, _) => self.clone(),
-            (&natural_zero!(), _, _) => Natural(Small(other)),
+            (&natural_zero!(), _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(small.mod_power_of_two_add(other, pow)))
             }
@@ -369,10 +369,10 @@ impl Natural {
         }
     }
 
-    fn mod_power_of_two_add_assign_limb(&mut self, other: Limb, pow: u64) {
-        match (&mut *self, other, pow) {
+    fn mod_power_of_two_add_assign_limb(&mut self, y: Limb, pow: u64) {
+        match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut natural_zero!(), _, _) => *self = Natural(Small(other)),
+            (&mut natural_zero!(), _, _) => *self = Natural(Small(y)),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_two_add_assign(other, pow)
             }
@@ -384,8 +384,8 @@ impl Natural {
                     *small = sum;
                 }
             }
-            (&mut Natural(Large(ref mut limbs)), other, pow) => {
-                limbs_vec_mod_power_of_two_add_limb_in_place(limbs, other, pow);
+            (&mut Natural(Large(ref mut limbs)), y, pow) => {
+                limbs_vec_mod_power_of_two_add_limb_in_place(limbs, y, pow);
                 self.trim();
             }
         }

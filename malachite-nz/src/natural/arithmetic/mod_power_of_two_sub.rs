@@ -226,10 +226,10 @@ pub fn limbs_mod_power_of_two_sub_in_place_either(
 }
 
 impl Natural {
-    fn mod_power_of_two_sub_limb_ref(&self, other: Limb, pow: u64) -> Natural {
-        match (&*self, other, pow) {
+    fn mod_power_of_two_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+        match (&*self, y, pow) {
             (x, 0, _) => x.clone(),
-            (&natural_zero!(), _, _) => Natural(Small(other)).mod_power_of_two_neg(pow),
+            (&natural_zero!(), _, _) => Natural(Small(y)).mod_power_of_two_neg(pow),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(small.mod_power_of_two_sub(other, pow)))
             }
@@ -252,10 +252,10 @@ impl Natural {
     }
 
     // other - self
-    fn mod_power_of_two_right_sub_limb_ref(&self, other: Limb, pow: u64) -> Natural {
-        match (&*self, other, pow) {
+    fn mod_power_of_two_right_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {
+        match (&*self, y, pow) {
             (_, 0, _) => self.mod_power_of_two_neg(pow),
-            (&natural_zero!(), _, _) => Natural(Small(other)),
+            (&natural_zero!(), _, _) => Natural(Small(y)),
             (&Natural(Small(small)), other, pow) if pow <= Limb::WIDTH => {
                 Natural(Small(other.mod_power_of_two_sub(small, pow)))
             }
@@ -279,10 +279,10 @@ impl Natural {
         }
     }
 
-    fn mod_power_of_two_sub_assign_limb(&mut self, other: Limb, pow: u64) {
-        match (&mut *self, other, pow) {
+    fn mod_power_of_two_sub_assign_limb(&mut self, y: Limb, pow: u64) {
+        match (&mut *self, y, pow) {
             (_, 0, _) => {}
-            (&mut natural_zero!(), _, _) => *self = Natural(Small(other)).mod_power_of_two_neg(pow),
+            (&mut natural_zero!(), _, _) => *self = Natural(Small(y)).mod_power_of_two_neg(pow),
             (&mut Natural(Small(ref mut small)), other, pow) if pow <= Limb::WIDTH => {
                 small.mod_power_of_two_sub_assign(other, pow)
             }

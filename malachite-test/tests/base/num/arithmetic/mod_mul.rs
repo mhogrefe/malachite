@@ -1,10 +1,10 @@
+use malachite_base::num::arithmetic::mod_mul::{_fast_mod_mul, _naive_mod_mul};
+use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_base::num::arithmetic::mod_mul::{_fast_mod_mul, _naive_mod_mul};
-use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
-use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_unsigneds_var_5, quadruples_of_unsigneds_var_1, triples_of_unsigneds_var_1,

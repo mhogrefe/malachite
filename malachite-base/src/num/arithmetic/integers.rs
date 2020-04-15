@@ -4,14 +4,12 @@ use comparison::Min;
 use num::arithmetic::traits::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedPow, CheckedRem, CheckedSub, DivAssignRem, DivExact,
     DivExactAssign, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, EqMod,
-    EqModPowerOfTwo, Mod, ModAssign, OverflowingAdd, OverflowingAddAssign, OverflowingDiv,
-    OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
-    OverflowingNegAssign, OverflowingPow, OverflowingRem, OverflowingRemAssign, OverflowingSub,
-    OverflowingSubAssign, Parity, Pow, SaturatingAdd, SaturatingAddAssign, SaturatingMul,
-    SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, ShlRound,
-    ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, UnsignedAbs, WrappingAdd, WrappingAddAssign,
-    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
-    WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign,
+    EqModPowerOfTwo, Mod, ModAssign, OverflowingDiv, OverflowingDivAssign, OverflowingPow,
+    OverflowingRem, OverflowingRemAssign, Parity, Pow, SaturatingAdd, SaturatingAddAssign,
+    SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign,
+    ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, UnsignedAbs, WrappingAdd,
+    WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg,
+    WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign,
 };
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use round::RoundingMode;
@@ -81,53 +79,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_neg_assign(&mut self) {
                 *self = self.wrapping_neg();
-            }
-        }
-
-        impl OverflowingNeg for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_neg(self) -> ($t, bool) {
-                $t::overflowing_neg(self)
-            }
-        }
-
-        impl OverflowingNegAssign for $t {
-            /// Replaces `self` with its negative.
-            ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingNegAssign;
-            ///
-            /// let mut x = 0i8;
-            /// assert_eq!(x.overflowing_neg_assign(), false);
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100u64;
-            /// assert_eq!(x.overflowing_neg_assign(), true);
-            /// assert_eq!(x, 18446744073709551516);
-            ///
-            /// let mut x = -100i64;
-            /// assert_eq!(x.overflowing_neg_assign(), false);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -128i8;
-            /// assert_eq!(x.overflowing_neg_assign(), true);
-            /// assert_eq!(x, -128);
-            /// ```
-            #[inline]
-            fn overflowing_neg_assign(&mut self) -> bool {
-                let (result, overflow) = self.overflowing_neg();
-                *self = result;
-                overflow
             }
         }
 
@@ -209,45 +160,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl OverflowingAdd<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_add(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_add(self, rhs)
-            }
-        }
-
-        impl OverflowingAddAssign for $t {
-            /// Replaces `self` with `self + rhs`.
-            ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
-            ///
-            /// let mut x = 123u16;
-            /// assert_eq!(x.overflowing_add_assign(456), false);
-            /// assert_eq!(x, 579);
-            ///
-            /// let mut x = 123u8;
-            /// assert_eq!(x.overflowing_add_assign(200), true);
-            /// assert_eq!(x, 67);
-            /// ```
-            #[inline]
-            fn overflowing_add_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_add(rhs);
-                *self = result;
-                overflow
-            }
-        }
-
         impl CheckedSub<$t> for $t {
             type Output = $t;
 
@@ -326,45 +238,6 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl OverflowingSub<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_sub(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_sub(self, rhs)
-            }
-        }
-
-        impl OverflowingSubAssign for $t {
-            /// Replaces `self` with `self - rhs`.
-            ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingSubAssign;
-            ///
-            /// let mut x = 456u16;
-            /// assert_eq!(x.overflowing_sub_assign(123), false);
-            /// assert_eq!(x, 333);
-            ///
-            /// let mut x = 123u16;
-            /// assert_eq!(x.overflowing_sub_assign(456), true);
-            /// assert_eq!(x, 65_203);
-            /// ```
-            #[inline]
-            fn overflowing_sub_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_sub(rhs);
-                *self = result;
-                overflow
-            }
-        }
-
         impl CheckedMul<$t> for $t {
             type Output = $t;
 
@@ -440,45 +313,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_mul_assign(&mut self, rhs: $t) {
                 *self = self.wrapping_mul(rhs);
-            }
-        }
-
-        impl OverflowingMul<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_mul(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_mul(self, rhs)
-            }
-        }
-
-        impl OverflowingMulAssign for $t {
-            /// Replaces `self` with `self * rhs`.
-            ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingMulAssign;
-            ///
-            /// let mut x = 123u16;
-            /// assert_eq!(x.overflowing_mul_assign(456), false);
-            /// assert_eq!(x, 56_088);
-            ///
-            /// let mut x = 123u8;
-            /// assert_eq!(x.overflowing_mul_assign(200), true);
-            /// assert_eq!(x, 24);
-            /// ```
-            #[inline]
-            fn overflowing_mul_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_mul(rhs);
-                *self = result;
-                overflow
             }
         }
 

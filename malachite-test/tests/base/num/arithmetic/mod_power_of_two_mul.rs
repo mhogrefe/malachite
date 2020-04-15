@@ -22,6 +22,14 @@ fn mod_power_of_two_mul_properties_helper<T: PrimitiveUnsigned + Rand + SampleRa
             assert_eq!(x_alt, product);
 
             assert_eq!(y.mod_power_of_two_mul(x, pow), product);
+            assert_eq!(
+                x.mod_power_of_two_mul(y.mod_power_of_two_neg(pow), pow),
+                product.mod_power_of_two_neg(pow)
+            );
+            assert_eq!(
+                x.mod_power_of_two_neg(pow).mod_power_of_two_mul(y, pow),
+                product.mod_power_of_two_neg(pow)
+            );
         },
     );
 
@@ -38,6 +46,16 @@ fn mod_power_of_two_mul_properties_helper<T: PrimitiveUnsigned + Rand + SampleRa
             assert_eq!(
                 x.mod_power_of_two_mul(y, pow).mod_power_of_two_mul(z, pow),
                 x.mod_power_of_two_mul(y.mod_power_of_two_mul(z, pow), pow)
+            );
+            assert_eq!(
+                x.mod_power_of_two_mul(y.mod_power_of_two_add(z, pow), pow),
+                x.mod_power_of_two_mul(y, pow)
+                    .mod_power_of_two_add(x.mod_power_of_two_mul(z, pow), pow)
+            );
+            assert_eq!(
+                x.mod_power_of_two_add(y, pow).mod_power_of_two_mul(z, pow),
+                x.mod_power_of_two_mul(z, pow)
+                    .mod_power_of_two_add(y.mod_power_of_two_mul(z, pow), pow)
             );
         },
     );

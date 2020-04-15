@@ -477,7 +477,7 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -511,7 +511,7 @@ impl Mul<Natural> for Natural {
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -545,7 +545,7 @@ impl<'a> Mul<&'a Natural> for Natural {
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -578,7 +578,7 @@ impl<'a> Mul<Natural> for &'a Natural {
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -622,7 +622,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```
@@ -665,7 +665,7 @@ impl MulAssign<Natural> for Natural {
 ///
 /// Additional memory: worst case O(n * log(n))
 ///
-/// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+/// where n = `self.significant_bits()` + `other.significant_bits()`
 ///
 /// # Examples
 /// ```

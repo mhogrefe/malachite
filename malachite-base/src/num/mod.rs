@@ -12,6 +12,14 @@ pub mod arithmetic {
     pub mod mod_power_of_two_mul;
     pub mod mod_power_of_two_neg;
     pub mod mod_power_of_two_sub;
+    pub mod mod_sub;
+    pub mod neg;
+    pub mod overflowing_abs;
+    pub mod overflowing_add;
+    pub mod overflowing_mul;
+    pub mod overflowing_neg;
+    pub mod overflowing_sub;
+    pub mod power_of_two;
     pub mod signeds;
     pub mod traits;
     pub mod unsigneds;

@@ -1,5 +1,3 @@
-use std::cmp::{max, min};
-
 use malachite_base::num::arithmetic::traits::{
     ModAdd, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, PowerOfTwo,
 };
@@ -357,8 +355,8 @@ fn benchmark_limbs_mod_power_of_two_add(gm: GenerationMode, limit: usize, file_n
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, _)| max(xs.len(), ys.len())),
-        "max(xs.len(), ys.len())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [(
             "malachite",
             &mut (|(ref xs, ref ys, pow)| no_out!(limbs_mod_power_of_two_add(xs, ys, pow))),
@@ -403,8 +401,8 @@ fn benchmark_limbs_vec_mod_power_of_two_add_in_place_left(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, _)| min(xs.len(), ys.len())),
-        "min(xs.len(), ys.len())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [(
             "malachite",
             &mut (|(mut xs, ys, pow)| {
@@ -428,8 +426,8 @@ fn benchmark_limbs_mod_power_of_two_add_in_place_either(
         gm.name(),
         limit,
         file_name,
-        &(|&(ref xs, ref ys, _)| min(xs.len(), ys.len())),
-        "min(xs.len(), ys.len())",
+        &(|&(_, _, pow)| usize::exact_from(pow)),
+        "pow",
         &mut [(
             "malachite",
             &mut (|(mut xs, mut ys, pow)| {

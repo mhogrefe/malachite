@@ -11,7 +11,7 @@ impl Mul<Integer> for Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -44,7 +44,7 @@ impl<'a> Mul<&'a Integer> for Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -78,7 +78,7 @@ impl<'a> Mul<Integer> for &'a Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -111,7 +111,7 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -145,7 +145,7 @@ impl MulAssign<Integer> for Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```
@@ -177,7 +177,7 @@ impl<'a> MulAssign<&'a Integer> for Integer {
     ///
     /// Additional memory: worst case O(n * log(n))
     ///
-    /// where n = max(`self.significant_bits()` + `other.significant_bits()`)
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
     ///
     /// # Examples
     /// ```

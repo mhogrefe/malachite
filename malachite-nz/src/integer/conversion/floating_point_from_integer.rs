@@ -157,32 +157,35 @@ macro_rules! float_impls {
             }
         }
 
-        //TODO clean
-
-        /// Converts an `Integer` to the nearest `f32` or an `f64`. The `Integer` is taken by
-        /// reference. If there are two nearest floats, the one whose least-significant bit is zero
-        /// is chosen. If the input is larger than the maximum finite value representable by the
-        /// floating-point type, the result is the maximum finite float. If the input is smaller
-        /// than the minimum (most negative) finite value, the result is the minimum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::from(&Integer::from_str("123").unwrap()), 123.0);
-        /// assert_eq!(f32::from(&Integer::from_str("-1000000001").unwrap()), -1.0e9);
-        /// assert_eq!(f32::from(
-        ///     &Integer::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), 3.4028235e38);
-        /// ```
         impl<'a> From<&'a Integer> for $f {
+            /// Converts an `Integer` to the nearest `f32` or an `f64`. The `Integer` is taken by
+            /// reference. If there are two nearest floats, the one whose least-significant bit is
+            /// zero is chosen. If the input is larger than the maximum finite value representable
+            /// by the floating-point type, the result is the maximum finite float. If the input is
+            /// smaller than the minimum (most negative) finite value, the result is the minimum
+            /// finite float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::from(&Integer::from_str("123").unwrap()), 123.0);
+            /// assert_eq!(f32::from(&Integer::from_str("-1000000001").unwrap()), -1.0e9);
+            /// assert_eq!(
+            ///     f32::from(
+            ///         &Integer::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     3.4028235e38
+            /// );
+            /// ```
             fn from(value: &'a Integer) -> $f {
                 let abs = $f::from(&value.abs);
                 if value.sign {
@@ -193,121 +196,139 @@ macro_rules! float_impls {
             }
         }
 
-        /// Converts an `Integer` to an `f32` or an `f64`. The `Integer` is taken by value. If the
-        /// input isn't exactly equal to some float, `None` is returned.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::checked_from(Integer::from_str("123").unwrap()), Some(123.0));
-        /// assert_eq!(f32::checked_from(Integer::from_str("-1000000000").unwrap()),
-        ///     Some(-1.0e9));
-        /// assert_eq!(f32::checked_from(Integer::from_str("1000000001").unwrap()), None);
-        /// assert_eq!(f32::checked_from(
-        ///     Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), None);
-        /// ```
         impl CheckedFrom<Integer> for $f {
+            /// Converts an `Integer` to an `f32` or an `f64`. The `Integer` is taken by value. If
+            /// the input isn't exactly equal to some float, `None` is returned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::checked_from(Integer::from_str("123").unwrap()), Some(123.0));
+            /// assert_eq!(
+            ///     f32::checked_from(Integer::from_str("-1000000000").unwrap()),
+            ///     Some(-1.0e9)
+            /// );
+            /// assert_eq!(f32::checked_from(Integer::from_str("1000000001").unwrap()), None);
+            /// assert_eq!(
+            ///     f32::checked_from(
+            ///         Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     None
+            /// );
+            /// ```
             fn checked_from(value: Integer) -> Option<$f> {
                 let sign = value.sign;
                 $f::checked_from(value.abs).map(|f| if sign { f } else { -f })
             }
         }
 
-        /// Converts an `Integer` to an `f32` or an `f64`. The `Integer` is taken by value. If the
-        /// input isn't exactly equal to some float, `None` is returned.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::checked_from(&Integer::from_str("123").unwrap()), Some(123.0));
-        /// assert_eq!(f32::checked_from(&Integer::from_str("-1000000000").unwrap()),
-        ///     Some(-1.0e9));
-        /// assert_eq!(f32::checked_from(&Integer::from_str("1000000001").unwrap()), None);
-        /// assert_eq!(f32::checked_from(
-        ///     &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), None);
-        /// ```
         impl<'a> CheckedFrom<&'a Integer> for $f {
+            /// Converts an `Integer` to an `f32` or an `f64`. The `Integer` is taken by value. If
+            /// the input isn't exactly equal to some float, `None` is returned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::checked_from(&Integer::from_str("123").unwrap()), Some(123.0));
+            /// assert_eq!(f32::checked_from(&Integer::from_str("-1000000000").unwrap()),
+            ///     Some(-1.0e9));
+            /// assert_eq!(f32::checked_from(&Integer::from_str("1000000001").unwrap()), None);
+            /// assert_eq!(
+            ///     f32::checked_from(
+            ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     None
+            /// );
+            /// ```
             fn checked_from(value: &'a Integer) -> Option<$f> {
                 $f::checked_from(&value.abs).map(|f| if value.sign { f } else { -f })
             }
         }
 
-        /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
-        /// `Integer` is taken by value.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::convertible_from(Integer::from_str("123").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(Integer::from_str("-1000000000").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(Integer::from_str("1000000001").unwrap()), false);
-        /// assert_eq!(f32::convertible_from(
-        ///     Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), false);
-        /// ```
         impl ConvertibleFrom<Integer> for $f {
+            /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
+            /// `Integer` is taken by value.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::convertible_from(Integer::from_str("123").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(Integer::from_str("-1000000000").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(Integer::from_str("1000000001").unwrap()), false);
+            /// assert_eq!(
+            ///     f32::convertible_from(
+            ///         Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     false
+            /// );
+            /// ```
             #[inline]
             fn convertible_from(value: Integer) -> bool {
                 $f::convertible_from(&value)
             }
         }
 
-        /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
-        /// `Integer` is taken by reference.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-        /// use malachite_nz::integer::Integer;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::convertible_from(&Integer::from_str("123").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(&Integer::from_str("-1000000000").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(&Integer::from_str("1000000001").unwrap()), false);
-        /// assert_eq!(f32::convertible_from(
-        ///     &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), false);
-        /// ```
         impl<'a> ConvertibleFrom<&'a Integer> for $f {
+            /// Determines whether an `Integer` can be exactly converted to an `f32` or `f64`. The
+            /// `Integer` is taken by reference.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
+            /// use malachite_nz::integer::Integer;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::convertible_from(&Integer::from_str("123").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(&Integer::from_str("-1000000000").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(&Integer::from_str("1000000001").unwrap()), false);
+            /// assert_eq!(
+            ///     f32::convertible_from(
+            ///         &Integer::from_str("-10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     false
+            /// );
+            /// ```
             fn convertible_from(value: &'a Integer) -> bool {
                 $f::convertible_from(&value.abs)
             }

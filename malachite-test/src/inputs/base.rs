@@ -4519,16 +4519,24 @@ pub fn triples_of_limb_vec_limb_vec_and_limb_var_12(
 pub fn triples_of_limb_vec_limb_vec_and_u64_var_13(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
-    let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).map(
-        |(mut xs, mut ys, pow)| {
+    if gm == GenerationMode::Exhaustive {
+        let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).map(
+            |(mut xs, mut ys, pow)| {
+                limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+                limbs_slice_mod_power_of_two_in_place(&mut ys, pow);
+                (xs, ys, pow)
+            },
+        );
+        Box::new(ts.unique())
+    } else {
+        let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(
+            gm.with_scale(gm.get_scale().unwrap()),
+        )
+        .map(|(mut xs, mut ys, pow)| {
             limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
             limbs_slice_mod_power_of_two_in_place(&mut ys, pow);
             (xs, ys, pow)
-        },
-    );
-    if gm == GenerationMode::Exhaustive {
-        Box::new(ts.unique())
-    } else {
+        });
         Box::new(ts)
     }
 }
@@ -4558,6 +4566,19 @@ pub fn triples_of_limb_vec_limb_vec_and_u64_var_15(
         triples_of_limb_vec_limb_vec_and_u64_var_13(gm).filter(|&(ref xs, ref ys, _)| {
             (xs.is_empty() || *xs.last().unwrap() != 0)
                 && (ys.is_empty() || *ys.last().unwrap() != 0)
+        }),
+    )
+}
+
+// All triples of `Vec<Limb>`, `Vec<Limb>`, and `u64` such that the number of significant bits of
+// either `Vec` does not exceed the `u64`, neither `Vec` is empty, and neither `Vec` has trailing
+// zeros.
+pub fn triples_of_limb_vec_limb_vec_and_u64_var_16(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        triples_of_limb_vec_limb_vec_and_u64_var_13(gm).filter(|&(ref xs, ref ys, _)| {
+            !xs.is_empty() && !ys.is_empty() && *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0
         }),
     )
 }
@@ -4626,13 +4647,13 @@ fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned<
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale << Limb::LOG_WIDTH).flat_map(U::checked_from)),
         )),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned_vecs(seed, scale)),
             &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+            &(|seed| u32s_geometric(seed, scale << Limb::LOG_WIDTH).flat_map(U::checked_from)),
         )),
     }
 }

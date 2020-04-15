@@ -13,16 +13,16 @@ use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-/// `limb` and whose other limbs are full of `true` bits. `limbs` may not be empty.
+/// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -39,60 +39,61 @@ pub fn limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-/// `limb` and whose other limbs are full of `true` bits, to an output slice. `in_limbs` may not be
-/// empty. The output slice must be at least as long as the input slice.
+/// `y` and whose other limbs are full of `true` bits, to an output slice. `xs` may not be empty.
+/// The output slice must be at least as long as the input slice.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `in_limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
+/// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_pos_and_limb_neg_to_out;
 ///
-/// let mut result = vec![10, 10];
-/// limbs_pos_and_limb_neg_to_out(&mut result, &[0, 2], 3);
-/// assert_eq!(result, &[0, 2]);
+/// let mut out = vec![10, 10];
+/// limbs_pos_and_limb_neg_to_out(&mut out, &[0, 2], 3);
+/// assert_eq!(out, &[0, 2]);
 ///
-/// let mut result = vec![10, 10, 10, 10];
-/// limbs_pos_and_limb_neg_to_out(&mut result, &[123, 456], 789);
-/// assert_eq!(result, &[17, 456, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_pos_and_limb_neg_to_out(&mut out, &[123, 456], 789);
+/// assert_eq!(out, &[17, 456, 10, 10]);
 /// ```
 pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let len = xs.len();
     assert!(out.len() >= len);
-    out[0] = xs[0] & y;
-    out[1..len].copy_from_slice(&xs[1..]);
+    let (xs_head, xs_tail) = xs.split_first().unwrap();
+    let (out_head, out_tail) = out[..len].split_first_mut().unwrap();
+    *out_head = xs_head & y;
+    out_tail.copy_from_slice(xs_tail);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
-/// `limb` and whose other limbs are full of `true` bits, to the input slice. `limbs` may not be
-/// empty.
+/// `y` and whose other limbs are full of `true` bits, to the input slice. `xs` may not be empty.
 ///
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_pos_and_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// limbs_pos_and_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, &[0, 2]);
+/// let mut xs = vec![0, 2];
+/// limbs_pos_and_limb_neg_in_place(&mut xs, 3);
+/// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_pos_and_limb_neg_in_place(&mut limbs, 789);
-/// assert_eq!(limbs, &[17, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_pos_and_limb_neg_in_place(&mut xs, 789);
+/// assert_eq!(xs, &[17, 456]);
 /// ```
 pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
     xs[0] &= ys;
@@ -100,17 +101,17 @@ pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, returns the limbs of the bitwise and of the `Integer` and a negative number whose
-/// lowest limb is given by `limb` and whose other limbs are full of `true` bits. `limbs` may not be
-/// empty or only contain zeros.
+/// lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
+/// or only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -121,61 +122,62 @@ pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 /// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
 /// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
 /// ```
-pub fn limbs_neg_and_limb_neg(xs: &[Limb], ys: Limb) -> Vec<Limb> {
+pub fn limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out = xs.to_vec();
-    limbs_vec_neg_and_limb_neg_in_place(&mut out, ys);
+    limbs_vec_neg_and_limb_neg_in_place(&mut out, y);
     out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise and of the `Integer` and a negative number whose
-/// lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output slice.
-/// `in_limbs` may not be empty or only contain zeros. Returns whether a carry occurs. The output
-/// slice must be at least as long as the input slice.
+/// lowest limb is given by `y` and whose other limbs are full of `true` bits to an output slice.
+/// `ixs` may not be empty or only contain zeros. Returns whether a carry occurs. The output slice
+/// must be at least as long as the input slice.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `in_limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
+/// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_neg_and_limb_neg_to_out;
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0, 2], 3), false);
-/// assert_eq!(result, &[0, 2]);
+/// let mut out = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[0, 2], 3), false);
+/// assert_eq!(out, &[0, 2]);
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[1, 1], 3), false);
-/// assert_eq!(result, &[4294967293, 1]);
+/// let mut out = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[1, 1], 3), false);
+/// assert_eq!(out, &[4294967293, 1]);
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 1], 1), false);
-/// assert_eq!(result, &[0, 2]);
+/// let mut out = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[0xffff_fffe, 1], 1), false);
+/// assert_eq!(out, &[0, 2]);
 ///
-/// let mut result = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut result, &[0xffff_fffe, 0xffff_ffff], 1),
-///         true);
-/// assert_eq!(result, &[0, 0]);
+/// let mut out = vec![0, 0];
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[0xffff_fffe, 0xffff_ffff], 1), true);
+/// assert_eq!(out, &[0, 0]);
 /// ```
 pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
-    assert!(out.len() >= xs.len());
+    let out = &mut out[..xs.len()];
     if xs[0] == 0 {
-        out[..xs.len()].copy_from_slice(xs);
+        out.copy_from_slice(xs);
         false
     } else {
-        let result_head = xs[0].wrapping_neg() & y;
+        let (xs_head, xs_tail) = xs.split_first().unwrap();
+        let (out_head, out_tail) = out.split_first_mut().unwrap();
+        let result_head = xs_head.wrapping_neg() & y;
         if result_head == 0 {
-            out[0] = 0;
-            limbs_add_limb_to_out(&mut out[1..], &xs[1..], 1)
+            *out_head = 0;
+            limbs_add_limb_to_out(out_tail, xs_tail, 1)
         } else {
-            out[0] = result_head.wrapping_neg();
-            out[1..xs.len()].copy_from_slice(&xs[1..]);
+            *out_head = result_head.wrapping_neg();
+            out_tail.copy_from_slice(xs_tail);
             false
         }
     }
@@ -183,49 +185,48 @@ pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
-/// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
-/// empty or only contain zeros. Returns whether there is a carry.
+/// given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
+/// only contain zeros. Returns whether there is a carry.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_slice_neg_and_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 3), false);
-/// assert_eq!(limbs, &[0, 2]);
+/// let mut xs = vec![0, 2];
+/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 3), false);
+/// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut limbs = vec![1, 1];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 3), false);
-/// assert_eq!(limbs, &[4294967293, 1]);
+/// let mut xs = vec![1, 1];
+/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 3), false);
+/// assert_eq!(xs, &[4294967293, 1]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 1];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 1), false);
-/// assert_eq!(limbs, &[0, 2]);
+/// let mut xs = vec![0xffff_fffe, 1];
+/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 1), false);
+/// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 0xffff_ffff];
-/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut limbs, 1), true);
-/// assert_eq!(limbs, &[0, 0]);
+/// let mut xs = vec![0xffff_fffe, 0xffff_ffff];
+/// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 1), true);
+/// assert_eq!(xs, &[0, 0]);
 /// ```
 pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
-    let (head, tail) = xs.split_at_mut(1);
-    let head = &mut head[0];
-    if *head == 0 {
+    let (xs_head, xs_tail) = xs.split_first_mut().unwrap();
+    if *xs_head == 0 {
         false
     } else {
-        *head = head.wrapping_neg() & y;
-        if *head == 0 {
-            limbs_slice_add_limb_in_place(tail, 1)
+        *xs_head = xs_head.wrapping_neg() & y;
+        if *xs_head == 0 {
+            limbs_slice_add_limb_in_place(xs_tail, 1)
         } else {
-            head.wrapping_neg_assign();
+            xs_head.wrapping_neg_assign();
             false
         }
     }
@@ -233,37 +234,37 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, takes the bitwise and of the `Integer` and a negative number whose lowest limb is
-/// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
-/// empty or only contain zeros. If there is a carry, increases the length of the `Vec` by 1.
+/// given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
+/// only contain zeros. If there is a carry, increases the length of the `Vec` by 1.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_vec_neg_and_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, &[0, 2]);
+/// let mut xs = vec![0, 2];
+/// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 3);
+/// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut limbs = vec![1, 1];
-/// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, &[4294967293, 1]);
+/// let mut xs = vec![1, 1];
+/// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 3);
+/// assert_eq!(xs, &[4294967293, 1]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 1];
-/// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 1);
-/// assert_eq!(limbs, &[0, 2]);
+/// let mut xs = vec![0xffff_fffe, 1];
+/// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 1);
+/// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 0xffff_ffff];
-/// limbs_vec_neg_and_limb_neg_in_place(&mut limbs, 1);
-/// assert_eq!(limbs, &[0, 0, 1]);
+/// let mut xs = vec![0xffff_fffe, 0xffff_ffff];
+/// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 1);
+/// assert_eq!(xs, &[0, 0, 1]);
 /// ```
 pub fn limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_and_limb_neg_in_place(xs, y) {
@@ -307,8 +308,8 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         return xs.to_vec();
     }
     let max_i = max(x_i, y_i);
-    let mut result_limbs = vec![0; max_i];
-    result_limbs.push(
+    let mut out = vec![0; max_i];
+    out.push(
         xs[max_i]
             & if x_i <= y_i {
                 ys[max_i].wrapping_neg()
@@ -316,16 +317,16 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
                 !ys[max_i]
             },
     );
-    result_limbs.extend(
+    out.extend(
         xs[max_i + 1..]
             .iter()
             .zip(ys[max_i + 1..].iter())
             .map(|(&x, &y)| x & !y),
     );
     if xs_len > ys_len {
-        result_limbs.extend_from_slice(&xs[ys_len..]);
+        out.extend_from_slice(&xs[ys_len..]);
     }
-    result_limbs
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
@@ -347,13 +348,13 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_pos_neg_to_out;
 ///
-/// let mut result = vec![0, 0];
-/// limbs_and_pos_neg_to_out(&mut result, &[1, 2], &[100, 200]);
-/// assert_eq!(result, &[0, 2]);
+/// let mut out = vec![0, 0];
+/// limbs_and_pos_neg_to_out(&mut out, &[1, 2], &[100, 200]);
+/// assert_eq!(out, &[0, 2]);
 ///
-/// let mut result = vec![10, 10, 10, 10];
-/// limbs_and_pos_neg_to_out(&mut result, &[1, 2, 5], &[100, 200]);
-/// assert_eq!(result, &[0, 2, 5, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_and_pos_neg_to_out(&mut out, &[1, 2, 5], &[100, 200]);
+/// assert_eq!(out, &[0, 2, 5, 10]);
 /// ```
 ///
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where the first input is positive and the second is
@@ -598,7 +599,7 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         return xs.to_vec();
     }
     let max_i = max(x_i, y_i);
-    let mut result_limbs = vec![0; max_i];
+    let mut out = vec![0; max_i];
     let x = if x_i >= y_i {
         xs[max_i].wrapping_sub(1)
     } else {
@@ -610,13 +611,13 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         ys[max_i]
     };
     let mut boundary_limb_seen = false;
-    result_limbs.push(limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen));
+    out.push(limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen));
     let xys = xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter());
     if boundary_limb_seen {
-        result_limbs.extend(xys.map(|(&x, &y)| x | y));
+        out.extend(xys.map(|(&x, &y)| x | y));
     } else {
         for (&x, &y) in xys {
-            result_limbs.push(limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen));
+            out.push(limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen));
         }
     }
     if xs_len != ys_len {
@@ -626,17 +627,17 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
             &ys[xs_len..]
         };
         if boundary_limb_seen {
-            result_limbs.extend_from_slice(zs);
+            out.extend_from_slice(zs);
         } else {
             for &z in zs.iter() {
-                result_limbs.push(limbs_and_neg_neg_helper(z, &mut boundary_limb_seen));
+                out.push(limbs_and_neg_neg_helper(z, &mut boundary_limb_seen));
             }
         }
     }
     if !boundary_limb_seen {
-        result_limbs.push(1);
+        out.push(1);
     }
-    result_limbs
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
@@ -788,16 +789,14 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
     };
     let mut boundary_limb_seen = false;
     xs[max_i] = limbs_and_neg_neg_helper(x | y, &mut boundary_limb_seen);
-    {
-        let xys = xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter());
-        if boundary_limb_seen {
-            for (x, &y) in xys {
-                *x |= y;
-            }
-        } else {
-            for (x, &y) in xys {
-                *x = limbs_and_neg_neg_helper(*x | y, &mut boundary_limb_seen);
-            }
+    let xys = xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter());
+    if boundary_limb_seen {
+        for (x, &y) in xys {
+            *x |= y;
+        }
+    } else {
+        for (x, &y) in xys {
+            *x = limbs_and_neg_neg_helper(*x | y, &mut boundary_limb_seen);
         }
     }
     if xs_len > ys_len && !boundary_limb_seen {
@@ -967,29 +966,29 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
     }
 }
 
-/// Takes the bitwise and of two `Integer`s, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-///     "-1000000004096");
-/// ```
 impl BitAnd<Integer> for Integer {
     type Output = Integer;
 
+    /// Takes the bitwise and of two `Integer`s, taking both by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "-1000000004096");
+    /// ```
     #[inline]
     fn bitand(mut self, other: Integer) -> Integer {
         self &= other;
@@ -997,30 +996,31 @@ impl BitAnd<Integer> for Integer {
     }
 }
 
-/// Takes the bitwise and of two `Integer`s, taking the left `Integer` by value and the right
-/// `Integer` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`, m = `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-///     "-1000000004096");
-/// ```
 impl<'a> BitAnd<&'a Integer> for Integer {
     type Output = Integer;
 
+    /// Takes the bitwise and of two `Integer`s, taking the left `Integer` by value and the right
+    /// `Integer` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`,
+    ///       m = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!((-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "-1000000004096");
+    /// ```
     #[inline]
     fn bitand(mut self, other: &'a Integer) -> Integer {
         self &= other;
@@ -1028,31 +1028,33 @@ impl<'a> BitAnd<&'a Integer> for Integer {
     }
 }
 
-/// Takes the bitwise and of two `Integer`s, taking the left `Integer` by reference and the right
-/// `Integer` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-///     "-1000000004096");
-/// ```
 impl<'a> BitAnd<Integer> for &'a Integer {
     type Output = Integer;
 
+    /// Takes the bitwise and of two `Integer`s, taking the left `Integer` by reference and the
+    /// right `Integer` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!(
+    ///     (&-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "-1000000004096"
+    /// );
+    /// ```
     #[inline]
     fn bitand(self, mut other: Integer) -> Integer {
         other &= self;
@@ -1060,31 +1062,33 @@ impl<'a> BitAnd<Integer> for &'a Integer {
     }
 }
 
-/// Takes the bitwise and of two `Integer`s, taking both `Integer`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`,
-///     m = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
-/// assert_eq!((&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
-///     "-1000000004096");
-/// ```
 impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     type Output = Integer;
 
+    /// Takes the bitwise and of two `Integer`s, taking both `Integer`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`,
+    ///     m = `max(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Integer::from(-123) & &Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!(
+    ///     (&-Integer::trillion() & &-(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "-1000000004096"
+    /// );
+    /// ```
     fn bitand(self, other: &'a Integer) -> Integer {
         match (self.sign, other.sign) {
             (true, true) => Integer {
@@ -1107,31 +1111,31 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
     }
 }
 
-/// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-/// value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::NegativeOne;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::NEGATIVE_ONE;
-/// x &= Integer::from(0x70ff_ffff);
-/// x &= Integer::from(0x7ff0_ffff);
-/// x &= Integer::from(0x7fff_f0ff);
-/// x &= Integer::from(0x7fff_fff0);
-/// assert_eq!(x, 0x70f0f0f0);
-/// ```
 impl BitAndAssign<Integer> for Integer {
+    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
+    /// by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::NegativeOne;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::NEGATIVE_ONE;
+    /// x &= Integer::from(0x70ff_ffff);
+    /// x &= Integer::from(0x7ff0_ffff);
+    /// x &= Integer::from(0x7fff_f0ff);
+    /// x &= Integer::from(0x7fff_fff0);
+    /// assert_eq!(x, 0x70f0f0f0);
+    /// ```
     fn bitand_assign(&mut self, other: Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitand_assign(other.abs),
@@ -1145,31 +1149,31 @@ impl BitAndAssign<Integer> for Integer {
     }
 }
 
-/// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-/// reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::NegativeOne;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::NEGATIVE_ONE;
-/// x &= &Integer::from(0x70ff_ffff);
-/// x &= &Integer::from(0x7ff0_ffff);
-/// x &= &Integer::from(0x7fff_f0ff);
-/// x &= &Integer::from(0x7fff_fff0);
-/// assert_eq!(x, 0x70f0f0f0);
-/// ```
 impl<'a> BitAndAssign<&'a Integer> for Integer {
+    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
+    /// by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::NegativeOne;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::NEGATIVE_ONE;
+    /// x &= &Integer::from(0x70ff_ffff);
+    /// x &= &Integer::from(0x7ff0_ffff);
+    /// x &= &Integer::from(0x7fff_f0ff);
+    /// x &= &Integer::from(0x7fff_fff0);
+    /// assert_eq!(x, 0x70f0f0f0);
+    /// ```
     fn bitand_assign(&mut self, other: &'a Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitand_assign(&other.abs),
@@ -1199,24 +1203,21 @@ impl Natural {
     }
 
     fn and_assign_neg_limb_neg(&mut self, other: Limb) {
-        if *self == 0 {
-            return;
-        }
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
+        match *self {
+            natural_zero!() => {}
+            Natural(Small(ref mut small)) => {
                 let result = small.wrapping_neg() & other;
                 if result == 0 {
-                    None
+                    *self = Natural(Large(vec![0, 1]));
                 } else {
-                    Some(result.wrapping_neg())
+                    *small = result.wrapping_neg();
                 }
-            },
-            { limbs_vec_neg_and_limb_neg_in_place(limbs, other) }
-        );
+            }
+            Natural(Large(ref mut limbs)) => limbs_vec_neg_and_limb_neg_in_place(limbs, other),
+        }
     }
+
+    //TODO clean
 
     fn and_assign_pos_neg(&mut self, other: &Natural) {
         if let Natural(Small(y)) = *other {

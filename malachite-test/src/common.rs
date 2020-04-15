@@ -230,6 +230,14 @@ impl GenerationMode {
         }
     }
 
+    pub(crate) fn get_scale(self) -> Option<u32> {
+        match self {
+            GenerationMode::Exhaustive => None,
+            GenerationMode::Random(scale) => Some(scale),
+            GenerationMode::SpecialRandom(scale) => Some(scale),
+        }
+    }
+
     pub(crate) fn with_scale(self, scale: u32) -> GenerationMode {
         match self {
             GenerationMode::Exhaustive => GenerationMode::Exhaustive,

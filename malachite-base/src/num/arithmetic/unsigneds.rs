@@ -1,10 +1,10 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModPowerOfTwo, ModPowerOfTwoAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
-    PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl,
-    TrueCheckedShr, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
+    ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, PowerOfTwo,
+    RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, ShrRoundAssign, TrueCheckedShl, TrueCheckedShr,
+    XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -14,62 +14,6 @@ use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl ModSub for $t {
-            type Output = $t;
-
-            /// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModSub;
-            ///
-            /// assert_eq!(4u8.mod_sub(3, 5), 1);
-            /// assert_eq!(7u32.mod_sub(9, 10), 8);
-            /// ```
-            ///
-            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
-            #[inline]
-            fn mod_sub(self, rhs: $t, m: $t) -> $t {
-                let diff = self.wrapping_sub(rhs);
-                if self < rhs {
-                    m.wrapping_add(diff)
-                } else {
-                    diff
-                }
-            }
-        }
-
-        impl ModSubAssign for $t {
-            /// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModSubAssign;
-            ///
-            /// let mut n = 4u8;
-            /// n.mod_sub_assign(3, 5);
-            /// assert_eq!(n, 1);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_sub_assign(9, 10);
-            /// assert_eq!(n, 8);
-            /// ```
-            ///
-            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
-            #[inline]
-            fn mod_sub_assign(&mut self, rhs: $t, m: $t) {
-                *self = self.mod_sub(rhs, m);
-            }
-        }
-
         impl IsPowerOfTwo for $t {
             #[inline]
             fn is_power_of_two(&self) -> bool {
@@ -372,31 +316,6 @@ macro_rules! impl_arithmetic_traits {
 
             fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
                 unimplemented!();
-            }
-        }
-
-        impl PowerOfTwo for $t {
-            /// Computes 2<sup>`pow`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `pow` is greater than or equal to the width of `$t`.
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::PowerOfTwo;
-            ///
-            /// assert_eq!(u16::power_of_two(0), 1);
-            /// assert_eq!(u8::power_of_two(3), 8);
-            /// assert_eq!(u64::power_of_two(40), 1 << 40);
-            /// ```
-            #[inline]
-            fn power_of_two(pow: u64) -> $t {
-                assert!(pow < $t::WIDTH);
-                1 << pow
             }
         }
     };

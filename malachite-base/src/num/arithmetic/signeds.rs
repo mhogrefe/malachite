@@ -1,10 +1,9 @@
 use comparison::{Max, Min};
 use num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo, NegAssign, NegMod,
-    OverflowingAbs, OverflowingAbsAssign, PowerOfTwo, SaturatingAbs, SaturatingAbsAssign,
-    SaturatingNeg, SaturatingNegAssign, TrueCheckedShl, TrueCheckedShr, UnsignedAbs, WrappingAbs,
-    WrappingAbsAssign,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo, NegMod, PowerOfTwo,
+    SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign, TrueCheckedShl,
+    TrueCheckedShr, UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -14,35 +13,6 @@ use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl NegAssign for $t {
-            /// Replaces `self` with its negative. Assumes that `self` can be negated.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.neg_assign();
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100i64;
-            /// x.neg_assign();
-            /// assert_eq!(x, -100);
-            ///
-            /// let mut x = -100i64;
-            /// x.neg_assign();
-            /// assert_eq!(x, 100);
-            /// ```
-            #[inline]
-            fn neg_assign(&mut self) {
-                *self = -*self;
-            }
-        }
-
         impl SaturatingNeg for $t {
             type Output = $t;
 
@@ -216,53 +186,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn wrapping_abs_assign(&mut self) {
                 *self = self.wrapping_abs();
-            }
-        }
-
-        impl OverflowingAbs for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_abs(self) -> ($t, bool) {
-                $t::overflowing_abs(self)
-            }
-        }
-
-        impl OverflowingAbsAssign for $t {
-            /// Replaces `self` with its absolute value.
-            ///
-            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAbsAssign;
-            ///
-            /// let mut x = 0i8;
-            /// assert_eq!(x.overflowing_abs_assign(), false);
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100i64;
-            /// assert_eq!(x.overflowing_abs_assign(), false);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -100i64;
-            /// assert_eq!(x.overflowing_abs_assign(), false);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -128i8;
-            /// assert_eq!(x.overflowing_abs_assign(), true);
-            /// assert_eq!(x, -128);
-            /// ```
-            #[inline]
-            fn overflowing_abs_assign(&mut self) -> bool {
-                let (result, overflow) = self.overflowing_abs();
-                *self = result;
-                overflow
             }
         }
 

@@ -9,13 +9,12 @@ use natural::Natural;
 use platform::Limb;
 
 impl Integer {
-    /// Converts a slice of limbs to an `Integer`, in ascending
-    /// order, so that less significant limbs have lower indices in the input slice. The limbs are
-    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
-    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
-    /// is empty, zero is returned.
+    /// Converts a slice of limbs to an `Integer`, in ascending order, so that less significant
+    /// limbs have lower indices in the input slice. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is non-
+    /// negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
     ///
-    /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
+    /// This function borrows `xs`. If taking ownership of `xs` is possible,
     /// `from_owned_twos_complement_limbs_asc` is more efficient.
     ///
     /// This method is more efficient than `from_twos_complement_limbs_desc`.
@@ -24,7 +23,7 @@ impl Integer {
     ///
     /// Additional memory: worst case O(n)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// # Examples
     /// ```
@@ -52,10 +51,10 @@ impl Integer {
     /// Converts a slice of limbs to an `Integer`, in descending
     /// order, so that less significant limbs have higher indices in the input slice. The limbs are
     /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
-    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
-    /// is empty, zero is returned.
+    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `xs` is
+    /// empty, zero is returned.
     ///
-    /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
+    /// This function borrows `xs`. If taking ownership of `xs` is possible,
     /// `from_owned_twos_complement_limbs_desc` is more efficient.
     ///
     /// This method is less efficient than `from_twos_complement_limbs_asc`.
@@ -64,7 +63,7 @@ impl Integer {
     ///
     /// Additional memory: worst case O(n)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// # Examples
     /// ```
@@ -85,13 +84,12 @@ impl Integer {
         )
     }
 
-    /// Converts a slice of limbs to an `Integer`, in ascending
-    /// order, so that less significant limbs have lower indices in the input slice. The limbs are
-    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
-    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
-    /// is empty, zero is returned.
+    /// Converts a slice of limbs to an `Integer`, in ascending order, so that less significant
+    /// limbs have lower indices in the input slice. The limbs are in two's complement, and the most
+    /// significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is non-
+    /// negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
     ///
-    /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
+    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
     /// `from_twos_complement_limbs_asc`.
     ///
     /// This method is more efficient than `from_owned_twos_complement_limbs_desc`.
@@ -100,7 +98,7 @@ impl Integer {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// # Examples
     /// ```
@@ -128,13 +126,12 @@ impl Integer {
         }
     }
 
-    /// Converts a slice of limbs to an `Integer`, in descending
-    /// order, so that less significant limbs have higher indices in the input slice. The limbs are
-    /// in two's complement, and the most significant bit of the limbs indicates the sign; if the
-    /// bit is zero, the `Integer` is non-negative, and if the bit is one it is negative. If `limbs`
-    /// is empty, zero is returned.
+    /// Converts a slice of limbs to an `Integer`, in descending order, so that less significant
+    /// limbs have higher indices in the input slice. The limbs are in two's complement, and the
+    /// most significant bit of the limbs indicates the sign; if the bit is zero, the `Integer` is
+    /// non-negative, and if the bit is one it is negative. If `xs` is empty, zero is returned.
     ///
-    /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
+    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
     /// `from_twos_complement_limbs_desc`.
     ///
     /// This method is less efficient than `from_owned_twos_complement_limbs_asc`.
@@ -143,7 +140,7 @@ impl Integer {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// # Examples
     /// ```
