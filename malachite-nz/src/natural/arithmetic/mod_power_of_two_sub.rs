@@ -244,9 +244,7 @@ impl Natural {
                 }
             }
             (&Natural(Large(ref limbs)), other, _) => {
-                let mut diff = Natural(Large(limbs_sub_limb(limbs, other).0));
-                diff.trim();
-                diff
+                Natural::from_owned_limbs_asc(limbs_sub_limb(limbs, other).0)
             }
         }
     }
@@ -269,13 +267,9 @@ impl Natural {
                     Natural(Small(diff))
                 }
             }
-            (&Natural(Large(ref limbs)), other, _) => {
-                let mut diff = Natural(Large(limbs_mod_power_of_two_limb_sub_limbs(
-                    other, limbs, pow,
-                )));
-                diff.trim();
-                diff
-            }
+            (&Natural(Large(ref limbs)), other, _) => Natural::from_owned_limbs_asc(
+                limbs_mod_power_of_two_limb_sub_limbs(other, limbs, pow),
+            ),
         }
     }
 
@@ -467,9 +461,7 @@ impl<'a, 'b> ModPowerOfTwoSub<&'a Natural> for &'b Natural {
             (x, &Natural(Small(y))) => x.mod_power_of_two_sub_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_right_sub_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut diff = Natural(Large(limbs_mod_power_of_two_sub(xs, ys, pow)));
-                diff.trim();
-                diff
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two_sub(xs, ys, pow))
             }
         }
     }

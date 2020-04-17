@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_mod_neg {
     ($t:ident) => {
         impl ModNeg for $t {
             type Output = $t;
@@ -66,9 +66,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8);
-impl_arithmetic_traits!(u16);
-impl_arithmetic_traits!(u32);
-impl_arithmetic_traits!(u64);
-impl_arithmetic_traits!(u128);
-impl_arithmetic_traits!(usize);
+impl_mod_neg!(u8);
+impl_mod_neg!(u16);
+impl_mod_neg!(u32);
+impl_mod_neg!(u64);
+impl_mod_neg!(u128);
+impl_mod_neg!(usize);

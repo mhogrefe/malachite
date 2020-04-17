@@ -1374,9 +1374,7 @@ impl<'a> Rem<Natural> for &'a Natural {
                 (&Natural(Large(ref xs)), Natural(Large(ref ys))) => limbs_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut r = Natural(Large(rs));
-            r.trim();
-            r
+            Natural::from_owned_limbs_asc(rs)
         }
     }
 }
@@ -1430,9 +1428,7 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut r = Natural(Large(rs));
-            r.trim();
-            r
+            Natural::from_owned_limbs_asc(rs)
         }
     }
 }

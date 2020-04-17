@@ -255,9 +255,7 @@ impl Natural {
             Natural(Small(small)) => limbs_neg_limb_get_bits(small, start, end),
             Natural(Large(ref limbs)) => limbs_slice_neg_get_bits(limbs, start, end),
         };
-        let mut bits = Natural(Large(limbs));
-        bits.trim();
-        bits
+        Natural::from_owned_limbs_asc(limbs)
     }
 
     fn neg_get_bits_owned(self, start: u64, end: u64) -> Natural {
@@ -265,9 +263,7 @@ impl Natural {
             Natural(Small(small)) => limbs_neg_limb_get_bits(small, start, end),
             Natural(Large(limbs)) => limbs_vec_neg_get_bits(limbs, start, end),
         };
-        let mut bits = Natural(Large(limbs));
-        bits.trim();
-        bits
+        Natural::from_owned_limbs_asc(limbs)
     }
 
     fn neg_assign_bits(&mut self, start: u64, end: u64, bits: &Natural) {

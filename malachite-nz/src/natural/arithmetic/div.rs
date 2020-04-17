@@ -2020,9 +2020,7 @@ impl Natural {
             match *self {
                 Natural(Small(small)) => Natural(Small(small / other)),
                 Natural(Large(ref limbs)) => {
-                    let mut q = Natural(Large(limbs_div_limb(limbs, other)));
-                    q.trim();
-                    q
+                    Natural::from_owned_limbs_asc(limbs_div_limb(limbs, other))
                 }
             }
         }
@@ -2169,7 +2167,7 @@ impl<'a> Div<Natural> for &'a Natural {
         } else if self.limb_count() < other.limb_count() {
             Natural::ZERO
         } else {
-            let qs = match (self, &mut other) {
+            Natural::from_owned_limbs_asc(match (self, &mut other) {
                 (x, &mut Natural(Small(y))) => {
                     return x.div_limb_ref(y);
                 }
@@ -2179,10 +2177,7 @@ impl<'a> Div<Natural> for &'a Natural {
                     qs
                 }
                 _ => unreachable!(),
-            };
-            let mut q = Natural(Large(qs));
-            q.trim();
-            q
+            })
         }
     }
 }
@@ -2232,16 +2227,13 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
         } else if self.limb_count() < other.limb_count() {
             Natural::ZERO
         } else {
-            let qs = match (self, other) {
+            Natural::from_owned_limbs_asc(match (self, other) {
                 (x, &Natural(Small(y))) => {
                     return x.div_limb_ref(y);
                 }
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_div(xs, ys),
                 _ => unreachable!(),
-            };
-            let mut q = Natural(Large(qs));
-            q.trim();
-            q
+            })
         }
     }
 }

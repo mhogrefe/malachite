@@ -1,6 +1,6 @@
 use num::arithmetic::traits::NegAssign;
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_neg {
     ($t:ident) => {
         impl NegAssign for $t {
             /// Replaces `self` with its negative. Assumes that `self` can be negated.
@@ -33,9 +33,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(i8);
-impl_arithmetic_traits!(i16);
-impl_arithmetic_traits!(i32);
-impl_arithmetic_traits!(i64);
-impl_arithmetic_traits!(i128);
-impl_arithmetic_traits!(isize);
+impl_neg!(i8);
+impl_neg!(i16);
+impl_neg!(i32);
+impl_neg!(i64);
+impl_neg!(i128);
+impl_neg!(isize);

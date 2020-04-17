@@ -362,9 +362,7 @@ impl Natural {
                 }
             }
             (&Natural(Large(ref limbs)), other, pow) => {
-                let mut sum = Natural(Large(limbs_mod_power_of_two_add_limb(limbs, other, pow)));
-                sum.trim();
-                sum
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two_add_limb(limbs, other, pow))
             }
         }
     }
@@ -531,9 +529,7 @@ impl<'a, 'b> ModPowerOfTwoAdd<&'a Natural> for &'b Natural {
             (x, &Natural(Small(y))) => x.mod_power_of_two_add_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_add_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut sum = Natural(Large(limbs_mod_power_of_two_add(xs, ys, pow)));
-                sum.trim();
-                sum
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two_add(xs, ys, pow))
             }
         }
     }

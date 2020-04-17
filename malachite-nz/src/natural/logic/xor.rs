@@ -473,9 +473,7 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
             (x, &Natural(Small(y))) => x.xor_limb_ref(y),
             (&Natural(Small(x)), y) => y.xor_limb_ref(x),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_xor(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_xor(xs, ys))
             }
         }
     }

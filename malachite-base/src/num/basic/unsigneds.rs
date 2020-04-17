@@ -6,7 +6,8 @@ use num::arithmetic::traits::{
     ModPowerOfTwoMul, ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign,
     ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
     NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
-    RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
+    RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
+    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -89,6 +90,9 @@ pub trait PrimitiveUnsigned:
     + XXDivModYIsQR
     + XXSubYYIsZZ
     + XMulYIsZZ
+    + XXXAddYYYIsZZZ
+    + XXXSubYYYIsZZZ
+    + XXXXAddYYYYIsZZZZ
 {
     type SignedOfEqualWidth: PrimitiveSigned;
 }

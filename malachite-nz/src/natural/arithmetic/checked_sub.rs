@@ -28,9 +28,9 @@ impl Natural {
                 if *self < other {
                     None
                 } else {
-                    let mut diff = Natural(Large(limbs_sub_limb(limbs, other).0));
-                    diff.trim();
-                    Some(diff)
+                    Some(Natural::from_owned_limbs_asc(
+                        limbs_sub_limb(limbs, other).0,
+                    ))
                 }
             }
         }
@@ -235,9 +235,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
                     if self < other {
                         None
                     } else {
-                        let mut diff = Natural(Large(limbs_sub(xs, ys).0));
-                        diff.trim();
-                        Some(diff)
+                        Some(Natural::from_owned_limbs_asc(limbs_sub(xs, ys).0))
                     }
                 }
             }

@@ -1273,9 +1273,7 @@ impl Natural {
                 Natural(Small(x & ys[0].wrapping_neg()))
             }
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_and_pos_neg(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_and_pos_neg(xs, ys))
             }
         }
     }
@@ -1345,9 +1343,7 @@ impl Natural {
             (_, &Natural(Small(y))) => self.and_neg_limb_neg(y.wrapping_neg()),
             (&Natural(Small(x)), _) => other.and_neg_limb_neg(x.wrapping_neg()),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_and_neg_neg(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_and_neg_neg(xs, ys))
             }
         }
     }

@@ -606,9 +606,7 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
         } else {
             match (self, other) {
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                    let mut product = Natural(Large(limbs_mul(xs, ys)));
-                    product.trim();
-                    product
+                    Natural::from_owned_limbs_asc(limbs_mul(xs, ys))
                 }
                 _ => unreachable!(),
             }

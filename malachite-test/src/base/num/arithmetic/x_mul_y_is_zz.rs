@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::arithmetic::unsigneds::_explicit_x_mul_y_is_zz;
+use malachite_base::num::arithmetic::x_mul_y_is_zz::_explicit_x_mul_y_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use rand::distributions::range::SampleRange;

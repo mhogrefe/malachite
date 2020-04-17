@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_add_yy_is_zz;
+use malachite_base::num::arithmetic::xx_add_yy_is_zz::_explicit_xx_add_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use rand::distributions::range::SampleRange;
 use rand::Rand;

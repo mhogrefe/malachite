@@ -439,9 +439,7 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
             (x, &Natural(Small(y))) => Natural(Small(x.and_limb_ref(y))),
             (&Natural(Small(x)), y) => Natural(Small(y.and_limb_ref(x))),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_and(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_and(xs, ys))
             }
         }
     }

@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_div_mod_y_is_qr;
+use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
@@ -59,7 +59,7 @@ fn benchmark_xx_div_mod_y_is_qr_algorithms<T: PrimitiveUnsigned + Rand + SampleR
         gm.name(),
         limit,
         file_name,
-        &(|&(x_1, x_0, _)| usize::exact_from(limbs_significant_bits(&[x_1, x_0]))),
+        &(|&(x_1, x_0, _)| usize::exact_from(limbs_significant_bits(&[x_0, x_1]))),
         "x.significant_bits()",
         &mut [
             (

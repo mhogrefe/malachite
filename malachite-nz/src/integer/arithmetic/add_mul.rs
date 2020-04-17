@@ -336,9 +336,7 @@ impl Natural {
             (x, y, 1) => (y - x, false),
             (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
                 let (out_limbs, sign) = limbs_overflowing_sub_mul_limb(xs, ys, z);
-                let mut out = Natural(Large(out_limbs));
-                out.trim();
-                (out, sign)
+                (Natural::from_owned_limbs_asc(out_limbs), sign)
             }
             (x, y, z) => {
                 let yz = y * Natural::from(z);
@@ -424,9 +422,7 @@ impl Natural {
             (&Natural(Small(x)), y, z) => ((y * z).sub_limb(x), false),
             (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
                 let (out_limbs, sign) = limbs_overflowing_sub_mul(xs, ys, zs);
-                let mut out = Natural(Large(out_limbs));
-                out.trim();
-                (out, sign)
+                (Natural::from_owned_limbs_asc(out_limbs), sign)
             }
         }
     }

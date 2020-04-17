@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{OverflowingAbs, OverflowingAbsAssign};
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_overflowing_abs {
     ($t:ident) => {
         impl OverflowingAbs for $t {
             type Output = $t;
@@ -51,9 +51,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(i8);
-impl_arithmetic_traits!(i16);
-impl_arithmetic_traits!(i32);
-impl_arithmetic_traits!(i64);
-impl_arithmetic_traits!(i128);
-impl_arithmetic_traits!(isize);
+impl_overflowing_abs!(i8);
+impl_overflowing_abs!(i16);
+impl_overflowing_abs!(i32);
+impl_overflowing_abs!(i64);
+impl_overflowing_abs!(i128);
+impl_overflowing_abs!(isize);

@@ -254,9 +254,7 @@ impl BitBlockAccess for Natural {
         match *self {
             Natural(Small(small)) => Natural(Small(small.get_bits(start, end))),
             Natural(Large(ref limbs)) => {
-                let mut bits = Natural(Large(limbs_slice_get_bits(limbs, start, end)));
-                bits.trim();
-                bits
+                Natural::from_owned_limbs_asc(limbs_slice_get_bits(limbs, start, end))
             }
         }
     }
@@ -300,9 +298,7 @@ impl BitBlockAccess for Natural {
         match self {
             Natural(Small(small)) => Natural(Small(small.get_bits(start, end))),
             Natural(Large(limbs)) => {
-                let mut bits = Natural(Large(limbs_vec_get_bits(limbs, start, end)));
-                bits.trim();
-                bits
+                Natural::from_owned_limbs_asc(limbs_vec_get_bits(limbs, start, end))
             }
         }
     }

@@ -5,6 +5,7 @@ use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::chars::NUMBER_OF_CHARS;
+use malachite_base::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
 use malachite_base::num::arithmetic::traits::{
     DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo, UnsignedAbs,
 };
@@ -13,7 +14,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom,
 };
 use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
@@ -92,12 +93,12 @@ use rust_wheels::iterators::strings::{
     exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
 };
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
-    exhaustive_quadruples_from_single, exhaustive_quintuples, exhaustive_sextuples_from_single,
-    exhaustive_triples, exhaustive_triples_from_single, lex_pairs, lex_triples, log_pairs,
-    random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
-    random_quintuples, random_sextuples_from_single, random_triples, random_triples_from_single,
-    sqrt_pairs,
+    exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
+    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
+    lex_pairs, lex_triples, log_pairs, random_octuples_from_single, random_pairs,
+    random_pairs_from_single, random_quadruples, random_quadruples_from_single, random_quintuples,
+    random_sextuples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
@@ -108,7 +109,7 @@ use rust_wheels::iterators::vecs::{
 use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{
     permute_1_2_4_3, permute_1_3_2, permute_1_3_4_2, permute_2_1, permute_2_1_3, reshape_1_2_to_3,
-    reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
+    reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, reshape_3_3_3_to_9, reshape_4_4_4_to_12,
 };
 
 pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
@@ -1480,6 +1481,54 @@ pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Lim
             limbs_two_limb_inverse_helper(d_1, d_0),
         )
     }))
+}
+
+pub fn octuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T, T, T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => {
+            Box::new(exhaustive_octuples_from_single(exhaustive_unsigned()))
+        }
+        GenerationMode::Random(_) => Box::new(random_octuples_from_single(random(&EXAMPLE_SEED))),
+        GenerationMode::SpecialRandom(_) => Box::new(random_octuples_from_single(
+            special_random_unsigned(&EXAMPLE_SEED),
+        )),
+    }
+}
+
+pub fn nonuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T, T, T, T, T, T)> {
+    let ts: It<((T, T, T), (T, T, T), (T, T, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_triples_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(
+            random_triples_from_single(random(&EXAMPLE_SEED)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
+            random_triples_from_single(special_random_unsigned(&EXAMPLE_SEED)),
+        )),
+    };
+    reshape_3_3_3_to_9(ts)
+}
+
+pub fn duodecuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
+    let qs: It<((T, T, T, T), (T, T, T, T), (T, T, T, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
+            exhaustive_quadruples_from_single(exhaustive_unsigned()),
+        )),
+        GenerationMode::Random(_) => Box::new(random_triples_from_single(
+            random_quadruples_from_single(random(&EXAMPLE_SEED)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
+            random_quadruples_from_single(special_random_unsigned(&EXAMPLE_SEED)),
+        )),
+    };
+    reshape_4_4_4_to_12(qs)
 }
 
 fn vecs_of_unsigned_with_seed<T: PrimitiveUnsigned + Rand>(
@@ -3285,6 +3334,27 @@ pub fn quadruples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, T, T)> {
     Box::new(quadruples_of_unsigneds(gm).filter(|&(x, y, z, m)| x < m && y < m && z < m))
+}
+
+// All quadruples of unsigned `T` that are valid inputs to _limbs_mod_preinverted.
+pub fn quadruples_of_unsigneds_var_2<
+    T: PrimitiveUnsigned + Rand,
+    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
+    gm: GenerationMode,
+) -> It<(T, T, T, T)>
+where
+    DT: From<T> + HasHalf<Half = T>,
+    T: CheckedFrom<DT>,
+{
+    Box::new(
+        triples_of_unsigneds(gm)
+            .filter(|&(_, _, d)| d != T::ZERO)
+            .map(|(x_1, x_0, d)| {
+                let inv = _limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
+                (x_1, x_0, d, inv)
+            }),
+    )
 }
 
 fn quadruples_of_unsigned_small_unsigned_small_unsigned_and_unsigned<

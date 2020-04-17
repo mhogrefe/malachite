@@ -1820,9 +1820,7 @@ impl Natural {
                 }
                 Natural(Large(ref limbs)) => {
                     let (qs, r) = limbs_div_limb_mod(limbs, other);
-                    let mut q = Natural(Large(qs));
-                    q.trim();
-                    (q, r)
+                    (Natural::from_owned_limbs_asc(qs), r)
                 }
             }
         }
@@ -1998,10 +1996,8 @@ impl<'a> DivMod<Natural> for &'a Natural {
                 }
                 _ => unreachable!(),
             };
-            let mut q = Natural(Large(qs));
-            q.trim();
             other.trim();
-            (q, other)
+            (Natural::from_owned_limbs_asc(qs), other)
         }
     }
 }
@@ -2063,11 +2059,10 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
                 (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => limbs_div_mod(xs, ys),
                 _ => unreachable!(),
             };
-            let mut q = Natural(Large(qs));
-            q.trim();
-            let mut r = Natural(Large(rs));
-            r.trim();
-            (q, r)
+            (
+                Natural::from_owned_limbs_asc(qs),
+                Natural::from_owned_limbs_asc(rs),
+            )
         }
     }
 }
@@ -2194,9 +2189,7 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
                 _ => unreachable!(),
             };
             self.trim();
-            let mut r = Natural(Large(rs));
-            r.trim();
-            r
+            Natural::from_owned_limbs_asc(rs)
         }
     }
 }

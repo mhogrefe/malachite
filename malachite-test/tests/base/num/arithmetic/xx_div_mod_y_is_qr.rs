@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_div_mod_y_is_qr;
+use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use rand::distributions::range::SampleRange;
 use rand::Rand;

@@ -1,7 +1,7 @@
 use num::arithmetic::traits::ModPowerOfTwoIsReduced;
 use num::logic::traits::SignificantBits;
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_mod_power_of_two_is_reduced {
     ($t:ident) => {
         impl ModPowerOfTwoIsReduced for $t {
             /// Returns whether `self` is reduced mod 2<sup>`pow`</sup>; in other words, whether it
@@ -27,9 +27,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8);
-impl_arithmetic_traits!(u16);
-impl_arithmetic_traits!(u32);
-impl_arithmetic_traits!(u64);
-impl_arithmetic_traits!(u128);
-impl_arithmetic_traits!(usize);
+impl_mod_power_of_two_is_reduced!(u8);
+impl_mod_power_of_two_is_reduced!(u16);
+impl_mod_power_of_two_is_reduced!(u32);
+impl_mod_power_of_two_is_reduced!(u64);
+impl_mod_power_of_two_is_reduced!(u128);
+impl_mod_power_of_two_is_reduced!(usize);

@@ -224,6 +224,44 @@ pub trait OverflowingAddAssign<RHS = Self> {
     fn overflowing_add_assign(&mut self, rhs: RHS) -> bool;
 }
 
+/// Adds two numbers, each composed of two `Self` values. The sum is returned as a pair of `Self`
+/// values. The more significant value always comes first. Addition is wrapping, and overflow is not
+/// indicated.
+pub trait XXAddYYIsZZ: Sized {
+    fn xx_add_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
+/// Adds two numbers, each composed of three `Self` values. The sum is returned as a triple of
+/// `Self` values. The more significant value always comes first. Addition is wrapping, and overflow
+/// is not indicated.
+pub trait XXXAddYYYIsZZZ: Sized {
+    fn xxx_add_yyy_is_zzz(
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self);
+}
+
+/// Adds two numbers, each composed of four `Self` values. The sum is returned as a quadruple of
+/// `Self` values. The more significant value always comes first. Addition is wrapping, and overflow
+/// is not indicated.
+pub trait XXXXAddYYYYIsZZZZ: Sized {
+    #[allow(clippy::too_many_arguments)]
+    fn xxxx_add_yyyy_is_zzzz(
+        x_3: Self,
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_3: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self, Self);
+}
+
 /// Checked subtraction. Computes `self - rhs`, returning `None` if there is no valid result.
 pub trait CheckedSub<RHS = Self> {
     type Output;
@@ -277,18 +315,25 @@ pub trait OverflowingSubAssign<RHS = Self> {
     fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
 }
 
-/// Adds two numbers, each composed of two `Self` values. The sum is returned as a pair of `Self`
-/// values. The more significant value always comes first. Addition is wrapping, and overflow is not
-/// indicated.
-pub trait XXAddYYIsZZ: Sized {
-    fn xx_add_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
-}
-
 /// Subtracts two numbers, each composed of two `Self` values. The difference is returned as a pair
 /// of `Self` values. The more significant value always comes first. Subtraction is wrapping, and
 /// overflow is not indicated.
 pub trait XXSubYYIsZZ: Sized {
     fn xx_sub_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
+/// Subtracts two numbers, each composed of three `Self` values. The difference is returned as a
+/// triple of `Self` values. The more significant value always comes first. Subtraction is wrapping,
+/// and overflow is not indicated.
+pub trait XXXSubYYYIsZZZ: Sized {
+    fn xxx_sub_yyy_is_zzz(
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self);
 }
 
 /// Computes `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod

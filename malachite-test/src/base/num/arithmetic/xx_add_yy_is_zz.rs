@@ -1,6 +1,6 @@
 use std::cmp::max;
 
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_add_yy_is_zz;
+use malachite_base::num::arithmetic::xx_add_yy_is_zz::_explicit_xx_add_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
@@ -61,8 +61,8 @@ fn benchmark_xx_add_yy_is_zz_algorithms<T: PrimitiveUnsigned + Rand + SampleRang
         file_name,
         &(|&(x_1, x_0, y_1, y_0)| {
             usize::exact_from(max(
-                limbs_significant_bits(&[x_1, x_0]),
-                limbs_significant_bits(&[y_1, y_0]),
+                limbs_significant_bits(&[x_0, x_1]),
+                limbs_significant_bits(&[y_0, y_1]),
             ))
         }),
         "max(x.significant_bits(), y.significant_bits())",

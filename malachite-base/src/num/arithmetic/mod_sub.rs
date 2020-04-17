@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{ModSub, ModSubAssign};
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_mod_sub {
     ($t:ident) => {
         impl ModSub for $t {
             type Output = $t;
@@ -60,9 +60,9 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8);
-impl_arithmetic_traits!(u16);
-impl_arithmetic_traits!(u32);
-impl_arithmetic_traits!(u64);
-impl_arithmetic_traits!(u128);
-impl_arithmetic_traits!(usize);
+impl_mod_sub!(u8);
+impl_mod_sub!(u16);
+impl_mod_sub!(u32);
+impl_mod_sub!(u64);
+impl_mod_sub!(u128);
+impl_mod_sub!(usize);

@@ -26,11 +26,7 @@ impl Natural {
             if fallback {
                 self.checked_sub(b * Natural::from(c))
             } else {
-                result.map(|limbs| {
-                    let mut result = Natural(Large(limbs));
-                    result.trim();
-                    result
-                })
+                result.map(Natural::from_owned_limbs_asc)
             }
         }
     }
@@ -225,11 +221,8 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
             if let Natural(Large(ref a_limbs)) = *self {
                 if let Natural(Large(ref b_limbs)) = *b {
                     if let Natural(Large(ref c_limbs)) = *c {
-                        return limbs_sub_mul(a_limbs, b_limbs, c_limbs).map(|result_limbs| {
-                            let mut result = Natural(Large(result_limbs));
-                            result.trim();
-                            result
-                        });
+                        return limbs_sub_mul(a_limbs, b_limbs, c_limbs)
+                            .map(Natural::from_owned_limbs_asc);
                     }
                 }
             }

@@ -1813,9 +1813,7 @@ impl Natural {
             match *self {
                 Natural(Small(small)) => Natural(Small(small / other)),
                 Natural(Large(ref limbs)) => {
-                    let mut q = Natural(Large(limbs_div_exact_limb(limbs, other)));
-                    q.trim();
-                    q
+                    Natural::from_owned_limbs_asc(limbs_div_exact_limb(limbs, other))
                 }
             }
         }
@@ -1987,7 +1985,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
         } else {
-            let qs = match (self, &mut other) {
+            Natural::from_owned_limbs_asc(match (self, &mut other) {
                 (x, &mut Natural(Small(y))) => {
                     return x.div_exact_limb_ref(y);
                 }
@@ -1997,10 +1995,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
                     qs
                 }
                 _ => unreachable!(),
-            };
-            let mut q = Natural(Large(qs));
-            q.trim();
-            q
+            })
         }
     }
 }
@@ -2060,7 +2055,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
         } else if self.limb_count() < other.limb_count() {
             panic!("division not exact");
         } else {
-            let qs = match (self, other) {
+            Natural::from_owned_limbs_asc(match (self, other) {
                 (x, &Natural(Small(y))) => {
                     return x.div_exact_limb_ref(y);
                 }
@@ -2070,10 +2065,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
                     qs
                 }
                 _ => unreachable!(),
-            };
-            let mut q = Natural(Large(qs));
-            q.trim();
-            q
+            })
         }
     }
 }

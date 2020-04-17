@@ -1,14 +1,65 @@
-use malachite_base::num::arithmetic::mod_mul::{_fast_mod_mul, _naive_mod_mul};
+use malachite_base::num::arithmetic::mod_mul::{
+    _fast_mod_mul, _limbs_invert_limb_naive, _limbs_invert_limb_u32, _limbs_invert_limb_u64,
+    _limbs_mod_preinverted, _naive_mod_mul,
+};
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_unsigneds_var_5, quadruples_of_unsigneds_var_1, triples_of_unsigneds_var_1,
+    pairs_of_unsigneds_var_5, quadruples_of_unsigneds_var_1, quadruples_of_unsigneds_var_2,
+    triples_of_unsigneds_var_1, unsigneds_var_1,
 };
+
+#[test]
+fn invert_limb_u32_properties() {
+    test_properties(unsigneds_var_1::<u32>, |&x| {
+        let inverse = _limbs_invert_limb_u32(x);
+        assert_eq!(_limbs_invert_limb_naive::<u32, u64>(x), inverse);
+        assert_ne!(inverse, 0);
+    });
+}
+
+#[test]
+fn invert_limb_u64_properties() {
+    test_properties(unsigneds_var_1::<u64>, |&x| {
+        let inverse = _limbs_invert_limb_u64(x);
+        assert_eq!(_limbs_invert_limb_naive::<u64, u128>(x), inverse);
+        assert_ne!(inverse, 0);
+    });
+}
+
+fn limbs_mod_preinverted_properties_helper<
+    T: PrimitiveUnsigned + Rand,
+    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>()
+where
+    DT: From<T> + HasHalf<Half = T>,
+    T: CheckedFrom<DT>,
+{
+    test_properties(
+        quadruples_of_unsigneds_var_2::<T, DT>,
+        |&(x_1, x_0, d, d_inv)| {
+            let r = _limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv);
+            let n = DT::join_halves(x_1, x_0);
+            assert_eq!(T::exact_from(n % DT::from(d)), r);
+            assert!(r < d);
+            let q = DT::join_halves(x_1, x_0) / DT::from(d);
+            assert_eq!(q * DT::from(d) + DT::from(r), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_mod_preinverted_properties() {
+    limbs_mod_preinverted_properties_helper::<u8, u16>();
+    limbs_mod_preinverted_properties_helper::<u16, u32>();
+    limbs_mod_preinverted_properties_helper::<u32, u64>();
+    limbs_mod_preinverted_properties_helper::<u64, u128>();
+}
 
 fn mod_mul_properties_helper<T: PrimitiveUnsigned + Rand + SampleRange>() {
     test_properties(triples_of_unsigneds_var_1::<T>, |&(x, y, m)| {

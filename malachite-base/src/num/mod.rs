@@ -1,7 +1,10 @@
 pub mod arithmetic {
     pub mod abs;
     pub mod checked_abs;
+    pub mod checked_add;
+    pub mod checked_mul;
     pub mod checked_neg;
+    pub mod checked_sub;
     pub mod integers;
     pub mod mod_add;
     pub mod mod_is_reduced;
@@ -20,9 +23,27 @@ pub mod arithmetic {
     pub mod overflowing_neg;
     pub mod overflowing_sub;
     pub mod power_of_two;
+    pub mod saturating_abs;
+    pub mod saturating_add;
+    pub mod saturating_mul;
+    pub mod saturating_neg;
+    pub mod saturating_sub;
+    pub mod sign;
     pub mod signeds;
     pub mod traits;
     pub mod unsigneds;
+    pub mod wrapping_abs;
+    pub mod wrapping_add;
+    pub mod wrapping_mul;
+    pub mod wrapping_neg;
+    pub mod wrapping_sub;
+    pub mod x_mul_y_is_zz;
+    pub mod xx_add_yy_is_zz;
+    pub mod xx_div_mod_y_is_qr;
+    pub mod xx_sub_yy_is_zz;
+    pub mod xxx_add_yyy_is_zzz;
+    pub mod xxx_sub_yyy_is_zzz;
+    pub mod xxxx_add_yyyy_is_zzzz;
 }
 pub mod basic {
     pub mod integers;

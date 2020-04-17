@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_div_mod_y_is_qr;
+use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]

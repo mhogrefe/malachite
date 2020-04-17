@@ -4,7 +4,9 @@ use num::arithmetic::traits::{
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
+use num::conversion::traits::{
+    CheckedFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom,
+};
 use num::logic::traits::LeadingZeros;
 
 pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
@@ -81,8 +83,23 @@ pub fn test_invert_u32_table() {
     }
 }
 
-/// This is invert_limb from ulong_extras.h, FLINT Dev 1, when GMP_LIMB_BITS == 32.
-fn invert_limb_u32(x: u32) -> u32 {
+pub fn _limbs_invert_limb_naive<
+    T: PrimitiveUnsigned,
+    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
+    x: T,
+) -> T
+where
+    T: CheckedFrom<DT>,
+    DT: From<T> + HasHalf<Half = T>,
+{
+    T::exact_from(DT::MAX / DT::from(x) - DT::power_of_two(T::WIDTH))
+}
+
+/// Computes (B ^ 2 - B * x - 1) / x = (B ^ 2 - 1) / x - B. The highest bit of `x` must be set.
+///
+/// This is invert_limb from longlong.h, FLINT Dev 1, when GMP_LIMB_BITS == 32.
+pub fn _limbs_invert_limb_u32(x: u32) -> u32 {
     assert!(x.get_highest_bit());
     let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
     let b = (a << 4)
@@ -145,8 +162,10 @@ pub fn test_invert_u64_table() {
     }
 }
 
-/// This is invert_limb from ulong_extras.h, FLINT Dev 1, when GMP_LIMB_BITS == 64.
-fn invert_limb_u64(x: u64) -> u64 {
+/// Computes (B ^ 2 - B * x - 1) / x = (B ^ 2 - 1) / x - B. The highest bit of `x` must be set.
+///
+/// This is invert_limb from longlong.h, FLINT Dev 1, when GMP_LIMB_BITS == 64.
+pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
     assert!(x.get_highest_bit());
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
@@ -166,68 +185,71 @@ fn invert_limb_u64(x: u64) -> u64 {
     )
 }
 
-// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT Dev 1.
-fn _mod_preinverted<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+/// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT Dev 1.
+pub fn _limbs_mod_preinverted<
+    T: PrimitiveUnsigned,
+    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
     mut x_1: T,
     x_0: T,
-    m: T,
-    inv: T,
+    d: T,
+    d_inv: T,
 ) -> T
 where
     DT: From<T> + HasHalf<Half = T>,
 {
-    assert_ne!(m, T::ZERO);
-    let inv = DT::from(inv);
-    let shift = LeadingZeros::leading_zeros(m);
+    assert_ne!(d, T::ZERO);
+    let d_inv = DT::from(d_inv);
+    let shift = LeadingZeros::leading_zeros(d);
     if shift == 0 {
-        if x_1 >= m {
-            x_1 -= m;
+        if x_1 >= d {
+            x_1 -= d;
         }
-        let (q_1, q_0) = (inv * DT::from(x_1))
+        let (q_1, q_0) = (d_inv * DT::from(x_1))
             .wrapping_add(DT::join_halves(x_1, x_0))
             .split_in_half();
-        let mut r = x_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(m));
+        let mut r = x_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(d));
         if r > q_0 {
-            r.wrapping_add_assign(m);
+            r.wrapping_add_assign(d);
         }
-        if r < m {
+        if r < d {
             r
         } else {
-            r - m
+            r - d
         }
     } else {
-        let mut m = m;
-        if x_1 >= m {
+        let mut d = d;
+        if x_1 >= d {
             let y_1 = x_1 >> (T::WIDTH - shift);
             let y_0 = x_1 << shift;
-            m <<= shift;
-            let (q1, q0) = (inv * DT::from(y_1))
+            d <<= shift;
+            let (q1, q0) = (d_inv * DT::from(y_1))
                 .wrapping_add(DT::join_halves(y_1, y_0))
                 .split_in_half();
-            x_1 = y_0.wrapping_sub(q1.wrapping_add(T::ONE).wrapping_mul(m));
+            x_1 = y_0.wrapping_sub(q1.wrapping_add(T::ONE).wrapping_mul(d));
             if x_1 > q0 {
-                x_1.wrapping_add_assign(m);
+                x_1.wrapping_add_assign(d);
             }
-            if x_1 >= m {
-                x_1 -= m;
+            if x_1 >= d {
+                x_1 -= d;
             }
         } else {
-            m <<= shift;
+            d <<= shift;
             x_1 <<= shift;
         }
         let y_1 = x_1.wrapping_add(x_0 >> (T::WIDTH - shift));
         let y_0 = x_0 << shift;
-        let (q_1, q_0) = (inv * DT::from(y_1))
+        let (q_1, q_0) = (d_inv * DT::from(y_1))
             .wrapping_add(DT::join_halves(y_1, y_0))
             .split_in_half();
-        let mut r = y_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(m));
+        let mut r = y_0.wrapping_sub(q_1.wrapping_add(T::ONE).wrapping_mul(d));
         if r > q_0 {
-            r.wrapping_add_assign(m);
+            r.wrapping_add_assign(d);
         }
-        if r < m {
+        if r < d {
             r >> shift
         } else {
-            (r - m) >> shift
+            (r - d) >> shift
         }
     }
 }
@@ -244,7 +266,7 @@ where
 {
     assert_ne!(m, T::ZERO);
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
-    _mod_preinverted::<T, DT>(product_1, product_0, m, inv)
+    _limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
 }
 
 macro_rules! impl_mod_mul_precomputed_fast {
@@ -293,8 +315,8 @@ macro_rules! impl_mod_mul_precomputed_fast {
     };
 }
 
-impl_mod_mul_precomputed_fast!(u32, u64, invert_limb_u32);
-impl_mod_mul_precomputed_fast!(u64, u128, invert_limb_u64);
+impl_mod_mul_precomputed_fast!(u32, u64, _limbs_invert_limb_u32);
+impl_mod_mul_precomputed_fast!(u64, u128, _limbs_invert_limb_u64);
 
 macro_rules! impl_mod_mul_precomputed_promoted {
     ($t:ident) => {

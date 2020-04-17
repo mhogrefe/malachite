@@ -383,9 +383,7 @@ impl<'a, 'b> ModPowerOfTwoMul<&'b Natural> for &'a Natural {
             (x, &Natural(Small(y))) => x.mod_power_of_two_mul_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_mul_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut product = Natural(Large(limbs_mod_power_of_two_mul_ref_ref(xs, ys, pow)));
-                product.trim();
-                product
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two_mul_ref_ref(xs, ys, pow))
             }
         }
     }

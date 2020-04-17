@@ -256,9 +256,7 @@ impl<'a> ModPowerOfTwo for &'a Natural {
         match *self {
             Natural(Small(ref small)) => Natural(Small(small.mod_power_of_two(pow))),
             Natural(Large(ref limbs)) => {
-                let mut result = Natural(Large(limbs_mod_power_of_two(limbs, pow)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_mod_power_of_two(limbs, pow))
             }
         }
     }
@@ -454,12 +452,10 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
         } else if pow <= Limb::WIDTH {
             Natural::from(Limb::wrapping_from(self).neg_mod_power_of_two(pow))
         } else {
-            let mut result = Natural(Large(match *self {
+            Natural::from_owned_limbs_asc(match *self {
                 Natural(Small(small)) => limbs_neg_mod_power_of_two(&[small], pow),
                 Natural(Large(ref limbs)) => limbs_neg_mod_power_of_two(limbs, pow),
-            }));
-            result.trim();
-            result
+            })
         }
     }
 }

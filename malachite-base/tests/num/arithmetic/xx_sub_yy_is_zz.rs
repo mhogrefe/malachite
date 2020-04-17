@@ -1,5 +1,5 @@
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::unsigneds::_explicit_xx_sub_yy_is_zz;
+use malachite_base::num::arithmetic::xx_sub_yy_is_zz::_explicit_xx_sub_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]

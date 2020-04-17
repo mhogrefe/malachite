@@ -40,6 +40,9 @@ pub mod num {
         pub mod xx_add_yy_is_zz;
         pub mod xx_div_mod_y_is_qr;
         pub mod xx_sub_yy_is_zz;
+        pub mod xxx_add_yyy_is_zzz;
+        pub mod xxx_sub_yyy_is_zzz;
+        pub mod xxxx_add_yyyy_is_zzzz;
     }
     pub mod basic {
         pub mod constants;

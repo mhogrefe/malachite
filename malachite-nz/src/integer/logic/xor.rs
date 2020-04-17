@@ -1467,9 +1467,7 @@ impl Natural {
                 })
             }
             Natural(Large(ref limbs)) => {
-                let mut result = Natural(Large(limbs_neg_xor_limb(limbs, other)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_neg_xor_limb(limbs, other))
             }
         }
     }
@@ -1517,9 +1515,7 @@ impl Natural {
         match *self {
             Natural(Small(small)) => Natural(Small(small.wrapping_neg() ^ other)),
             Natural(Large(ref limbs)) => {
-                let mut result = Natural(Large(limbs_neg_xor_limb_neg(limbs, other)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_neg_xor_limb_neg(limbs, other))
             }
         }
     }
@@ -1603,9 +1599,7 @@ impl Natural {
             (_, &Natural(Small(y))) => self.xor_pos_limb_neg(y.wrapping_neg()),
             (&Natural(Small(x)), _) => other.xor_neg_limb_pos(x),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_xor_pos_neg(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_xor_pos_neg(xs, ys))
             }
         }
     }
@@ -1661,9 +1655,7 @@ impl Natural {
             (_, &Natural(Small(y))) => self.xor_neg_limb_neg(y.wrapping_neg()),
             (&Natural(Small(x)), _) => other.xor_neg_limb_neg(x.wrapping_neg()),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                let mut result = Natural(Large(limbs_xor_neg_neg(xs, ys)));
-                result.trim();
-                result
+                Natural::from_owned_limbs_asc(limbs_xor_neg_neg(xs, ys))
             }
         }
     }

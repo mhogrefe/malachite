@@ -1,7 +1,6 @@
 use num::arithmetic::traits::{OverflowingNeg, OverflowingNegAssign};
 
-/// This macro defines trait implementations that are the same for unsigned and signed types.
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_overflowing_neg {
     ($t:ident) => {
         impl OverflowingNeg for $t {
             type Output = $t;
@@ -52,15 +51,15 @@ macro_rules! impl_arithmetic_traits {
     };
 }
 
-impl_arithmetic_traits!(u8);
-impl_arithmetic_traits!(u16);
-impl_arithmetic_traits!(u32);
-impl_arithmetic_traits!(u64);
-impl_arithmetic_traits!(u128);
-impl_arithmetic_traits!(usize);
-impl_arithmetic_traits!(i8);
-impl_arithmetic_traits!(i16);
-impl_arithmetic_traits!(i32);
-impl_arithmetic_traits!(i64);
-impl_arithmetic_traits!(i128);
-impl_arithmetic_traits!(isize);
+impl_overflowing_neg!(u8);
+impl_overflowing_neg!(u16);
+impl_overflowing_neg!(u32);
+impl_overflowing_neg!(u64);
+impl_overflowing_neg!(u128);
+impl_overflowing_neg!(usize);
+impl_overflowing_neg!(i8);
+impl_overflowing_neg!(i16);
+impl_overflowing_neg!(i32);
+impl_overflowing_neg!(i64);
+impl_overflowing_neg!(i128);
+impl_overflowing_neg!(isize);
