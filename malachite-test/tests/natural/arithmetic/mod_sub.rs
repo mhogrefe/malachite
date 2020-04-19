@@ -122,24 +122,44 @@ fn mod_sub_properties() {
     test_properties(triples_of_naturals_var_4, |&(ref x, ref y, ref m)| {
         assert!(x.mod_is_reduced(m));
         assert!(y.mod_is_reduced(m));
-        let diff_val_val = x.clone().mod_sub(y.clone(), m);
-        let diff_val_ref = x.clone().mod_sub(y, m);
-        let diff_ref_val = x.mod_sub(y.clone(), m);
+        let diff_val_val_val = x.clone().mod_sub(y.clone(), m.clone());
+        let diff_val_ref_val = x.clone().mod_sub(y, m.clone());
+        let diff_ref_val_val = x.mod_sub(y.clone(), m.clone());
+        let diff_ref_ref_val = x.mod_sub(y, m.clone());
+        let diff_val_val_ref = x.clone().mod_sub(y.clone(), m);
+        let diff_val_ref_ref = x.clone().mod_sub(y, m);
+        let diff_ref_val_ref = x.mod_sub(y.clone(), m);
         let diff = x.mod_sub(y, m);
-        assert!(diff_val_val.is_valid());
-        assert!(diff_val_ref.is_valid());
-        assert!(diff_ref_val.is_valid());
+        assert!(diff_val_val_val.is_valid());
+        assert!(diff_val_ref_val.is_valid());
+        assert!(diff_ref_val_val.is_valid());
+        assert!(diff_val_val_ref.is_valid());
+        assert!(diff_val_val_ref.is_valid());
+        assert!(diff_val_ref_ref.is_valid());
+        assert!(diff_ref_val_ref.is_valid());
         assert!(diff.is_valid());
         assert!(diff.mod_is_reduced(m));
-        assert_eq!(diff_val_val, diff);
-        assert_eq!(diff_val_ref, diff);
-        assert_eq!(diff_ref_val, diff);
+        assert_eq!(diff_val_val_val, diff);
+        assert_eq!(diff_val_ref_val, diff);
+        assert_eq!(diff_ref_val_val, diff);
+        assert_eq!(diff_ref_ref_val, diff);
+        assert_eq!(diff_val_val_ref, diff);
+        assert_eq!(diff_val_ref_ref, diff);
+        assert_eq!(diff_ref_val_ref, diff);
 
         assert_eq!(
             (Integer::from(x) - Integer::from(y)).mod_op(Integer::from(m)),
             diff
         );
 
+        let mut mut_x = x.clone();
+        mut_x.mod_sub_assign(y.clone(), m.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, diff);
+        let mut mut_x = x.clone();
+        mut_x.mod_sub_assign(y, m.clone());
+        assert_eq!(mut_x, diff);
+        assert!(mut_x.is_valid());
         let mut mut_x = x.clone();
         mut_x.mod_sub_assign(y.clone(), m);
         assert!(mut_x.is_valid());

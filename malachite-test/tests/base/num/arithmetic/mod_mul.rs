@@ -72,7 +72,7 @@ fn mod_mul_properties_helper<T: PrimitiveUnsigned + Rand + SampleRange>() {
         x_alt.mod_mul_assign(y, m);
         assert_eq!(x_alt, product);
 
-        let data = T::precompute_mod_mul_data(m);
+        let data = T::precompute_mod_mul_data(&m);
 
         assert_eq!(x.mod_mul_precomputed(y, m, &data), product);
 
@@ -117,7 +117,7 @@ where
     test_properties(triples_of_unsigneds_var_1::<T>, |&(x, y, m)| {
         let product = x.mod_mul(y, m);
         assert_eq!(
-            _fast_mod_mul::<T, DT>(x, y, m, T::precompute_mod_mul_data(m)),
+            _fast_mod_mul::<T, DT>(x, y, m, T::precompute_mod_mul_data(&m)),
             product
         );
     });

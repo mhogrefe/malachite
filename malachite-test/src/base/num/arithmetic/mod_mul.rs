@@ -273,7 +273,7 @@ fn benchmark_mod_mul_algorithms_with_fast<
                         x,
                         y,
                         m,
-                        T::precompute_mod_mul_data(m)
+                        T::precompute_mod_mul_data(&m)
                     ))
                 }),
             ),
@@ -325,7 +325,7 @@ fn benchmark_mod_mul_precomputed_algorithms<T: PrimitiveUnsigned + Rand + Sample
             (
                 "precomputed",
                 &mut (|(x, y, m)| {
-                    let data = T::precompute_mod_mul_data(m);
+                    let data = T::precompute_mod_mul_data(&m);
                     for _ in 0..10 {
                         x.mod_mul_precomputed(y, m, &data);
                     }

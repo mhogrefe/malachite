@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::XMulYIsZZ;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::SplitInHalf;
 
@@ -211,8 +212,7 @@ impl Natural {
             (_, 0) => *self = natural_zero!(),
             (&mut natural_one!(), _) => *self = Natural::from(other),
             (&mut Natural(Small(ref mut small)), other) => {
-                let product = DoubleLimb::from(*small) * DoubleLimb::from(other);
-                let (upper, lower) = product.split_in_half();
+                let (upper, lower) = Limb::x_mul_y_is_zz(*small, other);
                 if upper == 0 {
                     *small = lower;
                 } else {
@@ -233,8 +233,7 @@ impl Natural {
         } else {
             Natural(match *self {
                 Natural(Small(small)) => {
-                    let product = DoubleLimb::from(small) * DoubleLimb::from(other);
-                    let (upper, lower) = product.split_in_half();
+                    let (upper, lower) = Limb::x_mul_y_is_zz(small, other);
                     if upper == 0 {
                         Small(lower)
                     } else {

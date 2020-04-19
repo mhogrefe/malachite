@@ -481,7 +481,7 @@ pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     type Output;
     type Data;
 
-    fn precompute_mod_mul_data(m: M) -> Self::Data;
+    fn precompute_mod_mul_data(m: &M) -> Self::Data;
 
     fn mod_mul_precomputed(self, rhs: RHS, m: M, data: &Self::Data) -> Self::Output;
 }

@@ -85,7 +85,7 @@ fn mod_mul_helper<T: PrimitiveUnsigned>() {
         mut_x.mod_mul_assign(y, m);
         assert_eq!(mut_x, out);
 
-        let data = T::precompute_mod_mul_data(m);
+        let data = T::precompute_mod_mul_data(&m);
         assert_eq!(x.mod_mul_precomputed(y, m, &data), out);
 
         let mut mut_x = x;

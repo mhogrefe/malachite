@@ -88,8 +88,7 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(
     let mut borrow = 0;
     let double_limb = DoubleLimb::from(limb);
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let product = DoubleLimb::from(y) * double_limb;
-        let (upper, mut lower) = product.split_in_half();
+        let (upper, mut lower) = (DoubleLimb::from(y) * double_limb).split_in_half();
         lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);
@@ -191,8 +190,7 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
     let mut borrow = 0;
     let double_limb = DoubleLimb::from(limb);
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
-        let product = DoubleLimb::from(*y) * double_limb;
-        let (upper, mut lower) = product.split_in_half();
+        let (upper, mut lower) = (DoubleLimb::from(*y) * double_limb).split_in_half();
         lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);

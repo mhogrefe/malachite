@@ -7,7 +7,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "az"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -276,7 +276,7 @@ name = "rug"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "az 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "az 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gmp-mpfr-sys 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.69 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -399,7 +399,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
 "checksum autocfg 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
-"checksum az 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "50c75f843b208181e91db52dfa533306f2936d4fdf9b5e2550718feb36bb9a04"
+"checksum az 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "41a6b78289a33e09b00818ca8c90ab17c5dabb6e74f4b29a6de679c0e0886ade"
 "checksum block-buffer 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c0940dc441f31689269e10ac70eb1002a3a1d3ad1390e030043662eb7fe4688b"
 "checksum block-padding 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fa79dedbb091f449f1f39e53edf88d5dbe95f895dae6135a8d7b881fb5af73f5"
 "checksum byte-tools 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "e3b5ca7a04898ad4bcd41c90c5285445ff5b791899bb1b0abdd2a2aa791211d7"

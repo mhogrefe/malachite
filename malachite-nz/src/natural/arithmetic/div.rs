@@ -4,7 +4,9 @@ use std::mem::swap;
 use std::ops::{Div, DivAssign};
 
 use malachite_base::comparison::Max;
-use malachite_base::num::arithmetic::traits::{DivRem, WrappingAddAssign, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    DivRem, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
@@ -465,9 +467,7 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_in
             if n_1 != carry {
                 if flag && n_1 < carry {
                     q.wrapping_sub_assign(1);
-                    let (new_n_1, new_n_0) = DoubleLimb::join_halves(ns[1], ns[0])
-                        .wrapping_add(DoubleLimb::join_halves(d_2, ds_hi[0]))
-                        .split_in_half();
+                    let (new_n_1, new_n_0) = Limb::xx_add_yy_is_zz(ns[1], ns[0], d_2, ds_hi[0]);
                     ns[1] = new_n_1;
                     ns[0] = new_n_0;
                 } else {
@@ -2405,8 +2405,7 @@ fn limbs_div_limb_normalized_in_place(xs: &mut [Limb], xs_high: Limb, d: Limb, d
         return;
     }
     let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
-    let (mut q_high, mut q_low) =
-        (DoubleLimb::from(d_inv) * DoubleLimb::from(xs_high)).split_in_half();
+    let (mut q_high, mut q_low) = Limb::x_mul_y_is_zz(d_inv, xs_high);
     q_high.wrapping_add_assign(xs_high);
     let second_highest_limb = xs[len - 1];
     xs[len - 1] = q_high;
@@ -2414,7 +2413,7 @@ fn limbs_div_limb_normalized_in_place(xs: &mut [Limb], xs_high: Limb, d: Limb, d
         .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(xs_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
-        let (t, r) = (DoubleLimb::from(sum_high) * DoubleLimb::from(d_inv)).split_in_half();
+        let (t, r) = Limb::x_mul_y_is_zz(sum_high, d_inv);
         let mut q = DoubleLimb::from(sum_high) + DoubleLimb::from(t) + DoubleLimb::from(q_low);
         q_low = r;
         if big_carry {
@@ -2475,15 +2474,14 @@ fn limbs_div_limb_normalized_to_out(
         return;
     }
     let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
-    let (mut q_high, mut q_low) =
-        (DoubleLimb::from(d_inv) * DoubleLimb::from(xs_high)).split_in_half();
+    let (mut q_high, mut q_low) = Limb::x_mul_y_is_zz(d_inv, xs_high);
     q_high.wrapping_add_assign(xs_high);
     out[len - 1] = q_high;
     let (sum, mut big_carry) = DoubleLimb::join_halves(xs[len - 1], xs[len - 2])
         .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(xs_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
-        let (t, r) = (DoubleLimb::from(sum_high) * DoubleLimb::from(d_inv)).split_in_half();
+        let (t, r) = Limb::x_mul_y_is_zz(sum_high, d_inv);
         let mut q = DoubleLimb::from(sum_high) + DoubleLimb::from(t) + DoubleLimb::from(q_low);
         q_low = r;
         if big_carry {

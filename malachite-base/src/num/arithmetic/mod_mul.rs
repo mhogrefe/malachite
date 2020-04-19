@@ -278,8 +278,12 @@ macro_rules! impl_mod_mul_precomputed_fast {
             /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
             /// `mod_mul_precomputed_assign`.
             ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
             /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
-            fn precompute_mod_mul_data(m: $t) -> $t {
+            fn precompute_mod_mul_data(&m: &$t) -> $t {
                 $invert_limb(m << LeadingZeros::leading_zeros(m))
             }
 
@@ -296,12 +300,12 @@ macro_rules! impl_mod_mul_precomputed_fast {
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
             ///
-            /// let data = u8::precompute_mod_mul_data(7);
+            /// let data = u8::precompute_mod_mul_data(&7);
             /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
             /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
             /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
             ///
-            /// let data = u32::precompute_mod_mul_data(10);
+            /// let data = u32::precompute_mod_mul_data(&10);
             /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
             /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
             /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
@@ -327,9 +331,13 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
             /// `mod_mul_precomputed_assign`.
             ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
             /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
-            fn precompute_mod_mul_data(m: $t) -> u32 {
-                u32::precompute_mod_mul_data(u32::from(m))
+            fn precompute_mod_mul_data(&m: &$t) -> u32 {
+                u32::precompute_mod_mul_data(&u32::from(m))
             }
 
             /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
@@ -345,12 +353,12 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
             ///
-            /// let data = u8::precompute_mod_mul_data(7);
+            /// let data = u8::precompute_mod_mul_data(&7);
             /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
             /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
             /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
             ///
-            /// let data = u32::precompute_mod_mul_data(10);
+            /// let data = u32::precompute_mod_mul_data(&10);
             /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
             /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
             /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
@@ -377,7 +385,11 @@ impl ModMulPrecomputed<u128, u128> for u128 {
 
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// `mod_mul_precomputed_assign`.
-    fn precompute_mod_mul_data(_m: u128) {}
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    fn precompute_mod_mul_data(_m: &u128) {}
 
     /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
     /// precomputed data is provided; this speeds up computations involving several modular
@@ -392,12 +404,12 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     ///
-    /// let data = u8::precompute_mod_mul_data(7);
+    /// let data = u8::precompute_mod_mul_data(&7);
     /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
     /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
     /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
     ///
-    /// let data = u32::precompute_mod_mul_data(10);
+    /// let data = u32::precompute_mod_mul_data(&10);
     /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
     /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
     /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
@@ -416,12 +428,16 @@ impl ModMulPrecomputed<usize, usize> for usize {
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// `mod_mul_precomputed_assign`.
     ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
     /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
-    fn precompute_mod_mul_data(m: usize) -> usize {
+    fn precompute_mod_mul_data(&m: &usize) -> usize {
         if usize::WIDTH == u32::WIDTH {
-            usize::wrapping_from(u32::precompute_mod_mul_data(u32::wrapping_from(m)))
+            usize::wrapping_from(u32::precompute_mod_mul_data(&u32::wrapping_from(m)))
         } else {
-            usize::wrapping_from(u64::precompute_mod_mul_data(u64::wrapping_from(m)))
+            usize::wrapping_from(u64::precompute_mod_mul_data(&u64::wrapping_from(m)))
         }
     }
 
@@ -468,7 +484,7 @@ macro_rules! impl_mod_mul {
             /// ```
             /// use malachite_base::num::arithmetic::traits::*;
             ///
-            /// let data = u8::precompute_mod_mul_data(7);
+            /// let data = u8::precompute_mod_mul_data(&7);
             ///
             /// let mut x = 2u8;
             /// x.mod_mul_precomputed_assign(3, 7, &data);
@@ -482,7 +498,7 @@ macro_rules! impl_mod_mul {
             /// x.mod_mul_precomputed_assign(4, 7, &data);
             /// assert_eq!(x, 2);
             ///
-            /// let data = u32::precompute_mod_mul_data(10);
+            /// let data = u32::precompute_mod_mul_data(&10);
             ///
             /// let mut x = 7u32;
             /// x.mod_mul_precomputed_assign(3, 10, &data);

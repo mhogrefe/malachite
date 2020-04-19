@@ -1,97 +1,1560 @@
 use malachite_base::num::arithmetic::traits::{
-    PowerOfTwo, XMulYIsZZ, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOfTwoMul,
+    ModPowerOfTwoMulAssign, PowerOfTwo, XMulYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ,
+    XXXXAddYYYYIsZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::logic::traits::LeadingZeros;
 
+use natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::Limb;
+use platform::{DoubleLimb, Limb};
 
-/// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
-pub fn precompute_mod_mul_two_limbs(ns: &[Limb]) -> (Limb, Limb, Limb) {
-    let out_limbs =
-        (Natural::power_of_two(Limb::WIDTH << 2) / Natural::from_limbs_asc(ns)).into_limbs_asc();
+pub fn _limbs_precompute_mod_mul_two_limbs_alt(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
+    let out_limbs = (Natural::power_of_two(Limb::WIDTH << 2)
+        / Natural::from(DoubleLimb::join_halves(m_1, m_0)))
+    .into_limbs_asc();
     assert_eq!(out_limbs.len(), 3);
     (out_limbs[2], out_limbs[1], out_limbs[0])
 }
 
-/// Standard Barrett reduction: (set r = FLINT_BITS)
+/// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 ///
-/// We have n fits into 2 words and 2^r < n < 2^(2r). Therefore
-/// 2^(3r) > 2^(4r) / n > 2^(2r) and the precomputed number
-/// ninv = floor(2^(4r) / n) fits into 3 words.
-/// The inputs b and c are < n and therefore fit into 2 words.
+/// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
+    let xs = &mut [0; 5];
+    let out_limbs = &mut [0; 3];
+    let bits = LeadingZeros::leading_zeros(m_1);
+    if bits == 0 {
+        xs[4] = 1;
+        assert!(!limbs_div_mod_by_two_limb_normalized(
+            out_limbs,
+            xs,
+            &[m_0, m_1]
+        ));
+    } else {
+        xs[4] = Limb::power_of_two(bits);
+        assert!(!limbs_div_mod_by_two_limb_normalized(
+            out_limbs,
+            xs,
+            &[m_0 << bits, (m_1 << bits) | (m_0 >> (Limb::WIDTH - bits))]
+        ));
+    }
+    assert_ne!(out_limbs[2], 0);
+    (out_limbs[2], out_limbs[1], out_limbs[0])
+}
+
+/// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0. Both [x_0, x_1] and [y_0, y_1]
+/// must be less than [m_0, m_1].
+pub fn _limbs_mod_mul_two_limbs_naive(
+    x_1: Limb,
+    x_0: Limb,
+    y_1: Limb,
+    y_0: Limb,
+    m_1: Limb,
+    m_0: Limb,
+) -> (Limb, Limb) {
+    DoubleLimb::exact_from(
+        Natural::from(DoubleLimb::join_halves(x_1, x_0))
+            * Natural::from(DoubleLimb::join_halves(y_1, y_0))
+            % Natural::from(DoubleLimb::join_halves(m_1, m_0)),
+    )
+    .split_in_half()
+}
+
+/// Standard Barrett reduction: (set r = `Limb::WIDTH`)
 ///
-/// The computation of a = b*c mod n is:
-/// x = b*c             x < n^2 and therefore fits into 4 words
-/// z = (x >> r)*ninv   z <= n*2^(3*r) and therefore fits into 5 words
-/// q = (z >> (3r))*n   q fits into 4 words
-/// x = x - q           x fits into 3 words after the subtraction
-/// at this point the canonical reduction in the range [0, n) is one of
-///     a = x, a = x - n, or a = x - 2n
+/// We have m fits into 2 words and 2 ^ r < m < 2 ^ (2 * r). Therefore 2 ^ (3 * r) >
+/// 2 ^ (4 * r) / m > 2 ^ (2 * r) and the precomputed number inv = floor(2 ^ (4 * r) / m) fits into
+/// 3 words. The inputs x and y are < m and therefore fit into 2 words.
+///
+/// The computation of a = x*y mod m is:
+/// w = x * y               x < m ^ 2 and therefore fits into 4 words
+/// z = (w >> r) * inv      z <= m * 2 ^ (3 * r) and therefore fits into 5 words
+/// q = (z >> (3 * r)) * n  q fits into 4 words
+/// w = w - q               w fits into 3 words after the subtraction
+///
+/// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or
+/// a = w - 2 * m
 ///
 /// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT Dev 1.
 pub fn _limbs_mod_mul_two_limbs(
-    b1: Limb,
-    b0: Limb,
-    c1: Limb,
-    c0: Limb,
-    m1: Limb,
-    m0: Limb,
-    inv2: Limb,
-    inv1: Limb,
-    inv0: Limb,
+    x_1: Limb,
+    x_0: Limb,
+    y_1: Limb,
+    y_0: Limb,
+    m_1: Limb,
+    m_0: Limb,
+    inv_2: Limb,
+    inv_1: Limb,
+    inv_0: Limb,
 ) -> (Limb, Limb) {
-    // x[3:0] = b[1:0]*c[1:0]
-    let (t2, t1) = Limb::x_mul_y_is_zz(b0, c1);
-    let (s2, s1) = Limb::x_mul_y_is_zz(b1, c0);
-    let (x3, x2) = Limb::x_mul_y_is_zz(b1, c1);
-    let (x1, x0) = Limb::x_mul_y_is_zz(b0, c0);
-    let t3 = 0;
-    let (t3, t2, t1) = Limb::xxx_add_yyy_is_zzz(t3, t2, t1, 0, s2, s1);
-    let (x3, x2, x1) = Limb::xxx_add_yyy_is_zzz(x3, x2, x1, t3, t2, t1);
+    // w[3:0] = x[1:0] * y[1:0]
+    let (w_3, w_2) = Limb::x_mul_y_is_zz(x_1, y_1);
+    let (w_1, w_0) = Limb::x_mul_y_is_zz(x_0, y_0);
+    let (t, carry) = (DoubleLimb::from(x_1) * DoubleLimb::from(y_0))
+        .overflowing_add(DoubleLimb::from(x_0) * DoubleLimb::from(y_1));
+    let (t_2, t_1) = t.split_in_half();
+    let (w_3, w_2, w_1) =
+        Limb::xxx_add_yyy_is_zzz(w_3, w_2, w_1, if carry { 1 } else { 0 }, t_2, t_1);
 
-    // z[5:0] = x[3:1] * ninv[2:0], z[5] should end up zero
-    let (z1, _) = Limb::x_mul_y_is_zz(x1, inv0);
-    let (z3, z2) = Limb::x_mul_y_is_zz(x2, inv1);
-    let z4 = x3.wrapping_mul(inv2);
-    let (t3, t2) = Limb::x_mul_y_is_zz(x3, inv0);
-    let (s3, s2) = Limb::x_mul_y_is_zz(x1, inv2);
-    let t4 = 0;
-    let (t4, t3, t2) = Limb::xxx_add_yyy_is_zzz(t4, t3, t2, 0, s3, s2);
-    let (u2, u1) = Limb::x_mul_y_is_zz(x2, inv0);
-    let (u4, u3) = Limb::x_mul_y_is_zz(x3, inv1);
-    let (z4, z3, z2) = Limb::xxx_add_yyy_is_zzz(z4, z3, z2, t4, t3, t2);
-    let (v2, v1) = Limb::x_mul_y_is_zz(x1, inv1);
-    let (v4, v3) = Limb::x_mul_y_is_zz(x2, inv2);
-    let (z4, z3, z2, z1) = Limb::xxxx_add_yyyy_is_zzzz(z4, z3, z2, z1, u4, u3, u2, u1);
-    let (z4, z3, _, _) = Limb::xxxx_add_yyyy_is_zzzz(z4, z3, z2, z1, v4, v3, v2, v1);
+    // z[5:0] = w[3:1] * ninv[2:0], z[5] should end up zero
+    let (z_3, z_2) = Limb::x_mul_y_is_zz(w_2, inv_1);
+    let (t, carry) = (DoubleLimb::from(w_1) * DoubleLimb::from(inv_2))
+        .overflowing_add(DoubleLimb::from(w_3) * DoubleLimb::from(inv_0));
+    let (t_3, t_2) = t.split_in_half();
+    let (u_2, u_1) = Limb::x_mul_y_is_zz(w_2, inv_0);
+    let (u_4, u_3) = Limb::x_mul_y_is_zz(w_3, inv_1);
+    let (z_4, z_3, z_2) = Limb::xxx_add_yyy_is_zzz(
+        w_3.wrapping_mul(inv_2),
+        z_3,
+        z_2,
+        if carry { 1 } else { 0 },
+        t_3,
+        t_2,
+    );
+    let (v_2, v_1) = Limb::x_mul_y_is_zz(w_1, inv_1);
+    let (v_4, v_3) = Limb::x_mul_y_is_zz(w_2, inv_2);
+    let (z_4, z_3, z_2, z_1) = Limb::xxxx_add_yyyy_is_zzzz(
+        z_4,
+        z_3,
+        z_2,
+        (DoubleLimb::from(w_1) * DoubleLimb::from(inv_0)).upper_half(),
+        u_4,
+        u_3,
+        u_2,
+        u_1,
+    );
+    let (z_4, z_3, _, _) = Limb::xxxx_add_yyyy_is_zzzz(z_4, z_3, z_2, z_1, v_4, v_3, v_2, v_1);
 
     // q[3:0] = z[4:3] * n[1:0], q[3] is not needed
-    // x[3:0] -= q[3:0], x[3] should end up zero
-    let (t2, t1) = Limb::x_mul_y_is_zz(z3, m1);
-    let (s2, s1) = Limb::x_mul_y_is_zz(z4, m0);
-    let (q1, q0) = Limb::x_mul_y_is_zz(z3, m0);
-    let (x2, x1) = Limb::xx_sub_yy_is_zz(x2, x1, t2, t1);
-    let q2 = z4.wrapping_mul(m1);
-    let (x2, x1) = Limb::xx_sub_yy_is_zz(x2, x1, s2, s1);
-    let (x2, x1, x0) = Limb::xxx_sub_yyy_is_zzz(x2, x1, x0, q2, q1, q0);
+    // x[3:0] -= q[3:0], w[3] should end up zero
+    let (q_1, q_0) = Limb::x_mul_y_is_zz(z_3, m_0);
+    let (w_2, w_1) = DoubleLimb::join_halves(w_2, w_1)
+        .wrapping_sub(DoubleLimb::from(z_4) * DoubleLimb::from(m_0))
+        .wrapping_sub(DoubleLimb::from(z_3) * DoubleLimb::from(m_1))
+        .split_in_half();
+    let (w_2, w_1, w_0) = Limb::xxx_sub_yyy_is_zzz(w_2, w_1, w_0, z_4.wrapping_mul(m_1), q_1, q_0);
 
     // at most two subtractions of n, use q as temp space
-    let (q2, q1, q0) = Limb::xxx_sub_yyy_is_zzz(x2, x1, x0, 0, m1, m0);
-    let a1;
-    let a0;
-    if !q2.get_highest_bit() {
-        let (x2, x1, x0) = Limb::xxx_sub_yyy_is_zzz(q2, q1, q0, 0, m1, m0);
-        if !x2.get_highest_bit() {
-            a1 = x1;
-            a0 = x0;
+    let (q_2, q_1, q_0) = Limb::xxx_sub_yyy_is_zzz(w_2, w_1, w_0, 0, m_1, m_0);
+    if !q_2.get_highest_bit() {
+        let (w_2, w_1, w_0) = Limb::xxx_sub_yyy_is_zzz(q_2, q_1, q_0, 0, m_1, m_0);
+        if !w_2.get_highest_bit() {
+            (w_1, w_0)
         } else {
-            a1 = q1;
-            a0 = q0;
+            (q_1, q_0)
         }
     } else {
-        a1 = x1;
-        a0 = x0;
+        (w_1, w_0)
     }
-    (a1, a0)
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum ModMulData {
+    OneLimb(Limb),
+    MinTwoLimbs,
+    TwoLimbs(Limb, Limb, Limb),
+    MoreThanTwoLimbs,
+}
+
+fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
+    match *m {
+        natural_zero!() => panic!("division by zero"),
+        Natural(Small(ref x)) => ModMulData::OneLimb(Limb::precompute_mod_mul_data(x)),
+        Natural(Large(ref xs)) => match xs[..] {
+            [0, 1] => ModMulData::MinTwoLimbs,
+            [m_0, m_1] => {
+                let (inv_2, inv_1, inv_0) = _limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+                ModMulData::TwoLimbs(inv_2, inv_1, inv_0)
+            }
+            _ => ModMulData::MoreThanTwoLimbs,
+        },
+    }
+}
+
+impl Natural {
+    fn mod_mul_precomputed_two_limbs(
+        &self,
+        y: &Natural,
+        m: &Natural,
+        inv_2: Limb,
+        inv_1: Limb,
+        inv_0: Limb,
+    ) -> Natural {
+        let (r_1, r_0) = match (self, y, m) {
+            (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
+                _limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
+            }
+            (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref ms)))
+            | (&Natural(Small(y)), &Natural(Large(ref xs)), &Natural(Large(ref ms))) => {
+                _limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
+            }
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
+                _limbs_mod_mul_two_limbs(
+                    xs[1], xs[0], ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0,
+                )
+            }
+            _ => unreachable!(),
+        };
+        Natural::from_owned_limbs_asc(vec![r_0, r_1])
+    }
+
+    fn mod_mul_precomputed_two_limbs_assign(
+        &mut self,
+        y: &Natural,
+        m: &Natural,
+        inv_2: Limb,
+        inv_1: Limb,
+        inv_0: Limb,
+    ) {
+        match (&mut *self, y, m) {
+            (&mut Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
+                let (r_1, r_0) =
+                    _limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
+                *self = Natural::from_owned_limbs_asc(vec![r_0, r_1]);
+            }
+            (&mut Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
+                let (r_1, r_0) =
+                    _limbs_mod_mul_two_limbs(0, x, ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0);
+                *self = Natural::from_owned_limbs_asc(vec![r_0, r_1])
+            }
+            (&mut Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
+                let (r_1, r_0) =
+                    _limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
+                *xs = vec![r_0, r_1];
+                self.trim();
+            }
+            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
+                let (r_1, r_0) = _limbs_mod_mul_two_limbs(
+                    xs[1], xs[0], ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0,
+                );
+                *xs = vec![r_0, r_1];
+                self.trim();
+            }
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl ModMulPrecomputed<Natural, Natural> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking all three `Natural`s by value.
+    /// Assumes the inputs are already reduced mod `m`. Some precomputed data is provided; this
+    /// speeds up computations involving several modular multiplications with the same modulus. The
+    /// precomputed data should be obtained using `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(6u8).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(9u8).mod_mul_precomputed(
+    ///         Natural::from(9u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4u8).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// value.
+    fn mod_mul_precomputed(mut self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
+        self.mod_mul_precomputed_assign(other, m, data);
+        self
+    }
+}
+
+impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first two `Natural`s by
+    /// value and the last by reference. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(6u8).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(9u8).mod_mul_precomputed(
+    ///         Natural::from(9u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4u8).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value
+    /// and m is taken by reference.
+    fn mod_mul_precomputed(mut self, other: Natural, m: &'a Natural, data: &ModMulData) -> Natural {
+        self.mod_mul_precomputed_assign(other, m, data);
+        self
+    }
+}
+
+impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first and third `Natural`s
+    /// by value and the second by reference. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(6u8).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(9u8).mod_mul_precomputed(
+    ///         &Natural::from(9u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4u8).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value
+    /// and c is taken by reference.
+    fn mod_mul_precomputed(mut self, other: &'a Natural, m: Natural, data: &ModMulData) -> Natural {
+        self.mod_mul_precomputed_assign(other, m, data);
+        self
+    }
+}
+
+impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first `Natural` by value
+    /// and the other two by reference. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(6u8).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(9u8).mod_mul_precomputed(
+    ///         &Natural::from(9u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(4u8).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value and c and
+    /// m are taken by reference.
+    fn mod_mul_precomputed(
+        mut self,
+        other: &'a Natural,
+        m: &'b Natural,
+        data: &ModMulData,
+    ) -> Natural {
+        self.mod_mul_precomputed_assign(other, m, data);
+        self
+    }
+}
+
+impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first `Natural` by
+    /// reference and the other two by value. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(6u8)).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(9u8)).mod_mul_precomputed(
+    ///         Natural::from(9u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(4u8)).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by reference and c
+    /// and m are taken by value.
+    fn mod_mul_precomputed(self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
+        match (self, other, m, data) {
+            (&natural_zero!(), _, _, _) | (_, natural_zero!(), _, _) => Natural::ZERO,
+            (x, natural_one!(), _, _) => x.clone(),
+            (&natural_one!(), y, _, _) => y,
+            (
+                &Natural(Small(x)),
+                Natural(Small(y)),
+                Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs(&y, &m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => x * y % m,
+        }
+    }
+}
+
+impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` to a `Natural` mod a `Natural`, taking all the first and third
+    /// `Natural`s by reference and the second by value. Assumes the inputs are already reduced mod
+    /// `m`. Some precomputed data is provided; this speeds up computations involving several
+    /// modular multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(6u8)).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(9u8)).mod_mul_precomputed(
+    ///         Natural::from(9u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(4u8)).mod_mul_precomputed(
+    ///         Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by
+    /// reference and c is taken by value.
+    #[inline]
+    fn mod_mul_precomputed(self, other: Natural, m: &'b Natural, data: &ModMulData) -> Natural {
+        other.mod_mul_precomputed(self, m, data)
+    }
+}
+
+impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first two `Natural`s by
+    /// reference and the third by value. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(6u8)).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(9u8)).mod_mul_precomputed(
+    ///         &Natural::from(9u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(4u8)).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by
+    /// reference and m is taken by value.
+    fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
+        match (self, other, m, data) {
+            (&natural_zero!(), _, _, _) | (_, &natural_zero!(), _, _) => Natural::ZERO,
+            (x, &natural_one!(), _, _) => x.clone(),
+            (&natural_one!(), y, _, _) => y.clone(),
+            (
+                &Natural(Small(x)),
+                &Natural(Small(y)),
+                Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs(y, &m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => x * y % m,
+        }
+    }
+}
+
+impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
+    /// `mod_mul_precomputed_assign`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    #[inline]
+    fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking all three `Natural`s by
+    /// reference. Assumes the inputs are already reduced mod `m`. Some precomputed data is
+    /// provided; this speeds up computations involving several modular multiplications with the
+    /// same modulus. The precomputed data should be obtained using `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(6u8)).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "2"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(9u8)).mod_mul_precomputed(
+    ///         &Natural::from(9u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "1"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(4u8)).mod_mul_precomputed(
+    ///         &Natural::from(7u32),
+    ///         &Natural::from(10u32),
+    ///         &data
+    ///     ).to_string(),
+    ///     "8"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// reference.
+    fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
+        match (self, other, m, data) {
+            (&natural_zero!(), _, _, _) | (_, &natural_zero!(), _, _) => Natural::ZERO,
+            (x, &natural_one!(), _, _) => x.clone(),
+            (&natural_one!(), y, _, _) => y.clone(),
+            (
+                &Natural(Small(x)),
+                &Natural(Small(y)),
+                &Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs(y, m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => x * y % m,
+        }
+    }
+}
+
+impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second and third
+    /// `Natural`s by value. Assumes the inputs are already reduced mod `m`. Some precomputed data
+    /// is provided; this speeds up computations involving several modular multiplications with the
+    /// same modulus. The precomputed data should be obtained using `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    ///
+    /// let mut x = Natural::from(6u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(7u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "2");
+    ///
+    /// let mut x = Natural::from(9u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(9u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "1");
+    ///
+    /// let mut x = Natural::from(4u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(7u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "8");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// value and a == b.
+    fn mod_mul_precomputed_assign(&mut self, other: Natural, m: Natural, data: &ModMulData) {
+        match (&mut *self, other, m, data) {
+            (&mut natural_zero!(), _, _, _) | (_, natural_one!(), _, _) => {}
+            (x, natural_zero!(), _, _) => *x = Natural::ZERO,
+            (&mut natural_one!(), y, _, _) => *self = y,
+            (
+                &mut Natural(Small(x)),
+                Natural(Small(y)),
+                Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs_assign(&y, &m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => {
+                *x *= y;
+                *x %= m;
+            }
+        }
+    }
+}
+
+impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second `Natural`
+    /// by value and the third by reference. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    ///
+    /// let mut x = Natural::from(6u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(7u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "2");
+    ///
+    /// let mut x = Natural::from(9u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(9u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "1");
+    ///
+    /// let mut x = Natural::from(4u8);
+    /// x.mod_mul_precomputed_assign(Natural::from(7u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "8");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value,
+    /// m is taken by reference, and a == b.
+    fn mod_mul_precomputed_assign(&mut self, other: Natural, m: &'a Natural, data: &ModMulData) {
+        match (&mut *self, other, m, data) {
+            (&mut natural_zero!(), _, _, _) | (_, natural_one!(), _, _) => {}
+            (x, natural_zero!(), _, _) => *x = Natural::ZERO,
+            (&mut natural_one!(), y, _, _) => *self = y,
+            (
+                &mut Natural(Small(x)),
+                Natural(Small(y)),
+                &Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs_assign(&y, m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => {
+                *x *= y;
+                *x %= m;
+            }
+        }
+    }
+}
+
+impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
+    /// Multiplies a `Natural` to a `Natural` mod a `Natural` in place, taking the second `Natural`
+    /// by reference and the third by value. Assumes the inputs are already reduced mod `m`. Some
+    /// precomputed data is provided; this speeds up computations involving several modular
+    /// multiplications with the same modulus. The precomputed data should be obtained using
+    /// `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    ///
+    /// let mut x = Natural::from(6u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(7u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "2");
+    ///
+    /// let mut x = Natural::from(9u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(9u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "1");
+    ///
+    /// let mut x = Natural::from(4u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(7u32), Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "8");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value,
+    /// c is taken by reference, and a == b.
+    fn mod_mul_precomputed_assign(&mut self, other: &'a Natural, m: Natural, data: &ModMulData) {
+        match (&mut *self, other, m, data) {
+            (&mut natural_zero!(), _, _, _) | (_, &natural_one!(), _, _) => {}
+            (x, &natural_zero!(), _, _) => *x = Natural::ZERO,
+            (&mut natural_one!(), y, _, _) => *self = y.clone(),
+            (
+                &mut Natural(Small(x)),
+                &Natural(Small(y)),
+                Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs_assign(y, &m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => {
+                *x *= y;
+                *x %= m;
+            }
+        }
+    }
+}
+
+impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second and third
+    /// `Natural`s by reference. Assumes the inputs are already reduced mod `m`. Some precomputed
+    /// data is provided; this speeds up computations involving several modular multiplications with
+    /// the same modulus. The precomputed data should be obtained using `precompute_mod_mul_data`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&Natural::from(10u32));
+    ///
+    /// let mut x = Natural::from(6u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(7u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "2");
+    ///
+    /// let mut x = Natural::from(9u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(9u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "1");
+    ///
+    /// let mut x = Natural::from(4u8);
+    /// x.mod_mul_precomputed_assign(&Natural::from(7u32), &Natural::from(10u32), &data);
+    /// assert_eq!(x.to_string(), "8");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value, c and m
+    /// are taken by reference, and a == b.
+    fn mod_mul_precomputed_assign(
+        &mut self,
+        other: &'a Natural,
+        m: &'b Natural,
+        data: &ModMulData,
+    ) {
+        match (&mut *self, other, m, data) {
+            (&mut natural_zero!(), _, _, _) | (_, &natural_one!(), _, _) => {}
+            (x, &natural_zero!(), _, _) => *x = Natural::ZERO,
+            (&mut natural_one!(), y, _, _) => *self = y.clone(),
+            (
+                &mut Natural(Small(x)),
+                &Natural(Small(y)),
+                &Natural(Small(m)),
+                &ModMulData::OneLimb(inv),
+            ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
+                x.mod_mul_precomputed_two_limbs_assign(y, m, inv_2, inv_1, inv_0)
+            }
+            (x, y, m, _) => {
+                *x *= y;
+                *x %= m;
+            }
+        }
+    }
+}
+
+impl ModMul<Natural, Natural> for Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking all three `Natural`s by value.
+    /// Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(Natural::from(4u32), Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(Natural::from(6u32), Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// value.
+    #[inline]
+    fn mod_mul(self, other: Natural, m: Natural) -> Natural {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed(other, m, &data)
+    }
+}
+
+impl<'a> ModMul<Natural, &'a Natural> for Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first two `Natural`s by
+    /// value and the last by reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(Natural::from(4u32), &Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(Natural::from(6u32), &Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value
+    /// and m is taken by reference.
+    #[inline]
+    fn mod_mul(self, other: Natural, m: &'a Natural) -> Natural {
+        self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
+    }
+}
+
+impl<'a> ModMul<&'a Natural, Natural> for Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first and third `Natural`s
+    /// by value and the second by reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(&Natural::from(4u32), Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(&Natural::from(6u32), Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value
+    /// and c is taken by reference.
+    #[inline]
+    fn mod_mul(self, other: &'a Natural, m: Natural) -> Natural {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed(other, m, &data)
+    }
+}
+
+impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first `Natural` by value
+    /// and the other two by reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     Natural::from(3u32).mod_mul(&Natural::from(4u32), &Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(7u32).mod_mul(&Natural::from(6u32), &Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value and c and
+    /// m are taken by reference.
+    #[inline]
+    fn mod_mul(self, other: &'a Natural, m: &'b Natural) -> Natural {
+        self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
+    }
+}
+
+impl<'a> ModMul<Natural, Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first `Natural` by
+    /// reference and the other two by value. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(Natural::from(4u32), Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(Natural::from(6u32), Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by reference and c
+    /// and m are taken by value.
+    #[inline]
+    fn mod_mul(self, other: Natural, m: Natural) -> Natural {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed(other, m, &data)
+    }
+}
+
+impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` to a `Natural` mod a `Natural`, taking all the first and third
+    /// `Natural`s by reference and the second by value. Assumes the inputs are already reduced mod
+    /// `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(Natural::from(4u32), &Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(Natural::from(6u32), &Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by
+    /// reference and c is taken by value.
+    #[inline]
+    fn mod_mul(self, other: Natural, m: &'b Natural) -> Natural {
+        self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
+    }
+}
+
+impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking the first two `Natural`s by
+    /// reference and the third by value. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(&Natural::from(4u32), Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(&Natural::from(6u32), Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by
+    /// reference and m is taken by value.
+    #[inline]
+    fn mod_mul(self, other: &'b Natural, m: Natural) -> Natural {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed(other, m, &data)
+    }
+}
+
+impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural`, taking all three `Natural`s by
+    /// reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     (&Natural::from(3u32)).mod_mul(&Natural::from(4u32), &Natural::from(15u32)).to_string(),
+    ///     "12"
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(7u32)).mod_mul(&Natural::from(6u32), &Natural::from(10u32)).to_string(),
+    ///     "2"
+    /// );
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// reference.
+    #[inline]
+    fn mod_mul(self, other: &'b Natural, m: &'c Natural) -> Natural {
+        self.mod_mul_precomputed(other, m, &precompute_mod_mul_data_helper(m))
+    }
+}
+
+impl ModMulAssign<Natural, Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second and third
+    /// `Natural`s by value. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(3u32);
+    /// x.mod_mul_assign(Natural::from(4u32), Natural::from(15u32));
+    /// assert_eq!(x.to_string(), "12");
+    ///
+    /// let mut x = Natural::from(7u32);
+    /// x.mod_mul_assign(Natural::from(6u32), Natural::from(10u32));
+    /// assert_eq!(x.to_string(), "2");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// value and a == b.
+    #[inline]
+    fn mod_mul_assign(&mut self, other: Natural, m: Natural) {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed_assign(other, m, &data)
+    }
+}
+
+impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second `Natural`
+    /// by value and the third by reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(3u32);
+    /// x.mod_mul_assign(Natural::from(4u32), &Natural::from(15u32));
+    /// assert_eq!(x.to_string(), "12");
+    ///
+    /// let mut x = Natural::from(7u32);
+    /// x.mod_mul_assign(Natural::from(6u32), &Natural::from(10u32));
+    /// assert_eq!(x.to_string(), "2");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value,
+    /// m is taken by reference, and a == b.
+    #[inline]
+    fn mod_mul_assign(&mut self, other: Natural, m: &'a Natural) {
+        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m))
+    }
+}
+
+impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
+    /// Multiplies a `Natural` to a `Natural` mod a `Natural` in place, taking the second `Natural`
+    /// by reference and the third by value. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(3u32);
+    /// x.mod_mul_assign(&Natural::from(4u32), Natural::from(15u32));
+    /// assert_eq!(x.to_string(), "12");
+    ///
+    /// let mut x = Natural::from(7u32);
+    /// x.mod_mul_assign(&Natural::from(6u32), Natural::from(10u32));
+    /// assert_eq!(x.to_string(), "2");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value,
+    /// c is taken by reference, and a == b.
+    #[inline]
+    fn mod_mul_assign(&mut self, other: &'a Natural, m: Natural) {
+        let data = precompute_mod_mul_data_helper(&m);
+        self.mod_mul_precomputed_assign(other, m, &data)
+    }
+}
+
+impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` mod a `Natural` in place, taking the second and third
+    /// `Natural`s by reference. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `m.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::ModMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(3u32);
+    /// x.mod_mul_assign(&Natural::from(4u32), &Natural::from(15u32));
+    /// assert_eq!(x.to_string(), "12");
+    ///
+    /// let mut x = Natural::from(7u32);
+    /// x.mod_mul_assign(&Natural::from(6u32), &Natural::from(10u32));
+    /// assert_eq!(x.to_string(), "2");
+    /// ```
+    ///
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value, c and m
+    /// are taken by reference, and a == b.
+    #[inline]
+    fn mod_mul_assign(&mut self, other: &'a Natural, m: &'b Natural) {
+        self.mod_mul_precomputed_assign(other, m, &precompute_mod_mul_data_helper(m))
+    }
 }

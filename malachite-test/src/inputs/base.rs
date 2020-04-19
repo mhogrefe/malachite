@@ -37,6 +37,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
     limbs_eq_mod_ref_ref_ref,
 };
+use malachite_nz::natural::arithmetic::mod_mul::_limbs_precompute_mod_mul_two_limbs;
 use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limb::{
@@ -419,6 +420,14 @@ pub fn pairs_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
 // All pairs of `T`s where `T` is unsigned and the first `T` is smaller than the second.
 pub fn pairs_of_unsigneds_var_5<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
     Box::new(pairs_of_unsigneds(gm).filter(|&(x, y)| x < y))
+}
+
+// All pairs of `T`s that are valid inputs to _limbs_precompute_mod_mul_two_limbs.
+pub fn pairs_of_unsigneds_var_6<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    Box::new(
+        pairs_of_unsigneds(gm)
+            .filter(|&(m_1, m_0)| m_1 != T::ZERO && (m_1 != T::ONE || m_0 != T::ZERO)),
+    )
 }
 
 pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
@@ -1512,6 +1521,28 @@ pub fn nonuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
         )),
     };
     reshape_3_3_3_to_9(ts)
+}
+
+/// All nonuples of `Limb` that are valid inputs to _limbs_mod_mul_two_limbs.
+pub fn nonuples_of_limbs_var_1(
+    gm: GenerationMode,
+) -> It<(Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Box::new(
+        sextuples_of_unsigneds(gm).filter_map(|(x_1, x_0, y_1, y_0, m_1, m_0)| {
+            if m_1 == 0
+                || m_1 == 1 && m_0 == 0
+                || x_1 > m_1
+                || y_1 > m_1
+                || x_1 == m_1 && x_0 > m_0
+                || y_1 == m_1 && y_0 > m_0
+            {
+                None
+            } else {
+                let (inv_2, inv_1, inv_0) = _limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+                Some((x_1, x_0, y_1, y_0, m_1, m_0, inv_2, inv_1, inv_0))
+            }
+        }),
+    )
 }
 
 pub fn duodecuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(

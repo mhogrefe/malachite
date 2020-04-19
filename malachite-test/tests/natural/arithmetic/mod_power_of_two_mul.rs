@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoIsReduced, ModPowerOfTwoMul,
-    ModPowerOfTwoMulAssign, ModPowerOfTwoNeg,
+    ModMul, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoIsReduced, ModPowerOfTwoMul,
+    ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, PowerOfTwo,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mod_power_of_two_mul::{
@@ -223,7 +223,7 @@ fn mod_power_of_two_mul_properties() {
             assert_eq!(product_ref_val, product);
 
             assert_eq!((x * y).mod_power_of_two(pow), product);
-            //TODO assert_eq!(x.mod_mul(y, Natural::power_of_two(pow)), product);
+            assert_eq!(x.mod_mul(y, Natural::power_of_two(pow)), product);
 
             let mut mut_x = x.clone();
             mut_x.mod_power_of_two_mul_assign(y.clone(), pow);

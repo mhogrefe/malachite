@@ -31,6 +31,9 @@ impl ModSub<Natural, Natural> for Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b, c, and m are taken by
+    /// value.
     #[inline]
     fn mod_sub(mut self, other: Natural, m: Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -67,6 +70,9 @@ impl<'a> ModSub<Natural, &'a Natural> for Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b and c are taken by value
+    /// and m is taken by reference.
     #[inline]
     fn mod_sub(mut self, other: Natural, m: &'a Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -104,6 +110,9 @@ impl<'a> ModSub<&'a Natural, Natural> for Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b and m are taken by value
+    /// and c is taken by reference.
     #[inline]
     fn mod_sub(mut self, other: &'a Natural, m: Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -141,6 +150,9 @@ impl<'a, 'b> ModSub<&'a Natural, &'b Natural> for Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b is taken by value and c and
+    /// m are taken by reference.
     #[inline]
     fn mod_sub(mut self, other: &'a Natural, m: &'b Natural) -> Natural {
         self.mod_sub_assign(other, m);
@@ -178,6 +190,9 @@ impl<'a> ModSub<Natural, Natural> for &'a Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b is taken by reference and c
+    /// and m are taken by value.
     fn mod_sub(self, other: Natural, m: Natural) -> Natural {
         if *self >= other {
             self - other
@@ -217,6 +232,9 @@ impl<'a, 'b> ModSub<Natural, &'b Natural> for &'a Natural {
     ///     "8"
     /// );
     /// ```
+    ///
+    /// This is _fmpz_mod_subN from fmpz_mod/sub.c, FLINT Dev 1, where b and m are taken by
+    /// reference and c is taken by value.
     fn mod_sub(self, other: Natural, m: &'b Natural) -> Natural {
         if *self >= other {
             self - other

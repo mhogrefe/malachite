@@ -1,11 +1,12 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
+    ModMul, ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoMulAssign, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_two_mul::{
     limbs_mod_power_of_two_mul, limbs_mod_power_of_two_mul_ref_ref,
     limbs_mod_power_of_two_mul_val_ref,
 };
+use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::triples_of_limb_vec_limb_vec_and_u64_var_16;
@@ -243,7 +244,11 @@ fn benchmark_natural_mod_power_of_two_mul_algorithms(
             (
                 "naive",
                 &mut (|(x, y, pow)| no_out!((x * y).mod_power_of_two(pow))),
-            ), //TODO using mod_mul
+            ),
+            (
+                "using mod_mul",
+                &mut (|(x, y, pow)| no_out!(x.mod_mul(y, Natural::power_of_two(pow)))),
+            ),
         ],
     );
 }
