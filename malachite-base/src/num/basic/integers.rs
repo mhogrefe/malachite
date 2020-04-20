@@ -11,17 +11,17 @@ use comparison::{Max, Min};
 use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{
-    CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem, CheckedSub,
-    DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
-    OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
-    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingRem,
-    OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow, PowerOfTwo,
-    SaturatingAdd, SaturatingAddAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
-    SaturatingSub, SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign,
-    TrueCheckedShl, TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingDiv, WrappingDivAssign,
-    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingRem,
-    WrappingRemAssign, WrappingSub, WrappingSubAssign,
+    AddMul, AddMulAssign, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem,
+    CheckedSub, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
+    DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign,
+    ModPowerOfTwo, OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign,
+    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
+    OverflowingRem, OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow,
+    PowerOfTwo, SaturatingAdd, SaturatingAddAssign, SaturatingMul, SaturatingMulAssign,
+    SaturatingPow, SaturatingSub, SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound,
+    ShrRoundAssign, Sign, SubMul, SubMulAssign, TrueCheckedShl, TrueCheckedShr, WrappingAdd,
+    WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg,
+    WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign,
 };
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -39,6 +39,8 @@ pub trait PrimitiveInteger:
     'static
     + Add<Self, Output = Self>
     + AddAssign<Self>
+    + AddMul<Self, Self, Output = Self>
+    + AddMulAssign<Self, Self>
     + Binary
     + BitAccess
     + BitAnd<Self, Output = Self>
@@ -312,6 +314,8 @@ pub trait PrimitiveInteger:
     + Sized
     + Sub<Self, Output = Self>
     + SubAssign<Self>
+    + SubMul<Self, Self, Output = Self>
+    + SubMulAssign<Self, Self>
     + Sum<Self>
     + TrailingZeros
     + TrueCheckedShl<Output = Self>

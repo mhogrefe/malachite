@@ -117,7 +117,7 @@ impl Crementable for char {
     /// ```
     fn increment(&mut self) {
         *self = contiguous_range_to_char(char_to_contiguous_range(*self) + 1)
-            .unwrap_or_else(|| panic!("Cannot increment char::MAX"))
+            .expect("Cannot increment char::MAX")
     }
 
     /// Decrements this `char`, skipping over the surrogate range.

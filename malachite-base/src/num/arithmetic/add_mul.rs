@@ -1,0 +1,65 @@
+use num::arithmetic::traits::{AddMul, AddMulAssign};
+
+macro_rules! impl_add_mul {
+    ($t:ident) => {
+        impl AddMul for $t {
+            type Output = $t;
+
+            /// Computes `self + y * z` mod `m`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::AddMul;
+            ///
+            /// assert_eq!(2u8.add_mul(3, 7), 23);
+            /// assert_eq!(7u32.add_mul(5, 10), 57);
+            /// ```
+            #[inline]
+            fn add_mul(self, y: $t, z: $t) -> $t {
+                self + y * z
+            }
+        }
+
+        impl AddMulAssign for $t {
+            /// Replaces `self` with `self + y * z`.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+            ///
+            /// let mut x = 2u8;
+            /// x.add_mul_assign(3, 7);
+            /// assert_eq!(x, 23);
+            ///
+            /// let mut x = 7u32;
+            /// x.add_mul_assign(5, 10);
+            /// assert_eq!(x, 57);
+            /// ```
+            #[inline]
+            fn add_mul_assign(&mut self, y: $t, z: $t) {
+                *self += y * z;
+            }
+        }
+    };
+}
+
+impl_add_mul!(u8);
+impl_add_mul!(u16);
+impl_add_mul!(u32);
+impl_add_mul!(u64);
+impl_add_mul!(u128);
+impl_add_mul!(usize);
+impl_add_mul!(i8);
+impl_add_mul!(i16);
+impl_add_mul!(i32);
+impl_add_mul!(i64);
+impl_add_mul!(i128);
+impl_add_mul!(isize);

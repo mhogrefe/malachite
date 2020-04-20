@@ -546,7 +546,8 @@ macro_rules! impl_mod_mul {
         }
 
         impl ModMulAssign for $t {
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced
+            /// mod `m`.
             ///
             /// Time: worst case O(1)
             ///

@@ -3,8 +3,10 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
+use malachite_test::inputs::base::triples_of_signeds_var_2;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 
 #[test]
@@ -341,5 +343,12 @@ fn add_mul_properties() {
         assert_eq!(a.add_mul(b, &Integer::ONE), a + b);
         assert_eq!((a * b).add_mul(-a, b), 0);
         assert_eq!((a * b).add_mul(a, -b), 0);
+    });
+
+    test_properties(triples_of_signeds_var_2::<SignedLimb>, |&(x, y, z)| {
+        assert_eq!(
+            SignedLimb::from(x).add_mul(SignedLimb::from(y), SignedLimb::from(z)),
+            Integer::from(x).add_mul(Integer::from(y), Integer::from(z))
+        );
     });
 }

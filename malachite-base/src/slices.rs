@@ -17,8 +17,9 @@ use num::basic::traits::Zero;
 /// ```
 ///
 /// This is mpn_zero_p from gmp.h, GMP 6.1.2.
-pub fn slice_test_zero<T: Copy + Eq + Zero>(xs: &[T]) -> bool {
-    xs.iter().all(|&x| x == T::ZERO)
+pub fn slice_test_zero<T: Eq + Zero>(xs: &[T]) -> bool {
+    let zero = T::ZERO;
+    xs.iter().all(|x| x == &zero)
 }
 
 /// Sets all values in a slice to 0.

@@ -1,5 +1,6 @@
 pub mod arithmetic {
     pub mod abs;
+    pub mod add_mul;
     pub mod checked_abs;
     pub mod checked_add;
     pub mod checked_mul;
@@ -30,6 +31,7 @@ pub mod arithmetic {
     pub mod saturating_sub;
     pub mod sign;
     pub mod signeds;
+    pub mod sub_mul;
     pub mod traits;
     pub mod unsigneds;
     pub mod wrapping_abs;
@@ -64,6 +66,8 @@ pub mod conversion {
 }
 pub mod floats;
 pub mod logic {
+    pub mod bit_access;
+    pub mod bit_block_access;
     pub mod integers;
     pub mod signeds;
     pub mod traits;

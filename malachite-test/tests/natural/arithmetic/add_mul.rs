@@ -9,13 +9,13 @@ use malachite_nz::natural::arithmetic::add_mul::{
     limbs_vec_add_mul_limb_in_place_left, limbs_vec_add_mul_limb_in_place_right,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_27,
+    triples_of_unsigneds_var_3,
 };
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 
@@ -428,7 +428,7 @@ fn limbs_add_mul_in_place_left_properties() {
 }
 
 #[test]
-fn add_mul_limb_properties() {
+fn add_mul_properties() {
     test_properties(triples_of_naturals, |&(ref a, ref b, ref c)| {
         let mut mut_a = a.clone();
         mut_a.add_mul_assign(b.clone(), c.clone());
@@ -480,5 +480,12 @@ fn add_mul_limb_properties() {
         assert_eq!(Natural::ZERO.add_mul(a, b), a * b);
         assert_eq!(a.add_mul(b, &Natural::ZERO), *a);
         assert_eq!(a.add_mul(b, &Natural::ONE), a + b);
+    });
+
+    test_properties(triples_of_unsigneds_var_3::<Limb>, |&(x, y, z)| {
+        assert_eq!(
+            Limb::from(x).add_mul(Limb::from(y), Limb::from(z)),
+            Natural::from(x).add_mul(Natural::from(y), Natural::from(z))
+        );
     });
 }

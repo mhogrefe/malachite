@@ -1,19 +1,16 @@
-use std::cmp::min;
 use std::marker::PhantomData;
 use std::ops::Index;
 
 use comparison::Max;
 use named::Named;
-use num::arithmetic::traits::{
-    DivRound, ModPowerOfTwo, Parity, PowerOfTwo, SaturatingSubAssign, TrueCheckedShl,
-};
+use num::arithmetic::traits::{DivRound, Parity, PowerOfTwo, SaturatingSubAssign, TrueCheckedShl};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, HammingDistance,
-    LeadingZeros, LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
-    SignificantBits, TrailingZeros,
+    BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, HammingDistance, LeadingZeros,
+    LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits, SignificantBits,
+    TrailingZeros,
 };
 use round::RoundingMode;
 
@@ -414,119 +411,6 @@ macro_rules! impl_logic_traits {
             }
         }
 
-        /// Provides functions for accessing and modifying the `index`th bit of a primitive unsigned
-        /// integer, or the coefficient of 2<sup>`index`</sup> in its binary expansion.
-        ///
-        /// # Examples
-        /// ```
-        /// use malachite_base::num::logic::traits::BitAccess;
-        ///
-        /// let mut x = 0;
-        /// x.assign_bit(2, true);
-        /// x.assign_bit(5, true);
-        /// x.assign_bit(6, true);
-        /// assert_eq!(x, 100);
-        /// x.assign_bit(2, false);
-        /// x.assign_bit(5, false);
-        /// x.assign_bit(6, false);
-        /// assert_eq!(x, 0);
-        ///
-        /// let mut x = 0u64;
-        /// x.flip_bit(10);
-        /// assert_eq!(x, 1024);
-        /// x.flip_bit(10);
-        /// assert_eq!(x, 0);
-        /// ```
-        impl BitAccess for $t {
-            /// Determines whether the `index`th bit of a primitive unsigned integer, or the
-            /// coefficient of 2<sup>`index`</sup> in its binary expansion, is 0 or 1. `false`
-            /// means 0, `true` means 1.
-            ///
-            /// Getting bits beyond the type's width is allowed; those bits are false.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
-            ///
-            /// assert_eq!(123u8.get_bit(2), false);
-            /// assert_eq!(123u16.get_bit(3), true);
-            /// assert_eq!(123u32.get_bit(100), false);
-            /// assert_eq!(1_000_000_000_000u64.get_bit(12), true);
-            /// assert_eq!(1_000_000_000_000u64.get_bit(100), false);
-            /// ```
-            #[inline]
-            fn get_bit(&self, index: u64) -> bool {
-                index < Self::WIDTH && *self & $t::power_of_two(index) != 0
-            }
-
-            /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
-            /// 2<sup>`index`</sup> in its binary expansion, to 1.
-            ///
-            /// Setting bits beyond the type's width is disallowed.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `index >= Self::WIDTH`.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
-            ///
-            /// let mut x = 0u8;
-            /// x.set_bit(2);
-            /// x.set_bit(5);
-            /// x.set_bit(6);
-            /// assert_eq!(x, 100);
-            /// ```
-            #[inline]
-            fn set_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self |= $t::power_of_two(index);
-                } else {
-                    panic!(
-                        "Cannot set bit {} in non-negative value of width {}",
-                        index,
-                        Self::WIDTH
-                    );
-                }
-            }
-
-            /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
-            /// 2<sup>`index`</sup> in its binary expansion, to 0.
-            ///
-            /// Clearing bits beyond the type's width is allowed; since those bits are already
-            /// false, clearing them does nothing.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
-            ///
-            /// let mut x = 0x7fu8;
-            /// x.clear_bit(0);
-            /// x.clear_bit(1);
-            /// x.clear_bit(3);
-            /// x.clear_bit(4);
-            /// assert_eq!(x, 100);
-            /// ```
-            #[inline]
-            fn clear_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self &= !$t::power_of_two(index);
-                }
-            }
-        }
-
         impl BitScan for $t {
             /// Finds the smallest index of a `false` bit that is greater than or equal to
             /// `starting_index`. Since `$t` is unsigned and therefore has an implicit prefix of
@@ -596,86 +480,6 @@ macro_rules! impl_logic_traits {
                         Some(index)
                     }
                 }
-            }
-        }
-
-        impl BitBlockAccess for $t {
-            type Bits = $t;
-
-            /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
-            /// The block of bits has the same type as the input. If `end` is greater than the
-            /// type's width, the high bits of the result are all 0.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `start < end`.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
-            ///
-            /// assert_eq!(0xabcdu16.get_bits(4, 8), 0xc);
-            /// assert_eq!(0xabcdu16.get_bits(12, 100), 0xa);
-            /// assert_eq!(0xabcdu16.get_bits(5, 9), 14);
-            /// assert_eq!(0xabcdu16.get_bits(5, 5), 0);
-            /// assert_eq!(0xabcdu16.get_bits(100, 200), 0);
-            /// ```
-            fn get_bits(&self, start: u64, end: u64) -> Self {
-                assert!(start <= end);
-                if start >= $t::WIDTH {
-                    0
-                } else {
-                    (self >> start).mod_power_of_two(end - start)
-                }
-            }
-
-            /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
-            /// (inclusive) through `end` (exclusive) of `self`. The block of bits has the same type
-            /// as the input. If `bits` has fewer bits than `end - start`, the high bits are
-            /// interpreted as 0. If `end` is greater than the type's width, the high bits of `bits`
-            /// must be 0.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `start < end`, or if `end > $t::WIDTH` and bits `$t::WIDTH - start`
-            /// through `end - start` of `bits` are nonzero.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
-            ///
-            /// let mut x = 0xab5du16;
-            /// x.assign_bits(4, 8, &0xc);
-            /// assert_eq!(x, 0xabcd);
-            ///
-            /// let mut x = 0xabcdu16;
-            /// x.assign_bits(100, 200, &0);
-            /// assert_eq!(x, 0xabcd);
-            ///
-            /// let mut x = 0xabcdu16;
-            /// x.assign_bits(0, 100, &0x1234);
-            /// assert_eq!(x, 0x1234);
-            /// ```
-            fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
-                assert!(start <= end);
-                let width = $t::WIDTH;
-                let bits_width = end - start;
-                let bits = bits.mod_power_of_two(bits_width);
-                if bits != 0 && LeadingZeros::leading_zeros(bits) < start {
-                    panic!("Result exceeds width of output type");
-                } else if start >= width {
-                    // bits must be 0
-                    return;
-                } else {
-                    *self &= !($t::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
-                }
-                *self |= bits << start;
             }
         }
 

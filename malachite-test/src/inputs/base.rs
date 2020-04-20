@@ -64,6 +64,7 @@ use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
+use rand::distributions::{IndependentSample, Range};
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
@@ -456,6 +457,132 @@ pub fn triples_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(
     Box::new(triples_of_unsigneds(gm).filter(|&(x_1, _, y)| x_1 < y))
 }
 
+fn add_mul_inputs_valid<T: PrimitiveInteger>(x: T, y: T, z: T) -> bool {
+    y.checked_mul(z).and_then(|yz| x.checked_add(yz)).is_some()
+}
+
+pub(crate) struct ValidAddMulInputs<T> {
+    ts: It<(T, T, T)>,
+    range: Range<u64>,
+    pub(crate) rng: Box<IsaacRng>,
+}
+
+impl<T> ValidAddMulInputs<T> {
+    fn new(ts: It<(T, T, T)>, rng: Box<IsaacRng>) -> ValidAddMulInputs<T> {
+        ValidAddMulInputs {
+            ts,
+            range: Range::new(0, 3),
+            rng,
+        }
+    }
+}
+
+impl<T: PrimitiveInteger> Iterator for ValidAddMulInputs<T> {
+    type Item = (T, T, T);
+
+    fn next(&mut self) -> Option<(T, T, T)> {
+        self.ts.next().map(|(mut x, mut y, mut z)| {
+            while !add_mul_inputs_valid(x, y, z) {
+                match self.range.ind_sample(&mut self.rng) {
+                    0 => x >>= 1,
+                    1 => y >>= 1,
+                    2 => z >>= 1,
+                    _ => unreachable!(),
+                }
+            }
+            (x, y, z)
+        })
+    }
+}
+
+// All triples (x, y, z) of unsigned `T`, where x + y * z doesn't overflow.
+pub fn triples_of_unsigneds_var_3<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_triples_from_single(exhaustive_unsigned())
+                .filter(|&(x, y, z)| add_mul_inputs_valid(x, y, z)),
+        ),
+        GenerationMode::Random(_) => Box::new(ValidAddMulInputs::new(
+            Box::new(random_triples_from_single(random(&scramble(
+                &EXAMPLE_SEED,
+                "triples",
+            )))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(ValidAddMulInputs::new(
+            Box::new(random_triples_from_single(special_random_unsigned(
+                &scramble(&EXAMPLE_SEED, "triples"),
+            ))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+    }
+}
+
+fn sub_mul_inputs_valid<T: PrimitiveInteger>(x: T, y: T, z: T) -> bool {
+    y.checked_mul(z).and_then(|yz| x.checked_sub(yz)).is_some()
+}
+
+pub(crate) struct ValidSubMulInputs<T> {
+    ts: It<(T, T, T)>,
+    range: Range<u64>,
+    pub(crate) rng: Box<IsaacRng>,
+}
+
+impl<T> ValidSubMulInputs<T> {
+    fn new(ts: It<(T, T, T)>, rng: Box<IsaacRng>) -> ValidSubMulInputs<T> {
+        ValidSubMulInputs {
+            ts,
+            range: Range::new(0, 3),
+            rng,
+        }
+    }
+}
+
+impl<T: PrimitiveInteger> Iterator for ValidSubMulInputs<T> {
+    type Item = (T, T, T);
+
+    fn next(&mut self) -> Option<(T, T, T)> {
+        self.ts.next().map(|(mut x, mut y, mut z)| {
+            while !sub_mul_inputs_valid(x, y, z) {
+                match self.range.ind_sample(&mut self.rng) {
+                    0 => x >>= 1,
+                    1 => y >>= 1,
+                    2 => z >>= 1,
+                    _ => unreachable!(),
+                }
+            }
+            (x, y, z)
+        })
+    }
+}
+
+// All triples (x, y, z) of unsigned `T`, where x - y * z doesn't overflow.
+pub fn triples_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_triples_from_single(exhaustive_unsigned())
+                .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+        ),
+        GenerationMode::Random(_) => Box::new(ValidSubMulInputs::new(
+            Box::new(random_triples_from_single(random(&scramble(
+                &EXAMPLE_SEED,
+                "triples",
+            )))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(ValidSubMulInputs::new(
+            Box::new(random_triples_from_single(special_random_unsigned(
+                &scramble(&EXAMPLE_SEED, "triples"),
+            ))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+    }
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -504,6 +631,60 @@ where
             (x >= T::ZERO) == (y >= T::ZERO) && (y >= T::ZERO) == (z >= T::ZERO)
         }),
     )
+}
+
+// All triples (x, y, z) of signed `T`, where x + y * z doesn't overflow.
+pub fn triples_of_signeds_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_triples_from_single(exhaustive_signed())
+                .filter(|&(x, y, z)| add_mul_inputs_valid(x, y, z)),
+        ),
+        GenerationMode::Random(_) => Box::new(ValidAddMulInputs::new(
+            Box::new(random_triples_from_single(random(&scramble(
+                &EXAMPLE_SEED,
+                "triples",
+            )))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(ValidAddMulInputs::new(
+            Box::new(random_triples_from_single(special_random_signed(
+                &scramble(&EXAMPLE_SEED, "triples"),
+            ))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+    }
+}
+
+// All triples (x, y, z) of signed `T`, where x - y * z doesn't overflow.
+pub fn triples_of_signeds_var_3<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_triples_from_single(exhaustive_signed())
+                .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+        ),
+        GenerationMode::Random(_) => Box::new(ValidSubMulInputs::new(
+            Box::new(random_triples_from_single(random(&scramble(
+                &EXAMPLE_SEED,
+                "triples",
+            )))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(ValidSubMulInputs::new(
+            Box::new(random_triples_from_single(special_random_signed(
+                &scramble(&EXAMPLE_SEED, "triples"),
+            ))),
+            Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
+        )),
+    }
 }
 
 pub fn pairs_of_natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>

@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -39,17 +39,17 @@ use platform::Limb;
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= xs.len() {
+    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    if x_i >= xs.len() {
         // We're indexing into the infinite suffix of 1s
         true
     } else {
-        let limb = if slice_test_zero(&xs[..limb_index]) {
-            xs[limb_index].wrapping_neg()
+        let x = if slice_test_zero(&xs[..x_i]) {
+            xs[x_i].wrapping_neg()
         } else {
-            !xs[limb_index]
+            !xs[x_i]
         };
-        limb.get_bit(index & Limb::WIDTH_MASK)
+        x.get_bit(index & Limb::WIDTH_MASK)
     }
 }
 
@@ -71,59 +71,57 @@ pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 /// use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 /// use std::cmp::Ordering;
 ///
-/// let mut limbs = &mut [3, 2, 1];
-/// limbs_set_bit_neg(limbs, 1);
-/// assert_eq!(limbs, &[1, 2, 1]);
+/// let mut xs = &mut [3, 2, 1];
+/// limbs_set_bit_neg(xs, 1);
+/// assert_eq!(xs, &[1, 2, 1]);
 /// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= xs.len() {
+    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
+    if x_i >= xs.len() {
         return;
     }
     let reduced_index = index & Limb::WIDTH_MASK;
     let zero_bound = slice_leading_zeros(xs);
-    match limb_index.cmp(&zero_bound) {
+    match x_i.cmp(&zero_bound) {
         Ordering::Equal => {
-            let boundary_limb = &mut xs[limb_index];
-            // boundary limb != 0 here
-            *boundary_limb -= 1;
-            boundary_limb.clear_bit(reduced_index);
-            // boundary limb != Limb::MAX here
-            *boundary_limb += 1;
+            let boundary = &mut xs[x_i];
+            // boundary != 0 here
+            *boundary -= 1;
+            boundary.clear_bit(reduced_index);
+            // boundary != Limb::MAX here
+            *boundary += 1;
         }
         Ordering::Less => {
             assert!(!limbs_sub_limb_in_place(
-                &mut xs[limb_index..],
+                &mut xs[x_i..],
                 Limb::power_of_two(reduced_index),
             ));
         }
         Ordering::Greater => {
-            xs[limb_index].clear_bit(reduced_index);
+            xs[x_i].clear_bit(reduced_index);
         }
     }
 }
 
-fn limbs_clear_bit_neg_helper(xs: &mut [Limb], limb_index: usize, reduced_index: u64) -> bool {
+fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -> bool {
     let zero_bound = slice_leading_zeros(xs);
-    match limb_index.cmp(&zero_bound) {
+    match x_i.cmp(&zero_bound) {
         Ordering::Equal => {
-            // xs[limb_index] != 0 here
-            let mut boundary_limb = xs[limb_index] - 1;
-            boundary_limb.set_bit(reduced_index);
-            boundary_limb.wrapping_add_assign(1);
-            xs[limb_index] = boundary_limb;
-            if boundary_limb == 0 && limbs_slice_add_limb_in_place(&mut xs[limb_index + 1..], 1) {
-                return true;
-            }
+            // xs[x_i] != 0 here
+            let mut boundary = xs[x_i] - 1;
+            boundary.set_bit(reduced_index);
+            boundary.wrapping_add_assign(1);
+            xs[x_i] = boundary;
+            boundary == 0 && limbs_slice_add_limb_in_place(&mut xs[x_i + 1..], 1)
         }
         Ordering::Greater => {
-            xs[limb_index].set_bit(reduced_index);
+            xs[x_i].set_bit(reduced_index);
+            false
         }
-        _ => {}
+        _ => false,
     }
-    false
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
@@ -144,17 +142,17 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], limb_index: usize, reduced_index:
 /// use malachite_nz::integer::logic::bit_access::limbs_slice_clear_bit_neg;
 /// use std::cmp::Ordering;
 ///
-/// let mut limbs = vec![3, 2, 1];
-/// limbs_slice_clear_bit_neg(&mut limbs, 0);
-/// assert_eq!(limbs, &[4, 2, 1]);
+/// let mut xs = vec![3, 2, 1];
+/// limbs_slice_clear_bit_neg(&mut xs, 0);
+/// assert_eq!(xs, &[4, 2, 1]);
 /// ```
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative and bit_idx small enough
 /// that no additional memory needs to be given to d.
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
-    if limb_index >= xs.len() || limbs_clear_bit_neg_helper(xs, limb_index, reduced_index) {
+    if x_i >= xs.len() || limbs_clear_bit_neg_helper(xs, x_i, reduced_index) {
         panic!("Setting bit cannot be done within existing slice");
     }
 }
@@ -176,21 +174,21 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 /// use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 /// use std::cmp::Ordering;
 ///
-/// let mut limbs = vec![0, 0, 0xffff_ffff];
-/// limbs_vec_clear_bit_neg(&mut limbs, 64);
-/// assert_eq!(limbs, &[0, 0, 0, 1]);
+/// let mut xs = vec![0, 0, 0xffff_ffff];
+/// limbs_vec_clear_bit_neg(&mut xs, 64);
+/// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is negative.
 pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
+    let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
-    if limb_index < xs.len() {
-        if limbs_clear_bit_neg_helper(xs, limb_index, reduced_index) {
+    if x_i < xs.len() {
+        if limbs_clear_bit_neg_helper(xs, x_i, reduced_index) {
             xs.push(1);
         }
     } else {
-        xs.resize(limb_index, 0);
+        xs.resize(x_i, 0);
         xs.push(Limb::power_of_two(reduced_index));
     }
 }
@@ -390,33 +388,33 @@ impl Natural {
                     small.set_bit(index);
                     small.wrapping_neg_assign();
                 }
-                return;
             }
-            Natural(Large(ref mut limbs)) => limbs_set_bit_neg(limbs, index),
+            Natural(Large(ref mut limbs)) => {
+                limbs_set_bit_neg(limbs, index);
+                self.trim()
+            }
         }
-        self.trim();
     }
 
     // self cannot be zero
     fn clear_bit_neg(&mut self, index: u64) {
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
-                if index < Limb::WIDTH {
-                    let mut cleared_small = small.wrapping_neg();
-                    cleared_small.clear_bit(index);
-                    if cleared_small == 0 {
-                        None
-                    } else {
-                        Some(cleared_small.wrapping_neg())
-                    }
+        match *self {
+            Natural(Small(ref mut small)) if index < Limb::WIDTH => {
+                let mut cleared_small = small.wrapping_neg();
+                cleared_small.clear_bit(index);
+                if cleared_small == 0 {
+                    *self = Natural(Large(vec![0, 1]));
                 } else {
-                    None
+                    *small = cleared_small.wrapping_neg();
                 }
-            },
-            limbs_vec_clear_bit_neg(limbs, index)
-        );
+            }
+            Natural(Small(_)) => {
+                let limbs = self.promote_in_place();
+                limbs_vec_clear_bit_neg(limbs, index);
+            }
+            Natural(Large(ref mut limbs)) => {
+                limbs_vec_clear_bit_neg(limbs, index);
+            }
+        }
     }
 }

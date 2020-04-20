@@ -1217,20 +1217,14 @@ impl Natural {
         }
     }
 
-    //TODO clean
-
     fn and_assign_pos_neg(&mut self, other: &Natural) {
-        if let Natural(Small(y)) = *other {
-            self.and_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Natural(Small(ref mut x)) = *self {
-            if let Natural(Large(ref ys)) = *other {
-                *x &= ys[0].wrapping_neg();
-            }
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.and_assign_pos_limb_neg(y.wrapping_neg()),
+            (Natural(Small(ref mut x)), Natural(Large(ref ys))) => *x &= ys[0].wrapping_neg(),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_and_pos_neg_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 
@@ -1240,29 +1234,15 @@ impl Natural {
     }
 
     fn and_assign_neg_pos_ref(&mut self, other: &Natural) {
-        let new_self_value = if let Natural(Small(x)) = *self {
-            let mut new_self_value = other.clone();
-            new_self_value.and_assign_pos_limb_neg(x.wrapping_neg());
-            Some(new_self_value)
-        } else if let Natural(Small(ref y)) = *other {
-            let x = if let Natural(Large(ref xs)) = *self {
-                xs[0].wrapping_neg() & *y
-            } else {
-                unreachable!()
-            };
-            *self = Natural(Small(x));
-            None
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
-                limbs_vec_and_pos_neg_in_place_right(ys, xs);
+        match (&mut *self, other) {
+            (Natural(Small(x)), y) => *self = y.and_pos_limb_neg(x.wrapping_neg()),
+            (Natural(Large(ref xs)), Natural(Small(y))) => {
+                *self = Natural(Small(xs[0].wrapping_neg() & *y))
             }
-            self.trim();
-            None
-        } else {
-            None
-        };
-        if let Some(new_self_value) = new_self_value {
-            *self = new_self_value;
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+                limbs_vec_and_pos_neg_in_place_right(ys, xs);
+                self.trim();
+            }
         }
     }
 
@@ -1292,49 +1272,27 @@ impl Natural {
         })
     }
 
-    fn and_assign_neg_neg(&mut self, other: Natural) {
-        let new_self_value = if let Natural(Small(y)) = other {
-            self.and_assign_neg_limb_neg(y.wrapping_neg());
-            None
-        } else if let Natural(Small(ref mut x)) = *self {
-            let mut new_self_value = other.clone();
-            new_self_value.and_assign_neg_limb_neg(x.wrapping_neg());
-            Some(new_self_value)
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_vec_and_neg_neg_in_place_either(xs, &mut ys) {
-                    *xs = ys;
+    fn and_assign_neg_neg(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (Natural(Small(x)), _) => *self = other.and_neg_limb_neg(x.wrapping_neg()),
+            (_, Natural(Small(y))) => self.and_assign_neg_limb_neg(y.wrapping_neg()),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_vec_and_neg_neg_in_place_either(xs, ys) {
+                    *self = other;
                 }
+                self.trim();
             }
-            self.trim();
-            None
-        } else {
-            None
-        };
-        if let Some(new_self_value) = new_self_value {
-            *self = new_self_value;
         }
     }
 
     fn and_assign_neg_neg_ref(&mut self, other: &Natural) {
-        let new_self_value = if let Natural(Small(y)) = *other {
-            self.and_assign_neg_limb_neg(y.wrapping_neg());
-            None
-        } else if let Natural(Small(ref mut x)) = *self {
-            let mut new_self_value = other.clone();
-            new_self_value.and_assign_neg_limb_neg(x.wrapping_neg());
-            Some(new_self_value)
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (Natural(Small(x)), _) => *self = other.and_neg_limb_neg(x.wrapping_neg()),
+            (_, Natural(Small(y))) => self.and_assign_neg_limb_neg(y.wrapping_neg()),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_vec_and_neg_neg_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
-            None
-        } else {
-            None
-        };
-        if let Some(new_self_value) = new_self_value {
-            *self = new_self_value;
         }
     }
 

@@ -22,6 +22,7 @@ pub mod base {
     pub mod num {
         pub mod arithmetic {
             pub mod abs;
+            pub mod add_mul;
             pub mod log_two;
             pub mod mod_add;
             pub mod mod_is_reduced;
@@ -46,6 +47,7 @@ pub mod base {
             pub mod saturating_neg;
             pub mod saturating_sub;
             pub mod sign;
+            pub mod sub_mul;
             pub mod wrapping_abs;
             pub mod wrapping_add;
             pub mod wrapping_mul;

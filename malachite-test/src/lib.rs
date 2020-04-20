@@ -15,6 +15,7 @@ extern crate num;
 extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
+extern crate serde;
 extern crate stats;
 extern crate time;
 

@@ -495,6 +495,30 @@ pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, 
     fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &Self::Data);
 }
 
+// Computes `self + y * z`.
+pub trait AddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn add_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+// Replaces `self` with `self + y * z`.
+pub trait AddMulAssign<Y = Self, Z = Self> {
+    fn add_mul_assign(&mut self, y: Y, z: Z);
+}
+
+// Computes `self - y * z`.
+pub trait SubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn sub_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+// Replaces `self` with `self - y * z`.
+pub trait SubMulAssign<Y = Self, Z = Self> {
+    fn sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
 /// and the second of a single one. `x_0` must be less than `y`.
 pub trait XXDivModYIsQR: Sized {
@@ -793,30 +817,6 @@ pub trait DivExactAssign<RHS = Self> {
 
 pub trait DivisibleBy<RHS = Self> {
     fn divisible_by(self, rhs: RHS) -> bool;
-}
-
-pub trait AddMulAssign<B, C> {
-    // Equivalent to self += b * c
-    fn add_mul_assign(&mut self, b: B, c: C);
-}
-
-pub trait AddMul<B, C> {
-    type Output;
-
-    // Equivalent to self + b * c
-    fn add_mul(self, b: B, c: C) -> Self::Output;
-}
-
-pub trait SubMulAssign<B, C> {
-    // Equivalent to self -= b * c
-    fn sub_mul_assign(&mut self, b: B, c: C);
-}
-
-pub trait SubMul<B, C> {
-    type Output;
-
-    // Equivalent to self - b * c
-    fn sub_mul(self, b: B, c: C) -> Self::Output;
 }
 
 pub trait CheckedSubMul<B, C> {

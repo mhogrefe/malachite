@@ -11,10 +11,11 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
+    triples_of_signeds_var_3, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_var_29,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
@@ -607,5 +608,12 @@ fn sub_mul_properties() {
         assert_eq!(a.sub_mul(b, &Integer::ONE), a - b);
         assert_eq!((a * b).sub_mul(a, b), 0);
         assert_eq!((a * b).sub_mul(-a, -b), 0);
+    });
+
+    test_properties(triples_of_signeds_var_3::<SignedLimb>, |&(x, y, z)| {
+        assert_eq!(
+            SignedLimb::from(x).sub_mul(SignedLimb::from(y), SignedLimb::from(z)),
+            Integer::from(x).sub_mul(Integer::from(y), Integer::from(z))
+        );
     });
 }

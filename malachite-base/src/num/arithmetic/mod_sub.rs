@@ -32,7 +32,8 @@ macro_rules! impl_mod_sub {
         }
 
         impl ModSubAssign for $t {
-            /// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Replaces `self` with `self - rhs` mod `m`. Assumes the inputs are already reduced
+            /// mod `m`.
             ///
             /// Time: worst case O(1)
             ///

@@ -1,6 +1,7 @@
 use common::DemoBenchRegistry;
 
 pub mod abs;
+pub mod add_mul;
 pub mod log_two;
 pub mod mod_add;
 pub mod mod_is_reduced;
@@ -25,6 +26,7 @@ pub mod saturating_mul;
 pub mod saturating_neg;
 pub mod saturating_sub;
 pub mod sign;
+pub mod sub_mul;
 pub mod wrapping_abs;
 pub mod wrapping_add;
 pub mod wrapping_mul;
@@ -40,6 +42,7 @@ pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
+    add_mul::register(registry);
     log_two::register(registry);
     mod_add::register(registry);
     mod_is_reduced::register(registry);
@@ -64,6 +67,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     saturating_neg::register(registry);
     saturating_sub::register(registry);
     sign::register(registry);
+    sub_mul::register(registry);
     wrapping_abs::register(registry);
     wrapping_add::register(registry);
     wrapping_mul::register(registry);

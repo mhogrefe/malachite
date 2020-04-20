@@ -14,6 +14,7 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_28,
+    triples_of_unsigneds_var_4,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_naturals, pairs_of_naturals_var_1, triples_of_naturals_var_1,
@@ -661,5 +662,12 @@ fn sub_mul_properties() {
     test_properties(pairs_of_naturals_var_1, |&(ref a, ref b)| {
         assert_eq!(a.sub_mul(&Natural::ONE, b), a - b);
         assert_eq!(a.sub_mul(b, &Natural::ONE), a - b);
+    });
+
+    test_properties(triples_of_unsigneds_var_4::<Limb>, |&(x, y, z)| {
+        assert_eq!(
+            Limb::from(x).sub_mul(Limb::from(y), Limb::from(z)),
+            Natural::from(x).sub_mul(Natural::from(y), Natural::from(z))
+        );
     });
 }
