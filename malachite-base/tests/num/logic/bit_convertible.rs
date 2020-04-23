@@ -1,18 +1,13 @@
 use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::logic::integers::{
-    _from_bits_asc_alt, _from_bits_desc_alt, _to_bits_asc_alt, _to_bits_desc_alt,
-};
-use malachite_base::num::logic::signeds::{
-    _from_bits_asc_signed_naive, _from_bits_desc_signed_naive, _to_bits_asc_signed_naive,
-    _to_bits_desc_signed_naive,
+use malachite_base::num::logic::bit_convertible::{
+    _from_bits_asc_alt, _from_bits_asc_signed_naive, _from_bits_asc_unsigned_naive,
+    _from_bits_desc_alt, _from_bits_desc_signed_naive, _from_bits_desc_unsigned_naive,
+    _to_bits_asc_alt, _to_bits_asc_signed_naive, _to_bits_asc_unsigned_naive, _to_bits_desc_alt,
+    _to_bits_desc_signed_naive, _to_bits_desc_unsigned_naive,
 };
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_base::num::logic::unsigneds::{
-    _from_bits_asc_unsigned_naive, _from_bits_desc_unsigned_naive, _to_bits_asc_unsigned_naive,
-    _to_bits_desc_unsigned_naive,
-};
 
 #[test]
 pub fn test_to_bits_asc() {

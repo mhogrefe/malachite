@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::integers::_to_bits_asc_alt;
+use malachite_base::num::logic::bit_convertible::_to_bits_asc_alt;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, SignificantBits};
 use malachite_nz::natural::Natural;
 

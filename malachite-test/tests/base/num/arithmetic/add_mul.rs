@@ -14,8 +14,12 @@ fn add_mul_properties_unsigned_helper<T: PrimitiveUnsigned + Rand>() {
         x_alt.add_mul_assign(y, z);
         assert_eq!(x_alt, result);
 
-        assert_eq!(x + y * z, result);
         assert_eq!(x.add_mul(z, y), result);
+        assert_eq!(result.sub_mul(y, z), x);
+        assert_eq!(x.checked_add_mul(y, z), Some(result));
+        assert_eq!(x.saturating_add_mul(y, z), result);
+        assert_eq!(x.wrapping_add_mul(y, z), result);
+        assert_eq!(x.overflowing_add_mul(y, z), (result, false));
     });
 }
 
@@ -31,8 +35,12 @@ where
         x_alt.add_mul_assign(y, z);
         assert_eq!(x_alt, result);
 
-        assert_eq!(x + y * z, result);
         assert_eq!(x.add_mul(z, y), result);
+        assert_eq!(result.sub_mul(y, z), x);
+        assert_eq!(x.checked_add_mul(y, z), Some(result));
+        assert_eq!(x.saturating_add_mul(y, z), result);
+        assert_eq!(x.wrapping_add_mul(y, z), result);
+        assert_eq!(x.overflowing_add_mul(y, z), (result, false));
     });
 }
 

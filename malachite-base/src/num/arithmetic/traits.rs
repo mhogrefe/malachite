@@ -495,28 +495,126 @@ pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, 
     fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &Self::Data);
 }
 
-// Computes `self + y * z`.
+/// Computes `self + y * z`.
 pub trait AddMul<Y = Self, Z = Self> {
     type Output;
 
     fn add_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-// Replaces `self` with `self + y * z`.
+/// Replaces `self` with `self + y * z`.
 pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-// Computes `self - y * z`.
+/// Computes `self + y * z`, returning `None` if there is no valid result.
+pub trait CheckedAddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn checked_add_mul(self, y: Y, z: Z) -> Option<Self::Output>;
+}
+
+/// Computes `self + y * z`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingAddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn saturating_add_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces `self` with `self + y * z`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingAddMulAssign<Y = Self, Z = Self> {
+    fn saturating_add_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Computes `self + y * z`, wrapping around at the boundary of the type.
+pub trait WrappingAddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn wrapping_add_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces `self` with `self + y * z`, wrapping around at the boundary of the type.
+pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
+    fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Calculates `self + y * z`.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingAddMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn overflowing_add_mul(self, y: Y, z: Z) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self + y * z`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingAddMulAssign<Y = Self, Z = Self> {
+    fn overflowing_add_mul_assign(&mut self, y: Y, z: Z) -> bool;
+}
+
+/// Computes `self - y * z`.
 pub trait SubMul<Y = Self, Z = Self> {
     type Output;
 
     fn sub_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-// Replaces `self` with `self - y * z`.
+/// Replaces `self` with `self - y * z`.
 pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Computes `self - y * z`, returning `None` if there is no valid result.
+pub trait CheckedSubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn checked_sub_mul(self, y: Y, z: Z) -> Option<Self::Output>;
+}
+
+/// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingSubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn saturating_sub_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingSubMulAssign<Y = Self, Z = Self> {
+    fn saturating_sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Computes `self - y * z`, wrapping around at the boundary of the type.
+pub trait WrappingSubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn wrapping_sub_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces `self` with `self - y * z`, wrapping around at the boundary of the type.
+pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
+    fn wrapping_sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Calculates `self - y * z`.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingSubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn overflowing_sub_mul(self, y: Y, z: Z) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self - y * z`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingSubMulAssign<Y = Self, Z = Self> {
+    fn overflowing_sub_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
 
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
@@ -817,22 +915,6 @@ pub trait DivExactAssign<RHS = Self> {
 
 pub trait DivisibleBy<RHS = Self> {
     fn divisible_by(self, rhs: RHS) -> bool;
-}
-
-pub trait CheckedSubMul<B, C> {
-    type Output;
-
-    fn checked_sub_mul(self, b: B, c: C) -> Option<Self::Output>;
-}
-
-pub trait SaturatingSubMulAssign<B, C> {
-    fn saturating_sub_mul_assign(&mut self, b: B, c: C);
-}
-
-pub trait SaturatingSubMul<B, C> {
-    type Output;
-
-    fn saturating_sub_mul(self, b: B, c: C) -> Self::Output;
 }
 
 pub trait CheckedLogTwo {

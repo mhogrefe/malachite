@@ -1,6 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
-use malachite_base::num::logic::integers::{_from_bits_asc_alt, _from_bits_desc_alt};
+use malachite_base::num::logic::bit_convertible::{_from_bits_asc_alt, _from_bits_desc_alt};
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,

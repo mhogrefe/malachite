@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, CheckedAddMul};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::natural::arithmetic::add_mul::{
     limbs_add_mul, limbs_add_mul_in_place_left, limbs_add_mul_limb,
     limbs_slice_add_mul_limb_same_length_in_place_left,
@@ -15,7 +16,7 @@ use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7, triples_of_unsigned_vec_var_27,
-    triples_of_unsigneds_var_3,
+    triples_of_unsigneds, triples_of_unsigneds_var_3,
 };
 use malachite_test::inputs::natural::{pairs_of_naturals, triples_of_naturals};
 
@@ -486,6 +487,16 @@ fn add_mul_properties() {
         assert_eq!(
             Limb::from(x).add_mul(Limb::from(y), Limb::from(z)),
             Natural::from(x).add_mul(Natural::from(y), Natural::from(z))
+        );
+    });
+
+    test_properties(triples_of_unsigneds::<Limb>, |&(x, y, z)| {
+        let result = Natural::from(x).add_mul(Natural::from(y), Natural::from(z));
+        assert_eq!(
+            Limb::from(x)
+                .checked_add_mul(Limb::from(y), Limb::from(z))
+                .is_some(),
+            Limb::convertible_from(result)
         );
     });
 }

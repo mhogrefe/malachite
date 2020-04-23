@@ -11,17 +11,21 @@ use comparison::{Max, Min};
 use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{
-    AddMul, AddMulAssign, CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem,
-    CheckedSub, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
-    DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign,
-    ModPowerOfTwo, OverflowingAdd, OverflowingAddAssign, OverflowingDiv, OverflowingDivAssign,
+    AddMul, AddMulAssign, CheckedAdd, CheckedAddMul, CheckedDiv, CheckedMul, CheckedNeg,
+    CheckedPow, CheckedRem, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
+    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo,
+    EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo, OverflowingAdd, OverflowingAddAssign,
+    OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign,
     OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
-    OverflowingRem, OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, Parity, Pow,
-    PowerOfTwo, SaturatingAdd, SaturatingAddAssign, SaturatingMul, SaturatingMulAssign,
-    SaturatingPow, SaturatingSub, SaturatingSubAssign, ShlRound, ShlRoundAssign, ShrRound,
-    ShrRoundAssign, Sign, SubMul, SubMulAssign, TrueCheckedShl, TrueCheckedShr, WrappingAdd,
-    WrappingAddAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg,
-    WrappingNegAssign, WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign,
+    OverflowingRem, OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
+    OverflowingSubMulAssign, Parity, Pow, PowerOfTwo, SaturatingAdd, SaturatingAddAssign,
+    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
+    SaturatingSub, SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound,
+    ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul, SubMulAssign, TrueCheckedShl,
+    TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
+    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
+    WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
+    WrappingSubMulAssign,
 };
 use num::basic::traits::{One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -54,6 +58,7 @@ pub trait PrimitiveInteger:
     + BitXor<Self, Output = Self>
     + BitXorAssign<Self>
     + CheckedAdd<Self, Output = Self>
+    + CheckedAddMul<Self, Self, Output = Self>
     + CheckedDiv<Self, Output = Self>
     + CheckedFrom<u8>
     + CheckedFrom<u16>
@@ -84,6 +89,7 @@ pub trait PrimitiveInteger:
     + CheckedPow<u64, Output = Self>
     + CheckedRem<Self, Output = Self>
     + CheckedSub<Self, Output = Self>
+    + CheckedSubMul<Self, Self, Output = Self>
     + Clone
     + Copy
     + CountOnes
@@ -151,6 +157,8 @@ pub trait PrimitiveInteger:
     + OrdAbs
     + OverflowingAdd<Self, Output = Self>
     + OverflowingAddAssign<Self>
+    + OverflowingAddMul<Self, Self, Output = Self>
+    + OverflowingAddMulAssign<Self, Self>
     + OverflowingDiv<Self, Output = Self>
     + OverflowingDivAssign<Self>
     + OverflowingFrom<u8>
@@ -186,6 +194,8 @@ pub trait PrimitiveInteger:
     + OverflowingRemAssign<Self>
     + OverflowingSub<Self, Output = Self>
     + OverflowingSubAssign<Self>
+    + OverflowingSubMul<Self, Self, Output = Self>
+    + OverflowingSubMulAssign<Self, Self>
     + Parity
     + PartialEq<Self>
     + PartialOrd<Self>
@@ -198,6 +208,8 @@ pub trait PrimitiveInteger:
     + Rotate
     + SaturatingAdd<Self, Output = Self>
     + SaturatingAddAssign<Self>
+    + SaturatingAddMul<Self, Self, Output = Self>
+    + SaturatingAddMulAssign<Self, Self>
     + SaturatingFrom<u8>
     + SaturatingFrom<u16>
     + SaturatingFrom<u32>
@@ -227,6 +239,8 @@ pub trait PrimitiveInteger:
     + SaturatingPow<u64, Output = Self>
     + SaturatingSub<Self, Output = Self>
     + SaturatingSubAssign<Self>
+    + SaturatingSubMul<Self, Self, Output = Self>
+    + SaturatingSubMulAssign<Self, Self>
     + Shl<i8, Output = Self>
     + Shl<i16, Output = Self>
     + Shl<i32, Output = Self>
@@ -325,6 +339,8 @@ pub trait PrimitiveInteger:
     + Crementable
     + WrappingAdd<Self, Output = Self>
     + WrappingAddAssign<Self>
+    + WrappingAddMul<Self, Self, Output = Self>
+    + WrappingAddMulAssign<Self, Self>
     + WrappingDiv<Self, Output = Self>
     + WrappingDivAssign<Self>
     + WrappingFrom<u8>
@@ -360,6 +376,8 @@ pub trait PrimitiveInteger:
     + WrappingRemAssign<Self>
     + WrappingSub<Self, Output = Self>
     + WrappingSubAssign<Self>
+    + WrappingSubMul<Self, Self, Output = Self>
+    + WrappingSubMulAssign<Self, Self>
     + Zero
 {
     /// The number of bits of `Self`.

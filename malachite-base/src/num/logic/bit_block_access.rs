@@ -3,8 +3,9 @@ use std::cmp::min;
 use comparison::Max;
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
-use num::logic::traits::{BitBlockAccess, LeadingZeros};
+use num::logic::traits::{BitAccess, BitBlockAccess, LeadingZeros};
 
 macro_rules! impl_bit_block_access_unsigned {
     ($t:ident) => {
@@ -215,3 +216,19 @@ impl_bit_block_access_signed!(i32, u32);
 impl_bit_block_access_signed!(i64, u64);
 impl_bit_block_access_signed!(i128, u128);
 impl_bit_block_access_signed!(isize, usize);
+
+pub fn _get_bits_naive<T: BitAccess, U: BitAccess + Zero>(n: &T, start: u64, end: u64) -> U {
+    let mut result = U::ZERO;
+    for i in start..end {
+        if n.get_bit(i) {
+            result.set_bit(i - start);
+        }
+    }
+    result
+}
+
+pub fn _assign_bits_naive<T: BitAccess, U: BitAccess>(n: &mut T, start: u64, end: u64, bits: &U) {
+    for i in start..end {
+        n.assign_bit(i, bits.get_bit(i - start));
+    }
+}

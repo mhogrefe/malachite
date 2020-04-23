@@ -10,10 +10,10 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::power_of_two_digit_iterable::PrimitivePowerOfTwoDigitIterator;
 use malachite_base::num::logic::traits::{
     LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator,
 };
-use malachite_base::num::logic::unsigneds::PrimitivePowerOfTwoDigitIterator;
 use malachite_base::round::RoundingMode;
 
 use natural::logic::bit_block_access::limbs_slice_get_bits;

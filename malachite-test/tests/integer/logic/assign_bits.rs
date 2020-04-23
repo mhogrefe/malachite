@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, NegModPowerOfTwo};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::logic::integers::_assign_bits_naive;
+use malachite_base::num::logic::bit_block_access::_assign_bits_naive;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;

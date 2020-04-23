@@ -23,6 +23,8 @@ pub mod base {
         pub mod arithmetic {
             pub mod abs;
             pub mod add_mul;
+            pub mod checked_add_mul;
+            pub mod checked_sub_mul;
             pub mod log_two;
             pub mod mod_add;
             pub mod mod_is_reduced;
@@ -37,22 +39,28 @@ pub mod base {
             pub mod neg;
             pub mod overflowing_abs;
             pub mod overflowing_add;
+            pub mod overflowing_add_mul;
             pub mod overflowing_mul;
             pub mod overflowing_neg;
             pub mod overflowing_sub;
+            pub mod overflowing_sub_mul;
             pub mod power_of_two;
             pub mod saturating_abs;
             pub mod saturating_add;
+            pub mod saturating_add_mul;
             pub mod saturating_mul;
             pub mod saturating_neg;
             pub mod saturating_sub;
+            pub mod saturating_sub_mul;
             pub mod sign;
             pub mod sub_mul;
             pub mod wrapping_abs;
             pub mod wrapping_add;
+            pub mod wrapping_add_mul;
             pub mod wrapping_mul;
             pub mod wrapping_neg;
             pub mod wrapping_sub;
+            pub mod wrapping_sub_mul;
             pub mod x_mul_y_is_zz;
             pub mod xx_add_yy_is_zz;
             pub mod xx_div_mod_y_is_qr;

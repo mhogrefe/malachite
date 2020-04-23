@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::num::logic::integers::{_to_bits_asc_alt, _to_bits_desc_alt};
+use malachite_base::num::logic::bit_convertible::{_to_bits_asc_alt, _to_bits_desc_alt};
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,

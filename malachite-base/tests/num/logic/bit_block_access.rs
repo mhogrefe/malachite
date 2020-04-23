@@ -2,7 +2,7 @@ use malachite_base::comparison::Max;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::logic::integers::{_assign_bits_naive, _get_bits_naive};
+use malachite_base::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
 use malachite_base::num::logic::traits::BitBlockAccess;
 
 #[test]

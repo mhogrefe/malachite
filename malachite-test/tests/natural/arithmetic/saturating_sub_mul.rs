@@ -5,8 +5,10 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
+use malachite_test::inputs::base::triples_of_unsigneds;
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 
 #[test]
@@ -154,5 +156,12 @@ fn saturating_sub_mul_properties() {
         assert_eq!((a * b).saturating_sub_mul(a, b), 0);
         assert_eq!(a.saturating_sub_mul(&Natural::ONE, b), a.saturating_sub(b));
         assert_eq!(a.saturating_sub_mul(b, &Natural::ONE), a.saturating_sub(b));
+    });
+
+    test_properties(triples_of_unsigneds::<Limb>, |&(x, y, z)| {
+        assert_eq!(
+            Limb::from(x).saturating_sub_mul(Limb::from(y), Limb::from(z)),
+            Natural::from(x).saturating_sub_mul(Natural::from(y), Natural::from(z))
+        );
     });
 }

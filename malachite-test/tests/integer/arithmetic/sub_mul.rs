@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{CheckedSubMul, SubMul, SubMulAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
@@ -15,7 +16,8 @@ use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    triples_of_signeds_var_3, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
+    triples_of_signeds, triples_of_signeds_var_3,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_var_29,
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
@@ -614,6 +616,16 @@ fn sub_mul_properties() {
         assert_eq!(
             SignedLimb::from(x).sub_mul(SignedLimb::from(y), SignedLimb::from(z)),
             Integer::from(x).sub_mul(Integer::from(y), Integer::from(z))
+        );
+    });
+
+    test_properties(triples_of_signeds::<SignedLimb>, |&(x, y, z)| {
+        let result = Integer::from(x).sub_mul(Integer::from(y), Integer::from(z));
+        assert_eq!(
+            SignedLimb::from(x)
+                .checked_sub_mul(SignedLimb::from(y), SignedLimb::from(z))
+                .is_some(),
+            SignedLimb::convertible_from(result)
         );
     });
 }

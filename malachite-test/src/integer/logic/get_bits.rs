@@ -1,7 +1,7 @@
 use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::integers::_get_bits_naive;
+use malachite_base::num::logic::bit_block_access::_get_bits_naive;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,

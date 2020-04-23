@@ -1,12 +1,13 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, CheckedAddMul};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
-use malachite_test::inputs::base::triples_of_signeds_var_2;
+use malachite_test::inputs::base::{triples_of_signeds, triples_of_signeds_var_2};
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 
 #[test]
@@ -349,6 +350,16 @@ fn add_mul_properties() {
         assert_eq!(
             SignedLimb::from(x).add_mul(SignedLimb::from(y), SignedLimb::from(z)),
             Integer::from(x).add_mul(Integer::from(y), Integer::from(z))
+        );
+    });
+
+    test_properties(triples_of_signeds::<SignedLimb>, |&(x, y, z)| {
+        let result = Integer::from(x).add_mul(Integer::from(y), Integer::from(z));
+        assert_eq!(
+            SignedLimb::from(x)
+                .checked_add_mul(SignedLimb::from(y), SignedLimb::from(z))
+                .is_some(),
+            SignedLimb::convertible_from(result)
         );
     });
 }

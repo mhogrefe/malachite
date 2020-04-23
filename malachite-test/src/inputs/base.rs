@@ -458,7 +458,7 @@ pub fn triples_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(
 }
 
 fn add_mul_inputs_valid<T: PrimitiveInteger>(x: T, y: T, z: T) -> bool {
-    y.checked_mul(z).and_then(|yz| x.checked_add(yz)).is_some()
+    x.checked_add_mul(y, z).is_some()
 }
 
 pub(crate) struct ValidAddMulInputs<T> {
@@ -521,7 +521,7 @@ pub fn triples_of_unsigneds_var_3<T: PrimitiveUnsigned + Rand>(
 }
 
 fn sub_mul_inputs_valid<T: PrimitiveInteger>(x: T, y: T, z: T) -> bool {
-    y.checked_mul(z).and_then(|yz| x.checked_sub(yz)).is_some()
+    x.checked_sub_mul(y, z).is_some()
 }
 
 pub(crate) struct ValidSubMulInputs<T> {
