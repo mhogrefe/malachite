@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };

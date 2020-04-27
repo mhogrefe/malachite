@@ -1,4 +1,3 @@
-use comparison::{Max, Min};
 use num::arithmetic::traits::{SaturatingAbs, SaturatingAbsAssign};
 
 macro_rules! impl_saturating_abs {

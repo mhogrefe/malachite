@@ -4,7 +4,9 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
-use malachite_test::inputs::base::{triples_of_signeds, triples_of_unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signeds, pairs_of_unsigneds, triples_of_signeds, triples_of_unsigneds,
+};
 
 fn saturating_sub_mul_properties_unsigned_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(triples_of_unsigneds::<T>, |&(x, y, z)| {
@@ -16,6 +18,13 @@ fn saturating_sub_mul_properties_unsigned_helper<T: PrimitiveUnsigned + Rand>() 
 
         assert_eq!(x.saturating_sub_mul(z, y), result);
         assert!(result <= x);
+    });
+
+    test_properties(pairs_of_unsigneds::<T>, |&(a, b)| {
+        assert_eq!(a.saturating_sub_mul(T::ZERO, b), a);
+        assert_eq!(a.saturating_sub_mul(T::ONE, b), a.saturating_sub(b));
+        assert_eq!(a.saturating_sub_mul(b, T::ZERO), a);
+        assert_eq!(a.saturating_sub_mul(b, T::ONE), a.saturating_sub(b));
     });
 }
 
@@ -32,6 +41,13 @@ where
         assert_eq!(x_alt, result);
 
         assert_eq!(x.saturating_sub_mul(z, y), result);
+    });
+
+    test_properties(pairs_of_signeds::<T>, |&(a, b)| {
+        assert_eq!(a.saturating_sub_mul(T::ZERO, b), a);
+        assert_eq!(a.saturating_sub_mul(T::ONE, b), a.saturating_sub(b));
+        assert_eq!(a.saturating_sub_mul(b, T::ZERO), a);
+        assert_eq!(a.saturating_sub_mul(b, T::ONE), a.saturating_sub(b));
     });
 }
 

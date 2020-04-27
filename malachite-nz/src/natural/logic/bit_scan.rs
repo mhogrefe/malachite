@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};

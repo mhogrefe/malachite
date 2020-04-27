@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{DivRound, ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -1417,9 +1416,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 triples_of_signed_small_unsigned_and_rounding_mode_var_1::<SignedLimb, $t>,
                 |&(n, u, rm)| {
-                    if u < $t::exact_from(SignedLimb::WIDTH) {
-                        assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
-                    }
+                    assert_eq!(n.shr_round(u, rm), Integer::from(n).shr_round(u, rm));
                 },
             );
         }

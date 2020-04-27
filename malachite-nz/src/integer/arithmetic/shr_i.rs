@@ -141,7 +141,7 @@ macro_rules! impl_integer_shr_signed {
             /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
             /// taking the `Integer` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down`
             /// is equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed,
-            /// use `other < 0 || self.is_divisible_by_power_of_two(other)`.
+            /// use `other < 0 || self.divisible_by_power_of_two(other)`.
             ///
             /// Time: worst case O(`other`)
             ///
@@ -221,7 +221,7 @@ macro_rules! impl_integer_shr_signed {
             /// taking the `Integer` by reference. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use
-            /// `other < 0 || self.is_divisible_by_power_of_two(other)`.
+            /// `other < 0 || self.divisible_by_power_of_two(other)`.
             ///
             /// Time: worst case O(`other`)
             ///
@@ -303,7 +303,7 @@ macro_rules! impl_integer_shr_signed {
             /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
             /// in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
             /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `other < 0 || self.is_divisible_by_power_of_two(other)`.
+            /// `other < 0 || self.divisible_by_power_of_two(other)`.
             ///
             /// Time: worst case O(`other`)
             ///

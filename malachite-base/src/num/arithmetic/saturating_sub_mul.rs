@@ -1,4 +1,3 @@
-use comparison::{Max, Min};
 use num::arithmetic::traits::{
     SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, UnsignedAbs,
 };

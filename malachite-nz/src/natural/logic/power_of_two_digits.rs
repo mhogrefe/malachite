@@ -1,6 +1,5 @@
 use std::cmp::{min, Ordering};
 
-use malachite_base::comparison::Max;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, DivRound, ModPowerOfTwo, Parity, PowerOfTwo,
@@ -236,7 +235,7 @@ macro_rules! power_of_two_digits_primitive {
             /// let digits: &[u16] = &[3, 7, 1];
             /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits), 123);
             /// ```
-            #[allow(exceeding_bitshifts)]
+            #[allow(arithmetic_overflow)]
             fn from_power_of_two_digits_asc(log_base: u64, digits: &[$t]) -> Natural {
                 assert_ne!(log_base, 0);
                 if log_base > $t::WIDTH {
@@ -311,7 +310,7 @@ macro_rules! power_of_two_digits_primitive {
             /// let digits: &[u16] = &[1, 7, 3];
             /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits), 123);
             /// ```
-            #[allow(exceeding_bitshifts)]
+            #[allow(arithmetic_overflow)]
             fn from_power_of_two_digits_desc(log_base: u64, digits: &[$t]) -> Natural {
                 assert_ne!(log_base, 0);
                 if log_base > $t::WIDTH {

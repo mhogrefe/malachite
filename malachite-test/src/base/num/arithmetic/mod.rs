@@ -31,6 +31,8 @@ pub mod saturating_mul;
 pub mod saturating_neg;
 pub mod saturating_sub;
 pub mod saturating_sub_mul;
+pub mod shl_round;
+pub mod shr_round;
 pub mod sign;
 pub mod sub_mul;
 pub mod wrapping_abs;
@@ -80,6 +82,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     saturating_neg::register(registry);
     saturating_sub::register(registry);
     saturating_sub_mul::register(registry);
+    shl_round::register(registry);
+    shr_round::register(registry);
     sign::register(registry);
     sub_mul::register(registry);
     wrapping_abs::register(registry);

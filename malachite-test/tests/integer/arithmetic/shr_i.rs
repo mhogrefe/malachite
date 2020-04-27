@@ -1,15 +1,20 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_test::inputs::base::{pairs_of_signed_and_rounding_mode, signeds};
+use malachite_test::inputs::base::{
+    pairs_of_signed_and_rounding_mode, signeds,
+    triples_of_signed_small_signed_and_rounding_mode_var_1,
+};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_rounding_mode, pairs_of_integer_and_small_signed,
     triples_of_integer_small_signed_and_rounding_mode_var_2,
@@ -1437,6 +1442,20 @@ macro_rules! tests_and_properties {
                     assert_eq!(n.shr_round(i, rm), Integer::from(n).shr_round(i, rm));
                 },
             );
+
+            test_properties(
+                triples_of_signed_small_signed_and_rounding_mode_var_1::<SignedLimb, $t>,
+                |&(n, i, rm)| {
+                    if n == 0
+                        || i >= 0
+                        || i != $t::MIN
+                            && -i < $t::exact_from(SignedLimb::WIDTH)
+                            && n << -i >> -i == n
+                    {
+                        assert_eq!(n.shr_round(i, rm), Integer::from(n).shr_round(i, rm));
+                    }
+                },
+            );
         }
     };
 }
@@ -1494,22 +1513,22 @@ tests_and_properties!(
 );
 tests_and_properties!(
     i32,
-    test_shr_signed_limb,
-    shr_signed_limb_properties,
-    test_shr_round_signed_limb,
-    shr_round_assign_signed_limb_fail_1,
-    shr_round_assign_signed_limb_fail_2,
-    shr_round_assign_signed_limb_fail_3,
-    shr_round_assign_signed_limb_fail_4,
-    shr_round_signed_limb_fail_1,
-    shr_round_signed_limb_fail_2,
-    shr_round_signed_limb_fail_3,
-    shr_round_signed_limb_fail_4,
-    shr_round_signed_limb_ref_fail_1,
-    shr_round_signed_limb_ref_fail_2,
-    shr_round_signed_limb_ref_fail_3,
-    shr_round_signed_limb_ref_fail_4,
-    shr_round_signed_limb_properties,
+    test_shr_i32,
+    shr_i32_properties,
+    test_shr_round_i32,
+    shr_round_assign_i32_fail_1,
+    shr_round_assign_i32_fail_2,
+    shr_round_assign_i32_fail_3,
+    shr_round_assign_i32_fail_4,
+    shr_round_i32_fail_1,
+    shr_round_i32_fail_2,
+    shr_round_i32_fail_3,
+    shr_round_i32_fail_4,
+    shr_round_i32_ref_fail_1,
+    shr_round_i32_ref_fail_2,
+    shr_round_i32_ref_fail_3,
+    shr_round_i32_ref_fail_4,
+    shr_round_i32_properties,
     i,
     j,
     out,

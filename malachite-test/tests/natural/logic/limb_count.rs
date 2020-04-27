@@ -1,7 +1,6 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_nz::natural::Natural;

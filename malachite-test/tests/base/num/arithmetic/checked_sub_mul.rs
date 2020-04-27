@@ -4,13 +4,22 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::Rand;
 
 use malachite_test::common::test_properties;
-use malachite_test::inputs::base::{triples_of_signeds, triples_of_unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signeds, pairs_of_unsigneds, triples_of_signeds, triples_of_unsigneds,
+};
 
 fn sub_mul_properties_unsigned_helper<T: PrimitiveUnsigned + Rand>() {
     test_properties(triples_of_unsigneds::<T>, |&(x, y, z)| {
         let result = x.checked_sub_mul(y, z);
         assert_eq!(x.checked_sub_mul(z, y), result);
         assert_eq!(result.is_none(), x.overflowing_sub_mul(y, z).1);
+    });
+
+    test_properties(pairs_of_unsigneds::<T>, |&(a, b)| {
+        assert_eq!(a.checked_sub_mul(T::ZERO, b), Some(a));
+        assert_eq!(a.checked_sub_mul(T::ONE, b), a.checked_sub(b));
+        assert_eq!(a.checked_sub_mul(b, T::ZERO), Some(a));
+        assert_eq!(a.checked_sub_mul(b, T::ONE), a.checked_sub(b));
     });
 }
 
@@ -23,6 +32,13 @@ where
         let result = x.checked_sub_mul(y, z);
         assert_eq!(x.checked_sub_mul(z, y), result);
         assert_eq!(result.is_none(), x.overflowing_sub_mul(y, z).1);
+    });
+
+    test_properties(pairs_of_signeds::<T>, |&(a, b)| {
+        assert_eq!(a.checked_sub_mul(T::ZERO, b), Some(a));
+        assert_eq!(a.checked_sub_mul(T::ONE, b), a.checked_sub(b));
+        assert_eq!(a.checked_sub_mul(b, T::ZERO), Some(a));
+        assert_eq!(a.checked_sub_mul(b, T::ONE), a.checked_sub(b));
     });
 }
 

@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;

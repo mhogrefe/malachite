@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::comparison::{Max, Min};
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{

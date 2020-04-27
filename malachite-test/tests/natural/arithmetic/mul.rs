@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;

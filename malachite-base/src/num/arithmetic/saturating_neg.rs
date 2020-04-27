@@ -1,4 +1,3 @@
-use comparison::{Max, Min};
 use num::arithmetic::traits::{SaturatingNeg, SaturatingNegAssign};
 
 macro_rules! impl_saturating_neg {

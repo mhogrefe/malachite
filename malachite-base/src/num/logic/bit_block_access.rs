@@ -1,6 +1,5 @@
 use std::cmp::min;
 
-use comparison::Max;
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;

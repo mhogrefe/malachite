@@ -62,7 +62,7 @@ pub trait PrimitiveFloat:
     const MIN_NORMAL_EXPONENT: i64 = -((1 << (Self::EXPONENT_WIDTH - 1)) - 2);
     const MIN_EXPONENT: i64 = Self::MIN_NORMAL_EXPONENT - (Self::MANTISSA_WIDTH as i64);
     const MAX_EXPONENT: u64 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
-    const MIN_POSITIVE: Self;
+    const MIN_POSITIVE_SUBNORMAL: Self;
     const MAX_SUBNORMAL: Self;
     const MIN_POSITIVE_NORMAL: Self;
     const POSITIVE_INFINITY: Self;
@@ -132,7 +132,7 @@ macro_rules! float_traits {
     (
         $t: ident,
         $u: ident,
-        $min_positive: expr,
+        $min_positive_subnormal: expr,
         $max_subnormal: expr,
         $min_positive_normal: expr
     ) => {
@@ -148,7 +148,7 @@ macro_rules! float_traits {
             const NAN: Self = std::$t::NAN;
             const MAX_FINITE: Self = std::$t::MAX;
             const MIN_FINITE: Self = std::$t::MIN;
-            const MIN_POSITIVE: Self = $min_positive;
+            const MIN_POSITIVE_SUBNORMAL: Self = $min_positive_subnormal;
             const MAX_SUBNORMAL: Self = $max_subnormal;
             const MIN_POSITIVE_NORMAL: Self = $min_positive_normal;
             const SMALLEST_UNREPRESENTABLE_UINT: $u = (1 << (Self::MANTISSA_WIDTH + 1)) + 1;

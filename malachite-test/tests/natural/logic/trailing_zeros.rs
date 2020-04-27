@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;

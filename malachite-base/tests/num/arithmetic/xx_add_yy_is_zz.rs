@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::xx_add_yy_is_zz::_explicit_xx_add_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 

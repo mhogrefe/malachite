@@ -3,7 +3,6 @@ use std::iter::once;
 use std::mem::swap;
 use std::ops::{Div, DivAssign};
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     DivRem, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ,
 };

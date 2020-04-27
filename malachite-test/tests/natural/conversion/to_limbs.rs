@@ -1,8 +1,6 @@
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
-#[cfg(feature = "32_bit_limbs")]
-use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;

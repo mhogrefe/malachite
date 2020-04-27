@@ -27,7 +27,7 @@ fn test_f32() {
     test(f32::NAN, 0x7fc0_0000);
     test(f32::ZERO, 0);
     test(f32::NEGATIVE_ZERO, 0x8000_0000);
-    test(f32::MIN_POSITIVE, 1);
+    test(f32::MIN_POSITIVE_SUBNORMAL, 1);
     test(f32::MAX_SUBNORMAL, 0x7f_ffff);
     test(f32::MIN_POSITIVE_NORMAL, 0x80_0000);
     test(f32::ONE, 0x3f80_0000);
@@ -50,7 +50,7 @@ fn test_f64() {
     test(f64::NAN, 0x7ff8_0000_0000_0000);
     test(f64::ZERO, 0);
     test(f64::NEGATIVE_ZERO, 0x8000_0000_0000_0000);
-    test(f64::MIN_POSITIVE, 1);
+    test(f64::MIN_POSITIVE_SUBNORMAL, 1);
     test(f64::MAX_SUBNORMAL, 0xf_ffff_ffff_ffff);
     test(f64::MIN_POSITIVE_NORMAL, 0x10_0000_0000_0000);
     test(f64::ONE, 0x3ff0_0000_0000_0000);

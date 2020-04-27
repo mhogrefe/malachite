@@ -1,4 +1,3 @@
-use malachite_base::comparison::{Max, Min};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -263,25 +262,23 @@ impl Natural {
         })
     }
 
-    //TODO clean
-
     fn neg_assign_bits(&mut self, start: u64, end: u64, bits: &Natural) {
         if start == end {
             return;
         }
         let bits_width = end - start;
         if bits_width <= Limb::WIDTH {
-            if let Natural(Small(ref mut small_self)) = self {
-                if let Natural(Small(small_bits)) = bits {
-                    let small_bits = (!small_bits).mod_power_of_two(bits_width);
-                    if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
-                        let mut new_small_self = *small_self - 1;
-                        new_small_self.assign_bits(start, end, &small_bits);
-                        let (sum, overflow) = new_small_self.overflowing_add(1);
-                        if !overflow {
-                            *small_self = sum;
-                            return;
-                        }
+            if let (&mut Natural(Small(ref mut small_self)), &Natural(Small(small_bits))) =
+                (&mut *self, bits)
+            {
+                let small_bits = (!small_bits).mod_power_of_two(bits_width);
+                if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
+                    let mut new_small_self = *small_self - 1;
+                    new_small_self.assign_bits(start, end, &small_bits);
+                    let (sum, overflow) = new_small_self.overflowing_add(1);
+                    if !overflow {
+                        *small_self = sum;
+                        return;
                     }
                 }
             }

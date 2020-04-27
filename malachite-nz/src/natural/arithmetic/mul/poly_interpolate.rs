@@ -1,6 +1,5 @@
 use std::mem::swap;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };

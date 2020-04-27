@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 use std::mem::swap;
 use std::ops::{Rem, RemAssign};
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, PowerOfTwo, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,

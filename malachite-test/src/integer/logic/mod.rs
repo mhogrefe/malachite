@@ -1,6 +1,5 @@
 use std::iter::repeat;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;

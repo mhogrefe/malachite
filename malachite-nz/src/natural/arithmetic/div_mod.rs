@@ -1,7 +1,6 @@
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 
-use malachite_base::comparison::Max;
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,

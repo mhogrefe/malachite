@@ -823,7 +823,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
         /// specified rounding mode, taking the `Natural` by value. Passing `RoundingMode::Floor` or
         /// `RoundingMode::Down` is equivalent to using `>>`. To test whether `RoundingMode::Exact`
-        /// can be passed, use `self.is_divisible_by_power_of_two(other)`.
+        /// can be passed, use `self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(n)
         ///

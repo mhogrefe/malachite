@@ -35,6 +35,8 @@ pub mod arithmetic {
     pub mod saturating_neg;
     pub mod saturating_sub;
     pub mod saturating_sub_mul;
+    pub mod shl_round;
+    pub mod shr_round;
     pub mod sign;
     pub mod signeds;
     pub mod sub_mul;

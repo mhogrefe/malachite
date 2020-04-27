@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{ShrRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;

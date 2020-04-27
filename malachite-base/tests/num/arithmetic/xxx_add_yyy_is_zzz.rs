@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]

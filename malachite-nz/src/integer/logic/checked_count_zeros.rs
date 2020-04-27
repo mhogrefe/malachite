@@ -14,7 +14,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -25,15 +25,15 @@ use platform::Limb;
 /// ```
 pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
-    let mut nonzero_limb_seen = false;
-    for &limb in xs.iter() {
-        sum += if nonzero_limb_seen {
-            CountOnes::count_ones(limb)
-        } else if limb == 0 {
+    let mut nonzero_seen = false;
+    for &x in xs.iter() {
+        sum += if nonzero_seen {
+            CountOnes::count_ones(x)
+        } else if x == 0 {
             Limb::WIDTH
         } else {
-            nonzero_limb_seen = true;
-            CountZeros::count_zeros(limb.wrapping_neg())
+            nonzero_seen = true;
+            CountZeros::count_zeros(x.wrapping_neg())
         };
     }
     sum

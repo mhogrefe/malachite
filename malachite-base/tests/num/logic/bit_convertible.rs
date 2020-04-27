@@ -1,4 +1,3 @@
-use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::bit_convertible::{

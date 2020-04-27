@@ -1,4 +1,3 @@
-use comparison::Max;
 use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::LowMask;

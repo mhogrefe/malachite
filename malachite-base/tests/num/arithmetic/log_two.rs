@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;

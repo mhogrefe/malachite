@@ -1,7 +1,6 @@
 use std::cmp::min;
 use std::str::FromStr;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::logic::or::{

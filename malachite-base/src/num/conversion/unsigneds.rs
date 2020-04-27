@@ -470,7 +470,7 @@ impl VecFromOtherTypeSlice<u64> for usize {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `slice.len()`
-    #[allow(exceeding_bitshifts)]
+    #[allow(arithmetic_overflow)]
     fn vec_from_other_type_slice(slice: &[u64]) -> Vec<Self> {
         let mut xs;
         if usize::WIDTH == u32::WIDTH {
@@ -534,7 +534,7 @@ impl VecFromOtherTypeSlice<usize> for u32 {
     /// Additional memory: worst case O(n)
     ///
     /// where n = `slice.len()`
-    #[allow(exceeding_bitshifts)]
+    #[allow(arithmetic_overflow)]
     fn vec_from_other_type_slice(slice: &[usize]) -> Vec<Self> {
         let mut xs;
         if usize::WIDTH == u32::WIDTH {
@@ -563,7 +563,7 @@ impl VecFromOtherType<usize> for u32 {
     /// Time: worst case O(1)
     ///
     /// Additional memory: worst case O(1)
-    #[allow(exceeding_bitshifts)]
+    #[allow(arithmetic_overflow)]
     fn vec_from_other_type(value: usize) -> Vec<Self> {
         if usize::WIDTH == u32::WIDTH {
             vec![u32::wrapping_from(value)]

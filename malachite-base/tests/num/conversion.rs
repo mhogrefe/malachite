@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 use std::{u16, u8};
 
-use malachite_base::comparison::{Max, Min};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromOtherTypeSlice, JoinHalves, OverflowingFrom,

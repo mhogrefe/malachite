@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;

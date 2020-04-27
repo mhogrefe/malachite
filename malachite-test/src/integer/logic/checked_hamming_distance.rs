@@ -1,7 +1,6 @@
 use std::cmp::max;
 use std::iter::repeat;
 
-use malachite_base::comparison::Max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     BitIterable, CheckedHammingDistance, HammingDistance, SignificantBits,

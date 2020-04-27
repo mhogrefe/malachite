@@ -2,7 +2,6 @@ use std::cmp::{max, Ordering};
 use std::iter::repeat;
 use std::ops::{BitXor, BitXorAssign};
 
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 

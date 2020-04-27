@@ -15,17 +15,17 @@ use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// Hamming distance between the negative of that `Natural` (two's complement) and the negative of a
-/// `Limb`. Both have infinitely many implicit leading ones. `limbs` cannot be empty or only contain
-/// zeros; `other_limb` cannot be zero.
+/// `Limb`. Both have infinitely many implicit leading ones. `xs` cannot be empty or only contain
+/// zeros; `y` cannot be zero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -35,9 +35,9 @@ use platform::Limb;
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
 /// ```
 pub fn limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
-    let least_significant_limb = xs[0].wrapping_neg();
-    limbs_count_zeros_neg(xs) - CountZeros::count_zeros(least_significant_limb)
-        + least_significant_limb.hamming_distance(y.wrapping_neg())
+    let x_lo = xs[0].wrapping_neg();
+    limbs_count_zeros_neg(xs) - CountZeros::count_zeros(x_lo)
+        + x_lo.hamming_distance(y.wrapping_neg())
 }
 
 fn limbs_count_zeros(xs: &[Limb]) -> u64 {
@@ -103,7 +103,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// May panic if `xs` or `ys` only contain zeros.

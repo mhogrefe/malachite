@@ -104,12 +104,10 @@ pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
 }
 
 fn limbs_asc_from_negative_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Vec<Limb> {
-    {
-        let most_significant_limb = xs.last_mut().unwrap();
-        let leading_zeros = LeadingZeros::leading_zeros(*most_significant_limb);
-        if leading_zeros != 0 {
-            *most_significant_limb |= !Limb::low_mask(Limb::WIDTH - leading_zeros);
-        }
+    let x_high = xs.last_mut().unwrap();
+    let leading_zeros = LeadingZeros::leading_zeros(*x_high);
+    if leading_zeros != 0 {
+        *x_high |= !Limb::low_mask(Limb::WIDTH - leading_zeros);
     }
     assert!(!limbs_twos_complement_in_place(&mut xs));
     xs
@@ -257,8 +255,7 @@ impl BitConvertible for Integer {
         } else if !bits.last().unwrap() {
             Integer::from(Natural::from_bits_asc(bits))
         } else {
-            let limbs = limbs_asc_from_negative_twos_complement_bits_asc(bits);
-            -Natural::from_owned_limbs_asc(limbs)
+            -Natural::from_owned_limbs_asc(limbs_asc_from_negative_twos_complement_bits_asc(bits))
         }
     }
 
@@ -305,8 +302,7 @@ impl BitConvertible for Integer {
         } else if !bits[0] {
             Integer::from(Natural::from_bits_desc(bits))
         } else {
-            let limbs = limbs_asc_from_negative_twos_complement_bits_desc(bits);
-            -Natural::from_owned_limbs_asc(limbs)
+            -Natural::from_owned_limbs_asc(limbs_asc_from_negative_twos_complement_bits_desc(bits))
         }
     }
 }

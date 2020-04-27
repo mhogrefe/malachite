@@ -16,7 +16,6 @@
     clippy::filter_map_next,
     clippy::find_map,
     clippy::large_digit_groups,
-    clippy::manual_mul_add,
     clippy::map_flatten,
     clippy::match_same_arms,
     clippy::missing_const_for_fn,

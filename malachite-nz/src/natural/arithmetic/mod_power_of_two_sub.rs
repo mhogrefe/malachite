@@ -1,4 +1,3 @@
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ShrRound,
 };

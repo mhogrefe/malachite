@@ -1,4 +1,3 @@
-use malachite_base::comparison::{Max, Min};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };

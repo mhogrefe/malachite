@@ -1,6 +1,5 @@
 use std::num::ParseIntError;
 
-use comparison::{Max, Min};
 use num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
     WrappingFrom,

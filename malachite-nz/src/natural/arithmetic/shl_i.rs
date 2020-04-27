@@ -122,7 +122,7 @@ macro_rules! impl_natural_shl_signed {
         /// takes the floor) and rounds according to the specified rounding mode, taking the
         /// `Natural` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent
         /// to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-        /// `other > 0 || self.is_divisible_by_power_of_two(other)`.
+        /// `other > 0 || self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(`other`)
         ///
@@ -179,7 +179,7 @@ macro_rules! impl_natural_shl_signed {
         /// takes the floor) and rounds according to the specified rounding mode, taking the
         /// `Natural` by reference. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
         /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-        /// `other > 0 || self.is_divisible_by_power_of_two(other)`.
+        /// `other > 0 || self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(`other`)
         ///
@@ -240,7 +240,7 @@ macro_rules! impl_natural_shl_signed {
         /// takes the floor) and rounds according to the specified rounding mode, in place. Passing
         /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>=`. To test
         /// whether `RoundingMode::Exact` can be passed, use
-        /// `other > 0 || self.is_divisible_by_power_of_two(other)`.
+        /// `other > 0 || self.divisible_by_power_of_two(other)`.
         ///
         /// Time: worst case O(`other`)
         ///

@@ -20,7 +20,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -79,7 +79,7 @@ pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```

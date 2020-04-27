@@ -1,7 +1,5 @@
 use std::str::FromStr;
 
-#[cfg(feature = "32_bit_limbs")]
-use malachite_base::comparison::Max;
 use malachite_base::num::arithmetic::traits::{
     ModAdd, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
 };
