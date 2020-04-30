@@ -1,11 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::CheckedInto;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use num::{BigInt, Signed};
-use rug;
+use num::Signed;
 
 use malachite_test::common::test_properties;
 use malachite_test::common::{
@@ -13,48 +10,6 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
-
-#[test]
-fn test_abs() {
-    let test = |s, out| {
-        let abs = Integer::from_str(s).unwrap().abs();
-        assert!(abs.is_valid());
-        assert_eq!(abs.to_string(), out);
-
-        let abs = (&Integer::from_str(s).unwrap()).abs();
-        assert!(abs.is_valid());
-        assert_eq!(abs.to_string(), out);
-
-        assert_eq!(BigInt::from_str(s).unwrap().abs().to_string(), out);
-        assert_eq!(rug::Integer::from_str(s).unwrap().abs().to_string(), out);
-
-        let abs = Integer::from_str(s).unwrap().unsigned_abs();
-        assert!(abs.is_valid());
-        assert_eq!(abs.to_string(), out);
-
-        let abs = (&Integer::from_str(s).unwrap()).unsigned_abs();
-        assert!(abs.is_valid());
-        assert_eq!(abs.to_string(), out);
-
-        let x = Integer::from_str(s).unwrap();
-        let abs = x.unsigned_abs_ref();
-        assert!(abs.is_valid());
-        assert_eq!(abs.to_string(), out);
-
-        let mut x = Integer::from_str(s).unwrap();
-        x.abs_assign();
-        assert!(abs.is_valid());
-        assert_eq!(x.to_string(), out);
-    };
-    test("0", "0");
-    test("123", "123");
-    test("-123", "123");
-    test("1000000000000", "1000000000000");
-    test("-1000000000000", "1000000000000");
-    test("3000000000", "3000000000");
-    test("-3000000000", "3000000000");
-    test("-2147483648", "2147483648");
-}
 
 #[test]
 fn abs_properties() {
@@ -70,6 +25,11 @@ fn abs_properties() {
         );
 
         let abs_alt = x.abs();
+        assert!(abs_alt.is_valid());
+        assert_eq!(abs_alt, abs);
+
+        let mut abs_alt = x.clone();
+        abs_alt.abs_assign();
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 

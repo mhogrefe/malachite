@@ -1,5 +1,5 @@
 use named::Named;
-use num::arithmetic::traits::TrueCheckedShl;
+use num::arithmetic::traits::ArithmeticCheckedShl;
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{LowMask, PowerOfTwoDigits, SignificantBits};
@@ -150,7 +150,7 @@ macro_rules! impl_power_of_two_digits {
                         for &digit in digits.iter().rev() {
                             assert!(digit.significant_bits() <= log_base);
                             let shifted = n
-                                .true_checked_shl(log_base)
+                                .arithmetic_checked_shl(log_base)
                                 .expect("value represented by digits is too large");
                             n = shifted | $t::wrapping_from(digit);
                         }
@@ -200,7 +200,7 @@ macro_rules! impl_power_of_two_digits {
                         for &digit in digits {
                             assert!(digit.significant_bits() <= log_base);
                             let shifted = n
-                                .true_checked_shl(log_base)
+                                .arithmetic_checked_shl(log_base)
                                 .expect("value represented by digits is too large");
                             n = shifted | $t::wrapping_from(digit);
                         }

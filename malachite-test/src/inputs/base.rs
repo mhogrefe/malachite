@@ -7,7 +7,8 @@ use itertools::Itertools;
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
 use malachite_base::num::arithmetic::traits::{
-    DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo, UnsignedAbs,
+    ArithmeticCheckedShl, ArithmeticCheckedShr, DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo,
+    UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -792,7 +793,7 @@ where
     }
 }
 
-pub fn small_unsigneds<T: PrimitiveUnsigned + Rand>(gm: NoSpecialGenerationMode) -> It<T> {
+pub fn small_unsigneds<T: PrimitiveUnsigned>(gm: NoSpecialGenerationMode) -> It<T> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_unsigned()),
         NoSpecialGenerationMode::Random(scale) => {
@@ -846,12 +847,29 @@ pub fn small_u64s_var_4<T: PrimitiveInteger>(gm: NoSpecialGenerationMode) -> It<
     }
 }
 
+pub fn small_signeds<T: PrimitiveSigned>(gm: NoSpecialGenerationMode) -> It<T> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_signed()),
+        NoSpecialGenerationMode::Random(scale) => {
+            Box::new(i32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
+        }
+    }
+}
+
 fn sqrt_pairs_of_unsigneds<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
     Box::new(sqrt_pairs(exhaustive_unsigned(), exhaustive_unsigned()))
 }
 
 fn sqrt_pairs_of_unsigned_and_signed<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> It<(T, U)> {
     Box::new(sqrt_pairs(exhaustive_unsigned(), exhaustive_signed()))
+}
+
+fn sqrt_pairs_of_signed_and_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
+    Box::new(sqrt_pairs(exhaustive_signed(), exhaustive_unsigned()))
+}
+
+fn sqrt_pairs_of_signeds<T: PrimitiveSigned, U: PrimitiveSigned>() -> It<(T, U)> {
+    Box::new(sqrt_pairs(exhaustive_signed(), exhaustive_signed()))
 }
 
 fn random_pairs_of_primitive_and_geometric<T: PrimitiveInteger + Rand, U: PrimitiveInteger>(
@@ -1119,11 +1137,7 @@ where
     }
 }
 
-fn sqrt_pairs_of_signed_and_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
-    Box::new(sqrt_pairs(exhaustive_signed(), exhaustive_unsigned()))
-}
-
-pub fn pairs_of_signed_and_small_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_signed_and_small_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> It<(T, U)>
 where
@@ -1157,6 +1171,24 @@ where
         pairs_of_signed_and_small_unsigned::<T, U>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
+}
+
+pub fn pairs_of_signed_and_small_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => sqrt_pairs_of_signeds(),
+        GenerationMode::Random(scale) => random_pairs_of_primitive_and_geometric(scale),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
 }
 
 type ItU<T> = It<(T, u64)>;
@@ -5840,27 +5872,18 @@ pub fn triples_of_unsigned_small_unsigned_and_rounding_mode_var_1<
     gm: GenerationMode,
 ) -> It<(T, U, RoundingMode)>
 where
-    T: Shl<U, Output = T> + Shr<U, Output = T>,
+    T: Shl<U, Output = T> + Shr<U, Output = T> + ArithmeticCheckedShl<U, Output = T>,
 {
     Box::new(
-        triples_of_unsigned_small_unsigned_and_rounding_mode(gm).filter_map(|(n, u, rm)| {
-            if n == T::ZERO {
-                Some((n, u, rm))
-            } else if rm == RoundingMode::Exact {
-                if u >= U::exact_from(T::WIDTH) {
-                    None
+        triples_of_unsigned_small_unsigned_and_rounding_mode::<T, U>(gm).filter_map(
+            |(n, u, rm)| {
+                if n == T::ZERO || rm != RoundingMode::Exact {
+                    Some((n, u, rm))
                 } else {
-                    let shifted = n << u;
-                    if shifted >> u == n {
-                        Some((shifted, u, rm))
-                    } else {
-                        None
-                    }
+                    n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
                 }
-            } else {
-                Some((n, u, rm))
-            }
-        }),
+            },
+        ),
     )
 }
 
@@ -5933,25 +5956,14 @@ pub fn triples_of_unsigned_small_signed_and_rounding_mode_var_2<
     gm: GenerationMode,
 ) -> It<(T, U, RoundingMode)>
 where
-    T: Shl<U, Output = T> + Shr<U, Output = T>,
+    T: Shl<U, Output = T> + Shr<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
 {
     Box::new(
         triples_of_unsigned_small_signed_and_rounding_mode::<T, U>(gm).filter_map(|(n, i, rm)| {
-            if n == T::ZERO || i >= U::ZERO {
+            if n == T::ZERO || i >= U::ZERO || rm != RoundingMode::Exact {
                 Some((n, i, rm))
-            } else if rm == RoundingMode::Exact {
-                if -i >= U::exact_from(T::WIDTH) {
-                    None
-                } else {
-                    let shifted = n << -i;
-                    if shifted >> -i == n {
-                        Some((shifted, i, rm))
-                    } else {
-                        None
-                    }
-                }
             } else {
-                Some((n, i, rm))
+                n.arithmetic_checked_shr(i).map(|shifted| (shifted, i, rm))
             }
         }),
     )
@@ -6064,26 +6076,16 @@ pub fn triples_of_signed_small_signed_and_rounding_mode_var_1<
 where
     T: Shl<U, Output = T>
         + Shr<U, Output = T>
-        + WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+        + WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>
+        + ArithmeticCheckedShl<U, Output = T>,
     T::UnsignedOfEqualWidth: Rand,
 {
     Box::new(
-        triples_of_signed_small_signed_and_rounding_mode(gm).filter_map(|(n, i, rm)| {
-            if n == T::ZERO || i < U::ZERO {
+        triples_of_signed_small_signed_and_rounding_mode::<T, U>(gm).filter_map(|(n, i, rm)| {
+            if n == T::ZERO || i < U::ZERO || rm != RoundingMode::Exact {
                 Some((n, i, rm))
-            } else if rm == RoundingMode::Exact {
-                if i >= U::exact_from(T::WIDTH) {
-                    None
-                } else {
-                    let shifted = n << i;
-                    if shifted >> i == n {
-                        Some((shifted, i, rm))
-                    } else {
-                        None
-                    }
-                }
             } else {
-                Some((n, i, rm))
+                n.arithmetic_checked_shl(i).map(|shifted| (shifted, i, rm))
             }
         }),
     )

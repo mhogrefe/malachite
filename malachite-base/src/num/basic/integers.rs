@@ -11,18 +11,18 @@ use comparison::{Max, Min};
 use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{
-    AddMul, AddMulAssign, CheckedAdd, CheckedAddMul, CheckedDiv, CheckedMul, CheckedNeg,
-    CheckedPow, CheckedRem, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
-    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo,
-    EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo, OverflowingAdd, OverflowingAddAssign,
-    OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign,
-    OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
-    OverflowingRem, OverflowingRemAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
-    OverflowingSubMulAssign, Parity, Pow, PowerOfTwo, SaturatingAdd, SaturatingAddAssign,
-    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
-    SaturatingSub, SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound,
-    ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul, SubMulAssign, TrueCheckedShl,
-    TrueCheckedShr, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
+    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedAdd, CheckedAddMul,
+    CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRem, CheckedSub, CheckedSubMul,
+    DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
+    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
+    OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
+    OverflowingNegAssign, OverflowingPow, OverflowingRem, OverflowingRemAssign, OverflowingSub,
+    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowerOfTwo,
+    SaturatingAdd, SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
+    SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul,
+    SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
     WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
     WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
     WrappingSubMulAssign,
@@ -45,6 +45,24 @@ pub trait PrimitiveInteger:
     + AddAssign<Self>
     + AddMul<Self, Self, Output = Self>
     + AddMulAssign<Self, Self>
+    + ArithmeticCheckedShl<u8, Output = Self>
+    + ArithmeticCheckedShl<u16, Output = Self>
+    + ArithmeticCheckedShl<u32, Output = Self>
+    + ArithmeticCheckedShl<u64, Output = Self>
+    + ArithmeticCheckedShl<u128, Output = Self>
+    + ArithmeticCheckedShl<usize, Output = Self>
+    + ArithmeticCheckedShl<i8, Output = Self>
+    + ArithmeticCheckedShl<i16, Output = Self>
+    + ArithmeticCheckedShl<i32, Output = Self>
+    + ArithmeticCheckedShl<i64, Output = Self>
+    + ArithmeticCheckedShl<i128, Output = Self>
+    + ArithmeticCheckedShl<isize, Output = Self>
+    + ArithmeticCheckedShr<i8, Output = Self>
+    + ArithmeticCheckedShr<i16, Output = Self>
+    + ArithmeticCheckedShr<i32, Output = Self>
+    + ArithmeticCheckedShr<i64, Output = Self>
+    + ArithmeticCheckedShr<i128, Output = Self>
+    + ArithmeticCheckedShr<isize, Output = Self>
     + Binary
     + BitAccess
     + BitAnd<Self, Output = Self>
@@ -332,8 +350,6 @@ pub trait PrimitiveInteger:
     + SubMulAssign<Self, Self>
     + Sum<Self>
     + TrailingZeros
-    + TrueCheckedShl<Output = Self>
-    + TrueCheckedShr<Output = Self>
     + Two
     + UpperHex
     + Crementable

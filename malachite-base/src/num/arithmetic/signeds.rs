@@ -1,7 +1,6 @@
 use num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo, NegMod,
-    TrueCheckedShl, TrueCheckedShr, UnsignedAbs,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo, NegMod, UnsignedAbs,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -168,22 +167,6 @@ macro_rules! impl_arithmetic_traits {
                 } else {
                     -$t::exact_from(abs)
                 }
-            }
-        }
-
-        impl TrueCheckedShl for $t {
-            type Output = $t;
-
-            fn true_checked_shl(self, _rhs: u64) -> Option<$t> {
-                unimplemented!();
-            }
-        }
-
-        impl TrueCheckedShr for $t {
-            type Output = $t;
-
-            fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
-                unimplemented!();
             }
         }
     };

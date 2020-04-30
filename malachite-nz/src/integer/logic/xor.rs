@@ -19,14 +19,14 @@ use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `limbs` cannot be
+/// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `xs` cannot be
 /// empty or only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -41,47 +41,46 @@ pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     }
     let head = xs[0];
     let tail = &xs[1..];
-    let mut result_limbs = Vec::with_capacity(xs.len());
+    let mut out = Vec::with_capacity(xs.len());
     if head != 0 {
         let head = head.wrapping_neg() ^ y;
         if head == 0 {
-            result_limbs.push(0);
-            result_limbs.extend_from_slice(&limbs_add_limb(tail, 1));
+            out.push(0);
+            out.extend_from_slice(&limbs_add_limb(tail, 1));
         } else {
-            result_limbs.push(head.wrapping_neg());
-            result_limbs.extend_from_slice(tail);
+            out.push(head.wrapping_neg());
+            out.extend_from_slice(tail);
         }
     } else {
-        result_limbs.push(y.wrapping_neg());
-        result_limbs.extend_from_slice(&limbs_sub_limb(tail, 1).0);
+        out.push(y.wrapping_neg());
+        out.extend_from_slice(&limbs_sub_limb(tail, 1).0);
     }
-    result_limbs
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
 /// xor of the `Integer` and a `Limb` to an output slice. The output slice must be at least as long
-/// as the input slice. `limbs` cannot be empty or only contain zeros. Returns whether a carry
-/// occurs.
+/// as the input slice. `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `in_limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_to_out;
 ///
-/// let mut limbs = vec![0, 0, 0, 0];
-/// assert_eq!(limbs_neg_xor_limb_to_out(&mut limbs, &[123, 456], 789), false);
-/// assert_eq!(limbs, &[880, 456, 0, 0]);
+/// let mut xs = vec![0, 0, 0, 0];
+/// assert_eq!(limbs_neg_xor_limb_to_out(&mut xs, &[123, 456], 789), false);
+/// assert_eq!(xs, &[880, 456, 0, 0]);
 ///
-/// let mut limbs = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_neg_xor_limb_to_out(&mut limbs, &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2),
+/// let mut xs = vec![10, 10, 10, 10];
+/// assert_eq!(limbs_neg_xor_limb_to_out(&mut xs, &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2),
 ///     true);
-/// assert_eq!(limbs, &[0, 0, 0, 10]);
+/// assert_eq!(xs, &[0, 0, 0, 10]);
 /// ```
 pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let len = xs.len();
@@ -111,25 +110,25 @@ pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
-/// `limbs` cannot be empty or only contain zeros. Returns whether a carry occurs.
+/// `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_slice_neg_xor_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut limbs, 789), false);
-/// assert_eq!(limbs, &[880, 456]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut xs, 789), false);
+/// assert_eq!(xs, &[880, 456]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
-/// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut limbs, 2), true);
-/// assert_eq!(limbs, &[0, 0, 0]);
+/// let mut xs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
+/// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut xs, 2), true);
+/// assert_eq!(xs, &[0, 0, 0]);
 /// ```
 pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     if y == 0 {
@@ -154,25 +153,25 @@ pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
-/// `limbs` cannot be empty or only contain zeros. If a carry occurs, extends the `Vec`.
+/// `xs` cannot be empty or only contain zeros. If a carry occurs, extends the `Vec`.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_vec_neg_xor_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_neg_xor_limb_in_place(&mut limbs, 789);
-/// assert_eq!(limbs, &[880, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_neg_xor_limb_in_place(&mut xs, 789);
+/// assert_eq!(xs, &[880, 456]);
 ///
-/// let mut limbs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
-/// limbs_vec_neg_xor_limb_in_place(&mut limbs, 2);
-/// assert_eq!(limbs, &[0, 0, 0, 1]);
+/// let mut xs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
+/// limbs_vec_neg_xor_limb_in_place(&mut xs, 2);
+/// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_xor_limb_in_place(xs, y) {
@@ -182,16 +181,16 @@ pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-/// `limb` and whose other limbs are full of `true` bits. `limbs` may not be empty.
+/// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -202,92 +201,93 @@ pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 /// assert_eq!(limbs_pos_xor_limb_neg(&[2, 0xffff_ffff], 2), &[0, 0, 1]);
 /// ```
 pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
-    let lowest_limb = xs[0] ^ y;
+    let (head, tail) = xs.split_first().unwrap();
+    let lo = head ^ y;
     let mut out;
-    if lowest_limb == 0 {
-        out = limbs_add_limb(&xs[1..], 1);
+    if lo == 0 {
+        out = limbs_add_limb(tail, 1);
         out.insert(0, 0);
     } else {
         out = xs.to_vec();
-        out[0] = lowest_limb.wrapping_neg();
+        out[0] = lo.wrapping_neg();
     }
     out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
 /// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-/// `limb` and whose other limbs are full of `true` bits to an output slice. `in_limbs` may not be
-/// empty or only contain zeros. The output slice must be at least as long as the input slice.
-/// Returns whether there is a carry.
+/// `y` and whose other limbs are full of `true` bits to an output slice. `xs` may not be empty or
+/// only contain zeros. The output slice must be at least as long as the input slice. Returns
+/// whether there is a carry.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `in_limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or if `out` is shorter than `in_limbs`.
+/// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_pos_xor_limb_neg_to_out;
 ///
-/// let mut result = vec![10, 10];
-/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut result, &[0, 2], 3), false);
-/// assert_eq!(result, &[4294967293, 2]);
+/// let mut out = vec![10, 10];
+/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut out, &[0, 2], 3), false);
+/// assert_eq!(out, &[4294967293, 2]);
 ///
-/// let mut result = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut result, &[1, 2, 3], 4), false);
-/// assert_eq!(result, &[4294967291, 2, 3, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut out, &[1, 2, 3], 4), false);
+/// assert_eq!(out, &[4294967291, 2, 3, 10]);
 ///
-/// let mut result = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut result, &[2, 0xffff_ffff], 2), true);
-/// assert_eq!(result, &[0, 0, 10, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut out, &[2, 0xffff_ffff], 2), true);
+/// assert_eq!(out, &[0, 0, 10, 10]);
 /// ```
 pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
-    let len = xs.len();
-    assert!(out.len() >= len);
-    let lowest_limb = xs[0] ^ y;
-    if lowest_limb == 0 {
-        out[0] = 0;
-        limbs_add_limb_to_out(&mut out[1..len], &xs[1..], 1)
+    let (head, tail) = xs.split_first().unwrap();
+    let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
+    let lo = head ^ y;
+    if lo == 0 {
+        *out_head = 0;
+        limbs_add_limb_to_out(out_tail, tail, 1)
     } else {
-        out[0] = lowest_limb.wrapping_neg();
-        out[1..len].copy_from_slice(&xs[1..]);
+        *out_head = lo.wrapping_neg();
+        out_tail.copy_from_slice(tail);
         false
     }
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
-/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `limb` and
-/// whose other limbs are full of `true` bits, in place. `limbs` may not be empty. Returns whether
-/// there is a carry.
+/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
+/// other limbs are full of `true` bits, in place. `xs` may not be empty. Returns whether there is a
+/// carry.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_slice_pos_xor_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut limbs, 3), false);
-/// assert_eq!(limbs, &[4294967293, 2]);
+/// let mut out = vec![0, 2];
+/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut out, 3), false);
+/// assert_eq!(out, &[4294967293, 2]);
 ///
-/// let mut limbs = vec![1, 2, 3];
-/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut limbs, 4), false);
-/// assert_eq!(limbs, &[4294967291, 2, 3]);
+/// let mut out = vec![1, 2, 3];
+/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut out, 4), false);
+/// assert_eq!(out, &[4294967291, 2, 3]);
 ///
-/// let mut limbs = vec![2, 0xffff_ffff];
-/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut limbs, 2), true);
-/// assert_eq!(limbs, &[0, 0]);
+/// let mut out = vec![2, 0xffff_ffff];
+/// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut out, 2), true);
+/// assert_eq!(out, &[0, 0]);
 /// ```
 pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
     let (head, tail) = xs.split_at_mut(1);
@@ -302,33 +302,33 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
-/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `limb` and
-/// whose other limbs are full of `true` bits, in place. `limbs` may not be empty.
+/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
+/// other limbs are full of `true` bits, in place. `xs` may not be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_vec_pos_xor_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, &[4294967293, 2]);
+/// let mut xs = vec![0, 2];
+/// limbs_vec_pos_xor_limb_neg_in_place(&mut xs, 3);
+/// assert_eq!(xs, &[4294967293, 2]);
 ///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 4);
-/// assert_eq!(limbs, &[4294967291, 2, 3]);
+/// let mut xs = vec![1, 2, 3];
+/// limbs_vec_pos_xor_limb_neg_in_place(&mut xs, 4);
+/// assert_eq!(xs, &[4294967291, 2, 3]);
 ///
-/// let mut limbs = vec![2, 0xffff_ffff];
-/// limbs_vec_pos_xor_limb_neg_in_place(&mut limbs, 2);
-/// assert_eq!(limbs, &[0, 0, 1]);
+/// let mut xs = vec![2, 0xffff_ffff];
+/// limbs_vec_pos_xor_limb_neg_in_place(&mut xs, 2);
+/// assert_eq!(xs, &[0, 0, 1]);
 /// ```
 pub fn limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_pos_xor_limb_neg_in_place(xs, y) {
@@ -338,17 +338,17 @@ pub fn limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a negative number whose
-/// lowest limb is given by `limb` and whose other limbs are full of `true` bits. `limbs` may not be
-/// empty or only contain zeros.
+/// lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
+/// or only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty or only contains zeros.
+/// Panics if `xs` is empty or only contains zeros.
 ///
 /// # Example
 /// ```
@@ -358,102 +358,103 @@ pub fn limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 /// assert_eq!(limbs_neg_xor_limb_neg(&[1, 2, 3], 4), &[4294967291, 2, 3]);
 /// ```
 pub fn limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
-    let mut result_limbs;
+    let mut out;
     if xs[0] == 0 {
         let (result, carry) = limbs_sub_limb(xs, 1);
-        result_limbs = result;
+        out = result;
         assert!(!carry);
-        result_limbs[0] = y;
+        out[0] = y;
     } else {
-        result_limbs = xs.to_vec();
-        result_limbs[0] = xs[0].wrapping_neg() ^ y;
+        out = xs.to_vec();
+        out[0] = xs[0].wrapping_neg() ^ y;
     }
-    result_limbs
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a negative number whose
-/// lowest limb is given by `limb` and whose other limbs are full of `true` bits to an output slice.
-/// `in_limbs` may not be empty or only contain zeros. The output slice must be at least as long as
-/// the input slice.
+/// lowest limb is given by `y` and whose other limbs are full of `true` bits to an output slice.
+/// `xs` may not be empty or only contain zeros. The output slice must be at least as long as the
+/// input slice.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `in_limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty or only contains zeros, or if `out` is shorter than
-/// `in_limbs`.
+/// Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_neg_to_out;
 ///
-/// let mut result = vec![10, 10];
-/// limbs_neg_xor_limb_neg_to_out(&mut result, &[0, 2], 3);
-/// assert_eq!(result, &[3, 1]);
+/// let mut out = vec![10, 10];
+/// limbs_neg_xor_limb_neg_to_out(&mut out, &[0, 2], 3);
+/// assert_eq!(out, &[3, 1]);
 ///
-/// let mut result = vec![10, 10, 10, 10];
-/// limbs_neg_xor_limb_neg_to_out(&mut result, &[1, 2, 3], 4);
-/// assert_eq!(result, &[4294967291, 2, 3, 10]);
+/// let mut out = vec![10, 10, 10, 10];
+/// limbs_neg_xor_limb_neg_to_out(&mut out, &[1, 2, 3], 4);
+/// assert_eq!(out, &[4294967291, 2, 3, 10]);
 /// ```
 pub fn limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
-    let len = xs.len();
-    assert!(out.len() >= len);
-    if xs[0] == 0 {
-        out[0] = y;
-        assert!(!limbs_sub_limb_to_out(&mut out[1..len], &xs[1..], 1));
+    let (head, tail) = xs.split_first().unwrap();
+    let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
+    if *head == 0 {
+        *out_head = y;
+        assert!(!limbs_sub_limb_to_out(out_tail, tail, 1));
     } else {
-        out[0] = xs[0].wrapping_neg() ^ y;
-        out[1..len].copy_from_slice(&xs[1..]);
+        *out_head = xs[0].wrapping_neg() ^ y;
+        out_tail.copy_from_slice(tail);
     }
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, takes the bitwise xor of the `Integer` and a negative number whose lowest limb is
-/// given by `limb` and whose other limbs are full of `true` bits, in place. `limbs` may not be
-/// empty or only contain zeros.
+/// given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
+/// only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty or only contains zeros.
+/// Panics if `xs` is empty or only contains zeros.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_neg_in_place;
 ///
-/// let mut limbs = vec![0, 2];
-/// limbs_neg_xor_limb_neg_in_place(&mut limbs, 3);
-/// assert_eq!(limbs, &[3, 1]);
+/// let mut xs = vec![0, 2];
+/// limbs_neg_xor_limb_neg_in_place(&mut xs, 3);
+/// assert_eq!(xs, &[3, 1]);
 ///
-/// let mut limbs = vec![1, 2, 3];
-/// limbs_neg_xor_limb_neg_in_place(&mut limbs, 4);
-/// assert_eq!(limbs, &[4294967291, 2, 3]);
+/// let mut xs = vec![1, 2, 3];
+/// limbs_neg_xor_limb_neg_in_place(&mut xs, 4);
+/// assert_eq!(xs, &[4294967291, 2, 3]);
 /// ```
 pub fn limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
-    if xs[0] == 0 {
-        assert!(!limbs_sub_limb_in_place(&mut xs[1..], 1));
-        xs[0] = y;
+    let (head, tail) = xs.split_first_mut().unwrap();
+    if *head == 0 {
+        assert!(!limbs_sub_limb_in_place(tail, 1));
+        *head = y;
     } else {
-        xs[0] = xs[0].wrapping_neg() ^ y;
+        head.wrapping_neg_assign();
+        *head ^= y;
     }
 }
 
-fn limbs_xor_pos_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb {
-    if *boundary_limb_seen {
-        !input
-    } else if input == 0 {
+fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
+    if *boundary_seen {
+        !x
+    } else if x == 0 {
         0
     } else {
-        *boundary_limb_seen = true;
-        input.wrapping_neg()
+        *boundary_seen = true;
+        x.wrapping_neg()
     }
 }
 
@@ -488,44 +489,44 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        let mut result_limbs = vec![0; x_i];
-        result_limbs.push(xs[x_i].wrapping_neg());
-        result_limbs.extend(xs[x_i + 1..].iter().map(|x| !x));
-        result_limbs.extend(repeat(Limb::MAX).take(y_i - xs_len));
-        result_limbs.push(ys[y_i] - 1);
-        result_limbs.extend_from_slice(&ys[y_i + 1..]);
-        return result_limbs;
+        let mut out = vec![0; x_i];
+        out.push(xs[x_i].wrapping_neg());
+        out.extend(xs[x_i + 1..].iter().map(|x| !x));
+        out.extend(repeat(Limb::MAX).take(y_i - xs_len));
+        out.push(ys[y_i] - 1);
+        out.extend_from_slice(&ys[y_i + 1..]);
+        return out;
     } else if x_i >= ys_len {
-        let mut result_limbs = ys.to_vec();
-        result_limbs.extend_from_slice(&xs[ys_len..]);
-        return result_limbs;
+        let mut out = ys.to_vec();
+        out.extend_from_slice(&xs[ys_len..]);
+        return out;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    let mut result_limbs = vec![0; min_i];
-    let mut boundary_limb_seen = false;
-    let limb = match x_i.cmp(&y_i) {
+    let mut out = vec![0; min_i];
+    let mut boundary_seen = false;
+    let x = match x_i.cmp(&y_i) {
         Ordering::Equal => {
-            limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_limb_seen)
+            limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen)
         }
         Ordering::Less => {
-            boundary_limb_seen = true;
-            result_limbs.push(xs[x_i].wrapping_neg());
-            result_limbs.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
+            boundary_seen = true;
+            out.push(xs[x_i].wrapping_neg());
+            out.extend(xs[x_i + 1..y_i].iter().map(|x| !x));
             xs[y_i] ^ (ys[y_i] - 1)
         }
         Ordering::Greater => {
-            boundary_limb_seen = true;
-            result_limbs.extend_from_slice(&ys[y_i..x_i]);
+            boundary_seen = true;
+            out.extend_from_slice(&ys[y_i..x_i]);
             xs[x_i] ^ ys[x_i]
         }
     };
-    result_limbs.push(limb);
+    out.push(x);
     let xys = xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter());
-    if boundary_limb_seen {
-        result_limbs.extend(xys.map(|(x, y)| x ^ y));
+    if boundary_seen {
+        out.extend(xys.map(|(x, y)| x ^ y));
     } else {
         for (&x, &y) in xys {
-            result_limbs.push(limbs_xor_pos_neg_helper(x ^ !y, &mut boundary_limb_seen));
+            out.push(limbs_xor_pos_neg_helper(x ^ !y, &mut boundary_seen));
         }
     }
     if xs_len != ys_len {
@@ -534,15 +535,15 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         } else {
             &ys[xs_len..]
         };
-        if boundary_limb_seen {
-            result_limbs.extend_from_slice(zs);
+        if boundary_seen {
+            out.extend_from_slice(zs);
         } else {
             for &z in zs.iter() {
-                result_limbs.push(limbs_xor_pos_neg_helper(!z, &mut boundary_limb_seen));
+                out.push(limbs_xor_pos_neg_helper(!z, &mut boundary_seen));
             }
         }
     }
-    result_limbs
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
@@ -604,14 +605,14 @@ pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
     slice_set_zero(&mut out[..min_i]);
-    let mut boundary_limb_seen = false;
+    let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
         Ordering::Equal => {
             out[x_i] =
-                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_limb_seen);
+                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
         Ordering::Less => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             out[x_i] = xs[x_i].wrapping_neg();
             for (out, &x) in out[x_i + 1..y_i].iter_mut().zip(xs[x_i + 1..y_i].iter()) {
                 *out = !x;
@@ -619,7 +620,7 @@ pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
             out[y_i] = xs[y_i] ^ (ys[y_i] - 1);
         }
         Ordering::Greater => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             out[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
             out[x_i] = xs[x_i] ^ ys[x_i];
         }
@@ -627,13 +628,13 @@ pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xys = out[max_i + 1..]
         .iter_mut()
         .zip(xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter()));
-    if boundary_limb_seen {
+    if boundary_seen {
         for (out, (&x, &y)) in xys {
             *out = x ^ y;
         }
     } else {
         for (out, (&x, &y)) in xys {
-            *out = limbs_xor_pos_neg_helper(x ^ !y, &mut boundary_limb_seen);
+            *out = limbs_xor_pos_neg_helper(x ^ !y, &mut boundary_seen);
         }
     }
     if xs_len != ys_len {
@@ -642,11 +643,11 @@ pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         } else {
             (xs_len, ys_len, &ys[xs_len..])
         };
-        if boundary_limb_seen {
+        if boundary_seen {
             out[min_len..max_len].copy_from_slice(zs);
         } else {
             for (out, &z) in out[min_len..].iter_mut().zip(zs.iter()) {
-                *out = limbs_xor_pos_neg_helper(!z, &mut boundary_limb_seen);
+                *out = limbs_xor_pos_neg_helper(!z, &mut boundary_seen);
             }
         }
     }
@@ -659,35 +660,35 @@ fn limbs_xor_pos_neg_in_place_left_helper(
     y_i: usize,
 ) -> bool {
     let max_i = max(x_i, y_i);
-    let mut boundary_limb_seen = false;
+    let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
         Ordering::Equal => {
             xs[x_i] =
-                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_limb_seen);
+                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
         Ordering::Less => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             xs[x_i].wrapping_neg_assign();
             limbs_not_in_place(&mut xs[x_i + 1..y_i]);
             xs[y_i] ^= ys[y_i] - 1;
         }
         Ordering::Greater => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             xs[y_i..x_i].copy_from_slice(&ys[y_i..x_i]);
             xs[x_i] ^= ys[x_i];
         }
     }
     let xys = xs[max_i + 1..].iter_mut().zip(ys[max_i + 1..].iter());
-    if boundary_limb_seen {
+    if boundary_seen {
         for (x, &y) in xys {
             *x ^= y;
         }
     } else {
         for (x, &y) in xys {
-            *x = limbs_xor_pos_neg_helper(*x ^ !y, &mut boundary_limb_seen);
+            *x = limbs_xor_pos_neg_helper(*x ^ !y, &mut boundary_seen);
         }
     }
-    boundary_limb_seen
+    boundary_seen
 }
 
 /// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of one
@@ -736,21 +737,21 @@ pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
         xs[..ys_len].copy_from_slice(ys);
         return;
     }
-    let mut boundary_limb_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
+    let mut boundary_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
     match xs_len.cmp(&ys_len) {
         Ordering::Less => {
-            if boundary_limb_seen {
+            if boundary_seen {
                 xs.extend_from_slice(&ys[xs_len..]);
             } else {
                 for &y in ys[xs_len..].iter() {
-                    xs.push(limbs_xor_pos_neg_helper(!y, &mut boundary_limb_seen));
+                    xs.push(limbs_xor_pos_neg_helper(!y, &mut boundary_seen));
                 }
             }
         }
         Ordering::Greater => {
-            if !boundary_limb_seen {
+            if !boundary_seen {
                 for x in xs[ys_len..].iter_mut() {
-                    *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_limb_seen);
+                    *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
                 }
             }
         }
@@ -765,14 +766,14 @@ fn limbs_xor_pos_neg_in_place_right_helper(
     y_i: usize,
 ) -> bool {
     let max_i = max(x_i, y_i);
-    let mut boundary_limb_seen = false;
+    let mut boundary_seen = false;
     match x_i.cmp(&y_i) {
         Ordering::Equal => {
             ys[y_i] =
-                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_limb_seen);
+                limbs_xor_pos_neg_helper(xs[x_i] ^ ys[y_i].wrapping_neg(), &mut boundary_seen);
         }
         Ordering::Less => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             ys[x_i] = xs[x_i].wrapping_neg();
             for (y, &x) in ys[x_i + 1..].iter_mut().zip(xs[x_i + 1..y_i].iter()) {
                 *y = !x;
@@ -781,21 +782,21 @@ fn limbs_xor_pos_neg_in_place_right_helper(
             ys[y_i] ^= xs[y_i];
         }
         Ordering::Greater => {
-            boundary_limb_seen = true;
+            boundary_seen = true;
             ys[x_i] ^= xs[x_i];
         }
     }
     let xys = xs[max_i + 1..].iter().zip(ys[max_i + 1..].iter_mut());
-    if boundary_limb_seen {
+    if boundary_seen {
         for (&x, y) in xys {
             *y ^= x;
         }
     } else {
         for (&x, y) in xys {
-            *y = limbs_xor_pos_neg_helper(x ^ !*y, &mut boundary_limb_seen);
+            *y = limbs_xor_pos_neg_helper(x ^ !*y, &mut boundary_seen);
         }
     }
-    boundary_limb_seen
+    boundary_seen
 }
 
 /// Interpreting a slice of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of one
@@ -847,18 +848,18 @@ pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
         ys.extend_from_slice(&xs[ys_len..]);
         return;
     }
-    let mut boundary_limb_seen = limbs_xor_pos_neg_in_place_right_helper(xs, ys, x_i, y_i);
+    let mut boundary_seen = limbs_xor_pos_neg_in_place_right_helper(xs, ys, x_i, y_i);
     if xs_len > ys_len {
-        if boundary_limb_seen {
+        if boundary_seen {
             ys.extend_from_slice(&xs[ys_len..]);
         } else {
             for &x in xs[ys_len..].iter() {
-                ys.push(limbs_xor_pos_neg_helper(!x, &mut boundary_limb_seen));
+                ys.push(limbs_xor_pos_neg_helper(!x, &mut boundary_seen));
             }
         }
-    } else if xs_len < ys_len && !boundary_limb_seen {
+    } else if xs_len < ys_len && !boundary_seen {
         for y in ys[xs_len..].iter_mut() {
-            *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_limb_seen);
+            *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_seen);
         }
     }
 }
@@ -925,18 +926,18 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
         return false;
     }
     if xs_len >= ys_len {
-        let mut boundary_limb_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
-        if xs_len != ys_len && !boundary_limb_seen {
+        let mut boundary_seen = limbs_xor_pos_neg_in_place_left_helper(xs, ys, x_i, y_i);
+        if xs_len != ys_len && !boundary_seen {
             for x in xs[ys_len..].iter_mut() {
-                *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_limb_seen);
+                *x = limbs_xor_pos_neg_helper(!*x, &mut boundary_seen);
             }
         }
         false
     } else {
-        let mut boundary_limb_seen = limbs_xor_pos_neg_in_place_right_helper(xs, ys, x_i, y_i);
-        if !boundary_limb_seen {
+        let mut boundary_seen = limbs_xor_pos_neg_in_place_right_helper(xs, ys, x_i, y_i);
+        if !boundary_seen {
             for y in ys[xs_len..].iter_mut() {
-                *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_limb_seen);
+                *y = limbs_xor_pos_neg_helper(!*y, &mut boundary_seen);
             }
         }
         true
@@ -982,27 +983,27 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         return result;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
-    let mut result_limbs = vec![0; min_i];
+    let mut out = vec![0; min_i];
     if x_i == y_i {
-        result_limbs.push(xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg());
+        out.push(xs[x_i].wrapping_neg() ^ ys[x_i].wrapping_neg());
     } else {
         let (min_zs, max_zs) = if x_i <= y_i { (xs, ys) } else { (ys, xs) };
-        result_limbs.push(min_zs[min_i].wrapping_neg());
-        result_limbs.extend(min_zs[min_i + 1..max_i].iter().map(|limb| !limb));
-        result_limbs.push((max_zs[max_i] - 1) ^ min_zs[max_i]);
+        out.push(min_zs[min_i].wrapping_neg());
+        out.extend(min_zs[min_i + 1..max_i].iter().map(|z| !z));
+        out.push((max_zs[max_i] - 1) ^ min_zs[max_i]);
     }
-    result_limbs.extend(
+    out.extend(
         xs[max_i + 1..]
             .iter()
             .zip(ys[max_i + 1..].iter())
             .map(|(x, y)| x ^ y),
     );
     match xs_len.cmp(&ys_len) {
-        Ordering::Less => result_limbs.extend_from_slice(&ys[xs_len..]),
-        Ordering::Greater => result_limbs.extend_from_slice(&xs[ys_len..]),
+        Ordering::Less => out.extend_from_slice(&ys[xs_len..]),
+        Ordering::Greater => out.extend_from_slice(&xs[ys_len..]),
         _ => {}
     }
-    result_limbs
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
@@ -1139,14 +1140,13 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         assert!(!limbs_vec_sub_in_place_right(ys, xs));
-        return;
     } else if x_i >= ys_len {
         assert!(!limbs_sub_in_place_left(xs, ys));
-        return;
-    }
-    limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
-    if xs_len < ys_len {
-        xs.extend_from_slice(&ys[xs_len..]);
+    } else {
+        limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
+        if xs_len < ys_len {
+            xs.extend_from_slice(&ys[xs_len..]);
+        }
     }
 }
 
@@ -1198,12 +1198,11 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
     assert!(y_i < ys_len);
     if y_i >= xs_len {
         assert!(!limbs_sub_in_place_left(ys, xs));
-        return true;
+        true
     } else if x_i >= ys_len {
         assert!(!limbs_sub_in_place_left(xs, ys));
-        return false;
-    }
-    if xs_len >= ys_len {
+        false
+    } else if xs_len >= ys_len {
         limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
         false
     } else {
@@ -1212,28 +1211,31 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
     }
 }
 
-/// Takes the bitwise xor of two `Integer`s, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
-/// assert_eq!((-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(), "8191");
-/// ```
 impl BitXor<Integer> for Integer {
     type Output = Integer;
 
+    /// Takes the bitwise xor of two `Integer`s, taking both by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(
+    ///     (-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "8191"
+    /// );
+    /// ```
     #[inline]
     fn bitxor(mut self, other: Integer) -> Integer {
         self ^= other;
@@ -1241,29 +1243,33 @@ impl BitXor<Integer> for Integer {
     }
 }
 
-/// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by value and the right
-/// `Integer` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`, m = `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!((Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
-/// assert_eq!((-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(), "8191");
-/// ```
 impl<'a> BitXor<&'a Integer> for Integer {
     type Output = Integer;
 
+    /// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by value and the right
+    /// `Integer` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`,
+    ///       m = `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(
+    ///     (-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "8191"
+    /// );
+    /// ```
     #[inline]
     fn bitxor(mut self, other: &'a Integer) -> Integer {
         self ^= other;
@@ -1271,30 +1277,33 @@ impl<'a> BitXor<&'a Integer> for Integer {
     }
 }
 
-/// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by reference and the right
-/// `Integer` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
-/// assert_eq!((&-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(), "8191");
-/// ```
 impl<'a> BitXor<Integer> for &'a Integer {
     type Output = Integer;
 
+    /// Takes the bitwise xor of two `Integer`s, taking the left `Integer` by reference and the
+    /// right `Integer` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Integer::from(-123) ^ Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(
+    ///     (&-Integer::trillion() ^ -(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "8191"
+    /// );
+    /// ```
     #[inline]
     fn bitxor(self, mut other: Integer) -> Integer {
         other ^= self;
@@ -1302,33 +1311,33 @@ impl<'a> BitXor<Integer> for &'a Integer {
     }
 }
 
-/// Takes the bitwise xor of two `Integer`s, taking both `Integer`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`,
-///     m = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::integer::Integer;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
-/// assert_eq!(
-///     (&-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
-///     "8191"
-/// );
-/// ```
 impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     type Output = Integer;
 
+    /// Takes the bitwise xor of two `Integer`s, taking both `Integer`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`,
+    ///     m = `max(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Integer::from(-123) ^ &Integer::from(-456)).to_string(), "445");
+    /// assert_eq!(
+    ///     (&-Integer::trillion() ^ &-(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "8191"
+    /// );
+    /// ```
     fn bitxor(self, other: &'a Integer) -> Integer {
         match (self.sign, other.sign) {
             (true, true) => Integer {
@@ -1351,31 +1360,31 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
     }
 }
 
-/// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-/// value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits() + other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::NegativeOne;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(0xffff_ffffu32);
-/// x ^= Integer::from(0x0000_000f);
-/// x ^= Integer::from(0x0000_0f00);
-/// x ^= Integer::from(0x000f_0000);
-/// x ^= Integer::from(0x0f00_0000);
-/// assert_eq!(x, 0xf0f0_f0f0u32);
-/// ```
 impl BitXorAssign<Integer> for Integer {
+    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
+    /// by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::NegativeOne;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(0xffff_ffffu32);
+    /// x ^= Integer::from(0x0000_000f);
+    /// x ^= Integer::from(0x0000_0f00);
+    /// x ^= Integer::from(0x000f_0000);
+    /// x ^= Integer::from(0x0f00_0000);
+    /// assert_eq!(x, 0xf0f0_f0f0u32);
+    /// ```
     fn bitxor_assign(&mut self, other: Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitxor_assign(other.abs),
@@ -1392,31 +1401,31 @@ impl BitXorAssign<Integer> for Integer {
     }
 }
 
-/// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-/// reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::NegativeOne;
-/// use malachite_nz::integer::Integer;
-///
-/// let mut x = Integer::from(0xffff_ffffu32);
-/// x ^= &Integer::from(0x0000_000f);
-/// x ^= &Integer::from(0x0000_0f00);
-/// x ^= &Integer::from(0x000f_0000);
-/// x ^= &Integer::from(0x0f00_0000);
-/// assert_eq!(x, 0xf0f0_f0f0u32);
-/// ```
 impl<'a> BitXorAssign<&'a Integer> for Integer {
+    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
+    /// by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(m)
+    ///
+    /// where n = `xs.significant_bits() + ys.significant_bits()`, m = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::NegativeOne;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(0xffff_ffffu32);
+    /// x ^= &Integer::from(0x0000_000f);
+    /// x ^= &Integer::from(0x0000_0f00);
+    /// x ^= &Integer::from(0x000f_0000);
+    /// x ^= &Integer::from(0x0f00_0000);
+    /// assert_eq!(x, 0xf0f0_f0f0u32);
+    /// ```
     fn bitxor_assign(&mut self, other: &'a Integer) {
         match (self.sign, other.sign) {
             (true, true) => self.abs.bitxor_assign(&other.abs),
@@ -1432,6 +1441,8 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
         }
     }
 }
+
+//TODO clean
 
 impl Natural {
     fn xor_assign_neg_limb_pos(&mut self, other: Limb) {

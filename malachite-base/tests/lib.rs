@@ -6,6 +6,8 @@ pub mod num {
     pub mod arithmetic {
         pub mod abs;
         pub mod add_mul;
+        pub mod arithmetic_checked_shl;
+        pub mod arithmetic_checked_shr;
         pub mod checked_abs;
         pub mod checked_add_mul;
         pub mod checked_neg;

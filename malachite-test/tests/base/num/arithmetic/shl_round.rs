@@ -1,6 +1,8 @@
 use std::ops::{Shl, Shr};
 
-use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShr, ShlRound, ShlRoundAssign, ShrRound,
+};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -19,7 +21,8 @@ where
         + Shl<U, Output = T>
         + ShrRound<U, Output = T>
         + ShlRound<U, Output = T>
-        + ShlRoundAssign<U>,
+        + ShlRoundAssign<U>
+        + ArithmeticCheckedShr<U, Output = T>,
     U::UnsignedOfEqualWidth: Rand,
     U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {

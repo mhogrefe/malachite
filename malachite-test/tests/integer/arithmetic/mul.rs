@@ -1,10 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use num::BigInt;
-use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::common::{
@@ -13,96 +9,6 @@ use malachite_test::common::{
 use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
-
-#[test]
-fn test_mul() {
-    let test = |u, v, out| {
-        let mut n = Integer::from_str(u).unwrap();
-        n *= Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = Integer::from_str(u).unwrap();
-        n *= &Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = Integer::from_str(u).unwrap() * Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &Integer::from_str(u).unwrap() * Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = Integer::from_str(u).unwrap() * &Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = &Integer::from_str(u).unwrap() * &Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let n = BigInt::from_str(u).unwrap() * BigInt::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-
-        let n = rug::Integer::from_str(u).unwrap() * rug::Integer::from_str(v).unwrap();
-        assert_eq!(n.to_string(), out);
-    };
-    test("0", "0", "0");
-    test("0", "123", "0");
-    test("0", "-123", "0");
-    test("123", "0", "0");
-    test("-123", "0", "0");
-    test("1", "123", "123");
-    test("1", "-123", "-123");
-    test("-1", "123", "-123");
-    test("-1", "-123", "123");
-    test("123", "1", "123");
-    test("123", "-1", "-123");
-    test("-123", "1", "-123");
-    test("-123", "-1", "123");
-    test("123", "456", "56088");
-    test("123", "-456", "-56088");
-    test("-123", "456", "-56088");
-    test("-123", "-456", "56088");
-    test("0", "1000000000000", "0");
-    test("0", "-1000000000000", "0");
-    test("1000000000000", "0", "0");
-    test("-1000000000000", "0", "0");
-    test("1", "1000000000000", "1000000000000");
-    test("1", "-1000000000000", "-1000000000000");
-    test("-1", "1000000000000", "-1000000000000");
-    test("-1", "-1000000000000", "1000000000000");
-    test("1000000000000", "1", "1000000000000");
-    test("1000000000000", "-1", "-1000000000000");
-    test("-1000000000000", "1", "-1000000000000");
-    test("-1000000000000", "-1", "1000000000000");
-    test("1000000000000", "123", "123000000000000");
-    test("1000000000000", "-123", "-123000000000000");
-    test("-1000000000000", "123", "-123000000000000");
-    test("-1000000000000", "-123", "123000000000000");
-    test("123", "1000000000000", "123000000000000");
-    test("123", "-1000000000000", "-123000000000000");
-    test("-123", "1000000000000", "-123000000000000");
-    test("-123", "-1000000000000", "123000000000000");
-    test("123456789000", "987654321000", "121932631112635269000000");
-    test("123456789000", "-987654321000", "-121932631112635269000000");
-    test("-123456789000", "987654321000", "-121932631112635269000000");
-    test("-123456789000", "-987654321000", "121932631112635269000000");
-    test("4294967295", "2", "8589934590");
-    test("4294967295", "-2", "-8589934590");
-    test("-4294967295", "2", "-8589934590");
-    test("-4294967295", "-2", "8589934590");
-    test("4294967295", "4294967295", "18446744065119617025");
-    test("4294967295", "-4294967295", "-18446744065119617025");
-    test("-4294967295", "4294967295", "-18446744065119617025");
-    test("-4294967295", "-4294967295", "18446744065119617025");
-    test("18446744073709551615", "2", "36893488147419103230");
-    test("18446744073709551615", "-2", "-36893488147419103230");
-    test("-18446744073709551615", "2", "-36893488147419103230");
-    test("-18446744073709551615", "-2", "36893488147419103230");
-}
 
 #[test]
 fn mul_properties() {

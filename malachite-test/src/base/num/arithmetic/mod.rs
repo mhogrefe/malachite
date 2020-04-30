@@ -2,6 +2,8 @@ use common::DemoBenchRegistry;
 
 pub mod abs;
 pub mod add_mul;
+pub mod arithmetic_checked_shl;
+pub mod arithmetic_checked_shr;
 pub mod checked_add_mul;
 pub mod checked_sub_mul;
 pub mod log_two;
@@ -53,6 +55,8 @@ pub mod xxxx_add_yyyy_is_zzzz;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
     add_mul::register(registry);
+    arithmetic_checked_shl::register(registry);
+    arithmetic_checked_shr::register(registry);
     checked_add_mul::register(registry);
     checked_sub_mul::register(registry);
     log_two::register(registry);

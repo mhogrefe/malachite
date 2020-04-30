@@ -1140,59 +1140,54 @@ impl Natural {
         }
     }
 
-    //TODO clean
     fn or_assign_pos_neg_ref(&mut self, other: &Natural) {
-        if let Natural(Small(y)) = *other {
-            self.or_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Natural(Small(x)) = *self {
-            *self = other.or_neg_limb_pos(x);
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
+            (Natural(Small(x)), _) => *self = other.or_neg_limb_pos(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_vec_or_pos_neg_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 
-    fn or_assign_pos_neg(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.or_assign_pos_limb_neg(y.wrapping_neg());
-        } else if let Natural(Small(x)) = *self {
-            *self = other;
-            self.or_assign_neg_limb_pos(x);
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                limbs_or_pos_neg_in_place_right(xs, &mut ys);
-                *xs = ys;
+    fn or_assign_pos_neg(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.or_assign_pos_limb_neg(y.wrapping_neg()),
+            (Natural(Small(x)), _) => {
+                other.or_assign_neg_limb_pos(*x);
+                *self = other;
             }
-            self.trim();
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                limbs_or_pos_neg_in_place_right(xs, ys);
+                *self = other;
+                self.trim();
+            }
         }
     }
 
     fn or_assign_neg_pos_ref(&mut self, other: &Natural) {
-        if let Natural(Small(y)) = *other {
-            self.or_assign_neg_limb_pos(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.or_pos_limb_neg(x.wrapping_neg());
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.or_assign_neg_limb_pos(*y),
+            (Natural(Small(x)), _) => *self = other.or_pos_limb_neg(x.wrapping_neg()),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_or_pos_neg_in_place_right(ys, xs);
+                self.trim();
             }
-            self.trim();
         }
     }
 
-    fn or_assign_neg_pos(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.or_assign_neg_limb_pos(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other;
-            self.or_assign_pos_limb_neg(x.wrapping_neg());
-        } else if let Natural(Large(ref ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                limbs_or_pos_neg_in_place_right(ys, xs);
+    fn or_assign_neg_pos(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.or_assign_neg_limb_pos(*y),
+            (Natural(Small(x)), _) => {
+                other.or_assign_pos_limb_neg(x.wrapping_neg());
+                *self = other;
             }
-            self.trim();
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                limbs_or_pos_neg_in_place_right(ys, xs);
+                self.trim();
+            }
         }
     }
 
@@ -1207,31 +1202,29 @@ impl Natural {
     }
 
     fn or_assign_neg_neg_ref(&mut self, other: &Natural) {
-        if let Natural(Small(y)) = *other {
-            self.or_assign_neg_limb_neg(y.wrapping_neg());
-        } else if let Natural(Small(x)) = *self {
-            *self = other.or_neg_limb_neg(x.wrapping_neg());
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
+            (Natural(Small(x)), _) => *self = other.or_neg_limb_neg(x.wrapping_neg()),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_vec_or_neg_neg_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 
-    fn or_assign_neg_neg(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.or_assign_neg_limb_neg(y.wrapping_neg());
-        } else if let Natural(Small(x)) = *self {
-            *self = other;
-            self.or_assign_neg_limb_neg(x.wrapping_neg());
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_or_neg_neg_in_place_either(xs, &mut ys) {
-                    *xs = ys;
-                }
+    fn or_assign_neg_neg(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.or_assign_neg_limb_neg(y.wrapping_neg()),
+            (Natural(Small(x)), _) => {
+                other.or_assign_neg_limb_neg(x.wrapping_neg());
+                *self = other;
             }
-            self.trim();
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_or_neg_neg_in_place_either(xs, ys) {
+                    *self = other;
+                }
+                self.trim();
+            }
         }
     }
 

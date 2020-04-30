@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    NextPowerOfTwo, NextPowerOfTwoAssign, TrueCheckedShl,
+    ArithmeticCheckedShl, NextPowerOfTwo, NextPowerOfTwoAssign,
 };
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
@@ -35,7 +35,7 @@ pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
     if let Some(limb) = xs_last.checked_next_power_of_two() {
         result_limbs = vec![0; xs.len() - 1];
         if limb == *xs_last && !slice_test_zero(&xs[..xs.len() - 1]) {
-            if let Some(limb) = limb.true_checked_shl(1) {
+            if let Some(limb) = limb.arithmetic_checked_shl(1) {
                 result_limbs.push(limb)
             } else {
                 result_limbs.push(0);
@@ -88,7 +88,7 @@ pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
     if let Some(limb) = xs_last.checked_next_power_of_two() {
         if limb == *xs_last && !slice_test_zero(xs_init) {
             slice_set_zero(xs_init);
-            if let Some(limb) = limb.true_checked_shl(1) {
+            if let Some(limb) = limb.arithmetic_checked_shl(1) {
                 *xs_last = limb;
                 false
             } else {

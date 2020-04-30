@@ -3,7 +3,7 @@ use num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
     ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
     NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
-    RemPowerOfTwoAssign, TrueCheckedShl, TrueCheckedShr,
+    RemPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -287,33 +287,6 @@ macro_rules! impl_arithmetic_traits {
                     *self += 1;
                     rhs - remainder
                 }
-            }
-        }
-
-        impl TrueCheckedShl for $t {
-            type Output = $t;
-
-            fn true_checked_shl(self, rhs: u64) -> Option<$t> {
-                if self == 0 {
-                    Some(self)
-                } else if rhs >= $t::WIDTH {
-                    None
-                } else {
-                    let result = self << rhs;
-                    if result >> rhs == self {
-                        Some(result)
-                    } else {
-                        None
-                    }
-                }
-            }
-        }
-
-        impl TrueCheckedShr for $t {
-            type Output = $t;
-
-            fn true_checked_shr(self, _rhs: u64) -> Option<$t> {
-                unimplemented!();
             }
         }
     };

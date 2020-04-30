@@ -627,7 +627,7 @@ pub trait ShlRound<RHS> {
 
 /// Replaces `self` with `self` * 2<sup>`rhs`</sup>, rounding the result according to a specified
 /// rounding mode. Rounding might only be necessary if `rhs` is negative.
-pub trait ShlRoundAssign<RHS = Self> {
+pub trait ShlRoundAssign<RHS> {
     fn shl_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
 }
 
@@ -641,22 +641,22 @@ pub trait ShrRound<RHS> {
 
 /// Replaces `self` with `self` / 2<sup>`rhs`</sup>, rounding the result according to a specified
 /// rounding mode. Rounding might only be necessary if `rhs` is non-negative.
-pub trait ShrRoundAssign<RHS = Self> {
+pub trait ShrRoundAssign<RHS> {
     fn shr_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
 }
 
-/// Checked shift left. Computes `self << rhs`, returning `None` if there is no valid result.
-pub trait TrueCheckedShl {
+/// Computes `self << rhs`, returning `None` if the result is too large to fit.
+pub trait ArithmeticCheckedShl<RHS> {
     type Output;
 
-    fn true_checked_shl(self, rhs: u64) -> Option<Self::Output>;
+    fn arithmetic_checked_shl(self, rhs: RHS) -> Option<Self::Output>;
 }
 
-/// Checked shift right. Computes `self >> rhs`, returning `None` if there is no valid result.
-pub trait TrueCheckedShr {
+/// Computes `self >> rhs`, returning `None` if the result is too large to fit.
+pub trait ArithmeticCheckedShr<RHS> {
     type Output;
 
-    fn true_checked_shr(self, rhs: u64) -> Option<Self::Output>;
+    fn arithmetic_checked_shr(self, rhs: RHS) -> Option<Self::Output>;
 }
 
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,

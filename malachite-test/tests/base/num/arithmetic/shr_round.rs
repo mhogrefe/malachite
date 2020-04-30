@@ -1,6 +1,8 @@
 use std::ops::{Shl, Shr};
 
-use malachite_base::num::arithmetic::traits::{ShlRound, ShrRound, ShrRoundAssign};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, ShlRound, ShrRound, ShrRoundAssign,
+};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -22,7 +24,11 @@ use malachite_test::inputs::base::{
 
 fn shr_round_unsigned_unsigned_helper<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>()
 where
-    T: Shl<U, Output = T> + Shr<U, Output = T> + ShrRound<U, Output = T> + ShrRoundAssign<U>,
+    T: Shl<U, Output = T>
+        + Shr<U, Output = T>
+        + ShrRound<U, Output = T>
+        + ShrRoundAssign<U>
+        + ArithmeticCheckedShl<U, Output = T>,
 {
     test_properties(
         triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<T, U>,
@@ -231,7 +237,8 @@ where
         + Shr<U, Output = T>
         + ShlRound<U, Output = T>
         + ShrRound<U, Output = T>
-        + ShrRoundAssign<U>,
+        + ShrRoundAssign<U>
+        + ArithmeticCheckedShl<U, Output = T>,
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     U::UnsignedOfEqualWidth: Rand,
