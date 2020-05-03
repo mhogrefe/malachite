@@ -1,11 +1,10 @@
 use std::cmp::{max, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
-    Parity, ShrRound, WrappingAddAssign, WrappingSubAssign,
+    DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::round::RoundingMode;
 use malachite_base::slices::slice_set_zero;
 
 use natural::arithmetic::add::{
@@ -35,18 +34,6 @@ pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len
     }
     let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
     n.even() && n >= MULMOD_BNM1_THRESHOLD
-}
-
-/// Returns smallest possible number of limbs >= pl for a fft of size 2 ^ k, i.e. smallest multiple
-/// of 2 ^ k >= pl.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_fft_next_size from mpn/generic/mul-fft.c, GMP 6.1.2.
-pub(crate) fn _limbs_fft_next_size(pl: usize, k: usize) -> usize {
-    pl.shr_round(u64::wrapping_from(k), RoundingMode::Ceiling) << k
 }
 
 struct FFTTableNK {
@@ -1388,7 +1375,7 @@ pub(crate) fn _limbs_mul_fft(
     k: usize,
 ) -> bool {
     let square = xs as *const [Limb] == ys as *const [Limb];
-    assert_eq!(_limbs_fft_next_size(p, k), p);
+    assert!(p.divisible_by_power_of_two(u64::exact_from(k)));
     let n = p << Limb::LOG_WIDTH;
     let two_pow_k = 1 << k;
     let m = n >> k; // n == 2 ^ k * m

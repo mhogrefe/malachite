@@ -1,6 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{DivRound, ShrRound, ShrRoundAssign};
+use malachite_base::num::arithmetic::traits::{
+    DivRound, DivisibleByPowerOfTwo, ShrRound, ShrRoundAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -369,7 +371,7 @@ fn limbs_shr_exact_properties() {
                 assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
                 assert_eq!(m << bits, n);
             } else {
-                assert_ne!(&n >> bits << bits, n);
+                assert!(!n.divisible_by_power_of_two(bits));
             }
         },
     );
@@ -389,7 +391,7 @@ fn limbs_shr_round_properties() {
                 }
             } else {
                 assert_eq!(rm, RoundingMode::Exact);
-                assert_ne!(&n >> bits << bits, n);
+                assert!(!n.divisible_by_power_of_two(bits));
             }
         },
     );

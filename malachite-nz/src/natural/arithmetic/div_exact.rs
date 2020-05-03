@@ -2,12 +2,13 @@ use std::cmp::{max, min, Ordering};
 use std::mem::swap;
 
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModPowerOfTwo, Parity, WrappingSubAssign,
+    DivExact, DivExactAssign, ModPowerOfTwo, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -458,7 +459,11 @@ pub fn limbs_div_exact_limb_in_place(xs: &mut [Limb], d: Limb) {
 /// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.1.2.
 pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(n);
-    let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, n, (n + 1) >> 1);
+    let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
+        itch_local,
+        n,
+        n.shr_round(1, RoundingMode::Ceiling),
+    );
     itch_local + itch_out
 }
 
@@ -509,7 +514,7 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     let mut sizes = Vec::new();
     while size >= BINV_NEWTON_THRESHOLD {
         sizes.push(size);
-        size = (size + 1) >> 1;
+        size.shr_round_assign(1, RoundingMode::Ceiling);
     }
     // Compute a base value of `size` limbs.
     let scratch_lo = &mut scratch[..size];

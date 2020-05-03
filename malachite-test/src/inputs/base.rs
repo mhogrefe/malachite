@@ -5872,13 +5872,33 @@ pub fn triples_of_unsigned_small_unsigned_and_rounding_mode_var_1<
     gm: GenerationMode,
 ) -> It<(T, U, RoundingMode)>
 where
-    T: Shl<U, Output = T> + Shr<U, Output = T> + ArithmeticCheckedShl<U, Output = T>,
+    T: ArithmeticCheckedShl<U, Output = T>,
 {
     Box::new(
         triples_of_unsigned_small_unsigned_and_rounding_mode::<T, U>(gm).filter_map(
             |(n, u, rm)| {
                 if n == T::ZERO || rm != RoundingMode::Exact {
                     Some((n, u, rm))
+                } else {
+                    n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
+                }
+            },
+        ),
+    )
+}
+
+// All triples of `T`, small `u64`, and `RoundingMode`, where `T` is unsigned and the `T` can be
+// rounded to a multiple of 2 to the power of the `u64`, according to the rounding mode.
+pub fn triples_of_unsigned_small_u64_and_rounding_mode_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(
+        triples_of_unsigned_small_unsigned_and_rounding_mode::<T, u64>(gm).filter_map(
+            |(n, u, rm)| {
+                if n == T::ZERO || rm != RoundingMode::Exact {
+                    n.shr_round(u, rm)
+                        .arithmetic_checked_shl(u)
+                        .map(|_| (n, u, rm))
                 } else {
                     n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
                 }
@@ -6008,30 +6028,42 @@ pub fn triples_of_signed_small_unsigned_and_rounding_mode_var_1<
     gm: GenerationMode,
 ) -> It<(T, U, RoundingMode)>
 where
-    T: Shl<U, Output = T>
-        + Shr<U, Output = T>
+    T: ArithmeticCheckedShl<U, Output = T>
         + WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     T::UnsignedOfEqualWidth: Rand,
 {
     Box::new(
-        triples_of_signed_small_unsigned_and_rounding_mode(gm).filter_map(|(n, u, rm)| {
-            if n == T::ZERO {
+        triples_of_signed_small_unsigned_and_rounding_mode::<T, U>(gm).filter_map(|(n, u, rm)| {
+            if n == T::ZERO || rm != RoundingMode::Exact {
                 Some((n, u, rm))
-            } else if rm == RoundingMode::Exact {
-                if u >= U::exact_from(T::WIDTH) {
-                    None
-                } else {
-                    let shifted = n << u;
-                    if shifted >> u == n {
-                        Some((shifted, u, rm))
-                    } else {
-                        None
-                    }
-                }
             } else {
-                Some((n, u, rm))
+                n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
             }
         }),
+    )
+}
+
+// All triples of `T`, small `u64`, and `RoundingMode`, where `T` is signed and the `T` can be
+// rounded to a multiple of 2 to the power of the `u64`, according to the rounding mode.
+pub fn triples_of_signed_small_u64_and_rounding_mode_var_2<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64, RoundingMode)>
+where
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+    T::UnsignedOfEqualWidth: Rand,
+{
+    Box::new(
+        triples_of_signed_small_unsigned_and_rounding_mode::<T, u64>(gm).filter_map(
+            |(n, u, rm)| {
+                if n == T::ZERO || rm != RoundingMode::Exact {
+                    n.shr_round(u, rm)
+                        .arithmetic_checked_shl(u)
+                        .map(|_| (n, u, rm))
+                } else {
+                    n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
+                }
+            },
+        ),
     )
 }
 

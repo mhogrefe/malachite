@@ -22,5 +22,7 @@ pub mod integer {
         pub mod neg;
         pub mod parity;
         pub mod power_of_two;
+        pub mod shl_i;
+        pub mod shl_round_i;
     }
 }

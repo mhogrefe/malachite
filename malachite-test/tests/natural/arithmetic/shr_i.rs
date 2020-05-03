@@ -1,7 +1,8 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::{ShlRound, ShrRound, ShrRoundAssign};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShr, ShlRound, ShrRound, ShrRoundAssign,
+};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::round::RoundingMode;
@@ -845,10 +846,7 @@ macro_rules! tests_and_properties {
             test_properties(
                 triples_of_unsigned_small_signed_and_rounding_mode_var_1::<Limb, $t>,
                 |&(n, i, rm)| {
-                    if n == 0
-                        || i >= 0
-                        || i != $t::MIN && -i < $t::exact_from(Limb::WIDTH) && n << -i >> -i == n
-                    {
+                    if n.arithmetic_checked_shr(i).is_some() {
                         assert_eq!(n.shr_round(i, rm), Natural::from(n).shr_round(i, rm));
                     }
                 },

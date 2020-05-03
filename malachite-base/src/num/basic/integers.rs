@@ -19,7 +19,8 @@ use num::arithmetic::traits::{
     OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
     OverflowingNegAssign, OverflowingPow, OverflowingRem, OverflowingRemAssign, OverflowingSub,
     OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowerOfTwo,
-    SaturatingAdd, SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
+    RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd,
+    SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
     SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
     SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul,
     SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
@@ -224,6 +225,8 @@ pub trait PrimitiveInteger:
     + Rem<Self, Output = Self>
     + RemAssign<Self>
     + Rotate
+    + RoundToMultipleOfPowerOfTwo<u64, Output = Self>
+    + RoundToMultipleOfPowerOfTwoAssign<u64>
     + SaturatingAdd<Self, Output = Self>
     + SaturatingAddAssign<Self>
     + SaturatingAddMul<Self, Self, Output = Self>

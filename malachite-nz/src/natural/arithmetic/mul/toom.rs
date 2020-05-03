@@ -1,11 +1,12 @@
 use std::cmp::{max, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
-    EqModPowerOfTwo, WrappingAddAssign, WrappingSubAssign,
+    EqModPowerOfTwo, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
+use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 use natural::arithmetic::add::{
@@ -1022,10 +1023,10 @@ pub fn _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len
     if ys_len == 0 || xs_len < ys_len {
         return false;
     }
-    let n = if xs_len >= 2 * ys_len {
-        (xs_len + 3) >> 2
+    let n = if xs_len >= ys_len << 1 {
+        xs_len.shr_round(2, RoundingMode::Ceiling)
     } else {
-        (ys_len + 1) >> 1
+        ys_len.shr_round(1, RoundingMode::Ceiling)
     };
     let s = xs_len.saturating_sub(3 * n);
     let t = ys_len.saturating_sub(n);
@@ -1041,17 +1042,21 @@ pub fn _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_42_scratch_len(xs_len: usize, ys_len: usize) -> usize {
-    let n = if xs_len >= 2 * ys_len {
-        (xs_len + 3) >> 2
+    let n: usize = if xs_len >= ys_len << 1 {
+        xs_len.shr_round(2, RoundingMode::Ceiling)
     } else {
-        (ys_len + 1) >> 1
+        ys_len.shr_round(1, RoundingMode::Ceiling)
     };
     6 * n + 3
 }
 
 /// A helper function for `_limbs_mul_greater_to_out_toom_42`.
 ///
-/// //TODO complexity
+/// Time: O(n * log(n) * log(log(n)))
+///
+/// Additional memory: O(n * log(n))
+///
+/// where n = `xs.len()`
 ///
 /// This is TOOM42_MUL_N_REC from mpn/generic/toom42_mul.c, GMP 6.1.2.
 pub fn _limbs_mul_same_length_to_out_toom_42_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -1102,10 +1107,10 @@ pub fn _limbs_mul_greater_to_out_toom_42(
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    let n = if xs_len >= 2 * ys_len {
-        (xs_len + 3) >> 2
+    let n = if xs_len >= ys_len << 1 {
+        xs_len.shr_round(2, RoundingMode::Ceiling)
     } else {
-        (ys_len + 1) >> 1
+        ys_len.shr_round(1, RoundingMode::Ceiling)
     };
 
     split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2], xs_3);
@@ -1555,7 +1560,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
 
-    let n = (xs_len + 3) >> 2;
+    let n = xs_len.shr_round(2, RoundingMode::Ceiling);
     let m = 2 * n + 1;
     split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2], xs_3);
     split_into_chunks!(ys, n, t, [ys_0, ys_1, ys_2], ys_3);

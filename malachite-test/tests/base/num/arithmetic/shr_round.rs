@@ -44,14 +44,13 @@ where
 
     test_properties(pairs_of_unsigned_and_small_unsigned::<T, U>, |&(n, u)| {
         if u < U::exact_from(T::WIDTH) {
-            let left_shifted = n << u;
-            if left_shifted >> u == n {
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Down), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Up), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Floor), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Ceiling), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Nearest), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Exact), n);
+            if let Some(shifted) = n.arithmetic_checked_shl(u) {
+                assert_eq!(shifted.shr_round(u, RoundingMode::Down), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Up), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Floor), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Ceiling), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Nearest), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Exact), n);
             }
         }
     });
@@ -134,6 +133,7 @@ where
 fn shr_round_signed_unsigned_helper<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>()
 where
     T: Shl<U, Output = T>
+        + ArithmeticCheckedShl<U, Output = T>
         + Shr<U, Output = T>
         + ShrRound<U, Output = T>
         + ShrRoundAssign<U>
@@ -160,14 +160,13 @@ where
 
     test_properties(pairs_of_signed_and_small_unsigned::<T, U>, |&(n, u)| {
         if u < U::exact_from(T::WIDTH) {
-            let left_shifted = n << u;
-            if left_shifted >> u == n {
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Down), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Up), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Floor), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Ceiling), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Nearest), n);
-                assert_eq!(left_shifted.shr_round(u, RoundingMode::Exact), n);
+            if let Some(shifted) = n.arithmetic_checked_shl(u) {
+                assert_eq!(shifted.shr_round(u, RoundingMode::Down), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Up), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Floor), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Ceiling), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Nearest), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Exact), n);
             }
         }
     });
@@ -195,13 +194,13 @@ where
     test_properties(
         pairs_of_positive_signed_and_small_unsigned::<T, U>,
         |&(i, u)| {
-            if let Some(sum) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
-                assert_eq!(i.shr_round(sum, RoundingMode::Down), T::ZERO);
-                assert_eq!(i.shr_round(sum, RoundingMode::Floor), T::ZERO);
-                assert_eq!(i.shr_round(sum, RoundingMode::Up), T::ONE);
-                assert_eq!(i.shr_round(sum, RoundingMode::Ceiling), T::ONE);
-                if let Some(sum) = sum.checked_add(U::ONE) {
-                    assert_eq!(i.shr_round(sum, RoundingMode::Nearest), T::ZERO);
+            if let Some(shift) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
+                assert_eq!(i.shr_round(shift, RoundingMode::Down), T::ZERO);
+                assert_eq!(i.shr_round(shift, RoundingMode::Floor), T::ZERO);
+                assert_eq!(i.shr_round(shift, RoundingMode::Up), T::ONE);
+                assert_eq!(i.shr_round(shift, RoundingMode::Ceiling), T::ONE);
+                if let Some(extra_shift) = shift.checked_add(U::ONE) {
+                    assert_eq!(i.shr_round(extra_shift, RoundingMode::Nearest), T::ZERO);
                 }
             }
         },
@@ -210,13 +209,13 @@ where
     test_properties(
         pairs_of_negative_signed_not_min_and_small_unsigned::<T, U>,
         |&(i, u)| {
-            if let Some(sum) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
-                assert_eq!(i.shr_round(sum, RoundingMode::Down), T::ZERO);
-                assert_eq!(i.shr_round(sum, RoundingMode::Floor), T::NEGATIVE_ONE);
-                assert_eq!(i.shr_round(sum, RoundingMode::Up), T::NEGATIVE_ONE);
-                assert_eq!(i.shr_round(sum, RoundingMode::Ceiling), T::ZERO);
-                if let Some(sum) = sum.checked_add(U::ONE) {
-                    assert_eq!(i.shr_round(sum, RoundingMode::Nearest), T::ZERO);
+            if let Some(shift) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
+                assert_eq!(i.shr_round(shift, RoundingMode::Down), T::ZERO);
+                assert_eq!(i.shr_round(shift, RoundingMode::Floor), T::NEGATIVE_ONE);
+                assert_eq!(i.shr_round(shift, RoundingMode::Up), T::NEGATIVE_ONE);
+                assert_eq!(i.shr_round(shift, RoundingMode::Ceiling), T::ZERO);
+                if let Some(extra_shift) = shift.checked_add(U::ONE) {
+                    assert_eq!(i.shr_round(extra_shift, RoundingMode::Nearest), T::ZERO);
                 }
             }
         },

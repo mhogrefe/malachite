@@ -30,6 +30,7 @@ pub mod arithmetic {
     pub mod overflowing_sub;
     pub mod overflowing_sub_mul;
     pub mod power_of_two;
+    pub mod round_to_multiple_of_power_of_two;
     pub mod saturating_abs;
     pub mod saturating_add;
     pub mod saturating_add_mul;

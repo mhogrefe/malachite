@@ -659,6 +659,18 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, rhs: RHS) -> Option<Self::Output>;
 }
 
+/// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode.
+pub trait RoundToMultipleOfPowerOfTwo<RHS> {
+    type Output;
+
+    fn round_to_multiple_of_power_of_two(self, pow: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Rounds `self` to a multiple of a power of 2 in place, according to a specified rounding mode.
+pub trait RoundToMultipleOfPowerOfTwoAssign<RHS> {
+    fn round_to_multiple_of_power_of_two_assign(&mut self, pow: RHS, rm: RoundingMode);
+}
+
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
 /// and the second of a single one. `x_0` must be less than `y`.
 pub trait XXDivModYIsQR: Sized {

@@ -26,6 +26,7 @@ pub mod overflowing_neg;
 pub mod overflowing_sub;
 pub mod overflowing_sub_mul;
 pub mod power_of_two;
+pub mod round_to_multiple_of_power_of_two;
 pub mod saturating_abs;
 pub mod saturating_add;
 pub mod saturating_add_mul;
@@ -79,6 +80,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     overflowing_sub::register(registry);
     overflowing_sub_mul::register(registry);
     power_of_two::register(registry);
+    round_to_multiple_of_power_of_two::register(registry);
     saturating_abs::register(registry);
     saturating_add::register(registry);
     saturating_add_mul::register(registry);

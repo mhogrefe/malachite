@@ -1,15 +1,16 @@
 use std::cmp::min;
 
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::round::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::fft::{_limbs_fft_next_size, _limbs_mul_fft, _limbs_mul_fft_best_k};
+use natural::arithmetic::mul::fft::{_limbs_mul_fft, _limbs_mul_fft_best_k};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
@@ -34,15 +35,18 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     if n < MULMOD_BNM1_THRESHOLD {
         n
     } else if n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 {
-        (n + 1) >> 1 << 1
+        n.round_to_multiple_of_power_of_two(1, RoundingMode::Ceiling)
     } else if n <= (MULMOD_BNM1_THRESHOLD - 1) << 3 {
-        (n + 3) >> 2 << 2
+        n.round_to_multiple_of_power_of_two(2, RoundingMode::Ceiling)
     } else {
-        let ceiling_half_n = (n + 1) >> 1;
+        let ceiling_half_n: usize = n.shr_round(1, RoundingMode::Ceiling);
         if ceiling_half_n < MUL_FFT_MODF_THRESHOLD {
-            (n + 7) >> 3 << 3
+            n.round_to_multiple_of_power_of_two(3, RoundingMode::Ceiling)
         } else {
-            _limbs_fft_next_size(ceiling_half_n, _limbs_mul_fft_best_k(ceiling_half_n, false)) << 1
+            ceiling_half_n.round_to_multiple_of_power_of_two(
+                u64::exact_from(_limbs_mul_fft_best_k(ceiling_half_n, false)),
+                RoundingMode::Ceiling,
+            ) << 1
         }
     }
 }

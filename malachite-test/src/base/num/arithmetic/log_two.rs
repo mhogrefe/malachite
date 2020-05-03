@@ -28,19 +28,19 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, None, benchmark_usize_ceiling_log_two);
 }
 
-fn demo_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
+fn demo_floor_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.floor_log_two() = {}", n, n.floor_log_two());
     }
 }
 
-fn demo_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
+fn demo_ceiling_log_two<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for n in positive_unsigneds::<T>(gm).take(limit) {
         println!("{}.ceiling_log_two() = {}", n, n.ceiling_log_two());
     }
 }
 
-fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
+fn benchmark_floor_log_two<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -58,7 +58,7 @@ fn benchmark_unsigned_floor_log_two<T: PrimitiveUnsigned + Rand>(
     );
 }
 
-fn benchmark_unsigned_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
+fn benchmark_ceiling_log_two<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
@@ -85,19 +85,19 @@ macro_rules! unsigned {
         $bench_name_ceiling:ident
     ) => {
         fn $demo_name_floor(gm: GenerationMode, limit: usize) {
-            demo_unsigned_floor_log_two::<$t>(gm, limit);
+            demo_floor_log_two::<$t>(gm, limit);
         }
 
         fn $demo_name_ceiling(gm: GenerationMode, limit: usize) {
-            demo_unsigned_ceiling_log_two::<$t>(gm, limit);
+            demo_ceiling_log_two::<$t>(gm, limit);
         }
 
         fn $bench_name_floor(gm: GenerationMode, limit: usize, file_name: &str) {
-            benchmark_unsigned_floor_log_two::<$t>(gm, limit, file_name);
+            benchmark_floor_log_two::<$t>(gm, limit, file_name);
         }
 
         fn $bench_name_ceiling(gm: GenerationMode, limit: usize, file_name: &str) {
-            benchmark_unsigned_ceiling_log_two::<$t>(gm, limit, file_name);
+            benchmark_ceiling_log_two::<$t>(gm, limit, file_name);
         }
     };
 }
