@@ -1,12 +1,9 @@
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
-    pairs_of_integer_and_small_signed, rm_pairs_of_integer_and_small_signed,
-    triples_of_integer_small_signed_and_rounding_mode_var_2,
-};
+use inputs::integer::{pairs_of_integer_and_small_signed, rm_pairs_of_integer_and_small_signed};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shr_assign_i8);
@@ -26,24 +23,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shr_i32_ref);
     register_demo!(registry, demo_integer_shr_i64_ref);
     register_demo!(registry, demo_integer_shr_isize_ref);
-
-    register_demo!(registry, demo_integer_shr_round_assign_i8);
-    register_demo!(registry, demo_integer_shr_round_assign_i16);
-    register_demo!(registry, demo_integer_shr_round_assign_i32);
-    register_demo!(registry, demo_integer_shr_round_assign_i64);
-    register_demo!(registry, demo_integer_shr_round_assign_isize);
-
-    register_demo!(registry, demo_integer_shr_round_i8);
-    register_demo!(registry, demo_integer_shr_round_i16);
-    register_demo!(registry, demo_integer_shr_round_i32);
-    register_demo!(registry, demo_integer_shr_round_i64);
-    register_demo!(registry, demo_integer_shr_round_isize);
-
-    register_demo!(registry, demo_integer_shr_round_i8_ref);
-    register_demo!(registry, demo_integer_shr_round_i16_ref);
-    register_demo!(registry, demo_integer_shr_round_i32_ref);
-    register_demo!(registry, demo_integer_shr_round_i64_ref);
-    register_demo!(registry, demo_integer_shr_round_isize_ref);
 
     register_bench!(
         registry,
@@ -71,38 +50,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_integer_shr_isize_evaluation_strategy
     );
 
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_i8);
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_i16);
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_i32);
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_i64);
-    register_bench!(registry, Large, benchmark_integer_shr_round_assign_isize);
-
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_shr_round_i8_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_shr_round_i16_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_shr_round_i32_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_shr_round_i64_evaluation_strategy
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_integer_shr_round_isize_evaluation_strategy
-    );
-
     register_bench!(
         registry,
         Large,
@@ -121,12 +68,7 @@ macro_rules! demos_and_benches {
         $demo_integer_shr_assign_i:ident,
         $demo_integer_shr_i:ident,
         $demo_integer_shr_i_ref:ident,
-        $demo_integer_shr_round_assign_i:ident,
-        $demo_integer_shr_round_i:ident,
-        $demo_integer_shr_round_i_ref:ident,
-        $benchmark_integer_shr_i_evaluation_strategy:ident,
-        $benchmark_integer_shr_round_assign_i:ident,
-        $benchmark_integer_shr_round_i_evaluation_strategy:ident
+        $benchmark_integer_shr_i_evaluation_strategy:ident
     ) => {
         fn $demo_integer_shr_assign_i(gm: GenerationMode, limit: usize) {
             for (mut n, i) in pairs_of_integer_and_small_signed::<i32>(gm).take(limit) {
@@ -146,48 +88,6 @@ macro_rules! demos_and_benches {
         fn $demo_integer_shr_i_ref(gm: GenerationMode, limit: usize) {
             for (n, i) in pairs_of_integer_and_small_signed::<i32>(gm).take(limit) {
                 println!("&{} >> {} = {}", n, i, &n >> i);
-            }
-        }
-
-        fn $demo_integer_shr_round_assign_i(gm: GenerationMode, limit: usize) {
-            for (mut n, i, rm) in
-                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm).take(limit)
-            {
-                let n_old = n.clone();
-                n.shr_round_assign(i, rm);
-                println!(
-                    "x := {}; x.shr_round_assign({}, {}); x = {}",
-                    n_old, i, rm, n
-                );
-            }
-        }
-
-        fn $demo_integer_shr_round_i(gm: GenerationMode, limit: usize) {
-            for (n, i, rm) in
-                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm).take(limit)
-            {
-                let n_old = n.clone();
-                println!(
-                    "{}.shr_round({}, {}) = {}",
-                    n_old,
-                    i,
-                    rm,
-                    n.shr_round(i, rm)
-                );
-            }
-        }
-
-        fn $demo_integer_shr_round_i_ref(gm: GenerationMode, limit: usize) {
-            for (n, i, rm) in
-                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm).take(limit)
-            {
-                println!(
-                    "(&{}).shr_round({}, {}) = {}",
-                    n,
-                    i,
-                    rm,
-                    (&n).shr_round(i, rm)
-                );
             }
         }
 
@@ -217,54 +117,6 @@ macro_rules! demos_and_benches {
                 ],
             );
         }
-
-        fn $benchmark_integer_shr_round_assign_i(
-            gm: GenerationMode,
-            limit: usize,
-            file_name: &str,
-        ) {
-            m_run_benchmark(
-                &format!("Integer.shr_round_assign({}, RoundingMode)", $t::NAME),
-                BenchmarkType::Single,
-                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm),
-                gm.name(),
-                limit,
-                file_name,
-                &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
-                "|other|",
-                &mut [(
-                    "malachite",
-                    &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
-                )],
-            );
-        }
-
-        fn $benchmark_integer_shr_round_i_evaluation_strategy(
-            gm: GenerationMode,
-            limit: usize,
-            file_name: &str,
-        ) {
-            m_run_benchmark(
-                &format!("Integer.shr_round({}, RoundingMode)", $t::NAME),
-                BenchmarkType::EvaluationStrategy,
-                triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm),
-                gm.name(),
-                limit,
-                file_name,
-                &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
-                "|other|",
-                &mut [
-                    (
-                        &format!("Integer.shr_round({}, RoundingMode)", $t::NAME),
-                        &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm))),
-                    ),
-                    (
-                        &format!("(&Integer).shr_round({}, RoundingMode)", $t::NAME),
-                        &mut (|(x, y, rm)| no_out!((&x).shr_round(y, rm))),
-                    ),
-                ],
-            );
-        }
     };
 }
 demos_and_benches!(
@@ -272,60 +124,35 @@ demos_and_benches!(
     demo_integer_shr_assign_i8,
     demo_integer_shr_i8,
     demo_integer_shr_i8_ref,
-    demo_integer_shr_round_assign_i8,
-    demo_integer_shr_round_i8,
-    demo_integer_shr_round_i8_ref,
-    benchmark_integer_shr_i8_evaluation_strategy,
-    benchmark_integer_shr_round_assign_i8,
-    benchmark_integer_shr_round_i8_evaluation_strategy
+    benchmark_integer_shr_i8_evaluation_strategy
 );
 demos_and_benches!(
     i16,
     demo_integer_shr_assign_i16,
     demo_integer_shr_i16,
     demo_integer_shr_i16_ref,
-    demo_integer_shr_round_assign_i16,
-    demo_integer_shr_round_i16,
-    demo_integer_shr_round_i16_ref,
-    benchmark_integer_shr_i16_evaluation_strategy,
-    benchmark_integer_shr_round_assign_i16,
-    benchmark_integer_shr_round_i16_evaluation_strategy
+    benchmark_integer_shr_i16_evaluation_strategy
 );
 demos_and_benches!(
     i32,
     demo_integer_shr_assign_i32,
     demo_integer_shr_i32,
     demo_integer_shr_i32_ref,
-    demo_integer_shr_round_assign_i32,
-    demo_integer_shr_round_i32,
-    demo_integer_shr_round_i32_ref,
-    benchmark_integer_shr_i32_evaluation_strategy,
-    benchmark_integer_shr_round_assign_i32,
-    benchmark_integer_shr_round_i32_evaluation_strategy
+    benchmark_integer_shr_i32_evaluation_strategy
 );
 demos_and_benches!(
     i64,
     demo_integer_shr_assign_i64,
     demo_integer_shr_i64,
     demo_integer_shr_i64_ref,
-    demo_integer_shr_round_assign_i64,
-    demo_integer_shr_round_i64,
-    demo_integer_shr_round_i64_ref,
-    benchmark_integer_shr_i64_evaluation_strategy,
-    benchmark_integer_shr_round_assign_i64,
-    benchmark_integer_shr_round_i64_evaluation_strategy
+    benchmark_integer_shr_i64_evaluation_strategy
 );
 demos_and_benches!(
     isize,
     demo_integer_shr_assign_isize,
     demo_integer_shr_isize,
     demo_integer_shr_isize_ref,
-    demo_integer_shr_round_assign_isize,
-    demo_integer_shr_round_isize,
-    demo_integer_shr_round_isize_ref,
-    benchmark_integer_shr_isize_evaluation_strategy,
-    benchmark_integer_shr_round_assign_isize,
-    benchmark_integer_shr_round_isize_evaluation_strategy
+    benchmark_integer_shr_isize_evaluation_strategy
 );
 
 fn benchmark_integer_shr_assign_i32_library_comparison(

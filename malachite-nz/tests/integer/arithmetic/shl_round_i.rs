@@ -1301,6 +1301,22 @@ tests_and_properties!(
     shl_round_i64_ref_fail_4
 );
 tests_and_properties!(
+    i128,
+    test_shl_round_i128,
+    shl_round_assign_i128_fail_1,
+    shl_round_assign_i128_fail_2,
+    shl_round_assign_i128_fail_3,
+    shl_round_assign_i128_fail_4,
+    shl_round_i128_fail_1,
+    shl_round_i128_fail_2,
+    shl_round_i128_fail_3,
+    shl_round_i128_fail_4,
+    shl_round_i128_ref_fail_1,
+    shl_round_i128_ref_fail_2,
+    shl_round_i128_ref_fail_3,
+    shl_round_i128_ref_fail_4
+);
+tests_and_properties!(
     isize,
     test_shl_round_isize,
     shl_round_assign_isize_fail_1,

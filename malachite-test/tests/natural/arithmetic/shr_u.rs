@@ -9,9 +9,9 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::shr_u::{
-    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
+    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
-    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_to_nearest_in_place,
+    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_nearest_in_place,
     limbs_vec_shr_round_up_in_place,
 };
 use malachite_nz::natural::Natural;
@@ -96,12 +96,12 @@ fn test_limbs_shr_round_up_and_limbs_vec_shr_round_up_in_place() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_shr_round_to_nearest_and_limbs_vec_shr_round_to_nearest_in_place() {
+fn test_limbs_shr_round_nearest_and_limbs_vec_shr_round_nearest_in_place() {
     let test = |limbs: &[Limb], bits: u64, out: &[Limb]| {
-        assert_eq!(limbs_shr_round_to_nearest(limbs, bits), out);
+        assert_eq!(limbs_shr_round_nearest(limbs, bits), out);
 
         let mut limbs = limbs.to_vec();
-        limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
+        limbs_vec_shr_round_nearest_in_place(&mut limbs, bits);
         assert_eq!(limbs, out);
     };
     test(&[], 0, &[]);
@@ -348,12 +348,12 @@ fn limbs_shr_round_up_properties() {
 }
 
 #[test]
-fn limbs_shr_round_to_nearest_properties() {
+fn limbs_shr_round_nearest_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_unsigned,
         |&(ref limbs, bits)| {
             assert_eq!(
-                Natural::from_owned_limbs_asc(limbs_shr_round_to_nearest(limbs, bits)),
+                Natural::from_owned_limbs_asc(limbs_shr_round_nearest(limbs, bits)),
                 Natural::from_limbs_asc(limbs).shr_round(bits, RoundingMode::Nearest),
             );
         },
@@ -462,13 +462,13 @@ fn limbs_vec_shr_round_up_in_place_properties() {
 }
 
 #[test]
-fn limbs_vec_shr_round_to_nearest_in_place_properties() {
+fn limbs_vec_shr_round_nearest_in_place_properties() {
     test_properties(
         pairs_of_unsigned_vec_and_small_unsigned,
         |&(ref limbs, bits)| {
             let mut limbs = limbs.to_vec();
             let old_limbs = limbs.clone();
-            limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
+            limbs_vec_shr_round_nearest_in_place(&mut limbs, bits);
             let n = Natural::from_limbs_asc(&old_limbs).shr_round(bits, RoundingMode::Nearest);
             assert_eq!(Natural::from_owned_limbs_asc(limbs), n);
         },
@@ -487,7 +487,7 @@ fn limbs_vec_shr_exact_in_place_properties() {
                 assert_eq!(Natural::from_owned_limbs_asc(limbs), m);
                 assert_eq!(m << bits, n);
             } else {
-                assert_ne!(&n >> bits << bits, n);
+                assert!(!n.divisible_by_power_of_two(bits));
             }
         },
     );
@@ -508,7 +508,7 @@ fn limbs_vec_shr_round_in_place_properties() {
                 }
             } else {
                 assert_eq!(rm, RoundingMode::Exact);
-                assert_ne!(&n >> bits << bits, n);
+                assert!(!n.divisible_by_power_of_two(bits));
             }
         },
     );

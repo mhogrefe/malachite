@@ -172,4 +172,5 @@ tests_and_properties!(
     n
 );
 tests_and_properties!(i64, test_shl_i64, i, j, out, {}, n);
+tests_and_properties!(i128, test_shl_i128, i, j, out, {}, n);
 tests_and_properties!(isize, test_shl_isize, i, j, out, {}, n);

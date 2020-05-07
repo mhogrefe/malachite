@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(1, `limbs.len()` - `bits` / 32)
+/// where n = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -43,16 +43,16 @@ use platform::Limb;
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the result is returned.
 pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= xs.len() {
+    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    if delete_count >= xs.len() {
         Vec::new()
     } else {
+        let mut out = xs[delete_count..].to_vec();
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut result_limbs = xs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
-            limbs_slice_shr_in_place(&mut result_limbs, small_bits);
+            limbs_slice_shr_in_place(&mut out, small_bits);
         }
-        result_limbs
+        out
     }
 }
 
@@ -63,7 +63,7 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(1, `limbs.len()` - `bits` / 32)
+/// where n = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -85,20 +85,21 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
 /// the result is returned.
 pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
-    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= xs.len() {
+    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    if delete_count >= xs.len() {
         vec![1]
     } else {
-        let mut exact = slice_test_zero(&xs[..limbs_to_delete]);
+        let (xs_lo, xs_hi) = xs.split_at(delete_count);
+        let mut exact = slice_test_zero(xs_lo);
+        let mut out = xs_hi.to_vec();
         let small_bits = bits & Limb::WIDTH_MASK;
-        let mut result_limbs = xs[limbs_to_delete..].to_vec();
         if small_bits != 0 {
-            exact &= limbs_slice_shr_in_place(&mut result_limbs, small_bits) == 0;
+            exact &= limbs_slice_shr_in_place(&mut out, small_bits) == 0;
         }
         if !exact {
-            limbs_vec_add_limb_in_place(&mut result_limbs, 1);
+            limbs_vec_add_limb_in_place(&mut out, 1);
         }
-        result_limbs
+        out
     }
 }
 
@@ -121,32 +122,32 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the
-/// actual value of `self` divided by 2<sup>`other`</sup>. If the actual value is exactly between
+/// actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is exactly between
 /// two integers, it is rounded to the even one.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(m)
 ///
-/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / 32)
+/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shr_u::limbs_shr_round_to_nearest;
+/// use malachite_nz::natural::arithmetic::shr_u::limbs_shr_round_nearest;
 ///
-/// assert_eq!(limbs_shr_round_to_nearest(&[1], 1), &[0]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[3], 1), &[2]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[122, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[123, 456], 1), &[62, 228]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[123, 455], 1), &[2_147_483_710, 227]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[123, 456], 31), &[912, 0]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[123, 456], 32), &[456]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_shr_round_to_nearest(&[256, 456], 8), &[3_355_443_201, 1]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 1], 1), &[0, 1]);
-/// assert_eq!(limbs_shr_round_to_nearest(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
+/// assert_eq!(limbs_shr_round_nearest(&[1], 1), &[0]);
+/// assert_eq!(limbs_shr_round_nearest(&[3], 1), &[2]);
+/// assert_eq!(limbs_shr_round_nearest(&[122, 456], 1), &[61, 228]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 1), &[62, 228]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 455], 1), &[2_147_483_710, 227]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 31), &[912, 0]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 32), &[456]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 100), Vec::<u32>::new());
+/// assert_eq!(limbs_shr_round_nearest(&[256, 456], 8), &[3_355_443_201, 1]);
+/// assert_eq!(limbs_shr_round_nearest(&[4_294_967_295, 1], 1), &[0, 1]);
+/// assert_eq!(limbs_shr_round_nearest(&[4_294_967_295, 4_294_967_295], 32), &[0, 1]);
 /// ```
-pub fn limbs_shr_round_to_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
+pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
         xs.to_vec()
     } else if !limbs_get_bit(xs, bits - 1) {
@@ -166,7 +167,7 @@ pub fn limbs_shr_round_to_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(m)
 ///
-/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / 32)
+/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -200,7 +201,7 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 ///
 /// Additional memory: worst case O(m)
 ///
-/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / 32)
+/// where n = `limbs.len()`, m = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -228,7 +229,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
     match rm {
         RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
         RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(xs, bits)),
-        RoundingMode::Nearest => Some(limbs_shr_round_to_nearest(xs, bits)),
+        RoundingMode::Nearest => Some(limbs_shr_round_nearest(xs, bits)),
         RoundingMode::Exact => limbs_shr_exact(xs, bits),
     }
 }
@@ -335,7 +336,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = max(1, `limbs.len()` - `bits` / 32)
+/// where n = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -409,7 +410,7 @@ pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = max(1, `limbs.len()` - `bits` / 32)
+/// where n = max(1, `limbs.len()` - `bits` / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -463,14 +464,14 @@ pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
 /// w == u.
 pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
-    let limbs_to_delete = usize::exact_from(bits >> Limb::LOG_WIDTH);
-    if limbs_to_delete >= xs.len() {
+    let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
+    if delete_count >= xs.len() {
         xs.truncate(1);
         xs[0] = 1;
     } else {
-        let mut exact = slice_test_zero(&xs[..limbs_to_delete]);
+        let mut exact = slice_test_zero(&xs[..delete_count]);
         let small_bits = bits & Limb::WIDTH_MASK;
-        vec_delete_left(xs, limbs_to_delete);
+        vec_delete_left(xs, delete_count);
         if small_bits != 0 {
             exact &= limbs_slice_shr_in_place(xs, small_bits) == 0;
         }
@@ -498,7 +499,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounding to the `Natural`
-/// nearest to the actual value of `self` divided by 2<sup>`other`</sup>. If the actual value is
+/// nearest to the actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is
 /// exactly between two integers, it is rounded to the even one.
 ///
 /// Time: worst case O(n)
@@ -509,53 +510,53 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shr_u::limbs_vec_shr_round_to_nearest_in_place;
+/// use malachite_nz::natural::arithmetic::shr_u::limbs_vec_shr_round_nearest_in_place;
 ///
 /// let mut limbs = vec![1];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[0]);
 ///
 /// let mut limbs = vec![3];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[2]);
 ///
 /// let mut limbs = vec![122, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[61, 228]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[62, 228]);
 ///
 /// let mut limbs = vec![123, 455];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[2_147_483_710, 227]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 31);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 31);
 /// assert_eq!(limbs, &[912, 0]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 32);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[456]);
 ///
 /// let mut limbs = vec![123, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 100);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 100);
 /// assert_eq!(limbs, Vec::<u32>::new());
 ///
 /// let mut limbs = vec![256, 456];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 8);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 8);
 /// assert_eq!(limbs, &[3_355_443_201, 1]);
 ///
 /// let mut limbs = vec![4_294_967_295, 1];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 1);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 1);
 /// assert_eq!(limbs, &[0, 1]);
 ///
 /// let mut limbs = vec![4_294_967_295, 4_294_967_295];
-/// limbs_vec_shr_round_to_nearest_in_place(&mut limbs, 32);
+/// limbs_vec_shr_round_nearest_in_place(&mut limbs, 32);
 /// assert_eq!(limbs, &[0, 1]);
 /// ```
-pub fn limbs_vec_shr_round_to_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
+pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
     } else if !limbs_get_bit(xs, bits - 1) {
         limbs_vec_shr_in_place(xs, bits)
@@ -699,7 +700,7 @@ pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingM
             true
         }
         RoundingMode::Nearest => {
-            limbs_vec_shr_round_to_nearest_in_place(xs, bits);
+            limbs_vec_shr_round_nearest_in_place(xs, bits);
             true
         }
         RoundingMode::Exact => limbs_vec_shr_exact_in_place(xs, bits),
@@ -715,7 +716,7 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// Additional memory: worst case O(1)
         ///
-        /// where n = max(1, `self.significant_bits()` - `other`)
+        /// where n = max(1, `self.significant_bits()` - `bits`)
         ///
         /// # Examples
         /// ```
@@ -733,8 +734,8 @@ macro_rules! impl_natural_shr_unsigned {
             type Output = Natural;
 
             #[inline]
-            fn shr(mut self, other: $t) -> Natural {
-                self >>= other;
+            fn shr(mut self, bits: $t) -> Natural {
+                self >>= bits;
                 self
             }
         }
@@ -746,7 +747,7 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// Additional memory: worst case O(n)
         ///
-        /// where n = max(1, `self.significant_bits()` - `other`)
+        /// where n = max(1, `self.significant_bits()` - `bits`)
         ///
         /// # Examples
         /// ```
@@ -763,17 +764,15 @@ macro_rules! impl_natural_shr_unsigned {
         impl<'a> Shr<$t> for &'a Natural {
             type Output = Natural;
 
-            fn shr(self, other: $t) -> Natural {
-                if other == 0 || *self == 0 {
+            fn shr(self, bits: $t) -> Natural {
+                if bits == 0 || *self == 0 {
                     return self.clone();
                 }
                 match *self {
-                    Natural(Small(_)) if other >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
-                    Natural(Small(small)) => Natural(Small(small >> other)),
+                    Natural(Small(_)) if bits >= $t::wrapping_from(Limb::WIDTH) => Natural::ZERO,
+                    Natural(Small(small)) => Natural(Small(small >> bits)),
                     Natural(Large(ref limbs)) => {
-                        let mut result = Natural(Large(limbs_shr(limbs, u64::exact_from(other))));
-                        result.trim();
-                        result
+                        Natural::from_owned_limbs_asc(limbs_shr(limbs, u64::exact_from(bits)))
                     }
                 }
             }
@@ -785,7 +784,7 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// Additional memory: worst case O(1)
         ///
-        /// where n = max(1, `self.significant_bits()` - `other`)
+        /// where n = max(1, `self.significant_bits()` - `bits`)
         ///
         /// # Examples
         /// ```
@@ -799,21 +798,21 @@ macro_rules! impl_natural_shr_unsigned {
         /// assert_eq!(x.to_string(), "1");
         /// ```
         impl ShrAssign<$t> for Natural {
-            fn shr_assign(&mut self, other: $t) {
-                if other == 0 || *self == 0 {
+            fn shr_assign(&mut self, bits: $t) {
+                if bits == 0 || *self == 0 {
                     return;
                 }
                 match *self {
-                    Natural(Small(ref mut small)) if other >= $t::wrapping_from(Limb::WIDTH) => {
+                    Natural(Small(ref mut small)) if bits >= $t::wrapping_from(Limb::WIDTH) => {
                         *small = 0;
                         return;
                     }
                     Natural(Small(ref mut small)) => {
-                        *small >>= other;
+                        *small >>= bits;
                         return;
                     }
                     Natural(Large(ref mut limbs)) => {
-                        limbs_vec_shr_in_place(limbs, u64::exact_from(other));
+                        limbs_vec_shr_in_place(limbs, u64::exact_from(bits));
                     }
                 }
                 self.trim();
@@ -823,7 +822,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
         /// specified rounding mode, taking the `Natural` by value. Passing `RoundingMode::Floor` or
         /// `RoundingMode::Down` is equivalent to using `>>`. To test whether `RoundingMode::Exact`
-        /// can be passed, use `self.divisible_by_power_of_two(other)`.
+        /// can be passed, use `self.divisible_by_power_of_two(bits)`.
         ///
         /// Time: worst case O(n)
         ///
@@ -833,7 +832,7 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-        /// 2<sup>`other`</sup>.
+        /// 2<sup>`bits`</sup>.
         ///
         /// # Examples
         /// ```
@@ -846,13 +845,11 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// assert_eq!(Natural::from(0x101u32).shr_round(8u8, RoundingMode::Down).to_string(),
         ///     "1");
-        /// assert_eq!(Natural::from(0x101u32).shr_round(8u16, RoundingMode::Up).to_string(),
-        ///     "2");
+        /// assert_eq!(Natural::from(0x101u32).shr_round(8u16, RoundingMode::Up).to_string(), "2");
         ///
         /// assert_eq!(Natural::from(0x101u32).shr_round(9u32, RoundingMode::Down).to_string(),
         ///     "0");
-        /// assert_eq!(Natural::from(0x101u32).shr_round(9u64, RoundingMode::Up).to_string(),
-        ///     "1");
+        /// assert_eq!(Natural::from(0x101u32).shr_round(9u64, RoundingMode::Up).to_string(), "1");
         /// assert_eq!(Natural::from(0x101u32).shr_round(9u8, RoundingMode::Nearest).to_string(),
         ///     "1");
         /// assert_eq!(Natural::from(0xffu32).shr_round(9u16, RoundingMode::Nearest).to_string(),
@@ -867,8 +864,8 @@ macro_rules! impl_natural_shr_unsigned {
             type Output = Natural;
 
             #[inline]
-            fn shr_round(mut self, other: $t, rm: RoundingMode) -> Natural {
-                self.shr_round_assign(other, rm);
+            fn shr_round(mut self, bits: $t, rm: RoundingMode) -> Natural {
+                self.shr_round_assign(bits, rm);
                 self
             }
         }
@@ -877,17 +874,17 @@ macro_rules! impl_natural_shr_unsigned {
         /// specified rounding mode, taking the `Natural` by reference. Passing
         /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
         /// whether `RoundingMode::Exact` can be passed, use
-        /// `self.divisible_by_power_of_two(other)`.
+        /// `self.divisible_by_power_of_two(bits)`.
         ///
         /// Time: worst case O(n)
         ///
         /// Additional memory: worst case O(m)
         ///
-        /// where n = `self.significant_bits()`, m = max(1, `self.significant_bits()` - `other`)
+        /// where n = `self.significant_bits()`, m = max(1, `self.significant_bits()` - `bits`)
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-        /// 2<sup>`other`</sup>.
+        /// 2<sup>`bits`</sup>.
         ///
         /// # Examples
         /// ```
@@ -920,21 +917,17 @@ macro_rules! impl_natural_shr_unsigned {
         impl<'a> ShrRound<$t> for &'a Natural {
             type Output = Natural;
 
-            fn shr_round(self, other: $t, rm: RoundingMode) -> Natural {
-                if other == 0 || *self == 0 {
-                    return self.clone();
-                }
-                match *self {
-                    Natural(Small(ref small)) => Natural(Small(small.shr_round(other, rm))),
-                    Natural(Large(ref limbs)) => {
+            fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
+                match (self, bits) {
+                    (_, 0) | (natural_zero!(), _) => self.clone(),
+                    (Natural(Small(ref small)), bits) => Natural(Small(small.shr_round(bits, rm))),
+                    (Natural(Large(ref limbs)), bits) => {
                         if let Some(result_limbs) =
-                            limbs_shr_round(limbs, u64::exact_from(other), rm)
+                            limbs_shr_round(limbs, u64::exact_from(bits), rm)
                         {
-                            let mut result = Natural(Large(result_limbs));
-                            result.trim();
-                            result
+                            Natural::from_owned_limbs_asc(result_limbs)
                         } else {
-                            panic!("Right shift is not exact: {} >> {}", self, other);
+                            panic!("Right shift is not exact: {} >> {}", self, bits);
                         }
                     }
                 }
@@ -944,7 +937,7 @@ macro_rules! impl_natural_shr_unsigned {
         /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
         /// specified rounding mode, in place. Passing `RoundingMode::Floor` or `RoundingMode::Down`
         /// is equivalent to using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-        /// `self.divisible_by_power_of_two(other)`.
+        /// `self.divisible_by_power_of_two(bits)`.
         ///
         /// Time: worst case O(n)
         ///
@@ -954,7 +947,7 @@ macro_rules! impl_natural_shr_unsigned {
         ///
         /// # Panics
         /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-        /// 2<sup>`other`</sup>.
+        /// 2<sup>`bits`</sup>.
         ///
         /// # Examples
         /// ```
@@ -998,22 +991,19 @@ macro_rules! impl_natural_shr_unsigned {
         /// assert_eq!(n.to_string(), "1");
         /// ```
         impl ShrRoundAssign<$t> for Natural {
-            fn shr_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                if other == 0 || *self == 0 {
-                    return;
-                }
-                match *self {
-                    Natural(Small(ref mut small)) => {
-                        small.shr_round_assign(other, rm);
-                        return;
+            fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
+                match (&mut *self, bits) {
+                    (_, 0) | (natural_zero!(), _) => {}
+                    (Natural(Small(ref mut small)), bits) => {
+                        small.shr_round_assign(bits, rm);
                     }
-                    Natural(Large(ref mut limbs)) => {
-                        if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(other), rm) {
+                    (Natural(Large(ref mut limbs)), bits) => {
+                        if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm) {
                             panic!("Right shift is not exact.");
                         }
+                        self.trim();
                     }
                 }
-                self.trim();
             }
         }
     };

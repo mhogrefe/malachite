@@ -239,6 +239,7 @@ pub mod arithmetic {
     pub mod next_power_of_two;
     pub mod parity;
     pub mod power_of_two;
+    pub mod round_to_multiple_of_power_of_two;
     pub mod saturating_sub;
     pub mod saturating_sub_mul;
     pub mod shl_i;

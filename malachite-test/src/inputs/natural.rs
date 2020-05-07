@@ -631,6 +631,27 @@ pub fn pairs_of_natural_and_small_u64_var_3<T: PrimitiveUnsigned>(
     }
 }
 
+pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(log_pairs(
+            exhaustive_positive_naturals(),
+            exhaustive_unsigned(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+        )),
+    }
+}
+
 fn log_pairs_of_natural_and_signed<T: PrimitiveSigned>() -> It<(Natural, T)> {
     Box::new(log_pairs(exhaustive_naturals(), exhaustive_signed()))
 }

@@ -190,6 +190,8 @@ pub mod arithmetic {
     pub mod shl_round_i;
     pub mod shl_u;
     pub mod shr_i;
+    pub mod shr_round_i;
+    pub mod shr_round_u;
     pub mod shr_u;
     pub mod sign;
     pub mod sub;

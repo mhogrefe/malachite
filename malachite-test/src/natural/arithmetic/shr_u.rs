@@ -5,9 +5,9 @@ use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::shr_u::{
-    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_to_nearest, limbs_shr_round_up,
+    limbs_shr, limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_exact_in_place,
-    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_to_nearest_in_place,
+    limbs_vec_shr_in_place, limbs_vec_shr_round_in_place, limbs_vec_shr_round_nearest_in_place,
     limbs_vec_shr_round_up_in_place,
 };
 use malachite_nz::platform::Limb;
@@ -27,14 +27,14 @@ use inputs::natural::{
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_shr);
     register_demo!(registry, demo_limbs_shr_round_up);
-    register_demo!(registry, demo_limbs_shr_round_to_nearest);
+    register_demo!(registry, demo_limbs_shr_round_nearest);
     register_demo!(registry, demo_limbs_shr_exact);
     register_demo!(registry, demo_limbs_shr_round);
     register_demo!(registry, demo_limbs_shr_to_out);
     register_demo!(registry, demo_limbs_slice_shr_in_place);
     register_demo!(registry, demo_limbs_vec_shr_in_place);
     register_demo!(registry, demo_limbs_vec_shr_round_up_in_place);
-    register_demo!(registry, demo_limbs_vec_shr_round_to_nearest_in_place);
+    register_demo!(registry, demo_limbs_vec_shr_round_nearest_in_place);
     register_demo!(registry, demo_limbs_vec_shr_exact_in_place);
     register_demo!(registry, demo_limbs_vec_shr_round_in_place);
 
@@ -76,7 +76,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
     register_bench!(registry, Small, benchmark_limbs_shr);
     register_bench!(registry, Small, benchmark_limbs_shr_round_up);
-    register_bench!(registry, Small, benchmark_limbs_shr_round_to_nearest);
+    register_bench!(registry, Small, benchmark_limbs_shr_round_nearest);
     register_bench!(registry, Small, benchmark_limbs_shr_exact);
     register_bench!(registry, Small, benchmark_limbs_shr_round);
     register_bench!(registry, Small, benchmark_limbs_shr_to_out);
@@ -86,7 +86,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_vec_shr_round_to_nearest_in_place
+        benchmark_limbs_vec_shr_round_nearest_in_place
     );
     register_bench!(registry, Small, benchmark_limbs_vec_shr_exact_in_place);
     register_bench!(registry, Small, benchmark_limbs_vec_shr_round_in_place);
@@ -183,13 +183,13 @@ fn demo_limbs_shr_round_up(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize) {
+fn demo_limbs_shr_round_nearest(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         println!(
-            "limbs_shr_round_to_nearest({:?}, {}) = {:?}",
+            "limbs_shr_round_nearest({:?}, {}) = {:?}",
             limbs,
             bits,
-            limbs_shr_round_to_nearest(&limbs, bits)
+            limbs_shr_round_nearest(&limbs, bits)
         );
     }
 }
@@ -268,13 +268,13 @@ fn demo_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_vec_shr_round_to_nearest_in_place(gm: GenerationMode, limit: usize) {
+fn demo_limbs_vec_shr_round_nearest_in_place(gm: GenerationMode, limit: usize) {
     for (limbs, bits) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let limbs_old = limbs.clone();
-        limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits);
+        limbs_vec_shr_round_nearest_in_place(&mut limbs, bits);
         println!(
-            "limbs := {:?}; limbs_vec_shr_round_to_nearest_in_place(&mut limbs, {}); limbs = {:?}",
+            "limbs := {:?}; limbs_vec_shr_round_nearest_in_place(&mut limbs, {}); limbs = {:?}",
             limbs_old, bits, limbs
         );
     }
@@ -563,9 +563,9 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
     );
 }
 
-fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_shr_round_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
-        "limbs_shr_round_to_nearest(&[Limb], u64)",
+        "limbs_shr_round_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -580,7 +580,7 @@ fn benchmark_limbs_shr_round_to_nearest(gm: GenerationMode, limit: usize, file_n
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
             "malachite",
-            &mut (|(limbs, bits)| no_out!(limbs_shr_round_to_nearest(&limbs, bits))),
+            &mut (|(limbs, bits)| no_out!(limbs_shr_round_nearest(&limbs, bits))),
         )],
     );
 }
@@ -697,13 +697,13 @@ fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, f
     );
 }
 
-fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
+fn benchmark_limbs_vec_shr_round_nearest_in_place(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     m_run_benchmark(
-        "limbs_vec_shr_round_to_nearest_in_place(&mut Vec<Limb>, u64)",
+        "limbs_vec_shr_round_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -713,7 +713,7 @@ fn benchmark_limbs_vec_shr_round_to_nearest_in_place(
         "limbs.len()",
         &mut [(
             "malachite",
-            &mut (|(mut limbs, bits)| limbs_vec_shr_round_to_nearest_in_place(&mut limbs, bits)),
+            &mut (|(mut limbs, bits)| limbs_vec_shr_round_nearest_in_place(&mut limbs, bits)),
         )],
     );
 }
