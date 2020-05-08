@@ -650,8 +650,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Natural {
     type Output = Natural;
 
     /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, taking
-    /// `self` by value. The only rounding modes that are guaranteed to return without a panic are
-    /// `Down` and `Floor`.
+    /// `self` by value.
     ///
     /// The following two expressions are equivalent:
     ///
@@ -700,6 +699,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Natural {
     ///     12
     /// );
     /// ```
+    #[inline]
     fn round_to_multiple_of_power_of_two(mut self, pow: u64, rm: RoundingMode) -> Natural {
         self.round_to_multiple_of_power_of_two_assign(pow, rm);
         self
@@ -710,8 +710,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Natural {
     type Output = Natural;
 
     /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, taking
-    /// `self` by reference. The only rounding modes that are guaranteed to return without a panic
-    /// are `Down` and `Floor`.
+    /// `self` by reference.
     ///
     /// The following two expressions are equivalent:
     ///
@@ -781,8 +780,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Natural {
 
 impl RoundToMultipleOfPowerOfTwoAssign<u64> for Natural {
     /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode, in
-    /// place. The only rounding modes that are guaranteed to return without a panic are `Down` and
-    /// `Floor`.
+    /// place.
     ///
     /// The following two expressions are equivalent:
     ///

@@ -12,7 +12,7 @@ use malachite_test::inputs::integer::{
 };
 use malachite_test::inputs::natural::triples_of_natural_small_signed_and_rounding_mode_var_2;
 
-macro_rules! tests_and_properties {
+macro_rules! properties {
     (
         $t:ident,
         $shr_round_i_properties:ident
@@ -64,8 +64,8 @@ macro_rules! tests_and_properties {
         }
     };
 }
-tests_and_properties!(i8, shr_round_i8_properties);
-tests_and_properties!(i16, shr_round_i16_properties);
-tests_and_properties!(i32, shr_round_i32_properties);
-tests_and_properties!(i64, shr_round_i64_properties);
-tests_and_properties!(isize, shr_round_isize_properties);
+properties!(i8, shr_round_i8_properties);
+properties!(i16, shr_round_i16_properties);
+properties!(i32, shr_round_i32_properties);
+properties!(i64, shr_round_i64_properties);
+properties!(isize, shr_round_isize_properties);

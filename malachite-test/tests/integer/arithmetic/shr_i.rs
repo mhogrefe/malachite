@@ -9,7 +9,7 @@ use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_signed};
 use malachite_test::inputs::natural::pairs_of_natural_and_small_signed;
 
-macro_rules! tests_and_properties {
+macro_rules! properties {
     (
         $t:ident,
         $shr_i_properties:ident,
@@ -52,9 +52,9 @@ macro_rules! tests_and_properties {
         }
     };
 }
-tests_and_properties!(i8, shr_i8_properties, n, i, shifted, {});
-tests_and_properties!(i16, shr_i16_properties, n, i, shifted, {});
-tests_and_properties!(i32, shr_i32_properties, n, i, shifted, {
+properties!(i8, shr_i8_properties, n, i, shifted, {});
+properties!(i16, shr_i16_properties, n, i, shifted, {});
+properties!(i32, shr_i32_properties, n, i, shifted, {
     let mut rug_n = integer_to_rug_integer(n);
     rug_n >>= i;
     assert_eq!(rug_integer_to_integer(&rug_n), shifted);
@@ -64,5 +64,5 @@ tests_and_properties!(i32, shr_i32_properties, n, i, shifted, {
         shifted
     );
 });
-tests_and_properties!(i64, shr_i64_properties, n, i, shifted, {});
-tests_and_properties!(isize, shr_isize_properties, n, i, shifted, {});
+properties!(i64, shr_i64_properties, n, i, shifted, {});
+properties!(isize, shr_isize_properties, n, i, shifted, {});

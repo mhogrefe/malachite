@@ -1131,19 +1131,19 @@ macro_rules! tests_and_properties {
         #[test]
         #[should_panic]
         fn $shr_round_assign_i_fail_1() {
-            Integer::from(123).shr_round_assign($t::ONE, RoundingMode::Exact);
+            Integer::from(-123).shr_round_assign($t::ONE, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_assign_i_fail_2() {
-            Integer::from(123).shr_round_assign($t::exact_from(100), RoundingMode::Exact);
+            Integer::from(-123).shr_round_assign($t::exact_from(100), RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_assign_i_fail_3() {
-            Integer::from_str("1000000000001")
+            Integer::from_str("-1000000000001")
                 .unwrap()
                 .shr_round_assign($t::ONE, RoundingMode::Exact);
         }
@@ -1151,7 +1151,7 @@ macro_rules! tests_and_properties {
         #[test]
         #[should_panic]
         fn $shr_round_assign_i_fail_4() {
-            Integer::from_str("1000000000001")
+            Integer::from_str("-1000000000001")
                 .unwrap()
                 .shr_round_assign($t::exact_from(100), RoundingMode::Exact);
         }
@@ -1159,19 +1159,19 @@ macro_rules! tests_and_properties {
         #[test]
         #[should_panic]
         fn $shr_round_i_fail_1() {
-            Integer::from(123).shr_round($t::ONE, RoundingMode::Exact);
+            Integer::from(-123).shr_round($t::ONE, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_i_fail_2() {
-            Integer::from(123).shr_round($t::exact_from(100), RoundingMode::Exact);
+            Integer::from(-123).shr_round($t::exact_from(100), RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_i_fail_3() {
-            Integer::from_str("1000000000001")
+            Integer::from_str("-1000000000001")
                 .unwrap()
                 .shr_round($t::ONE, RoundingMode::Exact);
         }
@@ -1179,7 +1179,7 @@ macro_rules! tests_and_properties {
         #[test]
         #[should_panic]
         fn $shr_round_i_fail_4() {
-            Integer::from_str("1000000000001")
+            Integer::from_str("-1000000000001")
                 .unwrap()
                 .shr_round($t::exact_from(100), RoundingMode::Exact);
         }
@@ -1187,25 +1187,25 @@ macro_rules! tests_and_properties {
         #[test]
         #[should_panic]
         fn $shr_round_i_ref_fail_1() {
-            (&Integer::from(123)).shr_round($t::ONE, RoundingMode::Exact);
+            (&Integer::from(-123)).shr_round($t::ONE, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_i_ref_fail_2() {
-            (&Integer::from(123)).shr_round($t::exact_from(100), RoundingMode::Exact);
+            (&Integer::from(-123)).shr_round($t::exact_from(100), RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_i_ref_fail_3() {
-            (&Integer::from_str("1000000000001").unwrap()).shr_round($t::ONE, RoundingMode::Exact);
+            (&Integer::from_str("-1000000000001").unwrap()).shr_round($t::ONE, RoundingMode::Exact);
         }
 
         #[test]
         #[should_panic]
         fn $shr_round_i_ref_fail_4() {
-            (&Integer::from_str("1000000000001").unwrap())
+            (&Integer::from_str("-1000000000001").unwrap())
                 .shr_round($t::exact_from(100), RoundingMode::Exact);
         }
     };
