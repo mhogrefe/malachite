@@ -3,4 +3,14 @@
 [[package]]
 name = "malachite-base"
 version = "0.1.0"
+dependencies = [
+ "malachite-base-test-util 0.1.0",
+]
+
+[[package]]
+name = "malachite-base-test-util"
+version = "0.1.0"
+dependencies = [
+ "malachite-base 0.1.0",
+]
 

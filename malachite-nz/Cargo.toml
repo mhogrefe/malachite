@@ -20,6 +20,7 @@ lto = true
 
 [dev-dependencies]
 num = "0.2.0"
+malachite-base-test-util = { path = "../malachite-base-test-util" }
 
 [dev-dependencies.rug]
 version = "^1.2.0"

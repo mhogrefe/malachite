@@ -4,6 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_set_zero;
 
@@ -730,11 +731,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
                 carry -= 1;
             }
             // add 1 to carry instead of carry2 since carry2 might overflow
-            carry = if limbs_sub_limb_in_place(&mut out[..shift_limbs], carry) {
-                2
-            } else {
-                1
-            };
+            carry = Limb::iverson(limbs_sub_limb_in_place(&mut out[..shift_limbs], carry)) + 1;
         }
 
         // now subtract carry and carry2 from out[shift_limbs..n]
@@ -809,13 +806,10 @@ fn _limbs_mul_fft_decompose<'a>(
         assert!(diff <= k_times_n);
         // difference <= k_times_n, i.e. len <= 2 * k_times_n
         let (xs_lo, xs_hi) = xs.split_at(k_times_n);
-        scratch2[k_times_n] = if limbs_sub_to_out(&mut scratch2, xs_lo, &xs_hi[..diff])
-            && limbs_slice_add_limb_in_place(&mut scratch2[..k_times_n], 1)
-        {
-            1
-        } else {
-            0
-        };
+        scratch2[k_times_n] = Limb::iverson(
+            limbs_sub_to_out(&mut scratch2, xs_lo, &xs_hi[..diff])
+                && limbs_slice_add_limb_in_place(&mut scratch2[..k_times_n], 1),
+        );
         len = k_times_n + 1;
         &scratch2
     } else {
@@ -888,14 +882,10 @@ pub fn _limbs_mul_fft_fft(
         // xss[increment][n] can be -1 or -2
         if limbs_sub_same_length_in_place_right(scratch, &mut xss[increment]) {
             let (xss_increment_last, xss_increment_init) = xss[increment].split_last_mut().unwrap();
-            *xss_increment_last = if limbs_slice_add_limb_in_place(
+            *xss_increment_last = Limb::iverson(limbs_slice_add_limb_in_place(
                 xss_increment_init,
                 xss_increment_last.wrapping_neg(),
-            ) {
-                1
-            } else {
-                0
-            };
+            ));
         }
     } else {
         let half_k = k >> 1;
@@ -977,11 +967,10 @@ pub fn _limbs_mul_fft_inverse(
         // Ap[1][n] can be -1 or -2
         if limbs_sub_same_length_in_place_right(scratch, &mut xss_tail[0]) {
             let (xss_1_last, xss_1_init) = xss_tail[0].split_last_mut().unwrap();
-            *xss_1_last = if limbs_slice_add_limb_in_place(xss_1_init, xss_1_last.wrapping_neg()) {
-                1
-            } else {
-                0
-            };
+            *xss_1_last = Limb::iverson(limbs_slice_add_limb_in_place(
+                xss_1_init,
+                xss_1_last.wrapping_neg(),
+            ));
         }
     } else {
         let half_k = k >> 1;
@@ -1121,13 +1110,10 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
             }
             let (scratch_lo, scratch_hi) = scratch.split_at(n);
-            *xs_last = if limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
-                && limbs_slice_add_limb_in_place(xs_init, 1)
-            {
-                1
-            } else {
-                0
-            };
+            *xs_last = Limb::iverson(
+                limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
+                    && limbs_slice_add_limb_in_place(xs_init, 1),
+            );
         }
     }
 }
@@ -1219,13 +1205,10 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
             }
             let (scratch_lo, scratch_hi) = scratch.split_at(n);
-            *xs_last = if limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
-                && limbs_slice_add_limb_in_place(xs_init, 1)
-            {
-                1
-            } else {
-                0
-            };
+            *xs_last = Limb::iverson(
+                limbs_sub_same_length_to_out(xs_init, scratch_lo, scratch_hi)
+                    && limbs_slice_add_limb_in_place(xs_init, 1),
+            );
         }
     }
 }

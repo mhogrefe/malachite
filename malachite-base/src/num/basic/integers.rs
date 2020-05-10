@@ -28,7 +28,7 @@ use num::arithmetic::traits::{
     WrappingPow, WrappingRem, WrappingRemAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
     WrappingSubMulAssign,
 };
-use num::basic::traits::{One, Two, Zero};
+use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
     CheckedFrom, CheckedInto, ExactFrom, ExactInto, OverflowingFrom, OverflowingInto,
@@ -157,6 +157,7 @@ pub trait PrimitiveInteger:
     + ExactInto<isize>
     + FromStr
     + Hash
+    + Iverson
     + LeadingZeros
     + LowerHex
     + LowMask

@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -12,100 +10,6 @@ use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, test_pro
 use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds};
 use malachite_test::inputs::integer::{pairs_of_integer_and_signed, pairs_of_integer_and_unsigned};
 use malachite_test::integer::comparison::partial_eq_primitive_integer::num_partial_eq_primitive;
-
-#[test]
-fn test_partial_eq_u32() {
-    let test = |u, v: u32, out| {
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(
-            num_partial_eq_primitive(&BigInt::from_str(u).unwrap(), v),
-            out
-        );
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
-
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
-    };
-    test("0", 0, true);
-    test("0", 5, false);
-    test("123", 123, true);
-    test("-123", 123, false);
-    test("123", 5, false);
-    test("-123", 5, false);
-    test("1000000000000", 123, false);
-    test("-1000000000000", 123, false);
-}
-
-#[test]
-fn test_partial_eq_u64() {
-    let test = |u, v: u64, out| {
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(
-            num_partial_eq_primitive(&BigInt::from_str(u).unwrap(), v),
-            out
-        );
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
-
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
-    };
-    test("0", 0, true);
-    test("0", 5, false);
-    test("123", 123, true);
-    test("-123", 123, false);
-    test("123", 5, false);
-    test("-123", 5, false);
-    test("1000000000000", 1000000000000, true);
-    test("-1000000000000", 1000000000000, false);
-    test("1000000000000", 1000000000001, false);
-    test("-1000000000000", 1000000000001, false);
-    test("1000000000000000000000000", 1000000000000, false);
-    test("-1000000000000000000000000", 1000000000000, false);
-}
-
-#[test]
-fn test_partial_eq_i32() {
-    let test = |u, v: i32, out| {
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
-
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
-    };
-    test("0", 0, true);
-    test("0", 5, false);
-    test("123", 123, true);
-    test("-123", -123, true);
-    test("-123", 123, false);
-    test("123", 5, false);
-    test("-123", -5, false);
-    test("1000000000000", 123, false);
-    test("-1000000000000", -123, false);
-}
-
-#[test]
-fn test_partial_eq_i64() {
-    let test = |u, v: i64, out| {
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
-
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
-    };
-    test("0", 0, true);
-    test("0", 5, false);
-    test("123", 123, true);
-    test("-123", -123, true);
-    test("-123", 123, false);
-    test("123", 5, false);
-    test("-123", -5, false);
-    test("1000000000000", 1000000000000, true);
-    test("-1000000000000", -1000000000000, true);
-    test("1000000000000", 1000000000001, false);
-    test("-1000000000000", -1000000000001, false);
-    test("1000000000000000000000000", 1000000000000, false);
-    test("-1000000000000000000000000", -1000000000000, false);
-}
 
 fn partial_eq_primitive_integer_properties_helper_unsigned<
     T: PartialEq<Integer> + PartialEq<rug::Integer> + PrimitiveUnsigned + Rand,

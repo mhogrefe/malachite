@@ -1,5 +1,3 @@
-extern crate malachite_base;
-
 use malachite_base::comparison::{Max, Min};
 use malachite_base::crement::Crementable;
 use malachite_base::num::logic::traits::NotAssign;

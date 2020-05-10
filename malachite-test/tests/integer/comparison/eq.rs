@@ -1,31 +1,11 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use num::BigInt;
-use rug;
 
+use malachite_test::common::test_properties;
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer};
-use malachite_test::common::{test_eq_helper, test_properties};
 use malachite_test::inputs::base::pairs_of_signeds;
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
-
-#[test]
-fn test_eq() {
-    let strings = vec![
-        "0",
-        "1",
-        "-1",
-        "2",
-        "-2",
-        "123",
-        "-123",
-        "1000000000000",
-        "-1000000000000",
-    ];
-    test_eq_helper::<Integer>(&strings);
-    test_eq_helper::<BigInt>(&strings);
-    test_eq_helper::<rug::Integer>(&strings);
-}
 
 #[test]
 fn eq_properties() {

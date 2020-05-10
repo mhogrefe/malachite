@@ -126,6 +126,43 @@ pub fn limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) ->
     limbs_index_of_next_false_bit(&xs[i + 1..], starting_index) + after_boundary_offset
 }
 
+impl Natural {
+    // self != 0
+    fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
+        match *self {
+            Natural(Small(small)) => {
+                if starting_index >= Limb::WIDTH {
+                    None
+                } else {
+                    let index = TrailingZeros::trailing_zeros(
+                        (small - 1) & !Limb::low_mask(starting_index),
+                    );
+                    if index == Limb::WIDTH {
+                        None
+                    } else {
+                        Some(index)
+                    }
+                }
+            }
+            Natural(Large(ref limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
+        }
+    }
+
+    // self != 0
+    fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
+        match *self {
+            Natural(Small(small)) => {
+                if starting_index >= Limb::WIDTH {
+                    starting_index
+                } else {
+                    TrailingZeros::trailing_zeros(!((small - 1) | Limb::low_mask(starting_index)))
+                }
+            }
+            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
+        }
+    }
+}
+
 impl<'a> BitScan for &'a Integer {
     /// Finds the lowest index greater than or equal to `starting_index` at which the `Integer` has
     /// a `false` bit. If the `Integer` as negative, and the starting index is too large and there
@@ -195,43 +232,6 @@ impl<'a> BitScan for &'a Integer {
             self.abs.index_of_next_true_bit(starting_index)
         } else {
             Some(self.abs.index_of_next_true_bit_neg(starting_index))
-        }
-    }
-}
-
-impl Natural {
-    // self != 0
-    fn index_of_next_false_bit_neg(&self, starting_index: u64) -> Option<u64> {
-        match *self {
-            Natural(Small(small)) => {
-                if starting_index >= Limb::WIDTH {
-                    None
-                } else {
-                    let index = TrailingZeros::trailing_zeros(
-                        (small - 1) & !Limb::low_mask(starting_index),
-                    );
-                    if index == Limb::WIDTH {
-                        None
-                    } else {
-                        Some(index)
-                    }
-                }
-            }
-            Natural(Large(ref limbs)) => limbs_index_of_next_false_bit_neg(limbs, starting_index),
-        }
-    }
-
-    // self != 0
-    fn index_of_next_true_bit_neg(&self, starting_index: u64) -> u64 {
-        match *self {
-            Natural(Small(small)) => {
-                if starting_index >= Limb::WIDTH {
-                    starting_index
-                } else {
-                    TrailingZeros::trailing_zeros(!((small - 1) | Limb::low_mask(starting_index)))
-                }
-            }
-            Natural(Large(ref limbs)) => limbs_index_of_next_true_bit_neg(limbs, starting_index),
         }
     }
 }

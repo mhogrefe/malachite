@@ -1,5 +1,3 @@
-extern crate malachite_base;
-
 use malachite_base::strings::{string_is_subset, string_nub, string_sort};
 
 #[test]

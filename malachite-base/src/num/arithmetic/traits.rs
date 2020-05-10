@@ -659,6 +659,34 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, rhs: RHS) -> Option<Self::Output>;
 }
 
+/// Computes `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoShl<RHS> {
+    type Output;
+
+    fn mod_power_of_two_shl(self, rhs: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+/// mod 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoShlAssign<RHS> {
+    fn mod_power_of_two_shl_assign(&mut self, rhs: RHS, pow: u64);
+}
+
+/// Computes `self >> rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoShr<RHS> {
+    type Output;
+
+    fn mod_power_of_two_shr(self, rhs: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self >> rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+/// mod 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoShrAssign<RHS> {
+    fn mod_power_of_two_shr_assign(&mut self, rhs: RHS, pow: u64);
+}
+
 /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode.
 pub trait RoundToMultipleOfPowerOfTwo<RHS> {
     type Output;

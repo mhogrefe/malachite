@@ -9,3 +9,6 @@ path = "src/lib.rs"
 
 [profile.release]
 lto = true
+
+[dev-dependencies]
+malachite-base-test-util = { path = "../malachite-base-test-util" }

@@ -1,4 +1,5 @@
 extern crate malachite_base;
+extern crate malachite_base_test_util;
 extern crate malachite_nz;
 extern crate num;
 extern crate rug;
@@ -39,5 +40,12 @@ pub mod integer {
         pub mod decrement;
         pub mod increment;
         pub mod size;
+    }
+    pub mod comparison {
+        pub mod eq;
+        pub mod ord;
+        pub mod ord_abs;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_primitive_integer;
     }
 }

@@ -4,6 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
@@ -352,11 +353,10 @@ pub(crate) fn _limbs_mul_toom_interpolate_6_points(
         assert!(!limbs_sub_limb_in_place(&mut out[2 * n..2 * n + m], 1));
     }
 
-    let carry = if limbs_slice_add_same_length_in_place_left(&mut out[3 * n..4 * n], &w2[..n]) {
-        1
-    } else {
-        0
-    };
+    let carry = Limb::iverson(limbs_slice_add_same_length_in_place_left(
+        &mut out[3 * n..4 * n],
+        &w2[..n],
+    ));
     // w3H = w3H + w2L
     let special_carry_1 = out[4 * n] + carry;
     // w1L + w2H

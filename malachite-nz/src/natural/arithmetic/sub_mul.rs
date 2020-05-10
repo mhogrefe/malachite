@@ -4,6 +4,7 @@ use std::fmt::Display;
 use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
 };
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::mul::limbs_mul;
@@ -141,10 +142,8 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
     let borrow = limbs_sub_mul_limb_same_length_in_place_left(xs_lo, ys, limb);
     if borrow == 0 || xs_hi.is_empty() {
         borrow
-    } else if limbs_sub_limb_in_place(xs_hi, borrow) {
-        1
     } else {
-        0
+        Limb::iverson(limbs_sub_limb_in_place(xs_hi, borrow))
     }
 }
 

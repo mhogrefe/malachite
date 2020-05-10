@@ -420,6 +420,24 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     }
 }
 
+impl Natural {
+    /// Returns a double-ended iterator over the two's complement limbs of the negative of a
+    /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
+    /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX`
+    /// limb going backward. The `Natural` cannot be zero.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    fn negative_limbs(&self) -> NegativeLimbIterator {
+        assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
+        NegativeLimbIterator(NLIterator {
+            limbs: self.limbs(),
+            first_nonzero_index: None,
+        })
+    }
+}
+
 impl Integer {
     /// Returns the limbs of an `Integer`, in ascending order, so that less significant limbs have
     /// lower indices in the output vector. The limbs are in two's complement, and the most
@@ -654,23 +672,5 @@ impl Integer {
         } else {
             TwosComplementLimbIterator::Negative(self.abs.negative_limbs(), false)
         }
-    }
-}
-
-impl Natural {
-    /// Returns a double-ended iterator over the two's complement limbs of the negative of a
-    /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
-    /// There may be at most one trailing `Limb::MAX` limb going forward, or leading `Limb::MAX`
-    /// limb going backward. The `Natural` cannot be zero.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    fn negative_limbs(&self) -> NegativeLimbIterator {
-        assert_ne!(*self, 0, "Cannot get negative limbs of 0.");
-        NegativeLimbIterator(NLIterator {
-            limbs: self.limbs(),
-            first_nonzero_index: None,
-        })
     }
 }

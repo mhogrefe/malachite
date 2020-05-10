@@ -193,6 +193,55 @@ pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     }
 }
 
+impl Natural {
+    // self cannot be zero
+    pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
+        match *self {
+            Natural(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
+            Natural(Large(ref limbs)) => limbs_get_bit_neg(limbs, index),
+        }
+    }
+
+    // self cannot be zero
+    fn set_bit_neg(&mut self, index: u64) {
+        match *self {
+            Natural(Small(ref mut small)) => {
+                if index < Limb::WIDTH {
+                    small.wrapping_neg_assign();
+                    small.set_bit(index);
+                    small.wrapping_neg_assign();
+                }
+            }
+            Natural(Large(ref mut limbs)) => {
+                limbs_set_bit_neg(limbs, index);
+                self.trim()
+            }
+        }
+    }
+
+    // self cannot be zero
+    fn clear_bit_neg(&mut self, index: u64) {
+        match *self {
+            Natural(Small(ref mut small)) if index < Limb::WIDTH => {
+                let mut cleared_small = small.wrapping_neg();
+                cleared_small.clear_bit(index);
+                if cleared_small == 0 {
+                    *self = Natural(Large(vec![0, 1]));
+                } else {
+                    *small = cleared_small.wrapping_neg();
+                }
+            }
+            Natural(Small(_)) => {
+                let limbs = self.promote_in_place();
+                limbs_vec_clear_bit_neg(limbs, index);
+            }
+            Natural(Large(ref mut limbs)) => {
+                limbs_vec_clear_bit_neg(limbs, index);
+            }
+        }
+    }
+}
+
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
 /// coefficient of 2^<sup>`index`</sup> in its binary expansion.
 ///
@@ -366,55 +415,6 @@ impl BitAccess for Integer {
                 sign: false,
                 ref mut abs,
             } => abs.clear_bit_neg(index),
-        }
-    }
-}
-
-impl Natural {
-    // self cannot be zero
-    pub(crate) fn get_bit_neg(&self, index: u64) -> bool {
-        match *self {
-            Natural(Small(small)) => index >= Limb::WIDTH || small.wrapping_neg().get_bit(index),
-            Natural(Large(ref limbs)) => limbs_get_bit_neg(limbs, index),
-        }
-    }
-
-    // self cannot be zero
-    fn set_bit_neg(&mut self, index: u64) {
-        match *self {
-            Natural(Small(ref mut small)) => {
-                if index < Limb::WIDTH {
-                    small.wrapping_neg_assign();
-                    small.set_bit(index);
-                    small.wrapping_neg_assign();
-                }
-            }
-            Natural(Large(ref mut limbs)) => {
-                limbs_set_bit_neg(limbs, index);
-                self.trim()
-            }
-        }
-    }
-
-    // self cannot be zero
-    fn clear_bit_neg(&mut self, index: u64) {
-        match *self {
-            Natural(Small(ref mut small)) if index < Limb::WIDTH => {
-                let mut cleared_small = small.wrapping_neg();
-                cleared_small.clear_bit(index);
-                if cleared_small == 0 {
-                    *self = Natural(Large(vec![0, 1]));
-                } else {
-                    *small = cleared_small.wrapping_neg();
-                }
-            }
-            Natural(Small(_)) => {
-                let limbs = self.promote_in_place();
-                limbs_vec_clear_bit_neg(limbs, index);
-            }
-            Natural(Large(ref mut limbs)) => {
-                limbs_vec_clear_bit_neg(limbs, index);
-            }
         }
     }
 }

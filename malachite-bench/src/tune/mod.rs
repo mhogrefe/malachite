@@ -1,6 +1,5 @@
-use std::collections::{BTreeMap, HashMap};
-
 use stats::{mean, median};
+use std::collections::{BTreeMap, HashMap};
 use time::precise_time_ns;
 
 #[derive(Debug, PartialEq, Eq)]

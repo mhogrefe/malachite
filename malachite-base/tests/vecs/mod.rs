@@ -1,5 +1,3 @@
-extern crate malachite_base;
-
 use malachite_base::vecs::{vec_delete_left, vec_pad_left};
 
 #[test]

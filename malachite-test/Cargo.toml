@@ -32,5 +32,8 @@ version = "^1.2.0"
 default-features = false
 features = ["integer"]
 
+[dev-dependencies]
+malachite-base-test-util = { path = "../malachite-base-test-util" }
+
 [profile.release]
 lto = true

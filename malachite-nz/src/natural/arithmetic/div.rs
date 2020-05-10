@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
     DivRem, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ, XXAddYYIsZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{Iverson, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
@@ -931,11 +931,10 @@ fn _limbs_div_divide_and_conquer_approx_helper(
         };
         limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_lo);
         let ns_lo = &mut ns[..d_len];
-        carry = if limbs_sub_same_length_in_place_left(ns_lo, &scratch[..d_len]) {
-            1
-        } else {
-            0
-        };
+        carry = Limb::iverson(limbs_sub_same_length_in_place_left(
+            ns_lo,
+            &scratch[..d_len],
+        ));
         if highest_q && limbs_sub_same_length_in_place_left(&mut ns_lo[hi..], ds_lo) {
             carry += 1;
         }

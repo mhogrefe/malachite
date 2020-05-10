@@ -39,6 +39,15 @@ pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     sum
 }
 
+impl Natural {
+    fn count_zeros_neg(&self) -> u64 {
+        match *self {
+            Natural(Small(small)) => CountZeros::count_zeros(small.wrapping_neg()),
+            Natural(Large(ref limbs)) => limbs_count_zeros_neg(limbs),
+        }
+    }
+}
+
 impl Integer {
     /// Counts the number of zeros in the binary expansion of an `Integer`. If the `Integer` is
     /// non-negative, the number of zeros is infinite, so `None` is returned.
@@ -69,15 +78,6 @@ impl Integer {
             None
         } else {
             Some(self.abs.count_zeros_neg())
-        }
-    }
-}
-
-impl Natural {
-    fn count_zeros_neg(&self) -> u64 {
-        match *self {
-            Natural(Small(small)) => CountZeros::count_zeros(small.wrapping_neg()),
-            Natural(Large(ref limbs)) => limbs_count_zeros_neg(limbs),
         }
     }
 }

@@ -1,5 +1,3 @@
-extern crate malachite_base;
-
 use malachite_base::slices::{
     slice_leading_zeros, slice_move_left, slice_set_zero, slice_test_zero, slice_trailing_zeros,
 };

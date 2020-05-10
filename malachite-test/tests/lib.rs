@@ -1,5 +1,6 @@
 extern crate itertools;
 extern crate malachite_base;
+extern crate malachite_base_test_util;
 extern crate malachite_nz;
 extern crate malachite_test;
 extern crate num;
@@ -36,6 +37,8 @@ pub mod base {
             pub mod mod_power_of_two_is_reduced;
             pub mod mod_power_of_two_mul;
             pub mod mod_power_of_two_neg;
+            pub mod mod_power_of_two_shl;
+            pub mod mod_power_of_two_shr;
             pub mod mod_power_of_two_sub;
             pub mod mod_sub;
             pub mod neg;
@@ -77,6 +80,7 @@ pub mod base {
 
         pub mod basic {
             pub mod crement;
+            pub mod iverson;
         }
 
         pub mod conversion {
@@ -122,7 +126,6 @@ pub mod base {
         pub mod from_str;
         pub mod hash;
         pub mod neg;
-        pub mod size;
     }
 
     pub mod slices {

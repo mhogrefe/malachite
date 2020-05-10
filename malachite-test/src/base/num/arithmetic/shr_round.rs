@@ -429,8 +429,12 @@ macro_rules! shr_round_u_u {
             for (mut n, u, rm) in
                 triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm).take(limit)
             {
+                let old_n = n;
                 n.shr_round_assign(u, rm);
-                println!("x := {}; x.shr_round_assign({}, {}); x = {}", n, u, rm, n);
+                println!(
+                    "x := {}; x.shr_round_assign({}, {}); x = {}",
+                    old_n, u, rm, n
+                );
             }
         }
 
@@ -692,8 +696,12 @@ macro_rules! shr_round_u_i {
             for (mut n, i, rm) in
                 triples_of_unsigned_small_signed_and_rounding_mode_var_1::<$t, $u>(gm).take(limit)
             {
+                let old_n = n;
                 n.shr_round_assign(i, rm);
-                println!("x := {}; x.shr_round_assign({}, {}); x = {}", n, i, rm, n);
+                println!(
+                    "x := {}; x.shr_round_assign({}, {}); x = {}",
+                    old_n, i, rm, n
+                );
             }
         }
 
@@ -955,8 +963,12 @@ macro_rules! shr_round_i_u {
             for (mut n, u, rm) in
                 triples_of_signed_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm).take(limit)
             {
+                let old_n = n;
                 n.shr_round_assign(u, rm);
-                println!("x := {}; x.shr_round_assign({}, {}); x = {}", n, u, rm, n);
+                println!(
+                    "x := {}; x.shr_round_assign({}, {}); x = {}",
+                    old_n, u, rm, n
+                );
             }
         }
 
@@ -1218,8 +1230,12 @@ macro_rules! shr_round_i_i {
             for (mut n, i, rm) in
                 triples_of_signed_small_signed_and_rounding_mode_var_1::<$t, $u>(gm).take(limit)
             {
+                let old_n = n;
                 n.shr_round_assign(i, rm);
-                println!("x := {}; x.shr_round_assign({}, {}); x = {}", n, i, rm, n);
+                println!(
+                    "x := {}; x.shr_round_assign({}, {}); x = {}",
+                    old_n, i, rm, n
+                );
             }
         }
 

@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 
@@ -38,11 +39,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     split_into_chunks!(poly, n, n_high, [poly_0, poly_1, poly_2], poly_3);
     assert!(n_high <= n);
 
-    v_1[n] = if limbs_add_same_length_to_out(v_1, poly_0, poly_2) {
-        1
-    } else {
-        0
-    };
+    v_1[n] = Limb::iverson(limbs_add_same_length_to_out(v_1, poly_0, poly_2));
     scratch[n] = if limbs_add_to_out(scratch, poly_1, poly_3) {
         1
     } else {
@@ -92,11 +89,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
         }
         if n_high < n {
             scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
-            *scratch_last = if _limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1) {
-                1
-            } else {
-                0
-            };
+            *scratch_last =
+                Limb::iverson(_limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
         } else {
             *scratch_last = limbs_shl_to_out(scratch_init, poly_3, 2);
             if limbs_slice_add_same_length_in_place_left(scratch_init, poly_1) {
@@ -156,11 +150,11 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
         assert!(!limbs_slice_add_greater_in_place_left(v_1, coefficients[i]));
         i += 2;
     }
-    scratch[n] = if limbs_add_same_length_to_out(scratch, coefficients[1], coefficients[3]) {
-        1
-    } else {
-        0
-    };
+    scratch[n] = Limb::iverson(limbs_add_same_length_to_out(
+        scratch,
+        coefficients[1],
+        coefficients[3],
+    ));
     let mut i = 5;
     while i < degree {
         assert!(!limbs_slice_add_greater_in_place_left(

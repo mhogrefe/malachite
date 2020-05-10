@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
@@ -365,11 +365,10 @@ fn _limbs_mod_divide_and_conquer_helper(
         let qs_hi = &mut qs_hi[..hi];
         limbs_mul_greater_to_out(scratch, qs_hi, ds_lo);
         let ns_lo = &mut ns[..n + lo];
-        let mut carry = if limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], &scratch[..n]) {
-            1
-        } else {
-            0
-        };
+        let mut carry = Limb::iverson(limbs_sub_same_length_in_place_left(
+            &mut ns_lo[lo..],
+            &scratch[..n],
+        ));
         if highest_q && limbs_sub_same_length_in_place_left(&mut ns_lo[n..], ds_lo) {
             carry += 1;
         }
@@ -507,11 +506,8 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
                 if q_len_mod_d_len != d_len {
                     limbs_mul_to_out(&mut scratch, qs, ds_lo);
                     let ns = &mut ns[q_len - q_len_mod_d_len..n_len - q_len_mod_d_len];
-                    let mut carry = if limbs_sub_same_length_in_place_left(ns, &scratch) {
-                        1
-                    } else {
-                        0
-                    };
+                    let mut carry =
+                        Limb::iverson(limbs_sub_same_length_in_place_left(ns, &scratch));
                     if highest_q
                         && limbs_sub_same_length_in_place_left(&mut ns[q_len_mod_d_len..], ds_lo)
                     {
@@ -738,13 +734,9 @@ fn _limbs_mod_barrett_large_helper(
     // The product is d_len - 1 limbs long.
     limbs_mul_to_out(scratch, ds_lo, qs);
     let (scratch_last, scratch_init) = scratch[..d_len].split_last_mut().unwrap();
-    *scratch_last = if highest_q
-        && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo)
-    {
-        1
-    } else {
-        0
-    };
+    *scratch_last = Limb::iverson(
+        highest_q && limbs_slice_add_same_length_in_place_left(&mut scratch_init[q_len..], ds_lo),
+    );
     let (scratch_lo, scratch_hi) = scratch.split_at(n);
     let scratch_hi = &scratch_hi[..q_len_plus_one];
     if _limbs_sub_same_length_with_borrow_in_in_place_left(

@@ -1,4 +1,5 @@
 extern crate malachite_base;
+extern crate malachite_base_test_util;
 
 pub mod bools;
 pub mod chars;
@@ -21,6 +22,8 @@ pub mod num {
         pub mod mod_power_of_two_is_reduced;
         pub mod mod_power_of_two_mul;
         pub mod mod_power_of_two_neg;
+        pub mod mod_power_of_two_shl;
+        pub mod mod_power_of_two_shr;
         pub mod mod_power_of_two_sub;
         pub mod mod_sub;
         pub mod neg;
@@ -62,6 +65,7 @@ pub mod num {
     pub mod basic {
         pub mod constants;
         pub mod crement;
+        pub mod iverson;
     }
     pub mod comparison;
     pub mod conversion;
@@ -84,3 +88,4 @@ pub mod num {
 pub mod round;
 pub mod slices;
 pub mod strings;
+pub mod vecs;

@@ -2,10 +2,14 @@
 cd malachite-base &&
 cargo update &&
 cargo fmt &&
-cargo clippy
+cargo clippy &&
 cargo test --release &&
 cargo doc &&
 cargo build --release --target wasm32-unknown-unknown &&
+cd ../malachite-base-test-util &&
+cargo update &&
+cargo fmt &&
+cargo clippy &&
 cd ../malachite-nz &&
 cargo update &&
 cargo fmt &&

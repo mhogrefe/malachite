@@ -309,6 +309,27 @@ impl<'a> Index<u64> for IntegerBitIterator<'a> {
     }
 }
 
+impl Natural {
+    /// Returns a double-ended iterator over the two's complement bits of the negative of a
+    /// `Natural`. The forward order is ascending, so that less significant bits appear first. There
+    /// may be at most one trailing `true` bit going forward, or leading `true` bit going backward.
+    /// The `Natural` cannot be zero.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    fn negative_bits(&self) -> NegativeBitIterator {
+        assert_ne!(*self, 0, "Cannot get negative bits of 0.");
+        let bits = self.bits();
+        NegativeBitIterator {
+            bits,
+            first_true_index: None,
+            i: 0,
+            j: bits.significant_bits - 1,
+        }
+    }
+}
+
 impl<'a> BitIterable for &'a Integer {
     type BitIterator = IntegerBitIterator<'a>;
 
@@ -355,27 +376,6 @@ impl<'a> BitIterable for &'a Integer {
             IntegerBitIterator::Positive(self.abs.bits(), false)
         } else {
             IntegerBitIterator::Negative(self.abs.negative_bits(), false)
-        }
-    }
-}
-
-impl Natural {
-    /// Returns a double-ended iterator over the two's complement bits of the negative of a
-    /// `Natural`. The forward order is ascending, so that less significant bits appear first. There
-    /// may be at most one trailing `true` bit going forward, or leading `true` bit going backward.
-    /// The `Natural` cannot be zero.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    fn negative_bits(&self) -> NegativeBitIterator {
-        assert_ne!(*self, 0, "Cannot get negative bits of 0.");
-        let bits = self.bits();
-        NegativeBitIterator {
-            bits,
-            first_true_index: None,
-            i: 0,
-            j: bits.significant_bits - 1,
         }
     }
 }

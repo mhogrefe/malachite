@@ -283,8 +283,6 @@ impl AddAssign<Integer> for Integer {
     }
 }
 
-//TODO refactor matches
-
 impl<'a> AddAssign<&'a Integer> for Integer {
     /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the RHS by reference.
     ///

@@ -10,6 +10,174 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+impl Natural {
+    // self - b * c, returns sign (true means non-negative)
+    fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
+        match (self, b, c) {
+            (x, natural_zero!(), _) | (x, _, 0) => (x.clone(), true),
+            (x, y, 1) if x >= y => (x - y, true),
+            (x, y, 1) => (y - x, false),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
+                let (out_limbs, sign) = limbs_overflowing_sub_mul_limb(xs, ys, z);
+                (Natural::from_owned_limbs_asc(out_limbs), sign)
+            }
+            (x, y, z) => {
+                let yz = y * Natural::from(z);
+                if *x >= yz {
+                    (x - yz, true)
+                } else {
+                    (yz - x, false)
+                }
+            }
+        }
+    }
+
+    // self -= b * c, returns sign (true means non-negative)
+    fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
+        match (&mut *self, &mut b, c) {
+            (_, &mut natural_zero!(), _) | (_, _, 0) => true,
+            (x, y, 1) if *x >= *y => {
+                self.sub_assign_no_panic(b);
+                true
+            }
+            (x, y, 1) => {
+                x.sub_right_assign_no_panic(&*y);
+                false
+            }
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
+                let (right, sign) = limbs_overflowing_sub_mul_limb_in_place_either(xs, ys, z);
+                if right {
+                    b.trim();
+                    *self = b;
+                } else {
+                    self.trim();
+                }
+                sign
+            }
+            (x, _, z) => {
+                let yz = b * Natural(Small(z));
+                let sign = *x >= yz;
+                if sign {
+                    x.sub_assign_no_panic(yz);
+                } else {
+                    x.sub_right_assign_no_panic(&yz);
+                }
+                sign
+            }
+        }
+    }
+
+    // self -= &b * c, returns sign (true means non-negative)
+    fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
+        match (&mut *self, b, c) {
+            (_, &natural_zero!(), _) | (_, _, 0) => true,
+            (x, y, 1) if *x >= *y => {
+                self.sub_assign_ref_no_panic(y);
+                true
+            }
+            (x, y, 1) => {
+                x.sub_right_assign_no_panic(y);
+                false
+            }
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
+                let sign = limbs_overflowing_sub_mul_limb_in_place_left(xs, ys, z);
+                self.trim();
+                sign
+            }
+            (x, _, z) => {
+                let yz = b * Natural(Small(z));
+                let sign = *x >= yz;
+                if sign {
+                    x.sub_assign_no_panic(yz);
+                } else {
+                    x.sub_right_assign_no_panic(&yz);
+                }
+                sign
+            }
+        }
+    }
+
+    // self - &b * c, returns sign (true means non-negative)
+    pub(crate) fn add_mul_neg(&self, b: &Natural, c: &Natural) -> (Natural, bool) {
+        match (self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_limb_neg(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_limb_neg(y, z),
+            (&Natural(Small(x)), y, z) => ((y * z).sub_limb(x), false),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                let (out_limbs, sign) = limbs_overflowing_sub_mul(xs, ys, zs);
+                (Natural::from_owned_limbs_asc(out_limbs), sign)
+            }
+        }
+    }
+
+    fn add_mul_assign_neg_large(&mut self, ys: &[Limb], zs: &[Limb]) -> bool {
+        let xs = self.promote_in_place();
+        let sign = limbs_overflowing_sub_mul_in_place_left(xs, ys, zs);
+        self.trim();
+        sign
+    }
+
+    // self -= b * c, returns sign (true means non-negative)
+    fn add_mul_assign_neg(&mut self, b: Natural, c: Natural) -> bool {
+        match (&mut *self, b, c) {
+            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
+            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
+        }
+    }
+
+    // self -= b * &c, returns sign (true means non-negative)
+    fn add_mul_assign_neg_val_ref(&mut self, b: Natural, c: &Natural) -> bool {
+        match (&mut *self, b, c) {
+            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
+        }
+    }
+
+    // self -= &b * c, returns sign (true means non-negative)
+    fn add_mul_assign_neg_ref_val(&mut self, b: &Natural, c: Natural) -> bool {
+        match (&mut *self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
+            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, &Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
+        }
+    }
+
+    // self -= &b * &c, returns sign (true means non-negative)
+    fn add_mul_assign_neg_ref_ref(&mut self, b: &Natural, c: &Natural) -> bool {
+        match (&mut *self, b, c) {
+            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
+            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
+            (&mut natural_zero!(), y, z) => {
+                *self = y * z;
+                false
+            }
+            (_, &Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
+                self.add_mul_assign_neg_large(ys, zs)
+            }
+        }
+    }
+}
+
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
@@ -323,174 +491,6 @@ impl<'a, 'b> AddMulAssign<&'a Integer, &'b Integer> for Integer {
         } else {
             let sign = self.abs.add_mul_assign_neg_ref_ref(&y.abs, &z.abs);
             self.sign = (self.sign == sign) || self.abs == 0;
-        }
-    }
-}
-
-impl Natural {
-    // self - b * c, returns sign (true means non-negative)
-    fn add_mul_limb_neg(&self, b: &Natural, c: Limb) -> (Natural, bool) {
-        match (self, b, c) {
-            (x, natural_zero!(), _) | (x, _, 0) => (x.clone(), true),
-            (x, y, 1) if x >= y => (x - y, true),
-            (x, y, 1) => (y - x, false),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
-                let (out_limbs, sign) = limbs_overflowing_sub_mul_limb(xs, ys, z);
-                (Natural::from_owned_limbs_asc(out_limbs), sign)
-            }
-            (x, y, z) => {
-                let yz = y * Natural::from(z);
-                if *x >= yz {
-                    (x - yz, true)
-                } else {
-                    (yz - x, false)
-                }
-            }
-        }
-    }
-
-    // self -= b * c, returns sign (true means non-negative)
-    fn add_mul_assign_limb_neg(&mut self, mut b: Natural, c: Limb) -> bool {
-        match (&mut *self, &mut b, c) {
-            (_, &mut natural_zero!(), _) | (_, _, 0) => true,
-            (x, y, 1) if *x >= *y => {
-                self.sub_assign_no_panic(b);
-                true
-            }
-            (x, y, 1) => {
-                x.sub_right_assign_no_panic(&*y);
-                false
-            }
-            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
-                let (right, sign) = limbs_overflowing_sub_mul_limb_in_place_either(xs, ys, z);
-                if right {
-                    b.trim();
-                    *self = b;
-                } else {
-                    self.trim();
-                }
-                sign
-            }
-            (x, _, z) => {
-                let yz = b * Natural(Small(z));
-                let sign = *x >= yz;
-                if sign {
-                    x.sub_assign_no_panic(yz);
-                } else {
-                    x.sub_right_assign_no_panic(&yz);
-                }
-                sign
-            }
-        }
-    }
-
-    // self -= &b * c, returns sign (true means non-negative)
-    fn add_mul_assign_limb_neg_ref(&mut self, b: &Natural, c: Limb) -> bool {
-        match (&mut *self, b, c) {
-            (_, &natural_zero!(), _) | (_, _, 0) => true,
-            (x, y, 1) if *x >= *y => {
-                self.sub_assign_ref_no_panic(y);
-                true
-            }
-            (x, y, 1) => {
-                x.sub_right_assign_no_panic(y);
-                false
-            }
-            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
-                let sign = limbs_overflowing_sub_mul_limb_in_place_left(xs, ys, z);
-                self.trim();
-                sign
-            }
-            (x, _, z) => {
-                let yz = b * Natural(Small(z));
-                let sign = *x >= yz;
-                if sign {
-                    x.sub_assign_no_panic(yz);
-                } else {
-                    x.sub_right_assign_no_panic(&yz);
-                }
-                sign
-            }
-        }
-    }
-
-    // self - &b * c, returns sign (true means non-negative)
-    pub(crate) fn add_mul_neg(&self, b: &Natural, c: &Natural) -> (Natural, bool) {
-        match (self, b, c) {
-            (x, &Natural(Small(y)), z) => x.add_mul_limb_neg(z, y),
-            (x, y, &Natural(Small(z))) => x.add_mul_limb_neg(y, z),
-            (&Natural(Small(x)), y, z) => ((y * z).sub_limb(x), false),
-            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                let (out_limbs, sign) = limbs_overflowing_sub_mul(xs, ys, zs);
-                (Natural::from_owned_limbs_asc(out_limbs), sign)
-            }
-        }
-    }
-
-    fn add_mul_assign_neg_large(&mut self, ys: &[Limb], zs: &[Limb]) -> bool {
-        let xs = self.promote_in_place();
-        let sign = limbs_overflowing_sub_mul_in_place_left(xs, ys, zs);
-        self.trim();
-        sign
-    }
-
-    // self -= b * c, returns sign (true means non-negative)
-    fn add_mul_assign_neg(&mut self, b: Natural, c: Natural) -> bool {
-        match (&mut *self, b, c) {
-            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
-            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
-            (&mut natural_zero!(), y, z) => {
-                *self = y * z;
-                false
-            }
-            (_, Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
-        }
-    }
-
-    // self -= b * &c, returns sign (true means non-negative)
-    fn add_mul_assign_neg_val_ref(&mut self, b: Natural, c: &Natural) -> bool {
-        match (&mut *self, b, c) {
-            (x, Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
-            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg(y, z),
-            (&mut natural_zero!(), y, z) => {
-                *self = y * z;
-                false
-            }
-            (_, Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
-        }
-    }
-
-    // self -= &b * c, returns sign (true means non-negative)
-    fn add_mul_assign_neg_ref_val(&mut self, b: &Natural, c: Natural) -> bool {
-        match (&mut *self, b, c) {
-            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg(z, y),
-            (x, y, Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
-            (&mut natural_zero!(), y, z) => {
-                *self = y * z;
-                false
-            }
-            (_, &Natural(Large(ref ys)), Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
-        }
-    }
-
-    // self -= &b * &c, returns sign (true means non-negative)
-    fn add_mul_assign_neg_ref_ref(&mut self, b: &Natural, c: &Natural) -> bool {
-        match (&mut *self, b, c) {
-            (x, &Natural(Small(y)), z) => x.add_mul_assign_limb_neg_ref(z, y),
-            (x, y, &Natural(Small(z))) => x.add_mul_assign_limb_neg_ref(y, z),
-            (&mut natural_zero!(), y, z) => {
-                *self = y * z;
-                false
-            }
-            (_, &Natural(Large(ref ys)), &Natural(Large(ref zs))) => {
-                self.add_mul_assign_neg_large(ys, zs)
-            }
         }
     }
 }

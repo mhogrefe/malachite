@@ -4,6 +4,7 @@ use num::arithmetic::traits::{
     ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPowerOfTwo,
     ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
     ModPowerOfTwoMul, ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign,
+    ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
     ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
     NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
@@ -49,6 +50,39 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoMulAssign<Self>
     + ModPowerOfTwoNeg<Output = Self>
     + ModPowerOfTwoNegAssign
+    + ModPowerOfTwoShl<i8, Output = Self>
+    + ModPowerOfTwoShl<i16, Output = Self>
+    + ModPowerOfTwoShl<i32, Output = Self>
+    + ModPowerOfTwoShl<i64, Output = Self>
+    + ModPowerOfTwoShl<i128, Output = Self>
+    + ModPowerOfTwoShl<u8, Output = Self>
+    + ModPowerOfTwoShl<u16, Output = Self>
+    + ModPowerOfTwoShl<u32, Output = Self>
+    + ModPowerOfTwoShl<u64, Output = Self>
+    + ModPowerOfTwoShl<u128, Output = Self>
+    + ModPowerOfTwoShlAssign<u8>
+    + ModPowerOfTwoShlAssign<u16>
+    + ModPowerOfTwoShlAssign<u32>
+    + ModPowerOfTwoShlAssign<u64>
+    + ModPowerOfTwoShlAssign<u128>
+    + ModPowerOfTwoShlAssign<usize>
+    + ModPowerOfTwoShlAssign<i8>
+    + ModPowerOfTwoShlAssign<i16>
+    + ModPowerOfTwoShlAssign<i32>
+    + ModPowerOfTwoShlAssign<i64>
+    + ModPowerOfTwoShlAssign<i128>
+    + ModPowerOfTwoShlAssign<isize>
+    + ModPowerOfTwoShr<i8, Output = Self>
+    + ModPowerOfTwoShr<i16, Output = Self>
+    + ModPowerOfTwoShr<i32, Output = Self>
+    + ModPowerOfTwoShr<i64, Output = Self>
+    + ModPowerOfTwoShr<i128, Output = Self>
+    + ModPowerOfTwoShrAssign<i8>
+    + ModPowerOfTwoShrAssign<i16>
+    + ModPowerOfTwoShrAssign<i32>
+    + ModPowerOfTwoShrAssign<i64>
+    + ModPowerOfTwoShrAssign<i128>
+    + ModPowerOfTwoShrAssign<isize>
     + ModPowerOfTwoSub<Self, Output = Self>
     + ModPowerOfTwoSubAssign<Self>
     + ModSub<Self, Self, Output = Self>

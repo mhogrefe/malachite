@@ -1,7 +1,6 @@
-use std::collections::{BTreeMap, HashMap};
-
 use gnuplot::{AxesCommon, Caption, Color, Figure};
 use stats::{mean, median};
+use std::collections::{BTreeMap, HashMap};
 use time::precise_time_ns;
 
 fn escape_label_string(s: &str) -> String {

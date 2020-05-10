@@ -224,19 +224,23 @@ macro_rules! shl_round_u_i {
         $benchmark_shl_round:ident
     ) => {
         fn $demo_shl_round_assign(gm: GenerationMode, limit: usize) {
-            for (mut n, u, rm) in
+            for (mut n, i, rm) in
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm).take(limit)
             {
-                n.shl_round_assign(u, rm);
-                println!("x := {}; x.shl_round_assign({}, {}); x = {}", n, u, rm, n);
+                let old_n = n;
+                n.shl_round_assign(i, rm);
+                println!(
+                    "x := {}; x.shl_round_assign({}, {}); x = {}",
+                    old_n, i, rm, n
+                );
             }
         }
 
         fn $demo_shl_round(gm: GenerationMode, limit: usize) {
-            for (n, u, rm) in
+            for (n, i, rm) in
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm).take(limit)
             {
-                println!("{}.shl_round({}, {}) = {}", n, u, rm, n.shl_round(u, rm));
+                println!("{}.shl_round({}, {}) = {}", n, i, rm, n.shl_round(i, rm));
             }
         }
 
@@ -487,19 +491,23 @@ macro_rules! shl_round_i_i {
         $benchmark_shl_round:ident
     ) => {
         fn $demo_shl_round_assign(gm: GenerationMode, limit: usize) {
-            for (mut n, u, rm) in
+            for (mut n, i, rm) in
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm).take(limit)
             {
-                n.shl_round_assign(u, rm);
-                println!("x := {}; x.shl_round_assign({}, {}); x = {}", n, u, rm, n);
+                let old_n = n;
+                n.shl_round_assign(i, rm);
+                println!(
+                    "x := {}; x.shl_round_assign({}, {}); x = {}",
+                    old_n, i, rm, n
+                );
             }
         }
 
         fn $demo_shl_round(gm: GenerationMode, limit: usize) {
-            for (n, u, rm) in
+            for (n, i, rm) in
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm).take(limit)
             {
-                println!("({}).shl_round({}, {}) = {}", n, u, rm, n.shl_round(u, rm));
+                println!("({}).shl_round({}, {}) = {}", n, i, rm, n.shl_round(i, rm));
             }
         }
 

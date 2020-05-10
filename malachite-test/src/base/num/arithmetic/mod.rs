@@ -15,6 +15,8 @@ pub mod mod_power_of_two_add;
 pub mod mod_power_of_two_is_reduced;
 pub mod mod_power_of_two_mul;
 pub mod mod_power_of_two_neg;
+pub mod mod_power_of_two_shl;
+pub mod mod_power_of_two_shr;
 pub mod mod_power_of_two_sub;
 pub mod mod_sub;
 pub mod neg;
@@ -69,6 +71,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_power_of_two_is_reduced::register(registry);
     mod_power_of_two_mul::register(registry);
     mod_power_of_two_neg::register(registry);
+    mod_power_of_two_shl::register(registry);
+    mod_power_of_two_shr::register(registry);
     mod_power_of_two_sub::register(registry);
     mod_sub::register(registry);
     neg::register(registry);

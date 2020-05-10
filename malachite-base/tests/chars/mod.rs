@@ -1,5 +1,3 @@
-extern crate malachite_base;
-
 use std::{char, u32};
 
 use malachite_base::chars::{

@@ -994,6 +994,28 @@ pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + Sampl
     }
 }
 
+// All pairs of unsigned `T` and `u64`, where the `u64` is between 0 and `U::WIDTH`, inclusive.
+pub fn pairs_of_unsigned_and_small_u64_var_3<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(T, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_unsigned(),
+            range_down_increasing(U::WIDTH),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_range_down(seed, U::WIDTH)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| random_range_down(seed, U::WIDTH)),
+        )),
+    }
+}
+
 pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(usize, T)> {
@@ -1171,6 +1193,32 @@ where
         pairs_of_signed_and_small_unsigned::<T, U>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
+}
+
+// All pairs of signed `T` and `u64`, where the `u64` is between 0 and `U::WIDTH`, inclusive.
+pub fn pairs_of_signed_and_small_u64_var_1<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(T, u64)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_signed(),
+            range_down_increasing(U::WIDTH),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_range_down(seed, U::WIDTH)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| random_range_down(seed, U::WIDTH)),
+        )),
+    }
 }
 
 pub fn pairs_of_signed_and_small_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned>(
@@ -1359,6 +1407,35 @@ pub fn triples_of_unsigned_small_u64_and_small_u64_var_1<
             &(|seed| random_range(seed, 1, U::WIDTH)),
             &(|seed| u32s_geometric(seed, scale).map(u64::from)),
         )),
+    }
+}
+
+// All triples of `T`, `U` and `u64`, where `T` and `U` are unsigned and the `u64` is between the
+// number of significant_bits of the first `T` and `T::WIDTH`, inclusive.
+pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_3<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+    U: PrimitiveUnsigned,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, U, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(dependent_pairs(
+            sqrt_pairs_of_unsigneds(),
+            |&(x, _): &(T, _)| Box::new(range_increasing(x.significant_bits(), T::WIDTH)),
+        ))),
+        NoSpecialGenerationMode::Random(scale) => {
+            reshape_2_1_to_3(permute_2_1(Box::new(random_dependent_pairs(
+                scale,
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |&scale, &pow| {
+                    Box::new(random_pairs(
+                        &scramble(&EXAMPLE_SEED, "u"),
+                        &(|seed| random_range::<T>(seed, T::ZERO, T::low_mask(pow))),
+                        &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+                    ))
+                },
+            ))))
+        }
     }
 }
 
@@ -5069,8 +5146,8 @@ pub fn triples_of_limb_limb_vec_and_u64_var_1(gm: GenerationMode) -> It<(Limb, V
     ))
 }
 
-// All triples of `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between the number of
-// n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the two `T`s.
+// All triples of `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between n and
+// `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the two `T`s.
 pub fn triples_of_unsigned_unsigned_and_small_u64_var_1<
     T: PrimitiveUnsigned + Rand + SampleRange,
 >(
@@ -5508,9 +5585,8 @@ pub fn triples_of_limb_vec_limb_and_limb_vec_var_5(
     )
 }
 
-// All quadruples of `T`, `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between the
-// number of n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the
-// three `T`s.
+// All quadruples of `T`, `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between n and
+// `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the three `T`s.
 pub fn quadruples_of_three_unsigneds_and_small_u64_var_1<
     T: PrimitiveUnsigned + Rand + SampleRange,
 >(
@@ -5905,6 +5981,35 @@ pub fn triples_of_unsigned_small_u64_and_rounding_mode_var_2<T: PrimitiveUnsigne
             },
         ),
     )
+}
+
+// All triples of `T`, `U` and `u64`, where `T` is unsigned, `U` is signed, and the `u64` is between
+// the number of significant_bits of the first `T` and `T::WIDTH`, inclusive.
+pub fn triples_of_unsigned_small_signed_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+    U: PrimitiveSigned,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, U, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(dependent_pairs(
+            sqrt_pairs_of_unsigned_and_signed(),
+            |&(x, _): &(T, _)| Box::new(range_increasing(x.significant_bits(), T::WIDTH)),
+        ))),
+        NoSpecialGenerationMode::Random(scale) => {
+            reshape_2_1_to_3(permute_2_1(Box::new(random_dependent_pairs(
+                scale,
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |&scale, &pow| {
+                    Box::new(random_pairs(
+                        &scramble(&EXAMPLE_SEED, "u"),
+                        &(|seed| random_range::<T>(seed, T::ZERO, T::low_mask(pow))),
+                        &(|seed| i32s_geometric(seed, scale).flat_map(U::checked_from)),
+                    ))
+                },
+            ))))
+        }
+    }
 }
 
 fn triples_of_unsigned_small_signed_and_rounding_mode<

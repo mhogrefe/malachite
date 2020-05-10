@@ -5,6 +5,7 @@ use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::round::RoundingMode;
 
 use natural::Natural;
@@ -61,13 +62,9 @@ pub fn limbs_limb_div_round_limbs(limb: Limb, xs: &[Limb], rm: RoundingMode) -> 
             RoundingMode::Up | RoundingMode::Ceiling => Some(1),
             RoundingMode::Exact => None,
             // 1 if 2 * limb > Natural::from_limbs_asc(limbs); otherwise, 0
-            RoundingMode::Nearest => Some(
-                if xs.len() == 2 && xs[1] == 1 && limb.get_highest_bit() && (limb << 1) > xs[0] {
-                    1
-                } else {
-                    0
-                },
-            ),
+            RoundingMode::Nearest => Some(Limb::iverson(
+                xs.len() == 2 && xs[1] == 1 && limb.get_highest_bit() && (limb << 1) > xs[0],
+            )),
         }
     }
 }

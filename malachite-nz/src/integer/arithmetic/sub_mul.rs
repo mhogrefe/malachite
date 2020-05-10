@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::slices::slice_test_zero;
 
 use integer::Integer;
@@ -143,11 +144,7 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
     let mut borrow = limbs_sub_mul_limb_same_length_in_place_left(xs_lo, ys, z);
     // If xs bigger than ys, then propagate borrow through it.
     if xs_len != ys_len {
-        borrow = if limbs_sub_limb_in_place(xs_hi, borrow) {
-            1
-        } else {
-            0
-        };
+        borrow = Limb::iverson(limbs_sub_limb_in_place(xs_hi, borrow));
     }
     if borrow == 0 {
         true
@@ -208,11 +205,7 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_right(
         let mut borrow = limbs_sub_mul_limb_same_length_in_place_right(xs_lo, ys_lo, z);
         // If xs bigger than ys, then propagate borrow through it.
         if xs_len != ys_len {
-            borrow = if limbs_sub_limb_to_out(ys_hi, xs_hi, borrow) {
-                1
-            } else {
-                0
-            };
+            borrow = Limb::iverson(limbs_sub_limb_to_out(ys_hi, xs_hi, borrow));
         }
         if borrow == 0 {
             true

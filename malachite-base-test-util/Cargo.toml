@@ -1,0 +1,11 @@
+[package]
+name = "malachite-base-test-util"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+malachite-base = { path = "../malachite-base" }
+
+[profile.release]
+lto = true
