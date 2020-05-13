@@ -253,7 +253,7 @@ impl Natural {
         } else if let Natural(Small(y)) = other {
             self.sub_assign_limb_no_panic(y)
         } else {
-            match (&mut (*self), other) {
+            match (&mut *self, other) {
                 (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                     if limbs_sub_in_place_left(xs, ys) {
                         return true;
@@ -278,7 +278,7 @@ impl Natural {
         } else if let Natural(Small(y)) = *other {
             self.sub_assign_limb_no_panic(y)
         } else {
-            match (&mut (*self), other) {
+            match (&mut *self, other) {
                 (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     if limbs_sub_in_place_left(xs, ys) {
                         return true;
@@ -306,7 +306,7 @@ impl Natural {
                 true
             }
         } else {
-            match (&mut (*self), other) {
+            match (&mut *self, other) {
                 (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                     if limbs_vec_sub_in_place_right(ys, xs) {
                         return true;

@@ -22,7 +22,7 @@ use rug;
 use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
-    dependent_pairs, exhaustive_dependent_pairs_infinite_log,
+    dependent_pairs, exhaustive_dependent_pairs_infinite, exhaustive_dependent_pairs_infinite_log,
     exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
 };
 use rust_wheels::iterators::general::{random, range_increasing};
@@ -1015,6 +1015,112 @@ pub fn triples_of_natural_small_u64_and_bool(gm: GenerationMode) -> It<(Natural,
             &(|seed| random(seed)),
         )),
     }
+}
+
+// All triples of `Natural`, `T` and `u64`, where `T` is unsigned and the `u64` is greater than or
+// equal to the number of significant bits of the `Natural`.
+pub fn triples_of_natural_small_unsigned_and_u64_var_1<T: PrimitiveUnsigned>(
+    gm: GenerationMode,
+) -> It<(Natural, T, u64)> {
+    let ps: It<(u64, (Natural, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_dependent_pairs_infinite((), exhaustive_unsigned(), |_, &pow| {
+                Box::new(
+                    sqrt_pairs(
+                        range_increasing(Natural::ZERO, Natural::low_mask(pow)),
+                        exhaustive_unsigned(),
+                    )
+                    .map(Option::Some)
+                    .chain(repeat(None)),
+                )
+            })
+            .flat_map(|(pow, p)| {
+                if let Some(p) = p {
+                    Some((pow, p))
+                } else {
+                    None
+                }
+            }),
+        ),
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            scale,
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |&scale, &pow| {
+                random_pairs(
+                    &scramble(&EXAMPLE_SEED, "n and u"),
+                    &(|seed| random_range_natural(seed, Natural::ZERO, Natural::low_mask(pow))),
+                    &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+                )
+            },
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            scale,
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |&scale, &pow| {
+                random_pairs(
+                    &scramble(&EXAMPLE_SEED, "n and u"),
+                    &(|seed| {
+                        special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(pow))
+                    }),
+                    &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+                )
+            },
+        )),
+    };
+    reshape_2_1_to_3(permute_2_1(ps))
+}
+
+// All triples of `Natural`, `T` and `u64`, where `T` is signed and the `u64` is greater than or
+// equal to the number of significant bits of the `Natural`.
+pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
+    gm: GenerationMode,
+) -> It<(Natural, T, u64)> {
+    let ps: It<(u64, (Natural, T))> = match gm {
+        GenerationMode::Exhaustive => Box::new(
+            exhaustive_dependent_pairs_infinite((), exhaustive_unsigned(), |_, &pow| {
+                Box::new(
+                    sqrt_pairs(
+                        range_increasing(Natural::ZERO, Natural::low_mask(pow)),
+                        exhaustive_signed(),
+                    )
+                    .map(Option::Some)
+                    .chain(repeat(None)),
+                )
+            })
+            .flat_map(|(pow, p)| {
+                if let Some(p) = p {
+                    Some((pow, p))
+                } else {
+                    None
+                }
+            }),
+        ),
+        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
+            scale,
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |&scale, &pow| {
+                random_pairs(
+                    &scramble(&EXAMPLE_SEED, "n and u"),
+                    &(|seed| random_range_natural(seed, Natural::ZERO, Natural::low_mask(pow))),
+                    &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
+                )
+            },
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
+            scale,
+            u32s_geometric(&scramble(&EXAMPLE_SEED, "pow"), scale).map(u64::from),
+            |&scale, &pow| {
+                random_pairs(
+                    &scramble(&EXAMPLE_SEED, "n and u"),
+                    &(|seed| {
+                        special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(pow))
+                    }),
+                    &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
+                )
+            },
+        )),
+    };
+    reshape_2_1_to_3(permute_2_1(ps))
 }
 
 pub(crate) fn rm_triples_of_natural_small_u64_and_bool(

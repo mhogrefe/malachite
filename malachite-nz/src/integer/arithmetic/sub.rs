@@ -237,7 +237,7 @@ impl SubAssign<Integer> for Integer {
     /// assert_eq!(x.to_string(), "-2000000000000");
     /// ```
     fn sub_assign(&mut self, mut other: Integer) {
-        match (&mut (*self), &other) {
+        match (&mut *self, &other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), _) => {
                 *self = other;
@@ -297,7 +297,7 @@ impl SubAssign<Integer> for Integer {
 /// ```
 impl<'a> SubAssign<&'a Integer> for Integer {
     fn sub_assign(&mut self, other: &'a Integer) {
-        match (&mut (*self), other) {
+        match (&mut *self, other) {
             (_, &integer_zero!()) => {}
             (&mut integer_zero!(), y) => *self = -y.clone(),
             // e.g. 10 - -5 or -10 - 5; sign of self is unchanged

@@ -27,15 +27,15 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
             /// assert_eq!(3u8.arithmetic_checked_shr(-100), None);
             /// assert_eq!(0u8.arithmetic_checked_shr(-100), Some(0u8));
             /// ```
-            fn arithmetic_checked_shr(self, other: $u) -> Option<$t> {
-                if other < 0 {
-                    self.arithmetic_checked_shl(other.unsigned_abs())
+            fn arithmetic_checked_shr(self, bits: $u) -> Option<$t> {
+                if bits < 0 {
+                    self.arithmetic_checked_shl(bits.unsigned_abs())
                 } else {
-                    let abs_other = other.unsigned_abs();
-                    Some(if abs_other >= $t::WIDTH.wrapping_into() {
+                    let abs_bits = bits.unsigned_abs();
+                    Some(if abs_bits >= $t::WIDTH.wrapping_into() {
                         0
                     } else {
-                        self >> abs_other
+                        self >> abs_bits
                     })
                 }
             }
@@ -109,20 +109,20 @@ macro_rules! impl_arithmetic_checked_shr_signed_signed {
             /// assert_eq!((-3i8).arithmetic_checked_shr(-100), None);
             /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
             /// ```
-            fn arithmetic_checked_shr(self, other: $u) -> Option<$t> {
-                if other < 0 {
-                    self.arithmetic_checked_shl(other.unsigned_abs())
+            fn arithmetic_checked_shr(self, bits: $u) -> Option<$t> {
+                if bits < 0 {
+                    self.arithmetic_checked_shl(bits.unsigned_abs())
                 } else {
                     let width = $t::WIDTH.wrapping_into();
-                    let abs_other = other.unsigned_abs();
-                    Some(if width != 0 && abs_other >= width {
+                    let abs_bits = bits.unsigned_abs();
+                    Some(if width != 0 && abs_bits >= width {
                         if self >= 0 {
                             0
                         } else {
                             -1
                         }
                     } else {
-                        self >> abs_other
+                        self >> abs_bits
                     })
                 }
             }

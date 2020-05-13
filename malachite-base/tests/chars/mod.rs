@@ -4,7 +4,7 @@ use malachite_base::chars::{
     char_to_contiguous_range, contiguous_range_to_char, CHAR_JUST_ABOVE_SURROGATES,
     CHAR_JUST_BELOW_SURROGATES,
 };
-use malachite_base::comparison::Min;
+use malachite_base::comparison::traits::Min;
 use malachite_base::crement::Crementable;
 
 #[test]

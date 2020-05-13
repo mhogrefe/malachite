@@ -12,16 +12,16 @@ macro_rules! impl_shl_round {
             /// takes the floor) and rounds according to the specified rounding mode. Passing
             /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
             /// whether `RoundingMode::Exact` can be passed, use
-            /// `other > 0 || self.divisible_by_power_of_two(other)`. Rounding might only be
-            /// necessary if `other` is non-negative.
+            /// `bits > 0 || self.divisible_by_power_of_two(bits)`. Rounding might only be necessary
+            /// if `bits` is non-negative.
             ///
             /// Time: worst case O(1)
             ///
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -40,16 +40,16 @@ macro_rules! impl_shl_round {
             /// assert_eq!(0x100u64.shl_round(-8i64, RoundingMode::Exact), 1);
             /// ```
             #[inline]
-            fn shl_round(self, other: $u, rm: RoundingMode) -> $t {
-                if other >= 0 {
+            fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
+                if bits >= 0 {
                     let width = $u::wrapping_from($t::WIDTH);
-                    if width >= 0 && other >= width {
+                    if width >= 0 && bits >= width {
                         0
                     } else {
-                        self << other.unsigned_abs()
+                        self << bits.unsigned_abs()
                     }
                 } else {
-                    self.shr_round(other.unsigned_abs(), rm)
+                    self.shr_round(bits.unsigned_abs(), rm)
                 }
             }
         }
@@ -59,16 +59,16 @@ macro_rules! impl_shl_round {
             /// takes the floor) and rounds according to the specified rounding mode, in place.
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`.
             /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `other > 0 || self.divisible_by_power_of_two(other)`. Rounding might only be
-            /// necessary if `other` is non-negative.
+            /// `bits > 0 || self.divisible_by_power_of_two(bits)`. Rounding might only be necessary
+            /// if `bits` is non-negative.
             ///
             /// Time: worst case O(1)
             ///
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -108,16 +108,16 @@ macro_rules! impl_shl_round {
             /// assert_eq!(x, 1);
             /// ```
             #[inline]
-            fn shl_round_assign(&mut self, other: $u, rm: RoundingMode) {
-                if other >= 0 {
+            fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) {
+                if bits >= 0 {
                     let width = $u::wrapping_from($t::WIDTH);
-                    if width >= 0 && other >= width {
+                    if width >= 0 && bits >= width {
                         *self = 0;
                     } else {
-                        *self <<= other.unsigned_abs();
+                        *self <<= bits.unsigned_abs();
                     }
                 } else {
-                    self.shr_round_assign(other.unsigned_abs(), rm);
+                    self.shr_round_assign(bits.unsigned_abs(), rm);
                 }
             }
         }

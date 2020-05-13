@@ -29,29 +29,6 @@ use platform::{
     MUL_TOOM8H_THRESHOLD,
 };
 
-// This doesn't use `chunks_exact` because sometimes `xs_last` is longer than `n`.
-macro_rules! split_into_chunks {
-    ($xs: expr, $n: expr, $last_chunk_size: ident, [$($xs_i: ident),*], $xs_last: ident) => {
-        let remainder = &$xs;
-        $(
-            let ($xs_i, remainder) = remainder.split_at($n);
-        )*
-        let $xs_last = remainder;
-        let $last_chunk_size = $xs_last.len();
-    }
-}
-
-// This doesn't use `chunks_exact_mut` because sometimes `xs_last` is longer than `n`.
-macro_rules! split_into_chunks_mut {
-    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
-        let remainder = &mut $xs[..];
-        $(
-            let ($xs_i, remainder) = remainder.split_at_mut($n);
-        )*
-        let $xs_last = remainder;
-    }
-}
-
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 /// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
 /// cannot be empty.
@@ -77,9 +54,9 @@ macro_rules! split_into_chunks_mut {
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
 pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    let mut product_limbs = vec![0; xs.len() + ys.len()];
-    limbs_mul_greater_to_out(&mut product_limbs, xs, ys);
-    product_limbs
+    let mut out = vec![0; xs.len() + ys.len()];
+    limbs_mul_greater_to_out(&mut out, xs, ys);
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
@@ -171,7 +148,6 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         let mut scratch = vec![0; _limbs_mul_same_length_to_out_toom_8h_scratch_len(len)];
         _limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
     } else {
-        // The current FFT code allocates its own space. That should probably change.
         _limbs_mul_greater_to_out_fft(out, xs, ys);
     }
 }
@@ -471,32 +447,32 @@ pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb],
     }
 }
 
-/// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by value.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::{One, Zero};
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// assert_eq!((Natural::ONE * Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-/// assert_eq!((Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-/// assert_eq!((Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
-/// ```
 impl Mul<Natural> for Natural {
     type Output = Natural;
 
+    /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by value.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((Natural::ONE * Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) * Natural::ZERO).to_string(), "0");
+    /// assert_eq!((Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
+    /// assert_eq!((Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// ```
     #[inline]
     fn mul(mut self, other: Natural) -> Natural {
         self *= other;
@@ -504,33 +480,33 @@ impl Mul<Natural> for Natural {
     }
 }
 
-/// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by value and the right
-/// `Natural` by reference.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::{One, Zero};
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// assert_eq!((Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-/// assert_eq!((Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-/// assert_eq!((Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
-/// ```
 impl<'a> Mul<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by value and the right
+    /// `Natural` by reference.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((Natural::ONE * &Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
+    /// assert_eq!((Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
+    /// assert_eq!((Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// ```
     #[inline]
     fn mul(mut self, other: &'a Natural) -> Natural {
         self *= other;
@@ -538,33 +514,33 @@ impl<'a> Mul<&'a Natural> for Natural {
     }
 }
 
-/// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by reference and the right
-/// `Natural` by value.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::{One, Zero};
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Natural::ONE * Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) * Natural::ZERO).to_string(), "0");
-/// assert_eq!((&Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
-/// assert_eq!((&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
-/// ```
 impl<'a> Mul<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Multiplies a `Natural` by a `Natural`, taking the left `Natural` by reference and the right
+    /// `Natural` by value.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Natural::ONE * Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) * Natural::ZERO).to_string(), "0");
+    /// assert_eq!((&Natural::from(123u32) * Natural::from(456u32)).to_string(), "56088");
+    /// assert_eq!((&Natural::from_str("123456789000").unwrap() * Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// ```
     #[inline]
     fn mul(self, mut other: Natural) -> Natural {
         other *= self;
@@ -572,129 +548,117 @@ impl<'a> Mul<Natural> for &'a Natural {
     }
 }
 
-/// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::{One, Zero};
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// assert_eq!((&Natural::ONE * &Natural::from(123u32)).to_string(), "123");
-/// assert_eq!((&Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
-/// assert_eq!((&Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
-/// assert_eq!((&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
-///            .unwrap()).to_string(), "121932631112635269000000");
-/// ```
 impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Multiplies a `Natural` by a `Natural`, taking both `Natural`s by reference.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::{One, Zero};
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!((&Natural::ONE * &Natural::from(123u32)).to_string(), "123");
+    /// assert_eq!((&Natural::from(123u32) * &Natural::ZERO).to_string(), "0");
+    /// assert_eq!((&Natural::from(123u32) * &Natural::from(456u32)).to_string(), "56088");
+    /// assert_eq!((&Natural::from_str("123456789000").unwrap() * &Natural::from_str("987654321000")
+    ///            .unwrap()).to_string(), "121932631112635269000000");
+    /// ```
     fn mul(self, other: &'a Natural) -> Natural {
-        if let Natural(Small(y)) = *other {
-            self.mul_limb_ref(y)
-        } else if let Natural(Small(x)) = *self {
-            other.mul_limb_ref(x)
-        } else {
-            match (self, other) {
-                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                    Natural::from_owned_limbs_asc(limbs_mul(xs, ys))
-                }
-                _ => unreachable!(),
+        match (self, other) {
+            (Natural(Small(x)), y) => y.mul_limb_ref(*x),
+            (x, Natural(Small(y))) => x.mul_limb_ref(*y),
+            (Natural(Large(ref xs)), Natural(Large(ref ys))) => {
+                Natural::from_owned_limbs_asc(limbs_mul(xs, ys))
             }
         }
     }
 }
 
-/// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by value.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// let mut x = Natural::ONE;
-/// x *= Natural::from_str("1000").unwrap();
-/// x *= Natural::from_str("2000").unwrap();
-/// x *= Natural::from_str("3000").unwrap();
-/// x *= Natural::from_str("4000").unwrap();
-/// assert_eq!(x.to_string(), "24000000000000");
-/// ```
 impl MulAssign<Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by value.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// let mut x = Natural::ONE;
+    /// x *= Natural::from_str("1000").unwrap();
+    /// x *= Natural::from_str("2000").unwrap();
+    /// x *= Natural::from_str("3000").unwrap();
+    /// x *= Natural::from_str("4000").unwrap();
+    /// assert_eq!(x.to_string(), "24000000000000");
+    /// ```
     fn mul_assign(&mut self, mut other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.mul_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            other.mul_assign_limb(x);
-            *self = other;
-        } else {
-            match (&mut (*self), other) {
-                (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
-                    *xs = limbs_mul(xs, ys);
-                }
-                _ => unreachable!(),
+        match (&mut *self, &mut other) {
+            (Natural(Small(x)), _) => {
+                other.mul_assign_limb(*x);
+                *self = other;
             }
-            self.trim();
+            (_, Natural(Small(y))) => self.mul_assign_limb(*y),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+                *xs = limbs_mul(xs, ys);
+                self.trim();
+            }
         }
     }
 }
 
-/// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by reference.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `self.significant_bits()` + `other.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-/// use std::str::FromStr;
-///
-/// let mut x = Natural::ONE;
-/// x *= &Natural::from_str("1000").unwrap();
-/// x *= &Natural::from_str("2000").unwrap();
-/// x *= &Natural::from_str("3000").unwrap();
-/// x *= &Natural::from_str("4000").unwrap();
-/// assert_eq!(x.to_string(), "24000000000000");
-/// ```
 impl<'a> MulAssign<&'a Natural> for Natural {
+    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by
+    /// reference.
+    ///
+    /// Time: worst case O(n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: worst case O(n * log(n))
+    ///
+    /// where n = `self.significant_bits()` + `other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    /// use std::str::FromStr;
+    ///
+    /// let mut x = Natural::ONE;
+    /// x *= &Natural::from_str("1000").unwrap();
+    /// x *= &Natural::from_str("2000").unwrap();
+    /// x *= &Natural::from_str("3000").unwrap();
+    /// x *= &Natural::from_str("4000").unwrap();
+    /// assert_eq!(x.to_string(), "24000000000000");
+    /// ```
     fn mul_assign(&mut self, other: &'a Natural) {
-        if let Natural(Small(y)) = *other {
-            self.mul_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.mul_limb_ref(x);
-        } else {
-            match (&mut (*self), other) {
-                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
-                    *xs = limbs_mul(xs, ys);
-                }
-                _ => unreachable!(),
+        match (&mut *self, other) {
+            (Natural(Small(x)), _) => *self = other.mul_limb_ref(*x),
+            (_, Natural(Small(y))) => self.mul_assign_limb(*y),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+                *xs = limbs_mul(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 }

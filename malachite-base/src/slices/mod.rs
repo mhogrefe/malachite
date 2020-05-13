@@ -111,3 +111,28 @@ pub fn slice_trailing_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
 pub fn slice_move_left<T: Copy>(xs: &mut [T], amount: usize) {
     xs.copy_within(amount..xs.len(), 0);
 }
+
+// This doesn't use `chunks_exact` because sometimes `xs_last` is longer than `n`.
+#[macro_export]
+macro_rules! split_into_chunks {
+    ($xs: expr, $n: expr, $last_chunk_size: ident, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &$xs;
+        $(
+            let ($xs_i, remainder) = remainder.split_at($n);
+        )*
+        let $xs_last = remainder;
+        let $last_chunk_size = $xs_last.len();
+    }
+}
+
+// This doesn't use `chunks_exact_mut` because sometimes `xs_last` is longer than `n`.
+#[macro_export]
+macro_rules! split_into_chunks_mut {
+    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &mut $xs[..];
+        $(
+            let ($xs_i, remainder) = remainder.split_at_mut($n);
+        )*
+        let $xs_last = remainder;
+    }
+}

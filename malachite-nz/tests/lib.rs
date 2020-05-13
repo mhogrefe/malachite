@@ -24,13 +24,10 @@ pub mod integer {
         pub mod parity;
         pub mod power_of_two;
         pub mod round_to_multiple_of_power_of_two;
-        pub mod shl_i;
-        pub mod shl_round_i;
-        pub mod shl_u;
-        pub mod shr_i;
-        pub mod shr_round_i;
-        pub mod shr_round_u;
-        pub mod shr_u;
+        pub mod shl;
+        pub mod shl_round;
+        pub mod shr;
+        pub mod shr_round;
         pub mod sign;
         pub mod sub;
         pub mod sub_mul;
@@ -47,5 +44,9 @@ pub mod integer {
         pub mod ord_abs;
         pub mod partial_eq_natural;
         pub mod partial_eq_primitive_integer;
+        pub mod partial_ord_abs_natural_and_comparators;
+        pub mod partial_ord_abs_primitive_integer_and_comparators;
+        pub mod partial_ord_natural;
+        pub mod partial_ord_primitive_integer;
     }
 }

@@ -31,10 +31,10 @@ pub fn _limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[
     if n != 1 {
         let y = ys_init[0];
         let (xs_last, xs_init) = xs.split_last().unwrap();
-        let limb_p = xs_last
+        let product = xs_last
             .wrapping_mul(y)
             .wrapping_add(limbs_mul_limb_to_out(out_init, xs_init, y));
-        p.wrapping_add_assign(limb_p);
+        p.wrapping_add_assign(product);
         let m = n - 1;
         for i in 1..m {
             let y = ys_init[i];

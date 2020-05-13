@@ -1,6 +1,6 @@
 use std::char;
 
-use comparison::{Max, Min};
+use comparison::traits::{Max, Min};
 use crement::Crementable;
 
 // The number of Unicode scalar values, or 1,112,064.

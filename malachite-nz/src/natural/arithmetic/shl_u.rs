@@ -1,7 +1,8 @@
 use std::ops::{Shl, ShlAssign};
 
+use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
 
 use natural::InnerNatural::{Large, Small};
@@ -15,7 +16,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()` + `bits` / 32
+/// where n = `xs.len()` + `bits` / 32
 ///
 /// # Example
 /// ```
@@ -30,21 +31,21 @@ use platform::Limb;
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where the result is returned.
 pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
-    let mut shifted_limbs = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
+    let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
     if small_bits == 0 {
-        shifted_limbs.extend_from_slice(xs);
+        out.extend_from_slice(xs);
     } else {
         let cobits = Limb::WIDTH - small_bits;
         let mut remaining_bits = 0;
-        for limb in xs {
-            shifted_limbs.push((limb << small_bits) | remaining_bits);
-            remaining_bits = limb >> cobits;
+        for x in xs {
+            out.push((x << small_bits) | remaining_bits);
+            remaining_bits = x >> cobits;
         }
         if remaining_bits != 0 {
-            shifted_limbs.push(remaining_bits);
+            out.push(remaining_bits);
         }
     }
-    shifted_limbs
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -56,10 +57,10 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`, `bits` is 0, or `bits` is greater than or equal to
+/// Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
 /// `Limb::WIDTH`.
 ///
 /// # Example
@@ -77,16 +78,13 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2.
 pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
-    let len = xs.len();
-    assert!(out.len() >= len);
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
-    for i in 0..len {
-        let limb = xs[i];
-        out[i] = (limb << bits) | remaining_bits;
-        remaining_bits = limb >> cobits;
+    for (out, x) in out[..xs.len()].iter_mut().zip(xs.iter()) {
+        *out = (x << bits) | remaining_bits;
+        remaining_bits = x >> cobits;
     }
     remaining_bits
 }
@@ -100,19 +98,19 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::shl_u::limbs_slice_shl_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_shl_in_place(&mut limbs, 1), 0);
-/// assert_eq!(limbs, &[246, 912]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_shl_in_place(&mut xs, 1), 0);
+/// assert_eq!(xs, &[246, 912]);
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_shl_in_place(&mut limbs, 31), 228);
-/// assert_eq!(limbs, &[2_147_483_648, 61]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_shl_in_place(&mut xs, 31), 228);
+/// assert_eq!(xs, &[2_147_483_648, 61]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up.
@@ -121,10 +119,10 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
     let mut remaining_bits = 0;
-    for limb in xs.iter_mut() {
-        let old_limb = *limb;
-        *limb = (old_limb << bits) | remaining_bits;
-        remaining_bits = old_limb >> cobits;
+    for x in xs.iter_mut() {
+        let previous_x = *x;
+        *x = (previous_x << bits) | remaining_bits;
+        remaining_bits = previous_x >> cobits;
     }
     remaining_bits
 }
@@ -136,22 +134,22 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// Additional memory: worst case O(m)
 ///
-/// where n = `limbs.len()` + `bits` / 32, m = `bits`
+/// where n = `xs.len()` + `bits` / 32, m = `bits`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::shl_u::limbs_vec_shl_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_shl_in_place(&mut limbs, 1);
-/// assert_eq!(limbs, &[246, 912]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_shl_in_place(&mut xs, 1);
+/// assert_eq!(xs, &[246, 912]);
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_shl_in_place(&mut limbs, 31);
-/// assert_eq!(limbs, &[2_147_483_648, 61, 228]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_shl_in_place(&mut xs, 31);
+/// assert_eq!(xs, &[2_147_483_648, 61, 228]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up and the carry is
@@ -179,11 +177,11 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`, `in_limbs` is empty, `bits` is 0, or `bits` is
-/// greater than or equal to `Limb::WIDTH`.
+/// Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
+/// equal to `Limb::WIDTH`.
 ///
 /// # Example
 /// ```
@@ -205,15 +203,15 @@ pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
-    let mut low_limb = *xs.last().unwrap();
-    let remaining_bits = low_limb >> cobits;
-    let mut high_limb = low_limb << bits;
-    for i in (1..n).rev() {
-        low_limb = xs[i - 1];
-        out[i] = !(high_limb | (low_limb >> cobits));
-        high_limb = low_limb << bits;
+    let (xs_last, xs_init) = xs.split_last().unwrap();
+    let remaining_bits = xs_last >> cobits;
+    let mut previous_x = xs_last << bits;
+    let (out_head, out_tail) = out[..n].split_first_mut().unwrap();
+    for (out, x) in out_tail.iter_mut().rev().zip(xs_init.iter().rev()) {
+        *out = !(previous_x | (x >> cobits));
+        previous_x = x << bits;
     }
-    out[0] = !high_limb;
+    *out_head = !previous_x;
     remaining_bits
 }
 
@@ -225,7 +223,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(m)
         ///
-        /// where n = `self.significant_bits()` + `other`, m = `other`
+        /// where n = `self.significant_bits()` + `bits`, m = `bits`
         ///
         /// # Examples
         /// ```
@@ -244,8 +242,8 @@ macro_rules! impl_natural_shl_unsigned {
             type Output = Natural;
 
             #[inline]
-            fn shl(mut self, other: $t) -> Natural {
-                self <<= other;
+            fn shl(mut self, bits: $t) -> Natural {
+                self <<= bits;
                 self
             }
         }
@@ -256,7 +254,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(n)
         ///
-        /// where n = `self.significant_bits()` + `other`
+        /// where n = `self.significant_bits()` + `bits`
         ///
         /// # Examples
         /// ```
@@ -274,17 +272,20 @@ macro_rules! impl_natural_shl_unsigned {
         impl<'a> Shl<$t> for &'a Natural {
             type Output = Natural;
 
-            fn shl(self, other: $t) -> Natural {
-                if other == 0 || *self == 0 {
-                    return self.clone();
-                }
-                Natural(match *self {
-                    Natural(Small(small)) if other <= $t::wrapping_from(small.leading_zeros()) => {
-                        Small(small << other)
+            fn shl(self, bits: $t) -> Natural {
+                match (self, bits) {
+                    (_, 0) | (natural_zero!(), _) => self.clone(),
+                    (Natural(Small(small)), bits) => {
+                        Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
+                            Small(shifted)
+                        } else {
+                            Large(limbs_shl(&[*small], u64::exact_from(bits)))
+                        })
                     }
-                    Natural(Small(small)) => Large(limbs_shl(&[small], u64::exact_from(other))),
-                    Natural(Large(ref limbs)) => Large(limbs_shl(limbs, u64::exact_from(other))),
-                })
+                    (Natural(Large(ref limbs)), bits) => {
+                        Natural(Large(limbs_shl(limbs, u64::exact_from(bits))))
+                    }
+                }
             }
         }
 
@@ -294,7 +295,7 @@ macro_rules! impl_natural_shl_unsigned {
         ///
         /// Additional memory: worst case O(m)
         ///
-        /// where n = `self.significant_bits()` + `other`, m = `other`
+        /// where n = `self.significant_bits()` + `bits`, m = `bits`
         ///
         /// # Examples
         /// ```
@@ -312,26 +313,20 @@ macro_rules! impl_natural_shl_unsigned {
         /// assert_eq!(x.to_string(), "1024");
         /// ```
         impl ShlAssign<$t> for Natural {
-            fn shl_assign(&mut self, other: $t) {
-                if other == 0 || *self == 0 {
-                    return;
-                }
-                //TODO use TrueCheckedShl
-                mutate_with_possible_promotion!(
-                    self,
-                    small,
-                    limbs,
-                    {
-                        if other <= $t::wrapping_from(small.leading_zeros()) {
-                            Some(*small << other)
+            fn shl_assign(&mut self, bits: $t) {
+                match (&mut *self, bits) {
+                    (_, 0) | (natural_zero!(), _) => {}
+                    (Natural(Small(ref mut small)), bits) => {
+                        if let Some(shifted) = small.arithmetic_checked_shl(bits) {
+                            *small = shifted;
                         } else {
-                            None
+                            *self = Natural(Large(limbs_shl(&[*small], u64::exact_from(bits))));
                         }
-                    },
-                    {
-                        limbs_vec_shl_in_place(limbs, u64::exact_from(other));
                     }
-                );
+                    (Natural(Large(ref mut limbs)), bits) => {
+                        limbs_vec_shl_in_place(limbs, u64::exact_from(bits));
+                    }
+                }
             }
         }
     };

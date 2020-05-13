@@ -1386,7 +1386,6 @@ pub fn _limbs_mul_greater_to_out_toom_43(
         assert!(asm2[n] <= 9);
         assert!(bsm2[n] <= 4);
     }
-
     {
         let (v_neg_1, remainder) = scratch.split_at_mut(2 * m); // v_neg_1 length: 2 * n + 2
         let (bsm1, asm1) = remainder.split_at_mut(m); // bsm1 length: m
@@ -1419,7 +1418,7 @@ pub fn _limbs_mul_greater_to_out_toom_43(
 
     // v_0, 2 * n limbs
     limbs_mul_same_length_to_out(out, &xs[..n], ys_0); // W5
-    split_into_chunks_mut!(scratch, 2 * n + 1, [v_neg_1, v_neg_2], v_2);
+    split_into_chunks_mut!(scratch, 2 * n + 1, [v_neg_1, v_neg_2, v_2], _unused);
     _limbs_mul_toom_interpolate_6_points(
         out,
         n,
@@ -1905,7 +1904,7 @@ pub fn _limbs_mul_greater_to_out_toom_52(
         limbs_mul_same_length_to_out(v_0, &xs[..n], ys_0); // W5
     }
 
-    split_into_chunks_mut!(scratch, 2 * n + 1, [v_neg_1, v_neg_2], v_2);
+    split_into_chunks_mut!(scratch, 2 * n + 1, [v_neg_1, v_neg_2, v_2], _unused);
     _limbs_mul_toom_interpolate_6_points(
         out,
         n,

@@ -1,4 +1,4 @@
-use comparison::{Max, Min};
+use comparison::traits::{Max, Min};
 use crement::Crementable;
 use num::logic::traits::NotAssign;
 

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ShrRound,
+    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoShlAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -607,10 +607,8 @@ impl<'a> ModPowerOfTwoAddAssign<&'a Natural> for Natural {
     /// ```
     fn mod_power_of_two_add_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {
-            //TODO use mod_power_of_two_shl
             (x, y) if x as *const Natural == y as *const Natural => {
-                *self <<= 1;
-                self.mod_power_of_two_assign(pow)
+                self.mod_power_of_two_shl_assign(pow, 1);
             }
             (x, &Natural(Small(y))) => x.mod_power_of_two_add_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_two_add_limb_ref(x, pow),

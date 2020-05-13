@@ -1045,7 +1045,7 @@ pub(crate) fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
             Box::new(exhaustive_pairs_from_single(exhaustive_unsigned()))
         }
         NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            u32s_geometric(&EXAMPLE_SEED, scale).map(T::wrapping_from),
+            u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from),
         )),
     }
 }
@@ -1067,8 +1067,26 @@ pub fn pairs_of_small_unsigneds<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigne
         )),
         NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
-            &(|seed| u32s_geometric(seed, scale).map(T::wrapping_from)),
-            &(|seed| u32s_geometric(seed, scale).map(U::wrapping_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+pub fn pairs_of_small_signed_and_small_unsigned<
+    T: PrimitiveSigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, U)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_unsigned()))
+        }
+        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
 }

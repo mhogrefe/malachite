@@ -5,7 +5,7 @@ use malachite_base::round::RoundingMode;
 
 use integer::Integer;
 
-macro_rules! impl_integer_shl_round_signed {
+macro_rules! impl_shl_round_signed {
     ($t:ident) => {
         impl ShlRound<$t> for Integer {
             type Output = Integer;
@@ -14,15 +14,15 @@ macro_rules! impl_integer_shl_round_signed {
             /// 2 and takes the floor) and rounds according to the specified rounding mode, taking
             /// the `Integer` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `other > 0 || self.divisible_by_power_of_two(other)`.
+            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
             ///
-            /// Time: worst case O(`other`)
+            /// Time: worst case O(`bits`)
             ///
-            /// Additional memory: worst case O(`other`)
+            /// Additional memory: worst case O(`bits`)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -80,8 +80,8 @@ macro_rules! impl_integer_shl_round_signed {
             /// );
             /// ```
             #[inline]
-            fn shl_round(mut self, other: $t, rm: RoundingMode) -> Integer {
-                self.shl_round_assign(other, rm);
+            fn shl_round(mut self, bits: $t, rm: RoundingMode) -> Integer {
+                self.shl_round_assign(bits, rm);
                 self
             }
         }
@@ -93,15 +93,15 @@ macro_rules! impl_integer_shl_round_signed {
             /// 2 and takes the floor) and rounds according to the specified rounding mode, taking
             /// the `Integer` by reference. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `other > 0 || self.divisible_by_power_of_two(other)`.
+            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
             ///
-            /// Time: worst case O(`other`)
+            /// Time: worst case O(`bits`)
             ///
-            /// Additional memory: worst case O(`other`)
+            /// Additional memory: worst case O(`bits`)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -158,11 +158,11 @@ macro_rules! impl_integer_shl_round_signed {
             ///     "155921023828072216384094494261248"
             /// );
             /// ```
-            fn shl_round(self, other: $t, rm: RoundingMode) -> Integer {
-                if other >= 0 {
-                    self << other.unsigned_abs()
+            fn shl_round(self, bits: $t, rm: RoundingMode) -> Integer {
+                if bits >= 0 {
+                    self << bits.unsigned_abs()
                 } else {
-                    self.shr_round(other.unsigned_abs(), rm)
+                    self.shr_round(bits.unsigned_abs(), rm)
                 }
             }
         }
@@ -172,15 +172,15 @@ macro_rules! impl_integer_shl_round_signed {
             /// 2 and takes the floor) and rounds according to the specified rounding mode, in
             /// place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using
             /// `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `other > 0 || self.divisible_by_power_of_two(other)`.
+            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
             ///
-            /// Time: worst case O(`other`)
+            /// Time: worst case O(`bits`)
             ///
-            /// Additional memory: worst case O(`other`)
+            /// Additional memory: worst case O(`bits`)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -231,19 +231,19 @@ macro_rules! impl_integer_shl_round_signed {
             /// x.shl_round_assign(4i64, RoundingMode::Exact);
             /// assert_eq!(x.to_string(), "1024");
             /// ```
-            fn shl_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                if other >= 0 {
-                    *self <<= other.unsigned_abs();
+            fn shl_round_assign(&mut self, bits: $t, rm: RoundingMode) {
+                if bits >= 0 {
+                    *self <<= bits.unsigned_abs();
                 } else {
-                    self.shr_round_assign(other.unsigned_abs(), rm);
+                    self.shr_round_assign(bits.unsigned_abs(), rm);
                 }
             }
         }
     };
 }
-impl_integer_shl_round_signed!(i8);
-impl_integer_shl_round_signed!(i16);
-impl_integer_shl_round_signed!(i32);
-impl_integer_shl_round_signed!(i64);
-impl_integer_shl_round_signed!(i128);
-impl_integer_shl_round_signed!(isize);
+impl_shl_round_signed!(i8);
+impl_shl_round_signed!(i16);
+impl_shl_round_signed!(i32);
+impl_shl_round_signed!(i64);
+impl_shl_round_signed!(i128);
+impl_shl_round_signed!(isize);

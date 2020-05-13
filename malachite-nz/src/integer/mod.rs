@@ -187,13 +187,10 @@ pub mod arithmetic {
     pub mod parity;
     pub mod power_of_two;
     pub mod round_to_multiple_of_power_of_two;
-    pub mod shl_i;
-    pub mod shl_round_i;
-    pub mod shl_u;
-    pub mod shr_i;
-    pub mod shr_round_i;
-    pub mod shr_round_u;
-    pub mod shr_u;
+    pub mod shl;
+    pub mod shl_round;
+    pub mod shr;
+    pub mod shr_round;
     pub mod sign;
     pub mod sub;
     pub mod sub_mul;

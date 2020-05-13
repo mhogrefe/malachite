@@ -34,6 +34,7 @@ pub mod crement;
 pub mod named;
 pub mod num;
 pub mod round;
+#[macro_use]
 pub mod slices;
 pub mod strings;
 pub mod vecs;

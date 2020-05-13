@@ -7,7 +7,7 @@ use std::ops::{
 };
 use std::str::FromStr;
 
-use comparison::{Max, Min};
+use comparison::traits::{Max, Min};
 use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{

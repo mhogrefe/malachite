@@ -23,14 +23,14 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_unsigned {
             /// assert_eq!(3u8.arithmetic_checked_shl(100), None);
             /// assert_eq!(0u8.arithmetic_checked_shl(100), Some(0u8));
             /// ```
-            fn arithmetic_checked_shl(self, other: $u) -> Option<$t> {
+            fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                 if self == 0 {
                     Some(self)
-                } else if other >= $u::wrapping_from($t::WIDTH) {
+                } else if bits >= $u::wrapping_from($t::WIDTH) {
                     None
                 } else {
-                    let result = self << other;
-                    if result >> other == self {
+                    let result = self << bits;
+                    if result >> bits == self {
                         Some(result)
                     } else {
                         None
@@ -102,15 +102,15 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_signed {
             /// assert_eq!(100u8.arithmetic_checked_shl(-3), Some(12u8));
             /// assert_eq!(100u8.arithmetic_checked_shl(-100), Some(0u8));
             /// ```
-            fn arithmetic_checked_shl(self, other: $u) -> Option<$t> {
-                if other >= 0 {
-                    self.arithmetic_checked_shl(other.unsigned_abs())
+            fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
+                if bits >= 0 {
+                    self.arithmetic_checked_shl(bits.unsigned_abs())
                 } else {
-                    let abs_other = other.unsigned_abs();
-                    Some(if abs_other >= $t::WIDTH.wrapping_into() {
+                    let abs_bits = bits.unsigned_abs();
+                    Some(if abs_bits >= $t::WIDTH.wrapping_into() {
                         0
                     } else {
-                        self >> abs_other
+                        self >> abs_bits
                     })
                 }
             }
@@ -178,12 +178,12 @@ macro_rules! impl_arithmetic_checked_shl_signed_unsigned {
             /// assert_eq!((-3i8).arithmetic_checked_shl(100), None);
             /// assert_eq!(0i8.arithmetic_checked_shl(100), Some(0i8));
             /// ```
-            fn arithmetic_checked_shl(self, other: $u) -> Option<$t> {
+            fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
                 let abs = self.unsigned_abs();
                 if self >= 0 {
-                    abs.arithmetic_checked_shl(other).and_then($t::checked_from)
+                    abs.arithmetic_checked_shl(bits).and_then($t::checked_from)
                 } else {
-                    abs.arithmetic_checked_shl(other).and_then(|x| {
+                    abs.arithmetic_checked_shl(bits).and_then(|x| {
                         if x == $t::MIN.unsigned_abs() {
                             Some($t::MIN)
                         } else {
@@ -263,20 +263,20 @@ macro_rules! impl_arithmetic_checked_shl_signed_signed {
             /// assert_eq!(100i8.arithmetic_checked_shl(-100), Some(0i8));
             /// assert_eq!((-100i8).arithmetic_checked_shl(-100), Some(-1i8));
             /// ```
-            fn arithmetic_checked_shl(self, other: $u) -> Option<$t> {
-                if other >= 0 {
-                    self.arithmetic_checked_shl(other.unsigned_abs())
+            fn arithmetic_checked_shl(self, bits: $u) -> Option<$t> {
+                if bits >= 0 {
+                    self.arithmetic_checked_shl(bits.unsigned_abs())
                 } else {
                     let width = $t::WIDTH.wrapping_into();
-                    let abs_other = other.unsigned_abs();
-                    Some(if width != 0 && abs_other >= width {
+                    let abs_bits = bits.unsigned_abs();
+                    Some(if width != 0 && abs_bits >= width {
                         if self >= 0 {
                             0
                         } else {
                             -1
                         }
                     } else {
-                        self >> abs_other
+                        self >> abs_bits
                     })
                 }
             }

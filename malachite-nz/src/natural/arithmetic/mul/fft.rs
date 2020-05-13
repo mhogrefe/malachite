@@ -11,6 +11,7 @@ use malachite_base::slices::slice_set_zero;
 use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
+use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::limbs_mul_same_length_to_out;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
@@ -30,11 +31,10 @@ use platform::Limb;
 const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
 pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len: usize) -> bool {
-    if xs_len == 0 || xs_len < ys_len {
-        return false;
+    xs_len != 0 && xs_len >= ys_len && {
+        let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
+        n.even() && n >= MULMOD_BNM1_THRESHOLD
     }
-    let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
-    n.even() && n >= MULMOD_BNM1_THRESHOLD
 }
 
 struct FFTTableNK {
@@ -607,22 +607,18 @@ fn _limbs_mul_fft_normalize(xs: &mut [Limb]) {
 ///
 /// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, GMP 6.1.2, where r == a.
 fn _limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
-    let sub;
-    let mut carry;
-    {
-        let (xs_last, xs_init) = xs.split_last_mut().unwrap();
-        let (ys_last, ys_init) = ys.split_last().unwrap();
-        carry = xs_last.wrapping_add(*ys_last);
-        if limbs_slice_add_same_length_in_place_left(xs_init, ys_init) {
-            carry.wrapping_add_assign(1);
-        }
-        // 0 <= carry <= 3
-        sub = carry > 1;
-        *xs_last = if sub {
-            1 // r[n] - carry = 1
-        } else {
-            carry
-        };
+    let (xs_last, xs_init) = xs.split_last_mut().unwrap();
+    let (ys_last, ys_init) = ys.split_last().unwrap();
+    let mut carry = xs_last.wrapping_add(*ys_last);
+    if limbs_slice_add_same_length_in_place_left(xs_init, ys_init) {
+        carry.wrapping_add_assign(1);
+    }
+    // 0 <= carry <= 3
+    let sub = carry > 1;
+    *xs_last = if sub {
+        1 // r[n] - carry = 1
+    } else {
+        carry
     };
     if sub {
         assert!(!limbs_sub_limb_in_place(xs, carry - 1));
@@ -666,28 +662,28 @@ fn _limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
     let small_bits = u64::exact_from(bits) & Limb::WIDTH_MASK;
-    let mut shift_limbs = bits >> Limb::LOG_WIDTH;
+    let mut shift = bits >> Limb::LOG_WIDTH;
     // negate
-    if shift_limbs >= n {
-        // out[0..shift_limbs - 1]  <-- xs[n - shift_limbs..n - 1] << small_bits
-        // out[shift_limbs..n - 1]  <-- -xs[0..n - shift_limbs-1] << small_bits
-        shift_limbs -= n;
-        let (xs_lo, xs_hi) = xs.split_at(n - shift_limbs);
+    if shift >= n {
+        // out[0..shift - 1]  <-- xs[n - shift..n - 1] << small_bits
+        // out[shift..n - 1]  <-- -xs[0..n - shift-1] << small_bits
+        shift -= n;
+        let (xs_lo, xs_hi) = xs.split_at(n - shift);
         let mut carry2;
         let mut carry = if small_bits == 0 {
-            out[..shift_limbs].copy_from_slice(&xs_hi[..shift_limbs]);
+            out[..shift].copy_from_slice(&xs_hi[..shift]);
             carry2 = xs[n];
-            limbs_not_to_out(&mut out[shift_limbs..], xs_lo);
+            limbs_not_to_out(&mut out[shift..], xs_lo);
             0
         } else {
             // no out shift below since xs[n] <= 1
-            limbs_shl_to_out(out, &xs_hi[..shift_limbs + 1], small_bits);
-            carry2 = out[shift_limbs];
-            limbs_shl_with_complement_to_out(&mut out[shift_limbs..], xs_lo, small_bits)
+            limbs_shl_to_out(out, &xs_hi[..shift + 1], small_bits);
+            carry2 = out[shift];
+            limbs_shl_with_complement_to_out(&mut out[shift..], xs_lo, small_bits)
         };
 
-        // add carry to out[0], and add carry2 to out[shift_limbs]
-        // now add 1 in out[shift_limbs], subtract 1 in out[n], i.e. add 1 in out[0]
+        // add carry to out[0], and add carry2 to out[shift]
+        // now add 1 in out[shift], subtract 1 in out[n], i.e. add 1 in out[0]
         out[n] = 0;
         // carry < 2 ^ small_bits <= 2 ^ (Limb::WIDTH - 1) thus no overflow here
         carry += 1;
@@ -695,34 +691,34 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
         carry2.wrapping_add_assign(1);
         // carry2 might overflow when small_bits = Limb::WIDTH - 1
         if carry2 == 0 {
-            limbs_slice_add_limb_in_place(&mut out[shift_limbs + 1..], 1);
+            limbs_slice_add_limb_in_place(&mut out[shift + 1..], 1);
         } else {
-            limbs_slice_add_limb_in_place(&mut out[shift_limbs..], carry2);
+            limbs_slice_add_limb_in_place(&mut out[shift..], carry2);
         }
     } else {
         let carry2;
-        // out[0..shift_limbs - 1]  <-- -xs[n - shift_limbs..n - 1] << small_bits
-        // out[shift_limbs..n - 1]  <-- xs[0..n - shift_limbs - 1] << small_bits
-        let (xs_lo, xs_hi) = xs.split_at(n - shift_limbs);
+        // out[0..shift - 1]  <-- -xs[n - shift..n - 1] << small_bits
+        // out[shift..n - 1]  <-- xs[0..n - shift - 1] << small_bits
+        let (xs_lo, xs_hi) = xs.split_at(n - shift);
         let mut carry = if small_bits != 0 {
             // no out bits below since xs[n] <= 1
-            limbs_shl_with_complement_to_out(out, &xs_hi[..shift_limbs + 1], small_bits);
-            carry2 = !out[shift_limbs];
-            // out[..shift_limbs + 1] = xs[n - shift_limbs, n + 1] << small_bits
-            // out[shift_limbs..n] = xs[n - shift_limbs..] << small_bits
-            limbs_shl_to_out(&mut out[shift_limbs..], xs_lo, small_bits)
+            limbs_shl_with_complement_to_out(out, &xs_hi[..shift + 1], small_bits);
+            carry2 = !out[shift];
+            // out[..shift + 1] = xs[n - shift, n + 1] << small_bits
+            // out[shift..n] = xs[n - shift..] << small_bits
+            limbs_shl_to_out(&mut out[shift..], xs_lo, small_bits)
         } else {
-            // out[shift_limbs] is not used below, but we save xs test for shift_limbs = 0
-            limbs_not_to_out(out, &xs_hi[..shift_limbs + 1]);
+            // out[shift] is not used below, but we save xs test for shift = 0
+            limbs_not_to_out(out, &xs_hi[..shift + 1]);
             carry2 = xs[n];
-            out[shift_limbs..n].copy_from_slice(xs_lo);
+            out[shift..n].copy_from_slice(xs_lo);
             0
         };
 
-        // now complement out[..shift_limbs], subtract carry from out[0], subtract carry2 from
-        // out[shift_limbs]. If shift_limbs == 0 we just have out[0] = xs[n] << small_bits.
-        if shift_limbs != 0 {
-            // now add 1 in out[0], subtract 1 in out[shift_limbs], then add 1 to out[0]
+        // now complement out[..shift], subtract carry from out[0], subtract carry2 from out[shift].
+        // If shift == 0 we just have out[0] = xs[n] << small_bits.
+        if shift != 0 {
+            // now add 1 in out[0], subtract 1 in out[shift], then add 1 to out[0]
             if carry == 0 {
                 if limbs_slice_add_limb_in_place(&mut out[..n], 1) {
                     carry = 1;
@@ -731,28 +727,22 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
                 carry -= 1;
             }
             // add 1 to carry instead of carry2 since carry2 might overflow
-            carry = Limb::iverson(limbs_sub_limb_in_place(&mut out[..shift_limbs], carry)) + 1;
+            carry = Limb::iverson(limbs_sub_limb_in_place(&mut out[..shift], carry)) + 1;
         }
 
-        // now subtract carry and carry2 from out[shift_limbs..n]
+        // now subtract carry and carry2 from out[shift..n]
         let (out_last, out_init) = out[..n + 1].split_last_mut().unwrap();
-        {
-            let out_init_hi = &mut out_init[shift_limbs..];
-            *out_last = if limbs_sub_limb_in_place(out_init_hi, carry) {
-                Limb::MAX
-            } else {
-                0
-            };
-            if limbs_sub_limb_in_place(out_init_hi, carry2) {
-                out_last.wrapping_sub_assign(1);
-            }
+        let out_init_hi = &mut out_init[shift..];
+        *out_last = if limbs_sub_limb_in_place(out_init_hi, carry) {
+            Limb::MAX
+        } else {
+            0
+        };
+        if limbs_sub_limb_in_place(out_init_hi, carry2) {
+            out_last.wrapping_sub_assign(1);
         }
         if out_last.get_highest_bit() {
-            *out_last = if limbs_slice_add_limb_in_place(out_init, 1) {
-                1
-            } else {
-                0
-            };
+            *out_last = Limb::iverson(limbs_slice_add_limb_in_place(out_init, 1));
         }
     }
 }
@@ -832,8 +822,9 @@ fn _limbs_mul_fft_decompose<'a>(
                 source = &source[n..];
             }
             let scratch = &mut scratch[..width];
-            scratch[..j].copy_from_slice(&source[..j]);
-            slice_set_zero(&mut scratch[j..]);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(j);
+            scratch_lo.copy_from_slice(&source[..j]);
+            slice_set_zero(scratch_hi);
             _limbs_mul_fft_shl_mod_f_to_out(a_lo, scratch, i * m);
         }
         a_table.push(a_lo);
@@ -865,19 +856,13 @@ pub fn _limbs_mul_fft_fft(
 ) {
     assert_ne!(increment, 0);
     if k == 2 {
-        {
-            let (xss_first, xss_tail) = xss.split_first_mut().unwrap();
-            scratch.copy_from_slice(xss_first);
-            limbs_slice_add_same_length_in_place_left(xss_first, xss_tail[increment - 1]);
-            let (xss_0_last, xss_0_init) = xss_first.split_last_mut().unwrap();
-            // can be 2 or 3
-            if *xss_0_last > 1 {
-                *xss_0_last = if limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1) {
-                    0
-                } else {
-                    1
-                };
-            }
+        let (xss_first, xss_tail) = xss.split_first_mut().unwrap();
+        scratch.copy_from_slice(xss_first);
+        limbs_slice_add_same_length_in_place_left(xss_first, xss_tail[increment - 1]);
+        let (xss_0_last, xss_0_init) = xss_first.split_last_mut().unwrap();
+        // can be 2 or 3
+        if *xss_0_last > 1 {
+            *xss_0_last = Limb::iverson(!limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1));
         }
         // xss[increment][n] can be -1 or -2
         if limbs_sub_same_length_in_place_right(scratch, &mut xss[increment]) {
@@ -958,11 +943,7 @@ pub fn _limbs_mul_fft_inverse(
         // can be 2 or 3
         let (xss_0_last, xss_0_init) = xss_first.split_last_mut().unwrap();
         if *xss_0_last > 1 {
-            *xss_0_last = if limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1) {
-                0
-            } else {
-                1
-            };
+            *xss_0_last = Limb::iverson(!limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1));
         }
         // Ap[1][n] can be -1 or -2
         if limbs_sub_same_length_in_place_right(scratch, &mut xss_tail[0]) {
@@ -1070,7 +1051,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
             let residues =
                 _limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, &mut scratch);
             _limbs_mul_fft_decompose(b, two_pow_k, s, ys, p, q_shifted, &mut scratch);
-            xs[n] = if _limbs_mul_fft_internal(
+            xs[n] = Limb::iverson(_limbs_mul_fft_internal(
                 xs,
                 n,
                 k,
@@ -1081,11 +1062,7 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
                 &bit_reverse_table,
                 &mut scratch,
                 false,
-            ) {
-                1
-            } else {
-                0
-            };
+            ));
         }
     } else {
         let mut scratch = vec![0; n << 1];
@@ -1093,18 +1070,15 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
             let (ys_last, ys_init) = ys.split_last_mut().unwrap();
             limbs_mul_same_length_to_out(&mut scratch, ys_init, xs_init);
-            let mut carry = 0;
-            {
-                let scratch_hi = &mut scratch[n..];
-                if *xs_last != 0 && limbs_slice_add_same_length_in_place_left(scratch_hi, ys_init) {
-                    carry = 1;
+            let scratch_hi = &mut scratch[n..];
+            let mut carry = Limb::iverson(
+                *xs_last != 0 && limbs_slice_add_same_length_in_place_left(scratch_hi, ys_init),
+            );
+            if *ys_last != 0 {
+                if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
+                    carry += 1;
                 }
-                if *ys_last != 0 {
-                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
-                        carry += 1;
-                    }
-                    carry.wrapping_add_assign(*xs_last);
-                }
+                carry += *xs_last;
             }
             if carry != 0 {
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
@@ -1164,7 +1138,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
             _limbs_mul_fft_normalize(xs);
             let residues =
                 _limbs_mul_fft_decompose(a_lo, two_pow_k, s, xs, p, q_shifted, &mut scratch);
-            xs[n] = if _limbs_mul_fft_internal(
+            xs[n] = Limb::iverson(_limbs_mul_fft_internal(
                 xs,
                 n,
                 k,
@@ -1175,11 +1149,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
                 &bit_reverse_table,
                 &mut scratch,
                 true,
-            ) {
-                1
-            } else {
-                0
-            };
+            ));
         }
     } else {
         let mut scratch = vec![0; n << 1];
@@ -1187,22 +1157,16 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
             //TODO use square
             limbs_mul_same_length_to_out(&mut scratch, xs_init, xs_init);
-            let mut carry = 0;
-            {
-                let scratch_hi = &mut scratch[n..];
-                if *xs_last != 0 {
-                    //TODO use addmul
-                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
-                        carry = 1;
-                    }
-                    if limbs_slice_add_same_length_in_place_left(scratch_hi, xs_init) {
-                        carry += 1;
-                    }
-                    carry.wrapping_add_assign(*xs_last);
+            if *xs_last != 0 {
+                let carry = limbs_slice_add_mul_limb_same_length_in_place_left(
+                    &mut scratch[n..],
+                    xs_init,
+                    2,
+                )
+                .wrapping_add(*xs_last);
+                if carry != 0 {
+                    assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
                 }
-            }
-            if carry != 0 {
-                assert!(!limbs_slice_add_limb_in_place(&mut scratch, carry));
             }
             let (scratch_lo, scratch_hi) = scratch.split_at(n);
             *xs_last = Limb::iverson(
@@ -1328,9 +1292,11 @@ pub fn _limbs_mul_fft_internal(
         }
     } else if carry == 1 {
         // TODO This branch is untested!
-        if q >= 2 * p {
-            let ys = &mut ys[q - 2 * p..];
-            while limbs_slice_add_limb_in_place(ys, 1) {}
+        if q >= p << 1 {
+            let ys = &mut ys[q - (p << 1)..];
+            if limbs_slice_add_limb_in_place(ys, 1) {
+                limbs_slice_add_limb_in_place(ys, 1);
+            }
         } else {
             assert!(!limbs_sub_limb_in_place(&mut ys[q - p..], 1));
         }

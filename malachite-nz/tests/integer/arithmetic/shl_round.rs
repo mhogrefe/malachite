@@ -7,7 +7,7 @@ use malachite_base::round::RoundingMode;
 
 use malachite_nz::integer::Integer;
 
-macro_rules! tests_and_properties {
+macro_rules! tests_signed {
     (
         $t:ident,
         $test_shl_round_i: ident,
@@ -1236,7 +1236,7 @@ macro_rules! tests_and_properties {
         }
     };
 }
-tests_and_properties!(
+tests_signed!(
     i8,
     test_shl_round_i8,
     shl_round_assign_i8_fail_1,
@@ -1252,7 +1252,7 @@ tests_and_properties!(
     shl_round_i8_ref_fail_3,
     shl_round_i8_ref_fail_4
 );
-tests_and_properties!(
+tests_signed!(
     i16,
     test_shl_round_i16,
     shl_round_assign_i16_fail_1,
@@ -1268,7 +1268,7 @@ tests_and_properties!(
     shl_round_i16_ref_fail_3,
     shl_round_i16_ref_fail_4
 );
-tests_and_properties!(
+tests_signed!(
     i32,
     test_shl_round_i32,
     shl_round_assign_i32_fail_1,
@@ -1284,7 +1284,7 @@ tests_and_properties!(
     shl_round_i32_ref_fail_3,
     shl_round_i32_ref_fail_4
 );
-tests_and_properties!(
+tests_signed!(
     i64,
     test_shl_round_i64,
     shl_round_assign_i64_fail_1,
@@ -1300,7 +1300,7 @@ tests_and_properties!(
     shl_round_i64_ref_fail_3,
     shl_round_i64_ref_fail_4
 );
-tests_and_properties!(
+tests_signed!(
     i128,
     test_shl_round_i128,
     shl_round_assign_i128_fail_1,
@@ -1316,7 +1316,7 @@ tests_and_properties!(
     shl_round_i128_ref_fail_3,
     shl_round_i128_ref_fail_4
 );
-tests_and_properties!(
+tests_signed!(
     isize,
     test_shl_round_isize,
     shl_round_assign_isize_fail_1,

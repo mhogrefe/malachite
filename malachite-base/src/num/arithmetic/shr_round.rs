@@ -11,7 +11,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_two(other)`.
+            /// `self.divisible_by_power_of_two(bits)`.
             ///
             /// Time: worst case O(1)
             ///
@@ -19,7 +19,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             ///
             /// # Panics
             /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`other`</sup>.
+            /// 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -37,35 +37,35 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             ///
             /// assert_eq!(0x100u32.shr_round(8u64, RoundingMode::Exact), 1);
             /// ```
-            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
-                if other == 0 || self == 0 {
+            fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
+                if bits == 0 || self == 0 {
                     return self;
                 }
                 let width = $u::wrapping_from($t::WIDTH);
                 match rm {
-                    RoundingMode::Down | RoundingMode::Floor if other >= width => 0,
-                    RoundingMode::Down | RoundingMode::Floor => self >> other,
-                    RoundingMode::Up | RoundingMode::Ceiling if other >= width => 1,
+                    RoundingMode::Down | RoundingMode::Floor if bits >= width => 0,
+                    RoundingMode::Down | RoundingMode::Floor => self >> bits,
+                    RoundingMode::Up | RoundingMode::Ceiling if bits >= width => 1,
                     RoundingMode::Up | RoundingMode::Ceiling => {
-                        let shifted = self >> other;
-                        if shifted << other == self {
+                        let shifted = self >> bits;
+                        if shifted << bits == self {
                             shifted
                         } else {
                             shifted + 1
                         }
                     }
                     RoundingMode::Nearest
-                        if other == width && self > $t::power_of_two($t::WIDTH - 1) =>
+                        if bits == width && self > $t::power_of_two($t::WIDTH - 1) =>
                     {
                         1
                     }
-                    RoundingMode::Nearest if other >= width => 0,
+                    RoundingMode::Nearest if bits >= width => 0,
                     RoundingMode::Nearest => {
-                        let mostly_shifted = self >> (other - 1);
+                        let mostly_shifted = self >> (bits - 1);
                         if mostly_shifted.even() {
                             // round down
                             mostly_shifted >> 1
-                        } else if mostly_shifted << (other - 1) != self {
+                        } else if mostly_shifted << (bits - 1) != self {
                             // round up
                             (mostly_shifted >> 1) + 1
                         } else {
@@ -78,13 +78,13 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                             }
                         }
                     }
-                    RoundingMode::Exact if other >= width => {
-                        panic!("Right shift is not exact: {} >> {}", self, other);
+                    RoundingMode::Exact if bits >= width => {
+                        panic!("Right shift is not exact: {} >> {}", self, bits);
                     }
                     RoundingMode::Exact => {
-                        let shifted = self >> other;
-                        if shifted << other != self {
-                            panic!("Right shift is not exact: {} >> {}", self, other);
+                        let shifted = self >> bits;
+                        if shifted << bits != self {
+                            panic!("Right shift is not exact: {} >> {}", self, bits);
                         }
                         shifted
                     }
@@ -96,7 +96,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(other)`.
+            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(bits)`.
             ///
             /// Time: worst case O(1)
             ///
@@ -104,7 +104,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             ///
             /// # Panics
             /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`other`</sup>.
+            /// 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -143,35 +143,35 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             /// x.shr_round_assign(8u64, RoundingMode::Exact);
             /// assert_eq!(x, 1);
             /// ```
-            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
-                if other == 0 || *self == 0 {
+            fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
+                if bits == 0 || *self == 0 {
                     return;
                 }
                 let width = $u::wrapping_from($t::WIDTH);
                 match rm {
-                    RoundingMode::Down | RoundingMode::Floor if other >= width => *self = 0,
-                    RoundingMode::Down | RoundingMode::Floor => *self >>= other,
-                    RoundingMode::Up | RoundingMode::Ceiling if other >= width => *self = 1,
+                    RoundingMode::Down | RoundingMode::Floor if bits >= width => *self = 0,
+                    RoundingMode::Down | RoundingMode::Floor => *self >>= bits,
+                    RoundingMode::Up | RoundingMode::Ceiling if bits >= width => *self = 1,
                     RoundingMode::Up | RoundingMode::Ceiling => {
                         let original = *self;
-                        *self >>= other;
-                        if *self << other != original {
+                        *self >>= bits;
+                        if *self << bits != original {
                             *self += 1;
                         }
                     }
                     RoundingMode::Nearest
-                        if other == width && *self > $t::power_of_two($t::WIDTH - 1) =>
+                        if bits == width && *self > $t::power_of_two($t::WIDTH - 1) =>
                     {
                         *self = 1;
                     }
-                    RoundingMode::Nearest if other >= width => *self = 0,
+                    RoundingMode::Nearest if bits >= width => *self = 0,
                     RoundingMode::Nearest => {
                         let original = *self;
-                        *self >>= other - 1;
+                        *self >>= bits - 1;
                         if self.even() {
                             // round down
                             *self >>= 1;
-                        } else if *self << (other - 1) != original {
+                        } else if *self << (bits - 1) != original {
                             // round up
                             *self >>= 1;
                             *self += 1;
@@ -183,14 +183,14 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                             }
                         }
                     }
-                    RoundingMode::Exact if other >= width => {
-                        panic!("Right shift is not exact: {} >>= {}", *self, other);
+                    RoundingMode::Exact if bits >= width => {
+                        panic!("Right shift is not exact: {} >>= {}", *self, bits);
                     }
                     RoundingMode::Exact => {
                         let original = *self;
-                        *self >>= other;
-                        if *self << other != original {
-                            panic!("Right shift is not exact: {} >>= {}", original, other);
+                        *self >>= bits;
+                        if *self << bits != original {
+                            panic!("Right shift is not exact: {} >>= {}", original, bits);
                         }
                     }
                 }
@@ -243,7 +243,7 @@ macro_rules! impl_shr_round_primitive_signed {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_two(other)`. Rounding might only be necessary if `other`
+            /// `self.divisible_by_power_of_two(bits)`. Rounding might only be necessary if `bits`
             /// is non-negative.
             ///
             /// Time: worst case O(1)
@@ -251,8 +251,8 @@ macro_rules! impl_shr_round_primitive_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -270,15 +270,15 @@ macro_rules! impl_shr_round_primitive_signed {
             ///
             /// assert_eq!(0x100u32.shr_round(8i64, RoundingMode::Exact), 1);
             /// ```
-            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
-                if other >= 0 {
-                    self.shr_round(other.unsigned_abs(), rm)
+            fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
+                if bits >= 0 {
+                    self.shr_round(bits.unsigned_abs(), rm)
                 } else {
-                    let abs = other.unsigned_abs();
+                    let abs = bits.unsigned_abs();
                     if abs >= $t::WIDTH.wrapping_into() {
                         0
                     } else {
-                        self << other.unsigned_abs()
+                        self << bits.unsigned_abs()
                     }
                 }
             }
@@ -288,16 +288,16 @@ macro_rules! impl_shr_round_primitive_signed {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(other)`.
-            /// Rounding might only be necessary if `other` is non-negative.
+            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(bits)`.
+            /// Rounding might only be necessary if `bits` is non-negative.
             ///
             /// Time: worst case O(1)
             ///
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `other` is positive and `rm` is `RoundingMode::Exact` but `self` is not
-            /// divisible by 2<sup>`other`</sup>.
+            /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is not
+            /// divisible by 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -336,15 +336,15 @@ macro_rules! impl_shr_round_primitive_signed {
             /// x.shr_round_assign(8i64, RoundingMode::Exact);
             /// assert_eq!(x, 1);
             /// ```
-            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
-                if other >= 0 {
-                    self.shr_round_assign(other.unsigned_abs(), rm);
+            fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
+                if bits >= 0 {
+                    self.shr_round_assign(bits.unsigned_abs(), rm);
                 } else {
-                    let abs = other.unsigned_abs();
+                    let abs = bits.unsigned_abs();
                     if abs >= $t::WIDTH.wrapping_into() {
                         *self = 0;
                     } else {
-                        *self <<= other.unsigned_abs();
+                        *self <<= bits.unsigned_abs();
                     }
                 }
             }
@@ -432,7 +432,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_two(other)`.
+            /// `self.divisible_by_power_of_two(bits)`.
             ///
             /// Time: worst case O(1)
             ///
@@ -440,7 +440,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             ///
             /// # Panics
             /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`other`</sup>.
+            /// 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -458,12 +458,12 @@ macro_rules! impl_shr_round_signed_unsigned {
             ///
             /// assert_eq!(0x100i32.shr_round(8u64, RoundingMode::Exact), 1);
             /// ```
-            fn shr_round(self, other: $u, rm: RoundingMode) -> $t {
+            fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
                 let abs = self.unsigned_abs();
                 if self >= 0 {
-                    $t::wrapping_from(abs.shr_round(other, rm))
+                    $t::wrapping_from(abs.shr_round(bits, rm))
                 } else {
-                    let abs_shifted = abs.shr_round(other, -rm);
+                    let abs_shifted = abs.shr_round(bits, -rm);
                     if abs_shifted == 0 {
                         0
                     } else if abs_shifted == $t::MIN.unsigned_abs() {
@@ -479,7 +479,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             /// Shifts `self` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(other)`.
+            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(bits)`.
             ///
             /// Time: worst case O(1)
             ///
@@ -487,7 +487,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             ///
             /// # Panics
             /// Panics if `rm` is `RoundingMode::Exact` but `self` is not divisible by
-            /// 2<sup>`other`</sup>.
+            /// 2<sup>`bits`</sup>.
             ///
             /// # Examples
             /// ```
@@ -527,8 +527,8 @@ macro_rules! impl_shr_round_signed_unsigned {
             /// assert_eq!(x, 1);
             /// ```
             #[inline]
-            fn shr_round_assign(&mut self, other: $u, rm: RoundingMode) {
-                *self = self.shr_round(other, rm);
+            fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
+                *self = self.shr_round(bits, rm);
             }
         }
     };
