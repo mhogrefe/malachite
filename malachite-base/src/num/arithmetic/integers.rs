@@ -1,33 +1,13 @@
 use num::arithmetic::traits::{
-    CheckedDiv, CheckedPow, CheckedRem, DivAssignRem, DivExact, DivExactAssign, DivRem, DivRound,
-    DivRoundAssign, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign,
-    OverflowingDiv, OverflowingDivAssign, OverflowingPow, OverflowingRem, OverflowingRemAssign,
-    Parity, Pow, SaturatingPow, WrappingDiv, WrappingDivAssign, WrappingPow, WrappingRem,
-    WrappingRemAssign,
+    CheckedPow, DivAssignRem, DivExact, DivExactAssign, DivRem, DivRound, DivRoundAssign,
+    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, OverflowingPow,
+    Parity, Pow, SaturatingPow, WrappingPow,
 };
 use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl CheckedDiv<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_div(self, rhs: $t) -> Option<$t> {
-                $t::checked_div(self, rhs)
-            }
-        }
-
-        impl CheckedRem<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_rem(self, rhs: $t) -> Option<$t> {
-                $t::checked_rem(self, rhs)
-            }
-        }
-
         impl CheckedPow<u64> for $t {
             type Output = $t;
 
@@ -46,48 +26,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl WrappingDiv<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_div(self, rhs: $t) -> $t {
-                $t::wrapping_div(self, rhs)
-            }
-        }
-
-        impl WrappingRem<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn wrapping_rem(self, rhs: $t) -> $t {
-                $t::wrapping_rem(self, rhs)
-            }
-        }
-
         impl WrappingPow<u64> for $t {
             type Output = $t;
 
             #[inline]
             fn wrapping_pow(self, rhs: u64) -> $t {
                 $t::wrapping_pow(self, u32::exact_from(rhs))
-            }
-        }
-
-        impl OverflowingDiv<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_div(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_div(self, rhs)
-            }
-        }
-
-        impl OverflowingRem<$t> for $t {
-            type Output = $t;
-
-            #[inline]
-            fn overflowing_rem(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_rem(self, rhs)
             }
         }
 
@@ -106,38 +50,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn pow(self, exp: u64) -> $t {
                 $t::pow(self, u32::exact_from(exp))
-            }
-        }
-
-        impl WrappingDivAssign for $t {
-            #[inline]
-            fn wrapping_div_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_div(rhs);
-            }
-        }
-
-        impl WrappingRemAssign for $t {
-            #[inline]
-            fn wrapping_rem_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_rem(rhs);
-            }
-        }
-
-        impl OverflowingDivAssign for $t {
-            #[inline]
-            fn overflowing_div_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_div(rhs);
-                *self = result;
-                overflow
-            }
-        }
-
-        impl OverflowingRemAssign for $t {
-            #[inline]
-            fn overflowing_rem_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_rem(rhs);
-                *self = result;
-                overflow
             }
         }
 

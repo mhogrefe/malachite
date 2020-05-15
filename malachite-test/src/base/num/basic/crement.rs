@@ -54,7 +54,7 @@ fn demo_unsigned_increment<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limi
     for mut n in unsigneds_no_max::<T>(gm).take(limit) {
         let n_old = n;
         n.increment();
-        println!("n := {:?}; n.increment(); n = {:?}", n_old, n);
+        println!("n := {}; n.increment(); n = {}", n_old, n);
     }
 }
 
@@ -66,7 +66,7 @@ where
     for mut n in signeds_no_max::<T>(gm).take(limit) {
         let n_old = n;
         n.increment();
-        println!("n := {:?}; n.increment(); n = {:?}", n_old, n);
+        println!("n := {}; n.increment(); n = {}", n_old, n);
     }
 }
 
@@ -74,7 +74,7 @@ fn demo_unsigned_decrement<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limi
     for mut n in positive_unsigneds::<T>(gm).take(limit) {
         let n_old = n;
         n.decrement();
-        println!("n := {:?}; n.decrement(); n = {:?}", n_old, n);
+        println!("n := {}; n.decrement(); n = {}", n_old, n);
     }
 }
 
@@ -86,7 +86,7 @@ where
     for mut n in signeds_no_min::<T>(gm).take(limit) {
         let n_old = n;
         n.decrement();
-        println!("n := {:?}; n.decrement(); n = {:?}", n_old, n);
+        println!("n := {}; n.decrement(); n = {}", n_old, n);
     }
 }
 

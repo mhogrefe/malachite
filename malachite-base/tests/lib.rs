@@ -2,7 +2,11 @@
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 
-pub mod bools;
+pub mod bools {
+    pub mod constants;
+    pub mod crement;
+    pub mod not_assign;
+}
 pub mod comparison {
     pub mod macros;
 }
@@ -34,6 +38,7 @@ pub mod num {
         pub mod overflowing_abs;
         pub mod overflowing_add;
         pub mod overflowing_add_mul;
+        pub mod overflowing_div;
         pub mod overflowing_mul;
         pub mod overflowing_neg;
         pub mod overflowing_sub;
@@ -54,6 +59,7 @@ pub mod num {
         pub mod wrapping_abs;
         pub mod wrapping_add;
         pub mod wrapping_add_mul;
+        pub mod wrapping_div;
         pub mod wrapping_mul;
         pub mod wrapping_neg;
         pub mod wrapping_sub;

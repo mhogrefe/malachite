@@ -12,6 +12,7 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
     _limbs_add_same_length_with_carry_in_to_out, limbs_add_limb_to_out,
@@ -616,7 +617,6 @@ pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
         0
     };
     if q_lo && limbs_sub_same_length_in_place_left(&mut ns_lo[lo..], ds_lo) {
-        // TODO This branch is untested!
         carry += 1;
     }
     while carry != 0 {
@@ -691,7 +691,9 @@ pub fn _limbs_div_mod_divide_and_conquer(
                 assert!(n_2 < d_1 || n_2 == d_1 && n_1 <= d_0);
                 let mut q;
                 if n_2 == d_1 && n_1 == d_0 {
-                    // TODO This branch is untested!
+                    fail_on_untested_path(
+                        "_limbs_div_mod_divide_and_conquer, n_2 != d_1 || n_1 != d_0",
+                    );
                     q = Limb::MAX;
                     assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(ns, ds, q), n_2);
                 } else {
@@ -1267,7 +1269,7 @@ pub fn _limbs_div_mod_barrett_helper(
             _limbs_invert_approx(is, scratch_lo, scratch_hi);
             slice_move_left(is, 1);
         } else if limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1) {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_mod_barrett_helper, limbs_add_limb_to_out");
             slice_set_zero(&mut is[..i_len]);
         } else {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
@@ -1349,7 +1351,10 @@ pub fn _limbs_div_mod_barrett_large_helper(
         scratch_hi,
         limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
     ) {
-        // TODO This branch is untested!
+        fail_on_untested_path(
+            "_limbs_div_mod_barrett_large_helper, \
+            _limbs_sub_same_length_with_borrow_in_in_place_left",
+        );
         if limbs_sub_limb_in_place(qs, 1) {
             assert!(highest_q);
             highest_q = false;
@@ -1625,7 +1630,7 @@ pub(crate) fn _limbs_div_mod_balanced(
         } else if q_len < MU_DIV_QR_THRESHOLD {
             _limbs_div_mod_divide_and_conquer(qs, ns_shifted, ds_shifted, d_inv);
         } else {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_mod_balanced, q_len >= MU_DIV_QR_THRESHOLD");
             let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(q_len_2, q_len)];
             _limbs_div_mod_barrett(qs, rs, ns_shifted, ds_shifted, &mut scratch);
             ns_shifted[..q_len].copy_from_slice(&rs[..q_len]);

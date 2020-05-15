@@ -6,6 +6,7 @@ pub mod arithmetic {
     pub mod checked_abs;
     pub mod checked_add;
     pub mod checked_add_mul;
+    pub mod checked_div;
     pub mod checked_mul;
     pub mod checked_neg;
     pub mod checked_sub;
@@ -27,6 +28,7 @@ pub mod arithmetic {
     pub mod overflowing_abs;
     pub mod overflowing_add;
     pub mod overflowing_add_mul;
+    pub mod overflowing_div;
     pub mod overflowing_mul;
     pub mod overflowing_neg;
     pub mod overflowing_sub;
@@ -50,6 +52,7 @@ pub mod arithmetic {
     pub mod wrapping_abs;
     pub mod wrapping_add;
     pub mod wrapping_add_mul;
+    pub mod wrapping_div;
     pub mod wrapping_mul;
     pub mod wrapping_neg;
     pub mod wrapping_sub;

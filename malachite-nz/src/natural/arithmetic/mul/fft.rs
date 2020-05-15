@@ -8,6 +8,7 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_set_zero;
 
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
@@ -1283,25 +1284,27 @@ pub fn _limbs_mul_fft_internal(
             }
         }
     }
-    if carry == -1 {
-        let ys = &mut ys[q - p - 1..];
-        if limbs_slice_add_limb_in_place(&mut ys[1..], 1) {
-            // p[q - p], ..., p[q - 1] are all zero
-            limbs_sub_limb_in_place(ys, 1);
-            limbs_sub_limb_in_place(&mut ys[p..], 1);
-        }
-    } else if carry == 1 {
-        // TODO This branch is untested!
-        if q >= p << 1 {
-            let ys = &mut ys[q - (p << 1)..];
-            if limbs_slice_add_limb_in_place(ys, 1) {
-                limbs_slice_add_limb_in_place(ys, 1);
+    match carry {
+        -1 => {
+            let ys = &mut ys[q - p - 1..];
+            if limbs_slice_add_limb_in_place(&mut ys[1..], 1) {
+                // p[q - p], ..., p[q - 1] are all zero
+                limbs_sub_limb_in_place(ys, 1);
+                limbs_sub_limb_in_place(&mut ys[p..], 1);
             }
-        } else {
-            assert!(!limbs_sub_limb_in_place(&mut ys[q - p..], 1));
         }
-    } else {
-        assert_eq!(carry, 0);
+        1 => {
+            fail_on_untested_path("_limbs_mul_fft_internal, carry == 1");
+            if q >= p << 1 {
+                let ys = &mut ys[q - (p << 1)..];
+                if limbs_slice_add_limb_in_place(ys, 1) {
+                    limbs_slice_add_limb_in_place(ys, 1);
+                }
+            } else {
+                assert!(!limbs_sub_limb_in_place(&mut ys[q - p..], 1));
+            }
+        }
+        _ => assert_eq!(carry, 0),
     }
     // here p < 2 ^ (2 * m) * [k * 2 ^ (m(k - 1)) + (k - 1) * 2 ^ (m * (k - 2)) + ...]
     // < k * 2 ^ (2 * m) * [2 ^ (m * (k - 1)) + 2 ^ (m * (k - 2)) + ...]

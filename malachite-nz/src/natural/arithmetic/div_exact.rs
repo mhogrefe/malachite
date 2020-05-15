@@ -11,6 +11,7 @@ use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 
+use fail_on_untested_path;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -836,7 +837,6 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
                 let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
                 _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs, scratch_out);
             }
-            //TODO Else is untested!
             if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
                 if wrapped_len != 0 {
                     let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -848,6 +848,10 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
                         assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
                     }
                 }
+            } else {
+                fail_on_untested_path(
+                    "_limbs_modular_div_mod_barrett_unbalanced, wrapped_len is None",
+                );
             }
         }
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
@@ -1275,7 +1279,6 @@ fn _limbs_modular_div_barrett_greater(
                 let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
                 _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
             }
-            //TODO Else is untested!
             if let Some(wrapped_len) = (d_len + i_len).checked_sub(mul_size) {
                 if wrapped_len != 0 {
                     let (scratch_lo, scratch_hi) = scratch.split_at_mut(mul_size);
@@ -1287,6 +1290,10 @@ fn _limbs_modular_div_barrett_greater(
                         assert!(!limbs_sub_limb_in_place(&mut scratch[wrapped_len..], 1));
                     }
                 }
+            } else {
+                fail_on_untested_path(
+                    "_limbs_modular_div_mod_barrett_greater, wrapped_len is None",
+                );
             }
         }
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);
@@ -1380,7 +1387,6 @@ fn _limbs_modular_div_barrett_same_length(
             let (scratch, scratch_out) = scratch.split_at_mut(mul_size);
             _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds, qs_lo, scratch_out);
         }
-        //TODO Else is untested!
         if let Some(wrapped_len) = (n_len + i_len).checked_sub(mul_size) {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(wrapped_len);
             if wrapped_len != 0
@@ -1388,6 +1394,10 @@ fn _limbs_modular_div_barrett_same_length(
             {
                 assert!(!limbs_sub_limb_in_place(scratch_hi, 1));
             }
+        } else {
+            fail_on_untested_path(
+                "_limbs_modular_div_mod_barrett_same_length, wrapped_len is None",
+            );
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);

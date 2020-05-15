@@ -4,6 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::logic::traits::TrailingZeros;
 
+use fail_on_untested_path;
 use integer::Integer;
 use natural::arithmetic::add::{limbs_add, limbs_add_limb};
 use natural::arithmetic::divisible_by::{
@@ -109,8 +110,13 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
             let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
             let y = quick_neg_mod(y, m_0);
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
-                //TODO else untested!
-                limbs_mod_limb(xs, m_0) == if y < m_0 { y } else { y % m_0 }
+                limbs_mod_limb(xs, m_0)
+                    == if y < m_0 {
+                        y
+                    } else {
+                        fail_on_untested_path("limbs_pos_eq_neg_limb_mod_helper, y >= m_0");
+                        y % m_0
+                    }
             } else {
                 let r = limbs_mod_exact_odd_limb(xs, m_0, y);
                 r == 0 || r == m_0

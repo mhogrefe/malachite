@@ -49,4 +49,16 @@ pub mod integer {
         pub mod partial_ord_natural;
         pub mod partial_ord_primitive_integer;
     }
+    pub mod conversion {
+        pub mod clone;
+        pub mod floating_point_from_integer;
+        pub mod from_floating_point;
+        pub mod from_natural;
+        pub mod from_primitive_integer;
+        pub mod from_twos_complement_limbs;
+        pub mod natural_from_integer;
+        pub mod primitive_integer_from_integer;
+        pub mod serde;
+        pub mod to_twos_complement_limbs;
+    }
 }

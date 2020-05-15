@@ -627,8 +627,6 @@ fn _limbs_shl_and_sub_special(
     }
 }
 
-//TODO clean out
-
 /// Interpolation for Toom-4.5 (or Toom-4), using the evaluation points: infinity(4.5 only), 4, -4,
 /// 2, -2, 1, -1, 0. More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial
 /// f of degree 7 (or 6), given the 8 (rsp. 7) values:
@@ -672,20 +670,20 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     let m = 3 * n + 1;
     assert_eq!(r3.len(), m);
     assert_eq!(r7.len(), m);
-    let (out_1, remainder) = out.split_at_mut(n << 1);
+    let (out, remainder) = out.split_at_mut(n << 1);
     let (out_2, remainder) = remainder.split_at_mut(n);
     let (r5, r1) = remainder.split_at_mut(n << 2);
     let r1 = &mut r1[..s_plus_t];
     let r5_lo = &mut r5[..m];
     // Interpolation
-    _limbs_shl_and_sub(&mut r3[n..], out_1, 4, scratch);
+    _limbs_shl_and_sub(&mut r3[n..], out, 4, scratch);
     let carry = _limbs_shl_and_sub_same_length(r3, r1, 12, scratch);
     assert!(!limbs_sub_limb_in_place(&mut r3[s_plus_t..], carry));
-    _limbs_shl_and_sub(&mut r5_lo[n..], out_1, 2, scratch);
+    _limbs_shl_and_sub(&mut r5_lo[n..], out, 2, scratch);
     let carry = _limbs_shl_and_sub_same_length(r5_lo, r1, 6, scratch);
     assert!(!limbs_sub_limb_in_place(&mut r5_lo[s_plus_t..], carry));
     let (r7_last, r7_init) = r7.split_last_mut().unwrap();
-    if limbs_sub_same_length_in_place_left(&mut r7_init[n..], out_1) {
+    if limbs_sub_same_length_in_place_left(&mut r7_init[n..], out) {
         r7_last.wrapping_sub_assign(1);
     }
     let (r7_lo, r7_hi) = r7.split_at_mut(s_plus_t);
@@ -715,8 +713,9 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
     // Hr8+Lr7-Lr5
     split_into_chunks_mut!(r5_lo, n, [r5_lo_0, r5_lo_1, r5_lo_2], r5_lo_3);
     let (r7_lo, r7) = r7.split_at_mut(n);
-    let carry_1 = limbs_slice_add_same_length_in_place_left(&mut out_1[n..], r7_lo);
-    let carry_2 = limbs_sub_same_length_in_place_left(&mut out_1[n..], r5_lo_0);
+    let out = &mut out[n..];
+    let carry_1 = limbs_slice_add_same_length_in_place_left(out, r7_lo);
+    let carry_2 = limbs_sub_same_length_in_place_left(out, r5_lo_0);
     if carry_1 && !carry_2 {
         assert!(!limbs_slice_add_limb_in_place(r7, 1));
     } else if !carry_1 && carry_2 {
@@ -818,109 +817,90 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
     assert_eq!(r1.len(), m);
     assert_eq!(r3.len(), m);
     assert_eq!(r5.len(), m);
-    {
-        let (out_lo, remainder) = out.split_at_mut(3 * n);
-        let out_lo = &mut out_lo[..2 * n];
-        let (r4, r2) = remainder.split_at_mut(4 * n);
-        let r4 = &mut r4[..m];
-        // Interpolation
-        if half {
-            let (r2, r0) = r2.split_at_mut(4 * n);
-            let r0 = &mut r0[..s_plus_t];
-            let (r3_lo, r3_hi) = r3.split_at_mut(s_plus_t);
-            if limbs_sub_same_length_in_place_left(r3_lo, r0) {
-                assert!(!limbs_sub_limb_in_place(r3_hi, 1));
-            }
-
-            let carry = _limbs_shl_and_sub_same_length(r2, r0, 10, scratch);
-            assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..m], carry));
-            _limbs_shl_and_sub(r5, r0, 2, scratch);
-
-            let carry = _limbs_shl_and_sub_same_length(r1, r0, 20, scratch);
-            assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
-            _limbs_shl_and_sub(r4, r0, 4, scratch);
-        };
-        let r2 = &mut r2[..m];
-        let carry = _limbs_shl_and_sub_same_length(&mut r4[n..], out_lo, 20, scratch);
-        r4.last_mut().unwrap().wrapping_sub_assign(carry);
-        _limbs_shl_and_sub(&mut r1[n..], out_lo, 4, scratch);
-
-        assert!(!limbs_add_same_length_to_out(scratch, r1, r4));
-        limbs_sub_same_length_in_place_left(r4, r1); // can be negative
-        swap(&mut r1, &mut scratch);
-        let r1 = &mut r1[..m];
-
-        let carry = _limbs_shl_and_sub_same_length(&mut r5[n..], out_lo, 10, scratch);
-        r5.last_mut().unwrap().wrapping_sub_assign(carry);
-        _limbs_shl_and_sub(&mut r2[n..], out_lo, 2, scratch);
-
-        limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
-        assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
-        swap(&mut r5, &mut scratch);
-        {
-            let (r3_last, r3_init) = r3.split_last_mut().unwrap();
-            if limbs_sub_same_length_in_place_left(&mut r3_init[n..], out_lo) {
-                r3_last.wrapping_sub_assign(1);
-            }
+    let (out_lo, remainder) = out.split_at_mut(3 * n);
+    let out_lo = &mut out_lo[..2 * n];
+    let (r4, r2) = remainder.split_at_mut(4 * n);
+    let r4 = &mut r4[..m];
+    // Interpolation
+    if half {
+        let (r2, r0) = r2.split_at_mut(4 * n);
+        let r0 = &mut r0[..s_plus_t];
+        let (r3_lo, r3_hi) = r3.split_at_mut(s_plus_t);
+        if limbs_sub_same_length_in_place_left(r3_lo, r0) {
+            assert!(!limbs_sub_limb_in_place(r3_hi, 1));
         }
-        if AORSMUL_FASTER_AORS_AORSLSH {
-            limbs_sub_mul_limb_same_length_in_place_left(r4, r5, 257); // can be negative
-        } else {
-            limbs_sub_same_length_in_place_left(r4, r5); // can be negative
-            _limbs_shl_and_sub_same_length(r4, r5, 8, scratch); // can be negative
-        }
-
-        // A division by 2835 * 4 follows. Warning: the operand can be negative!
-        limbs_div_exact_limb_in_place(r4, 2_835 << 2);
-        {
-            let r4_last = r4.last_mut().unwrap();
-            if r4_last.leading_zeros() < 3 {
-                *r4_last |= Limb::MAX << (Limb::WIDTH - 2);
-            }
-        }
-
-        if AORSMUL_FASTER_2AORSLSH {
-            limbs_slice_add_mul_limb_same_length_in_place_left(r5, r4, 60); // can be negative
-        } else {
-            _limbs_shl_and_sub_same_length(r5, r4, 2, scratch); // can be negative
-            _limbs_shl_and_add_same_length_in_place_left(r5, r4, 6, scratch); // can give a carry
-        }
-        limbs_div_255_in_place(r5);
-
-        assert_eq!(_limbs_shl_and_sub_same_length(r2, r3, 5, scratch), 0);
-        if AORSMUL_FASTER_3AORSLSH {
-            assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 100), 0);
-        } else {
-            assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 6, scratch), 0);
-            assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 5, scratch), 0);
-            assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 2, scratch), 0);
-        }
-        assert_eq!(_limbs_shl_and_sub_same_length(r1, r3, 9, scratch), 0);
-        limbs_div_exact_limb_in_place(r1, 42_525);
-
-        if AORSMUL_FASTER_AORS_2AORSLSH {
-            assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 225), 0);
-        } else {
-            assert!(!limbs_sub_same_length_in_place_left(r2, r1));
-            assert_eq!(
-                _limbs_shl_and_add_same_length_in_place_left(r2, r1, 5, scratch),
-                0
-            );
-            assert_eq!(_limbs_shl_and_sub_same_length(r2, r1, 8, scratch), 0);
-        }
-        limbs_div_exact_limb_in_place(r2, 9 << 2);
-
-        assert!(!limbs_sub_same_length_in_place_left(r3, r2));
-
-        limbs_sub_same_length_in_place_right(r2, r4);
-        assert_eq!(limbs_slice_shr_in_place(r4, 1), 0);
-        assert!(!limbs_sub_same_length_in_place_left(r2, r4));
-    }
+        let carry = _limbs_shl_and_sub_same_length(r2, r0, 10, scratch);
+        assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..m], carry));
+        _limbs_shl_and_sub(r5, r0, 2, scratch);
+        let carry = _limbs_shl_and_sub_same_length(r1, r0, 20, scratch);
+        assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
+        _limbs_shl_and_sub(r4, r0, 4, scratch);
+    };
+    let r2 = &mut r2[..m];
+    let carry = _limbs_shl_and_sub_same_length(&mut r4[n..], out_lo, 20, scratch);
+    r4.last_mut().unwrap().wrapping_sub_assign(carry);
+    _limbs_shl_and_sub(&mut r1[n..], out_lo, 4, scratch);
+    assert!(!limbs_add_same_length_to_out(scratch, r1, r4));
+    limbs_sub_same_length_in_place_left(r4, r1); // can be negative
+    swap(&mut r1, &mut scratch);
     let r1 = &mut r1[..m];
-
+    let carry = _limbs_shl_and_sub_same_length(&mut r5[n..], out_lo, 10, scratch);
+    r5.last_mut().unwrap().wrapping_sub_assign(carry);
+    _limbs_shl_and_sub(&mut r2[n..], out_lo, 2, scratch);
+    limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
+    assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
+    swap(&mut r5, &mut scratch);
+    let (r3_last, r3_init) = r3.split_last_mut().unwrap();
+    if limbs_sub_same_length_in_place_left(&mut r3_init[n..], out_lo) {
+        r3_last.wrapping_sub_assign(1);
+    }
+    if AORSMUL_FASTER_AORS_AORSLSH {
+        limbs_sub_mul_limb_same_length_in_place_left(r4, r5, 257); // can be negative
+    } else {
+        limbs_sub_same_length_in_place_left(r4, r5); // can be negative
+        _limbs_shl_and_sub_same_length(r4, r5, 8, scratch); // can be negative
+    }
+    // A division by 2835 * 4 follows. Warning: the operand can be negative!
+    limbs_div_exact_limb_in_place(r4, 2_835 << 2);
+    let r4_last = r4.last_mut().unwrap();
+    if r4_last.leading_zeros() < 3 {
+        *r4_last |= Limb::MAX << (Limb::WIDTH - 2);
+    }
+    if AORSMUL_FASTER_2AORSLSH {
+        limbs_slice_add_mul_limb_same_length_in_place_left(r5, r4, 60); // can be negative
+    } else {
+        _limbs_shl_and_sub_same_length(r5, r4, 2, scratch); // can be negative
+        _limbs_shl_and_add_same_length_in_place_left(r5, r4, 6, scratch); // can give a carry
+    }
+    limbs_div_255_in_place(r5);
+    assert_eq!(_limbs_shl_and_sub_same_length(r2, r3, 5, scratch), 0);
+    if AORSMUL_FASTER_3AORSLSH {
+        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 100), 0);
+    } else {
+        assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 6, scratch), 0);
+        assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 5, scratch), 0);
+        assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 2, scratch), 0);
+    }
+    assert_eq!(_limbs_shl_and_sub_same_length(r1, r3, 9, scratch), 0);
+    limbs_div_exact_limb_in_place(r1, 42_525);
+    if AORSMUL_FASTER_AORS_2AORSLSH {
+        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 225), 0);
+    } else {
+        assert!(!limbs_sub_same_length_in_place_left(r2, r1));
+        assert_eq!(
+            _limbs_shl_and_add_same_length_in_place_left(r2, r1, 5, scratch),
+            0
+        );
+        assert_eq!(_limbs_shl_and_sub_same_length(r2, r1, 8, scratch), 0);
+    }
+    limbs_div_exact_limb_in_place(r2, 9 << 2);
+    assert!(!limbs_sub_same_length_in_place_left(r3, r2));
+    limbs_sub_same_length_in_place_right(r2, r4);
+    assert_eq!(limbs_slice_shr_in_place(r4, 1), 0);
+    assert!(!limbs_sub_same_length_in_place_left(r2, r4));
+    let r1 = &mut r1[..m];
     limbs_slice_add_same_length_in_place_left(r5, r1);
     assert_eq!(limbs_slice_shr_in_place(r5, 1), 0);
-
     // Last interpolation steps...
     assert!(!limbs_sub_same_length_in_place_left(r3, r1));
     assert!(!limbs_sub_same_length_in_place_left(r1, r5));
@@ -1070,194 +1050,160 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     assert_eq!(r5.len(), m);
     assert_eq!(r7.len(), m);
     assert_eq!(scratch.len(), m);
-    {
-        let (pp_lo, remainder) = out.split_at_mut(3 * n);
-        let pp_lo = &mut pp_lo[..n << 1];
-        split_into_chunks_mut!(remainder, n << 2, [r6, r4], r2);
-        let r4 = &mut r4[..m];
-        let r6 = &mut r6[..m];
-        // Interpolation
-        if half {
-            let (r2, r0) = r2.split_at_mut(n << 2);
-            let r0 = &mut r0[..s_plus_t];
-            let r2 = &mut r2[..m];
-            let (r4_lo, r4_hi) = r4.split_at_mut(s_plus_t);
-            if limbs_sub_same_length_in_place_left(r4_lo, r0) {
-                assert!(!limbs_sub_limb_in_place(r4_hi, 1));
-            }
-
-            let carry = _limbs_shl_and_sub_same_length(r3, r0, 14, scratch);
-            assert!(!limbs_sub_limb_in_place(&mut r3[s_plus_t..], carry));
-            _limbs_shl_and_sub(r6, r0, 2, scratch);
-
-            let carry = _limbs_shl_and_sub_same_length(r2, r0, 28, scratch);
-            assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..], carry));
-            _limbs_shl_and_sub(r5, r0, 4, scratch);
-
-            if BIT_CORRECTION {
-                let carry =
-                    _limbs_shl_and_sub_same_length(&mut r1[1..], r0, CORRECTED_WIDTH, scratch);
-                limbs_sub_limb_in_place(&mut r1[s_plus_t + 1..], carry);
-                let r5_first = r5.first_mut().unwrap();
-                let carry = *r5_first;
-                *r5_first = 0x80;
-                _limbs_shl_and_sub_special(r7, r5_first, r0, 6, scratch);
-                *r5_first = carry;
-            } else {
-                let carry = _limbs_shl_and_sub_same_length(r1, r0, CORRECTED_WIDTH, scratch);
-                assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
-                _limbs_shl_and_sub(r7, r0, 6, scratch);
-            }
-        }
+    let (pp_lo, remainder) = out.split_at_mut(3 * n);
+    let pp_lo = &mut pp_lo[..n << 1];
+    split_into_chunks_mut!(remainder, n << 2, [r6, r4], r2);
+    let r4 = &mut r4[..m];
+    let r6 = &mut r6[..m];
+    // Interpolation
+    if half {
+        let (r2, r0) = r2.split_at_mut(n << 2);
+        let r0 = &mut r0[..s_plus_t];
         let r2 = &mut r2[..m];
-        {
-            let (r5_last, r5_init) = r5[n..].split_last_mut().unwrap();
-            r5_last
-                .wrapping_sub_assign(_limbs_shl_and_sub_same_length(r5_init, pp_lo, 28, scratch));
+        let (r4_lo, r4_hi) = r4.split_at_mut(s_plus_t);
+        if limbs_sub_same_length_in_place_left(r4_lo, r0) {
+            assert!(!limbs_sub_limb_in_place(r4_hi, 1));
         }
-        _limbs_shl_and_sub(&mut r2[n..], pp_lo, 4, scratch);
-
-        limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
-        assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
-        swap(&mut r5, &mut scratch);
-        {
-            let (r6_last, r6_init) = r6[n..].split_last_mut().unwrap();
-            r6_last
-                .wrapping_sub_assign(_limbs_shl_and_sub_same_length(r6_init, pp_lo, 14, scratch));
-        }
-        _limbs_shl_and_sub(&mut r3[n..], pp_lo, 2, scratch);
-
-        assert!(!limbs_add_same_length_to_out(scratch, r3, r6));
-        limbs_sub_same_length_in_place_left(r6, r3); // can be negative
-        swap(&mut r3, &mut scratch);
-        {
-            let r1 = &mut r1[n..];
-            if BIT_CORRECTION {
-                _limbs_shl_and_sub_same_length(&mut r7[n + 1..], pp_lo, CORRECTED_WIDTH, scratch);
-                let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
-                assert!(!limbs_sub_limb_in_place(r1, pp_lo_first >> 6));
-                let carry =
-                    _limbs_shl_and_sub_same_length(r1, pp_lo_tail, Limb::WIDTH - 6, scratch);
-                limbs_sub_limb_in_place(&mut r1[2 * n - 1..], carry);
-            } else {
-                let carry =
-                    _limbs_shl_and_sub_same_length(&mut r7[n..], pp_lo, CORRECTED_WIDTH, scratch);
-                r7.last_mut().unwrap().wrapping_sub_assign(carry);
-                _limbs_shl_and_sub(r1, pp_lo, 6, scratch);
-            }
-        }
-        // can be negative
-        limbs_sub_same_length_to_out(scratch, r7, r1);
-        // if BIT_CORRECTION, can give a carry.
-        limbs_slice_add_same_length_in_place_left(r1, r7);
-        swap(&mut r7, &mut scratch);
-        {
-            let (r4_last, r4_init) = r4[n..].split_last_mut().unwrap();
-            if limbs_sub_same_length_in_place_left(r4_init, pp_lo) {
-                r4_last.wrapping_sub_assign(1);
-            }
-        }
-        if AORSMUL_FASTER_2AORSLSH {
-            limbs_sub_mul_limb_same_length_in_place_left(r5, r6, 1_028); // can be negative
+        let carry = _limbs_shl_and_sub_same_length(r3, r0, 14, scratch);
+        assert!(!limbs_sub_limb_in_place(&mut r3[s_plus_t..], carry));
+        _limbs_shl_and_sub(r6, r0, 2, scratch);
+        let carry = _limbs_shl_and_sub_same_length(r2, r0, 28, scratch);
+        assert!(!limbs_sub_limb_in_place(&mut r2[s_plus_t..], carry));
+        _limbs_shl_and_sub(r5, r0, 4, scratch);
+        if BIT_CORRECTION {
+            let carry = _limbs_shl_and_sub_same_length(&mut r1[1..], r0, CORRECTED_WIDTH, scratch);
+            limbs_sub_limb_in_place(&mut r1[s_plus_t + 1..], carry);
+            let r5_first = r5.first_mut().unwrap();
+            let carry = *r5_first;
+            *r5_first = 0x80;
+            _limbs_shl_and_sub_special(r7, r5_first, r0, 6, scratch);
+            *r5_first = carry;
         } else {
-            _limbs_shl_and_sub_same_length(r5, r6, 2, scratch); // can be negative
-            _limbs_shl_and_sub_same_length(r5, r6, 10, scratch); // can be negative
+            let carry = _limbs_shl_and_sub_same_length(r1, r0, CORRECTED_WIDTH, scratch);
+            assert!(!limbs_sub_limb_in_place(&mut r1[s_plus_t..], carry));
+            _limbs_shl_and_sub(r7, r0, 6, scratch);
         }
-        limbs_sub_mul_limb_same_length_in_place_left(r7, r5, 1_300); // can be negative
-        if AORSMUL_FASTER_3AORSLSH {
-            limbs_sub_mul_limb_same_length_in_place_left(r7, r6, 1_052_688); // can be negative
-        } else {
-            _limbs_shl_and_sub_same_length(r7, r6, 4, scratch); // can be negative
-            _limbs_shl_and_sub_same_length(r7, r6, 12, scratch); // can be negative
-            _limbs_shl_and_sub_same_length(r7, r6, 20, scratch); // can be negative
-        }
-        limbs_div_exact_limb_in_place(r7, 188_513_325);
-        limbs_div_255_in_place(r7);
-
-        // can be negative
-        limbs_sub_mul_limb_same_length_in_place_left(r5, r7, 12_567_555);
-        // A division by 2835x64 follows. Warning: the operand can be negative!
-        limbs_div_exact_limb_in_place(r5, 2_835 << 6);
-        {
-            let r5_last = r5.last_mut().unwrap();
-            if r5_last.leading_zeros() < 7 {
-                *r5_last |= Limb::MAX << (Limb::WIDTH - 6);
-            }
-        }
-
-        if AORSMUL_FASTER_AORS_AORSLSH {
-            limbs_sub_mul_limb_same_length_in_place_left(r6, r7, 4_095); // can be negative
-        } else {
-            // can give a carry
-            limbs_slice_add_same_length_in_place_left(r6, r7);
-            _limbs_shl_and_sub_same_length(r6, r7, 12, scratch); // can be negative
-        }
-        if AORSMUL_FASTER_2AORSLSH {
-            limbs_slice_add_mul_limb_same_length_in_place_left(r6, r5, 240); // can be negative
-        } else {
-            // can give a carry
-            _limbs_shl_and_add_same_length_in_place_left(r6, r5, 8, scratch);
-            _limbs_shl_and_sub_same_length(r6, r5, 4, scratch); // can be negative
-        }
-        // A division by 255x4 follows. Warning: the operand can be negative!
-        limbs_div_exact_limb_in_place(r6, 255 << 2);
-        {
-            let r6_last = r6.last_mut().unwrap();
-            if r6_last.leading_zeros() < 3 {
-                *r6_last |= Limb::MAX << (Limb::WIDTH - 2);
-            }
-        }
-
-        assert_eq!(_limbs_shl_and_sub_same_length(r3, r4, 7, scratch), 0);
-        assert_eq!(_limbs_shl_and_sub_same_length(r2, r4, 13, scratch), 0);
-        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r3, 400), 0);
-
-        // If `Limb::WIDTH` < 42 next operations on r1 can give a carry!
-        _limbs_shl_and_sub_same_length(r1, r4, 19, scratch);
-        limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 1_428);
-        limbs_sub_mul_limb_same_length_in_place_left(r1, r3, 112_896);
-        limbs_div_exact_limb_in_place(r1, 182_712_915);
-        limbs_div_255_in_place(r1);
-
+    }
+    let r2 = &mut r2[..m];
+    let (r5_last, r5_init) = r5[n..].split_last_mut().unwrap();
+    r5_last.wrapping_sub_assign(_limbs_shl_and_sub_same_length(r5_init, pp_lo, 28, scratch));
+    _limbs_shl_and_sub(&mut r2[n..], pp_lo, 4, scratch);
+    limbs_sub_same_length_to_out(scratch, r5, r2); // can be negative
+    assert!(!limbs_slice_add_same_length_in_place_left(r2, r5));
+    swap(&mut r5, &mut scratch);
+    let (r6_last, r6_init) = r6[n..].split_last_mut().unwrap();
+    r6_last.wrapping_sub_assign(_limbs_shl_and_sub_same_length(r6_init, pp_lo, 14, scratch));
+    _limbs_shl_and_sub(&mut r3[n..], pp_lo, 2, scratch);
+    assert!(!limbs_add_same_length_to_out(scratch, r3, r6));
+    limbs_sub_same_length_in_place_left(r6, r3); // can be negative
+    swap(&mut r3, &mut scratch);
+    let r1_hi = &mut r1[n..];
+    if BIT_CORRECTION {
+        _limbs_shl_and_sub_same_length(&mut r7[n + 1..], pp_lo, CORRECTED_WIDTH, scratch);
+        let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
+        assert!(!limbs_sub_limb_in_place(r1_hi, pp_lo_first >> 6));
+        let carry = _limbs_shl_and_sub_same_length(r1_hi, pp_lo_tail, Limb::WIDTH - 6, scratch);
+        limbs_sub_limb_in_place(&mut r1_hi[2 * n - 1..], carry);
+    } else {
+        let carry = _limbs_shl_and_sub_same_length(&mut r7[n..], pp_lo, CORRECTED_WIDTH, scratch);
+        r7.last_mut().unwrap().wrapping_sub_assign(carry);
+        _limbs_shl_and_sub(r1_hi, pp_lo, 6, scratch);
+    }
+    //
+    // can be negative
+    limbs_sub_same_length_to_out(scratch, r7, r1);
+    // if BIT_CORRECTION, can give a carry.
+    limbs_slice_add_same_length_in_place_left(r1, r7);
+    swap(&mut r7, &mut scratch);
+    let (r4_last, r4_init) = r4[n..].split_last_mut().unwrap();
+    if limbs_sub_same_length_in_place_left(r4_init, pp_lo) {
+        r4_last.wrapping_sub_assign(1);
+    }
+    if AORSMUL_FASTER_2AORSLSH {
+        limbs_sub_mul_limb_same_length_in_place_left(r5, r6, 1_028); // can be negative
+    } else {
+        _limbs_shl_and_sub_same_length(r5, r6, 2, scratch); // can be negative
+        _limbs_shl_and_sub_same_length(r5, r6, 10, scratch); // can be negative
+    }
+    limbs_sub_mul_limb_same_length_in_place_left(r7, r5, 1_300); // can be negative
+    if AORSMUL_FASTER_3AORSLSH {
+        limbs_sub_mul_limb_same_length_in_place_left(r7, r6, 1_052_688); // can be negative
+    } else {
+        _limbs_shl_and_sub_same_length(r7, r6, 4, scratch); // can be negative
+        _limbs_shl_and_sub_same_length(r7, r6, 12, scratch); // can be negative
+        _limbs_shl_and_sub_same_length(r7, r6, 20, scratch); // can be negative
+    }
+    limbs_div_exact_limb_in_place(r7, 188_513_325);
+    limbs_div_255_in_place(r7);
+    // can be negative
+    limbs_sub_mul_limb_same_length_in_place_left(r5, r7, 12_567_555);
+    // A division by 2835x64 follows. Warning: the operand can be negative!
+    limbs_div_exact_limb_in_place(r5, 2_835 << 6);
+    let r5_last = r5.last_mut().unwrap();
+    if r5_last.leading_zeros() < 7 {
+        *r5_last |= Limb::MAX << (Limb::WIDTH - 6);
+    }
+    if AORSMUL_FASTER_AORS_AORSLSH {
+        limbs_sub_mul_limb_same_length_in_place_left(r6, r7, 4_095); // can be negative
+    } else {
+        // can give a carry
+        limbs_slice_add_same_length_in_place_left(r6, r7);
+        _limbs_shl_and_sub_same_length(r6, r7, 12, scratch); // can be negative
+    }
+    if AORSMUL_FASTER_2AORSLSH {
+        limbs_slice_add_mul_limb_same_length_in_place_left(r6, r5, 240); // can be negative
+    } else {
+        // can give a carry
+        _limbs_shl_and_add_same_length_in_place_left(r6, r5, 8, scratch);
+        _limbs_shl_and_sub_same_length(r6, r5, 4, scratch); // can be negative
+    }
+    // A division by 255x4 follows. Warning: the operand can be negative!
+    limbs_div_exact_limb_in_place(r6, 255 << 2);
+    let r6_last = r6.last_mut().unwrap();
+    if r6_last.leading_zeros() < 3 {
+        *r6_last |= Limb::MAX << (Limb::WIDTH - 2);
+    }
+    assert_eq!(_limbs_shl_and_sub_same_length(r3, r4, 7, scratch), 0);
+    assert_eq!(_limbs_shl_and_sub_same_length(r2, r4, 13, scratch), 0);
+    assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r3, 400), 0);
+    // If `Limb::WIDTH` < 42 next operations on r1 can give a carry!
+    _limbs_shl_and_sub_same_length(r1, r4, 19, scratch);
+    limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 1_428);
+    limbs_sub_mul_limb_same_length_in_place_left(r1, r3, 112_896);
+    limbs_div_exact_limb_in_place(r1, 182_712_915);
+    limbs_div_255_in_place(r1);
+    assert_eq!(
+        limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 15_181_425),
+        0
+    );
+    limbs_div_exact_limb_in_place(r2, 42_525 << 4);
+    if AORSMUL_FASTER_AORS_2AORSLSH {
         assert_eq!(
-            limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 15_181_425),
+            limbs_sub_mul_limb_same_length_in_place_left(r3, r1, 3_969),
             0
         );
-        limbs_div_exact_limb_in_place(r2, 42_525 << 4);
-
-        if AORSMUL_FASTER_AORS_2AORSLSH {
-            assert_eq!(
-                limbs_sub_mul_limb_same_length_in_place_left(r3, r1, 3_969),
-                0
-            );
-        } else {
-            assert!(!limbs_sub_same_length_in_place_left(r3, r1));
-            assert_eq!(
-                _limbs_shl_and_add_same_length_in_place_left(r3, r1, 7, scratch),
-                0
-            );
-            assert_eq!(_limbs_shl_and_sub_same_length(r3, r1, 12, scratch), 0);
-        }
-        assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r3, r2, 900), 0);
-        limbs_div_exact_limb_in_place(r3, 9 << 4);
-
-        assert!(!limbs_sub_same_length_in_place_left(r4, r1));
-        assert!(!limbs_sub_same_length_in_place_left(r4, r3));
-        assert!(!limbs_sub_same_length_in_place_left(r4, r2));
-
-        limbs_slice_add_same_length_in_place_left(r6, r2);
-        assert_eq!(limbs_slice_shr_in_place(r6, 1), 0);
-        assert!(!limbs_sub_in_place_left(r2, r6));
-
-        limbs_sub_same_length_in_place_right(r3, r5);
-        assert_eq!(limbs_slice_shr_in_place(r5, 1), 0);
-        assert!(!limbs_sub_same_length_in_place_left(r3, r5));
-
-        limbs_slice_add_same_length_in_place_left(r7, r1);
-        assert_eq!(limbs_slice_shr_in_place(r7, 1), 0);
-        assert!(!limbs_sub_same_length_in_place_left(r1, r7));
+    } else {
+        assert!(!limbs_sub_same_length_in_place_left(r3, r1));
+        assert_eq!(
+            _limbs_shl_and_add_same_length_in_place_left(r3, r1, 7, scratch),
+            0
+        );
+        assert_eq!(_limbs_shl_and_sub_same_length(r3, r1, 12, scratch), 0);
     }
-
+    assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r3, r2, 900), 0);
+    limbs_div_exact_limb_in_place(r3, 9 << 4);
+    assert!(!limbs_sub_same_length_in_place_left(r4, r1));
+    assert!(!limbs_sub_same_length_in_place_left(r4, r3));
+    assert!(!limbs_sub_same_length_in_place_left(r4, r2));
+    limbs_slice_add_same_length_in_place_left(r6, r2);
+    assert_eq!(limbs_slice_shr_in_place(r6, 1), 0);
+    assert!(!limbs_sub_in_place_left(r2, r6));
+    limbs_sub_same_length_in_place_right(r3, r5);
+    assert_eq!(limbs_slice_shr_in_place(r5, 1), 0);
+    assert!(!limbs_sub_same_length_in_place_left(r3, r5));
+    limbs_slice_add_same_length_in_place_left(r7, r1);
+    assert_eq!(limbs_slice_shr_in_place(r7, 1), 0);
+    assert!(!limbs_sub_same_length_in_place_left(r1, r7));
     // Last interpolation steps could be mixed with recomposition.
     //
     // ||H-r7|M-r7|L-r7|   ||H-r5|M-r5|L-r5|

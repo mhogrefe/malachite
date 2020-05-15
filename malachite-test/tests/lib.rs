@@ -45,6 +45,7 @@ pub mod base {
             pub mod overflowing_abs;
             pub mod overflowing_add;
             pub mod overflowing_add_mul;
+            pub mod overflowing_div;
             pub mod overflowing_mul;
             pub mod overflowing_neg;
             pub mod overflowing_sub;
@@ -65,6 +66,7 @@ pub mod base {
             pub mod wrapping_abs;
             pub mod wrapping_add;
             pub mod wrapping_add_mul;
+            pub mod wrapping_div;
             pub mod wrapping_mul;
             pub mod wrapping_neg;
             pub mod wrapping_sub;
@@ -168,13 +170,10 @@ pub mod integer {
         pub mod parity;
         pub mod power_of_two;
         pub mod round_to_multiple_of_power_of_two;
-        pub mod shl_i;
-        pub mod shl_round_i;
-        pub mod shl_u;
-        pub mod shr_i;
-        pub mod shr_round_i;
-        pub mod shr_round_u;
-        pub mod shr_u;
+        pub mod shl;
+        pub mod shl_round;
+        pub mod shr;
+        pub mod shr_round;
         pub mod sign;
         pub mod sub;
         pub mod sub_mul;

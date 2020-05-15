@@ -10,6 +10,7 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
@@ -46,8 +47,8 @@ use natural::arithmetic::sub::{
 };
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::{
-    Limb, SignedLimb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD,
-    MUL_TOOM44_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
+    Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
+    MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
 
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
@@ -117,7 +118,7 @@ fn _limbs_toom_couple_handling(
 ///
 /// This is mpn_toom22_mul_itch from gmp-impl.h, GMP 6.1.2.
 pub const fn _limbs_mul_greater_to_out_toom_22_scratch_len(xs_len: usize) -> usize {
-    2 * (xs_len + Limb::WIDTH as usize)
+    (xs_len + Limb::WIDTH as usize) << 1
 }
 
 // TODO make these compiler flags?
@@ -187,13 +188,10 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if ys_len == 0 || xs_len < ys_len {
-        return false;
-    }
-    let s = xs_len >> 1;
-    let n = xs_len - s;
-    let t = ys_len.saturating_sub(n);
-    s > 0 && (s == n || s == n - 1) && 0 < t && t <= s
+    ys_len != 0
+        && xs_len > 1
+        && xs_len >= ys_len
+        && xs_len.shr_round(1, RoundingMode::Ceiling) < ys_len
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -203,8 +201,9 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
-/// 3. Others; see `_limbs_mul_greater_to_out_toom_22_input_sizes_valid`. The gist is that `xs` must
-/// be less than twice as long as `ys`.
+/// 3. xs_len' < 2 * `ys`.len(), where xs_len' is `xs`.len() rounded up to the next even number.
+/// 4. `xs`.len() > 1
+/// 5. `ys`.len() > 0
 ///
 /// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
 ///
@@ -237,129 +236,102 @@ pub fn _limbs_mul_greater_to_out_toom_22(
     scratch: &mut [Limb],
 ) {
     let xs_len = xs.len();
+    assert!(xs_len > 1);
     let ys_len = ys.len();
+    assert_ne!(ys_len, 0);
     assert!(xs_len >= ys_len);
-
+    let out = &mut out[..xs_len + ys_len];
     let s = xs_len >> 1;
     let n = xs_len - s;
     assert!(ys_len >= n);
     let t = ys_len - n;
-
-    assert!(s > 0 && (s == n || s == n - 1));
-    assert!(0 < t && t <= s);
-
     let (xs_0, xs_1) = xs.split_at(n); // xs_0: length n, xs_1: length s
     let (ys_0, ys_1) = ys.split_at(n); // ys_0: length n, ys_1: length t
-
     let mut v_neg_1_neg = false;
-    {
-        let (asm1, bsm1) = out.split_at_mut(n); // asm1: length n
-
-        // Compute asm1.
-        if s == n {
-            if limbs_cmp_same_length(xs_0, xs_1) == Ordering::Less {
-                limbs_sub_same_length_to_out(asm1, xs_1, xs_0);
-                v_neg_1_neg = true;
-            } else {
-                limbs_sub_same_length_to_out(asm1, xs_0, xs_1);
-            }
+    split_into_chunks_mut!(out, n, [asm1, bsm1], _unused);
+    // Compute bsm1.
+    if s == n {
+        if limbs_cmp_same_length(xs_0, xs_1) == Ordering::Less {
+            limbs_sub_same_length_to_out(asm1, xs_1, xs_0);
+            v_neg_1_neg = true;
         } else {
-            // n - s == 1
-            let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
-            if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
-                limbs_sub_same_length_to_out(asm1, xs_1, xs_0_init);
-                asm1[s] = 0;
-                v_neg_1_neg = true;
-            } else {
-                asm1[s] = *xs_0_last;
-                if limbs_sub_same_length_to_out(asm1, xs_0_init, xs_1) {
-                    asm1[s].wrapping_sub_assign(1);
-                }
+            limbs_sub_same_length_to_out(asm1, xs_0, xs_1);
+        }
+    } else {
+        // n - s == 1
+        let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
+        if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
+            limbs_sub_same_length_to_out(asm1, xs_1, xs_0_init);
+            asm1[s] = 0;
+            v_neg_1_neg = true;
+        } else {
+            asm1[s] = *xs_0_last;
+            if limbs_sub_same_length_to_out(asm1, xs_0_init, xs_1) {
+                asm1[s].wrapping_sub_assign(1);
             }
         }
-
-        // Compute bsm1.
-        if t == n {
-            if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
-                limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
-                v_neg_1_neg.not_assign();
-            } else {
-                limbs_sub_same_length_to_out(bsm1, ys_0, ys_1);
-            }
-        } else {
-            let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
-            if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
-                limbs_sub_same_length_to_out(bsm1, ys_1, ys_0_lo);
-                slice_set_zero(&mut bsm1[t..n]);
-                v_neg_1_neg.not_assign();
-            } else {
-                limbs_sub_to_out(bsm1, ys_0, ys_1);
-            }
-        }
-
-        let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
-        _limbs_mul_same_length_to_out_toom_22_recursive(v_neg_1, asm1, &bsm1[..n], scratch_out);
     }
-    let (v_neg_1, scratch_out) = scratch.split_at_mut(2 * n); // v_neg_1: length 2 * n
+    // Compute bsm1.
+    if t == n {
+        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+            limbs_sub_same_length_to_out(bsm1, ys_1, ys_0);
+            v_neg_1_neg.not_assign();
+        } else {
+            limbs_sub_same_length_to_out(bsm1, ys_0, ys_1);
+        }
+    } else {
+        let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+            limbs_sub_same_length_to_out(bsm1, ys_1, ys_0_lo);
+            slice_set_zero(&mut bsm1[t..]);
+            v_neg_1_neg.not_assign();
+        } else {
+            limbs_sub_to_out(bsm1, ys_0, ys_1);
+        }
+    }
+    let (v_neg_1, scratch_out) = scratch.split_at_mut(n << 1); // v_neg_1: length 2 * n
+    _limbs_mul_same_length_to_out_toom_22_recursive(v_neg_1, asm1, bsm1, scratch_out);
+    let (v_0, v_pos_inf) = out.split_at_mut(n << 1); // v_0: length 2 * n
+    if s > t {
+        _limbs_mul_greater_to_out_toom_22_recursive(v_pos_inf, xs_1, ys_1, scratch_out);
+    } else {
+        _limbs_mul_same_length_to_out_toom_22_recursive(v_pos_inf, xs_1, &ys_1[..s], scratch_out);
+    }
+    // v_0, 2 * n limbs
+    _limbs_mul_same_length_to_out_toom_22_recursive(v_0, xs_0, ys_0, scratch_out);
+    // L(v_pos_inf) + H(v_pos_inf)
+    let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
+    let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
     let mut carry = 0;
-    let mut carry2;
-    {
-        let (v_0, v_pos_inf) = out.split_at_mut(2 * n); // v_0: length 2 * n
-        if s > t {
-            _limbs_mul_greater_to_out_toom_22_recursive(v_pos_inf, xs_1, ys_1, scratch_out);
-        } else {
-            _limbs_mul_same_length_to_out_toom_22_recursive(
-                v_pos_inf,
-                xs_1,
-                &ys_1[..s],
-                scratch_out,
-            );
-        }
-
-        // v_0, 2 * n limbs
-        _limbs_mul_same_length_to_out_toom_22_recursive(v_0, xs_0, ys_0, scratch_out);
-
-        // L(v_pos_inf) + H(v_pos_inf)
-        let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
-        let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
-
-        // H(v_0) + L(v_pos_inf)
-        if limbs_slice_add_same_length_in_place_left(v_pos_inf_lo, v_0_hi) {
-            carry += 1;
-        }
-
-        // L(v_0) + H(v_0)
-        carry2 = carry;
-        if limbs_add_same_length_to_out(v_0_hi, v_pos_inf_lo, v_0_lo) {
-            carry2 += 1;
-        }
-
-        // s + t - n == either ys_len - (xs_len >> 1) or ys_len - (xs_len >> 1) - 2.
-        // n == xs_len - (xs_len >> 1) and xs_len >= ys_len.
-        // So n >= s + t - n.
-        if limbs_slice_add_greater_in_place_left(v_pos_inf_lo, &v_pos_inf_hi[..s + t - n]) {
-            carry += 1;
-        }
+    // H(v_0) + L(v_pos_inf)
+    if limbs_slice_add_same_length_in_place_left(v_pos_inf_lo, v_0_hi) {
+        carry += 1;
     }
-
+    // L(v_0) + H(v_0)
+    let mut carry2 = carry;
+    if limbs_add_same_length_to_out(v_0_hi, v_pos_inf_lo, v_0_lo) {
+        carry2 += 1;
+    }
+    // s + t - n == either ys_len - (xs_len >> 1) or ys_len - (xs_len >> 1) - 2.
+    // n == xs_len - (xs_len >> 1) and xs_len >= ys_len.
+    // So n >= s + t - n.
+    if limbs_slice_add_greater_in_place_left(v_pos_inf_lo, &v_pos_inf_hi[..s + t - n]) {
+        carry += 1;
+    }
+    let out_lo = &mut out[n..3 * n];
     if v_neg_1_neg {
-        if limbs_slice_add_same_length_in_place_left(&mut out[n..3 * n], v_neg_1) {
+        if limbs_slice_add_same_length_in_place_left(out_lo, v_neg_1) {
             carry += 1;
         }
-    } else if limbs_sub_same_length_in_place_left(&mut out[n..3 * n], v_neg_1) {
+    } else if limbs_sub_same_length_in_place_left(out_lo, v_neg_1) {
         carry.wrapping_sub_assign(1);
     }
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut out[2 * n..2 * n + s + t],
-        carry2,
-    ));
+    assert!(!limbs_slice_add_limb_in_place(&mut out[n << 1..], carry2));
+    let out_hi = &mut out[3 * n..];
     if carry <= 2 {
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut out[3 * n..2 * n + s + t],
-            carry,
-        ));
+        assert!(!limbs_slice_add_limb_in_place(out_hi, carry));
     } else {
-        assert!(!limbs_sub_limb_in_place(&mut out[3 * n..2 * n + s + t], 1));
+        assert!(!limbs_sub_limb_in_place(out_hi, 1));
     }
 }
 
@@ -372,12 +344,12 @@ pub fn _limbs_mul_greater_to_out_toom_22(
 ///
 /// This is mpn_toom32_mul_itch from gmp-impl.h, GMP 6.1.2.
 pub fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
-    let n = 1 + if 2 * xs_len >= 3 * ys_len {
+    let n = if 2 * xs_len >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
         (ys_len - 1) >> 1
     };
-    2 * n + 1
+    2 * n + 3
 }
 
 /// A helper function for `_limbs_mul_greater_to_out_toom_22`.
@@ -385,6 +357,7 @@ pub fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usiz
 /// //TODO complexity
 ///
 /// This is TOOM32_MUL_N_REC from mpn/generic/toom32_mul.c, GMP 6.1.2.
+#[inline]
 pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb], b: &[Limb]) {
     limbs_mul_same_length_to_out(p, a, b);
 }
@@ -396,20 +369,18 @@ pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if ys_len == 0 || xs_len < ys_len {
-        return false;
+    ys_len != 0 && xs_len >= ys_len + 2 && {
+        let n = 1 + if 2 * xs_len >= 3 * ys_len {
+            (xs_len - 1) / 3
+        } else {
+            (ys_len - 1) >> 1
+        };
+        xs_len >= 2 * n
+            && ys_len <= 2 * n
+            && xs_len + 6 <= 3 * ys_len
+            && xs_len <= ys_len + n
+            && xs_len + ys_len >= 4 * n
     }
-    let n = 1 + if 2 * xs_len >= 3 * ys_len {
-        (xs_len - 1) / 3
-    } else {
-        (ys_len - 1) >> 1
-    };
-    if ys_len + 2 > xs_len || xs_len + 6 > 3 * ys_len {
-        return false;
-    }
-    let s = xs_len.saturating_sub(2 * n);
-    let t = ys_len.saturating_sub(n);
-    0 < s && s <= n && 0 < t && t <= n && s + t >= n
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -456,117 +427,96 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-
     let n = 1 + if 2 * xs_len >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
         (ys_len - 1) >> 1
     };
-
     // Required, to ensure that s + t >= n.
     assert!(ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len);
-
     split_into_chunks!(xs, n, s, [xs_0, xs_1], xs_2);
     split_into_chunks!(ys, n, t, [ys_0], ys_1);
-
-    assert!(0 < s && s <= n);
-    assert!(0 < t && t <= n);
+    assert_ne!(s, 0);
+    assert!(s <= n);
+    assert_ne!(t, 0);
+    assert!(t <= n);
     assert!(s + t >= n);
-
-    let mut hi: SignedLimb;
     let mut v_neg_1_neg;
-    {
-        // Product area of size xs_len + ys_len = 3 * n + s + t >= 4 * n + 2.
-        // out_lo: length 2 * n
-        let (out_lo, out_hi) = out.split_at_mut(2 * n);
-        let (am1, bm1) = out_hi.split_at_mut(n); // am1: length n
-        {
-            let (ap1, bp1) = out_lo.split_at_mut(n); // ap1: length n, bp1: length n
-
-            // Compute ap1 = xs0 + xs1 + a3, am1 = xs0 - xs1 + a3
-            let mut ap1_hi = SignedLimb::iverson(limbs_add_to_out(ap1, xs_0, xs_2));
-            if ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Ordering::Less {
-                assert!(!limbs_sub_same_length_to_out(am1, xs_1, ap1));
-                hi = 0;
-                v_neg_1_neg = true;
-            } else {
-                hi = ap1_hi;
-                if limbs_sub_same_length_to_out(am1, ap1, xs_1) {
-                    hi -= 1;
-                }
-                v_neg_1_neg = false;
+    // Product area of size xs_len + ys_len = 3 * n + s + t >= 4 * n + 2.
+    split_into_chunks_mut!(out, n << 1, [out_lo, out_hi], _unused);
+    let (ap1, bp1) = out_lo.split_at_mut(n);
+    let (am1, bm1) = out_hi.split_at_mut(n);
+    // Compute ap1 = xs0 + xs1 + a3, am1 = xs0 - xs1 + a3
+    let mut hi = limbs_add_to_out(ap1, xs_0, xs_2);
+    let mut ap1_hi = Limb::iverson(hi);
+    v_neg_1_neg = ap1_hi == 0 && limbs_cmp_same_length(ap1, xs_1) == Ordering::Less;
+    if v_neg_1_neg {
+        assert!(!limbs_sub_same_length_to_out(am1, xs_1, ap1));
+    } else if limbs_sub_same_length_to_out(am1, ap1, xs_1) {
+        hi.not_assign();
+    }
+    if limbs_slice_add_same_length_in_place_left(ap1, xs_1) {
+        ap1_hi += 1;
+    }
+    let bp1_hi;
+    // Compute bp1 = ys0 + ys1 and bm1 = ys0 - ys1.
+    if t == n {
+        bp1_hi = limbs_add_same_length_to_out(bp1, ys_0, ys_1);
+        if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
+            assert!(!limbs_sub_same_length_to_out(bm1, ys_1, ys_0));
+            v_neg_1_neg.not_assign();
+        } else {
+            assert!(!limbs_sub_same_length_to_out(bm1, ys_0, ys_1));
+        }
+    } else {
+        bp1_hi = limbs_add_to_out(bp1, ys_0, ys_1);
+        let (ys_0_lo, ys_0_hi) = ys_0.split_at(t);
+        if slice_test_zero(ys_0_hi) && limbs_cmp_same_length(ys_0_lo, ys_1) == Ordering::Less {
+            let (bm1_lo, bm1_hi) = bm1.split_at_mut(t);
+            assert!(!limbs_sub_same_length_to_out(bm1_lo, ys_1, ys_0_lo));
+            slice_set_zero(bm1_hi);
+            v_neg_1_neg.not_assign();
+        } else {
+            assert!(!limbs_sub_to_out(bm1, ys_0, ys_1));
+        }
+    }
+    _limbs_mul_same_length_to_out_toom_32_recursive(scratch, ap1, bp1);
+    split_into_chunks_mut!(scratch, n, [_unused, scratch_lo], scratch_hi);
+    let mut carry = 0;
+    match ap1_hi {
+        1 => {
+            if limbs_slice_add_same_length_in_place_left(scratch_lo, bp1) {
+                carry = 1;
             }
-            if limbs_slice_add_same_length_in_place_left(ap1, xs_1) {
-                ap1_hi += 1;
-            }
-
-            let bp1_hi;
-            // Compute bp1 = ys0 + ys1 and bm1 = ys0 - ys1.
-            if t == n {
-                bp1_hi = limbs_add_same_length_to_out(bp1, ys_0, ys_1);
-                if limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less {
-                    assert!(!limbs_sub_same_length_to_out(bm1, ys_1, ys_0));
-                    v_neg_1_neg.not_assign();
-                } else {
-                    assert!(!limbs_sub_same_length_to_out(bm1, ys_0, ys_1));
-                }
-            } else {
-                bp1_hi = limbs_add_to_out(bp1, ys_0, ys_1);
-                if slice_test_zero(&ys_0[t..])
-                    && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less
-                {
-                    assert!(!limbs_sub_same_length_to_out(bm1, ys_1, &ys_0[..t]));
-                    slice_set_zero(&mut bm1[t..n]);
-                    v_neg_1_neg.not_assign();
-                } else {
-                    assert!(!limbs_sub_to_out(bm1, ys_0, ys_1));
-                }
-            }
-
-            _limbs_mul_same_length_to_out_toom_32_recursive(scratch, ap1, bp1);
-            let (scratch_lo, scratch_hi) = scratch[n..].split_at_mut(n);
-            let mut carry = 0;
-            if ap1_hi == 1 {
-                if limbs_slice_add_same_length_in_place_left(scratch_lo, &bp1[..n]) {
-                    carry = 1;
-                }
-                if bp1_hi {
-                    carry += 1;
-                }
-            } else if ap1_hi == 2 {
-                carry = limbs_slice_add_mul_limb_same_length_in_place_left(scratch_lo, bp1, 2);
-                if bp1_hi {
-                    carry += 2;
-                }
-            }
-            if bp1_hi && limbs_slice_add_same_length_in_place_left(scratch_lo, ap1) {
+            if bp1_hi {
                 carry += 1;
             }
-            scratch_hi[0] = carry;
         }
-        _limbs_mul_same_length_to_out_toom_32_recursive(out_lo, am1, &bm1[..n]);
-        if hi != 0 {
-            hi = 0;
-            if limbs_slice_add_same_length_in_place_left(&mut out_lo[n..], &bm1[..n]) {
-                hi = 1;
+        2 => {
+            carry = limbs_slice_add_mul_limb_same_length_in_place_left(scratch_lo, bp1, 2);
+            if bp1_hi {
+                carry += 2;
             }
         }
+        _ => {}
     }
-    out[2 * n] = Limb::wrapping_from(hi);
-
+    if bp1_hi && limbs_slice_add_same_length_in_place_left(scratch_lo, ap1) {
+        carry += 1;
+    }
+    scratch_hi[0] = carry;
+    _limbs_mul_same_length_to_out_toom_32_recursive(out_lo, am1, bm1);
+    out_hi[0] =
+        Limb::iverson(hi && limbs_slice_add_same_length_in_place_left(&mut out_lo[n..], bm1));
     // v1 <-- (v1 + vm1) / 2 = x0 + x2
-    {
-        let scratch = &mut scratch[..2 * n + 1];
-        let out = &out[..2 * n + 1];
-        if v_neg_1_neg {
-            limbs_sub_same_length_in_place_left(scratch, out);
-            assert_eq!(limbs_slice_shr_in_place(scratch, 1), 0);
-        } else {
-            limbs_slice_add_same_length_in_place_left(scratch, out);
-            assert_eq!(limbs_slice_shr_in_place(scratch, 1), 0);
-        }
+    let scratch_b = &mut scratch[..2 * n + 1];
+    let out_b = &out[..2 * n + 1];
+    if v_neg_1_neg {
+        limbs_sub_same_length_in_place_left(scratch_b, out_b);
+    } else {
+        limbs_slice_add_same_length_in_place_left(scratch_b, out_b);
     }
-
+    assert_eq!(limbs_slice_shr_in_place(scratch_b, 1), 0);
+    split_into_chunks_mut!(out, n, [out_0, out_1, out_2], _unused);
     // We get x1 + x3 = (x0 + x2) - (x0 - x1 + x2 - x3), and hence
     //
     // y = x1 + x3 + (x0 + x2) * B
@@ -591,49 +541,33 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     //
     // Since we store y0 at the same location as the low half of x0 + x2, we need to do the middle
     // sum first.
-    let mut hi = SignedLimb::wrapping_from(out[2 * n]);
-    let mut scratch_high = scratch[2 * n];
-    if limbs_add_same_length_to_out(&mut out[2 * n..], &scratch[..n], &scratch[n..2 * n]) {
-        scratch_high += 1;
+    let mut hi = out_2[0];
+    let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
+    let scratch_hi = &mut scratch_hi[..n + 1];
+    let (scratch_hi_last, scratch_hi_init) = scratch_hi.split_last().unwrap();
+    let mut x = *scratch_hi_last;
+    if limbs_add_same_length_to_out(out_2, scratch_lo, scratch_hi_init) {
+        x += 1;
     }
-    assert!(!limbs_slice_add_limb_in_place(
-        &mut scratch[n..2 * n + 1],
-        scratch_high,
-    ));
-
+    assert!(!limbs_slice_add_limb_in_place(scratch_hi, x));
     if v_neg_1_neg {
-        let carry = limbs_slice_add_same_length_in_place_left(&mut scratch[..n], &out[..n]);
-        let (out_lo, out_hi) = out.split_at_mut(2 * n);
+        let carry = limbs_slice_add_same_length_in_place_left(scratch_lo, out_0);
         // out_lo: length 2 * n
-        if _limbs_add_same_length_with_carry_in_in_place_left(&mut out_hi[..n], &out_lo[n..], carry)
-        {
-            hi += 1;
+        if _limbs_add_same_length_with_carry_in_in_place_left(out_2, out_1, carry) {
+            hi.wrapping_add_assign(1);
         }
-        assert!(!limbs_slice_add_limb_in_place(
-            &mut scratch[n..2 * n + 1],
-            Limb::wrapping_from(hi),
-        ));
+        assert!(!limbs_slice_add_limb_in_place(scratch_hi, hi));
     } else {
-        let carry = limbs_sub_same_length_in_place_left(&mut scratch[..n], &out[..n]);
-        let (out_lo, out_hi) = out.split_at_mut(2 * n);
+        let carry = limbs_sub_same_length_in_place_left(scratch_lo, out_0);
         // out_lo: length 2 * n
-        if _limbs_sub_same_length_with_borrow_in_in_place_left(
-            &mut out_hi[..n],
-            &out_lo[n..],
-            carry,
-        ) {
-            hi += 1;
+        if _limbs_sub_same_length_with_borrow_in_in_place_left(out_2, out_1, carry) {
+            hi.wrapping_add_assign(1);
         }
-        assert!(!limbs_sub_limb_in_place(
-            &mut scratch[n..2 * n + 1],
-            Limb::wrapping_from(hi),
-        ));
+        assert!(!limbs_sub_limb_in_place(scratch_hi, hi));
     }
-
     _limbs_mul_same_length_to_out_toom_32_recursive(out, xs_0, ys_0);
     // s + t limbs. Use mpn_mul for now, to handle unbalanced operands
     limbs_mul_to_out(&mut out[3 * n..], xs_2, ys_1);
-
     // Remaining interpolation.
     //
     //    y * B + x0 + x3 B^3 - x0 B^2 - x3 B
@@ -656,43 +590,38 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     //             +--------+
     //
     // We must take into account the carry from Hx0 - Lx3.
-    let mut hi;
-    {
-        split_into_chunks_mut!(out, n, [out_0, out_1, out_2], out_3);
-        let carry = limbs_sub_same_length_in_place_left(out_1, &out_3[..n]);
-        hi = SignedLimb::wrapping_from(scratch[2 * n]);
-        if carry {
-            hi.wrapping_add_assign(1);
-        }
-
-        let borrow = _limbs_sub_same_length_with_borrow_in_in_place_left(out_2, out_0, carry);
-        if _limbs_sub_same_length_with_borrow_in_to_out(out_3, &scratch[n..2 * n], out_1, borrow) {
-            hi -= 1;
-        }
+    split_into_chunks_mut!(out, n, [out_0, out_1, out_2], out_3);
+    let carry = limbs_sub_same_length_in_place_left(out_1, &out_3[..n]);
+    let (scratch_hi_last, scratch_hi_init) = scratch_hi.split_last().unwrap();
+    let mut hi = *scratch_hi_last;
+    if carry {
+        hi.wrapping_add_assign(1);
     }
-
-    if limbs_slice_add_greater_in_place_left(&mut out[n..4 * n], &scratch[..n]) {
-        hi += 1;
+    let borrow = _limbs_sub_same_length_with_borrow_in_in_place_left(out_2, out_0, carry);
+    if _limbs_sub_same_length_with_borrow_in_to_out(out_3, scratch_hi_init, out_1, borrow) {
+        hi.wrapping_sub_assign(1);
     }
-
+    if limbs_slice_add_greater_in_place_left(&mut out[n..n << 2], scratch_lo) {
+        hi.wrapping_add_assign(1);
+    }
     if s + t > n {
-        let (out_lo, out_hi) = out.split_at_mut(4 * n);
-        // out_lo: length 4 * n
+        split_into_chunks_mut!(out, n << 1, [_unused, out_lo], out_hi);
         let out_hi = &mut out_hi[..s + t - n];
-        if limbs_sub_in_place_left(&mut out_lo[2 * n..], out_hi) {
-            hi -= 1;
+        if limbs_sub_in_place_left(out_lo, out_hi) {
+            hi.wrapping_sub_assign(1);
         }
-
-        if hi < 0 {
-            // TODO This branch is untested!
-            assert!(!limbs_sub_limb_in_place(out_hi, Limb::exact_from(-hi)));
+        if hi.get_highest_bit() {
+            fail_on_untested_path("_limbs_mul_greater_to_out_toom_32, hi.get_highest_bit()");
+            assert!(!limbs_sub_limb_in_place(out_hi, hi.wrapping_neg()));
         } else {
-            assert!(!limbs_slice_add_limb_in_place(out_hi, Limb::exact_from(hi)));
+            assert!(!limbs_slice_add_limb_in_place(out_hi, hi));
         }
     } else {
         assert_eq!(hi, 0);
     }
 }
+
+//TODO clean
 
 /// This function can be used to determine the length of the input `scratch` slice in
 /// `_limbs_mul_greater_to_out_toom_33`.
@@ -921,7 +850,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
                 }
                 *v_neg_1_last = carry;
             } else {
-                // TODO This branch is untested!
+                fail_on_untested_path("_limbs_mul_greater_to_out_toom_33, !SMALLER_RECURSION 1");
                 _limbs_mul_same_length_to_out_toom_33_recursive(
                     v_neg_1,
                     asm1,
@@ -980,7 +909,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
             }
             v_1_hi[0] = carry;
         } else {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_mul_greater_to_out_toom_33, !SMALLER_RECURSION 2");
             let carry = v_1[2 * n + 1];
             _limbs_mul_same_length_to_out_toom_33_recursive(v_1, as1, &bs1[..n + 1], scratch_out);
             v_1[2 * n + 1] = carry;
@@ -2167,7 +2096,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             }
             *v_neg_1_last = carry;
         } else {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_mul_greater_to_out_toom_53, !SMALLER_RECURSION 1");
             v_neg_1[2 * n] = 0;
             if (asm1[n] | bsm1[n]) == 0 {
                 limbs_mul_same_length_to_out(v_neg_1, &asm1[..n], &bsm1[..n]);
@@ -2209,7 +2138,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
             }
             v_1_hi[0] = carry;
         } else {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_mul_greater_to_out_toom_53, !SMALLER_RECURSION 2");
             v_1[2 * n] = 0;
             if (as1[n] | bs1[n]) == 0 {
                 limbs_mul_same_length_to_out(v_1, &as1[..n], &bs1[..n]);

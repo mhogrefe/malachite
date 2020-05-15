@@ -12,6 +12,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -420,7 +421,6 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_in
                         q.wrapping_sub_assign(1);
                         limbs_slice_add_same_length_in_place_left(ns, ds_suffix);
                     } else {
-                        // TODO This branch is untested!
                         flag = false;
                     }
                 }
@@ -522,7 +522,6 @@ pub fn _limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_in
                     limbs_sub_same_length_in_place_left(&mut ns[q_len..d_len_m_1], &ds[..d_diff]);
                 if carry {
                     if n_1 == 0 {
-                        // TODO This branch is untested! (else)
                         if q_len != 0 {
                             carry = limbs_sub_limb_in_place(qs, 1);
                         }
@@ -650,7 +649,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             limbs_sub_same_length_in_place_left(rs_hi, ds);
         }
         if _limbs_div_barrett_approx(&mut scratch_2, &rs, ds, scratch) {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_barrett, !_limbs_div_barrett_approx");
             // Since the partial remainder fed to _limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
             // the largest possible value.
@@ -671,7 +670,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
-                    // TODO This branch is untested!
+                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_to_out 1");
                     assert!(highest_q);
                     return false;
                 }
@@ -707,7 +706,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
-                    // TODO This branch is untested!
+                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_to_out 2");
                     assert!(highest_q);
                     return false;
                 }
@@ -836,8 +835,8 @@ pub fn _limbs_div_schoolbook_approx(
                 q = Limb::MAX;
                 let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j + 1], ds, q);
                 if n_1 != carry {
-                    // TODO This branch is untested!
                     if flag && n_1 < carry {
+                        fail_on_untested_path("_limbs_div_schoolbook_approx, flag && n_1 < carry");
                         q.wrapping_sub_assign(1);
                         limbs_slice_add_same_length_in_place_left(&mut ns[b..j + 1], ds);
                     } else {
@@ -877,7 +876,9 @@ pub fn _limbs_div_schoolbook_approx(
             q = Limb::MAX;
             let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..2], &ds[..2], q);
             if flag && n_1 < carry {
-                // TODO This branch is untested!
+                fail_on_untested_path(
+                    "_limbs_div_schoolbook_approx, !flag || n_1 >= carry second time",
+                );
                 q.wrapping_sub_assign(1);
                 limbs_slice_add_same_length_in_place_left(&mut ns[..2], &ds[..2]);
             }
@@ -962,7 +963,6 @@ fn _limbs_div_divide_and_conquer_approx_helper(
         )
     };
     if q_lo {
-        // TODO This branch is untested!
         for q in qs[..lo].iter_mut() {
             *q = Limb::MAX;
         }
@@ -1041,7 +1041,6 @@ pub fn _limbs_div_divide_and_conquer_approx(
                 assert!(n_2 < d_1 || (n_2 == d_1 && n_1 <= d_0));
                 let mut q;
                 if n_2 == d_1 && n_1 == d_0 {
-                    // TODO This branch is untested!
                     q = Limb::MAX;
                     assert_eq!(
                         limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..d_len], ds, q),
@@ -1065,7 +1064,7 @@ pub fn _limbs_div_divide_and_conquer_approx(
                     }
                     ns[b] = n_0;
                     if carry {
-                        // TODO This branch is untested!
+                        fail_on_untested_path("_limbs_div_divide_and_conquer_approx, carry");
                         n_1.wrapping_add_assign(d_1);
                         if limbs_slice_add_same_length_in_place_left(&mut ns[..a], &ds[..a]) {
                             n_1.wrapping_add_assign(1);
@@ -1236,7 +1235,7 @@ fn _limbs_div_barrett_approx_helper(
             _limbs_invert_approx(is, scratch_2_lo, scratch_2_hi);
             slice_move_left(is, 1);
         } else if limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1) {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_barrett_approx_helper, limbs_add_limb_to_out");
             slice_set_zero(&mut is[..i_len]);
         } else {
             let (scratch_2_lo, scratch_2_hi) = scratch_2.split_at_mut(n);
@@ -1364,7 +1363,9 @@ fn _limbs_div_barrett_approx_preinverted(
         }
     }
     if limbs_slice_add_limb_in_place(qs, 3) || carry {
-        // TODO This branch is untested!
+        fail_on_untested_path(
+            "_limbs_div_barrett_approx_preinverted, limbs_slice_add_limb_in_place",
+        );
         if highest_q {
             // Return a quotient of just 1-bits, with highest_q set.
             for q in qs.iter_mut() {
@@ -1491,7 +1492,7 @@ pub fn _limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [
         if carry == 0 {
             qs[n_len - d_len] = if highest_q { 1 } else { 0 };
         } else if highest_q {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_to_out_unbalanced, highest_q");
             for q in qs[..new_n_len - d_len].iter_mut() {
                 *q = Limb::MAX;
             }
@@ -1560,7 +1561,7 @@ fn _limbs_div_to_out_unbalanced_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[
         if carry == 0 {
             qs[n_len - d_len] = if highest_q { 1 } else { 0 };
         } else if highest_q {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_to_out_unbalanced_val_ref, highest_q");
             for q in qs[..new_n_len - d_len].iter_mut() {
                 *q = Limb::MAX;
             }
@@ -1630,7 +1631,7 @@ fn _limbs_div_to_out_unbalanced_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [
         if carry == 0 {
             qs[n_len - d_len] = if highest_q { 1 } else { 0 };
         } else if highest_q {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_to_out_unbalanced_ref_val, highest_q");
             for q in qs[..new_n_len - d_len].iter_mut() {
                 *q = Limb::MAX;
             }
@@ -1701,7 +1702,7 @@ fn _limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb
         if carry == 0 {
             qs[n_len - d_len] = if highest_q { 1 } else { 0 };
         } else if highest_q {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_to_out_unbalanced_ref_ref, highest_q");
             for q in qs[..new_n_len - d_len].iter_mut() {
                 *q = Limb::MAX;
             }
@@ -1772,7 +1773,7 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
         if carry == 0 {
             scratch_2[q_len] = if highest_q { 1 } else { 0 };
         } else if highest_q {
-            // TODO This branch is untested!
+            fail_on_untested_path("_limbs_div_to_out_balanced, highest_q");
             // This happens only when the quotient is close to B ^ n and one of the approximate
             // division functions returned B ^ n.
             for s in scratch_2[..new_n_len - q_len_plus_1].iter_mut() {

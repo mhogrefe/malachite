@@ -9,6 +9,7 @@ path = "src/lib.rs"
 
 [features]
 32_bit_limbs = []
+fail_on_untested_path = []
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
@@ -21,6 +22,8 @@ lto = true
 [dev-dependencies]
 num = "0.2.0"
 malachite-base-test-util = { path = "../malachite-base-test-util" }
+serde = "^1.0.0"
+serde_json = "^1.0.32"
 
 [dev-dependencies.rug]
 version = "^1.2.0"

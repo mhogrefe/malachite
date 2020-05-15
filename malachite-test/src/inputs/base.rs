@@ -769,6 +769,30 @@ pub fn pairs_of_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveU
     }
 }
 
+pub fn pairs_of_unsigned_and_positive_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_unsigned(),
+            exhaustive_positive(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
 pub fn pairs_of_signed_and_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, U)>
@@ -789,6 +813,33 @@ where
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),
             &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+    U::UnsignedOfEqualWidth: Rand,
+    U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_signed(),
+            exhaustive_nonzero_signed(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_nonzero_signed(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_nonzero_signed(seed)),
         )),
     }
 }
@@ -2440,7 +2491,7 @@ pub fn triples_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(
-        triples_of_unsigned_vec_min_sizes(gm, 3, 3, 1).filter(|&(ref out, ref xs, ref ys)| {
+        triples_of_unsigned_vec_min_sizes(gm, 4, 2, 2).filter(|&(ref out, ref xs, ref ys)| {
             out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs.len(), ys.len())
         }),

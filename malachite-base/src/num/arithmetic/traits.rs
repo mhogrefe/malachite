@@ -712,11 +712,35 @@ pub trait CheckedDiv<RHS = Self> {
     fn checked_div(self, rhs: RHS) -> Option<Self::Output>;
 }
 
-/// Checked remainder. Computes `self % rhs`, returning `None` if there is no valid result.
-pub trait CheckedRem<RHS = Self> {
+/// Wrapping (modular) division. Computes `self / rhs`, wrapping around at the boundary of the type.
+pub trait WrappingDiv<RHS = Self> {
     type Output;
 
-    fn checked_rem(self, rhs: RHS) -> Option<Self::Output>;
+    fn wrapping_div(self, rhs: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) division. Replaces `self` with `self / rhs`, wrapping around at the boundary
+/// of the type.
+pub trait WrappingDivAssign<RHS = Self> {
+    fn wrapping_div_assign(&mut self, rhs: RHS);
+}
+
+/// Calculates `self` / `rhs`.
+///
+/// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingDiv<RHS = Self> {
+    type Output;
+
+    fn overflowing_div(self, rhs: RHS) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self` / `rhs`.
+///
+/// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingDivAssign<RHS = Self> {
+    fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
 }
 
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
@@ -733,47 +757,12 @@ pub trait SaturatingPow<RHS> {
     fn saturating_pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) division. Computes `self / rhs`, wrapping around at the boundary of the type.
-pub trait WrappingDiv<RHS = Self> {
-    type Output;
-
-    fn wrapping_div(self, rhs: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) remainder. Computes `self % rhs`, wrapping around at the boundary of the
-/// type.
-pub trait WrappingRem<RHS = Self> {
-    type Output;
-
-    fn wrapping_rem(self, rhs: RHS) -> Self::Output;
-}
-
 /// Wrapping (modular) exponentiation. Raises `self` to the power of `exp`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingPow<RHS> {
     type Output;
 
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
-}
-
-/// Calculates `self` / `rhs`.
-///
-/// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingDiv<RHS = Self> {
-    type Output;
-
-    fn overflowing_div(self, rhs: RHS) -> (Self::Output, bool);
-}
-
-/// Calculates `self` % `rhs`.
-///
-/// Returns a tuple of the remainder along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
-pub trait OverflowingRem<RHS = Self> {
-    type Output;
-
-    fn overflowing_rem(self, rhs: RHS) -> (Self::Output, bool);
 }
 
 /// Calculates `self.pow(exp)`.
@@ -830,22 +819,6 @@ pub trait Parity {
     fn even(self) -> bool;
 
     fn odd(self) -> bool;
-}
-
-pub trait WrappingDivAssign<RHS = Self> {
-    fn wrapping_div_assign(&mut self, rhs: RHS);
-}
-
-pub trait WrappingRemAssign<RHS = Self> {
-    fn wrapping_rem_assign(&mut self, rhs: RHS);
-}
-
-pub trait OverflowingDivAssign<RHS = Self> {
-    fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
-}
-
-pub trait OverflowingRemAssign<RHS = Self> {
-    fn overflowing_rem_assign(&mut self, rhs: RHS) -> bool;
 }
 
 pub trait DivisibleByPowerOfTwo {
