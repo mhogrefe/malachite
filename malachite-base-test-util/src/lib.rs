@@ -37,3 +37,12 @@
 extern crate malachite_base;
 
 pub mod common;
+pub mod num {
+    pub mod arithmetic {
+        pub mod mod_mul;
+    }
+    pub mod logic {
+        pub mod bit_block_access;
+        pub mod bit_convertible;
+    }
+}

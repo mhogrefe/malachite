@@ -9,7 +9,7 @@ macro_rules! impl_shr_round_unsigned {
         impl ShrRound<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` right (divides it by a power of 2) and rounds according to the
+            /// Shifts an `Integer` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, taking the `Integer` by value. Passing
             /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
             /// whether `RoundingMode::Exact` can be passed, use
@@ -74,7 +74,7 @@ macro_rules! impl_shr_round_unsigned {
         impl<'a> ShrRound<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` right (divides it by a power of 2) and rounds according to the
+            /// Shifts an `Integer` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, taking the `Integer` by reference. Passing
             /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
             /// whether `RoundingMode::Exact` can be passed, use
@@ -160,7 +160,7 @@ macro_rules! impl_shr_round_unsigned {
         }
 
         impl ShrRoundAssign<$t> for Integer {
-            /// Shifts a `Integer` right (divides it by a power of 2) and rounds according to the
+            /// Shifts an `Integer` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
             /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(bits)`.

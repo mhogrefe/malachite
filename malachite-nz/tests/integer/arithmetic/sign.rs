@@ -2,19 +2,11 @@ use std::cmp::Ordering;
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::Sign;
-use num::bigint::Sign as NumSign;
+use malachite_nz_test_util::integer::arithmetic::sign::num_sign;
 use num::BigInt;
 use rug;
 
 use malachite_nz::integer::Integer;
-
-fn num_sign(x: &BigInt) -> Ordering {
-    match x.sign() {
-        NumSign::NoSign => Ordering::Equal,
-        NumSign::Plus => Ordering::Greater,
-        NumSign::Minus => Ordering::Less,
-    }
-}
 
 #[test]
 fn test_sign() {

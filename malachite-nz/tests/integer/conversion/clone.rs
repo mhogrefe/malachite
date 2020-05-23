@@ -6,6 +6,7 @@ use rug;
 use malachite_nz::integer::Integer;
 
 #[test]
+#[allow(clippy::redundant_clone)]
 fn test_clone() {
     let test = |u| {
         let x = Integer::from_str(u).unwrap().clone();

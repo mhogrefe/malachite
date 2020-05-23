@@ -3,8 +3,7 @@ use std::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use num::bigint::Sign as NumSign;
-use num::BigInt;
+use malachite_nz_test_util::integer::arithmetic::sign::num_sign;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{integers, nrm_integers};
@@ -12,14 +11,6 @@ use inputs::integer::{integers, nrm_integers};
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_sign);
     register_bench!(registry, Large, benchmark_integer_sign_library_comparison);
-}
-
-pub fn num_sign(x: &BigInt) -> Ordering {
-    match x.sign() {
-        NumSign::NoSign => Ordering::Equal,
-        NumSign::Plus => Ordering::Greater,
-        NumSign::Minus => Ordering::Less,
-    }
 }
 
 fn demo_integer_sign(gm: GenerationMode, limit: usize) {

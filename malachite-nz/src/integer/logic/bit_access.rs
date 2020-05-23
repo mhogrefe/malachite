@@ -332,7 +332,7 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<sup>`index`</sup> in its
+    /// Sets the `index`th bit of an `Integer`, or the coefficient of 2<sup>`index`</sup> in its
     /// binary expansion, to 1.
     ///
     /// Negative integers are treated as though they are represented in two's complement.
@@ -375,7 +375,7 @@ impl BitAccess for Integer {
         }
     }
 
-    /// Sets the `index`th bit of a `Integer`, or the coefficient of 2<sup>`index`</sup> in its
+    /// Sets the `index`th bit of an `Integer`, or the coefficient of 2<sup>`index`</sup> in its
     /// binary expansion, to 0.
     ///
     /// Negative integers are treated as though they are represented in two's complement.

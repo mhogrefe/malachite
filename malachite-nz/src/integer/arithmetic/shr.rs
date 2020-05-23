@@ -11,7 +11,7 @@ macro_rules! impl_shr_unsigned {
         impl Shr<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor), taking
+            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor), taking
             /// the `Integer` by value.
             ///
             /// Time: worst case O(`bits`)
@@ -40,7 +40,7 @@ macro_rules! impl_shr_unsigned {
         impl<'a> Shr<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor), taking
+            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor), taking
             /// the `Integer` by reference.
             ///
             /// Time: worst case O(`bits`)
@@ -87,7 +87,7 @@ macro_rules! impl_shr_unsigned {
         }
 
         impl ShrAssign<$t> for Integer {
-            /// Shifts a `Integer` right (divides it by a power of 2 and takes the floor) in place.
+            /// Shifts an `Integer` right (divides it by a power of 2 and takes the floor) in place.
             ///
             /// Time: worst case O(`bits`)
             ///

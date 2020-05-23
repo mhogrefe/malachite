@@ -18,7 +18,7 @@ fn test_partial_ord_integer_natural() {
             Natural::from_str(v)
                 .unwrap()
                 .partial_cmp(&Integer::from_str(u).unwrap())
-                .map(|o| o.reverse()),
+                .map(Ordering::reverse),
             out
         );
     };

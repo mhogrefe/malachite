@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use num::{BigInt, Integer as NumInteger, Zero as NumZero};
+use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
@@ -22,10 +22,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_integer_divisible_by_library_comparison
     );
-}
-
-fn num_divisible_by(x: BigInt, y: BigInt) -> bool {
-    x == BigInt::zero() || y != BigInt::zero() && x.is_multiple_of(&y)
 }
 
 fn demo_integer_divisible_by(gm: GenerationMode, limit: usize) {
@@ -148,7 +144,7 @@ fn benchmark_integer_divisible_by_library_comparison(
             ),
             (
                 "num",
-                &mut (|((x, y), _, _)| no_out!(num_divisible_by(x, y))),
+                &mut (|((x, y), _, _)| no_out!(num_divisible_by(&x, &y))),
             ),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.is_divisible(&y)))),
         ],

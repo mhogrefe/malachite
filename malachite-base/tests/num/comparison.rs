@@ -4,7 +4,7 @@ use malachite_base::num::comparison::traits::OrdAbs;
 
 #[test]
 pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
-    fn test<T: OrdAbs>(x: T, y: T, cmp: Ordering, lt: bool, gt: bool, le: bool, ge: bool) {
+    fn test<T: Copy + OrdAbs>(x: T, y: T, cmp: Ordering, lt: bool, gt: bool, le: bool, ge: bool) {
         assert_eq!(x.cmp_abs(&y), cmp);
         assert_eq!(x.partial_cmp_abs(&y), Some(cmp));
         assert_eq!(lt, x.lt_abs(&y));

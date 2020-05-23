@@ -1,9 +1,10 @@
 use std::ops::Neg;
 
 use num::arithmetic::traits::{
-    Abs, AbsAssign, CeilingMod, CeilingModAssign, CheckedAbs, NegAssign, OverflowingAbs,
-    OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
-    UnsignedAbs, WrappingAbs, WrappingAbsAssign,
+    Abs, AbsAssign, CeilingMod, CeilingModAssign, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign,
+    CheckedAbs, NegAssign, OverflowingAbs, OverflowingAbsAssign, SaturatingAbs,
+    SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign, UnsignedAbs, WrappingAbs,
+    WrappingAbsAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
@@ -16,6 +17,8 @@ pub trait PrimitiveSigned:
     + AbsAssign
     + CeilingMod
     + CeilingModAssign
+    + CeilingModPowerOfTwo<Output = Self>
+    + CeilingModPowerOfTwoAssign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
     + From<i8>

@@ -1,13 +1,10 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-use num::{BigInt, Integer as NumInteger, Zero};
+use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
+use num::BigInt;
 
 use malachite_nz::integer::Integer;
-
-fn num_divisible_by(x: BigInt, y: BigInt) -> bool {
-    x == BigInt::zero() || y != BigInt::zero() && x.is_multiple_of(&y)
-}
 
 #[test]
 fn test_divisible_by() {
@@ -38,7 +35,7 @@ fn test_divisible_by() {
         assert_eq!(x == 0 || y != 0 && x % y == 0, divisible);
 
         assert_eq!(
-            num_divisible_by(BigInt::from_str(u).unwrap(), BigInt::from_str(v).unwrap()),
+            num_divisible_by(&BigInt::from_str(u).unwrap(), &BigInt::from_str(v).unwrap()),
             divisible
         );
         assert_eq!(

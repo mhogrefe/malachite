@@ -2,13 +2,6 @@ use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::str::FromStr;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
-
-#[allow(clippy::print_stdout)]
-pub fn make_sure_we_can_use_malachite_base<T: PrimitiveInteger>(x: T) {
-    println!("{}", x);
-}
-
 fn read_strings<T: FromStr>(strings: &[&str]) -> Vec<T>
 where
     T::Err: Debug,

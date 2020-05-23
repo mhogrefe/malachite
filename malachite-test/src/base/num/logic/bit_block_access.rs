@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
 use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

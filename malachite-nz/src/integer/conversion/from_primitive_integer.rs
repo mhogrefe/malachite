@@ -6,7 +6,7 @@ use natural::Natural;
 macro_rules! impl_from_unsigned {
     ($t: ident) => {
         impl From<$t> for Integer {
-            /// Converts a value to a `Integer`, where the value is of a primitive unsigned integer
+            /// Converts a value to an `Integer`, where the value is of a primitive unsigned integer
             /// type.
             ///
             /// Time: worst case O(1)
@@ -32,7 +32,7 @@ macro_rules! impl_from_unsigned {
 macro_rules! impl_from_signed {
     ($t: ident) => {
         impl From<$t> for Integer {
-            /// Converts a value to a `Integer`, where the value is of a primitive signed integer
+            /// Converts a value to an `Integer`, where the value is of a primitive signed integer
             /// type.
             ///
             /// Time: worst case O(1)

@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::bit_block_access::_assign_bits_naive;
 use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base_test_util::num::logic::bit_block_access::_assign_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

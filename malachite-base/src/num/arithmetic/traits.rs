@@ -743,6 +743,64 @@ pub trait OverflowingDivAssign<RHS = Self> {
     fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
 }
 
+/// Calculates `self` mod a power of 2. In other words, returns r, where
+/// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+pub trait ModPowerOfTwo {
+    type Output;
+
+    fn mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+/// Reduces `self` mod a power of 2. In other words, replaces `self` with r, where
+/// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+pub trait ModPowerOfTwoAssign {
+    fn mod_power_of_two_assign(&mut self, other: u64);
+}
+
+/// Calculates `-self` mod a power of 2. In other words, returns r, where
+/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+pub trait NegModPowerOfTwo {
+    type Output;
+
+    fn neg_mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+/// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
+/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+pub trait NegModPowerOfTwoAssign {
+    fn neg_mod_power_of_two_assign(&mut self, other: u64);
+}
+
+/// Calculates `self` rem a power of 2. In other words, returns r, where
+/// `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
+/// 0 <= |r| < 2<sup>`other`</sup>.
+pub trait RemPowerOfTwo {
+    type Output;
+
+    fn rem_power_of_two(self, other: u64) -> Self::Output;
+}
+
+/// Reduces `self` rem a power of 2. In other words, replaces `self` with r, where
+/// `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
+/// 0 <= |r| < 2<sup>`other`</sup>.
+pub trait RemPowerOfTwoAssign {
+    fn rem_power_of_two_assign(&mut self, other: u64);
+}
+
+/// Calculates `self` ceiling-mod a power of 2. In other words, returns r, where
+/// `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
+pub trait CeilingModPowerOfTwo {
+    type Output;
+
+    fn ceiling_mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+/// Reduces `self` ceiling-mod a power of 2. In other words, replaces `self` with r, where
+/// `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
+pub trait CeilingModPowerOfTwoAssign {
+    fn ceiling_mod_power_of_two_assign(&mut self, other: u64);
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -823,46 +881,6 @@ pub trait Parity {
 
 pub trait DivisibleByPowerOfTwo {
     fn divisible_by_power_of_two(self, pow: u64) -> bool;
-}
-
-pub trait ModPowerOfTwo {
-    type Output;
-
-    fn mod_power_of_two(self, other: u64) -> Self::Output;
-}
-
-pub trait ModPowerOfTwoAssign {
-    fn mod_power_of_two_assign(&mut self, other: u64);
-}
-
-pub trait NegModPowerOfTwo {
-    type Output;
-
-    fn neg_mod_power_of_two(self, other: u64) -> Self::Output;
-}
-
-pub trait NegModPowerOfTwoAssign {
-    fn neg_mod_power_of_two_assign(&mut self, other: u64);
-}
-
-pub trait RemPowerOfTwo {
-    type Output;
-
-    fn rem_power_of_two(self, other: u64) -> Self::Output;
-}
-
-pub trait RemPowerOfTwoAssign {
-    fn rem_power_of_two_assign(&mut self, other: u64);
-}
-
-pub trait CeilingModPowerOfTwo {
-    type Output;
-
-    fn ceiling_mod_power_of_two(self, other: u64) -> Self::Output;
-}
-
-pub trait CeilingModPowerOfTwoAssign {
-    fn ceiling_mod_power_of_two_assign(&mut self, other: u64);
 }
 
 pub trait DivMod<RHS = Self> {

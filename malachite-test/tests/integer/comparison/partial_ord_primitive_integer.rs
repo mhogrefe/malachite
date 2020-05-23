@@ -4,6 +4,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::comparison::partial_ord_primitive_integer::*;
 use num::BigInt;
 use rand::Rand;
 use rug;
@@ -15,7 +16,6 @@ use malachite_test::inputs::integer::{
     triples_of_integer_signed_and_integer, triples_of_integer_unsigned_and_integer,
     triples_of_signed_integer_and_signed, triples_of_unsigned_integer_and_unsigned,
 };
-use malachite_test::integer::comparison::partial_ord_primitive_integer::num_partial_cmp_primitive;
 
 fn partial_cmp_primitive_integer_properties_helper_unsigned<
     T: PartialOrd<Integer> + PartialOrd<rug::Integer> + PrimitiveUnsigned + Rand,

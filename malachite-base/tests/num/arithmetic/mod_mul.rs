@@ -1,10 +1,11 @@
 use malachite_base::num::arithmetic::mod_mul::{
-    _limbs_invert_limb_naive, _limbs_invert_limb_u32, _limbs_invert_limb_u64,
-    _limbs_mod_preinverted, test_invert_u32_table, test_invert_u64_table,
+    _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted, test_invert_u32_table,
+    test_invert_u64_table,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
 
 #[test]
 fn test_test_invert_u32_table() {

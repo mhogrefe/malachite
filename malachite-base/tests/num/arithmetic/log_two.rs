@@ -57,7 +57,7 @@ fn ceiling_log_two_helper_unsigned<T: PrimitiveUnsigned>(max: u128) {
     test(5, 3);
     test(100, 7);
     test(128, 7);
-    test(max, T::WIDTH.into());
+    test(max, T::WIDTH);
 }
 
 #[test]

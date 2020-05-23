@@ -9,7 +9,7 @@ macro_rules! impl_shl_unsigned {
         impl Shl<$t> for Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` left (multiplies it by a power of 2), taking the `Integer` by
+            /// Shifts an `Integer` left (multiplies it by a power of 2), taking the `Integer` by
             /// value.
             ///
             /// Time: worst case O(`bits`)
@@ -43,7 +43,7 @@ macro_rules! impl_shl_unsigned {
         impl<'a> Shl<$t> for &'a Integer {
             type Output = Integer;
 
-            /// Shifts a `Integer` left (multiplies it by a power of 2), taking the `Integer` by
+            /// Shifts an `Integer` left (multiplies it by a power of 2), taking the `Integer` by
             /// reference.
             ///
             /// Time: worst case O(`bits`)
@@ -75,7 +75,7 @@ macro_rules! impl_shl_unsigned {
         }
 
         impl ShlAssign<$t> for Integer {
-            /// Shifts a `Integer` left (multiplies it by a power of 2) in place.
+            /// Shifts an `Integer` left (multiplies it by a power of 2) in place.
             ///
             /// Time: worst case O(`bits`)
             ///

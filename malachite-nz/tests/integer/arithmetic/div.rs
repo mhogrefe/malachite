@@ -350,28 +350,28 @@ fn div_assign_ref_fail() {
 
 #[test]
 #[should_panic]
-#[allow(unused_must_use)]
+#[allow(unused_must_use, clippy::unnecessary_operation)]
 fn div_fail() {
     Integer::from(10) / Integer::ZERO;
 }
 
 #[test]
 #[should_panic]
-#[allow(unused_must_use)]
+#[allow(unused_must_use, clippy::unnecessary_operation)]
 fn div_val_ref_fail() {
     Integer::from(10) / &Integer::ZERO;
 }
 
 #[test]
 #[should_panic]
-#[allow(unused_must_use)]
+#[allow(unused_must_use, clippy::unnecessary_operation)]
 fn div_ref_val_fail() {
     &Integer::from(10) / Integer::ZERO;
 }
 
 #[test]
 #[should_panic]
-#[allow(unused_must_use)]
+#[allow(unused_must_use, clippy::unnecessary_operation)]
 fn div_ref_ref_fail() {
     &Integer::from(10) / &Integer::ZERO;
 }

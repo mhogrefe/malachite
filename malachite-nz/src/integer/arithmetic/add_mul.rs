@@ -181,7 +181,7 @@ impl Natural {
 impl<'a> AddMul<Integer, Integer> for Integer {
     type Output = Integer;
 
-    /// Adds the product of an `Integer` (y) and an `Integer` (z) to a `Integer` (self), taking
+    /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), taking
     /// `self`, y, and z by value.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))

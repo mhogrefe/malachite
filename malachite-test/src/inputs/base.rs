@@ -4,8 +4,7 @@ use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
-use malachite_base::chars::NUMBER_OF_CHARS;
-use malachite_base::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
+use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, ArithmeticCheckedShr, DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo,
     UnsignedAbs,
@@ -22,6 +21,7 @@ use malachite_base::num::logic::traits::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::add::{
@@ -957,7 +957,7 @@ pub fn pairs_of_unsigned_and_small_unsigned_var_1<
 ) -> It<(T, U)> {
     Box::new(
         pairs_of_unsigned_and_small_unsigned::<T, U>(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
+            .filter(|&(n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
 }
 
@@ -1064,6 +1064,31 @@ pub fn pairs_of_unsigned_and_small_u64_var_3<T: PrimitiveUnsigned + Rand, U: Pri
             &(|seed| special_random_unsigned(seed)),
             &(|seed| random_range_down(seed, U::WIDTH)),
         )),
+    }
+}
+
+// All pairs of unsigned `T` and small `u64`, where the `T` is 0 or the `u64` is smaller than
+// `T::WIDTH`.
+pub fn pairs_of_unsigned_and_small_u64_var_4<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(
+            lex_pairs(exhaustive_unsigned(), range_down_increasing(T::WIDTH - 1))
+                .interleave(range_up_increasing(T::WIDTH).map(|pow| (T::ZERO, pow))),
+        ),
+        GenerationMode::Random(scale) => Box::new(
+            random_pairs_of_primitive_and_geometric(scale)
+                .filter(|&(x, y)| x == T::ZERO || y < T::WIDTH),
+        ),
+        GenerationMode::SpecialRandom(scale) => Box::new(
+            random_pairs(
+                &EXAMPLE_SEED,
+                &(|seed| special_random_unsigned(seed)),
+                &(|seed| u32s_geometric(seed, scale).map(u64::from)),
+            )
+            .filter(|&(x, y)| x == T::ZERO || y < T::WIDTH),
+        ),
     }
 }
 
@@ -1290,6 +1315,50 @@ where
     }
 }
 
+// All pairs of signed `T` and `u64`, where the `T` is non-negative or the `u64` is between 0 and
+// `T::WIDTH`, inclusive.
+pub fn pairs_of_signed_and_small_u64_var_2<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_signed_and_small_unsigned_var_1(gm)
+            .filter(|&(x, y)| x >= T::ZERO || y <= T::WIDTH),
+    )
+}
+
+// All pairs of signed `T` and `u64`, where the `T` is non-negative or the `u64` is between 0 and
+// `T::WIDTH - 1`, inclusive.
+pub fn pairs_of_signed_and_small_u64_var_3<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_signed_and_small_unsigned_var_1(gm).filter(|&(x, y)| x >= T::ZERO || y < T::WIDTH),
+    )
+}
+
+/// All pairs of signed `T` and `u64`, where the `T` is non-positive and not `$t::MIN`, or the `u64`
+/// is between 0 and `T::WIDTH - 1`, inclusive.
+pub fn pairs_of_signed_and_small_u64_var_4<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, u64)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_signed_and_small_unsigned_var_1(gm)
+            .filter(|&(x, y)| y < T::WIDTH || (x < T::ZERO && x != T::MIN)),
+    )
+}
+
 pub fn pairs_of_signed_and_small_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned>(
     gm: GenerationMode,
 ) -> It<(T, U)>
@@ -1421,15 +1490,13 @@ pub fn triples_of_unsigned_unsigned_width_range_and_bool_var_1<
     Box::new(unfiltered.filter(|&(_, index, bit)| !bit || index < U::exact_from(T::WIDTH)))
 }
 
-// All triples of T, U, and U, where T and U are unsigned and the first U is less than or equal to
-// the second.
-pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_1<
+pub fn triples_of_unsigned_small_unsigned_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
 >(
     gm: GenerationMode,
 ) -> It<(T, U, U)> {
-    let ts = match gm {
+    match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
             exhaustive_unsigned(),
             exhaustive_pairs_from_single(exhaustive_unsigned()),
@@ -1446,8 +1513,21 @@ pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_1<
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
-    };
-    Box::new(ts.filter(|&(_, start, end)| start <= end))
+    }
+}
+
+// All triples of T, U, and U, where T and U are unsigned and the first U is less than or equal to
+// the second.
+pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, U)> {
+    Box::new(
+        triples_of_unsigned_small_unsigned_and_small_unsigned(gm)
+            .filter(|&(_, start, end)| start <= end),
+    )
 }
 
 // All triples of unsigned `T`, `u64`, and small `u64`, where the first `u64` is between 1 and
@@ -5213,6 +5293,32 @@ pub fn triples_of_limb_limb_vec_and_u64_var_1(gm: GenerationMode) -> It<(Limb, V
     permute_2_1_3(Box::new(
         triples_of_limb_vec_limb_and_u64_var_1(gm).filter(|&(_, _, pow)| pow != 0),
     ))
+}
+
+pub fn triples_of_unsigned_unsigned_and_small_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> It<(T, T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(reshape_2_1_to_3(Box::new(sqrt_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
 }
 
 // All triples of `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between n and

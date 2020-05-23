@@ -14,11 +14,12 @@ use num::arithmetic::traits::{
     AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedAdd, CheckedAddMul,
     CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedSub, CheckedSubMul, DivAssignMod,
     DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy,
-    DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo, OverflowingAdd,
-    OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv,
-    OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
-    OverflowingNegAssign, OverflowingPow, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
-    OverflowingSubMulAssign, Parity, Pow, PowerOfTwo, RoundToMultipleOfPowerOfTwo,
+    DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
+    ModPowerOfTwoAssign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
+    OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
+    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingSub,
+    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowerOfTwo,
+    RemPowerOfTwo, RemPowerOfTwoAssign, RoundToMultipleOfPowerOfTwo,
     RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
     SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
     SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
@@ -164,6 +165,7 @@ pub trait PrimitiveInteger:
     + Mod
     + ModAssign<Self>
     + ModPowerOfTwo
+    + ModPowerOfTwoAssign
     + Mul<Self, Output = Self>
     + MulAssign<Self>
     + Named
@@ -221,6 +223,8 @@ pub trait PrimitiveInteger:
     + Product
     + Rem<Self, Output = Self>
     + RemAssign<Self>
+    + RemPowerOfTwo<Output = Self>
+    + RemPowerOfTwoAssign
     + Rotate
     + RoundToMultipleOfPowerOfTwo<u64, Output = Self>
     + RoundToMultipleOfPowerOfTwoAssign<u64>

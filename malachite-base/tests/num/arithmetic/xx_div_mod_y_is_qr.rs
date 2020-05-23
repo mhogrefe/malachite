@@ -13,7 +13,7 @@ fn test_xx_div_mod_y_is_qr() {
     test::<u16>(1, 0, 2, 0x8000, 0);
     test::<u16>(1, 7, 2, 0x8003, 1);
     test::<u8>(0x78, 0x9a, 0xbc, 0xa4, 0x2a);
-    test::<u64>(0x12, 0x34, 0x33, 0x5a5a5a5a5a5a5a5b, 0x13);
+    test::<u64>(0x12, 0x34, 0x33, 0x5a5a_5a5a_5a5a_5a5b, 0x13);
 }
 
 macro_rules! xx_div_mod_y_is_qr_fail {

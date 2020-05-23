@@ -17,7 +17,9 @@ fail_on_untested_path = ["malachite-nz/fail_on_untested_path"]
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
+malachite-base-test-util = { path = "../malachite-base-test-util" }
 malachite-nz = { path = "../malachite-nz", default-features = false, features = ["serde"] }
+malachite-nz-test-util = { path = "../malachite-nz-test-util" }
 malachite-bench = { path = "../malachite-bench", default-features = false }
 rust-wheels = { path = "../../rust-wheels", default-features = false }
 itertools = "0.7.8"
@@ -32,9 +34,6 @@ time = "0.1.40"
 version = "^1.2.0"
 default-features = false
 features = ["integer"]
-
-[dev-dependencies]
-malachite-base-test-util = { path = "../malachite-base-test-util" }
 
 [profile.release]
 lto = true

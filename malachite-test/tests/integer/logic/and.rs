@@ -16,6 +16,7 @@ use malachite_nz::integer::logic::and::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
 use rug;
 
 use malachite_test::common::test_properties;
@@ -29,7 +30,6 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::integer::{integers, pairs_of_integers, triples_of_integers};
 use malachite_test::inputs::natural::pairs_of_naturals;
-use malachite_test::integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

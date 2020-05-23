@@ -2,7 +2,8 @@ use std::cmp::min;
 
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, DivisibleByPowerOfTwo, ModPowerOfTwo,
-    ModPowerOfTwoAssign, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, ShrRound, Sign,
+    ModPowerOfTwoAssign, NegModPowerOfTwo, PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign,
+    ShrRound, Sign,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -13,7 +14,10 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 
 use malachite_test::common::test_properties;
-use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_signed_and_small_u64_var_2, pairs_of_signed_and_small_u64_var_4,
+    pairs_of_signed_and_small_unsigned, unsigneds,
+};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_unsigned, pairs_of_integer_and_small_unsigned_var_1,
     pairs_of_integer_and_small_unsigned_var_2, triples_of_integer_integer_and_small_unsigned,
@@ -76,6 +80,23 @@ fn mod_power_of_two_properties() {
         },
     );
 
+    test_properties(
+        pairs_of_signed_and_small_u64_var_2::<SignedLimb>,
+        |&(i, pow)| {
+            assert_eq!(
+                i.mod_power_of_two(pow),
+                Integer::from(i).mod_power_of_two(pow)
+            );
+        },
+    );
+
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
+        assert_eq!(
+            n.mod_power_of_two(pow),
+            Integer::from(n).mod_power_of_two(pow)
+        );
+    });
+
     test_properties(integers, |n| {
         assert_eq!(n.mod_power_of_two(0), 0);
     });
@@ -100,6 +121,7 @@ fn rem_power_of_two_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
+        assert!(result.le_abs(n));
         assert_eq!(((n.shr_round(u, RoundingMode::Down) << u) + &result), *n);
         assert!(result.lt_abs(&Natural::power_of_two(u)));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
@@ -125,6 +147,23 @@ fn rem_power_of_two_properties() {
             );
         },
     );
+
+    test_properties(
+        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
+        |&(i, pow)| {
+            assert_eq!(
+                i.rem_power_of_two(pow),
+                Integer::from(i).rem_power_of_two(pow)
+            );
+        },
+    );
+
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
+        assert_eq!(
+            n.rem_power_of_two(pow),
+            Integer::from(n).rem_power_of_two(pow)
+        );
+    });
 
     test_properties(integers, |n| {
         assert_eq!(n.rem_power_of_two(0), 0);
@@ -185,6 +224,23 @@ fn ceiling_mod_power_of_two_properties() {
         assert_ne!(n.ceiling_mod_power_of_two(u), 0);
     });
 
+    test_properties(
+        pairs_of_signed_and_small_u64_var_4::<SignedLimb>,
+        |&(i, pow)| {
+            assert_eq!(
+                i.ceiling_mod_power_of_two(pow),
+                Integer::from(i).ceiling_mod_power_of_two(pow)
+            );
+        },
+    );
+
+    test_properties(pairs_of_natural_and_small_unsigned, |&(ref n, pow)| {
+        assert_eq!(
+            -n.neg_mod_power_of_two(pow),
+            Integer::from(n).ceiling_mod_power_of_two(pow)
+        );
+    });
+
     test_properties(integers, |n| {
         assert_eq!(n.ceiling_mod_power_of_two(0), 0);
     });
@@ -192,24 +248,4 @@ fn ceiling_mod_power_of_two_properties() {
     test_properties(unsigneds, |&u| {
         assert_eq!(Integer::ZERO.ceiling_mod_power_of_two(u), 0);
     });
-
-    test_properties(
-        pairs_of_signed_and_small_unsigned::<SignedLimb, u64>,
-        |&(i, pow)| {
-            assert_eq!(
-                i.divisible_by_power_of_two(pow),
-                Integer::from(i).divisible_by_power_of_two(pow)
-            );
-        },
-    );
-
-    test_properties(
-        pairs_of_natural_and_small_unsigned::<u64>,
-        |&(ref n, pow)| {
-            assert_eq!(
-                n.divisible_by_power_of_two(pow),
-                Integer::from(n).divisible_by_power_of_two(pow)
-            );
-        },
-    );
 }

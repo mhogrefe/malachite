@@ -544,7 +544,7 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
 impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     type Output = Integer;
 
-    /// Adds the product of a `Integer` (b) and a `Integer` (c) to a `Integer` (self), taking
+    /// Adds the product of an `Integer` (b) and an `Integer` (c) to an `Integer` (self), taking
     /// `self`, b, and c by reference.
     ///
     /// Time: O(m + n * log(n) * log(log(n)))

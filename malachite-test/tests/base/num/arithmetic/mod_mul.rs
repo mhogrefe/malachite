@@ -1,10 +1,11 @@
 use malachite_base::num::arithmetic::mod_mul::{
-    _fast_mod_mul, _limbs_invert_limb_naive, _limbs_invert_limb_u32, _limbs_invert_limb_u64,
-    _limbs_mod_preinverted, _naive_mod_mul,
+    _fast_mod_mul, _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted,
+    _naive_mod_mul,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
+use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 

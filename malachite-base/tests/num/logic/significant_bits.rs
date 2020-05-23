@@ -25,7 +25,7 @@ fn significant_bits_helper_unsigned<T: PrimitiveUnsigned>(max: u128) {
         assert_eq!(T::exact_from(n).significant_bits(), out);
     };
 
-    test(max, T::WIDTH.into());
+    test(max, T::WIDTH);
 }
 
 fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i128, min: i128) {
@@ -35,9 +35,8 @@ fn significant_bits_helper_signed<T: PrimitiveSigned>(max: i128, min: i128) {
         assert_eq!(T::exact_from(n).significant_bits(), out);
     };
 
-    let width = T::WIDTH.into();
-    test(max, width - 1);
-    test(min, width);
+    test(max, T::WIDTH - 1);
+    test(min, T::WIDTH);
 }
 
 #[test]

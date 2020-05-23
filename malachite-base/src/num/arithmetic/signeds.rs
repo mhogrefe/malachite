@@ -1,11 +1,9 @@
 use num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, ModPowerOfTwo, NegMod, UnsignedAbs,
+    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, NegMod, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::LowMask;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -15,23 +13,6 @@ macro_rules! impl_arithmetic_traits {
             fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 <$t as PrimitiveSigned>::UnsignedOfEqualWidth::wrapping_from(self)
                     .divisible_by_power_of_two(pow)
-            }
-        }
-
-        impl ModPowerOfTwo for $t {
-            type Output = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
-
-            #[inline]
-            fn mod_power_of_two(self, pow: u64) -> Self::Output {
-                if pow > $t::WIDTH && self < 0 {
-                    panic!("Result exceeds width of output type");
-                }
-                let x = Self::Output::wrapping_from(self);
-                if x == 0 || pow >= $t::WIDTH {
-                    x
-                } else {
-                    x & Self::Output::low_mask(pow)
-                }
             }
         }
 

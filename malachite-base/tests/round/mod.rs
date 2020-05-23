@@ -6,7 +6,7 @@ use malachite_base_test_util::common::test_eq_helper;
 use malachite_base::round::RoundingMode;
 
 #[test]
-#[allow(unknown_lints, clone_on_copy)]
+#[allow(unknown_lints, clippy::clone_on_copy)]
 fn test_clone() {
     let test = |rm: RoundingMode| {
         let cloned = rm.clone();

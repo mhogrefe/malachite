@@ -18,7 +18,8 @@ use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
+    pairs_of_unsigned_and_small_u64_var_4, pairs_of_unsigned_and_small_unsigned,
+    pairs_of_unsigned_vec_and_small_unsigned, unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned_var_1,
@@ -300,6 +301,7 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
         assert!(result_alt.is_valid());
         assert_eq!(result_alt, result);
 
+        assert!(result <= *n);
         assert_eq!((n >> u << u) + &result, *n);
         assert!(result < Natural::power_of_two(u));
         assert_eq!(result == 0, n.divisible_by_power_of_two(u));
@@ -349,6 +351,10 @@ fn mod_power_of_two_and_rem_power_of_two_properties() {
             assert_eq!(
                 u.mod_power_of_two(pow),
                 Natural::from(u).mod_power_of_two(pow)
+            );
+            assert_eq!(
+                u.rem_power_of_two(pow),
+                Natural::from(u).rem_power_of_two(pow)
             );
         },
     );
@@ -410,6 +416,16 @@ fn neg_mod_power_of_two_properties() {
         assert_eq!((((n >> u) + Natural::ONE) << u) - &m, *n);
         assert_eq!(n.mod_power_of_two(u) + m, Natural::power_of_two(u));
     });
+
+    test_properties(
+        pairs_of_unsigned_and_small_u64_var_4::<Limb>,
+        |&(u, pow)| {
+            assert_eq!(
+                u.neg_mod_power_of_two(pow),
+                Natural::from(u).neg_mod_power_of_two(pow)
+            );
+        },
+    );
 
     test_properties(naturals, |n| {
         assert_eq!(n.neg_mod_power_of_two(0), 0);

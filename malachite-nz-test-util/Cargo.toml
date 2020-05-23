@@ -1,0 +1,27 @@
+[package]
+name = "malachite-nz-test-util"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "malachite_nz_test_util"
+path = "src/lib.rs"
+
+[features]
+32_bit_limbs = ["malachite-nz/32_bit_limbs"]
+fail_on_untested_path = ["malachite-nz/fail_on_untested_path"]
+
+[dependencies]
+malachite-base = { path = "../malachite-base" }
+malachite-base-test-util = { path = "../malachite-base-test-util" }
+malachite-nz = { path = "../malachite-nz", default-features = false }
+num = "0.2.0"
+
+[profile.release]
+lto = true
+
+[dependencies.rug]
+version = "^1.2.0"
+default-features = false
+features = ["integer"]

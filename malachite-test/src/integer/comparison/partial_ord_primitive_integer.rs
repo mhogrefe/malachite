@@ -5,6 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::comparison::partial_ord_primitive_integer::*;
 use num::BigInt;
 use rand::Rand;
 
@@ -137,13 +138,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_isize_partial_cmp_integer_library_comparison
     );
-}
-
-pub fn num_partial_cmp_primitive<T>(x: &BigInt, u: T) -> Option<Ordering>
-where
-    BigInt: From<T>,
-{
-    x.partial_cmp(&BigInt::from(u))
 }
 
 fn demo_integer_partial_cmp_unsigned<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize)

@@ -23,7 +23,7 @@ pub fn test_checked_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Debug + Eq>(n_in: T, n_out: Option<U>)
+    fn test_double<T, U: Copy + Debug + Eq>(n_in: T, n_out: Option<U>)
     where
         U: CheckedFrom<T>,
     {
@@ -60,7 +60,7 @@ pub fn test_exact_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Debug + Eq>(n_in: T, n_out: U)
+    fn test_double<T, U: Copy + Debug + Eq>(n_in: T, n_out: U)
     where
         U: ExactFrom<T>,
     {
@@ -173,7 +173,7 @@ pub fn test_wrapping_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Debug + Eq>(n_in: T, n_out: U)
+    fn test_double<T, U: Copy + Debug + Eq>(n_in: T, n_out: U)
     where
         U: WrappingFrom<T>,
     {
@@ -186,10 +186,10 @@ pub fn test_wrapping_from() {
 
     test_double(-1i8, u32::MAX);
     test_double(u32::MAX, u16::MAX);
-    test_double(i32::MIN, 2_147_483_648u32);
+    test_double(i32::MIN, 0x8000_0000u32);
     test_double(i32::MIN, 0u16);
     test_double(i32::MIN, 0i16);
-    test_double(-5i32, 4_294_967_291u32);
+    test_double(-5i32, 0xffff_fffbu32);
     test_double(3_000_000_000u32, -1_294_967_296i32);
     test_double(-1000i16, 24i8);
 }
@@ -210,7 +210,7 @@ pub fn test_overflowing_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Debug + Eq>(n_in: T, n_out: (U, bool))
+    fn test_double<T, U: Copy + Debug + Eq>(n_in: T, n_out: (U, bool))
     where
         U: OverflowingFrom<T>,
     {
@@ -223,10 +223,10 @@ pub fn test_overflowing_from() {
 
     test_double(-1i8, (u32::MAX, true));
     test_double(u32::MAX, (u16::MAX, true));
-    test_double(i32::MIN, (2_147_483_648u32, true));
+    test_double(i32::MIN, (0x8000_0000u32, true));
     test_double(i32::MIN, (0u16, true));
     test_double(i32::MIN, (0i16, true));
-    test_double(-5i32, (4_294_967_291u32, true));
+    test_double(-5i32, (0xffff_fffbu32, true));
     test_double(3_000_000_000u32, (-1_294_967_296i32, true));
     test_double(-1000i16, (24i8, true));
 }
@@ -247,7 +247,7 @@ pub fn test_saturating_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Debug + Eq>(n_in: T, n_out: U)
+    fn test_double<T, U: Copy + Debug + Eq>(n_in: T, n_out: U)
     where
         U: SaturatingFrom<T>,
     {
@@ -339,7 +339,7 @@ pub fn test_join_halves() {
 
 #[test]
 pub fn test_from_other_type_slice() {
-    fn test<T: Debug + Eq, U: Debug + Eq>(slice: &[T], n: U)
+    fn test<T: Debug + Eq, U: Copy + Debug + Eq>(slice: &[T], n: U)
     where
         U: FromOtherTypeSlice<T>,
     {
@@ -368,33 +368,33 @@ pub fn test_from_other_type_slice() {
 
 #[test]
 pub fn test_vec_from_other_type_slice() {
-    fn test<T: Debug + Eq, U: Debug + Eq>(slice: &[T], vec: Vec<U>)
+    fn test<T: Debug + Eq, U: Debug + Eq>(slice: &[T], vec: &[U])
     where
         U: VecFromOtherTypeSlice<T>,
     {
         assert_eq!(U::vec_from_other_type_slice(slice), vec);
     };
-    test::<u32, u32>(&[123, 456], vec![123, 456]);
+    test::<u32, u32>(&[123, 456], &[123, 456]);
     test::<u8, u16>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xff],
-        vec![0xcdab, 0x01ef, 0x4523, 0x8967, 0xff],
+        &[0xcdab, 0x01ef, 0x4523, 0x8967, 0xff],
     );
-    test::<u8, u16>(&[0xab], vec![0xab]);
+    test::<u8, u16>(&[0xab], &[0xab]);
     test::<u16, u8>(
         &[0xcdab, 0x01ef, 0x4523, 0x8967],
-        vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89],
+        &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89],
     );
 }
 
 #[test]
 pub fn test_vec_from_other_type() {
-    fn test<T: Debug + Eq, U: Debug + Eq>(value: T, vec: Vec<U>)
+    fn test<T: Debug + Eq, U: Debug + Eq>(value: T, vec: &[U])
     where
         U: VecFromOtherType<T>,
     {
         assert_eq!(U::vec_from_other_type(value), vec);
     };
-    test::<u32, u32>(123, vec![123]);
-    test::<u8, u16>(0xab, vec![0xab]);
-    test::<u16, u8>(0xcdab, vec![0xab, 0xcd]);
+    test::<u32, u32>(123, &[123]);
+    test::<u8, u16>(0xab, &[0xab]);
+    test::<u16, u8>(0xcdab, &[0xab, 0xcd]);
 }

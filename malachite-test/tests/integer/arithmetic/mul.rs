@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
@@ -47,8 +48,16 @@ fn mul_properties() {
             product
         );
         assert_eq!(y * x, product);
-        //TODO assert_eq!((product / x).unwrap(), y);
-        //TODO assert_eq!((product / y).unwrap(), x);
+        if *x != 0 {
+            let (q, r) = (&product).div_mod(x);
+            assert_eq!(q, *y);
+            assert_eq!(r, 0);
+        }
+        if *y != 0 {
+            let (q, r) = (&product).div_mod(y);
+            assert_eq!(q, *x);
+            assert_eq!(r, 0);
+        }
 
         assert_eq!(-x * y, -&product);
         assert_eq!(x * -y, -product);

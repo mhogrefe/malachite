@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::integer::arithmetic::sign::num_sign;
 
 use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, test_properties};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
-use malachite_test::integer::arithmetic::sign::num_sign;
 
 #[test]
 fn sign_properties() {

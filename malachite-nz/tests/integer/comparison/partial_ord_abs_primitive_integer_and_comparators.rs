@@ -11,7 +11,7 @@ fn test_partial_cmp_abs_u32() {
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
         assert_eq!(
             v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(|o| o.reverse())
+            cmp.map(Ordering::reverse)
         );
         assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
         assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
@@ -72,7 +72,7 @@ fn test_partial_cmp_abs_u64() {
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
         assert_eq!(
             v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(|o| o.reverse())
+            cmp.map(Ordering::reverse)
         );
         assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
         assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
@@ -127,7 +127,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "1000000000000",
-        1000000000000,
+        1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -136,7 +136,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "-1000000000000",
-        1000000000000,
+        1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -145,7 +145,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "1000000000000",
-        1000000000001,
+        1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,
@@ -154,7 +154,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "-1000000000000",
-        1000000000001,
+        1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,
@@ -169,7 +169,7 @@ fn test_partial_cmp_abs_i32() {
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
         assert_eq!(
             v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(|o| o.reverse())
+            cmp.map(Ordering::reverse)
         );
         assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
         assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
@@ -279,7 +279,7 @@ fn test_partial_cmp_abs_i64() {
         assert_eq!(Integer::from_str(u).unwrap().partial_cmp_abs(&v), cmp);
         assert_eq!(
             v.partial_cmp_abs(&Integer::from_str(u).unwrap()),
-            cmp.map(|o| o.reverse())
+            cmp.map(Ordering::reverse)
         );
         assert_eq!(lt, Integer::from_str(u).unwrap().lt_abs(&v));
         assert_eq!(gt, Integer::from_str(u).unwrap().gt_abs(&v));
@@ -383,7 +383,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        1000000000000,
+        1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -392,7 +392,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        -1000000000000,
+        -1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -401,7 +401,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        1000000000000,
+        1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -410,7 +410,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        -1000000000000,
+        -1_000_000_000_000,
         Some(Ordering::Equal),
         false,
         false,
@@ -419,7 +419,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        1000000000001,
+        1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,
@@ -428,7 +428,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        -1000000000001,
+        -1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,
@@ -437,7 +437,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        1000000000001,
+        1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,
@@ -446,7 +446,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        -1000000000001,
+        -1_000_000_000_001,
         Some(Ordering::Less),
         true,
         false,

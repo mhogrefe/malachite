@@ -4,9 +4,7 @@ use num::arithmetic::traits::{
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::{
-    CheckedFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom,
-};
+use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::LeadingZeros;
 
 pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
@@ -81,19 +79,6 @@ pub fn test_invert_u32_table() {
             x, i
         );
     }
-}
-
-pub fn _limbs_invert_limb_naive<
-    T: PrimitiveUnsigned,
-    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
->(
-    x: T,
-) -> T
-where
-    T: CheckedFrom<DT>,
-    DT: From<T> + HasHalf<Half = T>,
-{
-    T::exact_from(DT::MAX / DT::from(x) - DT::power_of_two(T::WIDTH))
 }
 
 /// Computes (B ^ 2 - B * x - 1) / x = (B ^ 2 - 1) / x - B. The highest bit of `x` must be set.

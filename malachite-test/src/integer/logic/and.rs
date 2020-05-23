@@ -12,7 +12,7 @@ use malachite_nz::integer::logic::and::{
     limbs_vec_and_neg_neg_in_place_left, limbs_vec_and_pos_neg_in_place_right,
     limbs_vec_neg_and_limb_neg_in_place,
 };
-use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::and::{integer_and_alt_1, integer_and_alt_2};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -22,15 +22,6 @@ use inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
-use integer::logic::{integer_op_bits, integer_op_limbs};
-
-pub fn integer_and_alt_1(x: &Integer, y: &Integer) -> Integer {
-    integer_op_bits(&|a, b| a && b, x, y)
-}
-
-pub fn integer_and_alt_2(x: &Integer, y: &Integer) -> Integer {
-    integer_op_limbs(&|a, b| a & b, x, y)
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_pos_and_limb_neg);

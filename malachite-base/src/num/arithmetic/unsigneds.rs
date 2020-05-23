@@ -1,13 +1,11 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModPowerOfTwo, ModPowerOfTwoAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity, RemPowerOfTwo,
-    RemPowerOfTwoAssign,
+    ModPowerOfTwo, NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::{LeadingZeros, LowMask, SignificantBits, TrailingZeros};
+use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
@@ -119,60 +117,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn divisible_by_power_of_two(self, pow: u64) -> bool {
                 self.mod_power_of_two(pow) == 0
-            }
-        }
-
-        impl ModPowerOfTwo for $t {
-            type Output = $t;
-
-            #[inline]
-            fn mod_power_of_two(self, pow: u64) -> $t {
-                if self == 0 || pow >= $t::WIDTH {
-                    self
-                } else {
-                    self & $t::low_mask(pow)
-                }
-            }
-        }
-
-        impl ModPowerOfTwoAssign for $t {
-            #[inline]
-            fn mod_power_of_two_assign(&mut self, pow: u64) {
-                if *self != 0 && pow < $t::WIDTH {
-                    *self &= $t::low_mask(pow)
-                }
-            }
-        }
-
-        impl NegModPowerOfTwo for $t {
-            type Output = $t;
-
-            #[inline]
-            fn neg_mod_power_of_two(self, pow: u64) -> $t {
-                self.wrapping_neg().mod_power_of_two(pow)
-            }
-        }
-
-        impl NegModPowerOfTwoAssign for $t {
-            #[inline]
-            fn neg_mod_power_of_two_assign(&mut self, pow: u64) {
-                *self = self.neg_mod_power_of_two(pow)
-            }
-        }
-
-        impl RemPowerOfTwo for $t {
-            type Output = $t;
-
-            #[inline]
-            fn rem_power_of_two(self, pow: u64) -> $t {
-                self.mod_power_of_two(pow)
-            }
-        }
-
-        impl RemPowerOfTwoAssign for $t {
-            #[inline]
-            fn rem_power_of_two_assign(&mut self, pow: u64) {
-                self.mod_power_of_two_assign(pow)
             }
         }
 

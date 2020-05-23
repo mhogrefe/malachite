@@ -2,11 +2,11 @@ use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModMul, ModMulAssign,
     ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPowerOfTwo,
-    ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced,
-    ModPowerOfTwoMul, ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign,
-    ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
-    ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
+    ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul,
+    ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoShl,
+    ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, ModPowerOfTwoSub,
+    ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
     XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
@@ -44,7 +44,6 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAdd<Self, Output = Self>
     + ModPowerOfTwoAddAssign<Self>
-    + ModPowerOfTwoAssign
     + ModPowerOfTwoIsReduced
     + ModPowerOfTwoMul<Self, Output = Self>
     + ModPowerOfTwoMulAssign<Self>

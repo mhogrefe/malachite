@@ -1,31 +1,13 @@
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, CountZeros, SignificantBits};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
-use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::checked_count_zeros::{
+    integer_checked_count_zeros_alt_1, integer_checked_count_zeros_alt_2,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::nonempty_vecs_of_unsigned;
 use inputs::integer::integers;
-
-pub fn integer_checked_count_zeros_alt_1(n: &Integer) -> Option<u64> {
-    if *n < 0 {
-        Some(u64::wrapping_from(n.bits().filter(|&b| !b).count()))
-    } else {
-        None
-    }
-}
-
-pub fn integer_checked_count_zeros_alt_2(n: &Integer) -> Option<u64> {
-    if *n < 0 {
-        Some(
-            n.twos_complement_limbs()
-                .map(|limb| CountZeros::count_zeros(limb))
-                .sum(),
-        )
-    } else {
-        None
-    }
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_count_zeros_neg);

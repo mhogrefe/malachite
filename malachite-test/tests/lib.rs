@@ -2,6 +2,7 @@ extern crate itertools;
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
+extern crate malachite_nz_test_util;
 extern crate malachite_test;
 extern crate num;
 extern crate rand;
@@ -16,8 +17,7 @@ pub mod base {
     pub mod chars {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;
-        pub mod decrement;
-        pub mod increment;
+        pub mod crement;
     }
 
     pub mod num {
@@ -33,6 +33,7 @@ pub mod base {
             pub mod mod_is_reduced;
             pub mod mod_mul;
             pub mod mod_neg;
+            pub mod mod_power_of_two;
             pub mod mod_power_of_two_add;
             pub mod mod_power_of_two_is_reduced;
             pub mod mod_power_of_two_mul;
@@ -180,8 +181,7 @@ pub mod integer {
     }
 
     pub mod basic {
-        pub mod decrement;
-        pub mod increment;
+        pub mod crement;
     }
 
     pub mod comparison {
@@ -285,8 +285,7 @@ pub mod natural {
 
     pub mod basic {
         pub mod constants;
-        pub mod decrement;
-        pub mod increment;
+        pub mod crement;
         pub mod size;
     }
 

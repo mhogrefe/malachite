@@ -1,17 +1,11 @@
 use std::cmp::Ordering;
 use std::str::FromStr;
 
+use malachite_nz_test_util::integer::comparison::partial_ord_primitive_integer::*;
 use num::BigInt;
 use rug;
 
 use malachite_nz::integer::Integer;
-
-fn num_partial_cmp_primitive<T>(x: &BigInt, u: T) -> Option<Ordering>
-where
-    BigInt: From<T>,
-{
-    x.partial_cmp(&BigInt::from(u))
-}
 
 #[test]
 fn test_partial_cmp_u32() {
@@ -25,7 +19,7 @@ fn test_partial_cmp_u32() {
 
         assert_eq!(
             v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(|o| o.reverse())
+            out.map(Ordering::reverse)
         );
     };
     test("0", 0, Some(Ordering::Equal));
@@ -52,7 +46,7 @@ fn test_partial_cmp_u64() {
 
         assert_eq!(
             v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(|o| o.reverse())
+            out.map(Ordering::reverse)
         );
     };
     test("0", 0, Some(Ordering::Equal));
@@ -65,10 +59,10 @@ fn test_partial_cmp_u64() {
     test("-123", 122, Some(Ordering::Less));
     test("1000000000000", 123, Some(Ordering::Greater));
     test("-1000000000000", 123, Some(Ordering::Less));
-    test("1000000000000", 1000000000000, Some(Ordering::Equal));
-    test("-1000000000000", 1000000000000, Some(Ordering::Less));
-    test("1000000000000", 1000000000001, Some(Ordering::Less));
-    test("-1000000000000", 1000000000001, Some(Ordering::Less));
+    test("1000000000000", 1_000_000_000_000, Some(Ordering::Equal));
+    test("-1000000000000", 1_000_000_000_000, Some(Ordering::Less));
+    test("1000000000000", 1_000_000_000_001, Some(Ordering::Less));
+    test("-1000000000000", 1_000_000_000_001, Some(Ordering::Less));
 }
 
 #[test]
@@ -83,7 +77,7 @@ fn test_partial_cmp_i32() {
 
         assert_eq!(
             v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(|o| o.reverse())
+            out.map(Ordering::reverse)
         );
     };
     test("0", 0, Some(Ordering::Equal));
@@ -119,7 +113,7 @@ fn test_partial_cmp_i64() {
 
         assert_eq!(
             v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(|o| o.reverse())
+            out.map(Ordering::reverse)
         );
     };
     test("0", 0, Some(Ordering::Equal));
@@ -141,12 +135,16 @@ fn test_partial_cmp_i64() {
     test("1000000000000", -123, Some(Ordering::Greater));
     test("-1000000000000", 123, Some(Ordering::Less));
     test("-1000000000000", -123, Some(Ordering::Less));
-    test("1000000000000", 1000000000000, Some(Ordering::Equal));
-    test("1000000000000", -1000000000000, Some(Ordering::Greater));
-    test("-1000000000000", 1000000000000, Some(Ordering::Less));
-    test("-1000000000000", -1000000000000, Some(Ordering::Equal));
-    test("1000000000000", 1000000000001, Some(Ordering::Less));
-    test("1000000000000", -1000000000001, Some(Ordering::Greater));
-    test("-1000000000000", 1000000000001, Some(Ordering::Less));
-    test("-1000000000000", -1000000000001, Some(Ordering::Greater));
+    test("1000000000000", 1_000_000_000_000, Some(Ordering::Equal));
+    test("1000000000000", -1_000_000_000_000, Some(Ordering::Greater));
+    test("-1000000000000", 1_000_000_000_000, Some(Ordering::Less));
+    test("-1000000000000", -1_000_000_000_000, Some(Ordering::Equal));
+    test("1000000000000", 1_000_000_000_001, Some(Ordering::Less));
+    test("1000000000000", -1_000_000_000_001, Some(Ordering::Greater));
+    test("-1000000000000", 1_000_000_000_001, Some(Ordering::Less));
+    test(
+        "-1000000000000",
+        -1_000_000_000_001,
+        Some(Ordering::Greater),
+    );
 }

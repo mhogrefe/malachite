@@ -1,7 +1,9 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::bit_convertible::{_from_bits_asc_alt, _from_bits_desc_alt};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_base_test_util::num::logic::bit_convertible::{
+    _from_bits_asc_alt, _from_bits_desc_alt,
+};
 use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };

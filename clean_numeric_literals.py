@@ -1,3 +1,4 @@
+import collections
 import sys
 
 def process_number(number):
@@ -22,7 +23,7 @@ with open(sys.argv[1]) as f:
     reading_number = False
     current_number = ''
     for line in f.readlines():
-        replacements = {}
+        replacements = collections.OrderedDict()
         line = line.rstrip()
         for (i, c) in enumerate(line):
             if c == '"':

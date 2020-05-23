@@ -19,7 +19,7 @@ fn test_partial_ord_integer_natural() {
             Natural::from_str(y)
                 .unwrap()
                 .partial_cmp_abs(&Integer::from_str(x).unwrap())
-                .map(|o| o.reverse()),
+                .map(Ordering::reverse),
             cmp
         );
         assert_eq!(

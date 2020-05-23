@@ -202,7 +202,7 @@ impl ModPowerOfTwo for Natural {
     type Output = Natural;
 
     /// Takes a `Natural` mod a power of 2, taking the `Natural` by value. In other words, returns
-    /// r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+    /// r, where `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -233,11 +233,11 @@ impl<'a> ModPowerOfTwo for &'a Natural {
     type Output = Natural;
 
     /// Takes a `Natural` mod a power of 2, taking the `Natural` by reference. In other words,
-    /// returns r, where `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+    /// returns r, where `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
     ///
-    /// Time: worst case O(`other`)
+    /// Time: worst case O(`pow`)
     ///
-    /// Additional memory: worst case O(`other`)
+    /// Additional memory: worst case O(`pow`)
     ///
     /// # Examples
     /// ```
@@ -263,8 +263,8 @@ impl<'a> ModPowerOfTwo for &'a Natural {
 }
 
 impl ModPowerOfTwoAssign for Natural {
-    /// Takes a `Natural` mod a power of 2 in place. In other words, replaces `self` with r, where
-    /// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+    /// Reduces a `Natural` mod a power of 2 in place. In other words, replaces `self` with r, where
+    /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(1)
     ///
@@ -336,9 +336,9 @@ impl<'a> RemPowerOfTwo for &'a Natural {
     /// Takes a `Natural` rem a power of 2, taking the `Natural` by reference. For `Natural`s, rem
     /// is equivalent to mod.
     ///
-    /// Time: worst case O(`other`)
+    /// Time: worst case O(`pow`)
     ///
-    /// Additional memory: worst case O(`other`)
+    /// Additional memory: worst case O(`pow`)
     ///
     /// # Examples
     /// ```
@@ -360,7 +360,7 @@ impl<'a> RemPowerOfTwo for &'a Natural {
 }
 
 impl RemPowerOfTwoAssign for Natural {
-    /// Takes a `Natural` rem a power of 2 in place. For `Natural`s, rem is equivalent to mod.
+    /// Reduces a `Natural` rem a power of 2 in place. For `Natural`s, rem is equivalent to mod.
     ///
     /// Time: worst case O(1)
     ///
@@ -394,12 +394,12 @@ impl NegModPowerOfTwo for Natural {
     type Output = Natural;
 
     /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by value. In other
-    /// words, returns r, where `self` = q * 2<sup>`other`</sup> - r and
-    /// 0 <= r < 2<sup>`other`</sup>.
+    /// words, returns r, where `self` = q * 2<sup>`pow`</sup> - r and
+    /// 0 <= r < 2<sup>`pow`</sup>.
     ///
-    /// Time: worst case O(`other`)
+    /// Time: worst case O(`pow`)
     ///
-    /// Additional memory: worst case O(`other`)
+    /// Additional memory: worst case O(`pow`)
     ///
     /// # Examples
     /// ```
@@ -416,8 +416,8 @@ impl NegModPowerOfTwo for Natural {
     /// assert_eq!(Natural::from(1611u32).neg_mod_power_of_two(4).to_string(), "5");
     /// ```
     #[inline]
-    fn neg_mod_power_of_two(mut self, other: u64) -> Natural {
-        self.neg_mod_power_of_two_assign(other);
+    fn neg_mod_power_of_two(mut self, pow: u64) -> Natural {
+        self.neg_mod_power_of_two_assign(pow);
         self
     }
 }
@@ -426,12 +426,12 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
     type Output = Natural;
 
     /// Takes the negative of a `Natural` mod a power of 2, taking the `Natural` by reference. In
-    /// other words, returns r, where `self` = q * 2<sup>`other`</sup> - r and
-    /// 0 <= r < 2<sup>`other`</sup>.
+    /// other words, returns r, where `self` = q * 2<sup>`pow`</sup> - r and
+    /// 0 <= r < 2<sup>`pow`</sup>.
     ///
-    /// Time: worst case O(`other`)
+    /// Time: worst case O(`pow`)
     ///
-    /// Additional memory: worst case O(`other`)
+    /// Additional memory: worst case O(`pow`)
     ///
     /// # Examples
     /// ```
@@ -461,12 +461,12 @@ impl<'a> NegModPowerOfTwo for &'a Natural {
 }
 
 impl NegModPowerOfTwoAssign for Natural {
-    /// Takes the negative of a `Natural` mod a power of 2 in place. In other words, replaces `self`
-    /// with r, where `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+    /// Reduces the negative of a `Natural` mod a power of 2 in place. In other words, replaces
+    /// `self` with r, where `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
     ///
-    /// Time: worst case O(`other`)
+    /// Time: worst case O(`pow`)
     ///
-    /// Additional memory: worst case O(`other`)
+    /// Additional memory: worst case O(`pow`)
     ///
     /// # Examples
     /// ```
