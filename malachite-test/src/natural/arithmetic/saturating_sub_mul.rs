@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{SaturatingSubMul, SaturatingSubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -160,16 +161,7 @@ fn demo_natural_saturating_sub_mul_ref_ref_ref(gm: GenerationMode, limit: usize)
     }
 }
 
-fn bucketing_function(t: &(Natural, Natural, Natural)) -> usize {
-    usize::exact_from(max!(
-        t.0.significant_bits(),
-        t.1.significant_bits(),
-        t.2.significant_bits()
-    ))
-}
-
-const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
-                               c.significant_bits())";
+triple_significant_bits_fn!(Natural, bucketing_function);
 
 fn benchmark_natural_saturating_sub_mul_assign_algorithms(
     gm: GenerationMode,
@@ -184,7 +176,7 @@ fn benchmark_natural_saturating_sub_mul_assign_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Natural.saturating_sub_mul_assign(Natural, Natural)",
@@ -211,7 +203,7 @@ fn benchmark_natural_saturating_sub_mul_assign_val_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Natural.saturating_sub_mul_assign(Natural, &Natural)",
@@ -238,7 +230,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_val_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Natural.saturating_sub_mul_assign(&Natural, Natural)",
@@ -265,7 +257,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Natural.saturating_sub_mul_assign(&Natural, &Natural)",
@@ -292,7 +284,7 @@ fn benchmark_natural_saturating_sub_mul_evaluation_strategy(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Natural.saturating_sub_mul(Natural, Natural)",

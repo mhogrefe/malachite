@@ -801,6 +801,25 @@ pub trait CeilingModPowerOfTwoAssign {
     fn ceiling_mod_power_of_two_assign(&mut self, other: u64);
 }
 
+/// Determines whether `self` is even or odd.
+pub trait Parity {
+    /// Returns whether `self` is even.
+    fn even(self) -> bool;
+
+    /// Returns whether `self` is odd.
+    fn odd(self) -> bool;
+}
+
+/// Determines whether `self` is divisible by 2<sup>pow</sup>.
+pub trait DivisibleByPowerOfTwo {
+    fn divisible_by_power_of_two(self, pow: u64) -> bool;
+}
+
+/// Determines whether `self` is equal to other mod 2<sup>pow</sup>.
+pub trait EqModPowerOfTwo<RHS = Self> {
+    fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -865,22 +884,8 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
-pub trait EqModPowerOfTwo<RHS = Self> {
-    fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
-}
-
 pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
-}
-
-pub trait Parity {
-    fn even(self) -> bool;
-
-    fn odd(self) -> bool;
-}
-
-pub trait DivisibleByPowerOfTwo {
-    fn divisible_by_power_of_two(self, pow: u64) -> bool;
 }
 
 pub trait DivMod<RHS = Self> {

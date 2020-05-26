@@ -235,7 +235,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     assert!(degree < usize::wrapping_from(Limb::WIDTH));
     assert_eq!(v_2.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
-
     // The degree `degree` is also the number of full-size coefficients, so that the last
     // coefficient, of size `n_high`, starts at `poly[degree * n..]`.
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();

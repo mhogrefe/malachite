@@ -106,5 +106,16 @@ pub mod integer {
         pub mod bits;
         pub mod checked_count_ones;
         pub mod checked_count_zeros;
+        pub mod checked_hamming_distance;
+        pub mod clear_bit;
+        pub mod flip_bit;
+        pub mod from_bits;
+        pub mod get_bit;
+        pub mod get_bits;
+        pub mod index_of_next_false_bit;
+        pub mod index_of_next_true_bit;
+        pub mod low_mask;
+        pub mod not;
+        pub mod or;
     }
 }

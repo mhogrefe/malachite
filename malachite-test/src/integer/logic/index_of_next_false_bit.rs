@@ -1,28 +1,11 @@
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, BitScan, SignificantBits};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
-use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::index_of_next_false_bit::*;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use inputs::integer::pairs_of_integer_and_small_unsigned;
-
-pub fn integer_index_of_next_false_bit_alt(n: &Integer, u: u64) -> Option<u64> {
-    if u >= n.significant_bits() {
-        if *n >= 0 {
-            Some(u)
-        } else {
-            None
-        }
-    } else {
-        for (i, bit) in n.bits().enumerate().skip(usize::exact_from(u)) {
-            if !bit {
-                return Some(u64::wrapping_from(i));
-            }
-        }
-        None
-    }
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_index_of_next_false_bit_neg);

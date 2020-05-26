@@ -52,3 +52,19 @@ pub fn test_custom_cmp_helper<T: Debug + FromStr, F: FnMut(&T, &T) -> Ordering>(
 {
     test_helper_helper(strings, |i, j| i.cmp(&j), compare);
 }
+
+#[macro_export]
+macro_rules! triple_significant_bits_fn {
+    ($t:ident, $bucketing_function:ident) => {
+        fn $bucketing_function(t: &($t, $t, $t)) -> usize {
+            usize::exact_from(max!(
+                t.0.significant_bits(),
+                t.1.significant_bits(),
+                t.2.significant_bits()
+            ))
+        }
+    };
+}
+
+pub const TRIPLE_SIGNIFICANT_BITS_LABEL: &str =
+    "max(a.significant_bits(), b.significant_bits(), c.significant_bits())";

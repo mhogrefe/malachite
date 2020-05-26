@@ -5851,6 +5851,66 @@ pub fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec
     )
 }
 
+pub fn quadruples_of_three_unsigneds_and_small_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveUnsigned,
+>(
+    gm: GenerationMode,
+) -> It<(T, T, T, U)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(reshape_3_1_to_4(Box::new(sqrt_pairs(
+            exhaustive_triples_from_single(exhaustive_unsigned()),
+            exhaustive_unsigned(),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
+pub fn quadruples_of_three_signeds_and_small_unsigned<
+    T: PrimitiveSigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, T, T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(reshape_3_1_to_4(Box::new(sqrt_pairs(
+            exhaustive_triples_from_single(exhaustive_signed()),
+            exhaustive_unsigned(),
+        )))),
+        GenerationMode::Random(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
+        )),
+    }
+}
+
 fn digits_valid<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(log_base: u64, digits: &[U]) -> bool {
     let digits = &digits[..digits.len() - slice_trailing_zeros(&digits)];
     if digits.is_empty() {

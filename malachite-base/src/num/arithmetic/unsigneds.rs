@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, FloorLogTwo, IsPowerOfTwo, Mod,
-    ModPowerOfTwo, NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
+    DivAssignMod, DivMod, DivRound, FloorLogTwo, IsPowerOfTwo, Mod, NegMod, NegModAssign,
+    NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -110,13 +110,6 @@ macro_rules! impl_arithmetic_traits {
                 } else {
                     floor_log_two + 1
                 }
-            }
-        }
-
-        impl DivisibleByPowerOfTwo for $t {
-            #[inline]
-            fn divisible_by_power_of_two(self, pow: u64) -> bool {
-                self.mod_power_of_two(pow) == 0
             }
         }
 

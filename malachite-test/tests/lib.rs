@@ -1,4 +1,5 @@
 extern crate itertools;
+#[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
@@ -20,6 +21,10 @@ pub mod base {
         pub mod crement;
     }
 
+    pub mod comparison {
+        pub mod macros;
+    }
+
     pub mod num {
         pub mod arithmetic {
             pub mod abs;
@@ -28,6 +33,8 @@ pub mod base {
             pub mod arithmetic_checked_shr;
             pub mod checked_add_mul;
             pub mod checked_sub_mul;
+            pub mod divisible_by_power_of_two;
+            pub mod eq_mod_power_of_two;
             pub mod log_two;
             pub mod mod_add;
             pub mod mod_is_reduced;
@@ -51,6 +58,7 @@ pub mod base {
             pub mod overflowing_neg;
             pub mod overflowing_sub;
             pub mod overflowing_sub_mul;
+            pub mod parity;
             pub mod power_of_two;
             pub mod round_to_multiple_of_power_of_two;
             pub mod saturating_abs;

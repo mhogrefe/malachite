@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     NegModPowerOfTwo, NegModPowerOfTwoAssign,
@@ -6,7 +8,6 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use std::fmt::Debug;
 
 #[test]
 fn test_mod_power_of_two_and_rem_power_of_two_unsigned() {

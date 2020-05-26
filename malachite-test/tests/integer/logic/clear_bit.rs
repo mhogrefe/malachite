@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 use malachite_nz::integer::logic::bit_access::{
@@ -7,95 +5,12 @@ use malachite_nz::integer::logic::bit_access::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
 use malachite_test::inputs::integer::pairs_of_integer_and_small_unsigned;
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_slice_clear_bit_neg() {
-    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
-        let mut mut_limbs = limbs.to_vec();
-        limbs_slice_clear_bit_neg(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out);
-    };
-    test(&[3, 2, 1], 0, &[4, 2, 1]);
-    test(&[0, 0, 3], 32, &[0, 0, 3]);
-    test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
-    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, 0xffff_fffe]);
-    test(&[0xffff_fff7], 3, &[0xffff_ffff]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limbs_slice_clear_bit_fail_1() {
-    let mut mut_limbs = vec![0, 0, 0xffff_ffff];
-    limbs_slice_clear_bit_neg(&mut mut_limbs, 64);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limbs_slice_clear_bit_fail_2() {
-    let mut mut_limbs = vec![3, 2, 1];
-    limbs_slice_clear_bit_neg(&mut mut_limbs, 100);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_vec_clear_bit_neg() {
-    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
-        let mut mut_limbs = limbs.to_vec();
-        limbs_vec_clear_bit_neg(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out);
-    };
-    test(&[3, 2, 1], 0, &[4, 2, 1]);
-    test(&[0, 0, 3], 32, &[0, 0, 3]);
-    test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
-    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, 0xffff_fffe]);
-    test(&[0, 0, 0xffff_ffff], 64, &[0, 0, 0, 1]);
-    test(&[3, 2, 1], 100, &[3, 2, 1, 16]);
-    test(&[0xffff_fff7], 3, &[0xffff_ffff]);
-    test(&[0xffff_fff8], 3, &[0, 1]);
-}
-
-#[test]
-fn test_clear_bit() {
-    let test = |u, index, out| {
-        let mut n = Integer::from_str(u).unwrap();
-        n.clear_bit(index);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-    };
-    test("0", 10, "0");
-    test("0", 100, "0");
-    test("1024", 10, "0");
-    test("101", 0, "100");
-    test("1000000001024", 10, "1000000000000");
-    test("1000000001024", 100, "1000000001024");
-    test("1267650600228229402496703205376", 100, "1000000000000");
-    test("1267650600228229401496703205381", 100, "5");
-    test("-1", 5, "-33");
-    test("-1", 100, "-1267650600228229401496703205377");
-    test("-31", 0, "-32");
-    test("-999999998976", 10, "-1000000000000");
-    test("-1000000000000", 100, "-1267650600228229402496703205376");
-    test("-18446744078004518912", 0, "-18446744078004518912");
-    test("-18446744078004518912", 32, "-18446744082299486208");
-    test("-18446744078004518912", 33, "-18446744086594453504");
-    test("-18446744078004518912", 64, "-18446744078004518912");
-    test("-18446744078004518912", 65, "-55340232225423622144");
-    test("-36893488143124135936", 32, "-36893488147419103232");
-    test("-4294967295", 0, "-4294967296");
-    test("-4294967287", 3, "-4294967295");
-    test("-4294967288", 3, "-4294967296");
-}
 
 macro_rules! limbs_clear_bit_neg_helper {
     ($f:ident, $limbs:ident, $index:ident) => {

@@ -3,6 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
@@ -423,16 +424,7 @@ fn benchmark_limbs_overflowing_sub_mul_in_place_left(
     );
 }
 
-fn bucketing_function(t: &(Integer, Integer, Integer)) -> usize {
-    usize::exact_from(max!(
-        t.0.significant_bits(),
-        t.1.significant_bits(),
-        t.2.significant_bits()
-    ))
-}
-
-const BUCKETING_LABEL: &str = "max(a.significant_bits(), b.significant_bits(), \
-                               c.significant_bits())";
+triple_significant_bits_fn!(Integer, bucketing_function);
 
 fn benchmark_integer_sub_mul_assign_evaluation_strategy(
     gm: GenerationMode,
@@ -447,7 +439,7 @@ fn benchmark_integer_sub_mul_assign_evaluation_strategy(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul_assign(Integer, Integer)",
@@ -478,7 +470,7 @@ fn benchmark_integer_sub_mul_assign_algorithms(gm: GenerationMode, limit: usize,
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul_assign(Integer, Integer)",
@@ -505,7 +497,7 @@ fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul_assign(Integer, &Integer)",
@@ -532,7 +524,7 @@ fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul_assign(&Integer, Integer)",
@@ -559,7 +551,7 @@ fn benchmark_integer_sub_mul_assign_ref_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul_assign(&Integer, &Integer)",
@@ -586,7 +578,7 @@ fn benchmark_integer_sub_mul_evaluation_strategy(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul(Integer, Integer)",
@@ -621,7 +613,7 @@ fn benchmark_integer_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_n
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul(Integer, Integer)",
@@ -648,7 +640,7 @@ fn benchmark_integer_sub_mul_val_val_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul(Integer, &Integer)",
@@ -675,7 +667,7 @@ fn benchmark_integer_sub_mul_val_ref_val_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul(&Integer, Integer)",
@@ -702,7 +694,7 @@ fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "Integer.sub_mul(&Integer, &Integer)",
@@ -729,7 +721,7 @@ fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
         limit,
         file_name,
         &bucketing_function,
-        BUCKETING_LABEL,
+        TRIPLE_SIGNIFICANT_BITS_LABEL,
         &mut [
             (
                 "(&Integer).sub_mul(&Integer, &Integer)",

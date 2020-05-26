@@ -11,6 +11,8 @@ pub mod arithmetic {
     pub mod checked_neg;
     pub mod checked_sub;
     pub mod checked_sub_mul;
+    pub mod divisible_by_power_of_two;
+    pub mod eq_mod_power_of_two;
     pub mod integers;
     pub mod mod_add;
     pub mod mod_is_reduced;
@@ -34,6 +36,7 @@ pub mod arithmetic {
     pub mod overflowing_neg;
     pub mod overflowing_sub;
     pub mod overflowing_sub_mul;
+    pub mod parity;
     pub mod power_of_two;
     pub mod round_to_multiple_of_power_of_two;
     pub mod saturating_abs;

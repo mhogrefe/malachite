@@ -1,21 +1,12 @@
 use num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    DivAssignMod, DivMod, DivRound, DivisibleByPowerOfTwo, Mod, NegMod, UnsignedAbs,
+    DivAssignMod, DivMod, DivRound, Mod, NegMod, UnsignedAbs,
 };
-use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl DivisibleByPowerOfTwo for $t {
-            #[inline]
-            fn divisible_by_power_of_two(self, pow: u64) -> bool {
-                <$t as PrimitiveSigned>::UnsignedOfEqualWidth::wrapping_from(self)
-                    .divisible_by_power_of_two(pow)
-            }
-        }
-
         impl DivMod for $t {
             type DivOutput = $t;
             type ModOutput = $t;

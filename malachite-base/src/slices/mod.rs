@@ -117,8 +117,9 @@ pub fn slice_move_left<T: Copy>(xs: &mut [T], amount: usize) {
 macro_rules! split_into_chunks {
     ($xs: expr, $n: expr, $last_chunk_size: ident, [$($xs_i: ident),*], $xs_last: ident) => {
         let remainder = &$xs;
+        let n = $n;
         $(
-            let ($xs_i, remainder) = remainder.split_at($n);
+            let ($xs_i, remainder) = remainder.split_at(n);
         )*
         let $xs_last = remainder;
         let $last_chunk_size = $xs_last.len();
@@ -130,8 +131,9 @@ macro_rules! split_into_chunks {
 macro_rules! split_into_chunks_mut {
     ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
         let remainder = &mut $xs[..];
+        let n = $n;
         $(
-            let ($xs_i, remainder) = remainder.split_at_mut($n);
+            let ($xs_i, remainder) = remainder.split_at_mut(n);
         )*
         let $xs_last = remainder;
     }

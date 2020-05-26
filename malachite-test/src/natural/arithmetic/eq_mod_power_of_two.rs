@@ -62,13 +62,11 @@ fn demo_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
     for (ref x, ref y, pow) in triples_of_natural_natural_and_small_unsigned(gm).take(limit) {
-        println!(
-            "{}.eq_mod_power_of_two({}, {}) = {}",
-            x,
-            y,
-            pow,
-            x.eq_mod_power_of_two(y, pow)
-        );
+        if x.eq_mod_power_of_two(y, pow) {
+            println!("{} is equal to {} mod 2^{}", x, y, pow);
+        } else {
+            println!("{} is not equal to {} mod 2^{}", x, y, pow);
+        }
     }
 }
 

@@ -45,3 +45,7 @@ pub fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &I
 pub mod and;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
+pub mod checked_hamming_distance;
+pub mod index_of_next_false_bit;
+pub mod index_of_next_true_bit;
+pub mod or;

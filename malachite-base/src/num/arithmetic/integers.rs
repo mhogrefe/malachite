@@ -1,7 +1,6 @@
 use num::arithmetic::traits::{
     CheckedPow, DivAssignRem, DivExact, DivExactAssign, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, OverflowingPow,
-    Parity, Pow, SaturatingPow, WrappingPow,
+    DivisibleBy, EqMod, Mod, ModAssign, OverflowingPow, Pow, SaturatingPow, WrappingPow,
 };
 use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
@@ -50,25 +49,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn pow(self, exp: u64) -> $t {
                 $t::pow(self, u32::exact_from(exp))
-            }
-        }
-
-        impl Parity for $t {
-            #[inline]
-            fn even(self) -> bool {
-                (self & 1) == 0
-            }
-
-            #[inline]
-            fn odd(self) -> bool {
-                (self & 1) != 0
-            }
-        }
-
-        impl EqModPowerOfTwo<Self> for $t {
-            #[inline]
-            fn eq_mod_power_of_two(self, other: $t, pow: u64) -> bool {
-                (self ^ other).divisible_by_power_of_two(pow)
             }
         }
 

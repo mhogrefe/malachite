@@ -9,8 +9,7 @@ use malachite_nz::integer::logic::or::{
     limbs_slice_or_neg_neg_in_place_left, limbs_slice_or_pos_neg_in_place_left,
     limbs_vec_or_neg_neg_in_place_left, limbs_vec_or_pos_neg_in_place_left,
 };
-use malachite_nz::integer::Integer;
-use malachite_nz_test_util::integer::logic::{integer_op_bits, integer_op_limbs};
+use malachite_nz_test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -19,14 +18,6 @@ use inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
 use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
-
-pub fn integer_or_alt_1(x: &Integer, y: &Integer) -> Integer {
-    integer_op_bits(&|a, b| a || b, x, y)
-}
-
-pub fn integer_or_alt_2(x: &Integer, y: &Integer) -> Integer {
-    integer_op_limbs(&|a, b| a | b, x, y)
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_neg_or_limb);

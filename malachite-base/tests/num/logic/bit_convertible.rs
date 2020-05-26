@@ -1,12 +1,13 @@
-use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base_test_util::num::logic::bit_convertible::{
     _from_bits_asc_alt, _from_bits_asc_signed_naive, _from_bits_asc_unsigned_naive,
     _from_bits_desc_alt, _from_bits_desc_signed_naive, _from_bits_desc_unsigned_naive,
     _to_bits_asc_alt, _to_bits_asc_signed_naive, _to_bits_asc_unsigned_naive, _to_bits_desc_alt,
     _to_bits_desc_signed_naive, _to_bits_desc_unsigned_naive,
 };
+
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::logic::traits::BitConvertible;
 
 #[test]
 pub fn test_to_bits_asc() {

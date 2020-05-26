@@ -1,8 +1,9 @@
+use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
 
 #[test]
 pub fn test_get_bits_unsigned() {

@@ -15,6 +15,7 @@ fn even_properties() {
         assert_eq!(x.divisible_by(Integer::TWO), even);
         assert_eq!((x + Integer::ONE).odd(), even);
         assert_eq!((x - Integer::ONE).odd(), even);
+        assert_eq!((-x).even(), even);
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {
@@ -30,6 +31,7 @@ fn odd_properties() {
         assert_eq!(!x.divisible_by(Integer::TWO), odd);
         assert_eq!((x + Integer::ONE).even(), odd);
         assert_eq!((x - Integer::ONE).even(), odd);
+        assert_eq!((-x).odd(), odd);
     });
 
     test_properties(signeds::<SignedLimb>, |&i| {

@@ -59,19 +59,19 @@ power_of_two_unsigned_fail!(u64, power_of_two_u64_fail);
 power_of_two_unsigned_fail!(u128, power_of_two_u128_fail);
 power_of_two_unsigned_fail!(usize, power_of_two_usize_fail);
 
-macro_rules! floor_log_two_signed_fail {
-    ($t:ident, $floor_log_two_fail:ident) => {
+macro_rules! power_of_two_signed_fail {
+    ($t:ident, $power_of_two_fail:ident) => {
         #[test]
         #[should_panic]
-        fn $floor_log_two_fail() {
+        fn $power_of_two_fail() {
             $t::power_of_two($t::WIDTH - 1);
         }
     };
 }
 
-floor_log_two_signed_fail!(i8, floor_log_two_u8_fail);
-floor_log_two_signed_fail!(i16, floor_log_two_u16_fail);
-floor_log_two_signed_fail!(i32, floor_log_two_u32_fail);
-floor_log_two_signed_fail!(i64, floor_log_two_u64_fail);
-floor_log_two_signed_fail!(i128, floor_log_two_u128_fail);
-floor_log_two_signed_fail!(isize, floor_log_two_usize_fail);
+power_of_two_signed_fail!(i8, power_of_two_i8_fail);
+power_of_two_signed_fail!(i16, power_of_two_i16_fail);
+power_of_two_signed_fail!(i32, power_of_two_i32_fail);
+power_of_two_signed_fail!(i64, power_of_two_i64_fail);
+power_of_two_signed_fail!(i128, power_of_two_i128_fail);
+power_of_two_signed_fail!(isize, power_of_two_isize_fail);
