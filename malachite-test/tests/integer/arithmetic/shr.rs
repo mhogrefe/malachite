@@ -7,11 +7,11 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-
-use malachite_test::common::test_properties;
-use malachite_test::common::{
+use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{pairs_of_signed_and_small_unsigned, signeds, unsigneds};
 use malachite_test::inputs::integer::{
     integers, pairs_of_integer_and_small_signed, pairs_of_integer_and_small_unsigned,

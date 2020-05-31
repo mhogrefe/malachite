@@ -6,13 +6,13 @@ macro_rules! impl_saturating_add {
             type Output = $t;
 
             #[inline]
-            fn saturating_add(self, rhs: $t) -> $t {
-                $t::saturating_add(self, rhs)
+            fn saturating_add(self, other: $t) -> $t {
+                $t::saturating_add(self, other)
             }
         }
 
         impl SaturatingAddAssign for $t {
-            /// Replaces `self` with `self + rhs`, saturating at the numeric bounds instead of
+            /// Replaces `self` with `self + other`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
             /// Time: worst case O(1)
@@ -32,8 +32,8 @@ macro_rules! impl_saturating_add {
             /// assert_eq!(x, 255);
             /// ```
             #[inline]
-            fn saturating_add_assign(&mut self, rhs: $t) {
-                *self = self.saturating_add(rhs);
+            fn saturating_add_assign(&mut self, other: $t) {
+                *self = self.saturating_add(other);
             }
         }
     };

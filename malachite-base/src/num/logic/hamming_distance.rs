@@ -3,8 +3,8 @@ use num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
 macro_rules! impl_hamming_distance_unsigned {
     ($t:ident) => {
         impl HammingDistance<$t> for $t {
-            /// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips
-            /// needed to turn `self` into `rhs`.
+            /// Returns the Hamming distance between `self` and `other`, or the number of bit flips
+            /// needed to turn `self` into `other`.
             ///
             /// Time: worst case O(1)
             ///
@@ -35,9 +35,9 @@ impl_hamming_distance_unsigned!(usize);
 macro_rules! impl_checked_hamming_distance_signed {
     ($t:ident) => {
         impl CheckedHammingDistance<$t> for $t {
-            /// Returns the Hamming distance between `self` and `rhs`, or the number of bit flips
-            /// needed to turn `self` into `rhs`. If `self` and `rhs` have opposite signs, then the
-            /// number of flips would be infinite, so the result is `None`.
+            /// Returns the Hamming distance between `self` and `other`, or the number of bit flips
+            /// needed to turn `self` into `other`. If `self` and `other` have opposite signs, then
+            /// the number of flips would be infinite, so the result is `None`.
             ///
             /// Time: worst case O(1)
             ///

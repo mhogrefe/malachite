@@ -12,10 +12,10 @@ use malachite_nz::integer::logic::or::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_nz_test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::{
     pairs_of_signeds, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_unsigned_vec_and_unsigned_var_2, pairs_of_unsigned_vec_var_6,

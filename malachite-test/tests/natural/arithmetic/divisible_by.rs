@@ -10,9 +10,9 @@ use malachite_nz::natural::arithmetic::divisible_by::{
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
 
-use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_14, pairs_of_limb_vec_var_15,

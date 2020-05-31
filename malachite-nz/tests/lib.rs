@@ -117,5 +117,21 @@ pub mod integer {
         pub mod low_mask;
         pub mod not;
         pub mod or;
+        pub mod set_bit;
+        pub mod significant_bits;
+        pub mod to_bits;
+        pub mod trailing_zeros;
+        pub mod xor;
+    }
+}
+pub mod natural {
+    pub mod arithmetic {
+        pub mod add;
+        pub mod add_mul;
+        pub mod checked_sub;
+        pub mod checked_sub_mul;
+        pub mod div;
+        pub mod div_exact;
+        pub mod div_mod;
     }
 }

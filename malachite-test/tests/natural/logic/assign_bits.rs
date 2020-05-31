@@ -3,7 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, NegModPowerOfTwo};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_assign_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -24,7 +24,7 @@ fn verify_limbs_assign_bits(limbs: &[Limb], start: u64, end: u64, bits: &[Limb],
     let result = n;
     assert_eq!(Natural::from_limbs_asc(out), result);
     let mut n = old_n.clone();
-    _assign_bits_naive::<Natural, Natural>(&mut n, start, end, &bits);
+    assign_bits_naive::<Natural, Natural>(&mut n, start, end, &bits);
     assert_eq!(n, result);
 }
 
@@ -112,7 +112,7 @@ fn test_assign_bits() {
         n.assign_bits(start, end, &Natural::from_str(v).unwrap());
         assert_eq!(n, Natural::from_str(out).unwrap());
         let mut n = Natural::from_str(u).unwrap();
-        _assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
+        assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
         assert_eq!(n, Natural::from_str(out).unwrap());
     };
     test("123", 10, 10, "456", "123");
@@ -171,7 +171,7 @@ fn assign_bits_properties() {
             n.assign_bits(start, end, bits);
             let result = n;
             let mut n = old_n.clone();
-            _assign_bits_naive(&mut n, start, end, bits);
+            assign_bits_naive(&mut n, start, end, bits);
             assert_eq!(n, result);
             n.assign_bits(start, end, bits);
             assert_eq!(n, result);

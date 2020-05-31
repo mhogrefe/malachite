@@ -4,12 +4,13 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz_test_util::integer::comparison::partial_ord_primitive_integer::*;
 use num::BigInt;
 use rand::Rand;
 use rug;
 
-use malachite_test::common::{integer_to_bigint, integer_to_rug_integer, test_properties};
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{pairs_of_signeds, pairs_of_unsigneds};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_signed, pairs_of_integer_and_unsigned,

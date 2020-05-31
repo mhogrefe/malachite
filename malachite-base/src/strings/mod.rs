@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+use named::Named;
+
 /// Returns a `String` with the same characters and multiplicities, but in order.
 ///
 /// Time: worst case O(n * log(n))
@@ -71,3 +73,5 @@ pub fn string_is_subset(s: &str, t: &str) -> bool {
     let t_chars: HashSet<char> = t.chars().collect();
     s.chars().all(|c| t_chars.contains(&c))
 }
+
+impl_named!(String);

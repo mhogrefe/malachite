@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::_assign_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -80,7 +80,7 @@ fn benchmark_integer_assign_bits_algorithms(gm: GenerationMode, limit: usize, fi
             (
                 "naive",
                 &mut (|(mut n, start, end, bits)| {
-                    _assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits)
+                    assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits)
                 }),
             ),
         ],

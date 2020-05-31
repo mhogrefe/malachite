@@ -1,8 +1,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::integer::triples_of_integer_small_u64_and_bool;
 
 #[test]

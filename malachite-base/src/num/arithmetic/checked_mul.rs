@@ -6,8 +6,8 @@ macro_rules! impl_checked_mul {
             type Output = $t;
 
             #[inline]
-            fn checked_mul(self, rhs: $t) -> Option<$t> {
-                $t::checked_mul(self, rhs)
+            fn checked_mul(self, other: $t) -> Option<$t> {
+                $t::checked_mul(self, other)
             }
         }
     };

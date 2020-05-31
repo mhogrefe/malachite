@@ -5,7 +5,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
+use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 use rand::Rand;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -158,7 +158,7 @@ fn benchmark_unsigned_get_bits_algorithms<T: PrimitiveUnsigned + Rand>(
             ),
             (
                 "naive",
-                &mut (|(n, start, end)| no_out!(_get_bits_naive::<T, T>(&n, start, end))),
+                &mut (|(n, start, end)| no_out!(get_bits_naive::<T, T>(&n, start, end))),
             ),
         ],
     );
@@ -189,9 +189,7 @@ fn benchmark_signed_get_bits_algorithms<T: PrimitiveSigned + Rand>(
             (
                 "naive",
                 &mut (|(n, start, end)| {
-                    no_out!(_get_bits_naive::<T, T::UnsignedOfEqualWidth>(
-                        &n, start, end
-                    ))
+                    no_out!(get_bits_naive::<T, T::UnsignedOfEqualWidth>(&n, start, end))
                 }),
             ),
         ],
@@ -222,7 +220,7 @@ fn benchmark_unsigned_assign_bits_algorithms<T: PrimitiveUnsigned + Rand>(
             (
                 "naive",
                 &mut (|(mut n, start, end, bits)| {
-                    no_out!(_assign_bits_naive::<T, <T as BitBlockAccess>::Bits>(
+                    no_out!(assign_bits_naive::<T, <T as BitBlockAccess>::Bits>(
                         &mut n, start, end, &bits
                     ))
                 }),
@@ -258,7 +256,7 @@ fn benchmark_signed_assign_bits_algorithms<T: PrimitiveSigned + Rand, U: Primiti
             (
                 "naive",
                 &mut (|(mut n, start, end, bits)| {
-                    no_out!(_assign_bits_naive::<T, U>(&mut n, start, end, &bits))
+                    no_out!(assign_bits_naive::<T, U>(&mut n, start, end, &bits))
                 }),
             ),
         ],

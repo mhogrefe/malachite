@@ -6,13 +6,13 @@ macro_rules! impl_overflowing_sub {
             type Output = $t;
 
             #[inline]
-            fn overflowing_sub(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_sub(self, rhs)
+            fn overflowing_sub(self, other: $t) -> ($t, bool) {
+                $t::overflowing_sub(self, other)
             }
         }
 
         impl OverflowingSubAssign for $t {
-            /// Replaces `self` with `self - rhs`.
+            /// Replaces `self` with `self - other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred then the wrapped value is assigned.
@@ -34,8 +34,8 @@ macro_rules! impl_overflowing_sub {
             /// assert_eq!(x, 65_203);
             /// ```
             #[inline]
-            fn overflowing_sub_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_sub(rhs);
+            fn overflowing_sub_assign(&mut self, other: $t) -> bool {
+                let (result, overflow) = self.overflowing_sub(other);
                 *self = result;
                 overflow
             }

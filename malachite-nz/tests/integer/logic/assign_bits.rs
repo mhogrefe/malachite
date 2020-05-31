@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::_assign_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
@@ -18,7 +18,7 @@ fn verify_limbs_neg_assign_bits(xs: &[Limb], start: u64, end: u64, bits: &[Limb]
     let result = n;
     assert_eq!(-Natural::from_limbs_asc(out), result);
     let mut n = old_n;
-    _assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits);
+    assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits);
     assert_eq!(n, result);
 }
 
@@ -162,7 +162,7 @@ fn test_assign_bits() {
         n.assign_bits(start, end, &Natural::from_str(v).unwrap());
         assert_eq!(n, Integer::from_str(out).unwrap());
         let mut n = Integer::from_str(u).unwrap();
-        _assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
+        assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
         assert_eq!(n, Integer::from_str(out).unwrap());
     };
     test("123", 10, 10, "456", "123");

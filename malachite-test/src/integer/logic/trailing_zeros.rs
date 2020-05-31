@@ -1,17 +1,9 @@
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
-use malachite_nz::integer::Integer;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz_test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::integer::integers;
-
-pub fn integer_trailing_zeros_alt(n: &Integer) -> Option<u64> {
-    if *n == 0 {
-        None
-    } else {
-        Some(u64::wrapping_from(n.bits().take_while(|&b| !b).count()))
-    }
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_trailing_zeros);

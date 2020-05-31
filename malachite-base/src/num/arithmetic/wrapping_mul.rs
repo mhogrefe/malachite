@@ -6,13 +6,13 @@ macro_rules! impl_wrapping_mul {
             type Output = $t;
 
             #[inline]
-            fn wrapping_mul(self, rhs: $t) -> $t {
-                $t::wrapping_mul(self, rhs)
+            fn wrapping_mul(self, other: $t) -> $t {
+                $t::wrapping_mul(self, other)
             }
         }
 
         impl WrappingMulAssign for $t {
-            /// Replaces `self` with `self * rhs`, wrapping around at the boundary of the type.
+            /// Replaces `self` with `self * other`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)
             ///
@@ -31,8 +31,8 @@ macro_rules! impl_wrapping_mul {
             /// assert_eq!(x, 24);
             /// ```
             #[inline]
-            fn wrapping_mul_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_mul(rhs);
+            fn wrapping_mul_assign(&mut self, other: $t) {
+                *self = self.wrapping_mul(other);
             }
         }
     };

@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, SignificantBits};
-use malachite_base_test_util::num::logic::bit_convertible::_to_bits_asc_alt;
+use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::natural::Natural;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -23,7 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_to_bits_desc_algorithms);
 }
 
-pub fn _to_bits_asc_naive(n: &Natural) -> Vec<bool> {
+pub fn to_bits_asc_naive(n: &Natural) -> Vec<bool> {
     let mut bits = Vec::new();
     for i in 0..n.significant_bits() {
         bits.push(n.get_bit(i));
@@ -31,7 +31,7 @@ pub fn _to_bits_asc_naive(n: &Natural) -> Vec<bool> {
     bits
 }
 
-pub fn _to_bits_desc_naive(n: &Natural) -> Vec<bool> {
+pub fn to_bits_desc_naive(n: &Natural) -> Vec<bool> {
     let mut bits = Vec::new();
     for i in (0..n.significant_bits()).rev() {
         bits.push(n.get_bit(i));
@@ -89,8 +89,8 @@ fn benchmark_natural_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, fi
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.to_bits_asc()))),
-            ("alt", &mut (|n| no_out!(_to_bits_asc_alt(&n)))),
-            ("naive", &mut (|n| no_out!(_to_bits_asc_naive(&n)))),
+            ("alt", &mut (|n| no_out!(to_bits_asc_alt(&n)))),
+            ("naive", &mut (|n| no_out!(to_bits_asc_naive(&n)))),
         ],
     );
 }
@@ -136,8 +136,8 @@ fn benchmark_natural_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, f
         "n.significant_bits()",
         &mut [
             ("default", &mut (|n| no_out!(n.to_bits_desc()))),
-            ("alt", &mut (|n| no_out!(n._to_bits_desc_alt()))),
-            ("naive", &mut (|n| no_out!(_to_bits_desc_naive(&n)))),
+            ("alt", &mut (|n| no_out!(to_bits_desc_alt(&n)))),
+            ("naive", &mut (|n| no_out!(to_bits_desc_naive(&n)))),
         ],
     );
 }

@@ -2,7 +2,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
 use malachite_base_test_util::num::logic::bit_convertible::{
-    _from_bits_asc_alt, _from_bits_desc_alt,
+    from_bits_asc_alt, from_bits_desc_alt,
 };
 use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
@@ -23,7 +23,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_natural_from_bits_desc_algorithms);
 }
 
-pub fn _from_bits_asc_naive(bits: &[bool]) -> Natural {
+pub fn from_bits_asc_naive(bits: &[bool]) -> Natural {
     let mut n = Natural::ZERO;
     for i in bits
         .iter()
@@ -36,7 +36,7 @@ pub fn _from_bits_asc_naive(bits: &[bool]) -> Natural {
     n
 }
 
-pub fn _from_bits_desc_naive(bits: &[bool]) -> Natural {
+pub fn from_bits_desc_naive(bits: &[bool]) -> Natural {
     let mut n = Natural::ZERO;
     for i in bits
         .iter()
@@ -141,11 +141,11 @@ fn benchmark_natural_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, 
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_asc_alt::<Natural>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<Natural>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_asc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_naive(bits))),
             ),
         ],
     );
@@ -168,11 +168,11 @@ fn benchmark_natural_from_bits_desc_algorithms(gm: GenerationMode, limit: usize,
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_desc_alt::<Natural>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<Natural>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_desc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_naive(bits))),
             ),
         ],
     );

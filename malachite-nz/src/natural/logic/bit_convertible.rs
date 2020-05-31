@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible, LeadingZeros};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
 
 use natural::Natural;
 use platform::Limb;
@@ -189,31 +189,5 @@ impl BitConvertible for Natural {
     /// ```
     fn from_bits_desc(bits: &[bool]) -> Natural {
         Natural::from_owned_limbs_asc(limbs_asc_from_bits_desc(bits))
-    }
-}
-
-impl Natural {
-    pub fn _to_bits_desc_alt(&self) -> Vec<bool> {
-        let mut bits = Vec::new();
-        if *self == 0 {
-            return bits;
-        }
-        let mut first = true;
-        for limb in self.limbs().rev() {
-            let mut i = if first {
-                first = false;
-                Limb::WIDTH - LeadingZeros::leading_zeros(limb) - 1
-            } else {
-                Limb::WIDTH - 1
-            };
-            loop {
-                bits.push(limb.get_bit(i));
-                if i == 0 {
-                    break;
-                }
-                i -= 1;
-            }
-        }
-        bits
     }
 }

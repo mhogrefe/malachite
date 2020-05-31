@@ -6,13 +6,13 @@ macro_rules! impl_wrapping_add {
             type Output = $t;
 
             #[inline]
-            fn wrapping_add(self, rhs: $t) -> $t {
-                $t::wrapping_add(self, rhs)
+            fn wrapping_add(self, other: $t) -> $t {
+                $t::wrapping_add(self, other)
             }
         }
 
         impl WrappingAddAssign for $t {
-            /// Replaces `self` with `self + rhs`, wrapping around at the boundary of the type.
+            /// Replaces `self` with `self + other`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)
             ///
@@ -31,8 +31,8 @@ macro_rules! impl_wrapping_add {
             /// assert_eq!(x, 67);
             /// ```
             #[inline]
-            fn wrapping_add_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_add(rhs);
+            fn wrapping_add_assign(&mut self, other: $t) {
+                *self = self.wrapping_add(other);
             }
         }
     };

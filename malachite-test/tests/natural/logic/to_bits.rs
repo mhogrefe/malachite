@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
-use malachite_base_test_util::num::logic::bit_convertible::{_to_bits_asc_alt, _to_bits_desc_alt};
+use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
-use malachite_test::natural::logic::to_bits::{_to_bits_asc_naive, _to_bits_desc_naive};
+use malachite_test::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 
 #[test]
 fn test_to_bits_asc() {
@@ -16,7 +16,8 @@ fn test_to_bits_asc() {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(n.bits().collect::<Vec<bool>>(), out);
         assert_eq!(n.to_bits_asc(), out);
-        assert_eq!(_to_bits_asc_naive(&n), out);
+        assert_eq!(to_bits_asc_naive(&n), out);
+        assert_eq!(to_bits_asc_alt(&n), out);
     };
     test("0", vec![]);
     test("1", vec![true]);
@@ -76,8 +77,8 @@ fn test_to_bits_desc() {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(n.bits().rev().collect::<Vec<bool>>(), out);
         assert_eq!(n.to_bits_desc(), out);
-        assert_eq!(_to_bits_desc_naive(&n), out);
-        assert_eq!(n._to_bits_desc_alt(), out);
+        assert_eq!(to_bits_desc_naive(&n), out);
+        assert_eq!(to_bits_desc_alt(&n), out);
     };
     test("0", vec![]);
     test("1", vec![true]);
@@ -135,8 +136,8 @@ fn test_to_bits_desc() {
 fn to_bits_asc_properties() {
     test_properties(naturals, |x| {
         let bits = x.to_bits_asc();
-        assert_eq!(_to_bits_asc_naive(x), bits);
-        assert_eq!(_to_bits_asc_alt(x), bits);
+        assert_eq!(to_bits_asc_naive(x), bits);
+        assert_eq!(to_bits_asc_alt(x), bits);
         assert_eq!(x.bits().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_asc(&bits), *x);
         if *x != 0 {
@@ -153,9 +154,8 @@ fn to_bits_asc_properties() {
 fn to_bits_desc_properties() {
     test_properties(naturals, |x| {
         let bits = x.to_bits_desc();
-        assert_eq!(_to_bits_desc_naive(x), bits);
-        assert_eq!(_to_bits_desc_alt(x), bits);
-        assert_eq!(x._to_bits_desc_alt(), bits);
+        assert_eq!(to_bits_desc_naive(x), bits);
+        assert_eq!(to_bits_desc_alt(x), bits);
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), bits);
         assert_eq!(Natural::from_bits_desc(&bits), *x);
         if *x != 0 {

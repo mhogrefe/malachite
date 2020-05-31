@@ -49,3 +49,6 @@ pub mod checked_hamming_distance;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod or;
+pub mod to_bits;
+pub mod trailing_zeros;
+pub mod xor;

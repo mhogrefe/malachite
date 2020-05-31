@@ -6,13 +6,13 @@ macro_rules! impl_wrapping_sub {
             type Output = $t;
 
             #[inline]
-            fn wrapping_sub(self, rhs: $t) -> $t {
-                $t::wrapping_sub(self, rhs)
+            fn wrapping_sub(self, other: $t) -> $t {
+                $t::wrapping_sub(self, other)
             }
         }
 
         impl WrappingSubAssign for $t {
-            /// Replaces `self` with `self - rhs`, wrapping around at the boundary of the type.
+            /// Replaces `self` with `self - other`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)
             ///
@@ -31,8 +31,8 @@ macro_rules! impl_wrapping_sub {
             /// assert_eq!(x, 65_203);
             /// ```
             #[inline]
-            fn wrapping_sub_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_sub(rhs);
+            fn wrapping_sub_assign(&mut self, other: $t) {
+                *self = self.wrapping_sub(other);
             }
         }
     };

@@ -172,56 +172,57 @@ pub trait ModNegAssign<M = Self> {
     fn mod_neg_assign(&mut self, m: M);
 }
 
-/// Checked addition. Computes `self + rhs`, returning `None` if there is no valid result.
+/// Checked addition. Computes `self + other`, returning `None` if there is no valid result.
 pub trait CheckedAdd<RHS = Self> {
     type Output;
 
-    fn checked_add(self, rhs: RHS) -> Option<Self::Output>;
+    fn checked_add(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Saturating addition. Computes `self + rhs`, saturating at the numeric bounds instead of
+/// Saturating addition. Computes `self + other`, saturating at the numeric bounds instead of
 /// overflowing.
 pub trait SaturatingAdd<RHS = Self> {
     type Output;
 
-    fn saturating_add(self, rhs: RHS) -> Self::Output;
+    fn saturating_add(self, other: RHS) -> Self::Output;
 }
 
-/// Saturating addition. Replaces `self` with `self + rhs`, saturating at the numeric bounds instead
-/// of overflowing.
+/// Saturating addition. Replaces `self` with `self + other`, saturating at the numeric bounds
+/// instead of overflowing.
 pub trait SaturatingAddAssign<RHS = Self> {
-    fn saturating_add_assign(&mut self, rhs: RHS);
+    fn saturating_add_assign(&mut self, other: RHS);
 }
 
-/// Wrapping (modular) addition. Computes `self + rhs`, wrapping around at the boundary of the type.
+/// Wrapping (modular) addition. Computes `self + other`, wrapping around at the boundary of the
+/// type.
 pub trait WrappingAdd<RHS = Self> {
     type Output;
 
-    fn wrapping_add(self, rhs: RHS) -> Self::Output;
+    fn wrapping_add(self, other: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) addition. Replaces `self` with `self + rhs`, wrapping around at the boundary
-/// of the type.
+/// Wrapping (modular) addition. Replaces `self` with `self + other`, wrapping around at the
+/// boundary of the type.
 pub trait WrappingAddAssign<RHS = Self> {
-    fn wrapping_add_assign(&mut self, rhs: RHS);
+    fn wrapping_add_assign(&mut self, other: RHS);
 }
 
-/// Calculates `self` + `rhs`.
+/// Calculates `self` + `other`.
 ///
 /// Returns a tuple of the sum along with a boolean indicating whether an arithmetic overflow would
 /// occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingAdd<RHS = Self> {
     type Output;
 
-    fn overflowing_add(self, rhs: RHS) -> (Self::Output, bool);
+    fn overflowing_add(self, other: RHS) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self` + `rhs`.
+/// Replaces `self` with `self` + `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
 pub trait OverflowingAddAssign<RHS = Self> {
-    fn overflowing_add_assign(&mut self, rhs: RHS) -> bool;
+    fn overflowing_add_assign(&mut self, other: RHS) -> bool;
 }
 
 /// Adds two numbers, each composed of two `Self` values. The sum is returned as a pair of `Self`
@@ -262,57 +263,57 @@ pub trait XXXXAddYYYYIsZZZZ: Sized {
     ) -> (Self, Self, Self, Self);
 }
 
-/// Checked subtraction. Computes `self - rhs`, returning `None` if there is no valid result.
+/// Checked subtraction. Computes `self - other`, returning `None` if there is no valid result.
 pub trait CheckedSub<RHS = Self> {
     type Output;
 
-    fn checked_sub(self, rhs: RHS) -> Option<Self::Output>;
+    fn checked_sub(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Saturating subtraction. Computes `self - rhs`, saturating at the numeric bounds instead of
+/// Saturating subtraction. Computes `self - other`, saturating at the numeric bounds instead of
 /// overflowing.
 pub trait SaturatingSub<RHS = Self> {
     type Output;
 
-    fn saturating_sub(self, rhs: RHS) -> Self::Output;
+    fn saturating_sub(self, other: RHS) -> Self::Output;
 }
 
-/// Saturating subtraction. Replaces `self` with `self - rhs`, saturating at the numeric bounds
+/// Saturating subtraction. Replaces `self` with `self - other`, saturating at the numeric bounds
 /// instead of overflowing.
 pub trait SaturatingSubAssign<RHS = Self> {
-    fn saturating_sub_assign(&mut self, rhs: RHS);
+    fn saturating_sub_assign(&mut self, other: RHS);
 }
 
-/// Wrapping (modular) subtraction. Computes `self - rhs`, wrapping around at the boundary of the
+/// Wrapping (modular) subtraction. Computes `self - other`, wrapping around at the boundary of the
 /// type.
 pub trait WrappingSub<RHS = Self> {
     type Output;
 
-    fn wrapping_sub(self, rhs: RHS) -> Self::Output;
+    fn wrapping_sub(self, other: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) subtraction. Replaces `self` with `self - rhs`, wrapping around at the
+/// Wrapping (modular) subtraction. Replaces `self` with `self - other`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingSubAssign<RHS = Self> {
-    fn wrapping_sub_assign(&mut self, rhs: RHS);
+    fn wrapping_sub_assign(&mut self, other: RHS);
 }
 
-/// Calculates `self` - `rhs`.
+/// Calculates `self` - `other`.
 ///
 /// Returns a tuple of the difference along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingSub<RHS = Self> {
     type Output;
 
-    fn overflowing_sub(self, rhs: RHS) -> (Self::Output, bool);
+    fn overflowing_sub(self, other: RHS) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self` - `rhs`.
+/// Replaces `self` with `self` - `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
 pub trait OverflowingSubAssign<RHS = Self> {
-    fn overflowing_sub_assign(&mut self, rhs: RHS) -> bool;
+    fn overflowing_sub_assign(&mut self, other: RHS) -> bool;
 }
 
 /// Subtracts two numbers, each composed of two `Self` values. The difference is returned as a pair
@@ -336,109 +337,109 @@ pub trait XXXSubYYYIsZZZ: Sized {
     ) -> (Self, Self, Self);
 }
 
-/// Computes `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// Computes `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoAdd<RHS = Self> {
     type Output;
 
-    fn mod_power_of_two_add(self, rhs: RHS, pow: u64) -> Self::Output;
+    fn mod_power_of_two_add(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+/// reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoAddAssign<RHS = Self> {
-    fn mod_power_of_two_add_assign(&mut self, rhs: RHS, pow: u64);
+    fn mod_power_of_two_add_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModAdd<RHS = Self, M = Self> {
     type Output;
 
-    fn mod_add(self, rhs: RHS, m: M) -> Self::Output;
+    fn mod_add(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Replaces `self` with `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModAddAssign<RHS = Self, M = Self> {
-    fn mod_add_assign(&mut self, rhs: RHS, m: M);
+    fn mod_add_assign(&mut self, other: RHS, m: M);
 }
 
-/// Computes `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// Computes `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoSub<RHS = Self> {
     type Output;
 
-    fn mod_power_of_two_sub(self, rhs: RHS, pow: u64) -> Self::Output;
+    fn mod_power_of_two_sub(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+/// reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoSubAssign<RHS = Self> {
-    fn mod_power_of_two_sub_assign(&mut self, rhs: RHS, pow: u64);
+    fn mod_power_of_two_sub_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Computes `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Computes `self - other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModSub<RHS = Self, M = Self> {
     type Output;
 
-    fn mod_sub(self, rhs: RHS, m: M) -> Self::Output;
+    fn mod_sub(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self - rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Replaces `self` with `self - other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModSubAssign<RHS = Self, M = Self> {
-    fn mod_sub_assign(&mut self, rhs: RHS, m: M);
+    fn mod_sub_assign(&mut self, other: RHS, m: M);
 }
 
-/// Checked multiplication. Computes `self * rhs`, returning `None` if there is no valid result.
+/// Checked multiplication. Computes `self * other`, returning `None` if there is no valid result.
 pub trait CheckedMul<RHS = Self> {
     type Output;
 
-    fn checked_mul(self, rhs: RHS) -> Option<Self::Output>;
+    fn checked_mul(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Saturating multiplication. Computes `self * rhs`, saturating at the numeric bounds instead of
+/// Saturating multiplication. Computes `self * other`, saturating at the numeric bounds instead of
 /// overflowing.
 pub trait SaturatingMul<RHS = Self> {
     type Output;
 
-    fn saturating_mul(self, rhs: RHS) -> Self::Output;
+    fn saturating_mul(self, other: RHS) -> Self::Output;
 }
 
-/// Saturating multiplication. Replaces `self` with `self * rhs`, saturating at the numeric bounds
+/// Saturating multiplication. Replaces `self` with `self * other`, saturating at the numeric bounds
 /// instead of overflowing.
 pub trait SaturatingMulAssign<RHS = Self> {
-    fn saturating_mul_assign(&mut self, rhs: RHS);
+    fn saturating_mul_assign(&mut self, other: RHS);
 }
 
-/// Wrapping (modular) multiplication. Computes `self * rhs`, wrapping around at the boundary of the
-/// type.
+/// Wrapping (modular) multiplication. Computes `self * other`, wrapping around at the boundary of
+/// the type.
 pub trait WrappingMul<RHS = Self> {
     type Output;
 
-    fn wrapping_mul(self, rhs: RHS) -> Self::Output;
+    fn wrapping_mul(self, other: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) multiplication. Replaces `self` with `self * rhs`, wrapping around at the
+/// Wrapping (modular) multiplication. Replaces `self` with `self * other`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingMulAssign<RHS = Self> {
-    fn wrapping_mul_assign(&mut self, rhs: RHS);
+    fn wrapping_mul_assign(&mut self, other: RHS);
 }
 
-/// Calculates `self` * `rhs`.
+/// Calculates `self` * `other`.
 ///
 /// Returns a tuple of the product along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingMul<RHS = Self> {
     type Output;
 
-    fn overflowing_mul(self, rhs: RHS) -> (Self::Output, bool);
+    fn overflowing_mul(self, other: RHS) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self` * `rhs`.
+/// Replaces `self` with `self` * `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
 pub trait OverflowingMulAssign<RHS = Self> {
-    fn overflowing_mul_assign(&mut self, rhs: RHS) -> bool;
+    fn overflowing_mul_assign(&mut self, other: RHS) -> bool;
 }
 
 /// Multiplies two numbers, returning the product as a pair of `Self` values. The more significant
@@ -447,33 +448,33 @@ pub trait XMulYIsZZ: Sized {
     fn x_mul_y_is_zz(x: Self, y: Self) -> (Self, Self);
 }
 
-/// Computes `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// Computes `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoMul<RHS = Self> {
     type Output;
 
-    fn mod_power_of_two_mul(self, rhs: RHS, pow: u64) -> Self::Output;
+    fn mod_power_of_two_mul(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self * rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+/// reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoMulAssign<RHS = Self> {
-    fn mod_power_of_two_mul_assign(&mut self, rhs: RHS, pow: u64);
+    fn mod_power_of_two_mul_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModMul<RHS = Self, M = Self> {
     type Output;
 
-    fn mod_mul(self, rhs: RHS, m: M) -> Self::Output;
+    fn mod_mul(self, other: RHS, m: M) -> Self::Output;
 }
 
-/// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+/// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
 pub trait ModMulAssign<RHS = Self, M = Self> {
-    fn mod_mul_assign(&mut self, rhs: RHS, m: M);
+    fn mod_mul_assign(&mut self, other: RHS, m: M);
 }
 
-/// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
+/// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
 /// modular multiplications with the same modulus are necessary, it can be quicker to precompute
 /// some piece of data and reuse it in the multiplication calls. This trait provides a method for
 /// precomputing the data and a method for using it during multiplication.
@@ -483,16 +484,16 @@ pub trait ModMulPrecomputed<RHS = Self, M = Self> {
 
     fn precompute_mod_mul_data(m: &M) -> Self::Data;
 
-    fn mod_mul_precomputed(self, rhs: RHS, m: M, data: &Self::Data) -> Self::Output;
+    fn mod_mul_precomputed(self, other: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. If
+/// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If
 /// multiple modular multiplications with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
 /// method for using precomputed data during multiplication. For precomputing the data, use the
 /// `precompute_mod_mul_data` function in `ModMulPrecomputed`.
 pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, M> {
-    fn mod_mul_precomputed_assign(&mut self, rhs: RHS, m: M, data: &Self::Data);
+    fn mod_mul_precomputed_assign(&mut self, other: RHS, m: M, data: &Self::Data);
 }
 
 /// Computes `self + y * z`.
@@ -617,74 +618,74 @@ pub trait OverflowingSubMulAssign<Y = Self, Z = Self> {
     fn overflowing_sub_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
 
-/// Calculates `self` * 2<sup>`rhs`</sup>, rounding the result according to a specified rounding
-/// mode. Rounding might only be necessary if `rhs` is negative.
+/// Calculates `self` * 2<sup>`other`</sup>, rounding the result according to a specified rounding
+/// mode. Rounding might only be necessary if `other` is negative.
 pub trait ShlRound<RHS> {
     type Output;
 
-    fn shl_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+    fn shl_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
 }
 
-/// Replaces `self` with `self` * 2<sup>`rhs`</sup>, rounding the result according to a specified
-/// rounding mode. Rounding might only be necessary if `rhs` is negative.
+/// Replaces `self` with `self` * 2<sup>`other`</sup>, rounding the result according to a specified
+/// rounding mode. Rounding might only be necessary if `other` is negative.
 pub trait ShlRoundAssign<RHS> {
-    fn shl_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
+    fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
-/// Calculates `self` / 2<sup>`rhs`</sup>, rounding the result according to a specified rounding
-/// mode. Rounding might only be necessary if `rhs` is non-negative.
+/// Calculates `self` / 2<sup>`other`</sup>, rounding the result according to a specified rounding
+/// mode. Rounding might only be necessary if `other` is non-negative.
 pub trait ShrRound<RHS> {
     type Output;
 
-    fn shr_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+    fn shr_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
 }
 
-/// Replaces `self` with `self` / 2<sup>`rhs`</sup>, rounding the result according to a specified
-/// rounding mode. Rounding might only be necessary if `rhs` is non-negative.
+/// Replaces `self` with `self` / 2<sup>`other`</sup>, rounding the result according to a specified
+/// rounding mode. Rounding might only be necessary if `other` is non-negative.
 pub trait ShrRoundAssign<RHS> {
-    fn shr_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
+    fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
-/// Computes `self << rhs`, returning `None` if the result is too large to fit.
+/// Computes `self << other`, returning `None` if the result is too large to fit.
 pub trait ArithmeticCheckedShl<RHS> {
     type Output;
 
-    fn arithmetic_checked_shl(self, rhs: RHS) -> Option<Self::Output>;
+    fn arithmetic_checked_shl(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Computes `self >> rhs`, returning `None` if the result is too large to fit.
+/// Computes `self >> other`, returning `None` if the result is too large to fit.
 pub trait ArithmeticCheckedShr<RHS> {
     type Output;
 
-    fn arithmetic_checked_shr(self, rhs: RHS) -> Option<Self::Output>;
+    fn arithmetic_checked_shr(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Computes `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoShl<RHS> {
     type Output;
 
-    fn mod_power_of_two_shl(self, rhs: RHS, pow: u64) -> Self::Output;
+    fn mod_power_of_two_shl(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+/// reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoShlAssign<RHS> {
-    fn mod_power_of_two_shl_assign(&mut self, rhs: RHS, pow: u64);
+    fn mod_power_of_two_shl_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Computes `self >> rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+/// Computes `self >> other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
 /// 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoShr<RHS> {
     type Output;
 
-    fn mod_power_of_two_shr(self, rhs: RHS, pow: u64) -> Self::Output;
+    fn mod_power_of_two_shr(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self >> rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self >> other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+/// reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoShrAssign<RHS> {
-    fn mod_power_of_two_shr_assign(&mut self, rhs: RHS, pow: u64);
+    fn mod_power_of_two_shr_assign(&mut self, other: RHS, pow: u64);
 }
 
 /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode.
@@ -705,42 +706,43 @@ pub trait XXDivModYIsQR: Sized {
     fn xx_div_mod_y_is_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self);
 }
 
-/// Checked division. Computes `self / rhs`, returning `None` if there is no valid result.
+/// Checked division. Computes `self / other`, returning `None` if there is no valid result.
 pub trait CheckedDiv<RHS = Self> {
     type Output;
 
-    fn checked_div(self, rhs: RHS) -> Option<Self::Output>;
+    fn checked_div(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Wrapping (modular) division. Computes `self / rhs`, wrapping around at the boundary of the type.
+/// Wrapping (modular) division. Computes `self / other`, wrapping around at the boundary of the
+/// type.
 pub trait WrappingDiv<RHS = Self> {
     type Output;
 
-    fn wrapping_div(self, rhs: RHS) -> Self::Output;
+    fn wrapping_div(self, other: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) division. Replaces `self` with `self / rhs`, wrapping around at the boundary
-/// of the type.
+/// Wrapping (modular) division. Replaces `self` with `self / other`, wrapping around at the
+/// boundary of the type.
 pub trait WrappingDivAssign<RHS = Self> {
-    fn wrapping_div_assign(&mut self, rhs: RHS);
+    fn wrapping_div_assign(&mut self, other: RHS);
 }
 
-/// Calculates `self` / `rhs`.
+/// Calculates `self` / `other`.
 ///
 /// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingDiv<RHS = Self> {
     type Output;
 
-    fn overflowing_div(self, rhs: RHS) -> (Self::Output, bool);
+    fn overflowing_div(self, other: RHS) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self` / `rhs`.
+/// Replaces `self` with `self` / `other`.
 ///
 /// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
 pub trait OverflowingDivAssign<RHS = Self> {
-    fn overflowing_div_assign(&mut self, rhs: RHS) -> bool;
+    fn overflowing_div_assign(&mut self, other: RHS) -> bool;
 }
 
 /// Calculates `self` mod a power of 2. In other words, returns r, where
@@ -757,20 +759,6 @@ pub trait ModPowerOfTwoAssign {
     fn mod_power_of_two_assign(&mut self, other: u64);
 }
 
-/// Calculates `-self` mod a power of 2. In other words, returns r, where
-/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
-pub trait NegModPowerOfTwo {
-    type Output;
-
-    fn neg_mod_power_of_two(self, other: u64) -> Self::Output;
-}
-
-/// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
-/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
-pub trait NegModPowerOfTwoAssign {
-    fn neg_mod_power_of_two_assign(&mut self, other: u64);
-}
-
 /// Calculates `self` rem a power of 2. In other words, returns r, where
 /// `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
 /// 0 <= |r| < 2<sup>`other`</sup>.
@@ -785,6 +773,20 @@ pub trait RemPowerOfTwo {
 /// 0 <= |r| < 2<sup>`other`</sup>.
 pub trait RemPowerOfTwoAssign {
     fn rem_power_of_two_assign(&mut self, other: u64);
+}
+
+/// Calculates `-self` mod a power of 2. In other words, returns r, where
+/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+pub trait NegModPowerOfTwo {
+    type Output;
+
+    fn neg_mod_power_of_two(self, other: u64) -> Self::Output;
+}
+
+/// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
+/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+pub trait NegModPowerOfTwoAssign {
+    fn neg_mod_power_of_two_assign(&mut self, other: u64);
 }
 
 /// Calculates `self` ceiling-mod a power of 2. In other words, returns r, where
@@ -818,6 +820,82 @@ pub trait DivisibleByPowerOfTwo {
 /// Determines whether `self` is equal to other mod 2<sup>pow</sup>.
 pub trait EqModPowerOfTwo<RHS = Self> {
     fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
+}
+
+/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
+/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
+/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait DivMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn div_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+/// Divides a value by another value in place, returning the remainder. The quotient is rounded
+/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
+/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait DivAssignMod<RHS = Self> {
+    type ModOutput;
+
+    fn div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
+}
+
+/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
+/// towards zero and the remainder has the same sign as the dividend. The quotient and remainder
+/// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait DivRem<RHS = Self> {
+    type DivOutput;
+    type RemOutput;
+
+    fn div_rem(self, other: RHS) -> (Self::DivOutput, Self::RemOutput);
+}
+
+/// Divides a value by another value in place, returning the remainder. The quotient is rounded
+/// towards zero and the remainder has the same sign as the dividend. The quotient and remainder
+/// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait DivAssignRem<RHS = Self> {
+    type RemOutput;
+
+    fn div_assign_rem(&mut self, other: RHS) -> Self::RemOutput;
+}
+
+/// Divides a value by another value, returning the ceiling of the quotient and the remainder of the
+/// negative of the first value divided by the second. The quotient and remainder satisfy
+/// `self` = q * `other` - r and 0 <= r < `other`.
+pub trait CeilingDivNegMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn ceiling_div_neg_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+/// Divides a value by another value in place, taking the ceiling of the quotient and returning the
+/// remainder of the negative of the first value divided by the second. The quotient and remainder
+/// satisfy `self` = q * `other` - r and 0 <= r < `other`.
+pub trait CeilingDivAssignNegMod<RHS = Self> {
+    type ModOutput;
+
+    fn ceiling_div_assign_neg_mod(&mut self, other: RHS) -> Self::ModOutput;
+}
+
+/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
+/// towards positive infinity and the remainder has the opposite sign of the divisor. The quotient
+/// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait CeilingDivMod<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+
+    fn ceiling_div_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+/// Divides a value by another value in place, taking the quotient and returning the remainder. The
+/// quotient is rounded towards positive infinity and the remainder has the opposite sign of the
+/// divisor. The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait CeilingDivAssignMod<RHS = Self> {
+    type ModOutput;
+
+    fn ceiling_div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
 }
 
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
@@ -888,111 +966,59 @@ pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
 }
 
-pub trait DivMod<RHS = Self> {
-    type DivOutput;
-    type ModOutput;
-
-    fn div_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
-}
-
-pub trait DivAssignMod<RHS = Self> {
-    type ModOutput;
-
-    fn div_assign_mod(&mut self, rhs: RHS) -> Self::ModOutput;
-}
-
-pub trait DivRem<RHS = Self> {
-    type DivOutput;
-    type RemOutput;
-
-    fn div_rem(self, rhs: RHS) -> (Self::DivOutput, Self::RemOutput);
-}
-
-pub trait DivAssignRem<RHS = Self> {
-    type RemOutput;
-
-    fn div_assign_rem(&mut self, rhs: RHS) -> Self::RemOutput;
-}
-
 pub trait Mod<RHS = Self> {
     type Output;
 
     // would be called `mod`, but that's a keyword
-    fn mod_op(self, rhs: RHS) -> Self::Output;
+    fn mod_op(self, other: RHS) -> Self::Output;
 }
 
 pub trait ModAssign<RHS = Self> {
-    fn mod_assign(&mut self, rhs: RHS);
+    fn mod_assign(&mut self, other: RHS);
 }
 
 pub trait NegMod<RHS = Self> {
     type Output;
 
-    fn neg_mod(self, rhs: RHS) -> Self::Output;
+    fn neg_mod(self, other: RHS) -> Self::Output;
 }
 
 pub trait NegModAssign<RHS = Self> {
-    fn neg_mod_assign(&mut self, rhs: RHS);
+    fn neg_mod_assign(&mut self, other: RHS);
 }
 
 pub trait CeilingMod<RHS = Self> {
     type Output;
 
-    fn ceiling_mod(self, rhs: RHS) -> Self::Output;
+    fn ceiling_mod(self, other: RHS) -> Self::Output;
 }
 
 pub trait CeilingModAssign<RHS = Self> {
-    fn ceiling_mod_assign(&mut self, rhs: RHS);
+    fn ceiling_mod_assign(&mut self, other: RHS);
 }
 
 pub trait DivRound<RHS = Self> {
     type Output;
 
-    fn div_round(self, rhs: RHS, rm: RoundingMode) -> Self::Output;
+    fn div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
 }
 
 pub trait DivRoundAssign<RHS = Self> {
-    fn div_round_assign(&mut self, rhs: RHS, rm: RoundingMode);
-}
-
-pub trait CeilingDivNegMod<RHS = Self> {
-    type DivOutput;
-    type ModOutput;
-
-    fn ceiling_div_neg_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
-}
-
-pub trait CeilingDivAssignNegMod<RHS = Self> {
-    type ModOutput;
-
-    fn ceiling_div_assign_neg_mod(&mut self, rhs: RHS) -> Self::ModOutput;
-}
-
-pub trait CeilingDivMod<RHS = Self> {
-    type DivOutput;
-    type ModOutput;
-
-    fn ceiling_div_mod(self, rhs: RHS) -> (Self::DivOutput, Self::ModOutput);
-}
-
-pub trait CeilingDivAssignMod<RHS = Self> {
-    type ModOutput;
-
-    fn ceiling_div_assign_mod(&mut self, rhs: RHS) -> Self::ModOutput;
+    fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
 pub trait DivExact<RHS = Self> {
     type Output;
 
-    fn div_exact(self, rhs: RHS) -> Self::Output;
+    fn div_exact(self, other: RHS) -> Self::Output;
 }
 
 pub trait DivExactAssign<RHS = Self> {
-    fn div_exact_assign(&mut self, rhs: RHS);
+    fn div_exact_assign(&mut self, other: RHS);
 }
 
 pub trait DivisibleBy<RHS = Self> {
-    fn divisible_by(self, rhs: RHS) -> bool;
+    fn divisible_by(self, other: RHS) -> bool;
 }
 
 pub trait CheckedLogTwo {

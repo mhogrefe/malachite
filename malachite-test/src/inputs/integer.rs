@@ -16,6 +16,9 @@ use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{
+    integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer,
+};
 use num::BigInt;
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rug;
@@ -46,7 +49,7 @@ use rust_wheels::iterators::tuples::{
 };
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
-use common::{integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer, GenerationMode};
+use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It, RandomValueAndVecOfBool};
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 

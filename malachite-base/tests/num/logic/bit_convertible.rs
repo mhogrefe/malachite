@@ -1,8 +1,8 @@
 use malachite_base_test_util::num::logic::bit_convertible::{
-    _from_bits_asc_alt, _from_bits_asc_signed_naive, _from_bits_asc_unsigned_naive,
-    _from_bits_desc_alt, _from_bits_desc_signed_naive, _from_bits_desc_unsigned_naive,
-    _to_bits_asc_alt, _to_bits_asc_signed_naive, _to_bits_asc_unsigned_naive, _to_bits_desc_alt,
-    _to_bits_desc_signed_naive, _to_bits_desc_unsigned_naive,
+    from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive,
+    from_bits_desc_alt, from_bits_desc_signed_naive, from_bits_desc_unsigned_naive,
+    to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive, to_bits_desc_alt,
+    to_bits_desc_signed_naive, to_bits_desc_unsigned_naive,
 };
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -13,8 +13,8 @@ use malachite_base::num::logic::traits::BitConvertible;
 pub fn test_to_bits_asc() {
     fn test_unsigned<T: PrimitiveUnsigned>(x: T, out: &[bool]) {
         assert_eq!(x.to_bits_asc(), out);
-        assert_eq!(_to_bits_asc_unsigned_naive(x), out);
-        assert_eq!(_to_bits_asc_alt(&x), out);
+        assert_eq!(to_bits_asc_unsigned_naive(x), out);
+        assert_eq!(to_bits_asc_alt(&x), out);
         assert_eq!(x.bits().collect::<Vec<bool>>(), out);
     };
     test_unsigned(0u8, &[]);
@@ -26,8 +26,8 @@ pub fn test_to_bits_asc() {
 
     fn test_signed<T: PrimitiveSigned>(x: T, out: &[bool]) {
         assert_eq!(x.to_bits_asc(), out);
-        assert_eq!(_to_bits_asc_signed_naive(x), out);
-        assert_eq!(_to_bits_asc_alt(&x), out);
+        assert_eq!(to_bits_asc_signed_naive(x), out);
+        assert_eq!(to_bits_asc_alt(&x), out);
         assert_eq!(x.bits().collect::<Vec<bool>>(), out);
     };
     test_signed(0i8, &[]);
@@ -53,8 +53,8 @@ pub fn test_to_bits_asc() {
 pub fn test_to_bits_desc() {
     fn test_unsigned<T: PrimitiveUnsigned>(x: T, out: &[bool]) {
         assert_eq!(x.to_bits_desc(), out);
-        assert_eq!(_to_bits_desc_unsigned_naive(x), out);
-        assert_eq!(_to_bits_desc_alt(&x), out);
+        assert_eq!(to_bits_desc_unsigned_naive(x), out);
+        assert_eq!(to_bits_desc_alt(&x), out);
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), out);
     };
     test_unsigned(0u8, &[]);
@@ -66,8 +66,8 @@ pub fn test_to_bits_desc() {
 
     fn test_signed<T: PrimitiveSigned>(x: T, out: &[bool]) {
         assert_eq!(x.to_bits_desc(), out);
-        assert_eq!(_to_bits_desc_signed_naive(x), out);
-        assert_eq!(_to_bits_desc_alt(&x), out);
+        assert_eq!(to_bits_desc_signed_naive(x), out);
+        assert_eq!(to_bits_desc_alt(&x), out);
         assert_eq!(x.bits().rev().collect::<Vec<bool>>(), out);
     };
     test_signed(0i8, &[]);
@@ -93,8 +93,8 @@ pub fn test_to_bits_desc() {
 pub fn test_from_bits_asc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_asc(bits), out);
-        assert_eq!(_from_bits_asc_unsigned_naive::<T>(bits), out);
-        assert_eq!(_from_bits_asc_alt::<T>(bits), out);
+        assert_eq!(from_bits_asc_unsigned_naive::<T>(bits), out);
+        assert_eq!(from_bits_asc_alt::<T>(bits), out);
     };
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -114,8 +114,8 @@ pub fn test_from_bits_asc() {
 
     fn test_signed<T: PrimitiveSigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_asc(bits), out);
-        assert_eq!(_from_bits_asc_signed_naive::<T>(bits), out);
-        assert_eq!(_from_bits_asc_alt::<T>(bits), out);
+        assert_eq!(from_bits_asc_signed_naive::<T>(bits), out);
+        assert_eq!(from_bits_asc_alt::<T>(bits), out);
     };
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
@@ -206,8 +206,8 @@ from_bits_asc_fail_helper_signed!(
 pub fn test_from_bits_desc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_desc(bits), out);
-        assert_eq!(_from_bits_desc_unsigned_naive::<T>(bits), out);
-        assert_eq!(_from_bits_desc_alt::<T>(bits), out);
+        assert_eq!(from_bits_desc_unsigned_naive::<T>(bits), out);
+        assert_eq!(from_bits_desc_alt::<T>(bits), out);
     };
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -227,8 +227,8 @@ pub fn test_from_bits_desc() {
 
     fn test_signed<T: PrimitiveSigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_desc(bits), out);
-        assert_eq!(_from_bits_desc_signed_naive::<T>(bits), out);
-        assert_eq!(_from_bits_desc_alt::<T>(bits), out);
+        assert_eq!(from_bits_desc_signed_naive::<T>(bits), out);
+        assert_eq!(from_bits_desc_alt::<T>(bits), out);
     };
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);

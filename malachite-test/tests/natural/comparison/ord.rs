@@ -4,11 +4,11 @@ use malachite_base_test_util::common::test_cmp_helper;
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
 use rug;
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_2, pairs_of_unsigneds,
     triples_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_2, vecs_of_unsigned_var_1,

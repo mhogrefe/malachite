@@ -1,48 +1,11 @@
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::fs;
-use std::str::FromStr;
 
 use malachite_bench::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
-use num::{BigInt, BigUint};
-use rug;
 
 pub const SMALL_LIMIT: usize = 1_000;
 pub const LARGE_LIMIT: usize = 10_000;
-
-pub fn biguint_to_natural(n: &BigUint) -> Natural {
-    Natural::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn natural_to_biguint(n: &Natural) -> BigUint {
-    BigUint::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn rug_integer_to_natural(n: &rug::Integer) -> Natural {
-    Natural::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn natural_to_rug_integer(n: &Natural) -> rug::Integer {
-    rug::Integer::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn bigint_to_integer(n: &BigInt) -> Integer {
-    Integer::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn integer_to_bigint(n: &Integer) -> BigInt {
-    BigInt::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn rug_integer_to_integer(n: &rug::Integer) -> Integer {
-    Integer::from_str(n.to_string().as_ref()).unwrap()
-}
-
-pub fn integer_to_rug_integer(n: &Integer) -> rug::Integer {
-    rug::Integer::from_str(n.to_string().as_ref()).unwrap()
-}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScaleType {

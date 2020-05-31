@@ -26,12 +26,15 @@
 )]
 #![allow(clippy::cognitive_complexity, clippy::many_single_char_names)]
 
+#[macro_use]
+pub mod named;
+
+#[macro_use]
 pub mod bools;
+#[macro_use]
 pub mod chars;
 pub mod comparison;
 pub mod crement;
-#[macro_use]
-pub mod named;
 pub mod num;
 pub mod round;
 #[macro_use]

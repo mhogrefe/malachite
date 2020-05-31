@@ -6,15 +6,16 @@ macro_rules! impl_wrapping_div {
             type Output = $t;
 
             #[inline]
-            fn wrapping_div(self, rhs: $t) -> $t {
-                $t::wrapping_div(self, rhs)
+            fn wrapping_div(self, other: $t) -> $t {
+                $t::wrapping_div(self, other)
             }
         }
 
         impl WrappingDivAssign for $t {
-            /// Replaces `self` with `self / rhs`, wrapping around at the boundary of the type.
-            /// Wrapping only occurs when `$t` is signed, `self` is `$t::MIN`, and `rhs` is -1. The
-            /// "actual" result, -`$t::MIN`, can't be represented and is wrapped back to `$t::MIN`.
+            /// Replaces `self` with `self / other`, wrapping around at the boundary of the type.
+            /// Wrapping only occurs when `$t` is signed, `self` is `$t::MIN`, and `other` is -1.
+            /// The "actual" result, -`$t::MIN`, can't be represented and is wrapped back to
+            /// `$t::MIN`.
             ///
             /// Time: worst case O(1)
             ///
@@ -33,8 +34,8 @@ macro_rules! impl_wrapping_div {
             /// assert_eq!(x, -128);
             /// ```
             #[inline]
-            fn wrapping_div_assign(&mut self, rhs: $t) {
-                *self = self.wrapping_div(rhs);
+            fn wrapping_div_assign(&mut self, other: $t) {
+                *self = self.wrapping_div(other);
             }
         }
     };

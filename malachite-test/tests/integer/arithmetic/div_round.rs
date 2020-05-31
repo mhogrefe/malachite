@@ -3,13 +3,13 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
 use num::Integer as NumInteger;
 use rug::ops::DivRounding;
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{
-    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_nonzero_integer, pairs_of_integer_and_nonzero_integer_var_2,
     pairs_of_integer_and_rounding_mode, pairs_of_nonzero_integer_and_rounding_mode,
@@ -24,32 +24,32 @@ fn div_round_properties() {
             let mut mut_n = x.clone();
             mut_n.div_round_assign(y, rm);
             assert!(mut_n.is_valid());
-            let quotient = mut_n;
+            let q = mut_n;
 
             let mut mut_n = x.clone();
             mut_n.div_round_assign(y.clone(), rm);
             assert!(mut_n.is_valid());
-            assert_eq!(mut_n, quotient);
+            assert_eq!(mut_n, q);
 
-            let quotient_alt = x.div_round(y, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.div_round(y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.div_round(y.clone(), rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.clone().div_round(y, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.clone().div_round(y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.clone().div_round(y.clone(), rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.clone().div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            assert!(quotient.le_abs(x));
-            assert_eq!(-(-x).div_round(y, -rm), quotient);
-            assert_eq!(-x.div_round(-y, -rm), quotient);
+            assert!(q.le_abs(x));
+            assert_eq!(-(-x).div_round(y, -rm), q);
+            assert_eq!(-x.div_round(-y, -rm), q);
         },
     );
 

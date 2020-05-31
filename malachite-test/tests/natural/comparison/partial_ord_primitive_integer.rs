@@ -5,11 +5,12 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
 use rand::Rand;
 use rug;
 
-use malachite_test::common::{natural_to_biguint, natural_to_rug_integer, test_properties};
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{pairs_of_natural_signeds, pairs_of_unsigneds};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_natural_signed, pairs_of_natural_and_signed,

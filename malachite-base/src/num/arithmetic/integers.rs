@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
-    CheckedPow, DivAssignRem, DivExact, DivExactAssign, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, EqMod, Mod, ModAssign, OverflowingPow, Pow, SaturatingPow, WrappingPow,
+    CheckedPow, DivExact, DivExactAssign, DivRound, DivRoundAssign, DivisibleBy, EqMod, Mod,
+    ModAssign, OverflowingPow, Pow, SaturatingPow, WrappingPow,
 };
 use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
@@ -20,8 +20,8 @@ macro_rules! impl_arithmetic_traits {
             type Output = $t;
 
             #[inline]
-            fn saturating_pow(self, rhs: u64) -> $t {
-                $t::saturating_pow(self, u32::exact_from(rhs))
+            fn saturating_pow(self, other: u64) -> $t {
+                $t::saturating_pow(self, u32::exact_from(other))
             }
         }
 
@@ -29,8 +29,8 @@ macro_rules! impl_arithmetic_traits {
             type Output = $t;
 
             #[inline]
-            fn wrapping_pow(self, rhs: u64) -> $t {
-                $t::wrapping_pow(self, u32::exact_from(rhs))
+            fn wrapping_pow(self, other: u64) -> $t {
+                $t::wrapping_pow(self, u32::exact_from(other))
             }
         }
 
@@ -38,8 +38,8 @@ macro_rules! impl_arithmetic_traits {
             type Output = $t;
 
             #[inline]
-            fn overflowing_pow(self, rhs: u64) -> ($t, bool) {
-                $t::overflowing_pow(self, u32::exact_from(rhs))
+            fn overflowing_pow(self, other: u64) -> ($t, bool) {
+                $t::overflowing_pow(self, u32::exact_from(other))
             }
         }
 
@@ -52,60 +52,39 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl DivRem for $t {
-            type DivOutput = $t;
-            type RemOutput = $t;
-
-            #[inline]
-            fn div_rem(self, rhs: $t) -> ($t, $t) {
-                (self / rhs, self % rhs)
-            }
-        }
-
-        impl DivAssignRem for $t {
-            type RemOutput = $t;
-
-            #[inline]
-            fn div_assign_rem(&mut self, rhs: $t) -> $t {
-                let rem = *self % rhs;
-                *self /= rhs;
-                rem
-            }
-        }
-
         impl DivExact for $t {
             type Output = $t;
 
             #[inline]
-            fn div_exact(self, rhs: $t) -> $t {
-                self / rhs
+            fn div_exact(self, other: $t) -> $t {
+                self / other
             }
         }
 
         impl DivExactAssign for $t {
             #[inline]
-            fn div_exact_assign(&mut self, rhs: $t) {
-                *self /= rhs;
+            fn div_exact_assign(&mut self, other: $t) {
+                *self /= other;
             }
         }
 
         impl DivisibleBy for $t {
             #[inline]
-            fn divisible_by(self, rhs: $t) -> bool {
-                self == 0 || rhs != 0 && self % rhs == 0
+            fn divisible_by(self, other: $t) -> bool {
+                self == 0 || other != 0 && self % other == 0
             }
         }
 
         impl DivRoundAssign for $t {
-            fn div_round_assign(&mut self, rhs: $t, rm: RoundingMode) {
-                *self = self.div_round(rhs, rm);
+            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
+                *self = self.div_round(other, rm);
             }
         }
 
         impl ModAssign for $t {
             #[inline]
-            fn mod_assign(&mut self, rhs: $t) {
-                *self %= rhs;
+            fn mod_assign(&mut self, other: $t) {
+                *self %= other;
             }
         }
 

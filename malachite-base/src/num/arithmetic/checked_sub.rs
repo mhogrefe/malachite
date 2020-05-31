@@ -6,8 +6,8 @@ macro_rules! impl_checked_sub {
             type Output = $t;
 
             #[inline]
-            fn checked_sub(self, rhs: $t) -> Option<$t> {
-                $t::checked_sub(self, rhs)
+            fn checked_sub(self, other: $t) -> Option<$t> {
+                $t::checked_sub(self, other)
             }
         }
     };

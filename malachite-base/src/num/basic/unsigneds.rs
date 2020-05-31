@@ -18,8 +18,8 @@ use num::logic::traits::{HammingDistance, PowerOfTwoDigitIterable, PowerOfTwoDig
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
     CeilingLogTwo
-    + CeilingDivNegMod
-    + CeilingDivAssignNegMod
+    + CeilingDivAssignNegMod<Self, ModOutput = Self>
+    + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
     + CheckedLogTwo
     + CheckedNextPowerOfTwo<Output = Self>
     + FloorLogTwo
@@ -86,8 +86,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoSubAssign<Self>
     + ModSub<Self, Self, Output = Self>
     + ModSubAssign<Self, Self>
-    + NegMod
-    + NegModAssign
+    + NegMod<Self, Output = Self>
+    + NegModAssign<Self>
     + NegModPowerOfTwo<Output = Self>
     + NegModPowerOfTwoAssign
     + NextPowerOfTwo<Output = Self>

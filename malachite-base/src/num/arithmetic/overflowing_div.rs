@@ -6,17 +6,17 @@ macro_rules! impl_overflowing_div {
             type Output = $t;
 
             #[inline]
-            fn overflowing_div(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_div(self, rhs)
+            fn overflowing_div(self, other: $t) -> ($t, bool) {
+                $t::overflowing_div(self, other)
             }
         }
 
         impl OverflowingDivAssign for $t {
-            /// Replaces `self` with `self / rhs`.
+            /// Replaces `self` with `self / other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred then the wrapped value is assigned. Overflow only
-            /// occurs when `$t` is signed, `self` is `$t::MIN`, and `rhs` is -1. The "actual"
+            /// occurs when `$t` is signed, `self` is `$t::MIN`, and `other` is -1. The "actual"
             /// result, -`$t::MIN`, can't be represented and is wrapped back to `$t::MIN`.
             ///
             /// Time: worst case O(1)
@@ -36,8 +36,8 @@ macro_rules! impl_overflowing_div {
             /// assert_eq!(x, -128);
             /// ```
             #[inline]
-            fn overflowing_div_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_div(rhs);
+            fn overflowing_div_assign(&mut self, other: $t) -> bool {
+                let (result, overflow) = self.overflowing_div(other);
                 *self = result;
                 overflow
             }

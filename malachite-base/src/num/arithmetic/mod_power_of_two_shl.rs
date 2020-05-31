@@ -9,7 +9,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
         impl ModPowerOfTwoShl<$u> for $t {
             type Output = $t;
 
-            /// Computes `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+            /// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
             /// mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -35,7 +35,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
         }
 
         impl ModPowerOfTwoShlAssign<$u> for $t {
-            /// Replaces `self` with `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the input is
             /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -109,7 +109,7 @@ macro_rules! impl_mod_power_of_two_shl_signed {
         impl ModPowerOfTwoShl<$u> for $t {
             type Output = $t;
 
-            /// Computes `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
+            /// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
             /// mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -141,7 +141,7 @@ macro_rules! impl_mod_power_of_two_shl_signed {
         }
 
         impl ModPowerOfTwoShlAssign<$u> for $t {
-            /// Replaces `self` with `self << rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the input is
             /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)

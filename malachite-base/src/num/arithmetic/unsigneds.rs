@@ -1,7 +1,6 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    DivAssignMod, DivMod, DivRound, FloorLogTwo, IsPowerOfTwo, Mod, NegMod, NegModAssign,
-    NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
+    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, DivRound, FloorLogTwo, IsPowerOfTwo, Mod,
+    NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -113,33 +112,12 @@ macro_rules! impl_arithmetic_traits {
             }
         }
 
-        impl DivMod for $t {
-            type DivOutput = $t;
-            type ModOutput = $t;
-
-            #[inline]
-            fn div_mod(self, rhs: $t) -> ($t, $t) {
-                (self / rhs, self % rhs)
-            }
-        }
-
-        impl DivAssignMod for $t {
-            type ModOutput = $t;
-
-            #[inline]
-            fn div_assign_mod(&mut self, rhs: $t) -> $t {
-                let rem = *self % rhs;
-                *self /= rhs;
-                rem
-            }
-        }
-
         impl Mod for $t {
             type Output = $t;
 
             #[inline]
-            fn mod_op(self, rhs: $t) -> $t {
-                self % rhs
+            fn mod_op(self, other: $t) -> $t {
+                self % other
             }
         }
 
@@ -147,39 +125,39 @@ macro_rules! impl_arithmetic_traits {
             type Output = $t;
 
             #[inline]
-            fn neg_mod(self, rhs: $t) -> $t {
-                let rem = self % rhs;
+            fn neg_mod(self, other: $t) -> $t {
+                let rem = self % other;
                 if rem == 0 {
                     0
                 } else {
-                    rhs - rem
+                    other - rem
                 }
             }
         }
 
         impl NegModAssign for $t {
             #[inline]
-            fn neg_mod_assign(&mut self, rhs: $t) {
-                *self = self.neg_mod(rhs);
+            fn neg_mod_assign(&mut self, other: $t) {
+                *self = self.neg_mod(other);
             }
         }
 
         impl DivRound for $t {
             type Output = $t;
 
-            fn div_round(self, rhs: $t, rm: RoundingMode) -> $t {
-                let quotient = self / rhs;
+            fn div_round(self, other: $t, rm: RoundingMode) -> $t {
+                let quotient = self / other;
                 if rm == RoundingMode::Down || rm == RoundingMode::Floor {
                     quotient
                 } else {
-                    let remainder = self % rhs;
+                    let remainder = self % other;
                     match rm {
                         _ if remainder == 0 => quotient,
                         RoundingMode::Up | RoundingMode::Ceiling => quotient + 1,
                         RoundingMode::Nearest => {
-                            let shifted_rhs = rhs >> 1;
-                            if remainder > shifted_rhs
-                                || remainder == shifted_rhs && rhs.even() && quotient.odd()
+                            let shifted_other = other >> 1;
+                            if remainder > shifted_other
+                                || remainder == shifted_other && other.even() && quotient.odd()
                             {
                                 quotient + 1
                             } else {
@@ -187,42 +165,10 @@ macro_rules! impl_arithmetic_traits {
                             }
                         }
                         RoundingMode::Exact => {
-                            panic!("Division is not exact: {} / {}", self, rhs);
+                            panic!("Division is not exact: {} / {}", self, other);
                         }
                         _ => unreachable!(),
                     }
-                }
-            }
-        }
-
-        impl CeilingDivNegMod for $t {
-            type DivOutput = $t;
-            type ModOutput = $t;
-
-            #[inline]
-            fn ceiling_div_neg_mod(self, rhs: $t) -> ($t, $t) {
-                let quotient = self / rhs;
-                let remainder = self % rhs;
-                if remainder == 0 {
-                    (quotient, 0)
-                } else {
-                    (quotient + 1, rhs - remainder)
-                }
-            }
-        }
-
-        impl CeilingDivAssignNegMod for $t {
-            type ModOutput = $t;
-
-            #[inline]
-            fn ceiling_div_assign_neg_mod(&mut self, rhs: $t) -> $t {
-                let remainder = *self % rhs;
-                *self /= rhs;
-                if remainder == 0 {
-                    0
-                } else {
-                    *self += 1;
-                    rhs - remainder
                 }
             }
         }

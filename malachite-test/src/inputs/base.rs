@@ -21,7 +21,7 @@ use malachite_base::num::logic::traits::{
 };
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
-use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
+use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::add::{
@@ -605,6 +605,18 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(pairs_of_signeds(gm).filter(|&(x, y)| (x >= T::ZERO) == (y >= T::ZERO)))
+}
+
+// All pairs of signeds where the second is nonzero, and (T::MIN, T::NEGATIVE_ONE) is excluded.
+pub fn pairs_of_signeds_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        pairs_of_signed_and_nonzero_signed(gm)
+            .filter(|&(x, y)| x != T::MIN || y != T::NEGATIVE_ONE),
+    )
 }
 
 pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
@@ -3864,7 +3876,7 @@ where
         triples_of_unsigneds(gm)
             .filter(|&(_, _, d)| d != T::ZERO)
             .map(|(x_1, x_0, d)| {
-                let inv = _limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
+                let inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
                 (x_1, x_0, d, inv)
             }),
     )

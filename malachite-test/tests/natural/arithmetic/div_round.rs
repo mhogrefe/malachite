@@ -4,13 +4,13 @@ use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRou
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use num::{BigUint, Integer};
 use rug::ops::DivRounding;
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_2,
     pairs_of_natural_and_rounding_mode, pairs_of_positive_natural_and_rounding_mode,

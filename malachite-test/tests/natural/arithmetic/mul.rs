@@ -37,17 +37,18 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt, limbs_mul,
-    limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    _limbs_mul_greater_to_out_basecase, limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out,
+    limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 use num::BigUint;
 use rug;
 
-use malachite_test::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,

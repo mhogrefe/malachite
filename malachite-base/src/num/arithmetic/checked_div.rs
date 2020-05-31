@@ -6,8 +6,8 @@ macro_rules! impl_checked_div {
             type Output = $t;
 
             #[inline]
-            fn checked_div(self, rhs: $t) -> Option<$t> {
-                $t::checked_div(self, rhs)
+            fn checked_div(self, other: $t) -> Option<$t> {
+                $t::checked_div(self, other)
             }
         }
     };

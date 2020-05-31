@@ -12,12 +12,12 @@ use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use num::BigUint;
 use rug;
 
-use malachite_test::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_1, small_unsigneds,

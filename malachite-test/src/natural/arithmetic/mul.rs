@@ -46,10 +46,11 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, _limbs_mul_greater_to_out_basecase_mem_opt, limbs_mul,
-    limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    _limbs_mul_greater_to_out_basecase, limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out,
+    limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode,

@@ -1,4 +1,4 @@
-use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
+use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -12,7 +12,7 @@ pub fn test_get_bits_unsigned() {
         T: BitBlockAccess<Bits = T>,
     {
         assert_eq!(x.get_bits(start, end), out);
-        assert_eq!(_get_bits_naive::<T, T>(&x, start, end), out)
+        assert_eq!(get_bits_naive::<T, T>(&x, start, end), out)
     };
     test(0xabcdu16, 4, 8, 0xc);
     test(0xabcdu16, 12, 100, 0xa);
@@ -51,7 +51,7 @@ pub fn test_get_bits_signed() {
         T: BitBlockAccess<Bits = U>,
     {
         assert_eq!(x.get_bits(start, end), out);
-        assert_eq!(_get_bits_naive::<T, U>(&x, start, end), out)
+        assert_eq!(get_bits_naive::<T, U>(&x, start, end), out)
     };
     test(-0x5433i16, 4, 8, 0xc);
     test(-0x5433i16, 5, 9, 14);
@@ -100,7 +100,7 @@ pub fn test_assign_bits_unsigned() {
         assert_eq!(x, x_out);
 
         let mut x = x_in;
-        _assign_bits_naive(&mut x, start, end, &bits);
+        assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
     };
     // assign partially
@@ -161,7 +161,7 @@ pub fn test_assign_bits_signed() {
         assert_eq!(x, x_out);
 
         let mut x = x_in;
-        _assign_bits_naive(&mut x, start, end, &bits);
+        assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
     };
     // *self >= 0

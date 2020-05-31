@@ -2,10 +2,10 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base_test_util::num::logic::bit_convertible::{
-    _from_bits_asc_alt, _from_bits_asc_signed_naive, _from_bits_asc_unsigned_naive,
-    _from_bits_desc_alt, _from_bits_desc_signed_naive, _from_bits_desc_unsigned_naive,
-    _to_bits_asc_alt, _to_bits_asc_signed_naive, _to_bits_asc_unsigned_naive, _to_bits_desc_alt,
-    _to_bits_desc_signed_naive, _to_bits_desc_unsigned_naive,
+    from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive,
+    from_bits_desc_alt, from_bits_desc_signed_naive, from_bits_desc_unsigned_naive,
+    to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive, to_bits_desc_alt,
+    to_bits_desc_signed_naive, to_bits_desc_unsigned_naive,
 };
 use rand::Rand;
 
@@ -299,8 +299,8 @@ fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
         "u.significant_bits()",
         &mut [
             ("malachite", &mut (|u| no_out!(u.to_bits_asc()))),
-            ("alt", &mut (|u| no_out!(_to_bits_asc_alt(&u)))),
-            ("naive", &mut (|u| no_out!(_to_bits_asc_unsigned_naive(u)))),
+            ("alt", &mut (|u| no_out!(to_bits_asc_alt(&u)))),
+            ("naive", &mut (|u| no_out!(to_bits_asc_unsigned_naive(u)))),
         ],
     );
 }
@@ -324,8 +324,8 @@ fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
         "i.significant_bits()",
         &mut [
             ("malachite", &mut (|i| no_out!(i.to_bits_asc()))),
-            ("alt", &mut (|i| no_out!(_to_bits_asc_alt(&i)))),
-            ("naive", &mut (|i| no_out!(_to_bits_asc_signed_naive(i)))),
+            ("alt", &mut (|i| no_out!(to_bits_asc_alt(&i)))),
+            ("naive", &mut (|i| no_out!(to_bits_asc_signed_naive(i)))),
         ],
     );
 }
@@ -403,8 +403,8 @@ fn benchmark_unsigned_to_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
         "u.significant_bits()",
         &mut [
             ("default", &mut (|u| no_out!(u.to_bits_asc()))),
-            ("alt", &mut (|u| no_out!(_to_bits_desc_alt(&u)))),
-            ("naive", &mut (|u| no_out!(_to_bits_desc_unsigned_naive(u)))),
+            ("alt", &mut (|u| no_out!(to_bits_desc_alt(&u)))),
+            ("naive", &mut (|u| no_out!(to_bits_desc_unsigned_naive(u)))),
         ],
     );
 }
@@ -428,8 +428,8 @@ fn benchmark_signed_to_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
         "i.significant_bits()",
         &mut [
             ("default", &mut (|i| no_out!(i.to_bits_asc()))),
-            ("alt", &mut (|i| no_out!(_to_bits_desc_alt(&i)))),
-            ("naive", &mut (|u| no_out!(_to_bits_desc_signed_naive(u)))),
+            ("alt", &mut (|i| no_out!(to_bits_desc_alt(&i)))),
+            ("naive", &mut (|u| no_out!(to_bits_desc_signed_naive(u)))),
         ],
     );
 }
@@ -509,11 +509,11 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
             ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_asc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<T>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_asc_unsigned_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_unsigned_naive::<T>(bits))),
             ),
         ],
     );
@@ -540,11 +540,11 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
             ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_asc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<T>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_asc_signed_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_signed_naive::<T>(bits))),
             ),
         ],
     );
@@ -571,11 +571,11 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_desc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<T>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_desc_unsigned_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_unsigned_naive::<T>(bits))),
             ),
         ],
     );
@@ -605,11 +605,11 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_desc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<T>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_desc_signed_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_signed_naive::<T>(bits))),
             ),
         ],
     );

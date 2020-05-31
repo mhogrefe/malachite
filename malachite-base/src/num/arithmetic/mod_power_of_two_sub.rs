@@ -8,8 +8,8 @@ macro_rules! impl_mod_power_of_two_sub {
         impl ModPowerOfTwoSub for $t {
             type Output = $t;
 
-            /// Computes `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-            /// mod 2<sup>`pow`</sup>.
+            /// Computes `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+            /// reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -23,14 +23,14 @@ macro_rules! impl_mod_power_of_two_sub {
             /// assert_eq!(10u32.mod_power_of_two_sub(14, 4), 12);
             /// ```
             #[inline]
-            fn mod_power_of_two_sub(self, rhs: $t, pow: u64) -> $t {
+            fn mod_power_of_two_sub(self, other: $t, pow: u64) -> $t {
                 assert!(pow <= $t::WIDTH);
-                self.wrapping_sub(rhs).mod_power_of_two(pow)
+                self.wrapping_sub(other).mod_power_of_two(pow)
             }
         }
 
         impl ModPowerOfTwoSubAssign for $t {
-            /// Replaces `self` with `self - rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// Replaces `self` with `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are
             /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -50,9 +50,9 @@ macro_rules! impl_mod_power_of_two_sub {
             /// assert_eq!(n, 12);
             /// ```
             #[inline]
-            fn mod_power_of_two_sub_assign(&mut self, rhs: $t, pow: u64) {
+            fn mod_power_of_two_sub_assign(&mut self, other: $t, pow: u64) {
                 assert!(pow <= $t::WIDTH);
-                self.wrapping_sub_assign(rhs);
+                self.wrapping_sub_assign(other);
                 self.mod_power_of_two_assign(pow);
             }
         }

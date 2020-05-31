@@ -36,4 +36,6 @@
 
 extern crate num;
 
+pub mod common;
 pub mod integer;
+pub mod natural;

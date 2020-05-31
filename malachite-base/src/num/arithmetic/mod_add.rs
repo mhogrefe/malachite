@@ -5,7 +5,7 @@ macro_rules! impl_mod_add {
         impl ModAdd for $t {
             type Output = $t;
 
-            /// Computes `self + rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -21,18 +21,18 @@ macro_rules! impl_mod_add {
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
             #[inline]
-            fn mod_add(self, rhs: $t, m: $t) -> $t {
+            fn mod_add(self, other: $t, m: $t) -> $t {
                 let neg = m - self;
-                if neg > rhs {
-                    self + rhs
+                if neg > other {
+                    self + other
                 } else {
-                    rhs - neg
+                    other - neg
                 }
             }
         }
 
         impl ModAddAssign for $t {
-            /// Replaces `self` with `self + rhs` mod `m`. Assumes the inputs are already reduced
+            /// Replaces `self` with `self + other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///
             /// Time: worst case O(1)
@@ -54,12 +54,12 @@ macro_rules! impl_mod_add {
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
-            fn mod_add_assign(&mut self, rhs: $t, m: $t) {
+            fn mod_add_assign(&mut self, other: $t, m: $t) {
                 let neg = m - *self;
-                if neg > rhs {
-                    *self += rhs;
+                if neg > other {
+                    *self += other;
                 } else {
-                    *self = rhs - neg;
+                    *self = other - neg;
                 }
             }
         }

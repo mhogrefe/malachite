@@ -1,6 +1,6 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_get_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
 };
@@ -22,14 +22,14 @@ use malachite_test::inputs::natural::triples_of_natural_small_unsigned_and_small
 fn verify_limbs_neg_limb_get_bits(limb: Limb, start: u64, end: u64, out: &[Limb]) {
     let n = -Natural::from(limb);
     let result = n.get_bits(start, end);
-    assert_eq!(_get_bits_naive::<Integer, Natural>(&n, start, end), result);
+    assert_eq!(get_bits_naive::<Integer, Natural>(&n, start, end), result);
     assert_eq!(Natural::from_limbs_asc(out), result);
 }
 
 fn verify_limbs_neg_get_bits(limbs: &[Limb], start: u64, end: u64, out: &[Limb]) {
     let n = -Natural::from_limbs_asc(limbs);
     let result = n.get_bits(start, end);
-    assert_eq!(_get_bits_naive::<Integer, Natural>(&n, start, end), result);
+    assert_eq!(get_bits_naive::<Integer, Natural>(&n, start, end), result);
     assert_eq!(Natural::from_limbs_asc(out), result);
 }
 
@@ -64,7 +64,7 @@ fn get_bits_properties() {
         |&(ref n, start, end)| {
             let bits = n.get_bits(start, end);
             assert_eq!(n.clone().get_bits_owned(start, end), bits);
-            assert_eq!(_get_bits_naive::<Integer, Natural>(n, start, end), bits);
+            assert_eq!(get_bits_naive::<Integer, Natural>(n, start, end), bits);
             let significant_bits = n.significant_bits();
             assert_eq!(
                 n.get_bits(start + significant_bits, end + significant_bits),

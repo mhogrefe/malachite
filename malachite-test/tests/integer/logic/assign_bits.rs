@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, NegModPowerOfTwo};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_assign_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -27,7 +27,7 @@ fn verify_limbs_neg_assign_bits(limbs: &[Limb], start: u64, end: u64, bits: &[Li
     let result = n;
     assert_eq!(-Natural::from_limbs_asc(out), result);
     let mut n = old_n.clone();
-    _assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits);
+    assign_bits_naive::<Integer, Natural>(&mut n, start, end, &bits);
     assert_eq!(n, result);
 }
 
@@ -53,7 +53,7 @@ fn assign_bits_properties() {
             n.assign_bits(start, end, bits);
             let result = n;
             let mut n = old_n.clone();
-            _assign_bits_naive(&mut n, start, end, bits);
+            assign_bits_naive(&mut n, start, end, bits);
             assert_eq!(n, result);
             n.assign_bits(start, end, bits);
             assert_eq!(n, result);

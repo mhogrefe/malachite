@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_get_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
 
@@ -152,7 +152,7 @@ fn benchmark_natural_get_bits_algorithms(gm: GenerationMode, limit: usize, file_
             (
                 "naive",
                 &mut (|(n, start, end)| {
-                    no_out!(_get_bits_naive::<Natural, Natural>(&n, start, end))
+                    no_out!(get_bits_naive::<Natural, Natural>(&n, start, end))
                 }),
             ),
         ],

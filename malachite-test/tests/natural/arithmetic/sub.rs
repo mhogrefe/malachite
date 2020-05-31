@@ -17,13 +17,13 @@ use malachite_nz::natural::arithmetic::sub::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use num::BigUint;
 use rug;
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{
-    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
-};
 use malachite_test::inputs::base::pairs_of_unsigneds_var_1;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_and_unsigned,

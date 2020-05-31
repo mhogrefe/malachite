@@ -5,8 +5,8 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::common::integer_to_rug_integer;
 
-use malachite_test::common::integer_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::integers;
 

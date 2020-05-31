@@ -5,10 +5,10 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-
-use malachite_test::common::{
+use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
+
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{signeds, small_unsigneds};
 use malachite_test::inputs::integer::{

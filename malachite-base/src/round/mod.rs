@@ -2,6 +2,8 @@ use std::fmt::{self, Display, Formatter};
 use std::ops::Neg;
 use std::str::FromStr;
 
+use named::Named;
+
 /// A `RoundingMode` is used to specify the rounding behavior of a function whose codomain is
 /// restricted. For example, consider a function which divides two integers. The natural codomain
 /// of this function would be the set of rational numbers, but sometimes we want to perform what is
@@ -126,3 +128,5 @@ impl FromStr for RoundingMode {
         }
     }
 }
+
+impl_named!(RoundingMode);

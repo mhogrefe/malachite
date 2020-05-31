@@ -5,9 +5,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
 use rug;
 
-use malachite_test::common::natural_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{unsigneds, vecs_of_unsigned_var_1};
 use malachite_test::inputs::natural::naturals;

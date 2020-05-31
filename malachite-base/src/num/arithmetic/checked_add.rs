@@ -6,8 +6,8 @@ macro_rules! impl_checked_add {
             type Output = $t;
 
             #[inline]
-            fn checked_add(self, rhs: $t) -> Option<$t> {
-                $t::checked_add(self, rhs)
+            fn checked_add(self, other: $t) -> Option<$t> {
+                $t::checked_add(self, other)
             }
         }
     };

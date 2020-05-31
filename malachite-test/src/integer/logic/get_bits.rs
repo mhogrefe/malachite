@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_get_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
 };
@@ -199,7 +199,7 @@ fn benchmark_integer_get_bits_algorithms(gm: GenerationMode, limit: usize, file_
             (
                 "naive",
                 &mut (|(n, start, end)| {
-                    no_out!(_get_bits_naive::<Integer, Natural>(&n, start, end))
+                    no_out!(get_bits_naive::<Integer, Natural>(&n, start, end))
                 }),
             ),
         ],

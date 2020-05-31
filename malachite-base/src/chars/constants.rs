@@ -1,4 +1,5 @@
 use comparison::traits::{Max, Min};
+use named::Named;
 
 // The number of Unicode scalar values, or 1,112,064.
 pub const NUMBER_OF_CHARS: u32 = (1 << 20) + (1 << 16) - SURROGATE_RANGE_SIZE;
@@ -33,3 +34,5 @@ impl Min for char {
 impl Max for char {
     const MAX: char = std::char::MAX;
 }
+
+impl_named!(char);

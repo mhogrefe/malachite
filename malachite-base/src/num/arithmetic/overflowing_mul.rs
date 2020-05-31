@@ -6,13 +6,13 @@ macro_rules! impl_overflowing_mul {
             type Output = $t;
 
             #[inline]
-            fn overflowing_mul(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_mul(self, rhs)
+            fn overflowing_mul(self, other: $t) -> ($t, bool) {
+                $t::overflowing_mul(self, other)
             }
         }
 
         impl OverflowingMulAssign for $t {
-            /// Replaces `self` with `self * rhs`.
+            /// Replaces `self` with `self * other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred then the wrapped value is assigned.
@@ -34,8 +34,8 @@ macro_rules! impl_overflowing_mul {
             /// assert_eq!(x, 24);
             /// ```
             #[inline]
-            fn overflowing_mul_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_mul(rhs);
+            fn overflowing_mul_assign(&mut self, other: $t) -> bool {
+                let (result, overflow) = self.overflowing_mul(other);
                 *self = result;
                 overflow
             }

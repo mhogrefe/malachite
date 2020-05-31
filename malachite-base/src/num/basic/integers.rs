@@ -162,7 +162,7 @@ pub trait PrimitiveInteger:
     + LowMask
     + Min
     + Max
-    + Mod
+    + Mod<Self, Output = Self>
     + ModAssign<Self>
     + ModPowerOfTwo
     + ModPowerOfTwoAssign

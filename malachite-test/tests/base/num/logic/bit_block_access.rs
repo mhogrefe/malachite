@@ -5,7 +5,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::{_assign_bits_naive, _get_bits_naive};
+use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 use rand::Rand;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
@@ -29,7 +29,7 @@ where
         triples_of_unsigned_small_unsigned_and_small_unsigned_var_1::<T, u64>,
         |&(n, start, end)| {
             let bits = T::exact_from(n.get_bits(start, end));
-            assert_eq!(_get_bits_naive::<T, T>(&n, start, end), bits);
+            assert_eq!(get_bits_naive::<T, T>(&n, start, end), bits);
             assert!(bits <= n);
             assert_eq!(
                 T::exact_from(n.get_bits(start + width, end + width)),
@@ -64,7 +64,7 @@ where
         triples_of_signed_small_unsigned_and_small_unsigned_var_1::<T, u64>,
         |&(n, start, end)| {
             let bits = n.get_bits(start, end);
-            assert_eq!(_get_bits_naive::<T, U>(&n, start, end), bits);
+            assert_eq!(get_bits_naive::<T, U>(&n, start, end), bits);
             let mut n_alt = n;
             n_alt.assign_bits(start, end, &bits);
             assert_eq!(n_alt, n);
@@ -119,7 +119,7 @@ where
             mut_n_alt.assign_bits(start, end, &bits);
             assert_eq!(mut_n_alt, mut_n);
             let mut mut_n_alt = n;
-            _assign_bits_naive::<T, T>(&mut mut_n_alt, start, end, &bits);
+            assign_bits_naive::<T, T>(&mut mut_n_alt, start, end, &bits);
             assert_eq!(mut_n_alt, mut_n);
             assert_eq!(
                 mut_n.get_bits(start, end),
@@ -170,7 +170,7 @@ where
             mut_n_alt.assign_bits(start, end, &bits);
             assert_eq!(mut_n_alt, mut_n);
             let mut mut_n_alt = n;
-            _assign_bits_naive::<T, U>(&mut mut_n_alt, start, end, &bits);
+            assign_bits_naive::<T, U>(&mut mut_n_alt, start, end, &bits);
             assert_eq!(mut_n_alt, mut_n);
             assert_eq!(
                 mut_n.get_bits(start, end),

@@ -2,13 +2,13 @@ use std::str::FromStr;
 
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{
+    bigint_to_integer, natural_to_biguint, natural_to_rug_integer, rug_integer_to_integer,
+};
 use num::BigUint;
 use rug;
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{
-    bigint_to_integer, natural_to_biguint, natural_to_rug_integer, rug_integer_to_integer,
-};
 use malachite_test::inputs::natural::naturals;
 use malachite_test::natural::arithmetic::neg::neg_num;
 

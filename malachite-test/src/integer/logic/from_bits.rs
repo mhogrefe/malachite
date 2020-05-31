@@ -2,7 +2,7 @@ use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
 use malachite_base_test_util::num::logic::bit_convertible::{
-    _from_bits_asc_alt, _from_bits_desc_alt,
+    from_bits_asc_alt, from_bits_desc_alt,
 };
 use malachite_nz::integer::Integer;
 
@@ -16,7 +16,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_integer_from_bits_desc_algorithms);
 }
 
-pub fn _from_bits_asc_naive(bits: &[bool]) -> Integer {
+pub fn from_bits_asc_naive(bits: &[bool]) -> Integer {
     if bits.is_empty() {
         return Integer::ZERO;
     }
@@ -43,7 +43,7 @@ pub fn _from_bits_asc_naive(bits: &[bool]) -> Integer {
     n
 }
 
-pub fn _from_bits_desc_naive(bits: &[bool]) -> Integer {
+pub fn from_bits_desc_naive(bits: &[bool]) -> Integer {
     if bits.is_empty() {
         return Integer::ZERO;
     }
@@ -111,11 +111,11 @@ fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, 
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_asc_alt::<Integer>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<Integer>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_asc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_naive(bits))),
             ),
         ],
     );
@@ -138,11 +138,11 @@ fn benchmark_integer_from_bits_desc_algorithms(gm: GenerationMode, limit: usize,
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(_from_bits_desc_alt::<Integer>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<Integer>(bits))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(_from_bits_desc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_naive(bits))),
             ),
         ],
     );

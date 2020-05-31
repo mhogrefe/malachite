@@ -1,4 +1,4 @@
-use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
+use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 
 use malachite_base::num::arithmetic::mod_mul::{
     _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted, test_invert_u32_table,
@@ -22,7 +22,7 @@ fn test_test_invert_u64_table() {
 fn test_limbs_invert_limb_u32() {
     let test = |x, out| {
         assert_eq!(_limbs_invert_limb_u32(x), out);
-        assert_eq!(_limbs_invert_limb_naive::<u32, u64>(x), out);
+        assert_eq!(limbs_invert_limb_naive::<u32, u64>(x), out);
     };
     test(0x8000_0000, 0xffff_ffff);
     test(0x8000_0001, 0xffff_fffc);
@@ -41,7 +41,7 @@ fn limbs_invert_limb_u32_fail() {
 fn test_limbs_invert_limb_u64() {
     let test = |x, out| {
         assert_eq!(_limbs_invert_limb_u64(x), out);
-        assert_eq!(_limbs_invert_limb_naive::<u64, u128>(x), out);
+        assert_eq!(limbs_invert_limb_naive::<u64, u128>(x), out);
     };
     test(0x8000_0000_0000_0000, 0xffff_ffff_ffff_ffff);
     test(0x8000_0000_0000_0001, 0xffff_ffff_ffff_fffc);
@@ -67,7 +67,7 @@ fn test_limbs_mod_preinverted() {
         DT: From<T> + HasHalf<Half = T>,
         T: CheckedFrom<DT>,
     {
-        let d_inv = _limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
+        let d_inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
         assert_eq!(_limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
         assert_eq!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)), out);
     };

@@ -1,8 +1,8 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{integer_to_rug_integer, rug_integer_to_integer};
 use malachite_test::inputs::base::signeds;
 use malachite_test::inputs::integer::integers;
 use malachite_test::inputs::natural::naturals;

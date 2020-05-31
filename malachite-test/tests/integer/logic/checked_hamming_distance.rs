@@ -6,12 +6,12 @@ use malachite_nz::integer::logic::checked_hamming_distance::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::common::integer_to_rug_integer;
 use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };
 
-use malachite_test::common::integer_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_signeds, pairs_of_unsigned_vec_and_positive_unsigned_var_2,

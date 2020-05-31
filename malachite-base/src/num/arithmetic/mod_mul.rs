@@ -272,10 +272,10 @@ macro_rules! impl_mod_mul_precomputed_fast {
                 $invert_limb(m << LeadingZeros::leading_zeros(m))
             }
 
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
-            /// precomputed data is provided; this speeds up computations involving several modular
-            /// multiplications with the same modulus. The precomputed data should be obtained using
-            /// `precompute_mod_mul_data`.
+            /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Some precomputed data is provided; this speeds up computations involving several
+            /// modular multiplications with the same modulus. The precomputed data should be
+            /// obtained using `precompute_mod_mul_data`.
             ///
             /// Time: worst case O(1)
             ///
@@ -297,8 +297,8 @@ macro_rules! impl_mod_mul_precomputed_fast {
             /// ```
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-            fn mod_mul_precomputed(self, rhs: $t, m: $t, data: &$t) -> $t {
-                _fast_mod_mul::<$t, $dt>(self, rhs, m, *data)
+            fn mod_mul_precomputed(self, other: $t, m: $t, data: &$t) -> $t {
+                _fast_mod_mul::<$t, $dt>(self, other, m, *data)
             }
         }
     };
@@ -325,10 +325,10 @@ macro_rules! impl_mod_mul_precomputed_promoted {
                 u32::precompute_mod_mul_data(&u32::from(m))
             }
 
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
-            /// precomputed data is provided; this speeds up computations involving several modular
-            /// multiplications with the same modulus. The precomputed data should be obtained using
-            /// `precompute_mod_mul_data`.
+            /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Some precomputed data is provided; this speeds up computations involving several
+            /// modular multiplications with the same modulus. The precomputed data should be
+            /// obtained using `precompute_mod_mul_data`.
             ///
             /// Time: worst case O(1)
             ///
@@ -350,9 +350,9 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             /// ```
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-            fn mod_mul_precomputed(self, rhs: $t, m: $t, data: &u32) -> $t {
+            fn mod_mul_precomputed(self, other: $t, m: $t, data: &u32) -> $t {
                 $t::wrapping_from(u32::from(self).mod_mul_precomputed(
-                    u32::from(rhs),
+                    u32::from(other),
                     u32::from(m),
                     data,
                 ))
@@ -376,7 +376,7 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// Additional memory: worst case O(1)
     fn precompute_mod_mul_data(_m: &u128) {}
 
-    /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
+    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. Some
     /// precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_mul_data`.
@@ -401,8 +401,8 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// ```
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-    fn mod_mul_precomputed(self, rhs: u128, m: u128, _data: &()) -> u128 {
-        _naive_mod_mul(self, rhs, m)
+    fn mod_mul_precomputed(self, other: u128, m: u128, _data: &()) -> u128 {
+        _naive_mod_mul(self, other, m)
     }
 }
 
@@ -426,7 +426,7 @@ impl ModMulPrecomputed<usize, usize> for usize {
         }
     }
 
-    /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`. Some
+    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. Some
     /// precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_mul_data`.
@@ -436,16 +436,16 @@ impl ModMulPrecomputed<usize, usize> for usize {
     /// Additional memory: worst case O(1)
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-    fn mod_mul_precomputed(self, rhs: usize, m: usize, data: &usize) -> usize {
+    fn mod_mul_precomputed(self, other: usize, m: usize, data: &usize) -> usize {
         if usize::WIDTH == u32::WIDTH {
             usize::wrapping_from(u32::wrapping_from(self).mod_mul_precomputed(
-                u32::wrapping_from(rhs),
+                u32::wrapping_from(other),
                 u32::wrapping_from(m),
                 &u32::wrapping_from(*data),
             ))
         } else {
             usize::wrapping_from(u64::wrapping_from(self).mod_mul_precomputed(
-                u64::wrapping_from(rhs),
+                u64::wrapping_from(other),
                 u64::wrapping_from(m),
                 &u64::wrapping_from(*data),
             ))
@@ -456,7 +456,7 @@ impl ModMulPrecomputed<usize, usize> for usize {
 macro_rules! impl_mod_mul {
     ($t:ident) => {
         impl ModMulPrecomputedAssign<$t, $t> for $t {
-            /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced
+            /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`. Some precomputed data is provided; this speeds up computations involving
             /// several modular multiplications with the same modulus. The precomputed data should
             /// be obtained using `precompute_mod_mul_data`.
@@ -501,15 +501,15 @@ macro_rules! impl_mod_mul {
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
             /// assigned to a.
             #[inline]
-            fn mod_mul_precomputed_assign(&mut self, rhs: $t, m: $t, _data: &Self::Data) {
-                *self = _naive_mod_mul(*self, rhs, m);
+            fn mod_mul_precomputed_assign(&mut self, other: $t, m: $t, _data: &Self::Data) {
+                *self = _naive_mod_mul(*self, other, m);
             }
         }
 
         impl ModMul for $t {
             type Output = $t;
 
-            /// Computes `self * rhs` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
             /// Time: worst case O(1)
             ///
@@ -525,13 +525,13 @@ macro_rules! impl_mod_mul {
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
             #[inline]
-            fn mod_mul(self, rhs: $t, m: $t) -> $t {
-                _naive_mod_mul(self, rhs, m)
+            fn mod_mul(self, other: $t, m: $t) -> $t {
+                _naive_mod_mul(self, other, m)
             }
         }
 
         impl ModMulAssign for $t {
-            /// Replaces `self` with `self * rhs` mod `m`. Assumes the inputs are already reduced
+            /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///
             /// Time: worst case O(1)
@@ -553,8 +553,8 @@ macro_rules! impl_mod_mul {
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
-            fn mod_mul_assign(&mut self, rhs: $t, m: $t) {
-                *self = _naive_mod_mul(*self, rhs, m);
+            fn mod_mul_assign(&mut self, other: $t, m: $t) {
+                *self = _naive_mod_mul(*self, other, m);
             }
         }
     };

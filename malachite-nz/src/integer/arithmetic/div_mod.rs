@@ -864,9 +864,9 @@ impl<'a, 'b> CeilingDivMod<&'b Integer> for &'a Integer {
 impl CeilingDivAssignMod<Integer> for Integer {
     type ModOutput = Integer;
 
-    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value, taking
-    /// the quotient and returning the remainder. The quotient is rounded towards positive infinity
-    /// and the remainder has the opposite sign of the divisor. The quotient and remainder satisfy
+    /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value and
+    /// returning the remainder. The quotient is rounded towards positive infinity and the remainder
+    /// has the opposite sign of the divisor. The quotient and remainder satisfy
     /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
@@ -927,9 +927,9 @@ impl<'a> CeilingDivAssignMod<&'a Integer> for Integer {
     type ModOutput = Integer;
 
     /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference,
-    /// taking the quotient and returning the remainder. The quotient is rounded towards positive
-    /// infinity and the remainder has the opposite sign of the divisor. The quotient and remainder
-    /// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+    /// returning the remainder. The quotient is rounded towards positive infinity and the remainder
+    /// has the opposite sign of the divisor. The quotient and remainder satisfy
+    /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///

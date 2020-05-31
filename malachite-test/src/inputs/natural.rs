@@ -16,6 +16,7 @@ use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rug;
@@ -51,7 +52,7 @@ use rust_wheels::iterators::vecs::{
     exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs,
 };
 
-use common::{natural_to_biguint, natural_to_rug_integer, GenerationMode};
+use common::GenerationMode;
 use inputs::base::{
     finite_f32s, finite_f64s, natural_signeds, unsigneds, It, RandomValueAndVecOfBool,
 };

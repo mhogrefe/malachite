@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::num::logic::bit_block_access::_get_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
@@ -15,7 +15,7 @@ use malachite_nz::platform::Limb;
 fn verify_limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64, out: &[Limb]) {
     let n = -Natural::from(x);
     let result = n.get_bits(start, end);
-    assert_eq!(_get_bits_naive::<Integer, Natural>(&n, start, end), result);
+    assert_eq!(get_bits_naive::<Integer, Natural>(&n, start, end), result);
     assert_eq!(Natural::from_limbs_asc(out), result);
 }
 
@@ -23,7 +23,7 @@ fn verify_limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64, out: &[Limb]) {
 fn verify_limbs_neg_get_bits(xs: &[Limb], start: u64, end: u64, out: &[Limb]) {
     let n = -Natural::from_limbs_asc(xs);
     let result = n.get_bits(start, end);
-    assert_eq!(_get_bits_naive::<Integer, Natural>(&n, start, end), result);
+    assert_eq!(get_bits_naive::<Integer, Natural>(&n, start, end), result);
     assert_eq!(Natural::from_limbs_asc(out), result);
 }
 
@@ -133,7 +133,7 @@ fn test_get_bits() {
             Natural::from_str(out).unwrap()
         );
         assert_eq!(
-            _get_bits_naive::<Integer, Natural>(&Integer::from_str(n).unwrap(), start, end),
+            get_bits_naive::<Integer, Natural>(&Integer::from_str(n).unwrap(), start, end),
             Natural::from_str(out).unwrap()
         );
     };

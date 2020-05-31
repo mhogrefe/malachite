@@ -7,9 +7,9 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::natural_to_rug_integer;
 use rug;
 
-use malachite_test::common::natural_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 

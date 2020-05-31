@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::mod_mul::{
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
-use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
+use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -19,7 +19,7 @@ use malachite_test::inputs::base::{
 fn invert_limb_u32_properties() {
     test_properties(unsigneds_var_1::<u32>, |&x| {
         let inverse = _limbs_invert_limb_u32(x);
-        assert_eq!(_limbs_invert_limb_naive::<u32, u64>(x), inverse);
+        assert_eq!(limbs_invert_limb_naive::<u32, u64>(x), inverse);
         assert_ne!(inverse, 0);
     });
 }
@@ -28,7 +28,7 @@ fn invert_limb_u32_properties() {
 fn invert_limb_u64_properties() {
     test_properties(unsigneds_var_1::<u64>, |&x| {
         let inverse = _limbs_invert_limb_u64(x);
-        assert_eq!(_limbs_invert_limb_naive::<u64, u128>(x), inverse);
+        assert_eq!(limbs_invert_limb_naive::<u64, u128>(x), inverse);
         assert_ne!(inverse, 0);
     });
 }

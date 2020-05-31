@@ -19,6 +19,7 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -171,11 +172,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_ceiling_div_neg_mod_evaluation_strategy
     );
-}
-
-pub fn rug_ceiling_div_neg_mod(x: rug::Integer, y: rug::Integer) -> (rug::Integer, rug::Integer) {
-    let (quotient, remainder) = x.div_rem_ceil(y);
-    (quotient, -remainder)
 }
 
 fn demo_limbs_invert_limb(gm: GenerationMode, limit: usize) {

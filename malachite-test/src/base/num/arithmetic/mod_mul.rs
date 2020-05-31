@@ -11,7 +11,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::num::arithmetic::mod_mul::_limbs_invert_limb_naive;
+use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
@@ -154,7 +154,7 @@ fn benchmark_limbs_invert_limb_u32_algorithms(gm: GenerationMode, limit: usize, 
             ("default", &mut (|x| no_out!(_limbs_invert_limb_u32(x)))),
             (
                 "naive",
-                &mut (|x| no_out!(_limbs_invert_limb_naive::<u32, u64>(x))),
+                &mut (|x| no_out!(limbs_invert_limb_naive::<u32, u64>(x))),
             ),
         ],
     );
@@ -174,7 +174,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(gm: GenerationMode, limit: usize, 
             ("default", &mut (|x| no_out!(_limbs_invert_limb_u64(x)))),
             (
                 "naive",
-                &mut (|x| no_out!(_limbs_invert_limb_naive::<u64, u128>(x))),
+                &mut (|x| no_out!(limbs_invert_limb_naive::<u64, u128>(x))),
             ),
         ],
     );

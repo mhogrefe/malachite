@@ -4,9 +4,10 @@ use std::str::FromStr;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
 use rug;
 
-use malachite_test::common::{natural_to_rug_integer, test_properties};
+use malachite_test::common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
 

@@ -39,6 +39,7 @@ pub mod comparison {
     pub mod macros;
 }
 pub mod chars;
+pub mod named;
 pub mod num {
     pub mod arithmetic {
         pub mod abs;
@@ -49,6 +50,7 @@ pub mod num {
         pub mod checked_add_mul;
         pub mod checked_neg;
         pub mod checked_sub_mul;
+        pub mod div_mod;
         pub mod divisible_by_power_of_two;
         pub mod eq_mod_power_of_two;
         pub mod log_two;

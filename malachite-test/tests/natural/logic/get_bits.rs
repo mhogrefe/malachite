@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::num::logic::bit_block_access::_get_bits_naive;
+use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -19,7 +19,7 @@ use malachite_test::inputs::natural::{
 fn verify_limbs_get_bits(limbs: &[Limb], start: u64, end: u64, out: &[Limb]) {
     let n = Natural::from_limbs_asc(limbs);
     let result = n.get_bits(start, end);
-    assert_eq!(_get_bits_naive::<Natural, Natural>(&n, start, end), result);
+    assert_eq!(get_bits_naive::<Natural, Natural>(&n, start, end), result);
     assert_eq!(Natural::from_limbs_asc(out), result);
 }
 
@@ -90,7 +90,7 @@ fn test_get_bits() {
             Natural::from_str(out).unwrap()
         );
         assert_eq!(
-            _get_bits_naive::<Natural, Natural>(&Natural::from_str(n).unwrap(), start, end),
+            get_bits_naive::<Natural, Natural>(&Natural::from_str(n).unwrap(), start, end),
             Natural::from_str(out).unwrap()
         );
     };
@@ -132,7 +132,7 @@ fn get_bits_properties() {
         |&(ref n, start, end)| {
             let bits = n.get_bits(start, end);
             assert_eq!(n.clone().get_bits_owned(start, end), bits);
-            assert_eq!(_get_bits_naive::<Natural, Natural>(n, start, end), bits);
+            assert_eq!(get_bits_naive::<Natural, Natural>(n, start, end), bits);
             assert!(bits <= *n);
             let significant_bits = n.significant_bits();
             assert_eq!(

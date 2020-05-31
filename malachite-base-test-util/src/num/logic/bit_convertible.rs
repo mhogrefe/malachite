@@ -3,31 +3,31 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitConvertible;
 
-pub fn _to_bits_asc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
+pub fn to_bits_asc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
     let mut bits = n.to_bits_desc();
     bits.reverse();
     bits
 }
 
-pub fn _to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
+pub fn to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
     let mut bits = n.to_bits_asc();
     bits.reverse();
     bits
 }
 
-pub fn _from_bits_asc_alt<T: BitConvertible>(bits: &[bool]) -> T {
+pub fn from_bits_asc_alt<T: BitConvertible>(bits: &[bool]) -> T {
     let mut bits = bits.to_vec();
     bits.reverse();
     T::from_bits_desc(&bits)
 }
 
-pub fn _from_bits_desc_alt<T: BitConvertible>(bits: &[bool]) -> T {
+pub fn from_bits_desc_alt<T: BitConvertible>(bits: &[bool]) -> T {
     let mut bits = bits.to_vec();
     bits.reverse();
     T::from_bits_asc(&bits)
 }
 
-pub fn _to_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
+pub fn to_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
     let mut bits = Vec::new();
     for i in 0..n.significant_bits() {
         bits.push(n.get_bit(i));
@@ -35,7 +35,7 @@ pub fn _to_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn _to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
+pub fn to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
     let mut bits = Vec::new();
     for i in (0..n.significant_bits()).rev() {
         bits.push(n.get_bit(i));
@@ -43,7 +43,7 @@ pub fn _to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn _from_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
+pub fn from_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
     let mut n = T::ZERO;
     for i in bits
         .iter()
@@ -55,7 +55,7 @@ pub fn _from_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
     n
 }
 
-pub fn _from_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
+pub fn from_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
     let mut n = T::ZERO;
     for i in
         bits.iter()
@@ -68,7 +68,7 @@ pub fn _from_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T 
     n
 }
 
-pub fn _to_bits_asc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
+pub fn to_bits_asc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     let mut bits = Vec::new();
     if n == T::ZERO {
         return bits;
@@ -83,7 +83,7 @@ pub fn _to_bits_asc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn _to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
+pub fn to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     let mut bits = Vec::new();
     if n == T::ZERO {
         return bits;
@@ -99,7 +99,7 @@ pub fn _to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn _from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
+pub fn from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
     if bits.is_empty() {
         return T::ZERO;
     }
@@ -126,7 +126,7 @@ pub fn _from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
     n
 }
 
-pub fn _from_bits_desc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
+pub fn from_bits_desc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
     if bits.is_empty() {
         return T::ZERO;
     }

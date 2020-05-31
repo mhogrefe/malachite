@@ -495,7 +495,7 @@ fn benchmark_rem_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
         "n.significant_bits()",
         &mut [(
             "malachite",
-            &mut (|(mut n, pow)| n.mod_power_of_two_assign(pow)),
+            &mut (|(mut n, pow)| n.rem_power_of_two_assign(pow)),
         )],
     );
 }

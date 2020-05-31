@@ -1,7 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
 
-pub fn _limbs_invert_limb_naive<
+pub fn limbs_invert_limb_naive<
     T: PrimitiveUnsigned,
     DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(

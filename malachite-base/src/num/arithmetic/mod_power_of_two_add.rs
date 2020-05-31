@@ -8,8 +8,8 @@ macro_rules! impl_mod_power_of_two_add {
         impl ModPowerOfTwoAdd for $t {
             type Output = $t;
 
-            /// Computes `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced
-            /// mod 2<sup>`pow`</sup>.
+            /// Computes `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
+            /// reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
             ///
@@ -23,14 +23,14 @@ macro_rules! impl_mod_power_of_two_add {
             /// assert_eq!(10u32.mod_power_of_two_add(14, 4), 8);
             /// ```
             #[inline]
-            fn mod_power_of_two_add(self, rhs: $t, pow: u64) -> $t {
+            fn mod_power_of_two_add(self, other: $t, pow: u64) -> $t {
                 assert!(pow <= $t::WIDTH);
-                self.wrapping_add(rhs).mod_power_of_two(pow)
+                self.wrapping_add(other).mod_power_of_two(pow)
             }
         }
 
         impl ModPowerOfTwoAddAssign for $t {
-            /// Replaces `self` with `self + rhs` mod 2<sup>`pow`</sup>. Assumes the inputs are
+            /// Replaces `self` with `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are
             /// already reduced mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -50,9 +50,9 @@ macro_rules! impl_mod_power_of_two_add {
             /// assert_eq!(n, 8);
             /// ```
             #[inline]
-            fn mod_power_of_two_add_assign(&mut self, rhs: $t, pow: u64) {
+            fn mod_power_of_two_add_assign(&mut self, other: $t, pow: u64) {
                 assert!(pow <= $t::WIDTH);
-                self.wrapping_add_assign(rhs);
+                self.wrapping_add_assign(other);
                 self.mod_power_of_two_assign(pow);
             }
         }

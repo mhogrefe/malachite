@@ -1,49 +1,9 @@
-use num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, CeilingModAssign,
-    DivAssignMod, DivMod, DivRound, Mod, NegMod, UnsignedAbs,
-};
+use num::arithmetic::traits::{CeilingMod, CeilingModAssign, DivRound, Mod, NegMod, UnsignedAbs};
 use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl DivMod for $t {
-            type DivOutput = $t;
-            type ModOutput = $t;
-
-            #[inline]
-            fn div_mod(self, other: $t) -> ($t, $t) {
-                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
-                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    ($t::exact_from(quotient), remainder)
-                } else {
-                    let (quotient, remainder) = self
-                        .unsigned_abs()
-                        .ceiling_div_neg_mod(other.unsigned_abs());
-                    (-$t::exact_from(quotient), remainder)
-                };
-                (
-                    quotient,
-                    if other >= 0 {
-                        $t::exact_from(remainder)
-                    } else {
-                        -$t::exact_from(remainder)
-                    },
-                )
-            }
-        }
-
-        impl DivAssignMod for $t {
-            type ModOutput = $t;
-
-            #[inline]
-            fn div_assign_mod(&mut self, rhs: $t) -> $t {
-                let (q, r) = self.div_mod(rhs);
-                *self = q;
-                r
-            }
-        }
-
         impl Mod for $t {
             type Output = $t;
 
@@ -59,43 +19,6 @@ macro_rules! impl_arithmetic_traits {
                 } else {
                     -$t::exact_from(remainder)
                 }
-            }
-        }
-
-        impl CeilingDivMod for $t {
-            type DivOutput = $t;
-            type ModOutput = $t;
-
-            #[inline]
-            fn ceiling_div_mod(self, other: $t) -> ($t, $t) {
-                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
-                    let (quotient, remainder) = self
-                        .unsigned_abs()
-                        .ceiling_div_neg_mod(other.unsigned_abs());
-                    ($t::exact_from(quotient), remainder)
-                } else {
-                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    (-$t::exact_from(quotient), remainder)
-                };
-                (
-                    quotient,
-                    if other >= 0 {
-                        -$t::exact_from(remainder)
-                    } else {
-                        $t::exact_from(remainder)
-                    },
-                )
-            }
-        }
-
-        impl CeilingDivAssignMod for $t {
-            type ModOutput = $t;
-
-            #[inline]
-            fn ceiling_div_assign_mod(&mut self, rhs: $t) -> $t {
-                let (q, r) = self.ceiling_div_mod(rhs);
-                *self = q;
-                r
             }
         }
 
@@ -119,8 +42,8 @@ macro_rules! impl_arithmetic_traits {
 
         impl CeilingModAssign for $t {
             #[inline]
-            fn ceiling_mod_assign(&mut self, rhs: $t) {
-                *self = self.ceiling_mod(rhs);
+            fn ceiling_mod_assign(&mut self, other: $t) {
+                *self = self.ceiling_mod(other);
             }
         }
 

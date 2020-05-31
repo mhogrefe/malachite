@@ -7,9 +7,9 @@ use malachite_nz::natural::logic::hamming_distance::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
 use rug;
 
-use malachite_test::common::natural_to_rug_integer;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_1,

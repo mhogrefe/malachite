@@ -6,13 +6,13 @@ macro_rules! impl_saturating_mul {
             type Output = $t;
 
             #[inline]
-            fn saturating_mul(self, rhs: $t) -> $t {
-                $t::saturating_mul(self, rhs)
+            fn saturating_mul(self, other: $t) -> $t {
+                $t::saturating_mul(self, other)
             }
         }
 
         impl SaturatingMulAssign for $t {
-            /// Replaces `self` with `self * rhs`, saturating at the numeric bounds instead of
+            /// Replaces `self` with `self * other`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
             /// Time: worst case O(1)
@@ -32,8 +32,8 @@ macro_rules! impl_saturating_mul {
             /// assert_eq!(x, 255);
             /// ```
             #[inline]
-            fn saturating_mul_assign(&mut self, rhs: $t) {
-                *self = self.saturating_mul(rhs);
+            fn saturating_mul_assign(&mut self, other: $t) {
+                *self = self.saturating_mul(other);
             }
         }
     };

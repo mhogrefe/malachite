@@ -7,9 +7,9 @@ use malachite_nz::integer::arithmetic::eq_mod::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 
 use malachite_test::common::test_properties;
-use malachite_test::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_test::inputs::base::{
     triples_of_limb_limb_and_limb_vec_var_2, triples_of_limb_vec_limb_and_limb_vec_var_4,
     triples_of_limb_vec_limb_and_limb_vec_var_5, triples_of_limb_vec_limb_vec_and_limb_var_11,

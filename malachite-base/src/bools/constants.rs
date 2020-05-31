@@ -1,4 +1,5 @@
 use comparison::traits::{Max, Min};
+use named::Named;
 
 /// The minimum value of a `bool`, false.
 ///
@@ -17,3 +18,5 @@ impl Min for bool {
 impl Max for bool {
     const MAX: bool = true;
 }
+
+impl_named!(bool);

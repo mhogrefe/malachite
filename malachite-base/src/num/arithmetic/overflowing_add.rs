@@ -6,13 +6,13 @@ macro_rules! impl_overflowing_add {
             type Output = $t;
 
             #[inline]
-            fn overflowing_add(self, rhs: $t) -> ($t, bool) {
-                $t::overflowing_add(self, rhs)
+            fn overflowing_add(self, other: $t) -> ($t, bool) {
+                $t::overflowing_add(self, other)
             }
         }
 
         impl OverflowingAddAssign for $t {
-            /// Replaces `self` with `self + rhs`.
+            /// Replaces `self` with `self + other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
             /// overflow would have occurred then the wrapped value is assigned.
@@ -34,8 +34,8 @@ macro_rules! impl_overflowing_add {
             /// assert_eq!(x, 67);
             /// ```
             #[inline]
-            fn overflowing_add_assign(&mut self, rhs: $t) -> bool {
-                let (result, overflow) = self.overflowing_add(rhs);
+            fn overflowing_add_assign(&mut self, other: $t) -> bool {
+                let (result, overflow) = self.overflowing_add(other);
                 *self = result;
                 overflow
             }
