@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
     CheckedPow, DivExact, DivExactAssign, DivRound, DivRoundAssign, DivisibleBy, EqMod, Mod,
-    ModAssign, OverflowingPow, Pow, SaturatingPow, WrappingPow,
+    OverflowingPow, Pow, SaturatingPow, WrappingPow,
 };
 use num::conversion::traits::ExactFrom;
 use round::RoundingMode;
@@ -78,13 +78,6 @@ macro_rules! impl_arithmetic_traits {
         impl DivRoundAssign for $t {
             fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.div_round(other, rm);
-            }
-        }
-
-        impl ModAssign for $t {
-            #[inline]
-            fn mod_assign(&mut self, other: $t) {
-                *self %= other;
             }
         }
 

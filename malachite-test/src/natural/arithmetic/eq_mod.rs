@@ -5,14 +5,17 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
-    _combined_limbs_eq_limb_mod_limb, _limbs_eq_limb_mod_naive_1, _limbs_eq_limb_mod_naive_2,
-    _limbs_eq_mod_limb_naive_1, _limbs_eq_mod_limb_naive_2, _limbs_eq_mod_naive_1,
-    _limbs_eq_mod_naive_2, limbs_eq_limb_mod, limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref,
-    limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref,
-    limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref, limbs_eq_mod_ref_ref_ref,
-    limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
+    _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod, limbs_eq_limb_mod_limb,
+    limbs_eq_limb_mod_ref_ref, limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref,
+    limbs_eq_mod_limb_ref_ref, limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref,
+    limbs_eq_mod_ref_ref_ref, limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref,
+    limbs_eq_mod_ref_val_val,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz_test_util::natural::arithmetic::eq_mod::{
+    limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
+    limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1, limbs_eq_mod_naive_2,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -398,11 +401,11 @@ fn benchmark_limbs_eq_limb_mod_algorithms(gm: GenerationMode, limit: usize, file
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, y, ref m)| no_out!(_limbs_eq_limb_mod_naive_1(xs, y, m))),
+                &mut (|(ref xs, y, ref m)| no_out!(limbs_eq_limb_mod_naive_1(xs, y, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, y, ref m)| no_out!(_limbs_eq_limb_mod_naive_2(xs, y, m))),
+                &mut (|(ref xs, y, ref m)| no_out!(limbs_eq_limb_mod_naive_2(xs, y, m))),
             ),
         ],
     );
@@ -456,11 +459,11 @@ fn benchmark_limbs_eq_mod_limb_algorithms(gm: GenerationMode, limit: usize, file
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, ref ys, m)| no_out!(_limbs_eq_mod_limb_naive_1(xs, ys, m))),
+                &mut (|(ref xs, ref ys, m)| no_out!(limbs_eq_mod_limb_naive_1(xs, ys, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, ref ys, m)| no_out!(_limbs_eq_mod_limb_naive_2(xs, ys, m))),
+                &mut (|(ref xs, ref ys, m)| no_out!(limbs_eq_mod_limb_naive_2(xs, ys, m))),
             ),
         ],
     );
@@ -516,11 +519,11 @@ fn benchmark_limbs_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name
             ),
             (
                 "naive 1",
-                &mut (|(ref xs, ref ys, ref m)| no_out!(_limbs_eq_mod_naive_1(xs, ys, m))),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(limbs_eq_mod_naive_1(xs, ys, m))),
             ),
             (
                 "naive 2",
-                &mut (|(ref xs, ref ys, ref m)| no_out!(_limbs_eq_mod_naive_2(xs, ys, m))),
+                &mut (|(ref xs, ref ys, ref m)| no_out!(limbs_eq_mod_naive_2(xs, ys, m))),
             ),
         ],
     );

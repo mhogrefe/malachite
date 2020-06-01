@@ -11,6 +11,10 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::round::RoundingMode;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div_exact::{
+    limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
+};
 
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
@@ -18,7 +22,6 @@ use malachite_nz::natural::arithmetic::div_exact::{
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt,
     _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
     _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
     _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
@@ -203,7 +206,7 @@ fn test_limbs_div_exact_3_and_limbs_div_exact_3_in_place() {
         assert_eq!(ns, q);
 
         let mut ns = old_ns.to_vec();
-        _limbs_div_exact_3_in_place_alt(&mut ns);
+        limbs_div_exact_3_in_place_alt(&mut ns);
         assert_eq!(ns, q);
 
         let mut ns = old_ns.to_vec();
@@ -241,7 +244,7 @@ fn test_limbs_div_exact_3_to_out() {
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        _limbs_div_exact_3_to_out_alt(&mut out, xs);
+        limbs_div_exact_3_to_out_alt(&mut out, xs);
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();

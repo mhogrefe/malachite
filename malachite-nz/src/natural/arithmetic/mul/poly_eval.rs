@@ -439,7 +439,6 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     assert_eq!(scratch.len(), n + 1);
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
     assert_eq!(coefficients.len(), degree + 1);
-
     v_2_pow_neg[n] = limbs_shl_to_out(v_2_pow_neg, coefficients[0], shift * degree_u64);
     scratch[n] = limbs_shl_to_out(scratch, coefficients[1], shift * (degree_u64 - 1));
     if degree.even() {

@@ -1,4 +1,5 @@
 use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::named::Named;
 
 #[test]
 fn test_min() {
@@ -8,4 +9,9 @@ fn test_min() {
 #[test]
 fn test_max() {
     assert_eq!(char::MAX, '\u{10ffff}');
+}
+
+#[test]
+pub fn test_named() {
+    assert_eq!(bool::NAME, "bool");
 }

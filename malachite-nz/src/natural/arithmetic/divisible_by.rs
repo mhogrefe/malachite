@@ -15,20 +15,6 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
-/// Benchmarks show that this is never faster than just calling `limbs_divisible_by_limb`.
-///
-/// limbs.len() must be greater than 1; divisor must be nonzero.
-///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative.
-#[allow(clippy::absurd_extreme_comparisons)]
-pub fn _combined_limbs_divisible_by_limb(xs: &[Limb], d: Limb) -> bool {
-    if xs.len() <= BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_divisible_by_limb(xs, d)
-    } else {
-        limbs_mod_limb(xs, d) == 0
-    }
-}
-
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by a given limb.
 ///

@@ -7,7 +7,6 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt,
     _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
     _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
     _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
@@ -23,6 +22,9 @@ use malachite_nz::natural::arithmetic::div_exact::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_nz_test_util::natural::arithmetic::div_exact::{
+    limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
+};
 
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
@@ -184,7 +186,7 @@ fn limbs_div_exact_3_to_out_properties() {
         assert_eq!(out_alt, out);
 
         let mut out_alt = old_out.clone();
-        _limbs_div_exact_3_to_out_alt(&mut out_alt, in_limbs);
+        limbs_div_exact_3_to_out_alt(&mut out_alt, in_limbs);
         assert_eq!(out_alt, out);
     });
 }
@@ -205,7 +207,7 @@ fn limbs_div_exact_3_in_place_properties() {
         assert_eq!(limbs_alt, limbs);
 
         let mut limbs_alt = old_limbs.to_vec();
-        _limbs_div_exact_3_in_place_alt(&mut limbs_alt);
+        limbs_div_exact_3_in_place_alt(&mut limbs_alt);
         assert_eq!(limbs_alt, limbs);
     });
 }

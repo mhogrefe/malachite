@@ -76,12 +76,7 @@ pub fn limbs_invert_limb(d: Limb) -> Limb {
 /// Additional memory: worst case O(1)
 ///
 /// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn div_mod_by_preinversion(
-    n_high: Limb,
-    n_low: Limb,
-    d: Limb,
-    d_inv: Limb,
-) -> (Limb, Limb) {
+pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -181,7 +176,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], xs: &[Limb], d: Limb) -> Limb
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for (out_limb, &limb) in out_init.iter_mut().zip(xs_init.iter()).rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, limb, d, d_inv);
+            let (q, new_r) = _div_mod_by_preinversion(r, limb, d, d_inv);
             *out_limb = q;
             r = new_r;
         }
@@ -206,12 +201,12 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], xs: &[Limb], d: Limb) -> Limb
         let (out_first, out_tail) = out.split_first_mut().unwrap();
         for (out_limb, &limb) in out_tail.iter_mut().zip(xs_init.iter()).rev() {
             let n_shifted = (previous_x << bits) | (limb >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, n_shifted, d, d_inv);
+            let (q, new_r) = _div_mod_by_preinversion(r, n_shifted, d, d_inv);
             *out_limb = q;
             r = new_r;
             previous_x = limb;
         }
-        let (q, r) = div_mod_by_preinversion(r, previous_x << bits, d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(r, previous_x << bits, d, d_inv);
         *out_first = q;
         r >> bits
     }
@@ -265,7 +260,7 @@ pub fn limbs_div_limb_in_place_mod(xs: &mut [Limb], d: Limb) -> Limb {
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for limb in xs_init.iter_mut().rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, *limb, d, d_inv);
+            let (q, new_r) = _div_mod_by_preinversion(r, *limb, d, d_inv);
             *limb = q;
             r = new_r;
         }
@@ -290,12 +285,12 @@ pub fn limbs_div_limb_in_place_mod(xs: &mut [Limb], d: Limb) -> Limb {
         for i in (0..last_index).rev() {
             let limb = xs[i];
             let shifted_limb = (previous_limb << bits) | (limb >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, shifted_limb, d, d_inv);
+            let (q, new_r) = _div_mod_by_preinversion(r, shifted_limb, d, d_inv);
             xs[i + 1] = q;
             r = new_r;
             previous_limb = limb;
         }
-        let (q, r) = div_mod_by_preinversion(r, previous_limb << bits, d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(r, previous_limb << bits, d, d_inv);
         xs[0] = q;
         r >> bits
     }
@@ -2756,29 +2751,6 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
     }
 }
 
-pub fn _limbs_div_limb_to_out_mod_naive(out: &mut [Limb], xs: &[Limb], d: Limb) -> Limb {
-    assert!(out.len() >= xs.len());
-    let d = DoubleLimb::from(d);
-    let mut upper = 0;
-    for (out_limb, &in_limb) in out.iter_mut().zip(xs.iter()).rev() {
-        let (q, r) = DoubleLimb::join_halves(upper, in_limb).div_rem(d);
-        *out_limb = q.lower_half();
-        upper = r.lower_half();
-    }
-    upper
-}
-
-pub fn _limbs_div_limb_in_place_mod_naive(xs: &mut [Limb], d: Limb) -> Limb {
-    let d = DoubleLimb::from(d);
-    let mut upper = 0;
-    for limb in xs.iter_mut().rev() {
-        let (q, r) = DoubleLimb::join_halves(upper, *limb).div_rem(d);
-        *limb = q.lower_half();
-        upper = r.lower_half();
-    }
-    upper
-}
-
 /// The high bit of `d` must be set.
 ///
 /// Time: worst case O(n)
@@ -2797,7 +2769,7 @@ fn limbs_div_limb_normalized_in_place_mod(
 ) -> Limb {
     let len = xs.len();
     if len == 1 {
-        let (q, r) = div_mod_by_preinversion(xs_high, xs[0], d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(xs_high, xs[0], d, d_inv);
         xs[0] = q;
         return r;
     }
@@ -2840,7 +2812,7 @@ fn limbs_div_limb_normalized_in_place_mod(
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let (t, r) = div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
+    let (t, r) = _div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -2868,7 +2840,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 ) -> Limb {
     let len = xs.len();
     if len == 1 {
-        let (q, r) = div_mod_by_preinversion(highest_limb, xs[0], d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(highest_limb, xs[0], d, d_inv);
         out[0] = q;
         return r;
     }
@@ -2910,7 +2882,7 @@ fn limbs_div_limb_normalized_to_out_mod(
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let (t, r) = div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
+    let (t, r) = _div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -2945,7 +2917,7 @@ pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], xs: &[Limb], d: Limb) ->
         let highest_limb = limbs_shl_to_out(out, xs, bits);
         let d_inv = limbs_invert_limb(d);
         let (out_last, out_init) = out.split_last_mut().unwrap();
-        let (q, r) = div_mod_by_preinversion(highest_limb, *out_last, d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(highest_limb, *out_last, d, d_inv);
         *out_last = q;
         limbs_div_limb_normalized_in_place_mod(out_init, r, d, d_inv) >> bits
     }
@@ -2973,7 +2945,7 @@ pub fn _limbs_div_limb_in_place_mod_alt(xs: &mut [Limb], d: Limb) -> Limb {
         let d = d << bits;
         let highest_limb = limbs_slice_shl_in_place(xs, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = div_mod_by_preinversion(highest_limb, xs[len_minus_1], d, d_inv);
+        let (q, r) = _div_mod_by_preinversion(highest_limb, xs[len_minus_1], d, d_inv);
         xs[len_minus_1] = q;
         limbs_div_limb_normalized_in_place_mod(&mut xs[..len_minus_1], r, d, d_inv) >> bits
     }

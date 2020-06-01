@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
-    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, DivRound, FloorLogTwo, IsPowerOfTwo, Mod,
-    NegMod, NegModAssign, NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
+    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, DivRound, FloorLogTwo, IsPowerOfTwo,
+    NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -109,36 +109,6 @@ macro_rules! impl_arithmetic_traits {
                 } else {
                     floor_log_two + 1
                 }
-            }
-        }
-
-        impl Mod for $t {
-            type Output = $t;
-
-            #[inline]
-            fn mod_op(self, other: $t) -> $t {
-                self % other
-            }
-        }
-
-        impl NegMod for $t {
-            type Output = $t;
-
-            #[inline]
-            fn neg_mod(self, other: $t) -> $t {
-                let rem = self % other;
-                if rem == 0 {
-                    0
-                } else {
-                    other - rem
-                }
-            }
-        }
-
-        impl NegModAssign for $t {
-            #[inline]
-            fn neg_mod_assign(&mut self, other: $t) {
-                *self = self.neg_mod(other);
             }
         }
 

@@ -13,13 +13,16 @@ use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
+};
 use num::{BigUint, Integer};
 use rug;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
-    _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, limbs_div_limb_in_place_mod,
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod,
     limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod_three_limb_by_two_limb,
     limbs_invert_limb,
 };
@@ -67,7 +70,7 @@ fn test_limbs_div_limb_mod_and_limbs_div_limb_in_place_mod() {
         assert_eq!(ns, q);
 
         let mut ns = old_ns.to_vec();
-        assert_eq!(_limbs_div_limb_in_place_mod_naive(&mut ns, d), r);
+        assert_eq!(limbs_div_limb_in_place_mod_naive(&mut ns, d), r);
         assert_eq!(ns, q);
     };
     test(&[0, 0], 2, vec![0, 0], 0);
@@ -135,7 +138,7 @@ fn test_limbs_div_limb_to_out_mod() {
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        assert_eq!(_limbs_div_limb_to_out_mod_naive(&mut out, ns, d), r);
+        assert_eq!(limbs_div_limb_to_out_mod_naive(&mut out, ns, d), r);
         assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0, 0], 2, 0, &[0, 0, 10, 10]);

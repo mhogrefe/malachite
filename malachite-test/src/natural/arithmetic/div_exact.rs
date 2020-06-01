@@ -5,7 +5,6 @@ use malachite_nz::natural::arithmetic::div::{
     limbs_div, limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out, limbs_div_to_out,
 };
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_div_exact_3_in_place_alt, _limbs_div_exact_3_to_out_alt,
     _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
     _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
     _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
@@ -17,6 +16,9 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_div_exact_to_out,
     limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
     limbs_modular_invert, limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
+use malachite_nz_test_util::natural::arithmetic::div_exact::{
+    limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -601,8 +603,8 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
                 &mut (|(mut out, in_limbs)| limbs_div_exact_3_to_out(&mut out, &in_limbs)),
             ),
             (
-                "_limbs_div_exact_3_to_out_alt",
-                &mut (|(mut out, in_limbs)| _limbs_div_exact_3_to_out_alt(&mut out, &in_limbs)),
+                "limbs_div_exact_3_to_out_alt",
+                &mut (|(mut out, in_limbs)| limbs_div_exact_3_to_out_alt(&mut out, &in_limbs)),
             ),
         ],
     );
@@ -632,8 +634,8 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
                 &mut (|mut limbs| limbs_div_exact_3_in_place(&mut limbs)),
             ),
             (
-                "_limbs_div_exact_3_in_place_alt",
-                &mut (|mut limbs| _limbs_div_exact_3_in_place_alt(&mut limbs)),
+                "limbs_div_exact_3_in_place_alt",
+                &mut (|mut limbs| limbs_div_exact_3_in_place_alt(&mut limbs)),
             ),
         ],
     );

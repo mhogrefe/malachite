@@ -133,5 +133,9 @@ pub mod natural {
         pub mod div;
         pub mod div_exact;
         pub mod div_mod;
+        pub mod div_round;
+        pub mod divisible_by;
+        pub mod divisible_by_power_of_two;
+        pub mod eq_mod;
     }
 }

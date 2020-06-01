@@ -2773,20 +2773,19 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
     max(MUL_TOOM6H_THRESHOLD, MUL_TOOM44_THRESHOLD)
 }
 
-//TODO clean
-
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
-    let itch = (isize::exact_from(n) - isize::exact_from(_limbs_mul_toom_6h_min_threshold())) * 2
-        + isize::exact_from(max(
-            _limbs_mul_toom_6h_min_threshold() * 2 + usize::wrapping_from(Limb::WIDTH) * 6,
+    let t = _limbs_mul_toom_6h_min_threshold() << 1;
+    (n << 1)
+        + max(
+            t + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_greater_to_out_toom_44_scratch_len(_limbs_mul_toom_6h_min_threshold()),
-        ));
-    usize::exact_from(itch)
+        )
+        - t
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -2834,52 +2833,37 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-
     // Decomposition
     // Can not handle too much unbalance
     assert!(ys_len >= 42);
     assert!(xs_len * 3 < ys_len * 8 || ys_len >= 46 && xs_len * 6 < ys_len * 17);
-
     let n;
-    let mut p;
-    let mut q;
-    let mut half;
-    let mut s;
-    let mut t;
-    if xs_len * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * ys_len {
+    let mut half = false;
+    let (p, q, pn, qn) = if xs_len * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * ys_len {
         // xs.len() < 18 / 17 * ys.len()
         // This is the slowest variation
         n = 1 + (xs_len - 1) / 6;
-        p = 5;
-        q = 5;
-        half = false;
-        s = isize::exact_from(xs_len) - isize::exact_from(5 * n);
-        t = isize::exact_from(ys_len) - isize::exact_from(5 * n);
+        let n5 = 5 * n;
+        (5, 5, n5, n5)
     } else {
-        if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len {
+        let (mut p, mut q) = if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR
+            < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len
+        {
             // xs.len() < 119 / 90 * ys.len(), half
-            //
-            p = 7;
-            q = 6;
+            (7, 6)
         } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * 7 * ys_len {
             // xs.len() < 126 / 85 * ys.len(), !half
-            p = 7;
-            q = 5;
-        } else if xs_len * TOOM_6H_LIMIT_NUMERATOR < TOOM_6H_LIMIT_DENOMINATOR * 2 * ys_len {
+            (7, 5)
+        } else if xs_len * TOOM_6H_LIMIT_NUMERATOR < (TOOM_6H_LIMIT_DENOMINATOR * ys_len) << 1 {
             // xs.len() < 17 / 9 * ys.len(), half
-            p = 8;
-            q = 5;
-        } else if xs_len * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * 2 * ys_len {
+            (8, 5)
+        } else if xs_len * TOOM_6H_LIMIT_DENOMINATOR < (TOOM_6H_LIMIT_NUMERATOR * ys_len) << 1 {
             // xs.len() < 36 / 17 * ys.len(), !half
-            p = 8;
-            q = 4;
+            (8, 4)
         } else {
             // xs.len() >= 36 / 17 * ys.len(), half
-            p = 9;
-            q = 4;
-        }
-
-        half = !p.eq_mod_power_of_two(q, 1);
+            (9, 4)
+        };
         n = 1 + if q * xs_len >= p * ys_len {
             (xs_len - 1) / p
         } else {
@@ -2887,149 +2871,127 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         };
         p -= 1;
         q -= 1;
-
-        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
-        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
-
+        let mut pn = p * n;
+        let mut qn = q * n;
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
-        if half {
+        if !p.eq_mod_power_of_two(q, 1) {
             // Recover from badly-chosen splitting
-            if s < 1 {
+            if xs_len <= pn {
                 p -= 1;
-                s += isize::exact_from(n);
-                half = false;
-            } else if t < 1 {
+                pn -= n;
+            } else if ys_len <= qn {
                 q -= 1;
-                t += isize::exact_from(n);
-                half = false;
+                qn -= n;
+            } else {
+                half = true;
             }
         }
-    }
-
-    assert!(0 < s && s <= isize::exact_from(n));
-    assert!(0 < t && t <= isize::exact_from(n));
-    assert!(half || s + t > 3);
+        (p, q, pn, qn)
+    };
     assert!(n > 2);
-    let s = usize::exact_from(s);
-    let t = usize::exact_from(t);
+    assert!(xs_len > pn);
+    let s = xs_len - pn;
+    assert!(s <= n);
+    assert!(ys_len > qn);
+    let t = ys_len - qn;
+    assert!(t <= n);
+    assert!(half || s + t > 3);
     let m = n + 1;
-    let r = 2 * n + 1;
-
+    // r == 2 * n + 1
+    let r = m + n;
     // Also allocate 3 * n + 1 limbs for scratch2. `_limbs_mul_toom_interpolate_12_points` may need
     // all of them.
-    let limit = 12 * n + 6;
+    let limit = 6 * r; // 12 * n + 6
     assert!(limit <= _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len));
     assert!(limit <= _limbs_square_to_out_toom_6_scratch_len(6 * n));
-
-    let v_neg_2_neg;
     split_into_chunks_mut!(scratch, 3 * n + 1, [r5, r3, r1], scratch2);
-    {
-        let (out_lo, remainder) = out.split_at_mut(3 * n);
-        let (r4, remainder) = remainder.split_at_mut(4 * n);
-        split_into_chunks_mut!(remainder, m, [v0, v1, v2], _unused);
-        let (v3, scratch3) = scratch2.split_at_mut(m);
-        // Evaluation and recursive calls
-        // 1/2, -1/2
-        let v_neg_half_neg = {
-            let out_lo = &mut out_lo[..m];
-            _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                v2, v0, p, xs, n, 1, out_lo,
-            ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                v3, v1, q, ys, n, 1, out_lo,
-            )
-        };
-        // X(-1/2) * Y(-1/2) * 2^
-        // X(1/2) * Y(1/2) * 2^
-        _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
-        _limbs_mul_same_length_to_out_toom_6h_recursive(r5, v2, v3, scratch3);
-        if half {
-            _limbs_toom_couple_handling(r5, &mut out_lo[..r], v_neg_half_neg, n, 2, 1);
-        } else {
-            _limbs_toom_couple_handling(r5, &mut out_lo[..r], v_neg_half_neg, n, 1, 0);
-        }
-
-        // 1, -1
-        let v_neg_1_neg = {
-            let out_lo = &mut out_lo[..m];
-            let mut sign = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, out_lo);
-            let flip = if q == 3 {
-                _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, out_lo)
-            } else {
-                _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, ys, n, out_lo)
-            };
-            if flip {
-                sign.not_assign();
-            }
-            sign
-        };
-        // X(-1) * Y(-1)
-        // X(1) * Y(1)
-        _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
-        _limbs_mul_same_length_to_out_toom_6h_recursive(r3, v2, v3, scratch3);
-        _limbs_toom_couple_handling(r3, &mut out_lo[..r], v_neg_1_neg, n, 0, 0);
-
-        // 4, -4
-        let v_neg_4_neg = {
-            let out_lo = &mut out_lo[..m];
-            _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 2, out_lo)
-                != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, ys, n, 2, out_lo)
-        };
-        // X(-4) * Y(-4)
-        _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
-        _limbs_mul_same_length_to_out_toom_6h_recursive(r1, v2, v3, scratch3);
-        // X(4) * B(4)
-        _limbs_toom_couple_handling(r1, &mut out_lo[..r], v_neg_4_neg, n, 2, 4);
-
-        // 1/4, -1/4
-        let v_neg_quarter_neg = {
-            let out_lo = &mut out_lo[..m];
-            _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                v2, v0, p, xs, n, 2, out_lo,
-            ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                v3, v1, q, ys, n, 2, out_lo,
-            )
-        };
-        // X(-1/4) * Y(-1/4) * 4^
-        // X(1/4) * Y(1/4) * 4^
-        _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
-        _limbs_mul_same_length_to_out_toom_6h_recursive(r4, v2, v3, scratch3);
-        if half {
-            _limbs_toom_couple_handling(r4, &mut out_lo[..r], v_neg_quarter_neg, n, 4, 2);
-        } else {
-            _limbs_toom_couple_handling(r4, &mut out_lo[..r], v_neg_quarter_neg, n, 2, 0);
-        }
-
-        let out_lo = &mut out_lo[..m];
-        // 2, -2
-        v_neg_2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, xs, n, out_lo)
-            != _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v3, v1, q, ys, n, out_lo);
+    let (out_lo, remainder) = out.split_at_mut(3 * n);
+    let (r4, remainder) = remainder.split_at_mut(n << 2);
+    split_into_chunks_mut!(remainder, m, [v0, v1, v2], _unused);
+    let (v3, scratch3) = scratch2.split_at_mut(m);
+    // Evaluation and recursive calls
+    // 1/2, -1/2
+    let out_lo_lo = &mut out_lo[..m];
+    let v_neg_half_neg = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        v2, v0, p, xs, n, 1, out_lo_lo,
+    ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        v3, v1, q, ys, n, 1, out_lo_lo,
+    );
+    // X(-1/2) * Y(-1/2) * 2^
+    // X(1/2) * Y(1/2) * 2^
+    _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
+    _limbs_mul_same_length_to_out_toom_6h_recursive(r5, v2, v3, scratch3);
+    if half {
+        _limbs_toom_couple_handling(r5, &mut out_lo[..r], v_neg_half_neg, n, 2, 1);
+    } else {
+        _limbs_toom_couple_handling(r5, &mut out_lo[..r], v_neg_half_neg, n, 1, 0);
     }
-    {
-        // X(-2) * Y(-2)
-        // X(2) * Y(2)
-        let (out_lo, r2) = out.split_at_mut(7 * n);
-        {
-            let (v3, scratch3) = scratch2.split_at_mut(m);
-            let (r2_v1, v2) = r2.split_at_mut(2 * m);
-            let v2 = &mut v2[..m];
-            {
-                let (r2, v1) = r2_v1.split_at_mut(m);
-                _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, r2, v1, scratch3);
-            }
-            _limbs_mul_same_length_to_out_toom_6h_recursive(r2_v1, v2, v3, scratch3);
-        }
-        _limbs_toom_couple_handling(r2, &mut out_lo[..r], v_neg_2_neg, n, 1, 2);
+    // 1, -1
+    let out_lo_lo = &mut out_lo[..m];
+    let mut v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, out_lo_lo);
+    let flip = if q == 3 {
+        _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, out_lo_lo)
+    } else {
+        _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, ys, n, out_lo_lo)
+    };
+    if flip {
+        v_neg_1_neg.not_assign();
     }
-
+    // X(-1) * Y(-1)
+    // X(1) * Y(1)
+    _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
+    _limbs_mul_same_length_to_out_toom_6h_recursive(r3, v2, v3, scratch3);
+    _limbs_toom_couple_handling(r3, &mut out_lo[..r], v_neg_1_neg, n, 0, 0);
+    // 4, -4
+    let out_lo_lo = &mut out_lo[..m];
+    let v_neg_4_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 2, out_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, ys, n, 2, out_lo_lo);
+    // X(-4) * Y(-4)
+    _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
+    _limbs_mul_same_length_to_out_toom_6h_recursive(r1, v2, v3, scratch3);
+    // X(4) * B(4)
+    _limbs_toom_couple_handling(r1, &mut out_lo[..r], v_neg_4_neg, n, 2, 4);
+    // 1/4, -1/4
+    let out_lo_lo = &mut out_lo[..m];
+    let v_neg_quarter_neg = _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        v2, v0, p, xs, n, 2, out_lo_lo,
+    ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        v3, v1, q, ys, n, 2, out_lo_lo,
+    );
+    // X(-1/4) * Y(-1/4) * 4^
+    // X(1/4) * Y(1/4) * 4^
+    _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
+    _limbs_mul_same_length_to_out_toom_6h_recursive(r4, v2, v3, scratch3);
+    if half {
+        _limbs_toom_couple_handling(r4, &mut out_lo[..r], v_neg_quarter_neg, n, 4, 2);
+    } else {
+        _limbs_toom_couple_handling(r4, &mut out_lo[..r], v_neg_quarter_neg, n, 2, 0);
+    }
+    let out_lo = &mut out_lo[..m];
+    // 2, -2
+    let v_neg_2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, xs, n, out_lo)
+        != _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v3, v1, q, ys, n, out_lo);
+    // X(-2) * Y(-2)
+    // X(2) * Y(2)
+    let (out_lo, r2) = out.split_at_mut(7 * n);
+    let (v3, scratch3) = scratch2.split_at_mut(m);
+    let (r2_v1, v2) = r2.split_at_mut(2 * m);
+    let v2 = &mut v2[..m];
+    {
+        let (r2, v1) = r2_v1.split_at_mut(m);
+        _limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, r2, v1, scratch3);
+    }
+    _limbs_mul_same_length_to_out_toom_6h_recursive(r2_v1, v2, v3, scratch3);
+    _limbs_toom_couple_handling(r2, &mut out_lo[..r], v_neg_2_neg, n, 1, 2);
     // X(0) * Y(0)
     _limbs_mul_same_length_to_out_toom_6h_recursive(out, &xs[..n], &ys[..n], scratch2);
-
     // Infinity
     if half {
         if s > t {
-            _limbs_mul_to_out_toom_6h_recursive(&mut out[11 * n..], &xs[p * n..], &ys[q * n..]);
+            _limbs_mul_to_out_toom_6h_recursive(&mut out[11 * n..], &xs[pn..], &ys[qn..]);
         } else {
-            _limbs_mul_to_out_toom_6h_recursive(&mut out[11 * n..], &ys[q * n..], &xs[p * n..]);
+            _limbs_mul_to_out_toom_6h_recursive(&mut out[11 * n..], &ys[qn..], &xs[pn..]);
         }
     }
     _limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s + t, half, scratch2);
@@ -3039,6 +3001,8 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
 // (16 / 15) ^ (log(8) / log(2 * 8 - 1))
 const TOOM_8H_LIMIT_NUMERATOR: usize = 21;
 const TOOM_8H_LIMIT_DENOMINATOR: usize = 20;
+
+//TODO clean
 
 /// Time: worst case O(1)
 ///

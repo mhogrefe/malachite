@@ -2,6 +2,10 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div::{
+    limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
+};
 use num::BigUint;
 use rug;
 
@@ -14,8 +18,7 @@ use malachite_nz::natural::arithmetic::div::{
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div::{
-    _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt, limbs_div_limb,
-    limbs_div_limb_in_place, limbs_div_limb_to_out,
+    limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
 };
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
@@ -33,7 +36,7 @@ fn test_limbs_div_limb_and_limbs_div_limb_in_place() {
         assert_eq!(ns, q);
 
         let mut ns = ns_old;
-        _limbs_div_limb_in_place_alt(&mut ns, d);
+        limbs_div_limb_in_place_alt(&mut ns, d);
         assert_eq!(ns, q);
     };
     test(&[0, 0], 2, &[0, 0]);
@@ -82,7 +85,7 @@ fn test_limbs_div_limb_to_out() {
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        _limbs_div_limb_to_out_alt(&mut out, ns, d);
+        limbs_div_limb_to_out_alt(&mut out, ns, d);
         assert_eq!(out, out_after);
     };
     test(&[10, 10, 10, 10], &[0, 0], 2, &[0, 0, 10, 10]);

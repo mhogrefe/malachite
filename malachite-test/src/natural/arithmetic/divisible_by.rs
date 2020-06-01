@@ -3,11 +3,13 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::arithmetic::divisible_by::{
-    _combined_limbs_divisible_by_limb, limbs_divisible_by, limbs_divisible_by_limb,
-    limbs_divisible_by_ref_ref, limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
+    limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
+    limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
-use num::{BigUint, Integer, Zero as NumZero};
+use malachite_nz_test_util::natural::arithmetic::divisible_by::{
+    combined_limbs_divisible_by_limb, num_divisible_by,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -48,10 +50,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_divisible_by_library_comparison
     );
-}
-
-pub fn num_divisible_by(x: BigUint, y: BigUint) -> bool {
-    x == BigUint::zero() || y != BigUint::zero() && x.is_multiple_of(&y)
 }
 
 fn demo_limbs_divisible_by_limb(gm: GenerationMode, limit: usize) {
@@ -177,8 +175,8 @@ fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize
                 &mut (|(ref limbs, limb)| no_out!(limbs_mod_limb(limbs, limb) == 0)),
             ),
             (
-                "_combined_limbs_divisible_by_limb",
-                &mut (|(ref limbs, limb)| no_out!(_combined_limbs_divisible_by_limb(limbs, limb))),
+                "combined_limbs_divisible_by_limb",
+                &mut (|(ref limbs, limb)| no_out!(combined_limbs_divisible_by_limb(limbs, limb))),
             ),
         ],
     );
@@ -318,7 +316,7 @@ fn benchmark_natural_divisible_by_library_comparison(
             ),
             (
                 "num",
-                &mut (|((x, y), _, _)| no_out!(num_divisible_by(x, y))),
+                &mut (|((x, y), _, _)| no_out!(num_divisible_by(&x, &y))),
             ),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.is_divisible(&y)))),
         ],

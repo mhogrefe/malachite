@@ -8,8 +8,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_in_place_mod_naive,
-    _limbs_div_limb_to_out_mod_alt, _limbs_div_limb_to_out_mod_naive, _limbs_div_mod_barrett,
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett,
     _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
     _limbs_invert_newton_approx, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
@@ -23,6 +22,9 @@ use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
+};
 use num::Integer;
 
 use malachite_test::common::{test_properties, test_properties_custom_scale};
@@ -257,10 +259,7 @@ fn limbs_div_limb_to_out_mod_properties() {
             assert_eq!(out, final_out);
 
             let mut out = old_out.to_vec();
-            assert_eq!(
-                _limbs_div_limb_to_out_mod_naive(&mut out, in_limbs, limb),
-                r
-            );
+            assert_eq!(limbs_div_limb_to_out_mod_naive(&mut out, in_limbs, limb), r);
             assert_eq!(out, final_out);
         },
     );
@@ -285,7 +284,7 @@ fn limbs_div_limb_in_place_mod_properties() {
             assert_eq!(r, r_alt);
 
             let mut limbs = old_limbs.clone();
-            let r_alt = _limbs_div_limb_in_place_mod_naive(&mut limbs, limb);
+            let r_alt = limbs_div_limb_in_place_mod_naive(&mut limbs, limb);
             let q_alt = Natural::from_owned_limbs_asc(limbs);
             assert_eq!(q, q_alt);
             assert_eq!(r, r_alt);

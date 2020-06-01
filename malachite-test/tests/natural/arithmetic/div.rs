@@ -3,9 +3,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
-    _limbs_div_schoolbook, _limbs_div_schoolbook_approx, limbs_div,
-    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
+    limbs_div, limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
     limbs_div_limb_to_out, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
     limbs_div_to_out_val_ref,
@@ -14,6 +13,9 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::natural::arithmetic::div::{
+    limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
 
 use malachite_test::common::{test_properties, test_properties_custom_scale};
@@ -140,7 +142,7 @@ fn limbs_div_limb_to_out_properties() {
             assert_eq!(&out[len..], &old_out[len..]);
 
             let mut out_alt = old_out.clone();
-            _limbs_div_limb_to_out_alt(&mut out_alt, in_limbs, limb);
+            limbs_div_limb_to_out_alt(&mut out_alt, in_limbs, limb);
             assert_eq!(out, out_alt);
         },
     );
@@ -161,7 +163,7 @@ fn limbs_div_limb_in_place_properties() {
             );
 
             let mut limbs = old_limbs.clone();
-            _limbs_div_limb_in_place_alt(&mut limbs, limb);
+            limbs_div_limb_in_place_alt(&mut limbs, limb);
             assert_eq!(limbs, out);
         },
     );

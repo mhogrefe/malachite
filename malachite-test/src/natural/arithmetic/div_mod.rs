@@ -8,8 +8,7 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_limb_in_place_mod_alt,
-    _limbs_div_limb_in_place_mod_naive, _limbs_div_limb_to_out_mod_alt,
-    _limbs_div_limb_to_out_mod_naive, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
+    _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_limb_in_place_mod,
@@ -20,6 +19,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
+};
 use num::Integer;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -603,7 +605,7 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
             (
                 "naive",
                 &mut (|(mut out, in_limbs, limb)| {
-                    no_out!(_limbs_div_limb_to_out_mod_naive(&mut out, &in_limbs, limb))
+                    no_out!(limbs_div_limb_to_out_mod_naive(&mut out, &in_limbs, limb))
                 }),
             ),
         ],
@@ -638,7 +640,7 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
             (
                 "naive",
                 &mut (|(mut limbs, limb)| {
-                    no_out!(_limbs_div_limb_in_place_mod_naive(&mut limbs, limb))
+                    no_out!(limbs_div_limb_in_place_mod_naive(&mut limbs, limb))
                 }),
             ),
         ],

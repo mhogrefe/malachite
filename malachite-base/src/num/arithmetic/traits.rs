@@ -898,6 +898,54 @@ pub trait CeilingDivAssignMod<RHS = Self> {
     fn ceiling_div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
 }
 
+/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
+/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
+/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait Mod<RHS = Self> {
+    type Output;
+
+    fn mod_op(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a value by another value in place, returning the remainder. The quotient is rounded
+/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
+/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait ModAssign<RHS = Self> {
+    fn mod_assign(&mut self, other: RHS);
+}
+
+/// Divides a value by another value, returning the ceiling of the quotient and the remainder of the
+/// negative of the first value divided by the second. The quotient and remainder satisfy
+/// `self` = q * `other` - r and 0 <= r < `other`.
+pub trait NegMod<RHS = Self> {
+    type Output;
+
+    fn neg_mod(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a value by another value in place, taking the ceiling of the quotient and returning the
+/// remainder of the negative of the first value divided by the second. The quotient and remainder
+/// satisfy `self` = q * `other` - r and 0 <= r < `other`.
+pub trait NegModAssign<RHS = Self> {
+    fn neg_mod_assign(&mut self, other: RHS);
+}
+
+/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
+/// towards positive infinity and the remainder has the opposite sign of the divisor. The quotient
+/// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait CeilingMod<RHS = Self> {
+    type Output;
+
+    fn ceiling_mod(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a value by another value in place, taking the quotient and returning the remainder. The
+/// quotient is rounded towards positive infinity and the remainder has the opposite sign of the
+/// divisor. The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+pub trait CeilingModAssign<RHS = Self> {
+    fn ceiling_mod_assign(&mut self, other: RHS);
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -964,37 +1012,6 @@ pub trait NextPowerOfTwoAssign {
 
 pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
-}
-
-pub trait Mod<RHS = Self> {
-    type Output;
-
-    // would be called `mod`, but that's a keyword
-    fn mod_op(self, other: RHS) -> Self::Output;
-}
-
-pub trait ModAssign<RHS = Self> {
-    fn mod_assign(&mut self, other: RHS);
-}
-
-pub trait NegMod<RHS = Self> {
-    type Output;
-
-    fn neg_mod(self, other: RHS) -> Self::Output;
-}
-
-pub trait NegModAssign<RHS = Self> {
-    fn neg_mod_assign(&mut self, other: RHS);
-}
-
-pub trait CeilingMod<RHS = Self> {
-    type Output;
-
-    fn ceiling_mod(self, other: RHS) -> Self::Output;
-}
-
-pub trait CeilingModAssign<RHS = Self> {
-    fn ceiling_mod_assign(&mut self, other: RHS);
 }
 
 pub trait DivRound<RHS = Self> {

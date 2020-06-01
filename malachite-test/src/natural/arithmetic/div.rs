@@ -6,9 +6,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_limb_in_place_alt, _limbs_div_limb_to_out_alt,
-    _limbs_div_schoolbook, _limbs_div_schoolbook_approx, _limbs_div_to_out_balanced,
-    _limbs_div_to_out_unbalanced, limbs_div, limbs_div_divisor_of_limb_max_with_carry_in_place,
+    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
+    _limbs_div_to_out_balanced, _limbs_div_to_out_unbalanced, limbs_div,
+    limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
     limbs_div_limb_to_out, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
     limbs_div_to_out_val_ref,
@@ -16,6 +16,9 @@ use malachite_nz::natural::arithmetic::div::{
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, limbs_div_mod, limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
+};
+use malachite_nz_test_util::natural::arithmetic::div::{
+    limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -414,7 +417,7 @@ fn benchmark_limbs_div_limb_to_out_algorithms(gm: GenerationMode, limit: usize, 
             (
                 "alt",
                 &mut (|(mut out, in_limbs, limb)| {
-                    _limbs_div_limb_to_out_alt(&mut out, &in_limbs, limb)
+                    limbs_div_limb_to_out_alt(&mut out, &in_limbs, limb)
                 }),
             ),
         ],
@@ -438,7 +441,7 @@ fn benchmark_limbs_div_limb_in_place_algorithms(gm: GenerationMode, limit: usize
             ),
             (
                 "alt",
-                &mut (|(mut limbs, limb)| _limbs_div_limb_in_place_alt(&mut limbs, limb)),
+                &mut (|(mut limbs, limb)| limbs_div_limb_in_place_alt(&mut limbs, limb)),
             ),
         ],
     );

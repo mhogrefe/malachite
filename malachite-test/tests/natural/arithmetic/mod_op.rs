@@ -30,7 +30,7 @@ use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_9, pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
-    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
+    pairs_of_nonempty_unsigned_vec_and_unsigned_var_1, pairs_of_unsigned_and_positive_unsigned,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_10,
     quadruples_of_limb_vec_var_1, quadruples_of_three_limb_vecs_and_limb_var_2,
     sextuples_of_limbs_var_1, triples_of_limb_vec_var_45, triples_of_two_limb_vecs_and_limb_var_1,
@@ -10530,6 +10530,13 @@ fn mod_properties() {
             assert_eq!(x * y % z, (x % z) * (y % z) % z);
         },
     );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_unsigned::<Limb, Limb>,
+        |&(x, y)| {
+            assert_eq!(Natural::from(x) % Natural::from(y), x % y);
+        },
+    );
 }
 
 fn neg_mod_properties_helper(x: &Natural, y: &Natural) {
@@ -10598,6 +10605,13 @@ fn neg_mod_properties() {
         |&(ref x, ref y, ref z)| {
             assert_eq!((x + y).neg_mod(z), (x % z + y % z).neg_mod(z));
             assert_eq!((x * y).neg_mod(z), ((x % z) * (y % z)).neg_mod(z));
+        },
+    );
+
+    test_properties(
+        pairs_of_unsigned_and_positive_unsigned::<Limb, Limb>,
+        |&(x, y)| {
+            assert_eq!(Natural::from(x).neg_mod(Natural::from(y)), x.neg_mod(y));
         },
     );
 }

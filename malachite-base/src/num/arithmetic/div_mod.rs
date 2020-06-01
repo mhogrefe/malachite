@@ -97,7 +97,6 @@ macro_rules! impl_div_mod_unsigned {
             /// // 2 * 10 + 3 = 23
             /// assert_eq!(23u8.div_rem(10), (2, 3));
             ///
-            ///
             /// // 9 * 5 + 0 = 45
             /// assert_eq!(45u32.div_rem(5), (9, 0));
             /// ```
@@ -162,7 +161,6 @@ macro_rules! impl_div_mod_unsigned {
             ///
             /// // 3 * 10 - 7 = 23
             /// assert_eq!(23u8.ceiling_div_neg_mod(10), (3, 7));
-            ///
             ///
             /// // 9 * 5 + 0 = 45
             /// assert_eq!(45u32.ceiling_div_neg_mod(5), (9, 0));

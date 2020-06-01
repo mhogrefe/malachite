@@ -411,7 +411,7 @@ fn benchmark_integer_ceiling_mod_algorithms(gm: GenerationMode, limit: usize, fi
         &mut [
             ("standard", &mut (|(x, y)| no_out!(x.ceiling_mod(y)))),
             (
-                "using ceiling_div_ceiling_mod",
+                "using ceiling_div_mod",
                 &mut (|(x, y)| no_out!(x.ceiling_div_mod(y).1)),
             ),
         ],
