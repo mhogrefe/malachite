@@ -946,6 +946,20 @@ pub trait CeilingModAssign<RHS = Self> {
     fn ceiling_mod_assign(&mut self, other: RHS);
 }
 
+/// Divides a value by another value and rounds according to a specified rounding mode. See the
+/// `RoundingMode` documentation for details.
+pub trait DivRound<RHS = Self> {
+    type Output;
+
+    fn div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Divides a value by another value in place and rounds according to a specified rounding mode. See
+/// the `RoundingMode` documentation for details.
+pub trait DivRoundAssign<RHS = Self> {
+    fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -1012,16 +1026,6 @@ pub trait NextPowerOfTwoAssign {
 
 pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
-}
-
-pub trait DivRound<RHS = Self> {
-    type Output;
-
-    fn div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
-}
-
-pub trait DivRoundAssign<RHS = Self> {
-    fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
 pub trait DivExact<RHS = Self> {

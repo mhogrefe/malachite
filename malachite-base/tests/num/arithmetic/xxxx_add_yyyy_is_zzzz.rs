@@ -1,6 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
+#[allow(clippy::too_many_arguments)]
 fn test_xxxx_add_yyyy_is_zzzz() {
     fn test<T: PrimitiveUnsigned>(
         x_3: T,

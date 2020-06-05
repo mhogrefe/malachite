@@ -1,11 +1,10 @@
 use num::arithmetic::traits::{
-    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, DivRound, FloorLogTwo, IsPowerOfTwo,
-    NextPowerOfTwo, NextPowerOfTwoAssign, Parity,
+    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, FloorLogTwo, IsPowerOfTwo, NextPowerOfTwo,
+    NextPowerOfTwoAssign,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
-use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
@@ -108,37 +107,6 @@ macro_rules! impl_arithmetic_traits {
                     floor_log_two
                 } else {
                     floor_log_two + 1
-                }
-            }
-        }
-
-        impl DivRound for $t {
-            type Output = $t;
-
-            fn div_round(self, other: $t, rm: RoundingMode) -> $t {
-                let quotient = self / other;
-                if rm == RoundingMode::Down || rm == RoundingMode::Floor {
-                    quotient
-                } else {
-                    let remainder = self % other;
-                    match rm {
-                        _ if remainder == 0 => quotient,
-                        RoundingMode::Up | RoundingMode::Ceiling => quotient + 1,
-                        RoundingMode::Nearest => {
-                            let shifted_other = other >> 1;
-                            if remainder > shifted_other
-                                || remainder == shifted_other && other.even() && quotient.odd()
-                            {
-                                quotient + 1
-                            } else {
-                                quotient
-                            }
-                        }
-                        RoundingMode::Exact => {
-                            panic!("Division is not exact: {} / {}", self, other);
-                        }
-                        _ => unreachable!(),
-                    }
                 }
             }
         }

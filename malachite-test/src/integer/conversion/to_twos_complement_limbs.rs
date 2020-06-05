@@ -290,7 +290,6 @@ fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -322,7 +321,6 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,

@@ -34,6 +34,7 @@ pub mod base {
             pub mod checked_add_mul;
             pub mod checked_sub_mul;
             pub mod div_mod;
+            pub mod div_round;
             pub mod divisible_by_power_of_two;
             pub mod eq_mod_power_of_two;
             pub mod log_two;

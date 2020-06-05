@@ -5,21 +5,13 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 
 use natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
-
-pub fn _limbs_precompute_mod_mul_two_limbs_alt(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
-    let out_limbs = (Natural::power_of_two(Limb::WIDTH << 2)
-        / Natural::from(DoubleLimb::join_halves(m_1, m_0)))
-    .into_limbs_asc();
-    assert_eq!(out_limbs.len(), 3);
-    (out_limbs[2], out_limbs[1], out_limbs[0])
-}
 
 /// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 ///
@@ -45,24 +37,6 @@ pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb,
     }
     assert_ne!(out_limbs[2], 0);
     (out_limbs[2], out_limbs[1], out_limbs[0])
-}
-
-/// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0. Both [x_0, x_1] and [y_0, y_1]
-/// must be less than [m_0, m_1].
-pub fn _limbs_mod_mul_two_limbs_naive(
-    x_1: Limb,
-    x_0: Limb,
-    y_1: Limb,
-    y_0: Limb,
-    m_1: Limb,
-    m_0: Limb,
-) -> (Limb, Limb) {
-    DoubleLimb::exact_from(
-        Natural::from(DoubleLimb::join_halves(x_1, x_0))
-            * Natural::from(DoubleLimb::join_halves(y_1, y_0))
-            % Natural::from(DoubleLimb::join_halves(m_1, m_0)),
-    )
-    .split_in_half()
 }
 
 /// Standard Barrett reduction: (set r = `Limb::WIDTH`)

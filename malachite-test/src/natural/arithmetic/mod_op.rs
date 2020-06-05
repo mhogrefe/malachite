@@ -18,6 +18,7 @@ use malachite_nz::natural::arithmetic::mod_op::{
     limbs_mod_by_two_limb_normalized, limbs_mod_limb, limbs_mod_three_limb_by_two_limb,
     limbs_mod_to_out,
 };
+use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
 use num::Integer;
 use rug::ops::RemRounding;
 
@@ -149,10 +150,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_neg_mod_evaluation_strategy
     );
-}
-
-pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {
-    -x.rem_ceil(y)
 }
 
 fn demo_limbs_mod_limb(gm: GenerationMode, limit: usize) {

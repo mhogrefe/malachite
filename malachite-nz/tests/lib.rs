@@ -137,5 +137,13 @@ pub mod natural {
         pub mod divisible_by;
         pub mod divisible_by_power_of_two;
         pub mod eq_mod;
+        pub mod eq_mod_power_of_two;
+        pub mod is_power_of_two;
+        pub mod log_two;
+        pub mod mod_add;
+        pub mod mod_is_reduced;
+        pub mod mod_mul;
+        pub mod mod_neg;
+        pub mod mod_op;
     }
 }

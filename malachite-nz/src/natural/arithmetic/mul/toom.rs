@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::round::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
@@ -172,7 +172,7 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
     let ys_len = ys.len();
     if !TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
-    } else if 4 * xs_len < 5 * ys_len {
+    } else if xs_len << 2 < 5 * ys_len {
         _limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     } else if _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len) {
         _limbs_mul_greater_to_out_toom_32(out, xs, ys, scratch);
@@ -344,7 +344,7 @@ pub fn _limbs_mul_greater_to_out_toom_22(
 ///
 /// This is mpn_toom32_mul_itch from gmp-impl.h, GMP 6.1.2.
 pub fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
-    let n = if 2 * xs_len >= 3 * ys_len {
+    let n = if xs_len << 1 >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
         (ys_len - 1) >> 1
@@ -370,12 +370,12 @@ pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     ys_len != 0 && xs_len >= ys_len + 2 && {
-        let n = 1 + if 2 * xs_len >= 3 * ys_len {
+        let n = 1 + if xs_len << 1 >= 3 * ys_len {
             (xs_len - 1) / 3
         } else {
             (ys_len - 1) >> 1
         };
-        xs_len >= 2 * n
+        xs_len >= n << 1
             && ys_len <= n << 1
             && xs_len + 6 <= 3 * ys_len
             && xs_len <= ys_len + n
@@ -427,7 +427,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = 1 + if 2 * xs_len >= 3 * ys_len {
+    let n = 1 + if xs_len << 1 >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
         (ys_len - 1) >> 1
@@ -1045,7 +1045,7 @@ pub fn _limbs_mul_greater_to_out_toom_42(
     assert!(*as2_last <= 14);
     assert!(bs2[n] <= 2);
     let (v_neg_1, v_2) = scratch.split_at_mut(2 * n + 1);
-    split_into_chunks_mut!(out, 2 * n, [v_0, v_1], v_inf);
+    split_into_chunks_mut!(out, n << 1, [v_0, v_1], v_inf);
     // v_neg_1, 2 * n + 1 limbs
     _limbs_mul_same_length_to_out_toom_42_recursive(v_neg_1, asm1_init, bsm1);
     let (v_neg_1_last, v_neg_1_init) = v_neg_1.split_last_mut().unwrap();
@@ -1115,7 +1115,7 @@ pub fn _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// This is mpn_toom43_mul_itch from gmp-impl.h, GMP 6.1.2.
 pub fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usize) -> usize {
-    let n = 1 + if 3 * xs_len >= 4 * ys_len {
+    let n = 1 + if 3 * xs_len >= ys_len << 2 {
         (xs_len - 1) >> 2
     } else {
         (ys_len - 1) / 3
@@ -1187,7 +1187,7 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     let mut v_neg_1_neg = false;
     let mut v_neg_2_neg = false;
     split_into_chunks_mut!(out, m, [bs1, bsm2, bs2, as2, as1], _unused);
-    split_into_chunks_mut!(&mut scratch[2 * n + 2..], m, [bsm1, asm1], asm2);
+    split_into_chunks_mut!(&mut scratch[m << 1..], m, [bsm1, asm1], asm2);
     // Compute as2 and asm2.
     if _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(as2, asm2, xs, n, asm1) {
         v_neg_2_neg = true;
@@ -1244,7 +1244,7 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     split_into_chunks_mut!(out, m, [_unused, out_lo, bs2, as2], _unused);
     limbs_mul_same_length_to_out(v_neg_2, &asm2[..m], out_lo); // W2
     limbs_mul_same_length_to_out(&mut scratch[4 * n + 2..], as2, bs2);
-    let (bs1, remainder) = out.split_at_mut(2 * n);
+    let (bs1, remainder) = out.split_at_mut(n << 1);
     let (v_1, as1) = remainder.split_at_mut(2 * n + 4);
     // v_1, 2 * n + 1 limbs
     limbs_mul_same_length_to_out(v_1, &as1[..m], &bs1[..m]); // W3
@@ -1449,7 +1449,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
     // Clobbers amx, bmx.
     // v_1, 2 * n + 1 limbs
     _limbs_mul_same_length_to_out_toom_44_recursive(v_1, &apx[..n + 1], &bpx[..n + 1]);
-    let (v_0, v_inf) = out.split_at_mut(2 * n); // v_0 length: 2 * n
+    let (v_0, v_inf) = out.split_at_mut(n << 1); // v_0 length: 2 * n
     let v_inf = &mut v_inf[n << 2..];
     _limbs_mul_same_length_to_out_toom_44_recursive(v_0, xs_0, ys_0);
     if s > t {
@@ -1482,7 +1482,7 @@ pub fn _limbs_mul_greater_to_out_toom_44(
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     ys_len != 0 && xs_len >= ys_len && {
-        let n = 1 + if 2 * xs_len >= 5 * ys_len {
+        let n = 1 + if xs_len << 1 >= 5 * ys_len {
             (xs_len - 1) / 5
         } else {
             (ys_len - 1) >> 1
@@ -1583,7 +1583,7 @@ pub fn _limbs_mul_greater_to_out_toom_52(
     let mut v_neg_2_neg;
     let m = n + 1;
     split_into_chunks_mut!(out, m, [bs1, bsm2, bs2, as2, as1], _unused);
-    let (v_neg_1, scratch_hi) = scratch.split_at_mut(2 * n + 2);
+    let (v_neg_1, scratch_hi) = scratch.split_at_mut(m << 1);
     split_into_chunks_mut!(scratch_hi, m, [bsm1, asm1, asm2], _unused);
     let asm2 = asm2;
     let bsm1 = &mut bsm1[..n];
@@ -2074,7 +2074,7 @@ pub fn _limbs_mul_greater_to_out_toom_54(
     };
     assert!(n > 2);
     let m = n + 1;
-    let a4 = &xs[4 * n..];
+    let a4 = &xs[n << 2..];
     let b3 = &ys[3 * n..];
     let s = a4.len();
     assert_ne!(s, 0);
@@ -2096,7 +2096,7 @@ pub fn _limbs_mul_greater_to_out_toom_54(
     let out_lo_lo = &mut out_lo[..m];
     let neg_2_pow_sign =
         _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 4, xs, n, 2, out_lo_lo)
-            ^ _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, 3, ys, n, 2, out_lo_lo);
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, 3, ys, n, 2, out_lo_lo);
     // X(-4) * Y(-4)
     _limbs_mul_same_length_to_out_toom_54_recursive(out_lo, v0, v1);
     // X(+4) * Y(+4)
@@ -2836,7 +2836,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
     // Decomposition
     // Can not handle too much unbalance
     assert!(ys_len >= 42);
-    assert!(xs_len * 3 < ys_len * 8 || ys_len >= 46 && xs_len * 6 < ys_len * 17);
+    assert!(xs_len * 3 < ys_len << 3 || ys_len >= 46 && xs_len * 6 < ys_len * 17);
     let n;
     let mut half = false;
     let (p, q, pn, qn) = if xs_len * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * ys_len {
@@ -2976,7 +2976,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
     // X(2) * Y(2)
     let (out_lo, r2) = out.split_at_mut(7 * n);
     let (v3, scratch3) = scratch2.split_at_mut(m);
-    let (r2_v1, v2) = r2.split_at_mut(2 * m);
+    let (r2_v1, v2) = r2.split_at_mut(m << 1);
     let v2 = &mut v2[..m];
     {
         let (r2, v1) = r2_v1.split_at_mut(m);
@@ -3002,8 +3002,6 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
 const TOOM_8H_LIMIT_NUMERATOR: usize = 21;
 const TOOM_8H_LIMIT_DENOMINATOR: usize = 20;
 
-//TODO clean
-
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
@@ -3011,109 +3009,91 @@ const TOOM_8H_LIMIT_DENOMINATOR: usize = 20;
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_greater_to_out_toom_8h` are valid.
 pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    if xs_len == 0 || xs_len < ys_len {
-        return false;
-    }
-
-    if !(ys_len >= 86
-        && xs_len <= ys_len * 4
-        && (Limb::WIDTH > 11 * 3 || xs_len * 4 <= ys_len * 11)
-        && (Limb::WIDTH > 10 * 3 || xs_len <= ys_len * 2)
-        && (Limb::WIDTH > 9 * 3 || xs_len * 2 <= ys_len * 3))
+    if xs_len == 0
+        || ys_len < 86
+        || xs_len < ys_len
+        || xs_len > ys_len << 2
+        || Limb::WIDTH <= 11 * 3 && xs_len << 2 > ys_len * 11
+        || Limb::WIDTH <= 10 * 3 && xs_len > ys_len << 1
+        || Limb::WIDTH <= 9 * 3 && xs_len << 1 > ys_len * 3
     {
         return false;
     }
     let n;
-    let mut p;
-    let mut q;
-    let mut half;
-    let mut s;
-    let mut t;
-    if xs_len == ys_len
+    let mut half = false;
+    let mut xl = xs_len;
+    let mut yl = ys_len;
+    let (xr, yr) = if xs_len == ys_len
         || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
         // xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
         // This is the slowest variation
-        half = false;
         n = 1 + ((xs_len - 1) >> 3);
-        s = isize::exact_from(xs_len) - 7 * isize::exact_from(n);
-        t = isize::exact_from(ys_len) - 7 * isize::exact_from(n);
+        let n7 = 7 * n;
+        (n7, n7)
     } else {
-        if xs_len * 13 < 16 * ys_len {
+        let (p, q) = if xs_len * 13 < ys_len << 4 {
             // xs_len < 16 / 13 * ys_len, half
-            p = 9;
-            q = 8;
+            (9, 8)
         } else if Limb::WIDTH <= 9 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
                 < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
         {
             // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
-            p = 9;
-            q = 7;
+            (9, 7)
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
             // xs_len < 33 / 20 * ys_len, half
-            p = 10;
-            q = 7;
+            (10, 7)
         } else if Limb::WIDTH <= 10 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
         {
             // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
-            p = 10;
-            q = 6;
+            (10, 6)
         } else if xs_len * 6 < 13 * ys_len {
             // xs_len < 13 / 6 * ys_len, half
-            p = 11;
-            q = 6;
-        } else if Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len {
+            (11, 6)
+        } else if Limb::WIDTH <= 11 * 3 || xs_len << 2 < 9 * ys_len {
             // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
-            p = 11;
-            q = 5;
+            (11, 5)
         } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
             // xs_len < 20 / 7 * ys_len, half
-            p = 12;
-            q = 5;
+            (12, 5)
         } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
             // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
-            p = 12;
-            q = 4;
+            (12, 4)
         } else {
             // half
-            p = 13;
-            q = 4;
-        }
-
-        half = !p.eq_mod_power_of_two(q, 1);
+            (13, 4)
+        };
         n = 1 + if q * xs_len >= p * ys_len {
             (xs_len - 1) / p
         } else {
             (ys_len - 1) / q
         };
-        p -= 1;
-        q -= 1;
-
-        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
-        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
-
-        if half {
+        let pn = (p - 1) * n;
+        let qn = (q - 1) * n;
+        if !p.eq_mod_power_of_two(q, 1) {
             // Recover from badly chosen splitting
-            if s < 1 {
-                s += isize::exact_from(n);
-                half = false;
-            } else if t < 1 {
-                t += isize::exact_from(n);
-                half = false;
+            if xs_len <= pn {
+                xl += n;
+            } else if ys_len <= qn {
+                yl += n;
+            } else {
+                half = true;
             }
         }
+        (pn, qn)
+    };
+    xl > xr && yl > yr && {
+        let (s, t) = (xl - xr, yl - yr);
+        let limit = 15 * n + 6;
+        s <= n
+            && t <= n
+            && (half || s + t > 3)
+            && n > 2
+            && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)
+            && limit <= _limbs_square_to_out_toom_8_scratch_len(n << 3)
     }
-    let limit = 15 * n + 6;
-    0 < s
-        && s <= isize::exact_from(n)
-        && 0 < t
-        && t <= isize::exact_from(n)
-        && (half || s + t > 3)
-        && n > 2
-        && limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)
-        && limit <= _limbs_square_to_out_toom_8_scratch_len(n << 3)
 }
 
 // Implementation of the multiplication algorithm for Toom-Cook 8.5-way.
@@ -3124,15 +3104,15 @@ pub(crate) const BIT_CORRECTION: bool = true;
 pub(crate) const BIT_CORRECTION: bool = false;
 
 const TOOM_8H_MAYBE_MUL_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < 8 * MUL_TOOM22_THRESHOLD;
+    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM22_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM22: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < 8 * MUL_TOOM33_THRESHOLD;
+    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM33_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM33: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < 8 * MUL_TOOM44_THRESHOLD;
+    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM44_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM44: bool =
-    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < 8 * MUL_TOOM6H_THRESHOLD;
+    TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM6H_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM8H: bool =
-    TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 8 * MUL_TOOM8H_THRESHOLD;
+    TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= MUL_TOOM8H_THRESHOLD << 3;
 
 /// Time: O(n<sup>log<sub>7</sub>(15)</sup>)
 ///
@@ -3177,14 +3157,13 @@ fn _limbs_mul_toom_8h_min_threshold() -> usize {
 
 // This is mpn_toom8_mul_n_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
-    let itch = ((isize::exact_from(n) * 15) >> 3)
-        - ((isize::exact_from(_limbs_mul_toom_8h_min_threshold()) * 15) >> 3)
-        + isize::exact_from(max(
-            ((_limbs_mul_toom_8h_min_threshold() * 15) >> 3)
-                + usize::wrapping_from(Limb::WIDTH) * 6,
+    let t = (_limbs_mul_toom_8h_min_threshold() * 15) >> 3;
+    ((n * 15) >> 3)
+        + max(
+            t + usize::wrapping_from(Limb::WIDTH) * 6,
             _limbs_mul_same_length_to_out_toom_6h_scratch_len(_limbs_mul_toom_8h_min_threshold()),
-        ));
-    usize::exact_from(itch)
+        )
+        - t
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -3233,78 +3212,58 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-
     // Decomposition
     // Can not handle too small operands
     assert!(ys_len >= 86);
     // Can not handle too much unbalance
-    assert!(xs_len <= ys_len * 4);
-    assert!(Limb::WIDTH > 11 * 3 || xs_len * 4 <= ys_len * 11);
-    assert!(Limb::WIDTH > 10 * 3 || xs_len <= ys_len * 2);
-    assert!(Limb::WIDTH > 9 * 3 || xs_len * 2 <= ys_len * 3);
-
+    assert!(xs_len <= ys_len << 2);
+    assert!(Limb::WIDTH > 11 * 3 || xs_len << 2 <= ys_len * 11);
+    assert!(Limb::WIDTH > 10 * 3 || xs_len <= ys_len << 1);
+    assert!(Limb::WIDTH > 9 * 3 || xs_len << 1 <= ys_len * 3);
     let n;
-    let mut p;
-    let mut q;
-    let mut half;
-    let mut s;
-    let mut t;
-    if xs_len == ys_len
+    let mut half = false;
+    let (p, q, pn, qn) = if xs_len == ys_len
         || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
         // xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
         // This is the slowest variation
-        half = false;
         n = 1 + ((xs_len - 1) >> 3);
-        p = 7;
-        q = 7;
-        s = isize::exact_from(xs_len) - 7 * isize::exact_from(n);
-        t = isize::exact_from(ys_len) - 7 * isize::exact_from(n);
+        let n7 = 7 * n;
+        (7, 7, n7, n7)
     } else {
-        if xs_len * 13 < 16 * ys_len {
+        let (mut p, mut q) = if xs_len * 13 < ys_len << 4 {
             // xs_len < 16 / 13 * ys_len, half
-            p = 9;
-            q = 8;
+            (9, 8)
         } else if Limb::WIDTH <= 9 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
                 < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
         {
             // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
-            p = 9;
-            q = 7;
+            (9, 7)
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
             // xs_len < 33 / 20 * ys_len, half
-            p = 10;
-            q = 7;
+            (10, 7)
         } else if Limb::WIDTH <= 10 * 3
             || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
         {
             // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
-            p = 10;
-            q = 6;
+            (10, 6)
         } else if xs_len * 6 < 13 * ys_len {
             // xs_len < 13 / 6 * ys_len, half
-            p = 11;
-            q = 6;
-        } else if Limb::WIDTH <= 11 * 3 || xs_len * 4 < 9 * ys_len {
+            (11, 6)
+        } else if Limb::WIDTH <= 11 * 3 || xs_len << 2 < 9 * ys_len {
             // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
-            p = 11;
-            q = 5;
+            (11, 5)
         } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
             // xs_len < 20 / 7 * ys_len, half
-            p = 12;
-            q = 5;
+            (12, 5)
         } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
             // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
-            p = 12;
-            q = 4;
+            (12, 4)
         } else {
             // half
-            p = 13;
-            q = 4;
-        }
-
-        half = !p.eq_mod_power_of_two(q, 1);
+            (13, 4)
+        };
         n = 1 + if q * xs_len >= p * ys_len {
             (xs_len - 1) / p
         } else {
@@ -3312,204 +3271,163 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         };
         p -= 1;
         q -= 1;
-
-        s = isize::exact_from(xs_len) - isize::exact_from(p * n);
-        t = isize::exact_from(ys_len) - isize::exact_from(q * n);
-
-        if half {
+        let mut pn = p * n;
+        let mut qn = q * n;
+        if !p.eq_mod_power_of_two(q, 1) {
             // Recover from badly chosen splitting
-            if s < 1 {
+            if xs_len <= pn {
                 p -= 1;
-                s += isize::exact_from(n);
-                half = false;
-            } else if t < 1 {
+                pn -= n;
+            } else if ys_len <= qn {
                 q -= 1;
-                t += isize::exact_from(n);
-                half = false;
+                qn -= n;
+            } else {
+                half = true;
             }
         }
-    }
-
-    assert!(0 < s && s <= isize::exact_from(n));
-    assert!(0 < t && t <= isize::exact_from(n));
-    assert!(half || s + t > 3);
+        (p, q, pn, qn)
+    };
     assert!(n > 2);
-    let s = usize::exact_from(s);
-    let t = usize::exact_from(t);
+    assert!(xs_len > pn);
+    let s = xs_len - pn;
+    assert!(s <= n);
+    assert!(ys_len > qn);
+    let t = ys_len - qn;
+    assert!(t <= n);
+    assert!(half || s + t > 3);
     let m = n + 1;
+    let u = m + n; // 2 * n + 1
     let r = 3 * n + 1;
-
     // Also allocate 3 * n + 1 limbs for `scratch2`. `_limbs_mul_toom_interpolate_16_points` may
     // need all of them.
     let limit = 5 * r;
     assert!(limit <= _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len));
     assert!(limit <= _limbs_square_to_out_toom_8_scratch_len(n << 3));
-
     // Evaluation and recursive calls
-    let v_neg_4_neg;
-    {
-        let (pp_lo, remainder) = out.split_at_mut(3 * n);
-        let (r6, remainder) = remainder.split_at_mut(n << 2);
-        let (r4, remainder) = remainder.split_at_mut(n << 2);
-        split_into_chunks_mut!(remainder, m, [v0, v1, v2], _unused);
-        let v_neg_8th_neg;
-        {
-            let (r7, remainder) = scratch.split_at_mut(r);
-            let (v3, scratch2) = remainder[3 * r..].split_at_mut(m);
-            // 1/8, -1/8
-            v_neg_8th_neg = {
-                let pp_lo = &mut pp_lo[..m];
-                _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                    v2, v0, p, xs, n, 3, pp_lo,
-                ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                    v3, v1, q, ys, n, 3, pp_lo,
-                )
-            };
-            // X(-1/8) * Y(-1/8) * 8^
-            // X(1/8) * Y(1/8) * 8^
-            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-            _limbs_mul_same_length_to_out_toom_8h_recursive(r7, v2, v3, scratch2);
-        }
-        let limit = if BIT_CORRECTION { 2 * n + 2 } else { 2 * n + 1 };
-        {
-            let pp_lo = &mut pp_lo[..limit];
-            if half {
-                _limbs_toom_couple_handling(scratch, pp_lo, v_neg_8th_neg, n, 6, 3);
-            } else {
-                _limbs_toom_couple_handling(scratch, pp_lo, v_neg_8th_neg, n, 3, 0);
-            }
-        }
-        let v_neg_8_neg;
-        {
-            split_into_chunks_mut!(scratch, r, [_unused, r5, r3, r1], remainder);
-            let (v3, scratch2) = remainder.split_at_mut(m);
-            // 1/4, -1/4
-            let v_neg_quarter_neg = {
-                let pp_lo = &mut pp_lo[..m];
-                _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                    v2, v0, p, xs, n, 2, pp_lo,
-                ) != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                    v3, v1, q, ys, n, 2, pp_lo,
-                )
-            };
-            // X(-1/4) * Y(-1/4) * 4^
-            // X(1/4) * Y(1/4) * 4^
-            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-            _limbs_mul_same_length_to_out_toom_8h_recursive(r5, v2, v3, scratch2);
-            {
-                let pp_lo = &mut pp_lo[..2 * n + 1];
-                if half {
-                    _limbs_toom_couple_handling(r5, pp_lo, v_neg_quarter_neg, n, 4, 2);
-                } else {
-                    _limbs_toom_couple_handling(r5, pp_lo, v_neg_quarter_neg, n, 2, 0);
-                }
-            }
-            // 2, -2
-            let v_neg_2_neg = {
-                let pp_lo = &mut pp_lo[..m];
-                _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, xs, n, pp_lo)
-                    ^ _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v3, v1, q, ys, n, pp_lo)
-            };
-            // X(-2) * Y(-2)
-            // X(2) * Y(2)
-            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-            _limbs_mul_same_length_to_out_toom_8h_recursive(r3, v2, v3, scratch2);
-            _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], v_neg_2_neg, n, 1, 2);
-
-            // 8, -8
-            v_neg_8_neg = {
-                let pp_lo = &mut pp_lo[..m];
-                _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 3, pp_lo)
-                    != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-                        v3, v1, q, ys, n, 3, pp_lo,
-                    )
-            };
-            // X(-8) * Y(-8)
-            // X(8) * Y(8)
-            _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-            _limbs_mul_same_length_to_out_toom_8h_recursive(r1, v2, v3, scratch2);
-        }
-        _limbs_toom_couple_handling(
-            &mut scratch[3 * r..],
-            &mut pp_lo[..limit],
-            v_neg_8_neg,
-            n,
-            3,
-            6,
-        );
-        let (v3, scratch2) = scratch[r << 2..].split_at_mut(m);
-        // 1/2, -1/2
-        let v_neg_half_neg = {
-            let pp_lo = &mut pp_lo[..m];
-            _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 1, pp_lo)
-                != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-                    v3, v1, q, ys, n, 1, pp_lo,
-                )
-        };
-        // X(-1/2) * Y(-1/2) * 2^
-        // X(1/2) * Y(1/2) * 2^
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r6, v2, v3, scratch2);
-        {
-            let pp_lo = &mut pp_lo[..2 * n + 1];
-            if half {
-                _limbs_toom_couple_handling(r6, pp_lo, v_neg_half_neg, n, 2, 1);
-            } else {
-                _limbs_toom_couple_handling(r6, pp_lo, v_neg_half_neg, n, 1, 0);
-            }
-        }
-        // 1, -1
-        let v_neg_1_neg = {
-            let pp_lo = &mut pp_lo[..m];
-            let v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, pp_lo);
-            let flip = if Limb::WIDTH > 36 && q == 3 {
-                _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, pp_lo)
-            } else {
-                _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, ys, n, pp_lo)
-            };
-            if flip {
-                !v_neg_1_neg
-            } else {
-                v_neg_1_neg
-            }
-        };
-        // X(-1) * Y(-1)
-        // X(1) * Y(1)
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r4, v2, v3, scratch2);
-        _limbs_toom_couple_handling(r4, &mut pp_lo[..2 * n + 1], v_neg_1_neg, n, 0, 0);
-
-        // 4, -4
-        v_neg_4_neg = {
-            let pp_lo = &mut pp_lo[..m];
-            _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 2, pp_lo)
-                != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, ys, n, 2, pp_lo)
-        };
-        // X(-4) * Y(-4)
-        // X(4) * Y(4)
-        _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    let (pp_lo, remainder) = out.split_at_mut(3 * n);
+    split_into_chunks_mut!(remainder, n << 2, [r6, r4], remainder);
+    split_into_chunks_mut!(remainder, m, [v0, v1, v2], _unused);
+    let (r7, remainder) = scratch.split_at_mut(r);
+    let (v3, scratch2) = remainder[3 * r..].split_at_mut(m);
+    // 1/8, -1/8
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_8th_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 3, pp_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3, v1, q, ys, n, 3, pp_lo_lo,
+            );
+    // X(-1/8) * Y(-1/8) * 8^
+    // X(1/8) * Y(1/8) * 8^
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r7, v2, v3, scratch2);
+    let limit = if BIT_CORRECTION { m << 1 } else { u };
+    let pp_lo_lo = &mut pp_lo[..limit];
+    if half {
+        _limbs_toom_couple_handling(scratch, pp_lo_lo, v_neg_8th_neg, n, 6, 3);
+    } else {
+        _limbs_toom_couple_handling(scratch, pp_lo_lo, v_neg_8th_neg, n, 3, 0);
     }
+    split_into_chunks_mut!(scratch, r, [_unused, r5, r3, r1], remainder);
+    let (v3, scratch2) = remainder.split_at_mut(m);
+    // 1/4, -1/4
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_quarter_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 2, pp_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3, v1, q, ys, n, 2, pp_lo_lo,
+            );
+    // X(-1/4) * Y(-1/4) * 4^
+    // X(1/4) * Y(1/4) * 4^
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r5, v2, v3, scratch2);
+    let pp_lo_lo = &mut pp_lo[..u];
+    if half {
+        _limbs_toom_couple_handling(r5, pp_lo_lo, v_neg_quarter_neg, n, 4, 2);
+    } else {
+        _limbs_toom_couple_handling(r5, pp_lo_lo, v_neg_quarter_neg, n, 2, 0);
+    }
+    // 2, -2
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_2_neg = _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, p, xs, n, pp_lo_lo)
+        != _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v3, v1, q, ys, n, pp_lo_lo);
+    // X(-2) * Y(-2)
+    // X(2) * Y(2)
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r3, v2, v3, scratch2);
+    _limbs_toom_couple_handling(r3, &mut pp_lo[..u], v_neg_2_neg, n, 1, 2);
+    // 8, -8
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_8_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 3, pp_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, ys, n, 3, pp_lo_lo);
+    // X(-8) * Y(-8)
+    // X(8) * Y(8)
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r1, v2, v3, scratch2);
+    _limbs_toom_couple_handling(
+        &mut scratch[3 * r..],
+        &mut pp_lo[..limit],
+        v_neg_8_neg,
+        n,
+        3,
+        6,
+    );
+    let (v3, scratch2) = scratch[r << 2..].split_at_mut(m);
+    // 1/2, -1/2
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_half_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 1, pp_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3, v1, q, ys, n, 1, pp_lo_lo,
+            );
+    // X(-1/2) * Y(-1/2) * 2^
+    // X(1/2) * Y(1/2) * 2^
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r6, v2, v3, scratch2);
+    let pp_lo_lo = &mut pp_lo[..u];
+    if half {
+        _limbs_toom_couple_handling(r6, pp_lo_lo, v_neg_half_neg, n, 2, 1);
+    } else {
+        _limbs_toom_couple_handling(r6, pp_lo_lo, v_neg_half_neg, n, 1, 0);
+    }
+    // 1, -1
+    let pp_lo_lo = &mut pp_lo[..m];
+    let mut v_neg_1_neg = _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, pp_lo_lo);
+    if if Limb::WIDTH > 36 && q == 3 {
+        _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, pp_lo_lo)
+    } else {
+        _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, ys, n, pp_lo_lo)
+    } {
+        v_neg_1_neg.not_assign();
+    }
+    // X(-1) * Y(-1)
+    // X(1) * Y(1)
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r4, v2, v3, scratch2);
+    _limbs_toom_couple_handling(r4, &mut pp_lo[..u], v_neg_1_neg, n, 0, 0);
+    // 4, -4
+    let pp_lo_lo = &mut pp_lo[..m];
+    let v_neg_4_neg =
+        _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, p, xs, n, 2, pp_lo_lo)
+            != _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v3, v1, q, ys, n, 2, pp_lo_lo);
+    // X(-4) * Y(-4)
+    // X(4) * Y(4)
+    _limbs_mul_same_length_to_out_toom_8h_recursive(pp_lo, v0, v1, scratch2);
     split_into_chunks_mut!(scratch, r, [r7, r5, r3, r1], scratch2);
-    {
-        let (v3, scratch3) = scratch2.split_at_mut(m);
-        let (r2, v2) = out[11 * n..].split_at_mut(2 * n + 2);
-        _limbs_mul_same_length_to_out_toom_8h_recursive(r2, &v2[..m], v3, scratch3);
-    }
-    {
-        let (pp_lo, r2) = out.split_at_mut(11 * n);
-        _limbs_toom_couple_handling(r2, &mut pp_lo[..2 * n + 1], v_neg_4_neg, n, 2, 4);
-    }
-
+    let (v3, scratch3) = scratch2.split_at_mut(m);
+    let (r2, v2) = out[11 * n..].split_at_mut(m << 1);
+    _limbs_mul_same_length_to_out_toom_8h_recursive(r2, &v2[..m], v3, scratch3);
+    let (pp_lo, r2) = out.split_at_mut(11 * n);
+    _limbs_toom_couple_handling(r2, &mut pp_lo[..u], v_neg_4_neg, n, 2, 4);
     // X(0) * Y(0)
     _limbs_mul_same_length_to_out_toom_8h_recursive(out, &xs[..n], &ys[..n], scratch2);
-
     // Infinity
     if half {
         let r0 = &mut out[15 * n..];
         if s > t {
-            _limbs_mul_to_out_toom_8h_recursive(r0, &xs[p * n..], &ys[q * n..]);
+            _limbs_mul_to_out_toom_8h_recursive(r0, &xs[pn..], &ys[qn..]);
         } else {
-            _limbs_mul_to_out_toom_8h_recursive(r0, &ys[q * n..], &xs[p * n..]);
+            _limbs_mul_to_out_toom_8h_recursive(r0, &ys[qn..], &xs[pn..]);
         }
     }
     _limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s + t, half, &mut scratch2[..r]);

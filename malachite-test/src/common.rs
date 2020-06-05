@@ -217,7 +217,6 @@ pub enum BenchmarkType {
     Algorithms,
 }
 
-#[allow(too_many_arguments)]
 pub(crate) fn m_run_benchmark<'a, I: Iterator>(
     title: &'a str,
     benchmark_type: BenchmarkType,

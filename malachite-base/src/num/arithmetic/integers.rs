@@ -1,9 +1,8 @@
 use num::arithmetic::traits::{
-    CheckedPow, DivExact, DivExactAssign, DivRound, DivRoundAssign, DivisibleBy, EqMod, Mod,
-    OverflowingPow, Pow, SaturatingPow, WrappingPow,
+    CheckedPow, DivExact, DivExactAssign, EqMod, Mod, OverflowingPow, Pow, SaturatingPow,
+    WrappingPow,
 };
 use num::conversion::traits::ExactFrom;
-use round::RoundingMode;
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
@@ -65,19 +64,6 @@ macro_rules! impl_arithmetic_traits {
             #[inline]
             fn div_exact_assign(&mut self, other: $t) {
                 *self /= other;
-            }
-        }
-
-        impl DivisibleBy for $t {
-            #[inline]
-            fn divisible_by(self, other: $t) -> bool {
-                self == 0 || other != 0 && self % other == 0
-            }
-        }
-
-        impl DivRoundAssign for $t {
-            fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
-                *self = self.div_round(other, rm);
             }
         }
 

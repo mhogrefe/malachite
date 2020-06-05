@@ -7,6 +7,7 @@ pub mod arithmetic_checked_shr;
 pub mod checked_add_mul;
 pub mod checked_sub_mul;
 pub mod div_mod;
+pub mod div_round;
 pub mod divisible_by_power_of_two;
 pub mod eq_mod_power_of_two;
 pub mod log_two;
@@ -71,6 +72,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     checked_add_mul::register(registry);
     checked_sub_mul::register(registry);
     div_mod::register(registry);
+    div_round::register(registry);
     divisible_by_power_of_two::register(registry);
     eq_mod_power_of_two::register(registry);
     log_two::register(registry);

@@ -197,7 +197,6 @@ fn benchmark_integer_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, fi
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_integer_to_bits_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,

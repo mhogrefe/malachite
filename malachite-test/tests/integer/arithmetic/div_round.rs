@@ -3,6 +3,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::round::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
@@ -10,11 +11,13 @@ use num::Integer as NumInteger;
 use rug::ops::DivRounding;
 
 use malachite_test::common::test_properties;
+use malachite_test::inputs::base::triples_of_signed_nonzero_signed_and_rounding_mode_var_1;
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_nonzero_integer, pairs_of_integer_and_nonzero_integer_var_2,
     pairs_of_integer_and_rounding_mode, pairs_of_nonzero_integer_and_rounding_mode,
     triples_of_integer_nonzero_integer_and_rounding_mode_var_1,
 };
+use malachite_test::inputs::natural::triples_of_natural_positive_natural_and_rounding_mode_var_1;
 
 #[test]
 fn div_round_properties() {
@@ -117,6 +120,26 @@ fn div_round_properties() {
             assert_eq!(x.div_round(x, rm), 1);
             assert_eq!(x.div_round(-x, rm), -1);
             assert_eq!((-x).div_round(x, rm), -1);
+        },
+    );
+
+    test_properties(
+        triples_of_natural_positive_natural_and_rounding_mode_var_1,
+        |&(ref x, ref y, rm)| {
+            assert_eq!(
+                Integer::from(x).div_round(Integer::from(y), rm),
+                x.div_round(y, rm)
+            );
+        },
+    );
+
+    test_properties(
+        triples_of_signed_nonzero_signed_and_rounding_mode_var_1::<SignedLimb>,
+        |&(x, y, rm)| {
+            assert_eq!(
+                Integer::from(x).div_round(Integer::from(y), rm),
+                x.div_round(y, rm)
+            );
         },
     );
 }

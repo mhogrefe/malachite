@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::{
     ModAdd, ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced,
-    ModPowerOfTwoNeg, ModPowerOfTwoSub, PowerOfTwo,
+    ModPowerOfTwoNeg, ModPowerOfTwoShl, ModPowerOfTwoSub, PowerOfTwo,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::BitAccess;
@@ -501,7 +501,10 @@ fn mod_power_of_two_add_properties() {
     test_properties(pairs_of_natural_and_u64_var_1, |&(ref x, pow)| {
         assert_eq!(x.mod_power_of_two_add(Natural::ZERO, pow), *x);
         assert_eq!(Natural::ZERO.mod_power_of_two_add(x, pow), *x);
-        //TODO assert_eq!(x + x, x << 1);
+        assert_eq!(
+            x.mod_power_of_two_add(x, pow),
+            x.mod_power_of_two_shl(1, pow)
+        );
     });
 
     test_properties(

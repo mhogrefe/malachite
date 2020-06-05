@@ -619,6 +619,15 @@ where
     )
 }
 
+// All pairs of signeds where the second is nonzero and the first is not divisible by the second.
+pub fn pairs_of_signeds_var_3<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(pairs_of_signed_and_nonzero_signed::<T, T>(gm).filter(|&(x, y)| !x.divisible_by(y)))
+}
+
 pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -803,6 +812,16 @@ pub fn pairs_of_unsigned_and_positive_unsigned<
             &(|seed| special_random_positive_unsigned(seed)),
         )),
     }
+}
+
+// All pairs of `T`s`, where `T` is unsigned, the second `T` is nonzero, and the first `T` is not
+// divisible by the second.
+pub fn pairs_of_unsigned_and_positive_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T)> {
+    Box::new(
+        pairs_of_unsigned_and_positive_unsigned::<T, T>(gm).filter(|&(x, y)| !x.divisible_by(y)),
+    )
 }
 
 pub fn pairs_of_signed_and_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned + Rand>(
@@ -1903,6 +1922,27 @@ pub fn pairs_of_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+pub fn pairs_of_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(lex_pairs(
+            exhaustive_positive(),
+            exhaustive_rounding_modes(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, RoundingMode)>
@@ -1921,6 +1961,39 @@ where
             &(|seed| random_rounding_modes(seed)),
         )),
     }
+}
+
+pub fn pairs_of_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, RoundingMode)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::ZERO))
+}
+
+// All pairs of `T`, and `RoundingMode`, where `T` is signed and the `T` is not equal to `T::MIN`.
+pub fn pairs_of_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, RoundingMode)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::MIN))
+}
+
+// All pairs of `T`, and `RoundingMode`, where `T` is signed and the `T` is not equal to zero or
+// `T::MIN`.
+pub fn pairs_of_signed_and_rounding_mode_var_2<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, RoundingMode)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::ZERO && x != T::MIN))
 }
 
 pub fn sextuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
@@ -6507,6 +6580,99 @@ where
                 }
             } else {
                 Some((n, i, rm))
+            }
+        }),
+    )
+}
+
+fn triples_of_unsigned_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_unsigned(), exhaustive_positive()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, positive `T`, and `RoundingMode`, where `T` is unsigned and if the
+// `RoundingMode` is `RoundingMode::Exact`, the first `T` is divisible by the second.
+pub fn triples_of_unsigned_positive_unsigned_and_rounding_mode_var_1<
+    T: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        triples_of_unsigned_positive_unsigned_and_rounding_mode::<T>(gm).filter_map(
+            |(x, y, rm)| {
+                if rm == RoundingMode::Exact {
+                    x.checked_mul(y).map(|product| (product, y, rm))
+                } else {
+                    Some((x, y, rm))
+                }
+            },
+        ),
+    )
+}
+
+fn triples_of_signed_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)>
+where
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+    T::UnsignedOfEqualWidth: Rand,
+{
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_signed(), exhaustive_nonzero_signed()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_nonzero_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, nonzero `T`, and `RoundingMode`, where `T` is signed, the `T`s are not
+// `(T::MIN, T::NEGATIVE_ONE)` and if the `RoundingMode` is `RoundingMode::Exact`, the first `T` is
+// divisible by the second.
+pub fn triples_of_signed_nonzero_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)>
+where
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+    T::UnsignedOfEqualWidth: Rand,
+{
+    Box::new(
+        triples_of_signed_nonzero_signed_and_rounding_mode::<T>(gm).filter_map(|(x, y, rm)| {
+            if x == T::MIN && y == T::NEGATIVE_ONE {
+                None
+            } else if rm == RoundingMode::Exact {
+                x.checked_mul(y).map(|product| (product, y, rm))
+            } else {
+                Some((x, y, rm))
             }
         }),
     )

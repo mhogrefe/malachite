@@ -4,11 +4,13 @@ use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign, ModMulPrecom
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mod_mul::{
-    _limbs_mod_mul_two_limbs, _limbs_mod_mul_two_limbs_naive, _limbs_precompute_mod_mul_two_limbs,
-    _limbs_precompute_mod_mul_two_limbs_alt,
+    _limbs_mod_mul_two_limbs, _limbs_precompute_mod_mul_two_limbs,
 };
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::arithmetic::mod_mul::{
+    limbs_mod_mul_two_limbs_naive, limbs_precompute_mod_mul_two_limbs_alt,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{nonuples_of_limbs_var_1, pairs_of_unsigneds_var_6};
@@ -220,7 +222,7 @@ fn benchmark_limbs_precompute_mod_mul_two_limbs_algorithms(
             ),
             (
                 "alt",
-                &mut (|(m_1, m_0)| no_out!(_limbs_precompute_mod_mul_two_limbs_alt(m_1, m_0))),
+                &mut (|(m_1, m_0)| no_out!(limbs_precompute_mod_mul_two_limbs_alt(m_1, m_0))),
             ),
         ],
     );
@@ -253,7 +255,7 @@ fn benchmark_limbs_mod_mul_two_limbs(gm: GenerationMode, limit: usize, file_name
             (
                 "naive",
                 &mut (|(x_1, x_0, y_1, y_0, m_1, m_0, _, _, _)| {
-                    no_out!(_limbs_mod_mul_two_limbs_naive(x_1, x_0, y_1, y_0, m_1, m_0))
+                    no_out!(limbs_mod_mul_two_limbs_naive(x_1, x_0, y_1, y_0, m_1, m_0))
                 }),
             ),
         ],

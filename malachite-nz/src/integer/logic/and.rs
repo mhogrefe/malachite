@@ -32,9 +32,9 @@ use platform::Limb;
 /// assert_eq!(limbs_pos_and_limb_neg(&[123, 456], 789), &[17, 456]);
 /// ```
 pub fn limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
-    let mut result_limbs = xs.to_vec();
-    result_limbs[0] &= y;
-    result_limbs
+    let mut out = xs.to_vec();
+    out[0] &= y;
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
@@ -131,7 +131,7 @@ pub fn limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, writes the limbs of the bitwise and of the `Integer` and a negative number whose
 /// lowest limb is given by `y` and whose other limbs are full of `true` bits to an output slice.
-/// `ixs` may not be empty or only contain zeros. Returns whether a carry occurs. The output slice
+/// `xs` may not be empty or only contain zeros. Returns whether a carry occurs. The output slice
 /// must be at least as long as the input slice.
 ///
 /// Time: worst case O(n)

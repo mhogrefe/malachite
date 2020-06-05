@@ -28,22 +28,22 @@ use platform::Limb;
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is returned.
 pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
     let len = xs.len();
-    let mut result_limbs = Vec::with_capacity(len);
+    let mut out = Vec::with_capacity(len);
     for i in 0..len {
         let (sum, overflow) = xs[i].overflowing_add(y);
-        result_limbs.push(sum);
+        out.push(sum);
         if overflow {
             y = 1;
         } else {
             y = 0;
-            result_limbs.extend_from_slice(&xs[i + 1..]);
+            out.extend_from_slice(&xs[i + 1..]);
             break;
         }
     }
     if y != 0 {
-        result_limbs.push(y);
+        out.push(y);
     }
-    result_limbs
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -54,10 +54,10 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`.
+/// Panics if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
@@ -99,19 +99,19 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut limbs, 789), false);
-/// assert_eq!(limbs, &[912, 456]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 789), false);
+/// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut limbs, 2), true);
-/// assert_eq!(limbs, &[1]);
+/// let mut xs = vec![0xffff_ffff];
+/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 2), true);
+/// assert_eq!(xs, &[1]);
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.
@@ -133,22 +133,22 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_vec_add_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_add_limb_in_place(&mut limbs, 789);
-/// assert_eq!(limbs, &[912, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_add_limb_in_place(&mut xs, 789);
+/// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut limbs = vec![0xffff_ffff];
-/// limbs_vec_add_limb_in_place(&mut limbs, 2);
-/// assert_eq!(limbs, &[1, 1]);
+/// let mut xs = vec![0xffff_ffff];
+/// limbs_vec_add_limb_in_place(&mut xs, 2);
+/// assert_eq!(xs, &[1, 1]);
 /// ```
 ///
 /// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.1.2 where the input is non-negative.
@@ -197,22 +197,22 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let mut result_limbs = Vec::with_capacity(xs_len);
+    let mut out = Vec::with_capacity(xs_len);
     let mut carry = false;
     for (&x, &y) in xs.iter().zip(ys.iter()) {
-        result_limbs.push(add_and_carry(x, y, &mut carry));
+        out.push(add_and_carry(x, y, &mut carry));
     }
     if xs_len == ys_len {
         if carry {
-            result_limbs.push(1);
+            out.push(1);
         }
     } else {
-        result_limbs.extend_from_slice(&xs[ys_len..]);
-        if carry && limbs_slice_add_limb_in_place(&mut result_limbs[ys_len..], 1) {
-            result_limbs.push(1);
+        out.extend_from_slice(&xs[ys_len..]);
+        if carry && limbs_slice_add_limb_in_place(&mut out[ys_len..], 1) {
+            out.push(1);
         }
     }
-    result_limbs
+    out
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
@@ -259,13 +259,13 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_same_length_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_same_length_to_out(limbs, &[6, 7], &[1, 2]), false);
-/// assert_eq!(limbs, &[7, 9, 10, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_same_length_to_out(out, &[6, 7], &[1, 2]), false);
+/// assert_eq!(out, &[7, 9, 10, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_same_length_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
-/// assert_eq!(limbs, &[202, 202, 1, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_same_length_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
 /// This is mpn_add_n from gmp.h, GMP 6.1.2.
@@ -298,13 +298,13 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_greater_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_greater_to_out(limbs, &[1, 2, 3], &[6, 7]), false);
-/// assert_eq!(limbs, &[7, 9, 3, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_greater_to_out(out, &[1, 2, 3], &[6, 7]), false);
+/// assert_eq!(out, &[7, 9, 3, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_greater_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
-/// assert_eq!(limbs, &[202, 202, 1, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_greater_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.1.2, where the first input is at least as long as the second.
@@ -342,13 +342,13 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_to_out(limbs, &[6, 7], &[1, 2, 3]), false);
-/// assert_eq!(limbs, &[7, 9, 3, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_to_out(out, &[6, 7], &[1, 2, 3]), false);
+/// assert_eq!(out, &[7, 9, 3, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_to_out(limbs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
-/// assert_eq!(limbs, &[202, 202, 1, 10]);
+/// let out = &mut [10, 10, 10, 10];
+/// assert_eq!(limbs_add_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.1.2.
@@ -669,16 +669,14 @@ impl Natural {
     }
 
     pub(crate) fn add_limb_ref(&self, other: Limb) -> Natural {
-        if other == 0 {
-            return self.clone();
-        }
-        Natural(match *self {
-            Natural(Small(small)) => match small.overflowing_add(other) {
-                (sum, false) => Small(sum),
-                (sum, true) => Large(vec![sum, 1]),
+        match (self, other) {
+            (x, 0) => x.clone(),
+            (Natural(Small(small)), other) => match small.overflowing_add(other) {
+                (sum, false) => Natural::from(sum),
+                (sum, true) => Natural(Large(vec![sum, 1])),
             },
-            Natural(Large(ref limbs)) => Large(limbs_add_limb(limbs, other)),
-        })
+            (Natural(Large(ref limbs)), other) => Natural(Large(limbs_add_limb(limbs, other))),
+        }
     }
 
     pub(crate) fn add_assign_limb(&mut self, other: Limb) {
@@ -868,11 +866,9 @@ impl AddAssign<Natural> for Natural {
         match (&mut *self, &mut other) {
             (x, &mut Natural(Small(y))) => x.add_assign_limb(y),
             (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
-            (&mut Natural(Large(ref mut xs)), _) => {
-                if let Natural(Large(mut ys)) = other {
-                    if limbs_vec_add_in_place_either(xs, &mut ys) {
-                        *xs = ys;
-                    }
+            (&mut Natural(Large(ref mut xs)), &mut Natural(Large(ref mut ys))) => {
+                if limbs_vec_add_in_place_either(xs, ys) {
+                    *self = other;
                 }
             }
         }

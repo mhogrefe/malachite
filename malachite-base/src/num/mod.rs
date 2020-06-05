@@ -12,6 +12,8 @@ pub mod arithmetic {
     pub mod checked_sub;
     pub mod checked_sub_mul;
     pub mod div_mod;
+    pub mod div_round;
+    pub mod divisible_by;
     pub mod divisible_by_power_of_two;
     pub mod eq_mod_power_of_two;
     pub mod integers;
@@ -51,7 +53,6 @@ pub mod arithmetic {
     pub mod shl_round;
     pub mod shr_round;
     pub mod sign;
-    pub mod signeds;
     pub mod sub_mul;
     pub mod traits;
     pub mod unsigneds;

@@ -7,7 +7,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "az"
-version = "0.3.1"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -17,7 +17,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.2.2"
+version = "1.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.71 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -56,7 +56,7 @@ dependencies = [
  "malachite-base-test-util 0.1.0",
  "malachite-nz 0.1.0",
  "num 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "rug 1.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rug 1.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -164,11 +164,11 @@ dependencies = [
 
 [[package]]
 name = "rug"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "az 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "gmp-mpfr-sys 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "az 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gmp-mpfr-sys 1.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.71 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -193,9 +193,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
 "checksum autocfg 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
-"checksum az 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "41a6b78289a33e09b00818ca8c90ab17c5dabb6e74f4b29a6de679c0e0886ade"
+"checksum az 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e9bcd47d94aa4eb8c076b50fc61a75020789394ffb9bd74a180b3379130f6569"
 "checksum fuchsia-cprng 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
-"checksum gmp-mpfr-sys 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "63d7f805cf9df081683d463f62864bda8b8e3ce7162a8e11cd0c49f27b8ce89b"
+"checksum gmp-mpfr-sys 1.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3c04ccc68f16a0be7164b9de26e65aab8507596cc1969cec2e32fb1692b53b1b"
 "checksum libc 0.2.71 (registry+https://github.com/rust-lang/crates.io-index)" = "9457b06509d27052635f90d6466700c65095fdf75409b3fbdd903e988b886f49"
 "checksum num 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "b8536030f9fea7127f841b45bb6243b27255787fb4eb83958aa1ef9d2fdc0c36"
 "checksum num-bigint 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "090c7f9998ee0ff65aa5b723e4009f7b217707f1fb5ea551329cc4d6231fb304"
@@ -208,7 +208,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rand_core 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7a6fdeb83b075e8266dcc8762c22776f6877a63111121f5f8c7411e5be7eed4b"
 "checksum rand_core 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9c33a3c44ca05fa6f1807d8e6743f3824e8509beca625669633be0acbdf509dc"
 "checksum rdrand 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
-"checksum rug 1.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "72315b6d9cb7d886fb99724330c47ceb29e923df657c31da3849fe88c0ded710"
+"checksum rug 1.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a6cfccfa888f22369385e0fc5f37a37fca05782fc653df5fe7de0934cbe66632"
 "checksum winapi 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)" = "8093091eeb260906a183e6ae1abdba2ef5ef2257a21801128899c3fc699229c6"
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 "checksum winapi-x86_64-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"

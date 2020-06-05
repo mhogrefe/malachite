@@ -28,7 +28,6 @@
 
 #[macro_use]
 pub mod named;
-
 #[macro_use]
 pub mod bools;
 #[macro_use]

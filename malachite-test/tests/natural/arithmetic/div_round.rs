@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRou
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::round::RoundingMode;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
@@ -9,6 +10,7 @@ use num::Integer;
 use rug::ops::DivRounding;
 
 use malachite_test::common::test_properties;
+use malachite_test::inputs::base::triples_of_unsigned_positive_unsigned_and_rounding_mode_var_1;
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural_var_2,
     pairs_of_natural_and_rounding_mode, pairs_of_positive_natural_and_rounding_mode,
@@ -23,30 +25,30 @@ fn div_round_properties() {
             let mut mut_x = x.clone();
             mut_x.div_round_assign(y, rm);
             assert!(mut_x.is_valid());
-            let quotient = mut_x;
+            let q = mut_x;
 
             let mut mut_x = x.clone();
             mut_x.div_round_assign(y.clone(), rm);
             assert!(mut_x.is_valid());
-            assert_eq!(mut_x, quotient);
+            assert_eq!(mut_x, q);
 
-            let quotient_alt = x.div_round(y, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.div_round(y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.div_round(y.clone(), rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.clone().div_round(y, rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.clone().div_round(y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            let quotient_alt = x.clone().div_round(y.clone(), rm);
-            assert!(quotient_alt.is_valid());
-            assert_eq!(quotient_alt, quotient);
+            let q_alt = x.clone().div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
 
-            assert!(quotient <= *x);
+            assert!(q <= *x);
         },
     );
 
@@ -104,6 +106,16 @@ fn div_round_properties() {
         |&(ref x, rm)| {
             assert_eq!(Natural::ZERO.div_round(x, rm), 0);
             assert_eq!(x.div_round(x, rm), 1);
+        },
+    );
+
+    test_properties(
+        triples_of_unsigned_positive_unsigned_and_rounding_mode_var_1::<Limb>,
+        |&(x, y, rm)| {
+            assert_eq!(
+                Natural::from(x).div_round(Natural::from(y), rm),
+                x.div_round(y, rm)
+            );
         },
     );
 }

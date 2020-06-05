@@ -51,7 +51,6 @@ fn demo_natural_to_bits_desc(gm: GenerationMode, limit: usize) {
     }
 }
 
-#[allow(unused_collect)]
 fn benchmark_natural_to_bits_asc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -76,7 +75,6 @@ fn benchmark_natural_to_bits_asc_evaluation_strategy(
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_natural_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.to_bits_asc()",
@@ -95,7 +93,6 @@ fn benchmark_natural_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, fi
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_natural_to_bits_desc_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
@@ -123,7 +120,6 @@ fn benchmark_natural_to_bits_desc_evaluation_strategy(
     );
 }
 
-#[allow(unused_collect)]
 fn benchmark_natural_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     m_run_benchmark(
         "Natural.to_bits_desc()",

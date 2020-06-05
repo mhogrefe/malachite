@@ -221,7 +221,6 @@ pub(crate) fn rm_triples_of_naturals(
 
 // All triples of `Natural`s where the first is greater than or equal to the product of the second
 // and third.
-#[allow(op_ref)]
 pub fn triples_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
     Box::new(triples_of_naturals(gm).filter(|&(ref a, ref b, ref c)| a >= &(b * c)))
 }
