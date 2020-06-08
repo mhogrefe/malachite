@@ -19,14 +19,14 @@ use num::arithmetic::traits::{
     OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingSub,
     OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowerOfTwo,
-    RemPowerOfTwo, RemPowerOfTwoAssign, RoundToMultipleOfPowerOfTwo,
-    RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
-    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingSub,
-    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
-    ShrRound, ShrRoundAssign, Sign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign,
-    WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul,
-    WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingSub, WrappingSubAssign,
-    WrappingSubMul, WrappingSubMulAssign,
+    RemPowerOfTwo, RemPowerOfTwoAssign, RoundToMultiple, RoundToMultipleAssign,
+    RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd,
+    SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
+    SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul,
+    SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
+    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
+    WrappingPow, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -116,10 +116,10 @@ pub trait PrimitiveInteger:
     + Default
     + Display
     + Div<Self, Output = Self>
-    + DivAssign
+    + DivAssign<Self>
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
-    + DivExact
+    + DivExact<Self, Output = Self>
     + DivExactAssign
     + DivisibleBy
     + DivisibleByPowerOfTwo
@@ -226,6 +226,8 @@ pub trait PrimitiveInteger:
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
     + Rotate
+    + RoundToMultiple<Self, Output = Self>
+    + RoundToMultipleAssign<Self>
     + RoundToMultipleOfPowerOfTwo<u64, Output = Self>
     + RoundToMultipleOfPowerOfTwoAssign<u64>
     + SaturatingAdd<Self, Output = Self>

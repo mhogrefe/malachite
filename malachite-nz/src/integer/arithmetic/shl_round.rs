@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use integer::Integer;
 
@@ -29,7 +29,7 @@ macro_rules! impl_shl_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShlRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::integer::Integer;
@@ -108,7 +108,7 @@ macro_rules! impl_shl_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShlRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::integer::Integer;
@@ -187,7 +187,7 @@ macro_rules! impl_shl_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
             /// use malachite_base::num::basic::traits::One;
             /// use malachite_nz::integer::Integer;

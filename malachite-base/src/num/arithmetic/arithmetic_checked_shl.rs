@@ -1,5 +1,6 @@
 use num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Iverson;
 use num::conversion::traits::{CheckedFrom, WrappingFrom, WrappingInto};
 
 macro_rules! impl_arithmetic_checked_shl_unsigned_unsigned {
@@ -270,11 +271,7 @@ macro_rules! impl_arithmetic_checked_shl_signed_signed {
                     let width = $t::WIDTH.wrapping_into();
                     let abs_bits = bits.unsigned_abs();
                     Some(if width != 0 && abs_bits >= width {
-                        if self >= 0 {
-                            0
-                        } else {
-                            -1
-                        }
+                        -$t::iverson(self < 0)
                     } else {
                         self >> abs_bits
                     })

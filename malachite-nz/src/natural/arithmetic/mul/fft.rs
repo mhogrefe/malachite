@@ -734,11 +734,7 @@ fn _limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
         // now subtract carry and carry2 from out[shift..n]
         let (out_last, out_init) = out[..n + 1].split_last_mut().unwrap();
         let out_init_hi = &mut out_init[shift..];
-        *out_last = if limbs_sub_limb_in_place(out_init_hi, carry) {
-            Limb::MAX
-        } else {
-            0
-        };
+        *out_last = Limb::iverson(limbs_sub_limb_in_place(out_init_hi, carry)).wrapping_neg();
         if limbs_sub_limb_in_place(out_init_hi, carry2) {
             out_last.wrapping_sub_assign(1);
         }

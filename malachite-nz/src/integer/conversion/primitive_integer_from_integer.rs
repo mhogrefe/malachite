@@ -150,7 +150,7 @@ macro_rules! impl_from {
             ///
             /// assert_eq!(u32::saturating_from(Integer::from(123)), 123);
             /// assert_eq!(u32::saturating_from(Integer::from(-123)), 0);
-            /// assert_eq!(u32::saturating_from(Integer::trillion()), 4294967295);
+            /// assert_eq!(u32::saturating_from(Integer::trillion()), u32::MAX);
             /// assert_eq!(u32::saturating_from(-Integer::trillion()), 0);
             /// ```
             fn saturating_from(value: Integer) -> $u {
@@ -177,7 +177,7 @@ macro_rules! impl_from {
             ///
             /// assert_eq!(u32::saturating_from(&Integer::from(123)), 123);
             /// assert_eq!(u32::saturating_from(&Integer::from(-123)), 0);
-            /// assert_eq!(u32::saturating_from(&Integer::trillion()), 4294967295);
+            /// assert_eq!(u32::saturating_from(&Integer::trillion()), u32::MAX);
             /// assert_eq!(u32::saturating_from(&-Integer::trillion()), 0);
             /// ```
             fn saturating_from(value: &Integer) -> $u {

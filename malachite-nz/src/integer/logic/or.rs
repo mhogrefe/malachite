@@ -29,7 +29,7 @@ use platform::Limb;
 /// use malachite_nz::integer::logic::or::limbs_neg_or_limb;
 ///
 /// assert_eq!(limbs_neg_or_limb(&[123, 456], 789), &[107, 456]);
-/// assert_eq!(limbs_neg_or_limb(&[0, 0, 456], 789), &[0xffff_fceb, 0xffff_ffff, 455]);
+/// assert_eq!(limbs_neg_or_limb(&[0, 0, 456], 789), &[0xffff_fceb, u32::MAX, 455]);
 /// ```
 pub fn limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
@@ -75,7 +75,7 @@ pub fn limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// let mut xs = vec![0, 0, 0, 0];
 /// limbs_neg_or_limb_to_out(&mut xs, &[0, 0, 456], 789);
-/// assert_eq!(xs, &[0xffff_fceb, 0xffff_ffff, 455, 0]);
+/// assert_eq!(xs, &[0xffff_fceb, u32::MAX, 455, 0]);
 /// ```
 pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let len = xs.len();
@@ -121,7 +121,7 @@ pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 ///
 /// let mut xs = vec![0, 0, 456];
 /// limbs_neg_or_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[0xffff_fceb, 0xffff_ffff, 455]);
+/// assert_eq!(xs, &[0xffff_fceb, u32::MAX, 455]);
 /// ```
 pub fn limbs_neg_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     if y == 0 {

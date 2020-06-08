@@ -41,7 +41,7 @@ use platform::Limb;
 ///         (vec![4294966927, 455, 0], true));
 /// assert_eq!(limbs_overflowing_sub_mul_limb(&[123], &[123], 4),
 ///         (vec![369, 0], false));
-/// assert_eq!(limbs_overflowing_sub_mul_limb(&[123], &[123, 456], 0xffff_ffff),
+/// assert_eq!(limbs_overflowing_sub_mul_limb(&[123], &[123, 456], u32::MAX),
 ///         (vec![4294967050, 4294966962, 455], false));
 /// ```
 ///
@@ -84,7 +84,7 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec
 /// assert_eq!(xs, &[369, 0]);
 ///
 /// let mut xs = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, &[123, 456], 0xffff_ffff),
+/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, &[123, 456], u32::MAX),
 ///         false);
 /// assert_eq!(xs, &[4294967050, 4294966962, 455]);
 /// ```
@@ -183,7 +183,7 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 /// assert_eq!(ys, &[369, 0]);
 ///
 /// let mut ys = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_right(&[123], &mut ys, 0xffff_ffff), false);
+/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_right(&[123], &mut ys, u32::MAX), false);
 /// assert_eq!(ys, &[4294967050, 4294966962, 455]);
 /// ```
 ///
@@ -285,7 +285,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 ///
 /// let mut xs = vec![123];
 /// let mut ys = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_either(&mut xs, &mut ys, 0xffff_ffff),
+/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX),
 ///         (true, false));
 /// assert_eq!(xs, &[123]);
 /// assert_eq!(ys, &[4294967050, 4294966962, 455]);

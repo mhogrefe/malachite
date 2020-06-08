@@ -80,6 +80,7 @@ pub mod num {
         pub mod overflowing_sub_mul;
         pub mod parity;
         pub mod power_of_two;
+        pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_two;
         pub mod saturating_abs;
         pub mod saturating_add;
@@ -131,7 +132,7 @@ pub mod num {
         pub mod significant_bits;
     }
 }
-pub mod round;
+pub mod rounding_mode;
 pub mod slices;
 pub mod strings;
 pub mod vecs;

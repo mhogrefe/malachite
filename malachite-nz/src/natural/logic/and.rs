@@ -458,7 +458,7 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// let mut x = Natural::from(0xffff_ffffu32);
+/// let mut x = Natural::from(u32::MAX);
 /// x &= Natural::from(0xf0ff_ffffu32);
 /// x &= Natural::from(0xfff0_ffffu32);
 /// x &= Natural::from(0xffff_f0ffu32);
@@ -495,7 +495,7 @@ impl BitAndAssign<Natural> for Natural {
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
-/// let mut x = Natural::from(0xffff_ffffu32);
+/// let mut x = Natural::from(u32::MAX);
 /// x &= &Natural::from(0xf0ff_ffffu32);
 /// x &= &Natural::from(0xfff0_ffffu32);
 /// x &= &Natural::from(0xffff_f0ffu32);

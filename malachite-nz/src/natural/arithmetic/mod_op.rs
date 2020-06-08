@@ -133,7 +133,7 @@ pub fn _limbs_mod_limb_alt_3(xs: &[Limb], d: Limb) -> Limb {
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 ///
 /// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
-/// assert_eq!(limbs_mod_limb(&[0xffff_ffff, 0xffff_ffff], 3), 0);
+/// assert_eq!(limbs_mod_limb(&[u32::MAX, u32::MAX], 3), 0);
 /// ```
 #[cfg(feature = "32_bit_limbs")]
 #[inline]

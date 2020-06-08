@@ -143,7 +143,7 @@ pub fn _div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> 
 /// use malachite_nz::natural::arithmetic::div::limbs_div_limb;
 ///
 /// assert_eq!(limbs_div_limb(&[123, 456], 789), &[2_482_262_467, 0]);
-/// assert_eq!(limbs_div_limb(&[0xffff_ffff, 0xffff_ffff], 3), &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(limbs_div_limb(&[u32::MAX, u32::MAX], 3), &[0x5555_5555, 0x5555_5555]);
 /// ```
 ///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where the quotient is returned, but
@@ -178,7 +178,7 @@ pub fn limbs_div_limb(xs: &[Limb], d: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[2_482_262_467, 0, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
+/// limbs_div_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 ///
@@ -258,7 +258,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], xs: &[Limb], d: Limb) {
 /// limbs_div_limb_in_place(&mut limbs, 789);
 /// assert_eq!(limbs, &[2_482_262_467, 0]);
 ///
-/// let mut limbs = vec![0xffff_ffff, 0xffff_ffff];
+/// let mut limbs = vec![u32::MAX, u32::MAX];
 /// limbs_div_limb_in_place(&mut limbs, 3);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```

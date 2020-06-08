@@ -119,8 +119,8 @@ pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 ///
 /// assert_eq!(limbs_neg_and_limb_neg(&[0, 2], 3), &[0, 2]);
 /// assert_eq!(limbs_neg_and_limb_neg(&[1, 1], 3), &[4294967293, 1]);
-/// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 1], 1), &[0, 2]);
-/// assert_eq!(limbs_neg_and_limb_neg(&[0xffff_fffe, 0xffff_ffff], 1), &[0, 0, 1]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[u32::MAX - 1, 1], 1), &[0, 2]);
+/// assert_eq!(limbs_neg_and_limb_neg(&[u32::MAX - 1, u32::MAX], 1), &[0, 0, 1]);
 /// ```
 pub fn limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out = xs.to_vec();
@@ -156,11 +156,11 @@ pub fn limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[4294967293, 1]);
 ///
 /// let mut out = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[0xffff_fffe, 1], 1), false);
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[u32::MAX - 1, 1], 1), false);
 /// assert_eq!(out, &[0, 2]);
 ///
 /// let mut out = vec![0, 0];
-/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[0xffff_fffe, 0xffff_ffff], 1), true);
+/// assert_eq!(limbs_neg_and_limb_neg_to_out(&mut out, &[u32::MAX - 1, u32::MAX], 1), true);
 /// assert_eq!(out, &[0, 0]);
 /// ```
 pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
@@ -209,11 +209,11 @@ pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 3), false);
 /// assert_eq!(xs, &[4294967293, 1]);
 ///
-/// let mut xs = vec![0xffff_fffe, 1];
+/// let mut xs = vec![u32::MAX - 1, 1];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 1), false);
 /// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut xs = vec![0xffff_fffe, 0xffff_ffff];
+/// let mut xs = vec![u32::MAX - 1, u32::MAX];
 /// assert_eq!(limbs_slice_neg_and_limb_neg_in_place(&mut xs, 1), true);
 /// assert_eq!(xs, &[0, 0]);
 /// ```
@@ -258,11 +258,11 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 3);
 /// assert_eq!(xs, &[4294967293, 1]);
 ///
-/// let mut xs = vec![0xffff_fffe, 1];
+/// let mut xs = vec![u32::MAX - 1, 1];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 1);
 /// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut xs = vec![0xffff_fffe, 0xffff_ffff];
+/// let mut xs = vec![u32::MAX - 1, u32::MAX];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 1);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```

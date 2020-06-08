@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::arithmetic::add::{
     limbs_add_limb, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -29,8 +29,8 @@ use platform::Limb;
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::limbs_mod_power_of_two_add_limb;
 ///
 /// assert_eq!(limbs_mod_power_of_two_add_limb(&[123, 456], 789, 41), &[912, 456]);
-/// assert_eq!(limbs_mod_power_of_two_add_limb(&[0xffff_ffff, 3], 2, 34), &[1, 0]);
-/// assert_eq!(limbs_mod_power_of_two_add_limb(&[0xffff_ffff, 3], 2, 35), &[1, 4]);
+/// assert_eq!(limbs_mod_power_of_two_add_limb(&[u32::MAX, 3], 2, 34), &[1, 0]);
+/// assert_eq!(limbs_mod_power_of_two_add_limb(&[u32::MAX, 3], 2, 35), &[1, 4]);
 /// ```
 pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
@@ -62,11 +62,11 @@ pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Li
 /// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 789, 41), false);
 /// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 2, 33), true);
 /// assert_eq!(xs, &[1]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mod_power_of_two_add_limb_in_place(&mut xs, 2, 32), false);
 /// assert_eq!(xs, &[1]);
 /// ```
@@ -102,11 +102,11 @@ pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, 
 /// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 789, 41);
 /// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 2, 33);
 /// assert_eq!(xs, &[1, 1]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// limbs_vec_mod_power_of_two_add_limb_in_place(&mut xs, 2, 32);
 /// assert_eq!(xs, &[1]);
 /// ```
@@ -137,11 +137,11 @@ pub fn limbs_vec_mod_power_of_two_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb,
 ///
 /// assert_eq!(limbs_mod_power_of_two_add_greater(&[1, 2, 3], &[6, 7], 100), &[7, 9, 3]);
 /// assert_eq!(
-///     limbs_mod_power_of_two_add_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2], 97),
+///     limbs_mod_power_of_two_add_greater(&[100, 101, u32::MAX], &[102, 101, 2], 97),
 ///     &[202, 202, 1, 1]
 /// );
 /// assert_eq!(
-///     limbs_mod_power_of_two_add_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2], 96),
+///     limbs_mod_power_of_two_add_greater(&[100, 101, u32::MAX], &[102, 101, 2], 96),
 ///     &[202, 202, 1]
 /// );
 /// ```
@@ -169,11 +169,11 @@ pub fn limbs_mod_power_of_two_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) ->
 ///
 /// assert_eq!(limbs_mod_power_of_two_add(&[6, 7], &[1, 2, 3], 100), &[7, 9, 3]);
 /// assert_eq!(
-///     limbs_mod_power_of_two_add(&[100, 101, 0xffff_ffff], &[102, 101, 2], 97),
+///     limbs_mod_power_of_two_add(&[100, 101, u32::MAX], &[102, 101, 2], 97),
 ///     &[202, 202, 1, 1]
 /// );
 /// assert_eq!(
-///     limbs_mod_power_of_two_add(&[100, 101, 0xffff_ffff], &[102, 101, 2], 96),
+///     limbs_mod_power_of_two_add(&[100, 101, u32::MAX], &[102, 101, 2], 96),
 ///     &[202, 202, 1]
 /// );
 /// ```
@@ -208,14 +208,14 @@ pub fn limbs_mod_power_of_two_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Lim
 /// assert_eq!(limbs_slice_mod_power_of_two_add_greater_in_place_left(xs, &[1, 2], 68), false);
 /// assert_eq!(xs, &[7, 9, 8]);
 ///
-/// let xs = &mut [100, 101, 0xffff_ffff];
+/// let xs = &mut [100, 101, u32::MAX];
 /// assert_eq!(
 ///     limbs_slice_mod_power_of_two_add_greater_in_place_left(xs, &[102, 101, 2], 97),
 ///     true
 /// );
 /// assert_eq!(xs, &[202, 202, 1]);
 ///
-/// let xs = &mut [100, 101, 0xffff_ffff];
+/// let xs = &mut [100, 101, u32::MAX];
 /// assert_eq!(
 ///     limbs_slice_mod_power_of_two_add_greater_in_place_left(xs, &[102, 101, 2], 96),
 ///     false
@@ -255,11 +255,11 @@ pub fn limbs_slice_mod_power_of_two_add_greater_in_place_left(
 /// limbs_vec_mod_power_of_two_add_in_place_left(&mut xs, &[1, 2], 68);
 /// assert_eq!(xs, &[7, 9, 8]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// limbs_vec_mod_power_of_two_add_in_place_left(&mut xs, &[102, 101, 2], 97);
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// limbs_vec_mod_power_of_two_add_in_place_left(&mut xs, &[102, 101, 2], 96);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
@@ -315,13 +315,13 @@ pub fn limbs_vec_mod_power_of_two_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Li
 /// assert_eq!(xs, &[7, 9, 3]);
 /// assert_eq!(ys, &[6, 7]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// let mut ys = vec![102, 101, 2];
 /// assert_eq!(limbs_mod_power_of_two_add_in_place_either(&mut xs, &mut ys, 97), false);
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// let mut ys = vec![102, 101, 2];
 /// assert_eq!(limbs_mod_power_of_two_add_in_place_either(&mut xs, &mut ys, 96), false);
 /// assert_eq!(xs, &[202, 202, 1]);

@@ -62,7 +62,7 @@ use platform::{
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
 ///
 /// assert_eq!(limbs_invert_limb(0x8000_0002), 0xffff_fff8);
-/// assert_eq!(limbs_invert_limb(0xffff_fffe), 2);
+/// assert_eq!(limbs_invert_limb(u32::MAX - 1), 2);
 /// ```
 ///
 /// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.1.2.
@@ -112,7 +112,7 @@ pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb)
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_mod;
 ///
 /// assert_eq!(limbs_div_limb_mod(&[123, 456], 789), (vec![2_482_262_467, 0], 636));
-/// assert_eq!(limbs_div_limb_mod(&[0xffff_ffff, 0xffff_ffff], 3),
+/// assert_eq!(limbs_div_limb_mod(&[u32::MAX, u32::MAX], 3),
 ///     (vec![0x5555_5555, 0x5555_5555], 0));
 /// ```
 ///
@@ -149,7 +149,7 @@ pub fn limbs_div_limb_mod(xs: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 /// assert_eq!(out, &[2_482_262_467, 0, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[0xffff_ffff, 0xffff_ffff], 3), 0);
+/// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[u32::MAX, u32::MAX], 3), 0);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 ///
@@ -234,7 +234,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], xs: &[Limb], d: Limb) -> Limb
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, 789), 636);
 /// assert_eq!(limbs, &[2_482_262_467, 0]);
 ///
-/// let mut limbs = vec![0xffff_ffff, 0xffff_ffff];
+/// let mut limbs = vec![u32::MAX, u32::MAX];
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut limbs, 3), 0);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```

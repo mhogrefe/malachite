@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_limb_in_place_mod_alt,
     _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,

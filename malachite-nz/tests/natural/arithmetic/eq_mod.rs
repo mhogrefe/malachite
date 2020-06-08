@@ -38,10 +38,10 @@ fn test_limbs_eq_limb_mod_limb() {
     test(&[100, 101, 102], 1_239, 10, false);
     test(&[123, 456], 636, 789, true);
     test(&[123, 456], 1_000, 789, false);
-    test(&[0xffff_ffff, 0xffff_ffff], 101, 2, true);
-    test(&[0xffff_ffff, 0xffff_ffff], 100, 2, false);
-    test(&[0xffff_ffff, 0xffff_ffff], 120, 3, true);
-    test(&[0xffff_ffff, 0xffff_ffff], 110, 3, false);
+    test(&[u32::MAX, u32::MAX], 101, 2, true);
+    test(&[u32::MAX, u32::MAX], 100, 2, false);
+    test(&[u32::MAX, u32::MAX], 120, 3, true);
+    test(&[u32::MAX, u32::MAX], 110, 3, false);
     test(
         &[
             957_355_272,
@@ -84,23 +84,23 @@ fn test_limbs_eq_limb_mod_limb() {
     );
     test(
         &[
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
             511,
             0,
             0,
             0,
             4_227_858_432,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
             511,
             0,
             0,
@@ -115,19 +115,19 @@ fn test_limbs_eq_limb_mod_limb() {
             0,
             0,
             4_294_443_008,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
-            0xffff_ffff,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
         ],
         0xffff_f000,
-        0xffff_ffff,
+        u32::MAX,
         false,
     );
 }

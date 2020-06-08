@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{
     limbs_round_to_multiple_of_power_of_two, limbs_round_to_multiple_of_power_of_two_down,
     limbs_round_to_multiple_of_power_of_two_down_in_place,

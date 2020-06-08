@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     IsPowerOfTwo, ModPowerOfTwo, ModPowerOfTwoIsReduced, ModPowerOfTwoNeg, ModPowerOfTwoShl,
     ModPowerOfTwoShlAssign, ModPowerOfTwoShr,
@@ -19,38 +17,8 @@ use malachite_test::inputs::natural::{
     triples_of_natural_small_unsigned_and_u64_var_1,
 };
 
-macro_rules! tests_and_properties_unsigned {
-    ($t:ident, $test_mod_power_of_two_shl_u:ident, $mod_power_of_two_shl_u_properties:ident) => {
-        #[test]
-        fn $test_mod_power_of_two_shl_u() {
-            let test = |u, v: $t, pow, out| {
-                let mut n = Natural::from_str(u).unwrap();
-                assert!(n.mod_power_of_two_is_reduced(pow));
-                n.mod_power_of_two_shl_assign(v, pow);
-                assert!(n.is_valid());
-                assert_eq!(n.to_string(), out);
-                assert!(n.mod_power_of_two_is_reduced(pow));
-
-                let n = Natural::from_str(u).unwrap().mod_power_of_two_shl(v, pow);
-                assert!(n.is_valid());
-
-                let n = (&Natural::from_str(u).unwrap()).mod_power_of_two_shl(v, pow);
-                assert!(n.is_valid());
-                assert_eq!(n.to_string(), out);
-
-                assert_eq!(
-                    (Natural::from_str(u).unwrap() << v)
-                        .mod_power_of_two(pow)
-                        .to_string(),
-                    out
-                );
-            };
-            test("0", 10, 0, "0");
-            test("0", 10, 8, "0");
-            test("123", 5, 8, "96");
-            test("123", 100, 80, "0");
-        }
-
+macro_rules! properties_unsigned {
+    ($t:ident, $mod_power_of_two_shl_u_properties:ident) => {
         #[test]
         fn $mod_power_of_two_shl_u_properties() {
             test_properties(
@@ -102,66 +70,14 @@ macro_rules! tests_and_properties_unsigned {
         }
     };
 }
-tests_and_properties_unsigned!(
-    u8,
-    test_mod_power_of_two_shl_u8,
-    mod_power_of_two_shl_u8_properties
-);
-tests_and_properties_unsigned!(
-    u16,
-    test_mod_power_of_two_shl_u16,
-    mod_power_of_two_shl_u16_properties
-);
-tests_and_properties_unsigned!(
-    u32,
-    test_mod_power_of_two_shl_u32,
-    mod_power_of_two_shl_u32_properties
-);
-tests_and_properties_unsigned!(
-    u64,
-    test_mod_power_of_two_shl_u64,
-    mod_power_of_two_shl_u64_properties
-);
-tests_and_properties_unsigned!(
-    usize,
-    test_mod_power_of_two_shl_usize,
-    mod_power_of_two_shl_usize_properties
-);
+properties_unsigned!(u8, mod_power_of_two_shl_u8_properties);
+properties_unsigned!(u16, mod_power_of_two_shl_u16_properties);
+properties_unsigned!(u32, mod_power_of_two_shl_u32_properties);
+properties_unsigned!(u64, mod_power_of_two_shl_u64_properties);
+properties_unsigned!(usize, mod_power_of_two_shl_usize_properties);
 
-macro_rules! tests_and_properties_signed {
-    ($t:ident, $test_mod_power_of_two_shl_i:ident, $mod_power_of_two_shl_i_properties:ident) => {
-        #[test]
-        fn $test_mod_power_of_two_shl_i() {
-            let test = |u, v: $t, pow, out| {
-                let mut n = Natural::from_str(u).unwrap();
-                assert!(n.mod_power_of_two_is_reduced(pow));
-                n.mod_power_of_two_shl_assign(v, pow);
-                assert!(n.is_valid());
-                assert_eq!(n.to_string(), out);
-                assert!(n.mod_power_of_two_is_reduced(pow));
-
-                let n = Natural::from_str(u).unwrap().mod_power_of_two_shl(v, pow);
-                assert!(n.is_valid());
-
-                let n = (&Natural::from_str(u).unwrap()).mod_power_of_two_shl(v, pow);
-                assert!(n.is_valid());
-                assert_eq!(n.to_string(), out);
-
-                assert_eq!(
-                    (Natural::from_str(u).unwrap() << v)
-                        .mod_power_of_two(pow)
-                        .to_string(),
-                    out
-                );
-            };
-            test("0", 10, 0, "0");
-            test("0", 10, 8, "0");
-            test("123", 5, 8, "96");
-            test("123", 100, 80, "0");
-            test("123", -2, 8, "30");
-            test("123", -10, 8, "0");
-        }
-
+macro_rules! properties_signed {
+    ($t:ident, $mod_power_of_two_shl_i_properties:ident) => {
         #[test]
         fn $mod_power_of_two_shl_i_properties() {
             test_properties(
@@ -216,28 +132,8 @@ macro_rules! tests_and_properties_signed {
         }
     };
 }
-tests_and_properties_signed!(
-    i8,
-    test_mod_power_of_two_shl_i8,
-    mod_power_of_two_shl_i8_properties
-);
-tests_and_properties_signed!(
-    i16,
-    test_mod_power_of_two_shl_i16,
-    mod_power_of_two_shl_i16_properties
-);
-tests_and_properties_signed!(
-    i32,
-    test_mod_power_of_two_shl_i32,
-    mod_power_of_two_shl_i32_properties
-);
-tests_and_properties_signed!(
-    i64,
-    test_mod_power_of_two_shl_i64,
-    mod_power_of_two_shl_i64_properties
-);
-tests_and_properties_signed!(
-    isize,
-    test_mod_power_of_two_shl_isize,
-    mod_power_of_two_shl_isize_properties
-);
+properties_signed!(i8, mod_power_of_two_shl_i8_properties);
+properties_signed!(i16, mod_power_of_two_shl_i16_properties);
+properties_signed!(i32, mod_power_of_two_shl_i32_properties);
+properties_signed!(i64, mod_power_of_two_shl_i64_properties);
+properties_signed!(isize, mod_power_of_two_shl_isize_properties);

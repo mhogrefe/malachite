@@ -21,8 +21,8 @@ use platform::Limb;
 /// use malachite_nz::natural::arithmetic::add::limbs_add_limb;
 ///
 /// assert_eq!(limbs_add_limb(&[123, 456], 789), &[912, 456]);
-/// assert_eq!(limbs_add_limb(&[0xffff_ffff, 5], 2), &[1, 6]);
-/// assert_eq!(limbs_add_limb(&[0xffff_ffff], 2), &[1, 1]);
+/// assert_eq!(limbs_add_limb(&[u32::MAX, 5], 2), &[1, 6]);
+/// assert_eq!(limbs_add_limb(&[u32::MAX], 2), &[1, 1]);
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is returned.
@@ -68,7 +68,7 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[912, 456, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_add_limb_to_out(&mut out, &[0xffff_ffff], 2), true);
+/// assert_eq!(limbs_add_limb_to_out(&mut out, &[u32::MAX], 2), true);
 /// assert_eq!(out, &[1, 0, 0]);
 /// ```
 ///
@@ -109,7 +109,7 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 /// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 789), false);
 /// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 2), true);
 /// assert_eq!(xs, &[1]);
 /// ```
@@ -146,7 +146,7 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
 /// limbs_vec_add_limb_in_place(&mut xs, 789);
 /// assert_eq!(xs, &[912, 456]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// limbs_vec_add_limb_in_place(&mut xs, 2);
 /// assert_eq!(xs, &[1, 1]);
 /// ```
@@ -188,7 +188,7 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 /// use malachite_nz::natural::arithmetic::add::limbs_add_greater;
 ///
 /// assert_eq!(limbs_add_greater(&[1, 2, 3], &[6, 7]), &[7, 9, 3]);
-/// assert_eq!(limbs_add_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
+/// assert_eq!(limbs_add_greater(&[100, 101, u32::MAX], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.1.2, where the first input is at least as long as the second,
@@ -229,7 +229,7 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// use malachite_nz::natural::arithmetic::add::limbs_add;
 ///
 /// assert_eq!(limbs_add(&[6, 7], &[1, 2, 3]), &[7, 9, 3]);
-/// assert_eq!(limbs_add(&[100, 101, 0xffff_ffff], &[102, 101, 2]), &[202, 202, 1, 1]);
+/// assert_eq!(limbs_add(&[100, 101, u32::MAX], &[102, 101, 2]), &[202, 202, 1, 1]);
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.1.2, where the output is returned.
@@ -264,7 +264,7 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(out, &[7, 9, 10, 10]);
 ///
 /// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_same_length_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(limbs_add_same_length_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
 /// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
@@ -303,7 +303,7 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// assert_eq!(out, &[7, 9, 3, 10]);
 ///
 /// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_greater_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(limbs_add_greater_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
 /// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
@@ -347,7 +347,7 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// assert_eq!(out, &[7, 9, 3, 10]);
 ///
 /// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_to_out(out, &[100, 101, 0xffff_ffff], &[102, 101, 2]), true);
+/// assert_eq!(limbs_add_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
 /// assert_eq!(out, &[202, 202, 1, 10]);
 /// ```
 ///
@@ -411,7 +411,7 @@ pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
 /// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[1, 2]), false);
 /// assert_eq!(xs, &[7, 9]);
 ///
-/// let xs = &mut [100, 101, 0xffff_ffff];
+/// let xs = &mut [100, 101, u32::MAX];
 /// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
@@ -449,7 +449,7 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 /// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[1, 2]), false);
 /// assert_eq!(xs, &[7, 9, 8]);
 ///
-/// let xs = &mut [100, 101, 0xffff_ffff];
+/// let xs = &mut [100, 101, u32::MAX];
 /// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[102, 101, 2]), true);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
@@ -487,7 +487,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// limbs_vec_add_in_place_left(&mut xs, &[1, 2]);
 /// assert_eq!(xs, &[7, 9]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// limbs_vec_add_in_place_left(&mut xs, &[102, 101, 2]);
 /// assert_eq!(xs, &[202, 202, 1, 1]);
 /// ```
@@ -541,7 +541,7 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(xs, &[7, 9, 3]);
 /// assert_eq!(ys, &[6, 7]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// let mut ys = vec![102, 101, 2];
 /// assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), (false, true));
 /// assert_eq!(xs, &[202, 202, 1]);
@@ -584,7 +584,7 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 /// assert_eq!(xs, &[7, 9, 3]);
 /// assert_eq!(ys, &[6, 7]);
 ///
-/// let mut xs = vec![100, 101, 0xffff_ffff];
+/// let mut xs = vec![100, 101, u32::MAX];
 /// let mut ys = vec![102, 101, 2];
 /// assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), false);
 /// assert_eq!(xs, &[202, 202, 1, 1]);

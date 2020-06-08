@@ -21,7 +21,7 @@ use platform::Limb;
 /// use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 ///
 /// assert_eq!(limbs_count_zeros_neg(&[0, 1, 2]), 33);
-/// assert_eq!(limbs_count_zeros_neg(&[1, 0xffff_ffff]), 32);
+/// assert_eq!(limbs_count_zeros_neg(&[1, u32::MAX]), 32);
 /// ```
 pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;

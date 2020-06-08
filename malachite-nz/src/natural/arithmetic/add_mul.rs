@@ -13,10 +13,8 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
-//TODO clean
-
-/// Given the limbs of two `Natural`s a and b, and a limb c, returns the limbs of a + b * c. `xs`
-/// and `ys` should be nonempty and have no trailing zeros, and `limb` should be nonzero. The result
+/// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
+/// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
 /// will have no trailing zeros.
 ///
 /// Time: worst case O(n)
@@ -31,25 +29,25 @@ use platform::{DoubleLimb, Limb};
 ///
 /// assert_eq!(limbs_add_mul_limb(&[123, 456], &[123], 4), &[615, 456]);
 /// assert_eq!(limbs_add_mul_limb(&[123], &[0, 123], 4), &[123, 492]);
-/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], 0xffff_ffff), &[123, 333, 123]);
+/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], u32::MAX), &[123, 333, 123]);
 /// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
 /// positive, and w is returned instead of overwriting the first input.
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
-    let mut result;
+    let mut out;
     if xs.len() >= ys.len() {
-        result = xs.to_vec();
-        limbs_vec_add_mul_limb_greater_in_place_left(&mut result, ys, limb);
+        out = xs.to_vec();
+        limbs_vec_add_mul_limb_greater_in_place_left(&mut out, ys, limb);
     } else {
-        result = ys.to_vec();
-        limbs_vec_add_mul_limb_smaller_in_place_right(xs, &mut result, limb);
+        out = ys.to_vec();
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, &mut out, limb);
     }
-    result
+    out
 }
 
-/// Given the equal-length limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The
-/// lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of b * c, plus
+/// Given the equal-length limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The
+/// lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of y * z, plus
 /// the carry-out from the addition, is returned.
 ///
 /// Time: worst case O(n)
@@ -70,7 +68,7 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(xs, &[615]);
 ///
 /// let xs = &mut [123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], 0xffff_ffff), 123);
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], u32::MAX), 123);
 /// assert_eq!(xs, &[0]);
 ///
 /// let xs = &mut [123, 0];
@@ -78,7 +76,7 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// assert_eq!(xs, &[123, 492]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], u32::MAX), 123);
 /// assert_eq!(xs, &[123, 333]);
 /// ```
 ///
@@ -86,23 +84,23 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
-    limb: Limb,
+    z: Limb,
 ) -> Limb {
     let len = xs.len();
     assert_eq!(ys.len(), len);
     let mut carry = 0;
-    let limb_double = DoubleLimb::from(limb);
-    for i in 0..len {
-        let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
-        xs[i] = limb_result.lower_half();
-        carry = limb_result >> Limb::WIDTH;
+    let dz = DoubleLimb::from(z);
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let out = DoubleLimb::from(*x) + DoubleLimb::from(y) * dz + carry;
+        *x = out.lower_half();
+        carry = out >> Limb::WIDTH;
     }
     Limb::exact_from(carry)
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, computes a + b * c. The lowest limbs of
-/// the result are written to `ys` and the highest limb is returned. `xs` must have the same length
-/// as `ys`.
+/// Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
+/// of the result are written to `ys` and the highest limb is returned. `xs` must have the same
+/// length as `ys`.
 ///
 /// Time: worst case O(n)
 ///
@@ -122,7 +120,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 /// assert_eq!(ys, &[123, 492]);
 ///
 /// let ys = &mut [0, 123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 456], ys, 0xffff_ffff),
+/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX),
 ///         123);
 /// assert_eq!(ys, &[123, 333]);
 /// ```
@@ -133,23 +131,23 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
-    limb: Limb,
+    z: Limb,
 ) -> Limb {
     let xs_len = xs.len();
     assert_eq!(ys.len(), xs_len);
     let mut carry = 0;
-    let limb_double = DoubleLimb::from(limb);
-    for i in 0..xs_len {
-        let limb_result = DoubleLimb::from(xs[i]) + DoubleLimb::from(ys[i]) * limb_double + carry;
-        ys[i] = limb_result.lower_half();
-        carry = limb_result >> Limb::WIDTH;
+    let dz = DoubleLimb::from(z);
+    for (&x, y) in xs.iter().zip(ys.iter_mut()) {
+        let out = DoubleLimb::from(x) + DoubleLimb::from(*y) * dz + carry;
+        *y = out.lower_half();
+        carry = out >> Limb::WIDTH;
     }
     Limb::exact_from(carry)
 }
 
 /// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
 /// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
-/// no trailing zeros, and `limb` should be nonzero. The result will have no trailing zeros.
+/// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -167,7 +165,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// assert_eq!(xs, &[615, 456]);
 ///
 /// let mut xs = vec![123, 456];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], 0xffff_ffff);
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], u32::MAX);
 /// assert_eq!(xs, &[0, 579]);
 ///
 /// let mut xs = vec![123];
@@ -175,28 +173,24 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// assert_eq!(xs, &[123, 492]);
 ///
 /// let mut xs = vec![123, 456];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], 0xffff_ffff);
+/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], u32::MAX);
 /// assert_eq!(xs, &[123, 333, 123]);
 /// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive and sub is
 /// positive.
-pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
+pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
-        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, limb);
+        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, z);
     } else {
-        let (ys_lo, ys_hi) = ys.split_at(xs_len);
         xs.resize(ys.len(), 0);
-        let mut carry;
-        {
-            let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
-            carry = limbs_mul_limb_to_out(xs_hi, ys_hi, limb);
-            let inner_carry =
-                limbs_slice_add_mul_limb_same_length_in_place_left(xs_lo, ys_lo, limb);
-            if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
-                carry += 1;
-            }
+        let (xs_lo, xs_hi) = xs.split_at_mut(xs_len);
+        let (ys_lo, ys_hi) = ys.split_at(xs_len);
+        let mut carry = limbs_mul_limb_to_out(xs_hi, ys_hi, z);
+        let inner_carry = limbs_slice_add_mul_limb_same_length_in_place_left(xs_lo, ys_lo, z);
+        if inner_carry != 0 && limbs_slice_add_limb_in_place(xs_hi, inner_carry) {
+            carry += 1;
         }
         if carry != 0 {
             xs.push(carry);
@@ -204,10 +198,10 @@ pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], lim
     }
 }
 
-// ys.len() > 0, xs.len() >= ys.len(), limb != 0
-fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], limb: Limb) {
+// ys.len() > 0, xs.len() >= ys.len(), z != 0
+fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let ys_len = ys.len();
-    let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut xs[..ys_len], ys, limb);
+    let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut xs[..ys_len], ys, z);
     if carry != 0 {
         if xs.len() == ys_len {
             xs.push(carry);
@@ -217,9 +211,9 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
     }
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
-/// second (right) input, corresponding to the limbs of b. `xs` and `ys` should be nonempty and have
-/// no trailing zeros, and `limb` should be nonzero. The result will have no trailing zeros.
+/// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to the
+/// second (right) input, corresponding to the limbs of y. `xs` and `ys` should be nonempty and have
+/// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -237,7 +231,7 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// assert_eq!(ys, &[615, 456]);
 ///
 /// let mut ys = vec![123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 0xffff_ffff);
+/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, u32::MAX);
 /// assert_eq!(ys, &[0, 579]);
 ///
 /// let mut ys = vec![0, 123];
@@ -245,16 +239,16 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// assert_eq!(ys, &[123, 492]);
 ///
 /// let mut ys = vec![0, 123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 0xffff_ffff);
+/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, u32::MAX);
 /// assert_eq!(ys, &[123, 333, 123]);
 /// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
 /// positive, and the result is written to the second input rather than the first.
-pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
+pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
-        let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, limb);
+        let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, z);
         ys.extend_from_slice(&xs[ys_len..]);
         if carry != 0 {
             if xs.len() == ys_len {
@@ -264,30 +258,27 @@ pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, li
             }
         }
     } else {
-        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, limb);
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, z);
     }
 }
 
-// xs.len() > 0, xs.len() < ys.len(), limb != 0
-fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, limb: Limb) {
-    let mut carry;
-    {
-        let (ys_lo, ys_hi) = ys.split_at_mut(xs.len());
-        carry = limbs_slice_mul_limb_in_place(ys_hi, limb);
-        let inner_carry = limbs_slice_add_mul_limb_same_length_in_place_right(xs, ys_lo, limb);
-        if inner_carry != 0 && limbs_slice_add_limb_in_place(ys_hi, inner_carry) {
-            carry += 1;
-        }
+// xs.len() > 0, xs.len() < ys.len(), z != 0
+fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
+    let (ys_lo, ys_hi) = ys.split_at_mut(xs.len());
+    let mut carry = limbs_slice_mul_limb_in_place(ys_hi, z);
+    let inner_carry = limbs_slice_add_mul_limb_same_length_in_place_right(xs, ys_lo, z);
+    if inner_carry != 0 && limbs_slice_add_limb_in_place(ys_hi, inner_carry) {
+        carry += 1;
     }
     if carry != 0 {
         ys.push(carry);
     }
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to
+/// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to
 /// whichever input is longer. If the result is written to the first input, `false` is returned; if
 /// to the second, `true` is returned. `xs` and `ys` should be nonempty and have no trailing zeros,
-/// and `limb` should be nonzero. The result will have no trailing zeros.
+/// and `z` should be nonzero. The result will have no trailing zeros.
 ///
 /// Time: worst case O(n)
 ///
@@ -307,7 +298,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// let mut xs = vec![123, 456];
 /// let mut ys = vec![123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 0xffff_ffff), false);
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX), false);
 /// assert_eq!(xs, &[0, 579]);
 /// assert_eq!(ys, &[123]);
 ///
@@ -319,7 +310,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// let mut xs = vec![123, 456];
 /// let mut ys = vec![0, 123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 0xffff_ffff), false);
+/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX), false);
 /// assert_eq!(xs, &[123, 333, 123]);
 /// assert_eq!(ys, &[0, 123]);
 /// ```
@@ -329,19 +320,19 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 pub fn limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
-    limb: Limb,
+    z: Limb,
 ) -> bool {
     if xs.len() >= ys.len() {
-        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, limb);
+        limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, z);
         false
     } else {
-        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, limb);
+        limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, z);
         true
     }
 }
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, returns the limbs of
-/// a + b * c. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
+/// x + y * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
 /// slices should have any trailing zeros. The result will have no trailing zeros.
 ///
 /// Time: O(m + n * log(n) * log(log(n)))
@@ -368,24 +359,24 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 /// positive, and w is returned instead of overwriting the first input.
 pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
-    let mut product_size = ys.len() + zs.len();
-    let mut product = vec![0; product_size];
-    if limbs_mul_to_out(&mut product, ys, zs) == 0 {
-        product_size -= 1;
-        product.pop();
+    let mut out_len = ys.len() + zs.len();
+    let mut out = vec![0; out_len];
+    if limbs_mul_to_out(&mut out, ys, zs) == 0 {
+        out_len -= 1;
+        out.pop();
     }
-    assert_ne!(*product.last().unwrap(), 0);
-    if xs_len >= product_size {
-        limbs_add_greater(xs, &product)
+    assert_ne!(*out.last().unwrap(), 0);
+    if xs_len >= out_len {
+        limbs_add_greater(xs, &out)
     } else {
-        if limbs_slice_add_greater_in_place_left(&mut product, xs) {
-            product.push(1);
+        if limbs_slice_add_greater_in_place_left(&mut out, xs) {
+            out.push(1);
         }
-        product
+        out
     }
 }
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, computes a + b * c. The
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x + y * z. The
 /// limbs of the result are written to `xs`. `xs` should be nonempty and `ys` and `zs` should have
 /// length at least 2. None of the slices should have any trailing zeros. The result will have no
 /// trailing zeros.
@@ -417,105 +408,86 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 /// positive.
 pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
-    let mut product_size = ys.len() + zs.len();
-    let mut product = vec![0; product_size];
-    if limbs_mul_to_out(&mut product, ys, zs) == 0 {
-        product_size -= 1;
-        product.pop();
+    let mut out_len = ys.len() + zs.len();
+    let mut out = vec![0; out_len];
+    if limbs_mul_to_out(&mut out, ys, zs) == 0 {
+        out_len -= 1;
+        out.pop();
     }
-    assert_ne!(*product.last().unwrap(), 0);
-    if xs_len < product_size {
-        swap(xs, &mut product);
+    assert_ne!(*out.last().unwrap(), 0);
+    if xs_len < out_len {
+        swap(xs, &mut out);
     }
-    if limbs_slice_add_greater_in_place_left(xs, &product) {
+    if limbs_slice_add_greater_in_place_left(xs, &out) {
         xs.push(1);
     }
 }
 
 impl Natural {
-    fn add_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Natural {
-        if c == 0 || *b == 0 {
-            return self.clone();
-        }
-        if c == 1 {
-            return self + b;
-        }
-        match (self, b) {
-            (Natural(Large(ref a_limbs)), Natural(Large(ref b_limbs))) => {
-                Natural(Large(limbs_add_mul_limb(a_limbs, b_limbs, c)))
+    fn add_mul_limb_ref_ref(&self, y: &Natural, z: Limb) -> Natural {
+        match (self, y, z) {
+            (x, _, 0) | (x, natural_zero!(), _) => x.clone(),
+            (x, y, 1) => x + y,
+            (x, natural_one!(), z) => x + Natural::from(z),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), z) => {
+                Natural(Large(limbs_add_mul_limb(xs, ys, z)))
             }
-            _ => self + b * Natural::from(c),
+            (x, y, z) => x + y * Natural::from(z),
         }
     }
 
-    fn add_mul_assign_limb(&mut self, mut b: Natural, c: Limb) {
-        if c == 0 || b == 0 {
-            return;
-        }
-        if c == 1 {
-            *self += b;
-            return;
-        }
-        let (fallback, right) = match (&mut *self, &mut b) {
-            (&mut Natural(Large(ref mut a_limbs)), &mut Natural(Large(ref mut b_limbs))) => (
-                false,
-                limbs_vec_add_mul_limb_in_place_either(a_limbs, b_limbs, c),
-            ),
-            _ => (true, false),
-        };
-        if fallback {
-            *self += b * Natural::from(c);
-        } else if right {
-            *self = b;
+    fn add_mul_assign_limb(&mut self, mut y: Natural, z: Limb) {
+        match (&mut *self, &mut y, z) {
+            (_, _, 0) | (_, natural_zero!(), _) => {}
+            (x, _, 1) => *x += y,
+            (x, natural_one!(), z) => *x += Natural::from(z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys)), z) => {
+                if limbs_vec_add_mul_limb_in_place_either(xs, ys, z) {
+                    *self = y;
+                }
+            }
+            (x, _, z) => *x += y * Natural::from(z),
         }
     }
 
-    fn add_mul_assign_limb_ref(&mut self, b: &Natural, c: Limb) {
-        if c == 0 || *b == 0 {
-            return;
-        }
-        if c == 1 {
-            *self += b;
-            return;
-        }
-        let fallback = match (&mut *self, b) {
-            (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => {
-                limbs_vec_add_mul_limb_in_place_left(a_limbs, b_limbs, c);
-                false
+    fn add_mul_assign_limb_ref(&mut self, y: &Natural, z: Limb) {
+        match (&mut *self, y, z) {
+            (_, _, 0) | (_, natural_zero!(), _) => {}
+            (x, y, 1) => *x += y,
+            (x, natural_one!(), z) => *x += Natural::from(z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), z) => {
+                limbs_vec_add_mul_limb_in_place_left(xs, ys, z);
             }
-            _ => true,
-        };
-        if fallback {
-            *self += b * Natural::from(c);
+            (x, y, z) => *x += y * Natural::from(z),
         }
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
-/// and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
-/// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
-///     Natural::trillion()).to_string(), "65537000000000000");
-/// ```
 impl<'a> AddMul<Natural, Natural> for Natural {
     type Output = Natural;
 
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking
+    /// `self`, y, and z by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
+    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+    ///     Natural::trillion()).to_string(), "65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: Natural, c: Natural) -> Natural {
         self.add_mul_assign(b, c);
@@ -523,31 +495,31 @@ impl<'a> AddMul<Natural, Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
-/// b by value and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
-/// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
-///     &Natural::trillion()).to_string(), "65537000000000000");
-/// ```
 impl<'a> AddMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
+    /// and y by value and z by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
+    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: Natural, c: &'a Natural) -> Natural {
         self.add_mul_assign(b, c);
@@ -555,31 +527,31 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` and
-/// c by value and b by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
-/// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
-///     Natural::trillion()).to_string(), "65537000000000000");
-/// ```
 impl<'a> AddMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
+    /// and z by value and y by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
+    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+    ///     Natural::trillion()).to_string(), "65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: &'a Natural, c: Natural) -> Natural {
         self.add_mul_assign(b, c);
@@ -587,31 +559,31 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self` by
-/// value and b and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-/// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
-///     &Natural::trillion()).to_string(), "65537000000000000");
-/// ```
 impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking `self`
+    /// by value and y and z by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
+    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// ```
     #[inline]
     fn add_mul(mut self, b: &'a Natural, c: &'b Natural) -> Natural {
         self.add_mul_assign(b, c);
@@ -619,31 +591,33 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), taking `self`, b,
-/// and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(m + n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMul;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-/// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
-///     &Natural::trillion()).to_string(), "65537000000000000");
-/// ```
+//TODO clean
+
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), taking
+    /// `self`, y, and z by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(m + n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
+    /// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
+    ///     &Natural::trillion()).to_string(), "65537000000000000");
+    /// ```
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
         if let Natural(Small(small_a)) = *self {
             (b * c).add_limb(small_a)
@@ -664,33 +638,33 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
-/// b and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = Natural::trillion();
-/// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
-/// assert_eq!(x.to_string(), "65537000000000000");
-/// ```
 impl AddMulAssign<Natural, Natural> for Natural {
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
+    /// taking y and z by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(10u32);
+    /// x.add_mul_assign(Natural::from(3u32), Natural::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = Natural::trillion();
+    /// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
+    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: Natural, c: Natural) {
         if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb(c, small_b);
@@ -709,33 +683,33 @@ impl AddMulAssign<Natural, Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
-/// b by value and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = Natural::trillion();
-/// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
-/// assert_eq!(x.to_string(), "65537000000000000");
-/// ```
 impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
+    /// taking y by value and z by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(10u32);
+    /// x.add_mul_assign(Natural::from(3u32), &Natural::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = Natural::trillion();
+    /// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
+    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: Natural, c: &'a Natural) {
         if let Natural(Small(small_b)) = b {
             self.add_mul_assign_limb_ref(c, small_b);
@@ -754,33 +728,33 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
-/// b by reference and c by value.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = Natural::trillion();
-/// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
-/// assert_eq!(x.to_string(), "65537000000000000");
-/// ```
 impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
+    /// taking y by reference and z by value.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(10u32);
+    /// x.add_mul_assign(&Natural::from(3u32), Natural::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = Natural::trillion();
+    /// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
+    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: &'a Natural, c: Natural) {
         if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb(c, small_b);
@@ -799,33 +773,33 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     }
 }
 
-/// Adds the product of a `Natural` (b) and a `Natural` (c) to a `Natural` (self), in place, taking
-/// b and c by reference.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`b.significant_bits()`, `c.significant_bits()`)
-///       m = `a.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::AddMulAssign;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::from(10u32);
-/// x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
-/// assert_eq!(x, 22);
-///
-/// let mut x = Natural::trillion();
-/// x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
-/// assert_eq!(x.to_string(), "65537000000000000");
-/// ```
 impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
+    /// Adds the product of a `Natural` (y) and a `Natural` (z) to a `Natural` (self), in place,
+    /// taking y and z by reference.
+    ///
+    /// Time: O(m + n * log(n) * log(log(n)))
+    ///
+    /// Additional memory: O(n * log(n))
+    ///
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
+    ///       m = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::from(10u32);
+    /// x.add_mul_assign(&Natural::from(3u32), &Natural::from(4u32));
+    /// assert_eq!(x, 22);
+    ///
+    /// let mut x = Natural::trillion();
+    /// x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
+    /// assert_eq!(x.to_string(), "65537000000000000");
+    /// ```
     fn add_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
         if let Natural(Small(small_b)) = *b {
             self.add_mul_assign_limb_ref(c, small_b);

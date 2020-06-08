@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett,
     _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,

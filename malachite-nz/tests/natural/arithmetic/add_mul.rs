@@ -26,9 +26,9 @@ fn test_limbs_add_mul_limb() {
         assert_eq!(ys, result);
     };
     test(&[123, 456], &[123], 4, &[615, 456]);
-    test(&[123, 456], &[123], 0xffff_ffff, &[0, 579]);
+    test(&[123, 456], &[123], u32::MAX, &[0, 579]);
     test(&[123], &[0, 123], 4, &[123, 492]);
-    test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 333, 123]);
+    test(&[123, 456], &[0, 123], u32::MAX, &[123, 333, 123]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -43,9 +43,9 @@ fn test_limbs_slice_add_mul_limb_same_length_in_place_left() {
         assert_eq!(xs, xs_after);
     };
     test(&[123], &[123], 4, &[615], 0);
-    test(&[123], &[123], 0xffff_ffff, &[0], 123);
+    test(&[123], &[123], u32::MAX, &[0], 123);
     test(&[123, 0], &[0, 123], 4, &[123, 492], 0);
-    test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 333], 123);
+    test(&[123, 456], &[0, 123], u32::MAX, &[123, 333], 123);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -67,9 +67,9 @@ fn test_limbs_slice_add_mul_limb_same_length_in_place_right() {
         assert_eq!(ys, ys_after);
     };
     test(&[123, 456], &[123, 0], 4, &[615, 456], 0);
-    test(&[123, 456], &[123, 0], 0xffff_ffff, &[0, 579], 0);
+    test(&[123, 456], &[123, 0], u32::MAX, &[0, 579], 0);
     test(&[123, 0], &[0, 123], 4, &[123, 492], 0);
-    test(&[123, 456], &[0, 123], 0xffff_ffff, &[123, 333], 123);
+    test(&[123, 456], &[0, 123], u32::MAX, &[123, 333], 123);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -101,7 +101,7 @@ fn test_limbs_vec_add_mul_limb_in_place_either() {
     test(
         &[123, 456],
         &[123, 0],
-        0xffff_ffff,
+        u32::MAX,
         false,
         &[0, 579],
         &[123, 0],
@@ -110,7 +110,7 @@ fn test_limbs_vec_add_mul_limb_in_place_either() {
     test(
         &[123, 456],
         &[0, 123],
-        0xffff_ffff,
+        u32::MAX,
         false,
         &[123, 333, 123],
         &[0, 123],

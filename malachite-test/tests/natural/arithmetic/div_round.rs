@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{

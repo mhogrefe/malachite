@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{ShrRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

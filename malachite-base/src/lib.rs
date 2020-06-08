@@ -35,7 +35,7 @@ pub mod chars;
 pub mod comparison;
 pub mod crement;
 pub mod num;
-pub mod round;
+pub mod rounding_mode;
 #[macro_use]
 pub mod slices;
 pub mod strings;

@@ -43,8 +43,8 @@ fn test_limbs_twos_complement() {
     let test = |xs: &[Limb], out: &[Limb]| {
         assert_eq!(limbs_twos_complement(xs), out);
     };
-    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
-    test(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3]);
+    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
+    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -57,7 +57,7 @@ fn test_limbs_maybe_sign_extend_non_negative_in_place() {
     };
     test(&[], &[]);
     test(&[1, 2, 3], &[1, 2, 3]);
-    test(&[1, 2, 0xffff_ffff], &[1, 2, 0xffff_ffff, 0]);
+    test(&[1, 2, u32::MAX], &[1, 2, u32::MAX, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -77,8 +77,8 @@ fn test_limbs_twos_complement_in_place() {
         assert_eq!(mut_xs, out);
     };
     test(&[], &[], true);
-    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], false);
-    test(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3], false);
+    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc], false);
+    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3], false);
     test(&[0, 0, 0], &[0, 0, 0], true);
 }
 
@@ -90,12 +90,9 @@ fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_xs);
         assert_eq!(mut_xs, out);
     };
-    test(&[1, 2, 3], &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
-    test(
-        &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc],
-        &[1, 2, 3, 0xffff_ffff],
-    );
-    test(&[0, 0xffff_ffff], &[0, 1, 0xffff_ffff]);
+    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
+    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3, u32::MAX]);
+    test(&[0, u32::MAX], &[0, 1, u32::MAX]);
 }
 
 #[cfg(feature = "32_bit_limbs")]

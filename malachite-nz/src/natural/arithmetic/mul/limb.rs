@@ -20,8 +20,8 @@ use platform::{DoubleLimb, Limb};
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
 ///
 /// assert_eq!(limbs_mul_limb(&[123, 456], 789), &[97_047, 359_784]);
-/// assert_eq!(limbs_mul_limb(&[0xffff_ffff, 5], 2), &[4_294_967_294, 11]);
-/// assert_eq!(limbs_mul_limb(&[0xffff_ffff], 2), &[4_294_967_294, 1]);
+/// assert_eq!(limbs_mul_limb(&[u32::MAX, 5], 2), &[u32::MAX - 1, 11]);
+/// assert_eq!(limbs_mul_limb(&[u32::MAX], 2), &[u32::MAX - 1, 1]);
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
@@ -62,7 +62,7 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[97_057, 359_784, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[0xffff_ffff], 2, 3), 2);
+/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[u32::MAX], 2, 3), 2);
 /// assert_eq!(out, &[1, 0, 0]);
 /// ```
 ///
@@ -104,8 +104,8 @@ pub fn limbs_mul_limb_with_carry_to_out(
 /// assert_eq!(out, &[97_047, 359_784, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[0xffff_ffff], 2), 1);
-/// assert_eq!(out, &[4_294_967_294, 0, 0]);
+/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[u32::MAX], 2), 1);
+/// assert_eq!(out, &[u32::MAX - 1, 0, 0]);
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
@@ -132,7 +132,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 /// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 789, 10), 0);
 /// assert_eq!(xs, &[97_057, 359_784]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 2, 3), 2);
 /// assert_eq!(xs, &[1]);
 /// ```
@@ -163,9 +163,9 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut ca
 /// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 789), 0);
 /// assert_eq!(xs, &[97_047, 359_784]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 2), 1);
-/// assert_eq!(xs, &[4_294_967_294]);
+/// assert_eq!(xs, &[u32::MAX - 1]);
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
@@ -189,9 +189,9 @@ pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
 /// limbs_vec_mul_limb_in_place(&mut xs, 789);
 /// assert_eq!(xs, &[97_047, 359_784]);
 ///
-/// let mut xs = vec![0xffff_ffff];
+/// let mut xs = vec![u32::MAX];
 /// limbs_vec_mul_limb_in_place(&mut xs, 2);
-/// assert_eq!(xs, &[4_294_967_294, 1]);
+/// assert_eq!(xs, &[u32::MAX - 1, 1]);
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of

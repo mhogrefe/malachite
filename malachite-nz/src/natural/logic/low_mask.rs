@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwoAssign, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -21,7 +21,7 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_low_mask(0), Vec::<Limb>::new());
 /// assert_eq!(limbs_low_mask(3), vec![0x7]);
-/// assert_eq!(limbs_low_mask(100), vec![0xffff_ffff, 0xffff_ffff, 0xffff_ffff, 0xf]);
+/// assert_eq!(limbs_low_mask(100), vec![u32::MAX, u32::MAX, u32::MAX, 0xf]);
 /// ```
 pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
     let limb_len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);

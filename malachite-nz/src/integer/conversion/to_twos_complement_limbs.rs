@@ -22,8 +22,8 @@ use platform::Limb;
 /// ```
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement;
 ///
-/// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
-/// assert_eq!(limbs_twos_complement(&[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
+/// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(limbs_twos_complement(&[u32::MAX, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
 /// ```
 pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
@@ -53,9 +53,9 @@ pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 /// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
 /// assert_eq!(xs, &[1, 2, 3]);
 ///
-/// let mut xs = vec![1, 2, 0xffff_ffff];
+/// let mut xs = vec![1, 2, u32::MAX];
 /// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[1, 2, 0xffff_ffff, 0]);
+/// assert_eq!(xs, &[1, 2, u32::MAX, 0]);
 /// ```
 pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() {
@@ -82,7 +82,7 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 ///
 /// let mut xs = &mut [1, 2, 3];
 /// assert!(!limbs_twos_complement_in_place(xs));
-/// assert_eq!(xs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(xs, &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
 ///
 /// let mut xs = &mut [0, 0, 0];
 /// assert!(limbs_twos_complement_in_place(xs));
@@ -113,11 +113,11 @@ pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 ///
 /// let mut xs = vec![1, 2, 3];
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[0xffff_ffff, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(xs, &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
 ///
-/// let mut xs = vec![0, 0xffff_ffff];
+/// let mut xs = vec![0, u32::MAX];
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[0, 1, 0xffff_ffff]);
+/// assert_eq!(xs, &[0, 1, u32::MAX]);
 /// ```
 pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
@@ -640,13 +640,13 @@ impl Integer {
     /// assert_eq!(Integer::trillion().twos_complement_limbs().collect::<Vec<u32>>(),
     ///     &[3567587328, 232]);
     /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(Integer::from(0xffff_ffffu32).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///     &[0xffff_ffff, 0]);
+    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().collect::<Vec<u32>>(),
+    ///     &[u32::MAX, 0]);
     /// assert_eq!((-Integer::trillion()).twos_complement_limbs().collect::<Vec<u32>>(),
     ///     &[727379968, 4294967063]);
     /// // Sign-extension for a negative `Integer`
-    /// assert_eq!((-Integer::from(0xffff_ffffu32)).twos_complement_limbs()
-    ///     .collect::<Vec<u32>>(), &[1, 0xffff_ffff]);
+    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs()
+    ///     .collect::<Vec<u32>>(), &[1, u32::MAX]);
     ///
     /// assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
     /// assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect::<Vec<u32>>(), &[123]);
@@ -656,13 +656,13 @@ impl Integer {
     /// assert_eq!(Integer::trillion().twos_complement_limbs().rev().collect::<Vec<u32>>(),
     ///     &[232, 3567587328]);
     /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(Integer::from(0xffff_ffffu32).twos_complement_limbs().rev()
-    ///     .collect::<Vec<u32>>(), &[0, 0xffff_ffff]);
+    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().rev()
+    ///     .collect::<Vec<u32>>(), &[0, u32::MAX]);
     /// assert_eq!((-Integer::trillion()).twos_complement_limbs().rev().collect::<Vec<u32>>(),
     ///     &[4294967063, 727379968]);
     /// // Sign-extension for a negative `Integer`
-    /// assert_eq!((-Integer::from(0xffff_ffffu32)).twos_complement_limbs().rev()
-    ///     .collect::<Vec<u32>>(), &[0xffff_ffff, 1]);
+    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs().rev()
+    ///     .collect::<Vec<u32>>(), &[u32::MAX, 1]);
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
         if *self == 0 {

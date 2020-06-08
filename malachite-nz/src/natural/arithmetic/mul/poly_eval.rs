@@ -130,8 +130,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
     assert_eq!(coefficients.len(), degree + 1);
 
-    // The degree degree is also the number of full-size coefficients, so thet the last coefficient,
-    // of size n_high, starts at poly + degree*n.
+    // The degree `degree` is also the number of full-size coefficients, so that the last
+    // coefficient, of size `n_high`, starts at poly + degree * n.
     v_1[n] = Limb::iverson(limbs_add_same_length_to_out(
         v_1,
         coefficients[0],

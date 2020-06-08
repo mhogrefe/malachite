@@ -88,7 +88,7 @@ fn test_u32_wrapping_from_integer() {
     test("-123", 4_294_967_173);
     test("-1000000000000", 727_379_968);
     test("-4294967296", 0);
-    test("-4294967297", 0xffff_ffff);
+    test("-4294967297", u32::MAX);
 }
 
 #[test]
@@ -99,9 +99,9 @@ fn test_u32_saturating_from_integer() {
     };
     test("0", 0);
     test("123", 123);
-    test("1000000000000", 0xffff_ffff);
-    test("4294967296", 0xffff_ffff);
-    test("4294967297", 0xffff_ffff);
+    test("1000000000000", u32::MAX);
+    test("4294967296", u32::MAX);
+    test("4294967297", u32::MAX);
     test("-123", 0);
     test("-1000000000000", 0);
     test("-4294967296", 0);
@@ -122,7 +122,7 @@ fn test_u32_overflowing_from_integer() {
     test("-123", (4_294_967_173, true));
     test("-1000000000000", (727_379_968, true));
     test("-4294967296", (0, true));
-    test("-4294967297", (0xffff_ffff, true));
+    test("-4294967297", (u32::MAX, true));
 }
 
 #[test]
@@ -218,7 +218,7 @@ fn test_u64_wrapping_from_integer() {
     test("-123", 18_446_744_073_709_551_493);
     test("-1000000000000000000000000", 16_442_979_868_502_654_976);
     test("-18446744073709551616", 0);
-    test("-18446744073709551617", 0xffff_ffff_ffff_ffff);
+    test("-18446744073709551617", u64::MAX);
 }
 
 #[test]
@@ -229,9 +229,9 @@ fn test_u64_saturating_from_integer() {
     };
     test("0", 0);
     test("123", 123);
-    test("1000000000000000000000000", 0xffff_ffff_ffff_ffff);
-    test("18446744073709551616", 0xffff_ffff_ffff_ffff);
-    test("18446744073709551617", 0xffff_ffff_ffff_ffff);
+    test("1000000000000000000000000", u64::MAX);
+    test("18446744073709551616", u64::MAX);
+    test("18446744073709551617", u64::MAX);
     test("-123", 0);
     test("-1000000000000000000000000", 0);
     test("-18446744073709551616", 0);
@@ -258,7 +258,7 @@ fn test_u64_overflowing_from_integer() {
         (16_442_979_868_502_654_976, true),
     );
     test("-18446744073709551616", (0, true));
-    test("-18446744073709551617", (0xffff_ffff_ffff_ffff, true));
+    test("-18446744073709551617", (u64::MAX, true));
 }
 
 #[test]

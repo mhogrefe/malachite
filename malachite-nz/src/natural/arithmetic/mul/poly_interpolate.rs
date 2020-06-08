@@ -45,7 +45,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
     v_neg_1_neg: bool,
     mut v_inf_0: Limb,
 ) {
-    let two_k = k + k;
+    let two_k = k << 1;
     let two_k_plus_1 = two_k + 1;
     let four_k_plus_1 = two_k_plus_1 + two_k;
     assert_eq!(v_neg_1.len(), two_k_plus_1);
@@ -54,7 +54,6 @@ pub(crate) fn _limbs_mul_toom_interpolate_5_points(
     let v_2 = &mut v_2[..two_k_plus_1];
     // (1) v_2 <- v_2 - v_neg_1 < v_2 + |v_neg_1|,            (16 8 4 2 1) - (1 -1 1 -1  1) =
     // thus 0 <= v_2 < 50 * B ^ (2 * k) < 2 ^ 6 * B ^ (2 * k) (15 9 3  3  0)
-    //
     if v_neg_1_neg {
         assert!(!limbs_slice_add_same_length_in_place_left(v_2, v_neg_1));
     } else {

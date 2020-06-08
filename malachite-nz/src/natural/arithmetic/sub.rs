@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_sub_limb(&[123, 456], 78), (vec![45, 456], false));
 /// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4_294_966_630, 455], false));
-/// assert_eq!(limbs_sub_limb(&[1], 2), (vec![4_294_967_295], true));
+/// assert_eq!(limbs_sub_limb(&[1], 2), (vec![u32::MAX], true));
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.1.2, where the result is returned.
@@ -71,7 +71,7 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
-/// assert_eq!(out, &[4_294_967_295, 0, 0]);
+/// assert_eq!(out, &[u32::MAX, 0, 0]);
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.1.2.
@@ -115,7 +115,7 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// let mut limbs = vec![1];
 /// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 2), true);
-/// assert_eq!(limbs, &[4_294_967_295]);
+/// assert_eq!(limbs, &[u32::MAX]);
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.

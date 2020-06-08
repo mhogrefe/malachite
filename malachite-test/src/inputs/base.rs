@@ -6,8 +6,8 @@ use std::ops::{Shl, Shr};
 use itertools::Itertools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, ArithmeticCheckedShr, DivRound, EqMod, ModPowerOfTwo, Parity, PowerOfTwo,
-    UnsignedAbs,
+    ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, DivRound, EqMod, ModPowerOfTwo, Parity,
+    PowerOfTwo, RoundToMultiple, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -19,7 +19,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
 };
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
@@ -5500,6 +5500,143 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1<
                     && *ys.last().unwrap() != T::ZERO
             },
         ),
+    )
+}
+
+fn triples_of_unsigned_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, `T`, and `RoundingMode`, where `T` is unsigned and the first `T` can be
+// rounded to a multiple of the second, according to the rounding mode.
+pub fn triples_of_unsigned_unsigned_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        triples_of_unsigned_unsigned_and_rounding_mode::<T>(gm).filter_map(|(x, y, rm)| {
+            if x == y {
+                Some((x, y, rm))
+            } else if y == T::ZERO {
+                if rm == RoundingMode::Floor
+                    || rm == RoundingMode::Down
+                    || rm == RoundingMode::Nearest
+                {
+                    Some((x, y, rm))
+                } else {
+                    None
+                }
+            } else if rm != RoundingMode::Exact {
+                x.div_round(y, rm).checked_mul(y).map(|_| (x, y, rm))
+            } else {
+                x.checked_mul(y).map(|product| (product, y, rm))
+            }
+        }),
+    )
+}
+
+// Ignoring RoundingMode::Exact case
+fn round_to_multiple_unsigned_valid<T: PrimitiveUnsigned>(x: T, y: T, rm: RoundingMode) -> bool {
+    if x == y {
+        true
+    } else if y == T::ZERO {
+        rm == RoundingMode::Down || rm == RoundingMode::Down || rm == RoundingMode::Nearest
+    } else {
+        x.div_round(y, rm).checked_mul(y).is_some()
+    }
+}
+
+// Ignoring RoundingMode::Exact case
+fn round_to_multiple_signed_valid<T: PrimitiveSigned>(x: T, y: T, rm: RoundingMode) -> bool
+where
+    T: ConvertibleFrom<<T as UnsignedAbs>::Output> + CheckedFrom<<T as UnsignedAbs>::Output>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+{
+    let x_abs = x.unsigned_abs();
+    let y_abs = y.unsigned_abs();
+    if x >= T::ZERO {
+        round_to_multiple_unsigned_valid(x_abs, y_abs, rm)
+            && T::convertible_from(x_abs.round_to_multiple(y_abs, rm))
+    } else if !round_to_multiple_unsigned_valid(x_abs, y_abs, -rm) {
+        false
+    } else {
+        let abs_result = x_abs.round_to_multiple(y_abs, -rm);
+        abs_result == T::MIN.unsigned_abs()
+            || T::checked_from(abs_result)
+                .and_then(CheckedNeg::checked_neg)
+                .is_some()
+    }
+}
+
+fn triples_of_signed_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_signed()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
+// All triples of `T`, `T`, and `RoundingMode`, where `T` is signed and the first `T` can be rounded
+// to a multiple of the second, according to the rounding mode.
+pub fn triples_of_signed_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, RoundingMode)>
+where
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>
+        + ConvertibleFrom<<T as UnsignedAbs>::Output>
+        + CheckedFrom<<T as UnsignedAbs>::Output>,
+    <T as UnsignedAbs>::Output: PrimitiveUnsigned,
+    T::UnsignedOfEqualWidth: Rand,
+{
+    Box::new(
+        triples_of_signed_signed_and_rounding_mode::<T>(gm).filter_map(|(x, y, rm)| {
+            if rm != RoundingMode::Exact {
+                if round_to_multiple_signed_valid(x, y, rm) {
+                    Some((x, y, rm))
+                } else {
+                    None
+                }
+            } else {
+                x.checked_mul(y).map(|product| (product, y, rm))
+            }
+        }),
     )
 }
 

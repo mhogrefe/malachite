@@ -33,13 +33,13 @@ fn test_limbs_overflowing_sub_mul_limb() {
         assert_eq!(ys, result);
     };
     test(&[123, 456], &[123], 4, &[4_294_966_927, 455, 0], true);
-    test(&[123, 456], &[123], 0xffff_ffff, &[246, 333, 0], true);
+    test(&[123, 456], &[123], u32::MAX, &[246, 333, 0], true);
     test(&[123], &[123], 1, &[0, 0], true);
     test(&[123], &[123], 4, &[369, 0], false);
     test(
         &[123],
         &[123, 456],
-        0xffff_ffff,
+        u32::MAX,
         &[4_294_967_050, 4_294_966_962, 455],
         false,
     );
@@ -76,7 +76,7 @@ fn test_limbs_overflowing_sub_mul_limb_in_place_either() {
     test(
         &[123, 456],
         &[123],
-        0xffff_ffff,
+        u32::MAX,
         false,
         &[246, 333, 0],
         &[123],
@@ -87,7 +87,7 @@ fn test_limbs_overflowing_sub_mul_limb_in_place_either() {
     test(
         &[123],
         &[123, 456],
-        0xffff_ffff,
+        u32::MAX,
         true,
         &[123],
         &[4_294_967_050, 4_294_966_962, 455],

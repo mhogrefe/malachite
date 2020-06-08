@@ -15,7 +15,7 @@ fn test_limbs_count_zeros_neg() {
         assert_eq!(limbs_count_zeros_neg(xs), out);
     };
     test(&[0, 1, 2], 33);
-    test(&[1, 0xffff_ffff], 32);
+    test(&[1, u32::MAX], 32);
 }
 
 #[test]

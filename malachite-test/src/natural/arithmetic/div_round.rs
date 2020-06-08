@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use num::Integer;
 use rug::ops::DivRounding;

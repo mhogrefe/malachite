@@ -33,7 +33,7 @@ use platform::Limb;
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb;
 ///
 /// assert_eq!(limbs_neg_xor_limb(&[123, 456], 789), &[880, 456]);
-/// assert_eq!(limbs_neg_xor_limb(&[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2), &[0, 0, 0, 1]);
+/// assert_eq!(limbs_neg_xor_limb(&[u32::MAX - 1, u32::MAX, u32::MAX], 2), &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
@@ -78,7 +78,7 @@ pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// assert_eq!(xs, &[880, 456, 0, 0]);
 ///
 /// let mut xs = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_neg_xor_limb_to_out(&mut xs, &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2),
+/// assert_eq!(limbs_neg_xor_limb_to_out(&mut xs, &[u32::MAX - 1, u32::MAX, u32::MAX], 2),
 ///     true);
 /// assert_eq!(xs, &[0, 0, 0, 10]);
 /// ```
@@ -126,7 +126,7 @@ pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool
 /// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut xs, 789), false);
 /// assert_eq!(xs, &[880, 456]);
 ///
-/// let mut xs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
+/// let mut xs = vec![u32::MAX - 1, u32::MAX, u32::MAX];
 /// assert_eq!(limbs_slice_neg_xor_limb_in_place(&mut xs, 2), true);
 /// assert_eq!(xs, &[0, 0, 0]);
 /// ```
@@ -169,7 +169,7 @@ pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// limbs_vec_neg_xor_limb_in_place(&mut xs, 789);
 /// assert_eq!(xs, &[880, 456]);
 ///
-/// let mut xs = vec![0xffff_fffe, 0xffff_ffff, 0xffff_ffff];
+/// let mut xs = vec![u32::MAX - 1, u32::MAX, u32::MAX];
 /// limbs_vec_neg_xor_limb_in_place(&mut xs, 2);
 /// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```
@@ -198,7 +198,7 @@ pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 ///
 /// assert_eq!(limbs_pos_xor_limb_neg(&[0, 2], 3), &[4294967293, 2]);
 /// assert_eq!(limbs_pos_xor_limb_neg(&[1, 2, 3], 4), &[4294967291, 2, 3]);
-/// assert_eq!(limbs_pos_xor_limb_neg(&[2, 0xffff_ffff], 2), &[0, 0, 1]);
+/// assert_eq!(limbs_pos_xor_limb_neg(&[2, u32::MAX], 2), &[0, 0, 1]);
 /// ```
 pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let (head, tail) = xs.split_first().unwrap();
@@ -242,7 +242,7 @@ pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[4294967291, 2, 3, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut out, &[2, 0xffff_ffff], 2), true);
+/// assert_eq!(limbs_pos_xor_limb_neg_to_out(&mut out, &[2, u32::MAX], 2), true);
 /// assert_eq!(out, &[0, 0, 10, 10]);
 /// ```
 pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
@@ -285,7 +285,7 @@ pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 /// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut out, 4), false);
 /// assert_eq!(out, &[4294967291, 2, 3]);
 ///
-/// let mut out = vec![2, 0xffff_ffff];
+/// let mut out = vec![2, u32::MAX];
 /// assert_eq!(limbs_slice_pos_xor_limb_neg_in_place(&mut out, 2), true);
 /// assert_eq!(out, &[0, 0]);
 /// ```
@@ -326,7 +326,7 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// limbs_vec_pos_xor_limb_neg_in_place(&mut xs, 4);
 /// assert_eq!(xs, &[4294967291, 2, 3]);
 ///
-/// let mut xs = vec![2, 0xffff_ffff];
+/// let mut xs = vec![2, u32::MAX];
 /// limbs_vec_pos_xor_limb_neg_in_place(&mut xs, 2);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```
@@ -1552,7 +1552,7 @@ impl BitXorAssign<Integer> for Integer {
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     ///
-    /// let mut x = Integer::from(0xffff_ffffu32);
+    /// let mut x = Integer::from(u32::MAX);
     /// x ^= Integer::from(0x0000_000f);
     /// x ^= Integer::from(0x0000_0f00);
     /// x ^= Integer::from(0x000f_0000);
@@ -1593,7 +1593,7 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
     /// use malachite_base::num::basic::traits::NegativeOne;
     /// use malachite_nz::integer::Integer;
     ///
-    /// let mut x = Integer::from(0xffff_ffffu32);
+    /// let mut x = Integer::from(u32::MAX);
     /// x ^= &Integer::from(0x0000_000f);
     /// x ^= &Integer::from(0x0000_0f00);
     /// x ^= &Integer::from(0x000f_0000);

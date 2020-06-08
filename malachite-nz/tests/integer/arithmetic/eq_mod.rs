@@ -30,10 +30,10 @@ fn test_limbs_eq_neg_limb_mod_limb() {
     test(&[100, 101, 102], 1_233, 10, false);
     test(&[123, 456], 153, 789, true);
     test(&[123, 456], 1_000, 789, false);
-    test(&[0xffff_ffff, 0xffff_ffff], 101, 2, true);
-    test(&[0xffff_ffff, 0xffff_ffff], 100, 2, false);
-    test(&[0xffff_ffff, 0xffff_ffff], 111, 3, true);
-    test(&[0xffff_ffff, 0xffff_ffff], 110, 3, false);
+    test(&[u32::MAX, u32::MAX], 101, 2, true);
+    test(&[u32::MAX, u32::MAX], 100, 2, false);
+    test(&[u32::MAX, u32::MAX], 111, 3, true);
+    test(&[u32::MAX, u32::MAX], 110, 3, false);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -62,9 +62,9 @@ fn test_limbs_pos_limb_eq_neg_limb_mod() {
     test(1, 1, &[1, 1], false);
     test(1, 1, &[2, 1], false);
     test(1, 1, &[1, 0, 1], false);
-    test(0xffff_ffff, 0xffff_ffff, &[0xffff_fffe, 1], true);
-    test(0xffff_ffff, 0xffff_ffff, &[0xffff_fffe, 1, 2], false);
-    test(0xffff_ffff, 0xffff_ffff, &[0xffff_fffe, 2], false);
+    test(u32::MAX, u32::MAX, &[u32::MAX - 1, 1], true);
+    test(u32::MAX, u32::MAX, &[u32::MAX - 1, 1, 2], false);
+    test(u32::MAX, u32::MAX, &[u32::MAX - 1, 2], false);
     test(0xabcd_dbca, 0x641f_efdf, &[0xfed_cba9, 1], true);
 }
 

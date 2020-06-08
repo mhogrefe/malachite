@@ -40,8 +40,8 @@ fn test_mod_power_of_two_and_rem_power_of_two_unsigned() {
         64,
         2_003_764_205_206_896_640,
     );
-    test::<u32>(0xffff_ffff, 31, 0x7fff_ffff);
-    test::<u32>(0xffff_ffff, 32, 0xffff_ffff);
+    test::<u32>(u32::MAX, 31, 0x7fff_ffff);
+    test::<u32>(u32::MAX, 32, u32::MAX);
     test::<usize>(0xffff_ffff, 33, 0xffff_ffff);
     test::<u64>(0x1_0000_0000, 31, 0);
     test::<u64>(0x1_0000_0000, 32, 0);
@@ -375,7 +375,7 @@ fn test_neg_mod_power_of_two_unsigned() {
     test::<u8>(0, 0, 0);
     test::<u16>(260, 8, 252);
     test::<u32>(1_611, 4, 5);
-    test::<u32>(1, 32, 0xffff_ffff);
+    test::<u32>(1, 32, u32::MAX);
     test::<u128>(123, 100, 1_267_650_600_228_229_401_496_703_205_253);
     test::<u64>(1_000_000_000_000, 0, 0);
     test::<u64>(1_000_000_000_000, 12, 0);
@@ -393,7 +393,7 @@ fn test_neg_mod_power_of_two_unsigned() {
         64,
         16_442_979_868_502_654_976,
     );
-    test::<u32>(0xffff_ffff, 31, 1);
+    test::<u32>(u32::MAX, 31, 1);
     test::<usize>(0xffff_ffff, 32, 1);
     test::<u64>(0xffff_ffff, 33, 0x1_0000_0001);
     test::<u64>(0x1_0000_0000, 31, 0);

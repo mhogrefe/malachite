@@ -48,7 +48,7 @@ use platform::{
 /// use malachite_nz::platform::Limb;
 ///
 /// assert_eq!(limbs_mul_greater(&[1, 2, 3], &[6, 7]), &[6, 19, 32, 21, 0]);
-/// assert_eq!(limbs_mul_greater(&[100, 101, 0xffff_ffff], &[102, 101, 2]),
+/// assert_eq!(limbs_mul_greater(&[100, 101, u32::MAX], &[102, 101, 2]),
 ///         &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
@@ -79,7 +79,7 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// use malachite_nz::platform::Limb;
 ///
 /// assert_eq!(limbs_mul(&[6, 7], &[1, 2, 3]), &[6, 19, 32, 21, 0]);
-/// assert_eq!(limbs_mul(&[100, 101, 0xffff_ffff], &[102, 101, 2]),
+/// assert_eq!(limbs_mul(&[100, 101, u32::MAX], &[102, 101, 2]),
 ///         &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
@@ -118,7 +118,7 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(xs, &[6, 19, 14, 0]);
 ///
 /// let xs: &mut [Limb] = &mut [10; 6];
-/// limbs_mul_same_length_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]);
+/// limbs_mul_same_length_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]);
 /// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
@@ -182,7 +182,7 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 /// assert_eq!(xs, &[6, 19, 32, 21, 0]);
 ///
 /// let xs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_greater_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(limbs_mul_greater_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]), 2);
 /// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///
@@ -353,7 +353,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 /// assert_eq!(xs, &[6, 19, 32, 21, 0]);
 ///
 /// let xs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_to_out(xs, &[100, 101, 0xffff_ffff], &[102, 101, 2]), 2);
+/// assert_eq!(limbs_mul_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]), 2);
 /// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
 /// ```
 ///

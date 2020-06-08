@@ -42,12 +42,7 @@ fn test_limbs_neg_limb_get_bits() {
     test(0x1234_5678, 16, 48, &[0xffff_edcb]);
     test(0x1234_5678, 4, 16, &[0xa98]);
     // trailing_zeros >= start
-    test(
-        0x1234_5678,
-        0,
-        100,
-        &[0xedcb_a988, 0xffff_ffff, 0xffff_ffff, 0xf],
-    );
+    test(0x1234_5678, 0, 100, &[0xedcb_a988, u32::MAX, u32::MAX, 0xf]);
     test(0x1234_5678, 10, 10, &[]);
     // trailing_zeros >= end
     test(0x8000_0000, 5, 10, &[]);
@@ -82,7 +77,7 @@ fn test_limbs_slice_neg_get_bits() {
         &[0x1234_5678, 0xabcd_ef01],
         0,
         100,
-        &[0xedcb_a988, 0x5432_10fe, 0xffff_ffff, 0xf],
+        &[0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf],
     );
     test(&[0x1234_5678, 0xabcd_ef01], 10, 10, &[]);
     // trailing_zeros >= end
@@ -109,7 +104,7 @@ fn test_limbs_vec_neg_get_bits() {
         &[0x1234_5678, 0xabcd_ef01],
         0,
         100,
-        &[0xedcb_a988, 0x5432_10fe, 0xffff_ffff, 0xf],
+        &[0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf],
     );
     test(&[0x1234_5678, 0xabcd_ef01], 10, 10, &[]);
     test(&[0, 0x8000_0000], 5, 10, &[]);

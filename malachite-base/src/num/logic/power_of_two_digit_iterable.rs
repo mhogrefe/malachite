@@ -8,7 +8,7 @@ use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{
     BitBlockAccess, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, SignificantBits,
 };
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {

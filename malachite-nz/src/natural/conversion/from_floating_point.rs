@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::Natural;
 
@@ -29,7 +29,7 @@ macro_rules! float_impls {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::num::conversion::traits::RoundingFrom;
-        /// use malachite_base::round::RoundingMode;
+        /// use malachite_base::rounding_mode::RoundingMode;
         /// use malachite_nz::natural::Natural;
         ///
         /// assert_eq!(Natural::rounding_from(0.0, RoundingMode::Exact).to_string(), "0");

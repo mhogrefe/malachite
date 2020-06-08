@@ -285,15 +285,15 @@ macro_rules! impl_mod_mul_precomputed_fast {
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
             ///
-            /// let data = u8::precompute_mod_mul_data(&7);
-            /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
-            /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
-            /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
+            /// let data = u32::precompute_mod_mul_data(&7);
+            /// assert_eq!(2u32.mod_mul_precomputed(3, 7, &data), 6);
+            /// assert_eq!(5u32.mod_mul_precomputed(3, 7, &data), 1);
+            /// assert_eq!(4u32.mod_mul_precomputed(4, 7, &data), 2);
             ///
-            /// let data = u32::precompute_mod_mul_data(&10);
-            /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
-            /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
-            /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
+            /// let data = u64::precompute_mod_mul_data(&10);
+            /// assert_eq!(7u64.mod_mul_precomputed(3, 10, &data), 1);
+            /// assert_eq!(4u64.mod_mul_precomputed(9, 10, &data), 6);
+            /// assert_eq!(5u64.mod_mul_precomputed(8, 10, &data), 0);
             /// ```
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
@@ -343,10 +343,10 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
             /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
             ///
-            /// let data = u32::precompute_mod_mul_data(&10);
-            /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
-            /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
-            /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
+            /// let data = u16::precompute_mod_mul_data(&10);
+            /// assert_eq!(7u16.mod_mul_precomputed(3, 10, &data), 1);
+            /// assert_eq!(4u16.mod_mul_precomputed(9, 10, &data), 6);
+            /// assert_eq!(5u16.mod_mul_precomputed(8, 10, &data), 0);
             /// ```
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
@@ -389,15 +389,15 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     ///
-    /// let data = u8::precompute_mod_mul_data(&7);
-    /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
-    /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
-    /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
+    /// let data = u128::precompute_mod_mul_data(&7);
+    /// assert_eq!(2u128.mod_mul_precomputed(3, 7, &data), 6);
+    /// assert_eq!(5u128.mod_mul_precomputed(3, 7, &data), 1);
+    /// assert_eq!(4u128.mod_mul_precomputed(4, 7, &data), 2);
     ///
-    /// let data = u32::precompute_mod_mul_data(&10);
-    /// assert_eq!(7u32.mod_mul_precomputed(3, 10, &data), 1);
-    /// assert_eq!(4u32.mod_mul_precomputed(9, 10, &data), 6);
-    /// assert_eq!(5u32.mod_mul_precomputed(8, 10, &data), 0);
+    /// let data = u128::precompute_mod_mul_data(&10);
+    /// assert_eq!(7u128.mod_mul_precomputed(3, 10, &data), 1);
+    /// assert_eq!(4u128.mod_mul_precomputed(9, 10, &data), 6);
+    /// assert_eq!(5u128.mod_mul_precomputed(8, 10, &data), 0);
     /// ```
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.

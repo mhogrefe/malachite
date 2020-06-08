@@ -5,7 +5,7 @@ use num::conversion::traits::{
     FromOtherTypeSlice, HasHalf, JoinHalves, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice,
     WrappingFrom,
 };
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 macro_rules! impl_half_traits {
     ($t:ident, $ht: ident) => {

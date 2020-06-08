@@ -42,6 +42,7 @@ pub mod arithmetic {
     pub mod overflowing_sub_mul;
     pub mod parity;
     pub mod power_of_two;
+    pub mod round_to_multiple;
     pub mod round_to_multiple_of_power_of_two;
     pub mod saturating_abs;
     pub mod saturating_add;

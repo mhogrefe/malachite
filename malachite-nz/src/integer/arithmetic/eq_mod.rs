@@ -70,7 +70,7 @@ fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_limb_eq_neg_limb_mod;
 ///
-/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(0xffff_ffff, 0xffff_ffff, &[0xffff_fffe, 1]), true);
+/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(u32::MAX, u32::MAX, &[u32::MAX - 1, 1]), true);
 /// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(1, 1, &[1, 0, 1]), false);
 /// ```
 ///

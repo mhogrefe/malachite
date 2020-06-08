@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
@@ -37,13 +37,10 @@ use platform::Limb;
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_down(&[123, 456], 32), &[0, 456]);
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_down(&[123, 456], 100), Vec::<u32>::new());
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_down(&[256, 456], 8), &[256, 456]);
+/// assert_eq!(limbs_round_to_multiple_of_power_of_two_down(&[u32::MAX, 1], 1), &[u32::MAX - 1, 1]);
 /// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two_down(&[4_294_967_295, 1], 1),
-///     &[4_294_967_294, 1]
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two_down(&[4_294_967_295, 4_294_967_295], 32),
-///     &[0, 4_294_967_295]
+///     limbs_round_to_multiple_of_power_of_two_down(&[u32::MAX, u32::MAX], 32),
+///     &[0, u32::MAX]
 /// );
 /// ```
 pub fn limbs_round_to_multiple_of_power_of_two_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
@@ -85,9 +82,9 @@ pub fn limbs_round_to_multiple_of_power_of_two_down(xs: &[Limb], pow: u64) -> Ve
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_up(&[123, 456], 32), &[0, 457]);
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_up(&[123, 456], 100), &[0, 0, 0, 16]);
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_up(&[256, 456], 8), &[256, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_two_up(&[4_294_967_295, 1], 1), &[0, 2]);
+/// assert_eq!(limbs_round_to_multiple_of_power_of_two_up(&[u32::MAX, 1], 1), &[0, 2]);
 /// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two_up(&[4_294_967_295, 4_294_967_295], 32),
+///     limbs_round_to_multiple_of_power_of_two_up(&[u32::MAX, u32::MAX], 32),
 ///     &[0, 0, 1]
 /// );
 /// ```
@@ -171,9 +168,9 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even(
 ///     Vec::<u32>::new()
 /// );
 /// assert_eq!(limbs_round_to_multiple_of_power_of_two_nearest(&[256, 456], 8), &[256, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_two_nearest(&[4_294_967_295, 1], 1), &[0, 2]);
+/// assert_eq!(limbs_round_to_multiple_of_power_of_two_nearest(&[u32::MAX, 1], 1), &[0, 2]);
 /// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two_nearest(&[4_294_967_295, 4_294_967_295], 32),
+///     limbs_round_to_multiple_of_power_of_two_nearest(&[u32::MAX, u32::MAX], 32),
 ///     &[0, 0, 1]
 /// );
 /// ```
@@ -205,7 +202,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest(xs: &[Limb], pow: u64) ->
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::round::RoundingMode;
+/// use malachite_base::rounding_mode::RoundingMode;
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
 /// assert_eq!(
@@ -245,16 +242,12 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest(xs: &[Limb], pow: u64) ->
 ///     Some(vec![256, 456])
 /// );
 /// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two(&[4_294_967_295, 1], 1, RoundingMode::Exact),
+///     limbs_round_to_multiple_of_power_of_two(&[u32::MAX, 1], 1, RoundingMode::Exact),
 ///     None
 /// );
 /// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_two(
-///         &[4_294_967_295, 4_294_967_295],
-///         32,
-///         RoundingMode::Down
-///     ),
-///     Some(vec![0, 4_294_967_295])
+///     limbs_round_to_multiple_of_power_of_two(&[u32::MAX, u32::MAX], 32, RoundingMode::Down),
+///     Some(vec![0, u32::MAX])
 /// );
 /// ```
 pub fn limbs_round_to_multiple_of_power_of_two(
@@ -329,13 +322,13 @@ pub fn limbs_round_to_multiple_of_power_of_two(
 /// limbs_round_to_multiple_of_power_of_two_down_in_place(&mut xs, 8);
 /// assert_eq!(xs, &[256, 456]);
 ///
-/// let mut xs = vec![4_294_967_295, 1];
+/// let mut xs = vec![u32::MAX, 1];
 /// limbs_round_to_multiple_of_power_of_two_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[4_294_967_294, 1]);
+/// assert_eq!(xs, &[u32::MAX - 1, 1]);
 ///
-/// let mut xs = vec![4_294_967_295, 4_294_967_295];
+/// let mut xs = vec![u32::MAX, u32::MAX];
 /// limbs_round_to_multiple_of_power_of_two_down_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 4_294_967_295]);
+/// assert_eq!(xs, &[0, u32::MAX]);
 /// ```
 pub fn limbs_round_to_multiple_of_power_of_two_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -401,11 +394,11 @@ pub fn limbs_round_to_multiple_of_power_of_two_down_in_place(xs: &mut Vec<Limb>,
 /// limbs_round_to_multiple_of_power_of_two_up_in_place(&mut xs, 8);
 /// assert_eq!(xs, &[256, 456]);
 ///
-/// let mut xs = vec![4_294_967_295, 1];
+/// let mut xs = vec![u32::MAX, 1];
 /// limbs_round_to_multiple_of_power_of_two_up_in_place(&mut xs, 1);
 /// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut xs = vec![4_294_967_295, 4_294_967_295];
+/// let mut xs = vec![u32::MAX, u32::MAX];
 /// limbs_round_to_multiple_of_power_of_two_up_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```
@@ -509,11 +502,11 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even_in_place(
 /// limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut xs, 8);
 /// assert_eq!(xs, &[256, 456]);
 ///
-/// let mut xs = vec![4_294_967_295, 1];
+/// let mut xs = vec![u32::MAX, 1];
 /// limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut xs, 1);
 /// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut xs = vec![4_294_967_295, 4_294_967_295];
+/// let mut xs = vec![u32::MAX, u32::MAX];
 /// limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```
@@ -545,7 +538,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest_in_place(xs: &mut Vec<Lim
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::round::RoundingMode;
+/// use malachite_base::rounding_mode::RoundingMode;
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
 /// let mut xs = vec![1];
@@ -611,18 +604,18 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest_in_place(xs: &mut Vec<Lim
 /// );
 /// assert_eq!(xs, vec![256, 456]);
 ///
-/// let mut xs = vec![4_294_967_295, 1];
+/// let mut xs = vec![u32::MAX, 1];
 /// assert_eq!(
 ///     limbs_round_to_multiple_of_power_of_two_in_place(&mut xs, 1, RoundingMode::Exact),
 ///     false
 /// );
 ///
-/// let mut xs = vec![4_294_967_295, 4_294_967_295];
+/// let mut xs = vec![u32::MAX, u32::MAX];
 /// assert_eq!(
 ///     limbs_round_to_multiple_of_power_of_two_in_place(&mut xs, 32, RoundingMode::Down),
 ///     true
 /// );
-/// assert_eq!(xs, vec![0, 4_294_967_295]);
+/// assert_eq!(xs, vec![0, u32::MAX]);
 /// ```
 pub fn limbs_round_to_multiple_of_power_of_two_in_place(
     xs: &mut Vec<Limb>,
@@ -674,7 +667,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -734,7 +727,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -804,7 +797,7 @@ impl RoundToMultipleOfPowerOfTwoAssign<u64> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwoAssign;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use integer::Integer;
 
@@ -24,7 +24,7 @@ impl DivRound<Integer> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -133,7 +133,7 @@ impl<'a> DivRound<&'a Integer> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -243,7 +243,7 @@ impl<'a> DivRound<Integer> for &'a Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -367,7 +367,7 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -490,7 +490,7 @@ impl DivRoundAssign<Integer> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut n = Integer::from(-10);
@@ -593,7 +593,7 @@ impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut n = Integer::from(-10);

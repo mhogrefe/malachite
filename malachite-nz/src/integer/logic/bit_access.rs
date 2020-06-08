@@ -174,7 +174,7 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 /// use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 /// use std::cmp::Ordering;
 ///
-/// let mut xs = vec![0, 0, 0xffff_ffff];
+/// let mut xs = vec![0, 0, u32::MAX];
 /// limbs_vec_clear_bit_neg(&mut xs, 64);
 /// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```

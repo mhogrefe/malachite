@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{

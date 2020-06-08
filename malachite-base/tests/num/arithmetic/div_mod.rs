@@ -28,7 +28,7 @@ fn test_div_mod_and_div_rem_unsigned() {
     test::<usize>(123, 123, 1, 0);
     test::<u128>(123, 456, 0, 123);
     test::<u16>(456, 123, 3, 87);
-    test::<u32>(0xffff_ffff, 1, 0xffff_ffff, 0);
+    test::<u32>(u32::MAX, 1, u32::MAX, 0);
     test::<usize>(0xffff_ffff, 0xffff_ffff, 1, 0);
     test::<u64>(1_000_000_000_000, 1, 1_000_000_000_000, 0);
     test::<u64>(1_000_000_000_000, 3, 333_333_333_333, 1);

@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::mod_power_of_two::{
@@ -44,7 +44,7 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///
 /// assert_eq!(limbs_mod_power_of_two_limb_sub_limbs(3, &[2], 4), &[1]);
-/// assert_eq!(limbs_mod_power_of_two_limb_sub_limbs(3, &[1, 2, 3], 70), &[2, 4294967294, 60]);
+/// assert_eq!(limbs_mod_power_of_two_limb_sub_limbs(3, &[1, 2, 3], 70), &[2, u32::MAX - 1, 60]);
 /// ```
 pub fn limbs_mod_power_of_two_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut diff = limbs_neg_mod_power_of_two(ys, pow);
@@ -73,7 +73,7 @@ pub fn limbs_mod_power_of_two_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> 
 ///
 /// let mut ys = vec![1, 2, 3];
 /// limbs_mod_power_of_two_limb_sub_limbs_in_place(3, &mut ys, 70);
-/// assert_eq!(ys, &[2, 4294967294, 60]);
+/// assert_eq!(ys, &[2, u32::MAX - 1, 60]);
 /// ```
 pub fn limbs_mod_power_of_two_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>, pow: u64) {
     limbs_neg_mod_power_of_two_in_place(ys, pow);

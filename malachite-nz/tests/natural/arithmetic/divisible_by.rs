@@ -31,8 +31,8 @@ fn test_limbs_divisible_by_limb() {
     test(&[100, 101, 102], 10, false);
     test(&[123, 456], 789, false);
     test(&[369, 1_368], 3, true);
-    test(&[0xffff_ffff, 0xffff_ffff], 2, false);
-    test(&[0xffff_ffff, 0xffff_ffff], 3, true);
+    test(&[u32::MAX, u32::MAX], 2, false);
+    test(&[u32::MAX, u32::MAX], 3, true);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -96,16 +96,16 @@ fn test_limbs_divisible_by() {
         &[100, 101, 102],
         false,
     );
-    test(&[0xffff_ffff], &[0xffff_ffff], true);
-    test(&[1, 0xffff_fffe], &[0xffff_ffff], true);
+    test(&[u32::MAX], &[u32::MAX], true);
+    test(&[1, u32::MAX - 1], &[u32::MAX], true);
     test(
-        &[1, 0, 0, 0xffff_fffe, 0xffff_ffff, 0xffff_ffff],
-        &[0xffff_ffff; 3],
+        &[1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
+        &[u32::MAX; 3],
         true,
     );
     test(
-        &[1, 0, 0, 0xffff_fffd, 0xffff_ffff, 0xffff_ffff],
-        &[0xffff_ffff; 3],
+        &[1, 0, 0, 0xffff_fffd, u32::MAX, u32::MAX],
+        &[u32::MAX; 3],
         false,
     );
     test(&[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3], true);

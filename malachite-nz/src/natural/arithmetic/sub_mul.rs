@@ -30,8 +30,8 @@ use platform::{DoubleLimb, Limb};
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater;
 ///
 /// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[123], 4), Some(vec![4294966927, 455]));
-/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[123], 0xffff_ffff), Some(vec![246, 333]));
-/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[0, 123], 0xffff_ffff), None);
+/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[123], u32::MAX), Some(vec![246, 333]));
+/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[0, 123], u32::MAX), None);
 /// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
@@ -71,11 +71,11 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Optio
 /// assert_eq!(xs, &[4294966927, 455]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[123, 0], 0xffff_ffff), 0);
+/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[123, 0], u32::MAX), 0);
 /// assert_eq!(xs, &[246, 333]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
+/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[0, 123], u32::MAX), 123);
 /// assert_eq!(xs, &[123, 579]);
 /// ```
 ///
@@ -127,11 +127,11 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(
 /// assert_eq!(xs, &[4294966927, 455]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[123], 0xffff_ffff), 0);
+/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[123], u32::MAX), 0);
 /// assert_eq!(xs, &[246, 333]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[0, 123], 0xffff_ffff), 123);
+/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[0, 123], u32::MAX), 123);
 /// assert_eq!(xs, &[123, 579]);
 /// ```
 ///
@@ -169,11 +169,11 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 /// assert_eq!(ys, &[4294966927, 455]);
 ///
 /// let ys = &mut [123, 0];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, 0xffff_ffff), 0);
+/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX), 0);
 /// assert_eq!(ys, &[246, 333]);
 ///
 /// let ys = &mut [0, 123];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, 0xffff_ffff), 123);
+/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX), 123);
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///
@@ -229,11 +229,11 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 /// assert_eq!(ys, &[4294966927, 455]);
 ///
 /// let mut ys = vec![123];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, 0xffff_ffff), 0);
+/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, u32::MAX), 0);
 /// assert_eq!(ys, &[246, 333]);
 ///
 /// let mut ys = vec![0, 123];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, 0xffff_ffff), 123);
+/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, u32::MAX), 123);
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///

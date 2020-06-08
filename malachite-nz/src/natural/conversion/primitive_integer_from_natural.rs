@@ -130,7 +130,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u32::saturating_from(Natural::trillion()), 4_294_967_295);
+            /// assert_eq!(u32::saturating_from(Natural::trillion()), u32::MAX);
             /// ```
             #[inline]
             fn saturating_from(value: Natural) -> $u {
@@ -155,7 +155,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::saturating_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(u32::saturating_from(&Natural::trillion()), 4_294_967_295);
+            /// assert_eq!(u32::saturating_from(&Natural::trillion()), u32::MAX);
             /// ```
             fn saturating_from(value: &Natural) -> $u {
                 match *value {

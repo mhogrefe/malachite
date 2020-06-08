@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoIsReduced {
@@ -958,6 +958,18 @@ pub trait DivRound<RHS = Self> {
 /// the `RoundingMode` documentation for details.
 pub trait DivRoundAssign<RHS = Self> {
     fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
+/// Rounds `self` to a multiple of other, according to a specified rounding mode.
+pub trait RoundToMultiple<RHS = Self> {
+    type Output;
+
+    fn round_to_multiple(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Rounds `self` to a multiple of other in place, according to a specified rounding mode.
+pub trait RoundToMultipleAssign<RHS = Self> {
+    fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.

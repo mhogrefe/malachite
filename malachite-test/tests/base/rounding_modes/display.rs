@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::strings::string_is_subset;
 
 use malachite_test::common::test_properties_no_limit_exhaustive_no_special;

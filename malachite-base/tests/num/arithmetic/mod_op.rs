@@ -21,7 +21,7 @@ fn test_mod_op_unsigned() {
     test::<usize>(123, 123, 0);
     test::<u128>(123, 456, 123);
     test::<u16>(456, 123, 87);
-    test::<u32>(0xffff_ffff, 1, 0);
+    test::<u32>(u32::MAX, 1, 0);
     test::<usize>(0xffff_ffff, 0xffff_ffff, 0);
     test::<u64>(1_000_000_000_000, 1, 0);
     test::<u64>(1_000_000_000_000, 3, 1);

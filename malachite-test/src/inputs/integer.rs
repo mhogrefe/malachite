@@ -13,7 +13,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{

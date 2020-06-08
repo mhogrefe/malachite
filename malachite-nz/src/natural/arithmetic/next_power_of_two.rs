@@ -27,7 +27,7 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_next_power_of_two(&[3]), &[4]);
 /// assert_eq!(limbs_next_power_of_two(&[123, 456]), &[0, 512]);
-/// assert_eq!(limbs_next_power_of_two(&[123, 456, 0xffff_ffff]), &[0, 0, 0, 1]);
+/// assert_eq!(limbs_next_power_of_two(&[123, 456, u32::MAX]), &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
     let xs_last = xs.last().unwrap();
@@ -79,7 +79,7 @@ pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), false);
 /// assert_eq!(limbs, &[0, 512]);
 ///
-/// let mut limbs = vec![123, 456, 0xffff_ffff];
+/// let mut limbs = vec![123, 456, u32::MAX];
 /// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), true);
 /// assert_eq!(limbs, &[0, 0, 0]);
 /// ```
@@ -134,7 +134,7 @@ pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
 /// limbs_vec_next_power_of_two_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 512]);
 ///
-/// let mut limbs = vec![123, 456, 0xffff_ffff];
+/// let mut limbs = vec![123, 456, u32::MAX];
 /// limbs_vec_next_power_of_two_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0, 0, 0, 1]);
 /// ```

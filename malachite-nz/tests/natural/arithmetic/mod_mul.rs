@@ -25,11 +25,11 @@ fn test_limbs_precompute_mod_mul_two_limbs() {
             (inv_2, inv_1, inv_0)
         );
     };
-    test(1, 1, 0xffff_ffff, 0, 0xffff_ffff);
-    test(1, 2, 0xffff_fffe, 3, 0xffff_fff8);
+    test(1, 1, u32::MAX, 0, u32::MAX);
+    test(1, 2, u32::MAX - 1, 3, 0xffff_fff8);
     test(123, 456, 34_918_433, 1_162_528_328, 1_277_088_208);
-    test(0xffff_ffff, 0xffff_fffe, 1, 0, 2);
-    test(0xffff_ffff, 0xffff_ffff, 1, 0, 1);
+    test(u32::MAX, u32::MAX - 1, 1, 0, 2);
+    test(u32::MAX, u32::MAX, 1, 0, 1);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -49,16 +49,7 @@ fn test_limbs_mod_mul_two_limbs() {
     test(0, 0, 0, 0, 1, 1, 0, 0);
     test(1, 0, 0, 1, 1, 1, 1, 0);
     test(123, 456, 654, 321, 789, 876, 213, 4_164_192_732);
-    test(
-        123,
-        456,
-        789,
-        876,
-        0xffff_ffff,
-        0xffff_ffff,
-        467_532,
-        496_503,
-    );
+    test(123, 456, 789, 876, u32::MAX, u32::MAX, 467_532, 496_503);
 }
 
 #[test]

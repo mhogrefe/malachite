@@ -31,12 +31,8 @@ fn test_limbs_neg_xor_limb_and_limbs_vec_neg_xor_limb_in_place() {
     test(&[6, 7], 2, &[8, 7]);
     test(&[100, 101, 102], 10, &[106, 101, 102]);
     test(&[123, 456], 789, &[880, 456]);
-    test(&[0xffff_fffe, 0xffff_ffff, 0xffff_ffff], 2, &[0, 0, 0, 1]);
-    test(
-        &[0, 0, 0, 1],
-        2,
-        &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff, 0],
-    );
+    test(&[u32::MAX - 1, u32::MAX, u32::MAX], 2, &[0, 0, 0, 1]);
+    test(&[0, 0, 0, 1], 2, &[u32::MAX - 1, u32::MAX, u32::MAX, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -65,7 +61,7 @@ fn test_limbs_neg_xor_limb_to_out() {
     );
     test(
         &[10, 10, 10, 10],
-        &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff],
+        &[u32::MAX - 1, u32::MAX, u32::MAX],
         2,
         true,
         &[0, 0, 0, 10],
@@ -75,7 +71,7 @@ fn test_limbs_neg_xor_limb_to_out() {
         &[0, 0, 0, 1],
         2,
         false,
-        &[0xffff_fffe, 0xffff_ffff, 0xffff_ffff, 0],
+        &[u32::MAX - 1, u32::MAX, u32::MAX, 0],
     );
 }
 
@@ -98,8 +94,8 @@ fn test_limbs_pos_xor_limb_neg_and_limbs_vec_pos_xor_limb_neg_in_place() {
     };
     test(&[0, 2], 3, &[0xffff_fffd, 2]);
     test(&[1, 2, 3], 4, &[0xffff_fffb, 2, 3]);
-    test(&[2, 0xffff_ffff], 2, &[0, 0, 1]);
-    test(&[2, 0xffff_ffff, 0xffff_ffff], 2, &[0, 0, 0, 1]);
+    test(&[2, u32::MAX], 2, &[0, 0, 1]);
+    test(&[2, u32::MAX, u32::MAX], 2, &[0, 0, 0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -128,17 +124,11 @@ fn test_limbs_pos_xor_limb_neg_to_out() {
     test(&[0, 0], &[0, 2], 3, false, &[0xffff_fffd, 2]);
     test(&[1, 2, 100], &[0, 2, 100], 3, false, &[0xffff_fffd, 2, 100]);
     test(&[0, 0, 0], &[1, 2, 3], 4, false, &[0xffff_fffb, 2, 3]);
-    test(&[0, 0], &[2, 0xffff_ffff], 2, true, &[0, 0]);
-    test(
-        &[0, 0, 0],
-        &[2, 0xffff_ffff, 0xffff_ffff],
-        2,
-        true,
-        &[0, 0, 0],
-    );
+    test(&[0, 0], &[2, u32::MAX], 2, true, &[0, 0]);
+    test(&[0, 0, 0], &[2, u32::MAX, u32::MAX], 2, true, &[0, 0, 0]);
     test(
         &[1, 2, 3, 100],
-        &[2, 0xffff_ffff, 0xffff_ffff],
+        &[2, u32::MAX, u32::MAX],
         2,
         true,
         &[0, 0, 0, 100],
@@ -169,8 +159,8 @@ fn test_limbs_slice_pos_xor_limb_neg_in_place() {
     };
     test(&[0, 2], 3, false, &[0xffff_fffd, 2]);
     test(&[1, 2, 3], 4, false, &[0xffff_fffb, 2, 3]);
-    test(&[2, 0xffff_ffff], 2, true, &[0, 0]);
-    test(&[2, 0xffff_ffff, 0xffff_ffff], 2, true, &[0, 0, 0]);
+    test(&[2, u32::MAX], 2, true, &[0, 0]);
+    test(&[2, u32::MAX, u32::MAX], 2, true, &[0, 0, 0]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -270,7 +260,7 @@ fn test_limbs_xor_pos_neg_limbs_xor_pos_neg_in_place_left_and_limbs_xor_pos_neg_
     test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
     test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 2]);
     test(&[0, 0, 1], &[3], vec![3, 0, 1]);
-    test(&[3], &[0, 0, 1], vec![0xffff_fffd, 0xffff_ffff, 0]);
+    test(&[3], &[0, 0, 1], vec![0xffff_fffd, u32::MAX, 0]);
     test(&[0, 3, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 1]);
     test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
     test(&[0, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 2]);
@@ -342,7 +332,7 @@ fn test_limbs_xor_pos_neg_to_out() {
         &[3],
         &[0, 0, 1],
         &[10, 10, 10, 10],
-        vec![0xffff_fffd, 0xffff_ffff, 0, 10],
+        vec![0xffff_fffd, u32::MAX, 0, 10],
     );
     test(
         &[0, 3, 3],
@@ -411,7 +401,7 @@ fn test_limbs_xor_pos_neg_in_place_either() {
         &[0, 0, 1],
         true,
         vec![3],
-        vec![0xffff_fffd, 0xffff_ffff, 0],
+        vec![0xffff_fffd, u32::MAX, 0],
     );
     test(
         &[0, 3, 3],
@@ -460,8 +450,8 @@ fn test_limbs_xor_neg_neg_and_limbs_xor_neg_neg_in_place_left() {
     test(&[6, 7], &[1, 2, 3], vec![5, 5, 3]);
     test(&[1, 2, 3], &[6, 7], vec![5, 5, 3]);
     test(&[100, 101, 102], &[102, 101, 100], vec![6, 0, 2]);
-    test(&[0, 0, 1], &[3], vec![0xffff_fffd, 0xffff_ffff, 0]);
-    test(&[3], &[0, 0, 1], vec![0xffff_fffd, 0xffff_ffff, 0]);
+    test(&[0, 0, 1], &[3], vec![0xffff_fffd, u32::MAX, 0]);
+    test(&[3], &[0, 0, 1], vec![0xffff_fffd, u32::MAX, 0]);
     test(&[0, 3, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 1]);
     test(&[0, 0, 3], &[0, 3, 3], vec![0, 0xffff_fffd, 1]);
     test(&[0, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 2]);
@@ -504,13 +494,13 @@ fn test_limbs_xor_neg_neg_to_out() {
         &[0, 0, 1],
         &[3],
         &[10, 10, 10, 10],
-        vec![0xffff_fffd, 0xffff_ffff, 0, 10],
+        vec![0xffff_fffd, u32::MAX, 0, 10],
     );
     test(
         &[3],
         &[0, 0, 1],
         &[10, 10, 10, 10],
-        vec![0xffff_fffd, 0xffff_ffff, 0, 10],
+        vec![0xffff_fffd, u32::MAX, 0, 10],
     );
     test(
         &[0, 3, 3],
@@ -587,7 +577,7 @@ fn test_limbs_xor_neg_neg_in_place_either() {
         &[0, 0, 1],
         &[3],
         false,
-        vec![0xffff_fffd, 0xffff_ffff, 0],
+        vec![0xffff_fffd, u32::MAX, 0],
         vec![3],
     );
     test(
@@ -595,7 +585,7 @@ fn test_limbs_xor_neg_neg_in_place_either() {
         &[0, 0, 1],
         true,
         vec![3],
-        vec![0xffff_fffd, 0xffff_ffff, 0],
+        vec![0xffff_fffd, u32::MAX, 0],
     );
     test(
         &[0, 3, 3],

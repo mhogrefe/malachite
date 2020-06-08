@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use rand::Rand;
 
 use malachite_test::common::test_properties;

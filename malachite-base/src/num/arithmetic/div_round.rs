@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 macro_rules! impl_div_round_unsigned {
     ($t:ident) => {
@@ -21,7 +21,7 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             ///
             /// assert_eq!(10u8.div_round(4, RoundingMode::Down), 2);
             /// assert_eq!(10u16.div_round(4, RoundingMode::Up), 3);
@@ -74,7 +74,7 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             ///
             /// let mut x = 10u8;
             /// x.div_round_assign(4, RoundingMode::Down);
@@ -137,7 +137,7 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             ///
             /// assert_eq!((-10i8).div_round(4, RoundingMode::Down), -2);
             /// assert_eq!((-10i16).div_round(4, RoundingMode::Up), -3);
@@ -182,7 +182,7 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             ///
             /// let mut x = -10i8;
             /// x.div_round_assign(4, RoundingMode::Down);

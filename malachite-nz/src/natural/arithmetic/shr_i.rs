@@ -1,7 +1,7 @@
 use std::ops::{Shr, ShrAssign};
 
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::Natural;
 
@@ -136,7 +136,7 @@ macro_rules! impl_natural_shr_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::natural::Natural;
@@ -210,7 +210,7 @@ macro_rules! impl_natural_shr_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::natural::Natural;
@@ -285,7 +285,7 @@ macro_rules! impl_natural_shr_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             /// use malachite_base::num::basic::traits::One;
             /// use malachite_nz::natural::Natural;

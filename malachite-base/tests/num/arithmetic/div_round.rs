@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 #[test]
 fn test_div_round_unsigned() {
@@ -1179,7 +1179,7 @@ div_round_signed_fail!(i8, div_round_i8_fail_3);
 div_round_signed_fail!(i16, div_round_i16_fail_3);
 div_round_signed_fail!(i32, div_round_i32_fail_3);
 div_round_signed_fail!(i64, div_round_i64_fail_3);
-div_round_signed_fail!(i128, div_round_signed_i128_fail);
+div_round_signed_fail!(i128, div_round_signed_i128_fail_3);
 div_round_signed_fail!(isize, div_round_isize_fail_3);
 
 macro_rules! div_round_assign_fail {
@@ -1263,5 +1263,5 @@ div_round_assign_signed_fail!(i8, div_round_assign_i8_fail_3);
 div_round_assign_signed_fail!(i16, div_round_assign_i16_fail_3);
 div_round_assign_signed_fail!(i32, div_round_assign_i32_fail_3);
 div_round_assign_signed_fail!(i64, div_round_assign_i64_fail_3);
-div_round_assign_signed_fail!(i128, div_round_signed_assign_i128_fail);
+div_round_assign_signed_fail!(i128, div_round_signed_assign_i128_fail_3);
 div_round_assign_signed_fail!(isize, div_round_assign_isize_fail_3);

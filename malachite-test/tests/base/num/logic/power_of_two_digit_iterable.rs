@@ -4,7 +4,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
 };
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use rand::Rand;
 
 use malachite_test::common::{test_properties, test_properties_no_special};

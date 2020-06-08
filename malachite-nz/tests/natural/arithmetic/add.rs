@@ -28,8 +28,8 @@ fn test_limbs_add_limb() {
     test(&[6, 7], 2, &[8, 7]);
     test(&[100, 101, 102], 10, &[110, 101, 102]);
     test(&[123, 456], 789, &[912, 456]);
-    test(&[0xffff_ffff, 5], 2, &[1, 6]);
-    test(&[0xffff_ffff], 2, &[1, 1]);
+    test(&[u32::MAX, 5], 2, &[1, 6]);
+    test(&[u32::MAX], 2, &[1, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -57,14 +57,8 @@ fn test_limbs_add_limb_to_out() {
         false,
         &[912, 456, 10, 10],
     );
-    test(
-        &[10, 10, 10, 10],
-        &[0xffff_ffff, 5],
-        2,
-        false,
-        &[1, 6, 10, 10],
-    );
-    test(&[10, 10, 10, 10], &[0xffff_ffff], 2, true, &[1, 10, 10, 10]);
+    test(&[10, 10, 10, 10], &[u32::MAX, 5], 2, false, &[1, 6, 10, 10]);
+    test(&[10, 10, 10, 10], &[u32::MAX], 2, true, &[1, 10, 10, 10]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -87,8 +81,8 @@ fn test_limbs_slice_add_limb_in_place() {
     test(&[6, 7], 2, false, &[8, 7]);
     test(&[100, 101, 102], 10, false, &[110, 101, 102]);
     test(&[123, 456], 789, false, &[912, 456]);
-    test(&[0xffff_ffff, 5], 2, false, &[1, 6]);
-    test(&[0xffff_ffff], 2, true, &[1]);
+    test(&[u32::MAX, 5], 2, false, &[1, 6]);
+    test(&[u32::MAX], 2, true, &[1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -102,8 +96,8 @@ fn test_limbs_vec_add_limb_in_place() {
     test(&[6, 7], 2, &[8, 7]);
     test(&[100, 101, 102], 10, &[110, 101, 102]);
     test(&[123, 456], 789, &[912, 456]);
-    test(&[0xffff_ffff, 5], 2, &[1, 6]);
-    test(&[0xffff_ffff], 2, &[1, 1]);
+    test(&[u32::MAX, 5], 2, &[1, 6]);
+    test(&[u32::MAX], 2, &[1, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -125,10 +119,10 @@ fn test_limbs_add_greater() {
     test(&[1, 1, 1], &[1, 2, 3], vec![2, 3, 4]);
     test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
     test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
-    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
-    test(&[0xffff_ffff], &[1], vec![0, 1]);
-    test(&[1], &[0xffff_ffff], vec![0, 1]);
-    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+    test(&[u32::MAX, 3], &[1], vec![0, 4]);
+    test(&[u32::MAX], &[1], vec![0, 1]);
+    test(&[1], &[u32::MAX], vec![0, 1]);
+    test(&[u32::MAX], &[u32::MAX], vec![u32::MAX - 1, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -156,11 +150,11 @@ fn test_limbs_add_and_limbs_vec_add_in_place_left() {
     test(&[6, 7], &[1, 2, 3], vec![7, 9, 3]);
     test(&[1, 2, 3], &[6, 7], vec![7, 9, 3]);
     test(&[100, 101, 102], &[102, 101, 100], vec![202, 202, 202]);
-    test(&[0xffff_ffff, 3], &[1], vec![0, 4]);
-    test(&[1], &[0xffff_ffff, 3], vec![0, 4]);
-    test(&[0xffff_ffff], &[1], vec![0, 1]);
-    test(&[1], &[0xffff_ffff], vec![0, 1]);
-    test(&[0xffff_ffff], &[0xffff_ffff], vec![0xffff_fffe, 1]);
+    test(&[u32::MAX, 3], &[1], vec![0, 4]);
+    test(&[1], &[u32::MAX, 3], vec![0, 4]);
+    test(&[u32::MAX], &[1], vec![0, 1]);
+    test(&[1], &[u32::MAX], vec![0, 1]);
+    test(&[u32::MAX], &[u32::MAX], vec![u32::MAX - 1, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -190,14 +184,14 @@ fn test_limbs_add_greater_to_out() {
         vec![202, 202, 202, 10],
     );
     test(
-        &[0xffff_ffff, 3],
+        &[u32::MAX, 3],
         &[1],
         &[10, 10, 10, 10],
         false,
         vec![0, 4, 10, 10],
     );
     test(
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[1],
         &[10, 10, 10, 10],
         true,
@@ -205,17 +199,17 @@ fn test_limbs_add_greater_to_out() {
     );
     test(
         &[1],
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
         vec![0, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
-        vec![0xffff_fffe, 10, 10, 10],
+        vec![u32::MAX - 1, 10, 10, 10],
     );
 }
 
@@ -260,7 +254,7 @@ fn test_limbs_add_same_length_to_out() {
         vec![202, 202, 202, 10],
     );
     test(
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[1],
         &[10, 10, 10, 10],
         true,
@@ -268,17 +262,17 @@ fn test_limbs_add_same_length_to_out() {
     );
     test(
         &[1],
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
         vec![0, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
-        vec![0xffff_fffe, 10, 10, 10],
+        vec![u32::MAX - 1, 10, 10, 10],
     );
 }
 
@@ -334,7 +328,7 @@ fn test_limbs_add_to_out() {
         vec![202, 202, 202, 10],
     );
     test(
-        &[0xffff_ffff, 3],
+        &[u32::MAX, 3],
         &[1],
         &[10, 10, 10, 10],
         false,
@@ -342,13 +336,13 @@ fn test_limbs_add_to_out() {
     );
     test(
         &[1],
-        &[0xffff_ffff, 3],
+        &[u32::MAX, 3],
         &[10, 10, 10, 10],
         false,
         vec![0, 4, 10, 10],
     );
     test(
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[1],
         &[10, 10, 10, 10],
         true,
@@ -356,17 +350,17 @@ fn test_limbs_add_to_out() {
     );
     test(
         &[1],
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
         vec![0, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         &[10, 10, 10, 10],
         true,
-        vec![0xffff_fffe, 10, 10, 10],
+        vec![u32::MAX - 1, 10, 10, 10],
     );
 }
 
@@ -390,8 +384,8 @@ fn test_limbs_add_to_out_aliased() {
     test(&[1, 2, 3], 0, &[4, 5], false, vec![4, 5, 3]);
     test(&[1, 2, 3], 1, &[4, 5], false, vec![5, 5, 3]);
     test(&[1, 2, 3], 2, &[4, 5], false, vec![5, 7, 3]);
-    test(&[1, 1, 3], 1, &[0xffff_ffff, 5], false, vec![0, 6, 3]);
-    test(&[1, 1, 3], 1, &[0xffff_ffff], true, vec![0, 1, 3]);
+    test(&[1, 1, 3], 1, &[u32::MAX, 5], false, vec![0, 6, 3]);
+    test(&[1, 1, 3], 1, &[u32::MAX], true, vec![0, 1, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -430,9 +424,9 @@ fn test_limbs_slice_add_same_length_in_place_left() {
         false,
         vec![202, 202, 202],
     );
-    test(&[0xffff_ffff], &[1], true, vec![0]);
-    test(&[1], &[0xffff_ffff], true, vec![0]);
-    test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
+    test(&[u32::MAX], &[1], true, vec![0]);
+    test(&[1], &[u32::MAX], true, vec![0]);
+    test(&[u32::MAX], &[u32::MAX], true, vec![u32::MAX - 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -462,10 +456,10 @@ fn test_limbs_slice_add_greater_in_place_left() {
         false,
         vec![202, 202, 202],
     );
-    test(&[0xffff_ffff, 3], &[1], false, vec![0, 4]);
-    test(&[0xffff_ffff], &[1], true, vec![0]);
-    test(&[1], &[0xffff_ffff], true, vec![0]);
-    test(&[0xffff_ffff], &[0xffff_ffff], true, vec![0xffff_fffe]);
+    test(&[u32::MAX, 3], &[1], false, vec![0, 4]);
+    test(&[u32::MAX], &[1], true, vec![0]);
+    test(&[1], &[u32::MAX], true, vec![0]);
+    test(&[u32::MAX], &[u32::MAX], true, vec![u32::MAX - 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -521,22 +515,16 @@ fn test_limbs_slice_add_in_place_either() {
         vec![202, 202, 202],
         vec![102, 101, 100],
     );
-    test(&[0xffff_ffff, 3], &[1], (false, false), vec![0, 4], vec![1]);
-    test(&[1], &[0xffff_ffff, 3], (true, false), vec![1], vec![0, 4]);
-    test(&[0xffff_ffff], &[1], (false, true), vec![0], vec![1]);
+    test(&[u32::MAX, 3], &[1], (false, false), vec![0, 4], vec![1]);
+    test(&[1], &[u32::MAX, 3], (true, false), vec![1], vec![0, 4]);
+    test(&[u32::MAX], &[1], (false, true), vec![0], vec![1]);
+    test(&[1], &[u32::MAX], (false, true), vec![0], vec![u32::MAX]);
     test(
-        &[1],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         (false, true),
-        vec![0],
-        vec![0xffff_ffff],
-    );
-    test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
-        (false, true),
-        vec![0xffff_fffe],
-        vec![0xffff_ffff],
+        vec![u32::MAX - 1],
+        vec![u32::MAX],
     );
 }
 
@@ -567,16 +555,16 @@ fn test_limbs_vec_add_in_place_either() {
         vec![202, 202, 202],
         vec![102, 101, 100],
     );
-    test(&[0xffff_ffff, 3], &[1], false, vec![0, 4], vec![1]);
-    test(&[1], &[0xffff_ffff, 3], true, vec![1], vec![0, 4]);
-    test(&[0xffff_ffff], &[1], false, vec![0, 1], vec![1]);
-    test(&[1], &[0xffff_ffff], false, vec![0, 1], vec![0xffff_ffff]);
+    test(&[u32::MAX, 3], &[1], false, vec![0, 4], vec![1]);
+    test(&[1], &[u32::MAX, 3], true, vec![1], vec![0, 4]);
+    test(&[u32::MAX], &[1], false, vec![0, 1], vec![1]);
+    test(&[1], &[u32::MAX], false, vec![0, 1], vec![u32::MAX]);
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         false,
-        vec![0xffff_fffe, 1],
-        vec![0xffff_ffff],
+        vec![u32::MAX - 1, 1],
+        vec![u32::MAX],
     );
 }
 
@@ -620,7 +608,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
         vec![202, 202, 202, 10],
     );
     test(
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[1],
         false,
         &[10, 10, 10, 10],
@@ -628,7 +616,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
         vec![0, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
+        &[u32::MAX],
         &[1],
         true,
         &[10, 10, 10, 10],
@@ -636,7 +624,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
         vec![1, 10, 10, 10],
     );
     test(
-        &[0xffff_fffe],
+        &[u32::MAX - 1],
         &[1],
         true,
         &[10, 10, 10, 10],
@@ -645,27 +633,27 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
     );
     test(
         &[1],
-        &[0xffff_ffff],
+        &[u32::MAX],
         false,
         &[10, 10, 10, 10],
         true,
         vec![0, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         false,
         &[10, 10, 10, 10],
         true,
-        vec![0xffff_fffe, 10, 10, 10],
+        vec![u32::MAX - 1, 10, 10, 10],
     );
     test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
+        &[u32::MAX],
+        &[u32::MAX],
         true,
         &[10, 10, 10, 10],
         true,
-        vec![0xffff_ffff, 10, 10, 10],
+        vec![u32::MAX, 10, 10, 10],
     );
 }
 
@@ -708,24 +696,12 @@ fn test_limbs_add_same_length_with_carry_in_in_place_left() {
         false,
         vec![202, 202, 202],
     );
-    test(&[0xffff_ffff], &[1], false, true, vec![0]);
-    test(&[0xffff_ffff], &[1], true, true, vec![1]);
-    test(&[0xffff_fffe], &[1], true, true, vec![0]);
-    test(&[1], &[0xffff_ffff], false, true, vec![0]);
-    test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
-        false,
-        true,
-        vec![0xffff_fffe],
-    );
-    test(
-        &[0xffff_ffff],
-        &[0xffff_ffff],
-        true,
-        true,
-        vec![0xffff_ffff],
-    );
+    test(&[u32::MAX], &[1], false, true, vec![0]);
+    test(&[u32::MAX], &[1], true, true, vec![1]);
+    test(&[u32::MAX - 1], &[1], true, true, vec![0]);
+    test(&[1], &[u32::MAX], false, true, vec![0]);
+    test(&[u32::MAX], &[u32::MAX], false, true, vec![u32::MAX - 1]);
+    test(&[u32::MAX], &[u32::MAX], true, true, vec![u32::MAX]);
 }
 
 #[cfg(feature = "32_bit_limbs")]

@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{Parity, PowerOfTwo, ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::{WrappingFrom, WrappingInto};
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 macro_rules! impl_shr_round_unsigned_unsigned {
     ($t:ident, $u:ident) => {
@@ -23,7 +23,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             ///
             /// assert_eq!(0x101u32.shr_round(8u8, RoundingMode::Down), 1);
@@ -108,7 +108,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             ///
             /// let mut x = 0x101u32;
@@ -256,7 +256,7 @@ macro_rules! impl_shr_round_primitive_signed {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             ///
             /// assert_eq!(0x101u32.shr_round(8i8, RoundingMode::Down), 1);
@@ -301,7 +301,7 @@ macro_rules! impl_shr_round_primitive_signed {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             ///
             /// let mut x = 0x101u32;
@@ -444,7 +444,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             ///
             /// assert_eq!(0x101i32.shr_round(8u8, RoundingMode::Down), 1);
@@ -491,7 +491,7 @@ macro_rules! impl_shr_round_signed_unsigned {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::round::RoundingMode;
+            /// use malachite_base::rounding_mode::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             ///
             /// let mut x = 0x101i32;

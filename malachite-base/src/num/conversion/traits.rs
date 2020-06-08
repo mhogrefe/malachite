@@ -1,6 +1,6 @@
 use std::num::ParseIntError;
 
-use round::RoundingMode;
+use rounding_mode::RoundingMode;
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
 /// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.

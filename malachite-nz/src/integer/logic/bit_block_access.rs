@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::vecs::vec_delete_left;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -42,7 +42,7 @@ use platform::Limb;
 /// assert_eq!(limbs_neg_limb_get_bits(0x1234_5678, 4, 16), vec![0xa98]);
 /// assert_eq!(
 ///     limbs_neg_limb_get_bits(0x1234_5678, 0, 100),
-///     vec![0xedcb_a988, 0xffff_ffff, 0xffff_ffff, 0xf]
+///     vec![0xedcb_a988, u32::MAX, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_neg_limb_get_bits(0x1234_5678, 10, 10), empty);
@@ -98,7 +98,7 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 4, 16), vec![0xa98]);
 /// assert_eq!(
 ///     limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 0, 100),
-///     vec![0xedcb_a988, 0x5432_10fe, 0xffff_ffff, 0xf]
+///     vec![0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 10, 10), empty);
@@ -167,7 +167,7 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
 /// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 4, 16), vec![0xa98]);
 /// assert_eq!(
 ///     limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 0, 100),
-///     vec![0xedcb_a988, 0x5432_10fe, 0xffff_ffff, 0xf]
+///     vec![0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 10, 10), empty);
@@ -230,7 +230,7 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
 ///
 /// let mut xs = vec![123];
 /// limbs_neg_assign_bits(&mut xs, 64, 128, &[456]);
-/// assert_eq!(xs, &[123, 0, 4294966839, 4294967295]);
+/// assert_eq!(xs, &[123, 0, 4294966839, u32::MAX]);
 ///
 /// let mut xs = vec![123];
 /// limbs_neg_assign_bits(&mut xs, 80, 100, &[456]);

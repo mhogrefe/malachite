@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 
 use natural::Natural;
 use platform::Limb;
@@ -31,7 +31,7 @@ use platform::Limb;
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::round::RoundingMode;
+/// use malachite_base::rounding_mode::RoundingMode;
 /// use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 /// use malachite_nz::natural::Natural;
 ///
@@ -42,15 +42,15 @@ use platform::Limb;
 /// assert_eq!(limbs_limb_div_round_limbs(0, &[123, 456], RoundingMode::Exact), Some(0));
 /// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Exact), None);
 /// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Nearest), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[123, 1], RoundingMode::Nearest),
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[123, 1], RoundingMode::Nearest),
 ///     Some(1));
-/// assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_ffff, 1],
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX, 1],
 ///     RoundingMode::Nearest), Some(0));
 ///
-/// assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_fffe, 1],
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX - 1, 1],
 ///     RoundingMode::Nearest), Some(0));
 ///
-/// assert_eq!(limbs_limb_div_round_limbs(0xffff_ffff, &[0xffff_fffd, 1],
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xffff_fffd, 1],
 ///     RoundingMode::Nearest), Some(1));
 /// ```
 pub fn limbs_limb_div_round_limbs(limb: Limb, xs: &[Limb], rm: RoundingMode) -> Option<Limb> {
@@ -106,7 +106,7 @@ impl DivRound<Natural> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -180,7 +180,7 @@ impl<'a> DivRound<&'a Natural> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -256,7 +256,7 @@ impl<'a> DivRound<Natural> for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -344,7 +344,7 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRound;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -431,7 +431,7 @@ impl DivRoundAssign<Natural> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);
@@ -509,7 +509,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-    /// use malachite_base::round::RoundingMode;
+    /// use malachite_base::rounding_mode::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);

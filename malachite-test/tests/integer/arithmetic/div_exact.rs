@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 

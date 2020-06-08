@@ -5,7 +5,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
@@ -127,16 +127,17 @@ fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
 // This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
 fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
-    limbs_mul_same_length_to_out(out, &xs[..n + 1], &ys[..n + 1]);
+    let m = n + 1;
+    limbs_mul_same_length_to_out(out, &xs[..m], &ys[..m]);
     assert_eq!(out[2 * n + 1], 0);
-    let mut carry = out[2 * n];
+    let mut carry = out[n << 1];
     assert_ne!(carry, Limb::MAX);
     let (out_lo, out_hi) = out.split_at_mut(n);
     if limbs_sub_same_length_in_place_left(out_lo, &out_hi[..n]) {
         carry += 1;
     }
     out_hi[0] = 0;
-    assert!(!limbs_slice_add_limb_in_place(&mut out[..n + 1], carry));
+    assert!(!limbs_slice_add_limb_in_place(&mut out[..m], carry));
 }
 
 // First k to use for an FFT mod-F multiply. A mod-F FFT is an order log(2 ^ k) / log(2 ^ (k - 1))
@@ -150,8 +151,8 @@ const FFT_FIRST_K: usize = 4;
 ///
 /// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
 /// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
-/// This should not be a problem if `_limbs_mul_mod_base_pow_n_minus_1` is used to combine
-/// results and obtain a natural number when one knows in advance that the final value is less than
+/// This should not be a problem if `_limbs_mul_mod_base_pow_n_minus_1` is used to combine results
+/// and obtain a natural number when one knows in advance that the final value is less than
 /// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
 /// `_limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
 /// `ys.len()` <= n, because this condition implies

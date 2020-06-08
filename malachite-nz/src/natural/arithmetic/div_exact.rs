@@ -8,7 +8,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::round::RoundingMode;
+use malachite_base::rounding_mode::RoundingMode;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 
 use fail_on_untested_path;
@@ -264,7 +264,7 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3;
 ///
 /// assert_eq!(limbs_div_exact_3(&[8, 7]), &[1_431_655_768, 2]);
-/// assert_eq!(limbs_div_exact_3(&[0xffff_ffff, 0xffff_ffff]), &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(limbs_div_exact_3(&[u32::MAX, u32::MAX]), &[0x5555_5555, 0x5555_5555]);
 /// ```
 ///
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0
@@ -298,7 +298,7 @@ pub fn limbs_div_exact_3(xs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(out, &[1_431_655_768, 2, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_3_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff]);
+/// limbs_div_exact_3_to_out(&mut out, &[u32::MAX, u32::MAX]);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 ///
@@ -334,7 +334,7 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], xs: &[Limb]) {
 /// limbs_div_exact_3_in_place(&mut limbs);
 /// assert_eq!(limbs, &[1_431_655_768, 2]);
 ///
-/// let mut limbs = vec![0xffff_ffff, 0xffff_ffff];
+/// let mut limbs = vec![u32::MAX, u32::MAX];
 /// limbs_div_exact_3_in_place(&mut limbs);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
@@ -371,7 +371,7 @@ pub fn limbs_div_exact_3_in_place(xs: &mut [Limb]) {
 /// assert_eq!(out, &[2_147_483_651, 3, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_limb_to_out(&mut out, &[0xffff_ffff, 0xffff_ffff], 3);
+/// limbs_div_exact_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
 /// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
 /// ```
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], xs: &[Limb], d: Limb) {
@@ -401,7 +401,7 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], xs: &[Limb], d: Limb) {
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb;
 ///
 /// assert_eq!(limbs_div_exact_limb(&[6, 7], 2), &[2_147_483_651, 3]);
-/// assert_eq!(limbs_div_exact_limb(&[0xffff_ffff, 0xffff_ffff], 3), &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(limbs_div_exact_limb(&[u32::MAX, u32::MAX], 3), &[0x5555_5555, 0x5555_5555]);
 /// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where the result is returned.
@@ -435,7 +435,7 @@ pub fn limbs_div_exact_limb(xs: &[Limb], d: Limb) -> Vec<Limb> {
 /// limbs_div_exact_limb_in_place(&mut limbs, 2);
 /// assert_eq!(limbs, &[2_147_483_651, 3]);
 ///
-/// let mut limbs = vec![0xffff_ffff, 0xffff_ffff];
+/// let mut limbs = vec![u32::MAX, u32::MAX];
 /// limbs_div_exact_limb_in_place(&mut limbs, 3);
 /// assert_eq!(limbs, &[0x5555_5555, 0x5555_5555]);
 /// ```
@@ -499,7 +499,7 @@ pub fn _limbs_modular_invert_small(
 /// let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
 /// let is = &mut [10; 4];
 /// limbs_modular_invert(is, ds, &mut scratch);
-/// assert_eq!(is, &[1, 4294967294, 0, 0]);
+/// assert_eq!(is, &[1, u32::MAX - 1, 0, 0]);
 /// ```
 ///
 /// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.1.2.
