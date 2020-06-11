@@ -154,7 +154,7 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 
 // This is TOOM44_OK from mpn/generic/mul.c, GMP 6.1.2.
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
-    12 + 3 * xs_len < 4 * ys_len
+    12 + 3 * xs_len < ys_len << 2
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -192,7 +192,6 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
-
     if xs_len == ys_len {
         //TODO if xs as *const [Limb] == ys as *const [Limb] {
         //TODO     mpn_sqr(out, xs, xs_len);
@@ -205,7 +204,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if ys_len < MUL_TOOM33_THRESHOLD {
-        let toom_x2_scratch_len = 9 * ys_len / 2 + usize::wrapping_from(Limb::WIDTH) * 2;
+        let toom_x2_scratch_len = 9 * ys_len / 2 + (usize::wrapping_from(Limb::WIDTH) << 1);
         let mut scratch = vec![0; toom_x2_scratch_len];
         if xs_len >= 3 * ys_len {
             _limbs_mul_greater_to_out_toom_42(out, &xs[..ys_len << 1], ys, &mut scratch);
@@ -228,9 +227,10 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             let xs_len = xs.len();
             let out = &mut out[out_offset..];
             // ys_len <= xs_len < 3 * ys_len
-            if 4 * xs_len < 5 * ys_len {
+            let four_xs_len = xs_len << 2;
+            if four_xs_len < 5 * ys_len {
                 _limbs_mul_greater_to_out_toom_22(&mut scratch2, xs, ys, &mut scratch);
-            } else if 4 * xs_len < 7 * ys_len {
+            } else if four_xs_len < 7 * ys_len {
                 _limbs_mul_greater_to_out_toom_32(&mut scratch2, xs, ys, &mut scratch);
             } else {
                 _limbs_mul_greater_to_out_toom_42(&mut scratch2, xs, ys, &mut scratch);
@@ -251,21 +251,21 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         // Toom code).
         if ys_len < MUL_TOOM44_THRESHOLD || !toom44_ok(xs_len, ys_len) {
             // Use ToomX3 variants
-            let toom_x3_scratch_len = 4 * ys_len + usize::wrapping_from(Limb::WIDTH);
+            let toom_x3_scratch_len = (ys_len << 2) + usize::wrapping_from(Limb::WIDTH);
             let mut scratch = vec![0; toom_x3_scratch_len];
-            if 2 * xs_len >= 5 * ys_len {
+            if xs_len << 1 >= 5 * ys_len {
                 // The maximum scratch2 usage is for the `limbs_mul_to_out` result.
                 let mut scratch2 = vec![0; (7 * ys_len) >> 1];
-                if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
-                    _limbs_mul_greater_to_out_toom_42(out, &xs[..2 * ys_len], ys, &mut scratch);
-                } else {
-                    _limbs_mul_greater_to_out_toom_63(out, &xs[..2 * ys_len], ys, &mut scratch);
-                }
                 let two_ys_len = ys_len << 1;
-                let mut xs = &xs[two_ys_len..];
+                let (xs_lo, mut xs) = xs.split_at(two_ys_len);
+                if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
+                    _limbs_mul_greater_to_out_toom_42(out, xs_lo, ys, &mut scratch);
+                } else {
+                    _limbs_mul_greater_to_out_toom_63(out, xs_lo, ys, &mut scratch);
+                }
                 let mut out_offset = two_ys_len;
                 // xs_len >= 2.5 * ys_len
-                while 2 * xs.len() >= 5 * ys_len {
+                while xs.len() << 1 >= 5 * ys_len {
                     let out = &mut out[out_offset..];
                     let (xs_lo, xs_hi) = xs.split_at(two_ys_len);
                     if ys_len < MUL_TOOM42_TO_TOOM63_THRESHOLD {
@@ -288,14 +288,14 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
                 assert!(!limbs_slice_add_greater_in_place_left(out, scratch2_lo));
             } else if 6 * xs_len < 7 * ys_len {
                 _limbs_mul_greater_to_out_toom_33(out, xs, ys, &mut scratch);
-            } else if 2 * xs_len < 3 * ys_len {
+            } else if xs_len << 1 < 3 * ys_len {
                 if ys_len < MUL_TOOM32_TO_TOOM43_THRESHOLD {
                     _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
                 } else {
                     _limbs_mul_greater_to_out_toom_43(out, xs, ys, &mut scratch);
                 }
             } else if 6 * xs_len < 11 * ys_len {
-                if 4 * xs_len < 7 * ys_len {
+                if xs_len << 2 < 7 * ys_len {
                     if ys_len < MUL_TOOM32_TO_TOOM53_THRESHOLD {
                         _limbs_mul_greater_to_out_toom_32(out, xs, ys, &mut scratch);
                     } else {
@@ -396,10 +396,10 @@ pub fn _limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[L
     // We first multiply by the low order limb. This result can be stored, not added, to out.
     out[xs_len] = limbs_mul_limb_to_out(out, xs, ys[0]);
     // Now accumulate the product of xs and the next higher limb from ys.
+    let window_size = xs_len + 1;
     for i in 1..ys_len {
-        let out = &mut out[i..];
-        out[xs_len] =
-            limbs_slice_add_mul_limb_same_length_in_place_left(&mut out[..xs_len], xs, ys[i]);
+        let (out_last, out_init) = out[i..i + window_size].split_last_mut().unwrap();
+        *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);
     }
 }
 

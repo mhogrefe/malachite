@@ -9,7 +9,7 @@ use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_plac
 use integer::Integer;
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
-use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_limb_in_place;
 use natural::logic::bit_block_access::limbs_assign_bits_helper;
 use natural::logic::not::limbs_not_in_place;

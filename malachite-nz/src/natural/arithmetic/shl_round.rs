@@ -1,5 +1,3 @@
-use std::ops::{Shl, ShlAssign};
-
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
@@ -7,115 +5,8 @@ use malachite_base::rounding_mode::RoundingMode;
 
 use natural::Natural;
 
-macro_rules! impl_natural_shl_signed {
+macro_rules! impl_natural_shl_round_signed {
     ($t:ident) => {
-        impl Shl<$t> for Natural {
-            type Output = Natural;
-
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor), taking the `Natural` by value.
-            ///
-            /// Time: worst case O(`bits`)
-            ///
-            /// Additional memory: worst case O(`bits`)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((Natural::ZERO << 10i8).to_string(), "0");
-            /// assert_eq!((Natural::from(123u32) << 2i16).to_string(), "492");
-            /// assert_eq!((Natural::from(123u32) << 100i32).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// assert_eq!((Natural::ZERO << -10i64).to_string(), "0");
-            /// assert_eq!((Natural::from(492u32) << -2i8).to_string(), "123");
-            /// assert_eq!((Natural::trillion() << -10i16).to_string(), "976562500");
-            /// ```
-            #[inline]
-            fn shl(mut self, bits: $t) -> Natural {
-                self <<= bits;
-                self
-            }
-        }
-
-        impl<'a> Shl<$t> for &'a Natural {
-            type Output = Natural;
-
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor), taking the `Natural` by reference.
-            ///
-            /// Time: worst case O(`bits`)
-            ///
-            /// Additional memory: worst case O(`bits`)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::Zero;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!((&Natural::ZERO << 10i8).to_string(), "0");
-            /// assert_eq!((&Natural::from(123u32) << 2i16).to_string(), "492");
-            /// assert_eq!((&Natural::from(123u32) << 100i32).to_string(),
-            ///     "155921023828072216384094494261248");
-            /// assert_eq!((&Natural::ZERO << -10i64).to_string(), "0");
-            /// assert_eq!((&Natural::from(492u32) << -2i8).to_string(), "123");
-            /// assert_eq!((&Natural::trillion() << -10i16).to_string(), "976562500");
-            /// ```
-            fn shl(self, bits: $t) -> Natural {
-                if bits >= 0 {
-                    self << bits.unsigned_abs()
-                } else {
-                    self >> bits.unsigned_abs()
-                }
-            }
-        }
-
-        impl ShlAssign<$t> for Natural {
-            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
-            /// and takes the floor) in place.
-            ///
-            /// Time: worst case O(`bits`)
-            ///
-            /// Additional memory: worst case O(`bits`)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// let mut x = Natural::ONE;
-            /// x <<= 1i8;
-            /// x <<= 2i16;
-            /// x <<= 3i32;
-            /// x <<= 4i64;
-            /// assert_eq!(x.to_string(), "1024");
-            ///
-            /// let mut x = Natural::from(1024u32);
-            /// x <<= -1i8;
-            /// x <<= -2i16;
-            /// x <<= -3i32;
-            /// x <<= -4i64;
-            /// assert_eq!(x.to_string(), "1");
-            /// ```
-            fn shl_assign(&mut self, bits: $t) {
-                if bits >= 0 {
-                    *self <<= bits.unsigned_abs();
-                } else {
-                    *self >>= bits.unsigned_abs();
-                }
-            }
-        }
-
         impl ShlRound<$t> for Natural {
             type Output = Natural;
 
@@ -344,9 +235,9 @@ macro_rules! impl_natural_shl_signed {
         }
     };
 }
-impl_natural_shl_signed!(i8);
-impl_natural_shl_signed!(i16);
-impl_natural_shl_signed!(i32);
-impl_natural_shl_signed!(i64);
-impl_natural_shl_signed!(i128);
-impl_natural_shl_signed!(isize);
+impl_natural_shl_round_signed!(i8);
+impl_natural_shl_round_signed!(i16);
+impl_natural_shl_round_signed!(i32);
+impl_natural_shl_round_signed!(i64);
+impl_natural_shl_round_signed!(i128);
+impl_natural_shl_round_signed!(isize);

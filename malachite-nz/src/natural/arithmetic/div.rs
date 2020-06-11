@@ -30,7 +30,7 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
-use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,

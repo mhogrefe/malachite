@@ -18,7 +18,7 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
     _limbs_mul_mod_base_pow_n_minus_1_scratch_len, MULMOD_BNM1_THRESHOLD, MUL_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
+use natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::SQR_TOOM3_THRESHOLD;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
@@ -985,7 +985,7 @@ pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
     if xs_len >= 2 * n {
         // add xs[..m] and xs[2 * n..2 * n + m] in out[..m]
         // copy xs[m..n] to out[m..n]
-        split_into_chunks!(xs, n, _unused, [xs_0, xs_1], xs_2);
+        split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
         if limbs_add_to_out(out, xs_0, xs_2) {
             limbs_sub_same_length_in_place_left(out, xs_1);
             true

@@ -19,7 +19,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_div_round_val_ref);
     register_demo!(registry, demo_integer_div_round_ref_val);
     register_demo!(registry, demo_integer_div_round_ref_ref);
-    register_bench!(registry, Large, benchmark_integer_div_round_assign);
     register_bench!(
         registry,
         Large,
@@ -127,23 +126,6 @@ fn demo_integer_div_round_ref_ref(gm: GenerationMode, limit: usize) {
             (&x).div_round(&y, rm)
         );
     }
-}
-
-fn benchmark_integer_div_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Integer.div_round_assign(Integer, RoundingMode)",
-        BenchmarkType::Single,
-        triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref x, _, _)| usize::exact_from(x.significant_bits())),
-        "x.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(mut x, y, rm)| x.div_round_assign(y, rm)),
-        )],
-    );
 }
 
 fn benchmark_integer_div_round_down_library_comparison(

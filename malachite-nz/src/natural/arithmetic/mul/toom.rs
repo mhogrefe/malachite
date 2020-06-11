@@ -34,8 +34,8 @@ use natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out, limbs_mul_same_length_to_out,
     limbs_mul_to_out,
 };
-use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
-use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
+use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::square::{
     _limbs_square_to_out_toom_6_scratch_len, _limbs_square_to_out_toom_8_scratch_len,
 };
@@ -434,10 +434,12 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     };
     // Required, to ensure that s + t >= n.
     assert!(ys_len + 2 <= xs_len && xs_len + 6 <= 3 * ys_len);
-    split_into_chunks!(xs, n, s, [xs_0, xs_1], xs_2);
-    split_into_chunks!(ys, n, t, [ys_0], ys_1);
+    split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
+    let s = xs_2.len();
     assert_ne!(s, 0);
     assert!(s <= n);
+    split_into_chunks!(ys, n, [ys_0], ys_1);
+    let t = ys_1.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     assert!(s + t >= n);
@@ -723,8 +725,10 @@ pub fn _limbs_mul_greater_to_out_toom_33(
     assert!(xs_len >= ys_len);
     let n = xs_len.div_round(3, RoundingMode::Ceiling);
     let m = n + 1;
-    split_into_chunks!(xs, n, s, [xs_0, xs_1], xs_2);
-    split_into_chunks!(ys, n, t, [ys_0, ys_1], ys_2);
+    split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
+    let s = xs_2.len();
+    split_into_chunks!(ys, n, [ys_0, ys_1], ys_2);
+    let t = ys_2.len();
     assert_ne!(t, 0);
     split_into_chunks_mut!(out, m, [bs1, as2, bs2], _unused);
     // we need 4 * n + 4 <= 4 * n + s + t
@@ -981,10 +985,12 @@ pub fn _limbs_mul_greater_to_out_toom_42(
     } else {
         ys_len.shr_round(1, RoundingMode::Ceiling)
     };
-    split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2], xs_3);
-    split_into_chunks!(ys, n, t, [ys_0], ys_1);
+    split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
+    let s = xs_3.len();
     assert_ne!(s, 0);
     assert!(s <= n);
+    split_into_chunks!(ys, n, [ys_0], ys_1);
+    let t = ys_1.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     let mut scratch2 = vec![0; 6 * n + 5];
@@ -1175,7 +1181,8 @@ pub fn _limbs_mul_greater_to_out_toom_43(
     let s = xs_3.len();
     assert_ne!(s, 0);
     assert!(s <= n);
-    split_into_chunks!(ys, n, t, [ys_0, ys_1], ys_2);
+    split_into_chunks!(ys, n, [ys_0, ys_1], ys_2);
+    let t = ys_2.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     // This is probably true whenever `xs_len` >= 25 or `ys_len` >= 19. It guarantees that we can
@@ -1365,10 +1372,12 @@ pub fn _limbs_mul_greater_to_out_toom_44(
     assert!(xs_len >= ys_len);
     let n = xs_len.shr_round(2, RoundingMode::Ceiling);
     let m = 2 * n + 1;
-    split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2], xs_3);
+    split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
+    let s = xs_3.len();
     assert_ne!(s, 0);
     assert!(s <= n);
-    split_into_chunks!(ys, n, t, [ys_0, ys_1, ys_2], ys_3);
+    split_into_chunks!(ys, n, [ys_0, ys_1, ys_2], ys_3);
+    let t = ys_3.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     // NOTE: The multiplications to v_2, v_neg_2, v_half, and v_neg_1 overwrite the following limb,
@@ -1767,10 +1776,12 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     } else {
         (ys_len - 1) / 3
     };
-    split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2, xs_3], xs_4);
+    split_into_chunks!(xs, n, [xs_0, xs_1, xs_2, xs_3], xs_4);
+    let s = xs_4.len();
     assert_ne!(s, 0);
     assert!(s <= n);
-    split_into_chunks!(ys, n, t, [ys_0, ys_1], ys_2);
+    split_into_chunks!(ys, n, [ys_0, ys_1], ys_2);
+    let t = ys_2.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     let mut scratch2 = vec![0; 10 * (n + 1)];
@@ -2220,10 +2231,12 @@ pub fn _limbs_mul_greater_to_out_toom_62(
     } else {
         (ys_len - 1) >> 1
     };
-    split_into_chunks!(xs, n, s, [xs_0, xs_1, xs_2, xs_3, xs_4], xs_5);
+    split_into_chunks!(xs, n, [xs_0, xs_1, xs_2, xs_3, xs_4], xs_5);
+    let s = xs_5.len();
     assert_ne!(s, 0);
     assert!(s <= n);
-    split_into_chunks!(ys, n, t, [ys_0], ys_1);
+    split_into_chunks!(ys, n, [ys_0], ys_1);
+    let t = ys_1.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     let m = n + 1;
@@ -2545,7 +2558,8 @@ pub fn _limbs_mul_greater_to_out_toom_63(
     assert!(n > 2);
     let m = n + 1;
     // Decomposition
-    split_into_chunks!(ys, n, t, [ys_0, ys_1], ys_2);
+    split_into_chunks!(ys, n, [ys_0, ys_1], ys_2);
+    let t = ys_2.len();
     assert_ne!(t, 0);
     assert!(t <= n);
     let s = xs_len - 5 * n;

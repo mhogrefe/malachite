@@ -1,4 +1,6 @@
-use num::arithmetic::traits::{DivRound, RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
+use std::cmp::Ordering;
+
+use num::arithmetic::traits::{Parity, RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
 use num::conversion::traits::ExactFrom;
 use rounding_mode::RoundingMode;
 
@@ -8,7 +10,8 @@ macro_rules! impl_round_to_multiple_unsigned {
             type Output = $t;
 
             /// Rounds `self` to a multiple of `other`, according to a specified rounding mode. The
-            /// only rounding mode that is guaranteed to return without a panic is `Down`.
+            /// only rounding modes that are guaranteed to return without a panic are `Down` and
+            /// `Floor`.
             ///
             /// The following two expressions are equivalent:
             ///
@@ -42,20 +45,61 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// assert_eq!(14u8.round_to_multiple(4, RoundingMode::Nearest), 16);
             /// ```
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
-                match (self, other, rm) {
-                    (x, y, _) if x == y => x,
-                    (_, 0, RoundingMode::Down)
-                    | (_, 0, RoundingMode::Floor)
-                    | (_, 0, RoundingMode::Nearest) => 0,
-                    (x, 0, rm) => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
-                    (x, y, rm) => x.div_round(y, rm).checked_mul(other).unwrap(),
+                match (self, other) {
+                    (x, y) if x == y => x,
+                    (x, 0) => match rm {
+                        RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => 0,
+                        _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+                    }
+                    (x, y) => {
+                        let r = x % y;
+                        if r == 0 {
+                            x
+                        } else {
+                            let floor = x - r;
+                            match rm {
+                                RoundingMode::Down | RoundingMode::Floor => floor,
+                                RoundingMode::Up | RoundingMode::Ceiling => {
+                                    floor.checked_add(y).unwrap()
+                                }
+                                RoundingMode::Nearest => {
+                                    match r.cmp(&(y >> 1)) {
+                                        Ordering::Less => floor,
+                                        Ordering::Greater => floor.checked_add(y).unwrap(),
+                                        Ordering::Equal => if y.odd() {
+                                            floor
+                                        } else {
+                                            // The even multiple of y will have more trailing zeros.
+                                            let (ceiling, overflow) = floor.overflowing_add(y);
+                                            if floor.trailing_zeros() > ceiling.trailing_zeros() {
+                                                floor
+                                            } else if overflow {
+                                                panic!(
+                                                    "Cannot round {} to {} using RoundingMode {}",
+                                                    x,
+                                                    y,
+                                                    rm
+                                                );
+                                            } else {
+                                                ceiling
+                                            }
+                                        }
+                                    }
+                                },
+                                RoundingMode::Exact => {
+                                    panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds `self` to a multiple of `other` in place, according to a specified rounding
-            /// mode. The only rounding mode that is guaranteed to return without a panic is `Down`.
+            /// mode. The only rounding modes that are guaranteed to return without a panic are
+            /// `Down` and `Floor`.
             ///
             /// The following two expressions are equivalent:
             ///

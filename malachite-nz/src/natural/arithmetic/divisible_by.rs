@@ -10,7 +10,7 @@ use natural::arithmetic::div_exact::{
 };
 use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_op::limbs_mod_limb;
-use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};

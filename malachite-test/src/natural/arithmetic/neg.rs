@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use num::{BigInt, BigUint};
+use malachite_nz_test_util::natural::arithmetic::neg::neg_num;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::{naturals, nrm_naturals};
@@ -22,10 +22,6 @@ fn demo_natural_neg_ref(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
         println!("-(&{}) = {}", n, -&n);
     }
-}
-
-pub fn neg_num(u: BigUint) -> BigInt {
-    -BigInt::from(u)
 }
 
 fn benchmark_natural_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {

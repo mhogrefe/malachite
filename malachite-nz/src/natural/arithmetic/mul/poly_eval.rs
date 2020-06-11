@@ -11,7 +11,7 @@ use natural::arithmetic::add::{
     limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
@@ -35,9 +35,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 ) -> bool {
     assert_eq!(v_1.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
-
-    split_into_chunks!(poly, n, n_high, [poly_0, poly_1, poly_2], poly_3);
-    assert!(n_high <= n);
+    split_into_chunks!(poly, n, [poly_0, poly_1, poly_2], poly_3);
+    assert!(poly_3.len() <= n);
     v_1[n] = Limb::iverson(limbs_add_same_length_to_out(v_1, poly_0, poly_2));
     scratch[n] = Limb::iverson(limbs_add_to_out(scratch, poly_1, poly_3));
     let v_neg_1_neg = limbs_cmp_same_length(v_1, scratch) == Ordering::Less;
@@ -71,7 +70,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     n: usize,
     scratch: &mut [Limb],
 ) -> bool {
-    split_into_chunks!(poly, n, n_high, [poly_0, poly_1, poly_2], poly_3);
+    split_into_chunks!(poly, n, [poly_0, poly_1, poly_2], poly_3);
+    let n_high = poly_3.len();
     assert!(n_high <= n);
     assert_eq!(v_2.len(), n + 1);
     let (scratch_last, scratch_init) = scratch.split_last_mut().unwrap();

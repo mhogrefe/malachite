@@ -1,7 +1,8 @@
 use std::cmp::max;
 
 use malachite_base::num::arithmetic::traits::{
-    RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, ShrRound,
+    PowerOfTwo, RoundToMultiple, RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign,
+    ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -15,6 +16,7 @@ use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{
     limbs_round_to_multiple_of_power_of_two_up,
     limbs_round_to_multiple_of_power_of_two_up_in_place,
 };
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -477,6 +479,10 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_algorithms(
             (
                 "using shr_round",
                 &mut (|(x, y, rm)| no_out!(x.shr_round(y, rm) << y)),
+            ),
+            (
+                "using round_to_multiple",
+                &mut (|(x, y, rm)| no_out!(x.round_to_multiple(Natural::power_of_two(y), rm))),
             ),
         ],
     );

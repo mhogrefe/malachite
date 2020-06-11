@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, PowerOfTwo, RoundToMultipleOfPowerOfTwo,
+    Abs, DivisibleByPowerOfTwo, PowerOfTwo, RoundToMultiple, RoundToMultipleOfPowerOfTwo,
     RoundToMultipleOfPowerOfTwoAssign, ShrRound,
 };
 use malachite_base::num::basic::traits::Zero;
@@ -24,41 +24,43 @@ fn round_to_multiple_of_power_of_two_properties() {
     test_properties(
         triples_of_integer_small_unsigned_and_rounding_mode_var_1,
         |&(ref n, pow, rm)| {
-            let rounded = n.round_to_multiple_of_power_of_two(pow, rm);
-            assert!(rounded.is_valid());
+            let r = n.round_to_multiple_of_power_of_two(pow, rm);
+            assert!(r.is_valid());
 
-            let rounded_alt = n.clone().round_to_multiple_of_power_of_two(pow, rm);
-            assert!(rounded_alt.is_valid());
-            assert_eq!(rounded_alt, rounded);
+            let r_alt = n.clone().round_to_multiple_of_power_of_two(pow, rm);
+            assert!(r_alt.is_valid());
+            assert_eq!(r_alt, r);
 
             let mut mut_n = n.clone();
             mut_n.round_to_multiple_of_power_of_two_assign(pow, rm);
             assert!(mut_n.is_valid());
-            assert_eq!(mut_n, rounded);
+            assert_eq!(mut_n, r);
 
-            assert!(rounded.divisible_by_power_of_two(pow));
-            assert_eq!(n.shr_round(pow, rm) << pow, rounded);
-            assert_eq!(-(-n).round_to_multiple_of_power_of_two(pow, -rm), rounded);
+            assert!(r.divisible_by_power_of_two(pow));
+            assert_eq!(n.shr_round(pow, rm) << pow, r);
+            assert_eq!(-(-n).round_to_multiple_of_power_of_two(pow, -rm), r);
+            assert!((&r - n).abs() <= Integer::power_of_two(pow));
+            assert_eq!(n.round_to_multiple(Integer::power_of_two(pow), rm), r);
             match rm {
-                RoundingMode::Floor => assert!(rounded <= *n),
-                RoundingMode::Ceiling => assert!(rounded >= *n),
-                RoundingMode::Down => assert!(rounded.le_abs(n)),
-                RoundingMode::Up => assert!(rounded.ge_abs(n)),
-                RoundingMode::Exact => assert_eq!(rounded, *n),
+                RoundingMode::Floor => assert!(r <= *n),
+                RoundingMode::Ceiling => assert!(r >= *n),
+                RoundingMode::Down => assert!(r.le_abs(n)),
+                RoundingMode::Up => assert!(r.ge_abs(n)),
+                RoundingMode::Exact => assert_eq!(r, *n),
                 RoundingMode::Nearest => {
                     let k = Integer::power_of_two(pow);
                     let closest;
                     let second_closest;
-                    if rounded <= *n {
-                        closest = n - &rounded;
-                        second_closest = &rounded + k - n;
+                    if r <= *n {
+                        closest = n - &r;
+                        second_closest = &r + k - n;
                     } else {
-                        closest = &rounded - n;
-                        second_closest = n + k - &rounded;
+                        closest = &r - n;
+                        second_closest = n + k - &r;
                     }
                     assert!(closest <= second_closest);
                     if closest == second_closest {
-                        assert!(!rounded.get_bit(pow));
+                        assert!(!r.get_bit(pow));
                     }
                 }
             }

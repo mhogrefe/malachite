@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     XXXXAddYYYYIsZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 
@@ -86,7 +86,7 @@ pub fn _limbs_mod_mul_two_limbs(
         w_3.wrapping_mul(inv_2),
         z_3,
         z_2,
-        if carry { 1 } else { 0 },
+        Limb::iverson(carry),
         t_3,
         t_2,
     );

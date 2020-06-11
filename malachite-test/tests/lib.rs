@@ -182,6 +182,7 @@ pub mod integer {
         pub mod neg;
         pub mod parity;
         pub mod power_of_two;
+        pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_two;
         pub mod shl;
         pub mod shl_round;
@@ -283,13 +284,14 @@ pub mod natural {
         pub mod next_power_of_two;
         pub mod parity;
         pub mod power_of_two;
+        pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_two;
         pub mod saturating_sub;
         pub mod saturating_sub_mul;
-        pub mod shl_i;
-        pub mod shl_u;
-        pub mod shr_i;
-        pub mod shr_u;
+        pub mod shl;
+        pub mod shl_round;
+        pub mod shr;
+        pub mod shr_round;
         pub mod sign;
         pub mod sub;
         pub mod sub_mul;

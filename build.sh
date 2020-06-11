@@ -16,6 +16,7 @@ cargo fmt &&
 # cargo clippy --tests --features 32_bit_limbs --features serde &&
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path --features serde &&
 cargo test --release --test lib --features fail_on_untested_path --features serde && # Skip doctests when in 64-bit mode
+python extra-tests.py &&
 # cargo clippy --tests --features serde &&
 cargo doc &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
@@ -30,7 +31,6 @@ cargo fmt &&
 cd ../malachite-test &&
 cargo update &&
 cargo fmt &&
-python extra-tests.py
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path &&
 cargo test --release --features fail_on_untested_path &&
 cd .. &&

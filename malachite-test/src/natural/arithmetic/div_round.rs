@@ -23,7 +23,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_div_round_ref_val);
     register_demo!(registry, demo_natural_div_round_ref_ref);
     register_bench!(registry, Small, benchmark_limbs_limb_div_round_limbs);
-    register_bench!(registry, Large, benchmark_natural_div_round_assign);
     register_bench!(
         registry,
         Large,
@@ -162,23 +161,6 @@ fn benchmark_limbs_limb_div_round_limbs(gm: GenerationMode, limit: usize, file_n
         &mut [(
             "malachite",
             &mut (|(limb, limbs, rm)| no_out!(limbs_limb_div_round_limbs(limb, &limbs, rm))),
-        )],
-    );
-}
-
-fn benchmark_natural_div_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
-        "Natural.div_round_assign(Natural, RoundingMode)",
-        BenchmarkType::Single,
-        triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref x, _, _)| usize::exact_from(x.significant_bits())),
-        "x.significant_bits()",
-        &mut [(
-            "malachite",
-            &mut (|(mut x, y, rm)| x.div_round_assign(y, rm)),
         )],
     );
 }

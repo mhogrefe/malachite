@@ -26,8 +26,8 @@ use natural::arithmetic::mul::mul_mod::_limbs_mul_mod_base_pow_n_minus_1_next_si
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
-use natural::arithmetic::shl_u::limbs_shl_to_out;
-use natural::arithmetic::shr_u::{limbs_shr_to_out, limbs_slice_shr_in_place};
+use natural::arithmetic::shl::limbs_shl_to_out;
+use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,

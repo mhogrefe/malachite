@@ -17,6 +17,7 @@ pub mod mul;
 pub mod neg;
 pub mod parity;
 pub mod power_of_two;
+pub mod round_to_multiple;
 pub mod round_to_multiple_of_power_of_two;
 pub mod shl;
 pub mod shl_round;
@@ -44,6 +45,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     neg::register(registry);
     parity::register(registry);
     power_of_two::register(registry);
+    round_to_multiple::register(registry);
     round_to_multiple_of_power_of_two::register(registry);
     shl::register(registry);
     shl_round::register(registry);

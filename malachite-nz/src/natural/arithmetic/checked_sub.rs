@@ -19,12 +19,10 @@ impl Natural {
     }
 
     pub(crate) fn checked_sub_limb_ref(&self, other: Limb) -> Option<Natural> {
-        if other == 0 {
-            return Some(self.clone());
-        }
-        match *self {
-            Natural(Small(small)) => small.checked_sub(other).map(|u| Natural(Small(u))),
-            Natural(Large(ref limbs)) => {
+        match (self, other) {
+            (_, 0) => Some(self.clone()),
+            (Natural(Small(small)), other) => small.checked_sub(other).map(Natural::from),
+            (Natural(Large(ref limbs)), other) => {
                 if *self < other {
                     None
                 } else {
@@ -35,6 +33,7 @@ impl Natural {
             }
         }
     }
+    //TODO clean
 
     // self -= other, return borrow
     pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
@@ -60,190 +59,7 @@ impl Natural {
         self.trim();
         false
     }
-}
 
-/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second `Natural`
-/// is greater than the first, returns `None`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::CheckedSub;
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(Natural::from(123u32))), "None");
-/// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(Natural::ZERO)), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(Natural::from(123u32))),
-///     "Some(333)");
-/// assert_eq!(
-///     format!(
-///         "{:?}",
-///         (Natural::trillion() * Natural::from(3u32)).checked_sub(Natural::trillion())
-///     ),
-///     "Some(2000000000000)"
-/// );
-/// ```
-impl CheckedSub<Natural> for Natural {
-    type Output = Natural;
-
-    fn checked_sub(mut self, other: Natural) -> Option<Natural> {
-        if self.sub_assign_no_panic(other) {
-            None
-        } else {
-            Some(self)
-        }
-    }
-}
-
-/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
-/// `Natural` by reference. If the second `Natural` is greater than the first, returns `None`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::CheckedSub;
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(&Natural::from(123u32))), "None");
-/// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(&Natural::ZERO)), "Some(123)");
-/// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(&Natural::from(123u32))),
-///     "Some(333)");
-/// assert_eq!(
-///     format!(
-///         "{:?}",
-///         (Natural::trillion() * Natural::from(3u32)).checked_sub(&Natural::trillion())
-///     ),
-///     "Some(2000000000000)"
-/// );
-/// ```
-impl<'a> CheckedSub<&'a Natural> for Natural {
-    type Output = Natural;
-
-    fn checked_sub(mut self, other: &'a Natural) -> Option<Natural> {
-        if self.sub_assign_ref_no_panic(other) {
-            None
-        } else {
-            Some(self)
-        }
-    }
-}
-
-/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-/// `Natural` by value. If the second `Natural` is greater than the first, returns `None`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::CheckedSub;
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(Natural::from(123u32))), "None");
-/// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(Natural::ZERO)),
-///     "Some(123)");
-/// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(Natural::from(123u32))),
-///     "Some(333)");
-/// assert_eq!(
-///     format!(
-///         "{:?}",
-///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(Natural::trillion())
-///     ),
-///     "Some(2000000000000)"
-/// );
-/// ```
-impl<'a> CheckedSub<Natural> for &'a Natural {
-    type Output = Natural;
-
-    fn checked_sub(self, mut other: Natural) -> Option<Natural> {
-        if other.sub_right_assign_no_panic(self) {
-            None
-        } else {
-            Some(other)
-        }
-    }
-}
-
-/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference. If the second
-/// `Natural` is greater than the first, returns `None`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::arithmetic::traits::CheckedSub;
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(&Natural::from(123u32))), "None");
-/// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(&Natural::ZERO)),
-///     "Some(123)");
-/// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(&Natural::from(123u32))),
-///     "Some(333)");
-/// assert_eq!(
-///     format!(
-///         "{:?}",
-///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(&Natural::trillion())
-///     ),
-///     "Some(2000000000000)"
-/// );
-/// ```
-impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
-    type Output = Natural;
-
-    fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
-        if self as *const Natural == other as *const Natural {
-            Some(Natural::ZERO)
-        } else {
-            match (self, other) {
-                (x, &natural_zero!()) => Some(x.clone()),
-                (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
-                (&Natural(Small(_)), _) => None,
-                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                    if self < other {
-                        None
-                    } else {
-                        Some(Natural::from_owned_limbs_asc(limbs_sub(xs, ys).0))
-                    }
-                }
-            }
-        }
-    }
-}
-
-impl Natural {
     // self -= other, return borrow
     pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
         if other == 0 {
@@ -316,6 +132,187 @@ impl Natural {
             }
             self.trim();
             false
+        }
+    }
+}
+
+impl CheckedSub<Natural> for Natural {
+    type Output = Natural;
+
+    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value. If the second
+    /// `Natural` is greater than the first, returns `None`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(Natural::from(123u32))), "None");
+    /// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(Natural::ZERO)), "Some(123)");
+    /// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(Natural::from(123u32))),
+    ///     "Some(333)");
+    /// assert_eq!(
+    ///     format!(
+    ///         "{:?}",
+    ///         (Natural::trillion() * Natural::from(3u32)).checked_sub(Natural::trillion())
+    ///     ),
+    ///     "Some(2000000000000)"
+    /// );
+    /// ```
+    fn checked_sub(mut self, other: Natural) -> Option<Natural> {
+        if self.sub_assign_no_panic(other) {
+            None
+        } else {
+            Some(self)
+        }
+    }
+}
+
+impl<'a> CheckedSub<&'a Natural> for Natural {
+    type Output = Natural;
+
+    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
+    /// `Natural` by reference. If the second `Natural` is greater than the first, returns `None`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(format!("{:?}", Natural::ZERO.checked_sub(&Natural::from(123u32))), "None");
+    /// assert_eq!(format!("{:?}", Natural::from(123u32).checked_sub(&Natural::ZERO)), "Some(123)");
+    /// assert_eq!(format!("{:?}", Natural::from(456u32).checked_sub(&Natural::from(123u32))),
+    ///     "Some(333)");
+    /// assert_eq!(
+    ///     format!(
+    ///         "{:?}",
+    ///         (Natural::trillion() * Natural::from(3u32)).checked_sub(&Natural::trillion())
+    ///     ),
+    ///     "Some(2000000000000)"
+    /// );
+    /// ```
+    fn checked_sub(mut self, other: &'a Natural) -> Option<Natural> {
+        if self.sub_assign_ref_no_panic(other) {
+            None
+        } else {
+            Some(self)
+        }
+    }
+}
+
+impl<'a> CheckedSub<Natural> for &'a Natural {
+    type Output = Natural;
+
+    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
+    /// `Natural` by value. If the second `Natural` is greater than the first, returns `None`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(Natural::from(123u32))), "None");
+    /// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(Natural::ZERO)),
+    ///     "Some(123)");
+    /// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(Natural::from(123u32))),
+    ///     "Some(333)");
+    /// assert_eq!(
+    ///     format!(
+    ///         "{:?}",
+    ///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(Natural::trillion())
+    ///     ),
+    ///     "Some(2000000000000)"
+    /// );
+    /// ```
+    fn checked_sub(self, mut other: Natural) -> Option<Natural> {
+        if other.sub_right_assign_no_panic(self) {
+            None
+        } else {
+            Some(other)
+        }
+    }
+}
+
+impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
+    type Output = Natural;
+
+    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference. If the second
+    /// `Natural` is greater than the first, returns `None`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::CheckedSub;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(format!("{:?}", (&Natural::ZERO).checked_sub(&Natural::from(123u32))), "None");
+    /// assert_eq!(format!("{:?}", (&Natural::from(123u32)).checked_sub(&Natural::ZERO)),
+    ///     "Some(123)");
+    /// assert_eq!(format!("{:?}", (&Natural::from(456u32)).checked_sub(&Natural::from(123u32))),
+    ///     "Some(333)");
+    /// assert_eq!(
+    ///     format!(
+    ///         "{:?}",
+    ///         (&(Natural::trillion() * Natural::from(3u32))).checked_sub(&Natural::trillion())
+    ///     ),
+    ///     "Some(2000000000000)"
+    /// );
+    /// ```
+    fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
+        if self as *const Natural == other as *const Natural {
+            Some(Natural::ZERO)
+        } else {
+            match (self, other) {
+                (x, &natural_zero!()) => Some(x.clone()),
+                (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
+                (&Natural(Small(_)), _) => None,
+                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                    if self < other {
+                        None
+                    } else {
+                        Some(Natural::from_owned_limbs_asc(limbs_sub(xs, ys).0))
+                    }
+                }
+            }
         }
     }
 }

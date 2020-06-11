@@ -1,10 +1,11 @@
 use std::str::FromStr;
 
-use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
+use malachite_base::num::arithmetic::traits::{IsPowerOfTwo, ShlRound};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_nz::natural::arithmetic::shl_u::{
+use malachite_base::rounding_mode::RoundingMode;
+use malachite_nz::natural::arithmetic::shl::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,
 };
@@ -20,12 +21,12 @@ use rug;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_1, small_unsigneds,
-    triples_of_unsigned_vec_unsigned_vec_and_u64_var_5,
+    pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_1, signeds,
+    small_unsigneds, triples_of_unsigned_vec_unsigned_vec_and_u64_var_5,
     triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
 };
 use malachite_test::inputs::natural::{
-    naturals, pairs_of_natural_and_small_unsigned,
+    naturals, pairs_of_natural_and_small_signed, pairs_of_natural_and_small_unsigned,
     triples_of_natural_small_unsigned_and_small_unsigned,
 };
 
@@ -289,7 +290,7 @@ fn limbs_shl_with_complement_to_out_properties() {
     );
 }
 
-macro_rules! tests_and_properties {
+macro_rules! tests_and_properties_unsigned {
     (
         $t: ident,
         $test_shl_u: ident,
@@ -394,7 +395,7 @@ macro_rules! tests_and_properties {
         }
     }
 }
-tests_and_properties!(
+tests_and_properties_unsigned!(
     u8,
     test_shl_u8,
     shl_u8_properties,
@@ -406,7 +407,7 @@ tests_and_properties!(
     shifted,
     {}
 );
-tests_and_properties!(
+tests_and_properties_unsigned!(
     u16,
     test_shl_u16,
     shl_u16_properties,
@@ -418,7 +419,7 @@ tests_and_properties!(
     shifted,
     {}
 );
-tests_and_properties!(
+tests_and_properties_unsigned!(
     u32,
     test_shl_limb,
     shl_limb_properties,
@@ -460,7 +461,7 @@ tests_and_properties!(
         );
     }
 );
-tests_and_properties!(
+tests_and_properties_unsigned!(
     u64,
     test_shl_u64,
     shl_u64_properties,
@@ -472,12 +473,214 @@ tests_and_properties!(
     shifted,
     {}
 );
-tests_and_properties!(
+tests_and_properties_unsigned!(
     usize,
     test_shl_usize,
     shl_usize_properties,
     u,
     v,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);
+
+macro_rules! tests_and_properties_signed {
+    (
+        $t:ident,
+        $test_shl_i:ident,
+        $shl_i_properties:ident,
+        $i:ident,
+        $j:ident,
+        $out:ident,
+        $shl_library_comparison_tests:expr,
+        $n:ident,
+        $shifted:ident,
+        $shl_library_comparison_properties:expr
+    ) => {
+        #[test]
+        fn $test_shl_i() {
+            let test = |$i, $j: $t, $out| {
+                let mut n = Natural::from_str($i).unwrap();
+                n <<= $j;
+                assert_eq!(n.to_string(), $out);
+                assert!(n.is_valid());
+
+                let n = Natural::from_str($i).unwrap() << $j;
+                assert_eq!(n.to_string(), $out);
+                assert!(n.is_valid());
+
+                let n = &Natural::from_str($i).unwrap() << $j;
+                assert_eq!(n.to_string(), $out);
+                assert!(n.is_valid());
+
+                $shl_library_comparison_tests
+            };
+            test("0", 0, "0");
+            test("0", 10, "0");
+            test("123", 0, "123");
+            test("123", 1, "246");
+            test("123", 2, "492");
+            test("123", 25, "4127195136");
+            test("123", 26, "8254390272");
+            test("123", 100, "155921023828072216384094494261248");
+            test("2147483648", 1, "4294967296");
+            test("1000000000000", 0, "1000000000000");
+            test("1000000000000", 3, "8000000000000");
+            test("1000000000000", 24, "16777216000000000000");
+            test("1000000000000", 25, "33554432000000000000");
+            test("1000000000000", 31, "2147483648000000000000");
+            test("1000000000000", 32, "4294967296000000000000");
+            test("1000000000000", 33, "8589934592000000000000");
+            test(
+                "1000000000000",
+                100,
+                "1267650600228229401496703205376000000000000",
+            );
+
+            test("0", -10, "0");
+            test("123", 0, "123");
+            test("245", -1, "122");
+            test("246", -1, "123");
+            test("247", -1, "123");
+            test("491", -2, "122");
+            test("492", -2, "123");
+            test("493", -2, "123");
+            test("4127195135", -25, "122");
+            test("4127195136", -25, "123");
+            test("4127195137", -25, "123");
+            test("8254390271", -26, "122");
+            test("8254390272", -26, "123");
+            test("8254390273", -26, "123");
+            test("155921023828072216384094494261247", -100, "122");
+            test("155921023828072216384094494261248", -100, "123");
+            test("155921023828072216384094494261249", -100, "123");
+            test("4294967295", -1, "2147483647");
+            test("4294967296", -1, "2147483648");
+            test("4294967297", -1, "2147483648");
+            test("7999999999999", -3, "999999999999");
+            test("8000000000000", -3, "1000000000000");
+            test("8000000000001", -3, "1000000000000");
+            test("16777216000000000000", -24, "1000000000000");
+            test("33554432000000000000", -25, "1000000000000");
+            test("2147483648000000000000", -31, "1000000000000");
+            test("4294967296000000000000", -32, "1000000000000");
+            test("8589934592000000000000", -33, "1000000000000");
+            test(
+                "1267650600228229401496703205376000000000000",
+                -100,
+                "1000000000000",
+            );
+            test("1000000000000", -10, "976562500");
+            test("980657949", -72, "0");
+            test("4294967295", -31, "1");
+            test("4294967295", -32, "0");
+            test("4294967296", -32, "1");
+            test("4294967296", -33, "0");
+        }
+
+        #[test]
+        fn $shl_i_properties() {
+            test_properties(pairs_of_natural_and_small_signed::<$t>, |&(ref $n, $i)| {
+                let mut mut_n = $n.clone();
+                mut_n <<= $i;
+                assert!(mut_n.is_valid());
+                let $shifted = mut_n;
+
+                let shifted_alt = $n << $i;
+                assert!(shifted_alt.is_valid());
+                assert_eq!(shifted_alt, $shifted);
+
+                let shifted_alt = $n.clone() << $i;
+                assert!(shifted_alt.is_valid());
+                assert_eq!(shifted_alt, $shifted);
+
+                assert_eq!($n.shl_round($i, RoundingMode::Floor), $shifted);
+
+                $shl_library_comparison_properties
+            });
+
+            test_properties(naturals, |n| {
+                assert_eq!(n << $t::ZERO, *n);
+            });
+
+            test_properties(signeds::<$t>, |&i| {
+                assert_eq!(Natural::ZERO << i, 0);
+            });
+        }
+    };
+}
+tests_and_properties_signed!(
+    i8,
+    test_shl_i8,
+    shl_i8_properties,
+    i,
+    j,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);
+tests_and_properties_signed!(
+    i16,
+    test_shl_i16,
+    shl_i16_properties,
+    i,
+    j,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);
+tests_and_properties_signed!(
+    i32,
+    test_shl_signed_limb,
+    shl_signed_limb_properties,
+    i,
+    j,
+    out,
+    {
+        let mut n = rug::Integer::from_str(i).unwrap();
+        n <<= j;
+        assert_eq!(n.to_string(), out);
+
+        let n = rug::Integer::from_str(i).unwrap() << j;
+        assert_eq!(n.to_string(), out);
+    },
+    n,
+    shifted,
+    {
+        let mut rug_n = natural_to_rug_integer(n);
+        rug_n <<= i;
+        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
+
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(n) << i)),
+            shifted
+        );
+    }
+);
+tests_and_properties_signed!(
+    i64,
+    test_shl_i64,
+    shl_i64_properties,
+    i,
+    j,
+    out,
+    {},
+    n,
+    shifted,
+    {}
+);
+tests_and_properties_signed!(
+    isize,
+    test_shl_isize,
+    shl_isize_properties,
+    i,
+    j,
     out,
     {},
     n,

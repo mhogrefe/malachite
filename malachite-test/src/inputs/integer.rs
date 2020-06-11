@@ -1381,6 +1381,29 @@ fn triples_of_integer_nonzero_integer_and_rounding_mode(
     }
 }
 
+fn triples_of_integer_integer_and_rounding_mode(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, RoundingMode)> {
+    match gm {
+        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_integers()),
+            exhaustive_rounding_modes(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| special_random_integers(seed, scale)),
+            &(|seed| random_rounding_modes(seed)),
+        )),
+    }
+}
+
 // All triples of `Integer`, positive `Integer`, and `RoundingMode`, where if the `RoundingMode` is
 // `RoundingMode::Exact`, the first `Integer` is divisible by the second.
 pub fn triples_of_integer_nonzero_integer_and_rounding_mode_var_1(
@@ -1392,6 +1415,38 @@ pub fn triples_of_integer_nonzero_integer_and_rounding_mode_var_1(
                 (x * &y, y, rm)
             } else {
                 (x, y, rm)
+            }
+        }),
+    )
+}
+
+// All triples of `Integer`, `Integer`, and `RoundingMode`, where the first `Integer` can be rounded
+// to a multiple of the second, according to the rounding mode.
+pub fn triples_of_integer_integer_and_rounding_mode_var_2(
+    gm: GenerationMode,
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        triples_of_integer_integer_and_rounding_mode(gm).filter_map(|(x, y, rm)| {
+            if x == y {
+                Some((x, y, rm))
+            } else if y == 0 {
+                if rm == RoundingMode::Down
+                    || rm
+                        == if x >= 0 {
+                            RoundingMode::Floor
+                        } else {
+                            RoundingMode::Ceiling
+                        }
+                    || rm == RoundingMode::Nearest
+                {
+                    Some((x, y, rm))
+                } else {
+                    None
+                }
+            } else if rm == RoundingMode::Exact {
+                Some((x * &y, y, rm))
+            } else {
+                Some((x, y, rm))
             }
         }),
     )

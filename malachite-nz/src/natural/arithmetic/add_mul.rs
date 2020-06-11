@@ -591,8 +591,6 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     }
 }
 
-//TODO clean
-
 impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
@@ -619,21 +617,15 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        if let Natural(Small(small_a)) = *self {
-            (b * c).add_limb(small_a)
-        } else if let Natural(Small(small_b)) = *b {
-            self.add_mul_limb_ref_ref(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_limb_ref_ref(b, small_c)
-        } else {
-            if let Natural(Large(ref a_limbs)) = *self {
-                if let Natural(Large(ref b_limbs)) = *b {
-                    if let Natural(Large(ref c_limbs)) = *c {
-                        return Natural(Large(limbs_add_mul(a_limbs, b_limbs, c_limbs)));
-                    }
-                }
-            }
-            unreachable!();
+        match (self, b, c) {
+            (Natural(Small(small_a)), b, c) => (b * c).add_limb(*small_a),
+            (a, Natural(Small(small_b)), c) => a.add_mul_limb_ref_ref(c, *small_b),
+            (a, b, Natural(Small(small_c))) => a.add_mul_limb_ref_ref(b, *small_c),
+            (
+                Natural(Large(ref a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => Natural(Large(limbs_add_mul(a_limbs, b_limbs, c_limbs))),
         }
     }
 }
@@ -665,20 +657,16 @@ impl AddMulAssign<Natural, Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: Natural, c: Natural) {
-        if let Natural(Small(small_b)) = b {
-            self.add_mul_assign_limb(c, small_b);
-        } else if let Natural(Small(small_c)) = c {
-            self.add_mul_assign_limb(b, small_c);
-        } else if *self == 0 {
-            *self = b * c;
-        } else {
-            let self_limbs = self.promote_in_place();
-            if let Natural(Large(ref b_limbs)) = b {
-                if let Natural(Large(ref c_limbs)) = c {
-                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
-                }
-            }
+    fn add_mul_assign(&mut self, mut b: Natural, mut c: Natural) {
+        match (&mut *self, &mut b, &mut c) {
+            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
+            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb(c, *small_b),
+            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb(b, *small_c),
+            (
+                Natural(Large(ref mut a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
         }
     }
 }
@@ -710,20 +698,16 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: Natural, c: &'a Natural) {
-        if let Natural(Small(small_b)) = b {
-            self.add_mul_assign_limb_ref(c, small_b);
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_assign_limb(b, small_c);
-        } else if *self == 0 {
-            *self = b * c;
-        } else {
-            let self_limbs = self.promote_in_place();
-            if let Natural(Large(ref b_limbs)) = b {
-                if let Natural(Large(ref c_limbs)) = *c {
-                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
-                }
-            }
+    fn add_mul_assign(&mut self, mut b: Natural, c: &'a Natural) {
+        match (&mut *self, &mut b, c) {
+            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
+            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb_ref(c, *small_b),
+            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb(b, *small_c),
+            (
+                Natural(Large(ref mut a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
         }
     }
 }
@@ -755,20 +739,16 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     /// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: &'a Natural, c: Natural) {
-        if let Natural(Small(small_b)) = *b {
-            self.add_mul_assign_limb(c, small_b);
-        } else if let Natural(Small(small_c)) = c {
-            self.add_mul_assign_limb_ref(b, small_c);
-        } else if *self == 0 {
-            *self = b * c;
-        } else {
-            let self_limbs = self.promote_in_place();
-            if let Natural(Large(ref b_limbs)) = *b {
-                if let Natural(Large(ref c_limbs)) = c {
-                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
-                }
-            }
+    fn add_mul_assign(&mut self, b: &'a Natural, mut c: Natural) {
+        match (&mut *self, b, &mut c) {
+            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
+            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb(c, *small_b),
+            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb_ref(b, *small_c),
+            (
+                Natural(Large(ref mut a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
         }
     }
 }
@@ -801,19 +781,15 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
     fn add_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if let Natural(Small(small_b)) = *b {
-            self.add_mul_assign_limb_ref(c, small_b);
-        } else if let Natural(Small(small_c)) = *c {
-            self.add_mul_assign_limb_ref(b, small_c);
-        } else if *self == 0 {
-            *self = b * c;
-        } else {
-            let self_limbs = self.promote_in_place();
-            if let Natural(Large(ref b_limbs)) = *b {
-                if let Natural(Large(ref c_limbs)) = *c {
-                    limbs_add_mul_in_place_left(self_limbs, b_limbs, c_limbs);
-                }
-            }
+        match (&mut *self, b, c) {
+            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
+            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb_ref(c, *small_b),
+            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb_ref(b, *small_c),
+            (
+                Natural(Large(ref mut a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
         }
     }
 }

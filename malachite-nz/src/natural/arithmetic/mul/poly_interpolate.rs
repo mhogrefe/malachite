@@ -16,8 +16,8 @@ use natural::arithmetic::div::limbs_div_divisor_of_limb_max_with_carry_in_place;
 use natural::arithmetic::div_exact::{limbs_div_exact_3_in_place, limbs_div_exact_limb_in_place};
 use natural::arithmetic::mul::poly_eval::_limbs_shl_and_add_same_length_in_place_left;
 use natural::arithmetic::mul::toom::BIT_CORRECTION;
-use natural::arithmetic::shl_u::limbs_shl_to_out;
-use natural::arithmetic::shr_u::limbs_slice_shr_in_place;
+use natural::arithmetic::shl::limbs_shl_to_out;
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,

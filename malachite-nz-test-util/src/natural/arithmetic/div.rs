@@ -4,7 +4,7 @@ use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use malachite_nz::natural::arithmetic::div::_div_by_preinversion;
 use malachite_nz::natural::arithmetic::div_mod::{_div_mod_by_preinversion, limbs_invert_limb};
-use malachite_nz::natural::arithmetic::shl_u::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use malachite_nz::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use malachite_nz::platform::{DoubleLimb, Limb};
 
 /// The high bit of `d` must be set.

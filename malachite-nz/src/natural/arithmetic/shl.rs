@@ -1,6 +1,6 @@
 use std::ops::{Shl, ShlAssign};
 
-use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
@@ -16,11 +16,11 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `xs.len()` + `bits` / 32
+/// where n = `xs.len()` + `bits` / Limb::WIDTH
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shl_u::limbs_shl;
+/// use malachite_nz::natural::arithmetic::shl::limbs_shl;
 ///
 /// assert_eq!(limbs_shl(&[123, 456], 1), &[246, 912]);
 /// assert_eq!(limbs_shl(&[123, 456], 31), &[2_147_483_648, 61, 228]);
@@ -65,7 +65,7 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shl_u::limbs_shl_to_out;
+/// use malachite_nz::natural::arithmetic::shl::limbs_shl_to_out;
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 1), 0);
@@ -102,7 +102,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shl_u::limbs_slice_shl_in_place;
+/// use malachite_nz::natural::arithmetic::shl::limbs_slice_shl_in_place;
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_slice_shl_in_place(&mut xs, 1), 0);
@@ -134,14 +134,14 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// Additional memory: worst case O(m)
 ///
-/// where n = `xs.len()` + `bits` / 32, m = `bits`
+/// where n = `xs.len()` + `bits` / Limb::WIDTH, m = `bits`
 ///
 /// # Panics
 /// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shl_u::limbs_vec_shl_in_place;
+/// use malachite_nz::natural::arithmetic::shl::limbs_vec_shl_in_place;
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_shl_in_place(&mut xs, 1);
@@ -185,7 +185,7 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 ///
 /// # Example
 /// ```
-/// use malachite_nz::natural::arithmetic::shl_u::limbs_shl_with_complement_to_out;
+/// use malachite_nz::natural::arithmetic::shl::limbs_shl_with_complement_to_out;
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_shl_with_complement_to_out(&mut out, &[123, 456], 1), 0);
@@ -337,3 +337,120 @@ impl_natural_shl_unsigned!(u32);
 impl_natural_shl_unsigned!(u64);
 impl_natural_shl_unsigned!(u128);
 impl_natural_shl_unsigned!(usize);
+
+macro_rules! impl_natural_shl_signed {
+    ($t:ident) => {
+        impl Shl<$t> for Natural {
+            type Output = Natural;
+
+            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
+            /// and takes the floor), taking the `Natural` by value.
+            ///
+            /// Time: worst case O(`bits`)
+            ///
+            /// Additional memory: worst case O(`bits`)
+            ///
+            /// # Examples
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::basic::traits::Zero;
+            /// use malachite_nz::natural::Natural;
+            ///
+            /// assert_eq!((Natural::ZERO << 10i8).to_string(), "0");
+            /// assert_eq!((Natural::from(123u32) << 2i16).to_string(), "492");
+            /// assert_eq!((Natural::from(123u32) << 100i32).to_string(),
+            ///     "155921023828072216384094494261248");
+            /// assert_eq!((Natural::ZERO << -10i64).to_string(), "0");
+            /// assert_eq!((Natural::from(492u32) << -2i8).to_string(), "123");
+            /// assert_eq!((Natural::trillion() << -10i16).to_string(), "976562500");
+            /// ```
+            #[inline]
+            fn shl(mut self, bits: $t) -> Natural {
+                self <<= bits;
+                self
+            }
+        }
+
+        impl<'a> Shl<$t> for &'a Natural {
+            type Output = Natural;
+
+            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
+            /// and takes the floor), taking the `Natural` by reference.
+            ///
+            /// Time: worst case O(`bits`)
+            ///
+            /// Additional memory: worst case O(`bits`)
+            ///
+            /// # Examples
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::basic::traits::Zero;
+            /// use malachite_nz::natural::Natural;
+            ///
+            /// assert_eq!((&Natural::ZERO << 10i8).to_string(), "0");
+            /// assert_eq!((&Natural::from(123u32) << 2i16).to_string(), "492");
+            /// assert_eq!((&Natural::from(123u32) << 100i32).to_string(),
+            ///     "155921023828072216384094494261248");
+            /// assert_eq!((&Natural::ZERO << -10i64).to_string(), "0");
+            /// assert_eq!((&Natural::from(492u32) << -2i8).to_string(), "123");
+            /// assert_eq!((&Natural::trillion() << -10i16).to_string(), "976562500");
+            /// ```
+            fn shl(self, bits: $t) -> Natural {
+                if bits >= 0 {
+                    self << bits.unsigned_abs()
+                } else {
+                    self >> bits.unsigned_abs()
+                }
+            }
+        }
+
+        impl ShlAssign<$t> for Natural {
+            /// Shifts a `Natural` left (multiplies it by a power of 2 or divides it by a power of 2
+            /// and takes the floor) in place.
+            ///
+            /// Time: worst case O(`bits`)
+            ///
+            /// Additional memory: worst case O(`bits`)
+            ///
+            /// # Examples
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::basic::traits::One;
+            /// use malachite_nz::natural::Natural;
+            ///
+            /// let mut x = Natural::ONE;
+            /// x <<= 1i8;
+            /// x <<= 2i16;
+            /// x <<= 3i32;
+            /// x <<= 4i64;
+            /// assert_eq!(x.to_string(), "1024");
+            ///
+            /// let mut x = Natural::from(1024u32);
+            /// x <<= -1i8;
+            /// x <<= -2i16;
+            /// x <<= -3i32;
+            /// x <<= -4i64;
+            /// assert_eq!(x.to_string(), "1");
+            /// ```
+            fn shl_assign(&mut self, bits: $t) {
+                if bits >= 0 {
+                    *self <<= bits.unsigned_abs();
+                } else {
+                    *self >>= bits.unsigned_abs();
+                }
+            }
+        }
+    };
+}
+impl_natural_shl_signed!(i8);
+impl_natural_shl_signed!(i16);
+impl_natural_shl_signed!(i32);
+impl_natural_shl_signed!(i64);
+impl_natural_shl_signed!(i128);
+impl_natural_shl_signed!(isize);
