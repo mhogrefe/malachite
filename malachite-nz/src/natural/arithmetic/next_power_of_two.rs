@@ -1,7 +1,8 @@
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, NextPowerOfTwo, NextPowerOfTwoAssign,
 };
-use malachite_base::slices::{slice_set_zero, slice_test_zero};
+use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

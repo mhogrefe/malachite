@@ -6,7 +6,7 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
@@ -186,7 +186,6 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
     assert_ne!(0, ys_len);
     assert!(ys_len <= xs_len);
     assert!(xs_len <= n);
-
     if n < MULMOD_BNM1_THRESHOLD || n.odd() {
         if ys_len < n {
             if xs_len + ys_len <= n {
@@ -202,13 +201,11 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
         }
     } else {
         let half_n = n >> 1;
-
         // We need at least xs_len + ys_len >= half_n, to be able to fit one of the recursive
         // products at out. Requiring strict inequality makes the code slightly simpler. If desired,
         // we could avoid this restriction by initially halving n as long as n is even and
         // xs_len + ys_len <= n/2.
         assert!(xs_len + ys_len > half_n);
-
         // Compute xm = a * b mod (2 ^ (Limb::WIDTH * half_n) - 1),
         // xp = a * b mod (2 ^ (Limb::WIDTH * half_n) + 1), and Chinese-Remainder-Theorem together
         // as
@@ -242,7 +239,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
         let m = half_n + 1;
         if !ap1_is_xs_0 {
             let (xs_0, xs_1) = xs.split_at(half_n);
-            let (scratch_2, scratch_3) = scratch[2 * m..].split_at_mut(m);
+            let (scratch_2, scratch_3) = scratch[m << 1..].split_at_mut(m);
             let carry = limbs_sub_to_out(scratch_2, xs_0, xs_1);
             *scratch_2.last_mut().unwrap() = 0;
             if carry {
@@ -260,7 +257,6 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 bnp = half_n + usize::exact_from(*scratch_3.last_mut().unwrap());
             }
         }
-
         let k = if half_n < MUL_FFT_MODF_THRESHOLD {
             0
         } else {
@@ -274,7 +270,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 if ap1_is_xs_0 {
                     scratch[half_n] = Limb::iverson(_limbs_mul_fft(scratch, half_n, xs, ys, k));
                 } else {
-                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
+                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                     scratch_lo[half_n] = Limb::iverson(_limbs_mul_fft(
                         scratch_lo,
                         half_n,
@@ -284,7 +280,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                     ));
                 }
             } else {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                 scratch_lo[half_n] = Limb::iverson(_limbs_mul_fft(
                     scratch_lo,
                     half_n,
@@ -294,18 +290,18 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 ));
             }
         } else if bp1_is_ys_0 {
-            assert!(anp + bnp <= 2 * half_n + 1);
+            assert!(anp + bnp <= (half_n << 1) + 1);
             assert!(anp + bnp > half_n);
             assert!(anp >= bnp);
             if ap1_is_xs_0 {
                 limbs_mul_greater_to_out(scratch, xs, ys);
             } else {
-                let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                 limbs_mul_greater_to_out(scratch_lo, &scratch_hi[..anp], ys);
             }
             anp += bnp;
             anp -= half_n;
-            assert!(anp <= half_n || scratch[2 * half_n] == 0);
+            assert!(anp <= half_n || scratch[half_n << 1] == 0);
             if anp > half_n {
                 anp -= 1;
             }
@@ -319,7 +315,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             }
         } else {
             assert!(!ap1_is_xs_0);
-            let (scratch_lo, scratch_hi) = scratch.split_at_mut(2 * m);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
             _limbs_mul_mod_base_pow_n_plus_1_basecase(
                 scratch_lo,
                 scratch_hi,
@@ -358,7 +354,6 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             }
             _ => assert_eq!(carry, 0),
         }
-
         // Compute the highest half:
         // ([(scratch + xm) / 2 mod (2 ^ (Limb::WIDTH * half_n) - 1)] - scratch) *
         // 2 ^ (Limb::WIDTH * half_n)

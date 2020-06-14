@@ -10,7 +10,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base::slices::{slice_move_left, slice_set_zero};
+use malachite_base::slices::slice_move_left::slice_move_left;
+use malachite_base::slices::slice_set_zero::slice_set_zero;
 
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,

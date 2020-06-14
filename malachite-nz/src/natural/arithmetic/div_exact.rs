@@ -9,7 +9,9 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
+use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use fail_on_untested_path;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -1849,8 +1851,8 @@ impl DivExact<Natural> for Natural {
     type Output = Natural;
 
     /// Divides a `Natural` by a `Natural`, taking both `Natural`s by value. The first `Natural`
-    /// must be exactly divisible by the second. If it isn't, this function will crash or return
-    /// a meaningless result.
+    /// must be exactly divisible by the second. If it isn't, this function may crash or return a
+    /// meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -1897,7 +1899,7 @@ impl<'a> DivExact<&'a Natural> for Natural {
 
     /// Divides a `Natural` by a `Natural`, taking the first `Natural` by value and the second by
     /// reference. The first `Natural` must be exactly divisible by the second. If it isn't, this
-    /// function will crash or return a meaningless result.
+    /// function may crash or return a meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -1947,7 +1949,7 @@ impl<'a> DivExact<Natural> for &'a Natural {
 
     /// Divides a `Natural` by a `Natural`, taking the first `Natural` by reference and the second
     /// by value. The first `Natural` must be exactly divisible by the second. If it isn't, this
-    /// function will crash or return a meaningless result.
+    /// function may crash or return a meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -2014,8 +2016,8 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     type Output = Natural;
 
     /// Divides a `Natural` by a `Natural`, taking both `Natural`s by reference. The first `Natural`
-    /// must be exactly divisible by the second. If it isn't, this function will crash or return
-    /// a meaningless result.
+    /// must be exactly divisible by the second. If it isn't, this function may crash or return a
+    /// meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -2083,7 +2085,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
 impl DivExactAssign<Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value. The
     /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
-    /// isn't, this function will crash or assign the first `Natural` to a meaningless value.
+    /// isn't, this function may crash or assign a meaningless value to the first `Natural`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
@@ -2147,7 +2149,7 @@ impl DivExactAssign<Natural> for Natural {
 impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference. The
     /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
-    /// isn't, this function will crash or assign the first `Natural` to a meaningless value.
+    /// isn't, this function may crash or assign a meaningless value to the first `Natural`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the

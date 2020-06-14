@@ -33,105 +33,91 @@ impl Natural {
             }
         }
     }
-    //TODO clean
 
     // self -= other, return borrow
     pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
-        if other == 0 {
-            return false;
-        }
-        match *self {
-            Natural(Small(ref mut small)) => {
-                return match small.checked_sub(other) {
-                    Some(diff) => {
-                        *small = diff;
-                        false
-                    }
-                    None => true,
-                };
-            }
-            Natural(Large(ref mut limbs)) => {
-                if limbs_sub_limb_in_place(limbs, other) {
-                    return true;
+        match (&mut *self, other) {
+            (_, 0) => false,
+            (Natural(Small(ref mut x)), y) => match x.checked_sub(y) {
+                Some(diff) => {
+                    *x = diff;
+                    false
                 }
+                None => true,
+            },
+            (Natural(Large(ref mut xs)), y) => {
+                let borrow = limbs_sub_limb_in_place(xs, y);
+                if !borrow {
+                    self.trim();
+                }
+                borrow
             }
         }
-        self.trim();
-        false
     }
 
     // self -= other, return borrow
     pub(crate) fn sub_assign_no_panic(&mut self, other: Natural) -> bool {
-        if other == 0 {
-            false
-        } else if self.limb_count() < other.limb_count() {
-            true
-        } else if let Natural(Small(y)) = other {
-            self.sub_assign_limb_no_panic(y)
-        } else {
-            match (&mut *self, other) {
-                (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
-                    if limbs_sub_in_place_left(xs, ys) {
-                        return true;
-                    }
+        match (&mut *self, other) {
+            (_, natural_zero!()) => false,
+            (x, Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
+            (Natural(Small(_)), _) => true,
+            (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
+                let borrow = xs.len() < ys.len() || limbs_sub_in_place_left(xs, ys);
+                if !borrow {
+                    self.trim();
                 }
-                _ => unreachable!(),
+                borrow
             }
-            self.trim();
-            false
         }
     }
 
     // self -= &other, return borrow
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
-        if *other == 0 {
-            false
-        } else if self as *const Natural == other as *const Natural {
-            *self = Natural::ZERO;
-            false
-        } else if self.limb_count() < other.limb_count() {
-            true
-        } else if let Natural(Small(y)) = *other {
-            self.sub_assign_limb_no_panic(y)
-        } else {
-            match (&mut *self, other) {
-                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
-                    if limbs_sub_in_place_left(xs, ys) {
-                        return true;
-                    }
-                }
-                _ => unreachable!(),
+        match (&mut *self, other) {
+            (_, natural_zero!()) => false,
+            (x, y) if x as *const Natural == y as *const Natural => {
+                *self = Natural::ZERO;
+                false
             }
-            self.trim();
-            false
+            (x, &Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
+            (Natural(Small(_)), _) => true,
+            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+                let borrow = xs.len() < ys.len() || limbs_sub_in_place_left(xs, ys);
+                if !borrow {
+                    self.trim();
+                }
+                borrow
+            }
         }
     }
 
     // self = &other - self, return borrow
     pub(crate) fn sub_right_assign_no_panic(&mut self, other: &Natural) -> bool {
-        if self as *const Natural == other as *const Natural {
-            *self = Natural::ZERO;
-            false
-        } else if self.limb_count() > other.limb_count() {
-            true
-        } else if let Natural(Small(y)) = *self {
-            if let Some(result) = other.checked_sub_limb_ref(y) {
-                *self = result;
+        match (&mut *self, other) {
+            (natural_zero!(), y) => {
+                *self = y.clone();
                 false
-            } else {
-                true
             }
-        } else {
-            match (&mut *self, other) {
-                (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
-                    if limbs_vec_sub_in_place_right(ys, xs) {
-                        return true;
-                    }
+            (x, y) if x as *const Natural == y as *const Natural => {
+                *self = Natural::ZERO;
+                false
+            }
+            (Natural(Small(x)), y) => {
+                if let Some(result) = y.checked_sub_limb_ref(*x) {
+                    *self = result;
+                    false
+                } else {
+                    true
                 }
-                _ => unreachable!(),
             }
-            self.trim();
-            false
+            (_, Natural(Small(_))) => true,
+            (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
+                let borrow = xs.len() > ys.len() || limbs_vec_sub_in_place_right(ys, xs);
+                if !borrow {
+                    self.trim();
+                }
+                borrow
+            }
         }
     }
 }
@@ -298,19 +284,16 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     /// );
     /// ```
     fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
-        if self as *const Natural == other as *const Natural {
-            Some(Natural::ZERO)
-        } else {
-            match (self, other) {
-                (x, &natural_zero!()) => Some(x.clone()),
-                (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
-                (&Natural(Small(_)), _) => None,
-                (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
-                    if self < other {
-                        None
-                    } else {
-                        Some(Natural::from_owned_limbs_asc(limbs_sub(xs, ys).0))
-                    }
+        match (self, other) {
+            (x, y) if x as *const Natural == y as *const Natural => Some(Natural::ZERO),
+            (x, &natural_zero!()) => Some(x.clone()),
+            (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
+            (&Natural(Small(_)), _) => None,
+            (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
+                if self < other {
+                    None
+                } else {
+                    Some(Natural::from_owned_limbs_asc(limbs_sub(xs, ys).0))
                 }
             }
         }

@@ -26,13 +26,19 @@ fn test_limbs_mod_power_of_two_limb_sub_limbs_and_limbs_mod_power_of_two_limb_su
     };
     test(3, &[2], 4, &[1]);
     test(3, &[10], 4, &[9]);
-    test(3, &[1, 2, 3], 70, &[2, 4294967294, 60]);
+    test(3, &[1, 2, 3], 70, &[2, u32::MAX - 1, 60]);
     test(
         3,
         &[1, 2, 3],
         200,
         &[
-            2, 4294967294, 4294967292, 4294967295, 4294967295, 4294967295, 255,
+            2,
+            u32::MAX - 1,
+            0xffff_fffc,
+            u32::MAX,
+            u32::MAX,
+            u32::MAX,
+            255,
         ],
     );
 }
@@ -41,7 +47,7 @@ fn test_limbs_mod_power_of_two_limb_sub_limbs_and_limbs_mod_power_of_two_limb_su
 #[test]
 #[should_panic]
 fn limbs_mod_power_of_two_limb_sub_limbs_fail() {
-    limbs_mod_power_of_two_limb_sub_limbs(3, &mut vec![10], 0);
+    limbs_mod_power_of_two_limb_sub_limbs(3, &[10], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -67,14 +73,14 @@ fn test_limbs_mod_power_of_two_sub() {
     test(&[2], &[], 3, &[2]);
     test(&[], &[2], 3, &[6]);
     test(&[2], &[3], 2, &[3]);
-    test(&[1, 2, 3], &[6, 7], 100, &[4294967291, 4294967290, 2]);
-    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 4294967293, 15]);
+    test(&[1, 2, 3], &[6, 7], 100, &[0xffff_fffb, 0xffff_fffa, 2]);
+    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xffff_fffd, 15]);
     test(&[6, 7], &[1, 2], 100, &[5, 5]);
     test(
         &[1, 2],
         &[6, 7],
         100,
-        &[4294967291, 4294967290, 4294967295, 15],
+        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
     );
     test(&[6, 7], &[2, 3, 0], 100, &[4, 4, 0]);
 }
@@ -92,14 +98,14 @@ fn test_limbs_mod_power_of_two_sub_in_place_right() {
     test(&[2], &[], 3, &[2]);
     test(&[], &[2], 3, &[6]);
     test(&[2], &[3], 2, &[3]);
-    test(&[1, 2, 3], &[6, 7], 100, &[4294967291, 4294967290, 2]);
-    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 4294967293, 15]);
+    test(&[1, 2, 3], &[6, 7], 100, &[0xffff_fffb, 0xffff_fffa, 2]);
+    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xffff_fffd, 15]);
     test(&[6, 7], &[1, 2], 100, &[5, 5]);
     test(
         &[1, 2],
         &[6, 7],
         100,
-        &[4294967291, 4294967290, 4294967295, 15],
+        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
     );
 }
 
@@ -131,7 +137,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         &[6, 7],
         100,
         false,
-        &[4294967291, 4294967290, 2],
+        &[0xffff_fffb, 0xffff_fffa, 2],
         &[6, 7],
     );
     test(
@@ -140,7 +146,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         100,
         true,
         &[6, 7],
-        &[5, 5, 4294967293, 15],
+        &[5, 5, 0xffff_fffd, 15],
     );
     test(&[6, 7], &[1, 2], 100, false, &[5, 5], &[1, 2]);
     test(
@@ -148,7 +154,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         &[6, 7],
         100,
         false,
-        &[4294967291, 4294967290, 4294967295, 15],
+        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
         &[6, 7],
     );
 }

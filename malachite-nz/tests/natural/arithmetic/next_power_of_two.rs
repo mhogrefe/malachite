@@ -26,7 +26,7 @@ fn test_limbs_next_power_of_two_and_limbs_vec_next_power_of_two_in_place() {
     test(&[6, 7], &[0, 8]);
     test(&[100, 101, 102], &[0, 0, 128]);
     test(&[123, 456], &[0, 512]);
-    test(&[123, 456, 0xffff_ffff], &[0, 0, 0, 1]);
+    test(&[123, 456, u32::MAX], &[0, 0, 0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -62,7 +62,7 @@ fn test_limbs_slice_next_power_of_two_in_place() {
     test(&[6, 7], false, &[0, 8]);
     test(&[100, 101, 102], false, &[0, 0, 128]);
     test(&[123, 456], false, &[0, 512]);
-    test(&[123, 456, 0xffff_ffff], true, &[0, 0, 0]);
+    test(&[123, 456, u32::MAX], true, &[0, 0, 0]);
 }
 
 #[test]

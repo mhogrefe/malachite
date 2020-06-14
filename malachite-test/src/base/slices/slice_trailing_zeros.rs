@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_trailing_zeros;
+use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;

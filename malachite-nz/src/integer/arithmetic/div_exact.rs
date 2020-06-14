@@ -6,8 +6,8 @@ impl DivExact<Integer> for Integer {
     type Output = Integer;
 
     /// Divides an `Integer` by an `Integer`, taking both `Integer`s by value. The first `Integer`
-    /// must be exactly divisible by the second. If it isn't, this function will crash or return
-    /// a meaningless result.
+    /// must be exactly divisible by the second. If it isn't, this function may crash or return a
+    /// meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -54,7 +54,7 @@ impl<'a> DivExact<&'a Integer> for Integer {
 
     /// Divides an `Integer` by an `Integer`, taking the first `Integer` by value and the second by
     /// reference. The first `Integer` must be exactly divisible by the second. If it isn't, this
-    /// function will crash or return a meaningless result.
+    /// function may crash or return a meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -101,7 +101,7 @@ impl<'a> DivExact<Integer> for &'a Integer {
 
     /// Divides an `Integer` by an `Integer`, taking the first `Integer` by reference and the second
     /// by value. The first `Integer` must be exactly divisible by the second. If it isn't, this
-    /// function will crash or return a meaningless result.
+    /// function may crash or return a meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
     /// unsure and you want to know, use `self.div_mod(other)` and check whether the remainder is
@@ -149,7 +149,7 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
     type Output = Integer;
 
     /// Divides an `Integer` by an `Integer`, taking both `Integer`s by reference. The first
-    /// `Integer` must be exactly divisible by the second. If it isn't, this function will crash or
+    /// `Integer` must be exactly divisible by the second. If it isn't, this function may crash or
     /// return a meaningless result.
     ///
     /// If you are unsure whether the division will be exact use `self / other` instead. If you're
@@ -197,7 +197,7 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
 impl DivExactAssign<Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value. The
     /// `Integer` being assigned to must be exactly divisible by the `Integer` on the RHS. If it
-    /// isn't, this function will crash or assign the first `Integer` to a meaningless value.
+    /// isn't, this function may crash or assign a meaningless value to the first `Integer`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
@@ -241,7 +241,7 @@ impl DivExactAssign<Integer> for Integer {
 impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference. The
     /// `Integer` being assigned to must be exactly divisible by the `Integer` on the RHS. If it
-    /// isn't, this function will crash or assign the first `Integer` to a meaningless value.
+    /// isn't, this function may crash or assign a meaningless value to the first `Integer`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the

@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,

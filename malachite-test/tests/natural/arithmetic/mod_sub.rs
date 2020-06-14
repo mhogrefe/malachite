@@ -62,7 +62,7 @@ fn mod_sub_properties() {
         assert_eq!(mut_x, diff);
         assert!(mut_x.is_valid());
 
-        assert_eq!(y.mod_sub(x, m), (&diff).mod_neg(m),);
+        assert_eq!(y.mod_sub(x, m), (&diff).mod_neg(m));
         assert_eq!(x.mod_add(y.mod_neg(m), m), diff);
         assert_eq!((&diff).mod_add(y, m), *x);
         assert_eq!(diff.mod_sub(x, m), y.mod_neg(m));

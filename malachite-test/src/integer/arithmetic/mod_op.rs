@@ -69,7 +69,7 @@ fn demo_integer_mod_assign(gm: GenerationMode, limit: usize) {
         let x_old = x.clone();
         let y_old = y.clone();
         x.mod_assign(y);
-        println!("x := {}; x.mod_assign({}); x = {}", x_old, y_old, x,);
+        println!("x := {}; x.mod_assign({}); x = {}", x_old, y_old, x);
     }
 }
 
@@ -77,7 +77,7 @@ fn demo_integer_mod_assign_ref(gm: GenerationMode, limit: usize) {
     for (mut x, y) in pairs_of_integer_and_nonzero_integer(gm).take(limit) {
         let x_old = x.clone();
         x.mod_assign(&y);
-        println!("x := {}; x.mod_assign(&{}); x = {}", x_old, y, x,);
+        println!("x := {}; x.mod_assign(&{}); x = {}", x_old, y, x);
     }
 }
 

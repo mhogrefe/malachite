@@ -46,8 +46,8 @@ fn test_limbs_round_to_multiple_of_power_of_two_down() {
     test(&[123, 456], 32, &[0, 456]);
     test(&[123, 456], 100, &[]);
     test(&[256, 456], 8, &[256, 456]);
-    test(&[4_294_967_295, 1], 1, &[4_294_967_294, 1]);
-    test(&[4_294_967_295, 4_294_967_295], 32, &[0, 4_294_967_295]);
+    test(&[u32::MAX, 1], 1, &[u32::MAX - 1, 1]);
+    test(&[u32::MAX, u32::MAX], 32, &[0, u32::MAX]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -67,12 +67,12 @@ fn test_limbs_round_to_multiple_of_power_of_two_up_in_place() {
     test(&[123, 456], 0, &[123, 456]);
     test(&[123, 456], 1, &[124, 456]);
     test(&[123, 455], 1, &[124, 455]);
-    test(&[123, 456], 31, &[2147483648, 456]);
+    test(&[123, 456], 31, &[0x8000_0000, 456]);
     test(&[123, 456], 32, &[0, 457]);
     test(&[123, 456], 100, &[0, 0, 0, 16]);
     test(&[256, 456], 8, &[256, 456]);
-    test(&[4_294_967_295, 1], 1, &[0, 2]);
-    test(&[4_294_967_295, 4_294_967_295], 32, &[0, 0, 1]);
+    test(&[u32::MAX, 1], 1, &[0, 2]);
+    test(&[u32::MAX, u32::MAX], 32, &[0, 0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -105,8 +105,8 @@ fn test_limbs_round_to_multiple_of_power_of_two_nearest() {
     test(&[123, 456], 32, &[0, 456]);
     test(&[123, 456], 100, &[]);
     test(&[256, 456], 8, &[256, 456]);
-    test(&[4_294_967_295, 1], 1, &[0, 2]);
-    test(&[4_294_967_295, 4_294_967_295], 32, &[0, 0, 1]);
+    test(&[u32::MAX, 1], 1, &[0, 2]);
+    test(&[u32::MAX, u32::MAX], 32, &[0, 0, 1]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -133,17 +133,17 @@ fn test_limbs_round_to_multiple_of_power_of_two() {
         &[123, 456],
         31,
         RoundingMode::Ceiling,
-        Some(vec![2147483648, 456]),
+        Some(vec![0x8000_0000, 456]),
     );
     test(&[123, 456], 32, RoundingMode::Up, Some(vec![0, 457]));
     test(&[123, 456], 100, RoundingMode::Down, Some(vec![]));
     test(&[256, 456], 8, RoundingMode::Exact, Some(vec![256, 456]));
-    test(&[4_294_967_295, 1], 1, RoundingMode::Exact, None);
+    test(&[u32::MAX, 1], 1, RoundingMode::Exact, None);
     test(
-        &[4_294_967_295, 4_294_967_295],
+        &[u32::MAX, u32::MAX],
         32,
         RoundingMode::Down,
-        Some(vec![0, 4_294_967_295]),
+        Some(vec![0, u32::MAX]),
     );
 }
 

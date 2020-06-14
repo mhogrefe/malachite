@@ -120,8 +120,8 @@ pub trait PrimitiveInteger:
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
     + DivExact<Self, Output = Self>
-    + DivExactAssign
-    + DivisibleBy
+    + DivExactAssign<Self>
+    + DivisibleBy<Self>
     + DivisibleByPowerOfTwo
     + DivMod<Self, DivOutput = Self, ModOutput = Self>
     + DivRem<Self, DivOutput = Self, RemOutput = Self>

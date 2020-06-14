@@ -50,9 +50,12 @@ pub mod num {
         pub mod checked_add_mul;
         pub mod checked_neg;
         pub mod checked_sub_mul;
+        pub mod div_exact;
         pub mod div_mod;
         pub mod div_round;
+        pub mod divisible_by;
         pub mod divisible_by_power_of_two;
+        pub mod eq_mod;
         pub mod eq_mod_power_of_two;
         pub mod log_two;
         pub mod mod_add;
@@ -132,7 +135,21 @@ pub mod num {
         pub mod significant_bits;
     }
 }
-pub mod rounding_mode;
-pub mod slices;
+pub mod rounding_mode {
+    pub mod clone;
+    pub mod display;
+    pub mod eq;
+    pub mod from_str;
+    pub mod neg;
+    pub mod size;
+}
+pub mod slices {
+    pub mod slice_leading_zeros;
+    pub mod slice_move_left;
+    pub mod slice_set_zero;
+    pub mod slice_test_zero;
+    pub mod slice_trailing_zeros;
+    pub mod split_into_chunks;
+}
 pub mod strings;
 pub mod vecs;

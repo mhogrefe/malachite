@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_move_left;
+use malachite_base::slices::slice_move_left::slice_move_left;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

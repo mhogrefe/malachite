@@ -25,7 +25,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 fn demo_x_mul_y_is_zz<T: PrimitiveUnsigned + Rand + SampleRange>(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_unsigneds::<T>(gm).take(limit) {
-        println!("{} * {} = {:?}", x, y, T::x_mul_y_is_zz(x, y),);
+        println!("{} * {} = {:?}", x, y, T::x_mul_y_is_zz(x, y));
     }
 }
 

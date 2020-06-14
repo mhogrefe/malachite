@@ -1,7 +1,4 @@
-use num::arithmetic::traits::{
-    CheckedPow, DivExact, DivExactAssign, EqMod, Mod, OverflowingPow, Pow, SaturatingPow,
-    WrappingPow,
-};
+use num::arithmetic::traits::{CheckedPow, OverflowingPow, Pow, SaturatingPow, WrappingPow};
 use num::conversion::traits::ExactFrom;
 
 macro_rules! impl_arithmetic_traits {
@@ -50,32 +47,8 @@ macro_rules! impl_arithmetic_traits {
                 $t::pow(self, u32::exact_from(exp))
             }
         }
-
-        impl DivExact for $t {
-            type Output = $t;
-
-            #[inline]
-            fn div_exact(self, other: $t) -> $t {
-                self / other
-            }
-        }
-
-        impl DivExactAssign for $t {
-            #[inline]
-            fn div_exact_assign(&mut self, other: $t) {
-                *self /= other;
-            }
-        }
-
-        impl EqMod for $t {
-            #[inline]
-            fn eq_mod(self, other: $t, m: $t) -> bool {
-                self == other || m != 0 && self.mod_op(m) == other.mod_op(m)
-            }
-        }
     };
 }
-
 impl_arithmetic_traits!(u8);
 impl_arithmetic_traits!(u16);
 impl_arithmetic_traits!(u32);

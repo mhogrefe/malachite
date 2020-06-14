@@ -41,11 +41,11 @@ fn test_limbs_div_limb_and_limbs_div_limb_in_place() {
     };
     test(&[0, 0], 2, &[0, 0]);
     test(&[6, 7], 1, &[6, 7]);
-    test(&[6, 7], 2, &[0x8_000_0_003, 3]);
+    test(&[6, 7], 2, &[0x8000_0003, 3]);
     test(&[100, 101, 102], 10, &[1_288_490_198, 858_993_469, 10]);
     test(&[123, 456], 789, &[2_482_262_467, 0]);
     test(&[u32::MAX, u32::MAX], 2, &[u32::MAX, 0x7fff_ffff]);
-    test(&[u32::MAX, u32::MAX], 3, &[0x5_555_5_555, 0x5_555_5_555]);
+    test(&[u32::MAX, u32::MAX], 3, &[0x5555_5555, 0x5555_5555]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -90,7 +90,7 @@ fn test_limbs_div_limb_to_out() {
     };
     test(&[10, 10, 10, 10], &[0, 0], 2, &[0, 0, 10, 10]);
     test(&[10, 10, 10, 10], &[6, 7], 1, &[6, 7, 10, 10]);
-    test(&[10, 10, 10, 10], &[6, 7], 2, &[0x8_000_0_003, 3, 10, 10]);
+    test(&[10, 10, 10, 10], &[6, 7], 2, &[0x8000_0003, 3, 10, 10]);
     test(
         &[10, 10, 10, 10],
         &[100, 101, 102],
@@ -113,7 +113,7 @@ fn test_limbs_div_limb_to_out() {
         &[10, 10, 10, 10],
         &[u32::MAX, u32::MAX],
         3,
-        &[0x5_555_5_555, 0x5_555_5_555, 10, 10],
+        &[0x5555_5555, 0x5555_5555, 10, 10],
     );
 }
 
@@ -172,7 +172,7 @@ fn test_limbs_div_schoolbook() {
         // q_len < d_len_m_1
         // !highest_q first time
         // !(!flag || n_1 < Limb::checked_from(d_len).unwrap())
-        test(&[10], &[1, 2, 3], &[3, 4, 0x8_000_0_000], false, &[10]);
+        test(&[10], &[1, 2, 3], &[3, 4, 0x8000_0000], false, &[10]);
         // q_len >= d_len_m_1
         // !(n_1 == d_1 && ns[d_len_s_m_1] == d_2)
         // !carry first time
@@ -183,7 +183,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[10, 10, 10, 10],
             &[1, 2, 3, 4, 5, 6],
-            &[3, 4, 0x8_000_0_000],
+            &[3, 4, 0x8000_0000],
             false,
             &[4_294_967_207, 9, 12, 10],
         );
@@ -194,22 +194,16 @@ fn test_limbs_div_schoolbook() {
         //      ns_hi,
         //      limbs_sub_mul_limb_same_length_in_place_left(ns_lo, qs, ds[i])) fourth time
         // n_1 == 0 third time
-        test(&[10], &[0, 0, 0, 1], &[1, 0, 0x8_000_0_000], false, &[1]);
+        test(&[10], &[0, 0, 0, 1], &[1, 0, 0x8000_0000], false, &[1]);
         // q_len == 0 second time
-        test(&[10], &[0; 3], &[0, 0, 0x8_000_0_000], false, &[10]);
+        test(&[10], &[0; 3], &[0, 0, 0x8000_0000], false, &[10]);
         // *ns_last >= carry
-        test(
-            &[10; 3],
-            &[0; 5],
-            &[0, 0, 0x8_000_0_000],
-            false,
-            &[0, 0, 10],
-        );
+        test(&[10; 3], &[0; 5], &[0, 0, 0x8000_0000], false, &[0, 0, 10]);
         // n_1 != 0 third time
         test(
             &[10; 2],
             &[0, 0, 1, 1],
-            &[1, 0, 0x8_000_0_000],
+            &[1, 0, 0x8000_0000],
             false,
             &[2, 10],
         );
@@ -244,7 +238,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[10; 2],
             &[0, 0, 1, 0, 1],
-            &[0, 1, 0x8_000_0_000],
+            &[0, 1, 0x8000_0000],
             false,
             &[u32::MAX, 1],
         );
@@ -252,7 +246,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[10; 2],
             &[0, 0, 0, 0, 1],
-            &[1, 0, 0x8_000_0_000],
+            &[1, 0, 0x8000_0000],
             false,
             &[u32::MAX, 1],
         );
@@ -276,7 +270,7 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
                 0,
-                0xff00_0_000,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -355,7 +349,7 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
                 0,
-                0xf000_0_000,
+                0xf000_0000,
                 16_383,
                 0,
                 0,
@@ -528,7 +522,7 @@ fn test_limbs_div_schoolbook() {
                 0xf_ffff,
                 0,
                 0,
-                0xffff_0_000,
+                0xffff_0000,
                 u32::MAX,
                 0x1f_ffff,
                 0,
@@ -958,7 +952,7 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
                 0,
-                0xf000_0_000,
+                0xf000_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -1340,7 +1334,7 @@ fn test_limbs_div_schoolbook() {
                 u32::MAX,
             ],
             &[
-                0xffff_0_000,
+                0xffff_0000,
                 u32::MAX,
                 16_383,
                 3_221_225_472,
@@ -1452,7 +1446,7 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
                 0,
-                0xff00_0_000,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -1598,7 +1592,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[0; 3],
             &[
-                0xffff_0_000,
+                0xffff_0000,
                 2_047,
                 0,
                 0,
@@ -1646,7 +1640,7 @@ fn test_limbs_div_schoolbook() {
                 8_191,
             ],
             &[
-                0xffff_0_000,
+                0xffff_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -1663,7 +1657,7 @@ fn test_limbs_div_schoolbook() {
                 0,
                 0,
                 0,
-                0xff00_0_000,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -1696,8 +1690,8 @@ fn test_limbs_div_schoolbook() {
         // q_len == 0 first time
         test(
             &[0],
-            &[0, 0, 0x8_000_0_000],
-            &[0, 0x8_000_0_000, 0x8_000_0_000],
+            &[0, 0, 0x8000_0000],
+            &[0, 0x8000_0000, 0x8000_0000],
             false,
             &[0],
         );
@@ -1710,7 +1704,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[10],
             &[0, 0, 1, 1],
-            &[0, 1, 0x8_000_0_000_0_000_0_000],
+            &[0, 1, 0x8000_0000_0000_0000],
             false,
             &[2],
         );
@@ -2787,7 +2781,7 @@ fn test_limbs_div_schoolbook() {
         test(
             &[10; 3],
             &[
-                0x2_000_0_000,
+                0x2000_0000,
                 4_503_599_090_491_408,
                 31_664_835_368_329_200,
                 18_410_716_373_991_817_215,
@@ -2808,7 +2802,7 @@ fn test_limbs_div_schoolbook() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_fail_1() {
-    let ds = &[3, 0x8_000_0_000];
+    let ds = &[3, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook(&mut [10], &mut [1, 2, 3], ds, d_inv);
 }
@@ -2816,7 +2810,7 @@ fn limbs_div_schoolbook_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_fail_2() {
-    let ds = &[3, 4, 5, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook(&mut [10], &mut [1, 2, 3], ds, d_inv);
 }
@@ -2824,7 +2818,7 @@ fn limbs_div_schoolbook_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_fail_3() {
-    let ds = &[3, 4, 0x8_000_0_000];
+    let ds = &[3, 4, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook(&mut [10], &mut [1, 2, 3, 4, 5], ds, d_inv);
 }
@@ -2855,7 +2849,7 @@ fn test_limbs_div_divide_and_conquer() {
         test(
             &[10; 4],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9],
-            &[3, 4, 5, 6, 7, 0x8_000_0_000],
+            &[3, 4, 5, 6, 7, 0x8000_0000],
             false,
             &[4_294_967_057, 15, 18, 10],
         );
@@ -2866,14 +2860,14 @@ fn test_limbs_div_divide_and_conquer() {
         test(
             &[10; 3],
             &[0; 9],
-            &[0, 0, 0, 0, 0, 0x8_000_0_000],
+            &[0, 0, 0, 0, 0, 0x8000_0000],
             false,
             &[0, 0, 0],
         );
         test(
             &[10; 3],
             &[0, 0, 0, 0, 0, 0, 0, 0, 1],
-            &[0, 0, 0, 0, 0, 0x8_000_0_000],
+            &[0, 0, 0, 0, 0, 0x8000_0000],
             false,
             &[0, 0, 2],
         );
@@ -2883,7 +2877,7 @@ fn test_limbs_div_divide_and_conquer() {
         test(
             &[10; 3],
             &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-            &[0, 0, 0, 1, 0, 0, 0, 0x8_000_0_000],
+            &[0, 0, 0, 1, 0, 0, 0, 0x8000_0000],
             false,
             &[1, 0, 0],
         );
@@ -2893,7 +2887,7 @@ fn test_limbs_div_divide_and_conquer() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_fail_1() {
-    let ds = &[3, 4, 5, 6, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer(&mut [10; 4], &[1, 2, 3, 4, 5, 6, 7, 8, 9], ds, d_inv);
 }
@@ -2901,7 +2895,7 @@ fn limbs_div_divide_and_conquer_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_fail_2() {
-    let ds = &[3, 4, 5, 6, 7, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer(&mut [10; 4], &[1, 2, 3, 4, 5, 6, 7, 8], ds, d_inv);
 }
@@ -2909,7 +2903,7 @@ fn limbs_div_divide_and_conquer_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_fail_3() {
-    let ds = &[3, 4, 5, 6, 7, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer(&mut [10, 10], &[1, 2, 3, 4, 5, 6, 7, 8, 9], ds, d_inv);
 }
@@ -2965,20 +2959,8 @@ fn test_limbs_div_barrett() {
         // !highest_q third time
         // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
         //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater)
-        test(
-            &[10; 3],
-            &[1, 2, 3],
-            &[0, 0x8_000_0_000],
-            false,
-            &[6, 10, 10],
-        );
-        test(
-            &[10; 3],
-            &[1, 2, 3],
-            &[3, 0x8_000_0_000],
-            false,
-            &[6, 10, 10],
-        );
+        test(&[10; 3], &[1, 2, 3], &[0, 0x8000_0000], false, &[6, 10, 10]);
+        test(&[10; 3], &[1, 2, 3], &[3, 0x8000_0000], false, &[6, 10, 10]);
         // q_len >= d_len
         // !highest_q first time
         // !_limbs_div_barrett_approx(&mut scratch_2, &mut rs, ds, scratch)
@@ -2986,43 +2968,31 @@ fn test_limbs_div_barrett() {
         test(
             &[10; 3],
             &[1, 2, 3, 4],
-            &[0, 0x8_000_0_000],
+            &[0, 0x8000_0000],
             false,
             &[6, 8, 10],
         );
         test(
             &[10; 3],
             &[1, 2, 3, 4],
-            &[3, 0x8_000_0_000],
+            &[3, 0x8000_0000],
             false,
             &[5, 8, 10],
         );
         // *scratch_2_head > 6
-        test(
-            &[10; 3],
-            &[0, 0, 1],
-            &[0, 0x8_000_0_001],
-            false,
-            &[1, 10, 10],
-        );
+        test(&[10; 3], &[0, 0, 1], &[0, 0x8000_0001], false, &[1, 10, 10]);
         // !ghost_limb
         test(
             &[10; 3],
             &[0, 0, 0, 0],
-            &[0, 0, 0x8_000_0_000],
+            &[0, 0, 0x8000_0000],
             false,
             &[0, 10, 10],
         );
         // highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
         //      || limbs_cmp_same_length(&mut rs, ns) == Ordering::Greater
         // !limbs_sub_limb_to_out(qs, &tp[1..q_len + 1], 1) second time
-        test(
-            &[10; 3],
-            &[0, 0, 1],
-            &[1, 0x8_000_0_000],
-            false,
-            &[1, 10, 10],
-        );
+        test(&[10; 3], &[0, 0, 1], &[1, 0x8000_0000], false, &[1, 10, 10]);
         // *scratch_2_head <= 4
         // !highest_q second time
         // !(highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..d_len], ds)
@@ -3030,7 +3000,7 @@ fn test_limbs_div_barrett() {
         test(
             &[10; 3],
             &[0, 0, 0, 0],
-            &[0, 0x8_000_0_000],
+            &[0, 0x8000_0000],
             false,
             &[0, 0, 10],
         );
@@ -3040,7 +3010,7 @@ fn test_limbs_div_barrett() {
         test(
             &[10; 3],
             &[0, 0, 1, 0],
-            &[1, 0x8_000_0_000],
+            &[1, 0x8000_0000],
             false,
             &[1, 0, 10],
         );
@@ -5529,7 +5499,7 @@ fn test_limbs_div_barrett() {
         test(
             &[10; 3],
             &[0, 0, 1],
-            &[0, 0x8_000_0_000_0_000_0_001],
+            &[0, 0x8000_0000_0000_0001],
             false,
             &[1, 10, 10],
         );
@@ -5540,7 +5510,7 @@ fn test_limbs_div_barrett() {
 #[should_panic]
 fn limbs_div_barrett_fail_1() {
     let ns = &[1, 2, 3];
-    let ds = &[0x8_000_0_000];
+    let ds = &[0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
@@ -5549,7 +5519,7 @@ fn limbs_div_barrett_fail_1() {
 #[should_panic]
 fn limbs_div_barrett_fail_2() {
     let ns = &[1, 2];
-    let ds = &[0, 0x8_000_0_000];
+    let ds = &[0, 0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
@@ -5567,7 +5537,7 @@ fn limbs_div_barrett_fail_3() {
 #[should_panic]
 fn limbs_div_barrett_fail_4() {
     let ns = &[1, 2, 3, 4];
-    let ds = &[0, 0x8_000_0_000];
+    let ds = &[0, 0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett(&mut [10], ns, ds, &mut scratch);
 }
@@ -5598,20 +5568,20 @@ fn test_limbs_div_schoolbook_approx() {
         test(
             &[10],
             &[1, 2, 3],
-            &[3, 4, 0x8_000_0_000],
+            &[3, 4, 0x8000_0000],
             false,
             &[10],
             &[1, 2, 3],
         );
         // !(!flag || n_1 >= d_1) second time
-        test(&[0], &[0; 4], &[0, 0, 0x8_000_0_000], false, &[0], &[0; 4]);
+        test(&[0], &[0; 4], &[0, 0, 0x8000_0000], false, &[0], &[0; 4]);
         // q_len + 1 >= d_len
         // !(!flag || n_1 >= d_1) first time
         // !carry second time
         test(
             &[0, 0],
             &[0; 5],
-            &[0, 0, 0x8_000_0_000],
+            &[0, 0, 0x8000_0000],
             false,
             &[0, 0],
             &[0; 5],
@@ -5770,17 +5740,17 @@ fn test_limbs_div_schoolbook_approx() {
         // n_1 == carry
         test(
             &[10, 10, 10, 10],
-            &[0, 0, 0, 1, 4, 0x8_000_0_000],
-            &[3, 4, 0x8_000_0_000],
+            &[0, 0, 0, 1, 4, 0x8000_0000],
+            &[3, 4, 0x8000_0000],
             false,
             &[0xffff_fffc, u32::MAX, u32::MAX, 10],
-            &[0, 19, 0, 0x7fff_fffe, 0x8_000_0_000, 0x8_000_0_000],
+            &[0, 19, 0, 0x7fff_fffe, 0x8000_0000, 0x8000_0000],
         );
         // carry first time
         test(
             &[10, 10, 10, 10, 10],
             &[0, 0, 0, 0, 0, 3],
-            &[3, 0, 0x8_000_0_000],
+            &[3, 0, 0x8000_0000],
             false,
             &[u32::MAX, u32::MAX, 5, 10, 10],
             &[0, 3, 2_147_483_630, u32::MAX, 0, 3],
@@ -5789,17 +5759,17 @@ fn test_limbs_div_schoolbook_approx() {
         // !(flag && n_1 < carry)
         test(
             &[10, 10, 10, 10],
-            &[0, 0, 0, 3, u32::MAX, 0x8_000_0_000],
-            &[3, 4, u32::MAX, 0x8_000_0_000],
+            &[0, 0, 0, 3, u32::MAX, 0x8000_0000],
+            &[3, 4, u32::MAX, 0x8000_0000],
             false,
             &[u32::MAX, u32::MAX, 10, 10],
-            &[0, 0, 3, 0x8_000_0_000, 0x8_000_0_000, 0x8_000_0_000],
+            &[0, 0, 3, 0x8000_0000, 0x8000_0000, 0x8000_0000],
         );
         // carry second time
         test(
             &[10; 4],
             &[0, 0, 0, 0, 0, 0, 1, 0],
-            &[0, 1, 0, 0x8_000_0_000],
+            &[0, 1, 0, 0x8000_0000],
             false,
             &[u32::MAX, u32::MAX, 1, 0],
             &[0, 0, 1, 0x7fff_fffe, u32::MAX, 0, 1, 0],
@@ -7799,7 +7769,7 @@ fn test_limbs_div_schoolbook_approx() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_approx_fail_1() {
-    let ds = &[3, 0x8_000_0_000];
+    let ds = &[3, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook_approx(&mut [10], &mut [1, 2, 3], ds, d_inv);
 }
@@ -7807,7 +7777,7 @@ fn limbs_div_schoolbook_approx_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_approx_fail_2() {
-    let ds = &[3, 4, 5, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook_approx(&mut [10], &mut [1, 2, 3], ds, d_inv);
 }
@@ -7815,7 +7785,7 @@ fn limbs_div_schoolbook_approx_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_div_schoolbook_approx_fail_3() {
-    let ds = &[3, 4, 0x8_000_0_000];
+    let ds = &[3, 4, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_schoolbook_approx(&mut [10], &mut [1, 2, 3, 4, 5], ds, d_inv);
 }
@@ -7848,7 +7818,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
         test(
             &[10; 4],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9],
-            &[3, 4, 5, 6, 7, 0x8_000_0_000],
+            &[3, 4, 5, 6, 7, 0x8000_0000],
             false,
             &[4_294_967_057, 15, 18, 10],
         );
@@ -14619,7 +14589,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
         test(
             &[10; 6],
             &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-            &[3, 4, 5, 6, 7, 0x8_000_0_000],
+            &[3, 4, 5, 6, 7, 0x8000_0000],
             false,
             &[3_614, 4_294_966_768, 4_294_967_005, 19, 22, 10],
         );
@@ -16025,7 +15995,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 0,
                 0,
                 0,
-                0xf000_0_000,
+                0xf000_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -17208,7 +17178,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 0,
                 2,
                 0,
-                0x1_0_000,
+                0x1_0000,
                 0,
                 0,
                 0,
@@ -17353,7 +17323,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 0,
                 0,
                 0,
-                0x10_0_000,
+                0x10_0000,
                 0,
                 0,
                 0,
@@ -17648,7 +17618,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 0,
                 0,
                 0,
-                0x400_0_000,
+                0x400_0000,
                 0,
                 0,
                 0,
@@ -19191,7 +19161,7 @@ fn test_limbs_div_divide_and_conquer_approx() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_approx_fail_1() {
-    let ds = &[3, 4, 5, 6, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer_approx(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, d_inv);
 }
@@ -19199,7 +19169,7 @@ fn limbs_div_divide_and_conquer_approx_fail_1() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_approx_fail_2() {
-    let ds = &[3, 4, 5, 6, 7, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer_approx(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6], ds, d_inv);
 }
@@ -19207,7 +19177,7 @@ fn limbs_div_divide_and_conquer_approx_fail_2() {
 #[test]
 #[should_panic]
 fn limbs_div_divide_and_conquer_approx_fail_3() {
-    let ds = &[3, 4, 5, 6, 7, 0x8_000_0_000];
+    let ds = &[3, 4, 5, 6, 7, 0x8000_0000];
     let d_inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
     _limbs_div_divide_and_conquer_approx(
         &mut [10, 10],
@@ -19270,7 +19240,7 @@ fn test_limbs_div_barrett_approx() {
         // d_len_s == i_len
         // !highest_q first time in _limbs_div_barrett_approx_preinverted
         // q_len == 0 first time in _limbs_div_barrett_approx_preinverted
-        test(&[10; 3], &[1, 2], &[0, 0x8_000_0_000], false, &[10, 10, 10]);
+        test(&[10; 3], &[1, 2], &[0, 0x8000_0000], false, &[10, 10, 10]);
         // q_len + 1 >= d_len
         // d_len_s != i_len
         // !limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1)
@@ -19279,20 +19249,8 @@ fn test_limbs_div_barrett_approx() {
         // q_len == 0 second time in _limbs_div_barrett_approx_preinverted
         // !(limbs_slice_add_limb_in_place(qs, 3) || carry)
         //      in _limbs_div_barrett_approx_preinverted
-        test(
-            &[10; 3],
-            &[1, 2, 3],
-            &[0, 0x8_000_0_000],
-            false,
-            &[8, 10, 10],
-        );
-        test(
-            &[10; 3],
-            &[1, 2, 3],
-            &[3, 0x8_000_0_000],
-            false,
-            &[8, 10, 10],
-        );
+        test(&[10; 3], &[1, 2, 3], &[0, 0x8000_0000], false, &[8, 10, 10]);
+        test(&[10; 3], &[1, 2, 3], &[3, 0x8000_0000], false, &[8, 10, 10]);
         // q_len != 0 second time in _limbs_div_barrett_approx_preinverted
         // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_barrett_approx_preinverted
         // n != 0 in _limbs_div_barrett_approx_preinverted
@@ -20019,7 +19977,7 @@ fn test_limbs_div_barrett_approx() {
 #[should_panic]
 fn limbs_div_barrett_approx_fail_1() {
     let ns = &[1, 2];
-    let ds = &[0x8_000_0_000];
+    let ds = &[0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
@@ -20028,7 +19986,7 @@ fn limbs_div_barrett_approx_fail_1() {
 #[should_panic]
 fn limbs_div_barrett_approx_fail_2() {
     let ns = &[1];
-    let ds = &[0, 0x8_000_0_000];
+    let ds = &[0, 0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10, 10, 10], ns, ds, &mut scratch);
 }
@@ -20046,7 +20004,7 @@ fn limbs_div_barrett_approx_fail_3() {
 #[should_panic]
 fn limbs_div_barrett_approx_fail_4() {
     let ns = &[1, 2, 3, 4];
-    let ds = &[0, 0x8_000_0_000];
+    let ds = &[0, 0x8000_0000];
     let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
     _limbs_div_barrett_approx(&mut [10], ns, ds, &mut scratch);
 }
@@ -20717,7 +20675,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x8_0_000,
+                0x8_0000,
                 0,
                 0,
                 0,
@@ -20766,7 +20724,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x2_0_000,
+                0x2_0000,
                 0,
                 0,
                 0,
@@ -31354,7 +31312,7 @@ fn test_limbs_div() {
                 402_653_184,
                 0,
                 0,
-                0xff00_0_000,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -31373,7 +31331,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x1_0_000,
+                0x1_0000,
                 0,
                 0,
                 0,
@@ -31447,7 +31405,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x200_0_000,
+                0x200_0000,
                 0,
                 0,
                 0,
@@ -31651,7 +31609,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0xf000_0_000,
+                0xf000_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -31670,7 +31628,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x10_0_000,
+                0x10_0000,
                 0,
                 0,
                 0,
@@ -31744,7 +31702,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x2_000_0_000,
+                0x2000_0000,
                 0,
                 0,
                 0,
@@ -31943,7 +31901,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 0x1ff_ffff,
                 0,
-                0x4_000_0_000,
+                0x4000_0000,
                 1,
                 0,
                 0,
@@ -31988,7 +31946,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0xff00_0_000,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -32062,7 +32020,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x4_000_0_000,
+                0x4000_0000,
                 u32::MAX - 1,
                 u32::MAX,
                 u32::MAX,
@@ -32166,7 +32124,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 0xf_ffff,
                 0,
-                0x400_0_000,
+                0x400_0000,
                 0,
                 0,
                 0,
@@ -32508,7 +32466,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0xfff0_0_000,
+                0xfff0_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -32684,7 +32642,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x8_0_000,
+                0x8_0000,
                 0,
                 0,
                 0,
@@ -32758,7 +32716,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x1_000_0_000,
+                0x1000_0000,
                 0,
                 0,
                 0,
@@ -32981,7 +32939,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                0x80_0_000,
+                0x80_0000,
                 0,
                 0,
                 0,
@@ -38714,14 +38672,14 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                131_071,
+                0x1_ffff,
                 0,
                 54_525_952,
                 0,
                 402_653_184,
                 0,
                 0,
-                4_278_190_080,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -38740,7 +38698,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                65_536,
+                0x1_0000,
                 0,
                 0,
                 0,
@@ -38788,7 +38746,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                67_108_863,
+                0x3ff_ffff,
                 0,
                 0,
                 6,
@@ -38814,7 +38772,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                33_554_432,
+                0x200_0000,
                 0,
                 0,
                 0,
@@ -38910,7 +38868,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                4_294_967_289,
+                0xffff_fff9,
                 u32::MAX,
                 4_294_967_103,
                 u32::MAX,
@@ -39011,14 +38969,14 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                2_097_151,
+                0x1f_ffff,
                 0,
                 603_979_776,
                 0,
                 0,
                 0,
                 0,
-                4_026_531_840,
+                0xf000_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -39037,7 +38995,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                1_048_576,
+                0x10_0000,
                 0,
                 0,
                 0,
@@ -39085,7 +39043,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                1_073_741_823,
+                0x3fff_ffff,
                 0,
                 0,
                 64,
@@ -39111,7 +39069,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                536_870_912,
+                0x2000_0000,
                 0,
                 0,
                 0,
@@ -39162,7 +39120,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 127,
                 0,
-                28_672,
+                0x7000,
                 0,
                 0,
                 0,
@@ -39234,7 +39192,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                65_535,
+                0xffff,
                 0,
                 12_582_912,
                 0,
@@ -39253,7 +39211,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                2_147_483_647,
+                0x7fff_ffff,
                 1,
                 0,
                 0,
@@ -39308,9 +39266,9 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                33_554_431,
+                0x1ff_ffff,
                 0,
-                1_073_741_824,
+                0x4000_0000,
                 1,
                 0,
                 0,
@@ -39355,7 +39313,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                4_278_190_080,
+                0xff00_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -39429,7 +39387,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                1_073_741_824,
+                0x4000_0000,
                 u32::MAX - 1,
                 u32::MAX,
                 u32::MAX,
@@ -39531,9 +39489,9 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                1_048_575,
+                0xf_ffff,
                 0,
-                67_108_864,
+                0x400_0000,
                 0,
                 0,
                 0,
@@ -39605,7 +39563,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                536_870_911,
+                0x1fff_ffff,
                 0,
                 0,
                 4,
@@ -39727,7 +39685,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                4_294_967_284,
+                0xffff_fff4,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -39754,7 +39712,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                32_767,
+                0x7fff,
                 0,
                 0,
                 0,
@@ -39801,7 +39759,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                4_294_963_200,
+                0xffff_f000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -39828,7 +39786,7 @@ fn test_limbs_div() {
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
-                16_777_215,
+                0xff_ffff,
                 0,
                 0,
                 0,
@@ -39875,7 +39833,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                4_293_918_720,
+                0xfff0_0000,
                 u32::MAX,
                 u32::MAX,
                 u32::MAX,
@@ -40051,7 +40009,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                524_288,
+                0x8_0000,
                 0,
                 0,
                 0,
@@ -40125,7 +40083,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                268_435_456,
+                0x1000_0000,
                 0,
                 0,
                 0,
@@ -40274,7 +40232,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                16_384,
+                0x4000,
                 0,
                 0,
                 0,
@@ -40348,7 +40306,7 @@ fn test_limbs_div() {
                 0,
                 0,
                 0,
-                8_388_608,
+                0x80_0000,
                 0,
                 0,
                 0,

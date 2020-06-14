@@ -1,6 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::slices::slice_leading_zeros;
+use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;

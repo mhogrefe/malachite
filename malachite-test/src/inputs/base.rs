@@ -20,7 +20,8 @@ use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
 };
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
@@ -432,6 +433,23 @@ pub fn pairs_of_unsigneds_var_6<T: PrimitiveUnsigned + Rand>(gm: GenerationMode)
     )
 }
 
+// All pairs of `T`s where `T` is unsigned, the second `T` is nonzero, and the first `T` is
+// divisible by the second.
+pub fn pairs_of_unsigneds_var_7<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T)> {
+    let ps = pairs_of_unsigneds::<T>(gm).filter_map(|(x, y)| {
+        if y == T::ZERO {
+            None
+        } else {
+            Some((x.round_to_multiple(y, RoundingMode::Down), y))
+        }
+    });
+    if gm == GenerationMode::Exhaustive {
+        Box::new(ps.unique())
+    } else {
+        Box::new(ps)
+    }
+}
+
 pub fn triples_of_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<(T, T, T)> {
     match gm {
         GenerationMode::Exhaustive => {
@@ -584,6 +602,14 @@ pub fn triples_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+// All triples of `T`s, where `T` is unsigned and the first `T` is not equal to the second mod the
+// third.
+pub fn triples_of_unsigneds_var_5<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    Box::new(triples_of_unsigneds::<T>(gm).filter(|&(x, y, m)| !x.eq_mod(y, m)))
+}
+
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -626,6 +652,27 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     Box::new(pairs_of_signed_and_nonzero_signed::<T, T>(gm).filter(|&(x, y)| !x.divisible_by(y)))
+}
+
+// All pairs of `T`s where `T` is signed, the second `T` is nonzero, and the first `T` is divisible
+// by the second.
+pub fn pairs_of_signeds_var_4<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    let ps = pairs_of_signeds::<T>(gm).filter_map(|(x, y)| {
+        if y == T::ZERO || x == T::MIN && y == T::NEGATIVE_ONE {
+            None
+        } else {
+            Some((x.round_to_multiple(y, RoundingMode::Down), y))
+        }
+    });
+    if gm == GenerationMode::Exhaustive {
+        Box::new(ps.unique())
+    } else {
+        Box::new(ps)
+    }
 }
 
 pub fn triples_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
@@ -707,6 +754,16 @@ where
             Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
         )),
     }
+}
+
+// All triples of `T`s, where `T` is signed and the first `T` is not equal to the second mod the
+// third.
+pub fn triples_of_signeds_var_4<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(triples_of_signeds::<T>(gm).filter(|&(x, y, m)| !x.eq_mod(y, m)))
 }
 
 pub fn pairs_of_natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>

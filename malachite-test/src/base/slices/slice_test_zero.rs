@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;

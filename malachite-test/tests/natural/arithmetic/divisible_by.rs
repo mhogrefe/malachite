@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
@@ -17,6 +17,7 @@ use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_14, pairs_of_limb_vec_var_15,
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigned_vec_var_13,
+    pairs_of_unsigneds,
 };
 use malachite_test::inputs::natural::{
     naturals, pairs_of_natural_and_positive_natural_var_1,
@@ -93,7 +94,7 @@ fn divisible_by_properties() {
         assert_eq!(x.clone().divisible_by(y), divisible);
         assert_eq!(x.clone().divisible_by(y.clone()), divisible);
 
-        assert_eq!(*x == 0 || *y != 0 && x % y == 0, divisible,);
+        assert_eq!(*x == 0 || *y != 0 && x % y == 0, divisible);
         assert_eq!(
             num_divisible_by(&natural_to_biguint(x), &natural_to_biguint(y)),
             divisible
@@ -121,7 +122,7 @@ fn divisible_by_properties() {
         pairs_of_natural_and_positive_natural_var_2,
         |&(ref x, ref y)| {
             assert!(!x.divisible_by(y));
-            assert!(*x != 0 && (*y == 0 || x * y != 0));
+            assert!(*x != 0 && (*y == 0 || x % y != 0));
             assert!(!num_divisible_by(
                 &natural_to_biguint(x),
                 &natural_to_biguint(y)
@@ -141,5 +142,12 @@ fn divisible_by_properties() {
             assert!(!Natural::ONE.divisible_by(n));
         }
         assert!(n.divisible_by(n));
+    });
+
+    test_properties(pairs_of_unsigneds::<Limb>, |&(x, y)| {
+        assert_eq!(
+            Natural::from(x).divisible_by(Natural::from(y)),
+            x.divisible_by(y)
+        );
     });
 }

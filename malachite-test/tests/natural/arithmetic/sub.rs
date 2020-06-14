@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwoNeg, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,

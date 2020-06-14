@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::integer::arithmetic::eq_mod::{
     limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
@@ -7,6 +7,7 @@ use malachite_nz::integer::arithmetic::eq_mod::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 
 use malachite_test::common::test_properties;
@@ -14,7 +15,8 @@ use malachite_test::inputs::base::{
     triples_of_limb_limb_and_limb_vec_var_2, triples_of_limb_vec_limb_and_limb_vec_var_4,
     triples_of_limb_vec_limb_and_limb_vec_var_5, triples_of_limb_vec_limb_vec_and_limb_var_11,
     triples_of_limb_vec_limb_vec_and_limb_var_12, triples_of_limb_vec_var_58,
-    triples_of_limb_vec_var_59, triples_of_unsigned_unsigned_and_unsigned_vec_var_1,
+    triples_of_limb_vec_var_59, triples_of_signeds,
+    triples_of_unsigned_unsigned_and_unsigned_vec_var_1,
     triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
@@ -23,6 +25,7 @@ use malachite_test::inputs::integer::{
     pairs_of_integer_and_natural, pairs_of_integers, triples_of_integer_integer_and_natural,
     triples_of_integer_integer_and_natural_var_1, triples_of_integer_integer_and_natural_var_2,
 };
+use malachite_test::inputs::natural::triples_of_naturals;
 
 #[test]
 fn limbs_eq_neg_limb_mod_limb_properties() {
@@ -277,5 +280,16 @@ fn eq_mod_properties() {
     test_properties(pairs_of_integer_and_natural, |&(ref x, ref y)| {
         assert_eq!(x.eq_mod(Integer::ZERO, y), x.divisible_by(Integer::from(y)));
         assert!(x.eq_mod(x, y));
+    });
+
+    test_properties(triples_of_naturals, |&(ref x, ref y, ref m)| {
+        assert_eq!(Integer::from(x).eq_mod(Integer::from(y), m), x.eq_mod(y, m));
+    });
+
+    test_properties(triples_of_signeds::<SignedLimb>, |&(x, y, m)| {
+        assert_eq!(
+            Integer::from(x).eq_mod(Integer::from(y), Integer::from(m).unsigned_abs()),
+            x.eq_mod(y, m)
+        );
     });
 }

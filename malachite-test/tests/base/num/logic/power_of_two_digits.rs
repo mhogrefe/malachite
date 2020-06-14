@@ -4,7 +4,8 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
+use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 

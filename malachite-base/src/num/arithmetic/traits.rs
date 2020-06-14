@@ -812,12 +812,12 @@ pub trait Parity {
     fn odd(self) -> bool;
 }
 
-/// Determines whether `self` is divisible by 2<sup>pow</sup>.
+/// Determines whether `self` is divisible by 2<sup>`pow`</sup>.
 pub trait DivisibleByPowerOfTwo {
     fn divisible_by_power_of_two(self, pow: u64) -> bool;
 }
 
-/// Determines whether `self` is equal to other mod 2<sup>pow</sup>.
+/// Determines whether `self` is equal to `other` mod 2<sup>`pow`</sup>.
 pub trait EqModPowerOfTwo<RHS = Self> {
     fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
 }
@@ -960,6 +960,31 @@ pub trait DivRoundAssign<RHS = Self> {
     fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
+/// Divides a value by another value. The first value must be exactly divisible by the second. If it
+/// isn't, this function may crash or return a meaningless result.
+pub trait DivExact<RHS = Self> {
+    type Output;
+
+    fn div_exact(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a value by another value in place. The value being assigned to must be exactly divisible
+/// by the value on the RHS. If it isn't, this function may crash or assign a meaningless value to
+/// the first value.
+pub trait DivExactAssign<RHS = Self> {
+    fn div_exact_assign(&mut self, other: RHS);
+}
+
+/// Determines whether `self` is divisible by `other`.
+pub trait DivisibleBy<RHS = Self> {
+    fn divisible_by(self, other: RHS) -> bool;
+}
+
+/// Determines whether `self` is equal to `other` mod `m`.
+pub trait EqMod<RHS = Self, M = Self> {
+    fn eq_mod(self, other: RHS, m: M) -> bool;
+}
+
 /// Rounds `self` to a multiple of other, according to a specified rounding mode.
 pub trait RoundToMultiple<RHS = Self> {
     type Output;
@@ -1036,24 +1061,6 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
-pub trait EqMod<RHS = Self, M = Self> {
-    fn eq_mod(self, other: RHS, m: M) -> bool;
-}
-
-pub trait DivExact<RHS = Self> {
-    type Output;
-
-    fn div_exact(self, other: RHS) -> Self::Output;
-}
-
-pub trait DivExactAssign<RHS = Self> {
-    fn div_exact_assign(&mut self, other: RHS);
-}
-
-pub trait DivisibleBy<RHS = Self> {
-    fn divisible_by(self, other: RHS) -> bool;
-}
-
 pub trait CheckedLogTwo {
     fn checked_log_two(self) -> Option<u64>;
 }
@@ -1070,7 +1077,7 @@ pub trait CeilingLogTwo {
     fn ceiling_log_two(self) -> u64;
 }
 
-/// Calculates 2<sup>pow</sup>.
+/// Calculates 2<sup>`pow`</sup>.
 pub trait PowerOfTwo {
     fn power_of_two(pow: u64) -> Self;
 }

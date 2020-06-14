@@ -46,3 +46,6 @@ pub mod num {
         pub mod bit_convertible;
     }
 }
+pub mod slices {
+    pub mod slice_move_left;
+}

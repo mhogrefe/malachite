@@ -29,7 +29,7 @@ use malachite_nz_test_util::natural::arithmetic::div_exact::{
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
     odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_8,
-    pairs_of_unsigned_vec_var_12, quadruples_of_limb_vec_var_4,
+    pairs_of_unsigned_vec_var_12, pairs_of_unsigneds_var_7, quadruples_of_limb_vec_var_4,
     quadruples_of_three_limb_vecs_and_limb_var_3, quadruples_of_three_limb_vecs_and_limb_var_4,
     quadruples_of_three_limb_vecs_and_limb_var_5, quadruples_of_three_limb_vecs_and_limb_var_6,
     triples_of_limb_vec_limb_vec_and_positive_limb_var_2, triples_of_limb_vec_var_50,
@@ -419,7 +419,11 @@ fn div_exact_properties() {
     });
 
     test_properties(positive_naturals, |n| {
-        assert_eq!(Natural::ZERO.div_exact(n), Natural::ZERO);
+        assert_eq!(Natural::ZERO.div_exact(n), 0);
         assert_eq!(n.div_exact(n), 1);
+    });
+
+    test_properties(pairs_of_unsigneds_var_7::<Limb>, |&(x, y)| {
+        assert_eq!(Natural::from(x).div_exact(Natural::from(y)), x.div_exact(y));
     });
 }

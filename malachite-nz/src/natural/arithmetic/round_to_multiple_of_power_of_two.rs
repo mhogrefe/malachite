@@ -6,7 +6,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::{slice_set_zero, slice_test_zero};
+use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;

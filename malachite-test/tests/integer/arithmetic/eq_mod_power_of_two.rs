@@ -66,7 +66,7 @@ fn eq_mod_power_of_two_properties() {
             #[cfg(feature = "32_bit_limbs")]
             assert_eq!(
                 integer_to_rug_integer(x)
-                    .is_congruent_2pow(&integer_to_rug_integer(y), Limb::exact_from(pow),),
+                    .is_congruent_2pow(&integer_to_rug_integer(y), Limb::exact_from(pow)),
                 eq_mod_power_of_two
             );
             assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);

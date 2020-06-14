@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, 
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
 
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;

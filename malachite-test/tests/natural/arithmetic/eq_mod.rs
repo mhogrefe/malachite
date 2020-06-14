@@ -10,6 +10,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::natural_to_rug_integer;
 use malachite_nz_test_util::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
@@ -25,6 +26,7 @@ use malachite_test::inputs::base::{
     triples_of_limb_vec_var_57, triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
+    triples_of_unsigneds,
 };
 use malachite_test::inputs::natural::{
     pairs_of_naturals, triples_of_naturals, triples_of_naturals_var_2, triples_of_naturals_var_3,
@@ -248,5 +250,12 @@ fn eq_mod_properties() {
         assert_eq!(x.eq_mod(Natural::ZERO, y), x.divisible_by(y));
         assert!(x.eq_mod(x, y));
         assert_eq!(x.eq_mod(y, Natural::ZERO), x == y);
+    });
+
+    test_properties(triples_of_unsigneds::<Limb>, |&(x, y, m)| {
+        assert_eq!(
+            Natural::from(x).eq_mod(Natural::from(y), Natural::from(m)),
+            x.eq_mod(y, m)
+        );
     });
 }

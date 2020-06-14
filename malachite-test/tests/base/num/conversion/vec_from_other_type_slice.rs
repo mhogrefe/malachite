@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::NegModPowerOfTwo;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
-use malachite_base::slices::slice_test_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 use rand::Rand;
 
 use malachite_test::common::test_properties;

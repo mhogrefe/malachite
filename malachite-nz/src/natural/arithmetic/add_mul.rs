@@ -521,8 +521,8 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: Natural, c: &'a Natural) -> Natural {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: Natural, z: &'a Natural) -> Natural {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -553,8 +553,8 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     ///     Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: &'a Natural, c: Natural) -> Natural {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: &'a Natural, z: Natural) -> Natural {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -585,8 +585,8 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
-    fn add_mul(mut self, b: &'a Natural, c: &'b Natural) -> Natural {
-        self.add_mul_assign(b, c);
+    fn add_mul(mut self, y: &'a Natural, z: &'b Natural) -> Natural {
+        self.add_mul_assign(y, z);
         self
     }
 }
@@ -616,16 +616,14 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     /// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
-    fn add_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        match (self, b, c) {
-            (Natural(Small(small_a)), b, c) => (b * c).add_limb(*small_a),
-            (a, Natural(Small(small_b)), c) => a.add_mul_limb_ref_ref(c, *small_b),
-            (a, b, Natural(Small(small_c))) => a.add_mul_limb_ref_ref(b, *small_c),
-            (
-                Natural(Large(ref a_limbs)),
-                Natural(Large(ref b_limbs)),
-                Natural(Large(ref c_limbs)),
-            ) => Natural(Large(limbs_add_mul(a_limbs, b_limbs, c_limbs))),
+    fn add_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+        match (self, y, z) {
+            (Natural(Small(x)), y, z) => (y * z).add_limb(*x),
+            (x, Natural(Small(y)), z) => x.add_mul_limb_ref_ref(z, *y),
+            (x, y, Natural(Small(z))) => x.add_mul_limb_ref_ref(y, *z),
+            (Natural(Large(ref xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                Natural(Large(limbs_add_mul(xs, ys, zs)))
+            }
         }
     }
 }
@@ -657,16 +655,14 @@ impl AddMulAssign<Natural, Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, mut b: Natural, mut c: Natural) {
-        match (&mut *self, &mut b, &mut c) {
-            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
-            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb(c, *small_b),
-            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb(b, *small_c),
-            (
-                Natural(Large(ref mut a_limbs)),
-                Natural(Large(ref b_limbs)),
-                Natural(Large(ref c_limbs)),
-            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
+    fn add_mul_assign(&mut self, mut y: Natural, mut z: Natural) {
+        match (&mut *self, &mut y, &mut z) {
+            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
+            (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                limbs_add_mul_in_place_left(xs, ys, zs)
+            }
         }
     }
 }
@@ -698,16 +694,14 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     /// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, mut b: Natural, c: &'a Natural) {
-        match (&mut *self, &mut b, c) {
-            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
-            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb_ref(c, *small_b),
-            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb(b, *small_c),
-            (
-                Natural(Large(ref mut a_limbs)),
-                Natural(Large(ref b_limbs)),
-                Natural(Large(ref c_limbs)),
-            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
+    fn add_mul_assign(&mut self, mut y: Natural, z: &'a Natural) {
+        match (&mut *self, &mut y, z) {
+            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
+            (_, _, Natural(Small(z))) => self.add_mul_assign_limb(y, *z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                limbs_add_mul_in_place_left(xs, ys, zs)
+            }
         }
     }
 }
@@ -739,16 +733,14 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     /// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: &'a Natural, mut c: Natural) {
-        match (&mut *self, b, &mut c) {
-            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
-            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb(c, *small_b),
-            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb_ref(b, *small_c),
-            (
-                Natural(Large(ref mut a_limbs)),
-                Natural(Large(ref b_limbs)),
-                Natural(Large(ref c_limbs)),
-            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
+    fn add_mul_assign(&mut self, y: &'a Natural, mut z: Natural) {
+        match (&mut *self, y, &mut z) {
+            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Natural(Small(y)), _) => self.add_mul_assign_limb(z, *y),
+            (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                limbs_add_mul_in_place_left(xs, ys, zs)
+            }
         }
     }
 }
@@ -780,16 +772,14 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     /// x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
-    fn add_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        match (&mut *self, b, c) {
-            (Natural(Small(small_a)), _, _) => *self = (b * c).add_limb(*small_a),
-            (_, Natural(Small(small_b)), _) => self.add_mul_assign_limb_ref(c, *small_b),
-            (_, _, Natural(Small(small_c))) => self.add_mul_assign_limb_ref(b, *small_c),
-            (
-                Natural(Large(ref mut a_limbs)),
-                Natural(Large(ref b_limbs)),
-                Natural(Large(ref c_limbs)),
-            ) => limbs_add_mul_in_place_left(a_limbs, b_limbs, c_limbs),
+    fn add_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+        match (&mut *self, y, z) {
+            (Natural(Small(x)), _, _) => *self = (y * z).add_limb(*x),
+            (_, Natural(Small(y)), _) => self.add_mul_assign_limb_ref(z, *y),
+            (_, _, Natural(Small(z))) => self.add_mul_assign_limb_ref(y, *z),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys)), Natural(Large(ref zs))) => {
+                limbs_add_mul_in_place_left(xs, ys, zs)
+            }
         }
     }
 }

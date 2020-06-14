@@ -213,11 +213,11 @@ fn test_limbs_mul_greater() {
         vec![10_200, 20_402, 30_605, 20_402, 10_200, 0],
     );
     test(vec![u32::MAX], vec![1], vec![u32::MAX, 0]);
-    test(vec![u32::MAX], vec![u32::MAX], vec![1, 0xffff_fffe]);
+    test(vec![u32::MAX], vec![u32::MAX], vec![1, u32::MAX - 1]);
     test(
         vec![u32::MAX; 3],
         vec![u32::MAX; 3],
-        vec![1, 0, 0, 0xffff_fffe, u32::MAX, u32::MAX],
+        vec![1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
     );
 }
 
@@ -251,11 +251,11 @@ fn test_limbs_mul() {
         vec![10_200, 20_402, 30_605, 20_402, 10_200, 0],
     );
     test(vec![u32::MAX], vec![1], vec![u32::MAX, 0]);
-    test(vec![u32::MAX], vec![u32::MAX], vec![1, 0xffff_fffe]);
+    test(vec![u32::MAX], vec![u32::MAX], vec![1, u32::MAX - 1]);
     test(
         vec![u32::MAX; 3],
         vec![u32::MAX; 3],
-        vec![1, 0, 0, 0xffff_fffe, u32::MAX, u32::MAX],
+        vec![1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
     );
 }
 
@@ -270,7 +270,7 @@ fn test_limbs_mul_fail() {
 #[test]
 fn test_limbs_mul_same_length_to_out() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
-        let mut out = out_before.clone();
+        let mut out = out_before;
         limbs_mul_same_length_to_out(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
     };
@@ -292,13 +292,13 @@ fn test_limbs_mul_same_length_to_out() {
         vec![u32::MAX],
         vec![u32::MAX],
         vec![10; 4],
-        vec![1, 0xffff_fffe, 10, 10],
+        vec![1, u32::MAX - 1, 10, 10],
     );
     test(
         vec![u32::MAX; 3],
         vec![u32::MAX; 3],
         vec![10; 6],
-        vec![1, 0, 0, 0xffff_fffe, u32::MAX, u32::MAX],
+        vec![1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
     );
 }
 
@@ -334,7 +334,7 @@ fn test_limbs_mul_greater_to_out() {
             let mut out = out_before.clone();
             _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
             assert_eq!(out, out_after);
-            let mut out = out_before.clone();
+            let mut out = out_before;
             assert_eq!(
                 limbs_mul_greater_to_out(&mut out, &xs, &ys),
                 highest_result_limb
@@ -374,15 +374,15 @@ fn test_limbs_mul_greater_to_out() {
         vec![u32::MAX],
         vec![u32::MAX],
         vec![10; 4],
-        0xffff_fffe,
-        vec![1, 0xffff_fffe, 10, 10],
+        u32::MAX - 1,
+        vec![1, u32::MAX - 1, 10, 10],
     );
     test(
         vec![u32::MAX; 3],
         vec![u32::MAX; 3],
         vec![10; 6],
         u32::MAX,
-        vec![1, 0, 0, 0xffff_fffe, u32::MAX, u32::MAX],
+        vec![1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
     );
 }
 
@@ -397,7 +397,7 @@ fn test_limbs_mul_greater_to_out() {
         let mut out = out_before.clone();
         _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
-        let mut out = out_before.clone();
+        let mut out = out_before;
         assert_eq!(
             limbs_mul_greater_to_out(&mut out, &xs, &ys),
             highest_result_limb
@@ -1192,7 +1192,7 @@ fn limbs_mul_greater_to_out_fail_3() {
 #[test]
 fn test_limbs_mul_to_out() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
-        let mut out = out_before.clone();
+        let mut out = out_before;
         limbs_mul_to_out(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
     };
@@ -1216,13 +1216,13 @@ fn test_limbs_mul_to_out() {
         vec![u32::MAX],
         vec![u32::MAX],
         vec![10; 4],
-        vec![1, 0xffff_fffe, 10, 10],
+        vec![1, u32::MAX - 1, 10, 10],
     );
     test(
         vec![u32::MAX; 3],
         vec![u32::MAX; 3],
         vec![10; 6],
-        vec![1, 0, 0, 0xffff_fffe, u32::MAX, u32::MAX],
+        vec![1, 0, 0, u32::MAX - 1, u32::MAX, u32::MAX],
     );
 }
 
@@ -1353,7 +1353,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
         u32::MAX,
         u32::MAX,
         u32::MAX,
-        536_870_911,
+        0x1fff_ffff,
         0,
         0,
         0,
@@ -1402,7 +1402,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
         u32::MAX,
         u32::MAX,
         u32::MAX,
-        268_435_455,
+        0xfff_ffff,
         0,
         0,
         0,
@@ -1453,11 +1453,9 @@ fn test_limbs_mul_greater_to_out_toom_22() {
             0,
             0,
             0,
-            16_384,
+            0x4000,
             0,
-            67_108_864,
-            0,
-            0,
+            0x400_0000,
             0,
             0,
             0,
@@ -1466,7 +1464,9 @@ fn test_limbs_mul_greater_to_out_toom_22() {
             0,
             0,
             0,
-            4_026_531_840,
+            0,
+            0,
+            0xf000_0000,
             u32::MAX,
             u32::MAX,
             u32::MAX,
@@ -1497,7 +1497,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
             u32::MAX,
             u32::MAX,
             u32::MAX,
-            33_554_431,
+            0x1ff_ffff,
             0,
             0,
             0,
@@ -2139,11 +2139,11 @@ fn test_limbs_mul_greater_to_out_toom_42() {
     // as1[n] == 2
     test(
         vec![
-            1_048_575,
+            0xf_ffff,
             0,
             0,
             4_294_965_248,
-            33_554_431,
+            0x1ff_ffff,
             0,
             0,
             0,
@@ -2152,7 +2152,7 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             u32::MAX,
             u32::MAX,
             0,
-            2_147_483_648,
+            0x8000_0000,
             u32::MAX,
             u32::MAX,
             u32::MAX,
@@ -2174,25 +2174,25 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             4_293_918_721,
             u32::MAX,
             u32::MAX,
-            2_147_483_647,
+            0x7fff_ffff,
             4_261_412_864,
             u32::MAX,
             4_291_035_135,
             4_294_967_231,
             1_049_102,
-            536_870_912,
+            0x2000_0000,
             0,
             4_293_914_624,
-            33_554_430,
-            2_147_483_648,
-            134_217_728,
+            0x1ff_fffe,
+            0x8000_0000,
+            0x800_0000,
             2_048,
             4_294_966_784,
             4_294_966_271,
             4_294_705_151,
             u32::MAX - 1,
-            131_072,
-            2_147_483_648,
+            0x2_0000,
+            0x8000_0000,
             2_047,
             0,
             0,
@@ -2234,16 +2234,16 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             0,
             u32::MAX,
             u32::MAX,
-            1_048_575,
-            4_294_967_280,
+            0xf_ffff,
+            0xffff_fff0,
             u32::MAX,
             63,
             0,
-            2_147_483_648,
+            0x8000_0000,
             u32::MAX,
             u32::MAX,
         ],
-        vec![65_535, 0, 0, 4_294_967_264],
+        vec![0xffff, 0, 0, 4_294_967_264],
         vec![10; 15],
         vec![
             0,
@@ -2254,10 +2254,10 @@ fn test_limbs_mul_greater_to_out_toom_42() {
             u32::MAX - 1,
             4_265_607_103,
             1_049_087,
-            2_147_483_632,
+            0x7fff_fff0,
             4_294_932_480,
             63,
-            65_535,
+            0xffff,
             2_147_483_664,
             u32::MAX,
             4_294_967_263,
@@ -2441,21 +2441,21 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             0,
             0,
             0,
-            4_294_967_280,
+            0xffff_fff0,
             u32::MAX,
             u32::MAX,
             u32::MAX,
         ],
         vec![
-            2_147_483_647,
-            4_294_963_200,
-            2_097_151,
+            0x7fff_ffff,
+            0xffff_f000,
+            0x1f_ffff,
             0,
             0,
             0,
             2_147_483_520,
             0,
-            4_294_967_280,
+            0xffff_fff0,
             u32::MAX,
             u32::MAX,
             4_290_789_375,
@@ -2469,16 +2469,16 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             0,
             0,
             0,
-            8_388_608,
+            0x80_0000,
             4_290_772_992,
             7,
-            4_294_963_200,
+            0xffff_f000,
             u32::MAX,
             u32::MAX,
-            1_073_741_823,
+            0x3fff_ffff,
             4_290_772_984,
             134_184_963,
-            16_777_216,
+            0x100_0000,
             0,
             0,
             8_176,
@@ -2486,14 +2486,14 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             4_261_412_868,
             4_294_967_167,
             2_139_095_038,
-            4_294_963_200,
+            0xffff_f000,
             4_263_643_135,
-            4_294_967_287,
+            0xffff_fff7,
             255,
             0,
             2_147_483_520,
             66_846_728,
-            4_294_967_280,
+            0xffff_fff0,
             u32::MAX,
             u32::MAX,
             4_290_789_375,
@@ -2523,7 +2523,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             18_446_744_073_701_163_071,
             u64::MAX,
             u64::MAX,
-            68_719_476_735,
+            0xf_ffff_ffff,
             0,
             0,
             0,
@@ -2532,12 +2532,12 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             u64::MAX,
             u64::MAX,
             u64::MAX,
-            262_143,
+            0x3_ffff,
             0,
             0,
             0,
-            18_446_462_598_732_840_960,
-            32_767,
+            0xffff_0000_0000_0000,
+            0x7fff,
             0,
             0,
             18_446_744_073_709_518_848,
@@ -2548,18 +2548,18 @@ fn test_limbs_mul_greater_to_out_toom_43() {
         ],
         vec![
             18_437_736_874_454_810_624,
-            1_048_575,
+            0xf_ffff,
             0,
             18_446_744_039_349_813_248,
             u64::MAX,
             u64::MAX,
             u64::MAX,
-            140_737_488_355_327,
+            0x7fff_ffff_ffff,
             0,
-            18_446_744_073_709_551_600,
+            0xffff_ffff_ffff_fff0,
             u64::MAX,
             u64::MAX,
-            134_217_727,
+            0x7ff_ffff,
             18_446_744_056_529_682_432,
             u64::MAX,
             u64::MAX,
@@ -2577,7 +2577,7 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             18_446_744_073_709_551_552,
             18_302_628_885_835_021_327,
             u64::MAX,
-            524_287,
+            0x7_ffff,
             18_445_617_082_746_798_336,
             144_114_380_622_004_095,
             0,
@@ -2585,14 +2585,14 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             18_446_744_073_700_114_495,
             2_336_462_208_959,
             34_359_738_336,
-            68_719_476_736,
+            0x10_0000_0000,
             18_445_618_173_803_233_282,
             18_446_744_039_345_618_958,
             127,
-            1_125_899_906_842_624,
+            0x4_0000_0000_0000,
             4_611_721_063_213_039_616,
             18_437_736_874_454_810_624,
-            524_287,
+            0x7_ffff,
             13_835_058_055_282_163_712,
             18_446_744_039_350_075_391,
             4_398_047_033_343,
@@ -2600,10 +2600,10 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             u64::MAX,
             18_446_598_938_174_685_183,
             562_949_953_454_079,
-            18_446_744_073_709_551_600,
+            0xffff_ffff_ffff_fff0,
             u64::MAX,
             18_446_744_073_709_518_847,
-            134_217_727,
+            0x7ff_ffff,
             18_446_744_056_529_682_432,
             u64::MAX,
             u64::MAX,
@@ -3126,7 +3126,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
     // slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
     test(
         vec![
-            32_767,
+            0x7fff,
             0,
             0,
             0,
@@ -3173,17 +3173,17 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             4_294_934_529,
             u32::MAX,
             u32::MAX,
-            32_766,
+            0x7ffe,
             0,
             4_292_870_208,
-            131_071,
+            0x1_ffff,
             71_303_040,
             4_294_966_784,
             4_294_868_990,
             u32::MAX,
-            8_388_607,
+            0x7f_ffff,
             16_760_832,
-            4_278_190_080,
+            0xff00_0000,
             2_047,
             4_278_075_360,
             u32::MAX,
@@ -3193,7 +3193,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
             259_839,
             4_277_682_176,
             2_147_487_743,
-            33_554_431,
+            0x1ff_ffff,
             32,
             4_227_858_432,
             8_190,
@@ -3483,16 +3483,16 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         ],
     );
     test(
-        vec![4_194_296, 3_221_225_472, u32::MAX, 1, 4_294_934_528],
+        vec![0x3f_fff8, 3_221_225_472, u32::MAX, 1, 4_294_934_528],
         vec![0, 4_294_959_104, u32::MAX],
         vec![10; 8],
         vec![
             0,
-            65_536,
-            4_294_967_288,
+            0x1_0000,
+            0xffff_fff8,
             4_196_343,
             3_221_209_088,
-            268_435_455,
+            0xfff_ffff,
             4_294_959_106,
             4_294_934_527,
         ],
@@ -3513,19 +3513,10 @@ fn test_limbs_mul_greater_to_out_toom_53() {
         assert_eq!(out, out_after);
     };
     test(
-        vec![u64::MAX, u64::MAX, 3, 18_446_744_073_709_551_614, u64::MAX],
+        vec![u64::MAX, u64::MAX, 3, u64::MAX - 1, u64::MAX],
         vec![u64::MAX, u64::MAX, u64::MAX],
         vec![10; 8],
-        vec![
-            1,
-            0,
-            18_446_744_073_709_551_612,
-            0,
-            0,
-            3,
-            18_446_744_073_709_551_614,
-            u64::MAX,
-        ],
+        vec![1, 0, 0xffff_ffff_ffff_fffc, 0, 0, 3, u64::MAX - 1, u64::MAX],
     );
 }
 
@@ -3799,7 +3790,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             0,
             0,
             0,
-            4_294_967_280,
+            0xffff_fff0,
             u32::MAX,
             u32::MAX,
             u32::MAX,
@@ -3814,7 +3805,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             0,
             4_286_578_688,
             u32::MAX,
-            262_143,
+            0x3_ffff,
             4_227_858_432,
             u32::MAX,
         ],
@@ -3840,10 +3831,10 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             134_217_215,
             0,
             4_290_773_120,
-            1_073_741_823,
+            0x3fff_ffff,
             4_286_578_688,
             4_294_967_279,
-            262_143,
+            0x3_ffff,
             4_227_858_432,
             u32::MAX,
         ],
@@ -4194,7 +4185,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             u32::MAX,
             u32::MAX,
             u32::MAX,
-            67_108_863,
+            0x3ff_ffff,
             0,
             0,
             0,
@@ -4240,7 +4231,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
     // slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less
     test(
         vec![
-            1_073_741_823,
+            0x3fff_ffff,
             0,
             0,
             0,
@@ -4258,12 +4249,12 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             u32::MAX,
             u32::MAX,
         ],
-        vec![4_293_918_720, u32::MAX, 0, 268_435_448, 4_294_443_008],
+        vec![0xfff0_0000, u32::MAX, 0, 0xfff_fff8, 4_294_443_008],
         vec![10; 22],
         vec![
-            1_048_576,
+            0x10_0000,
             4_294_705_152,
-            1_073_741_822,
+            0x3fff_fffe,
             4_026_531_848,
             67_633_149,
             1_073_610_751,
@@ -4272,7 +4263,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             0,
             1_024,
             4_290_772_992,
-            33_554_431,
+            0x1ff_ffff,
             4_294_705_152,
             4_290_773_503,
             u32::MAX,
@@ -4281,7 +4272,7 @@ fn test_limbs_mul_greater_to_out_toom_62() {
             4_293_918_719,
             u32::MAX,
             0,
-            268_435_448,
+            0xfff_fff8,
             4_294_443_008,
         ],
     );
@@ -12256,7 +12247,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         u32::MAX,
         u32::MAX,
         u32::MAX,
-        67_108_863,
+        0x3ff_ffff,
         0,
         0,
         0,
@@ -12417,7 +12408,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        4_294_967_280,
+        0xffff_fff0,
         u32::MAX,
         u32::MAX,
         u32::MAX,
@@ -13847,7 +13838,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        4_278_190_080,
+        0xff00_0000,
         u32::MAX,
         u32::MAX,
         u32::MAX,
@@ -14014,7 +14005,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         u32::MAX,
         u32::MAX,
         u32::MAX,
-        33_554_431,
+        0x1ff_ffff,
         0,
         0,
         0,
@@ -16247,7 +16238,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        2_147_483_648,
+        0x8000_0000,
         u32::MAX,
         u32::MAX,
         u32::MAX,
@@ -16282,7 +16273,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         u32::MAX,
         u32::MAX,
         u32::MAX,
-        8_388_607,
+        0x7f_ffff,
         0,
         0,
         0,
@@ -16318,7 +16309,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        4_293_918_720,
+        0xfff0_0000,
         u32::MAX,
         u32::MAX,
         u32::MAX,
@@ -17995,7 +17986,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        4_278_190_080,
+        0xff00_0000,
         u32::MAX,
         u32::MAX,
         u32::MAX,
@@ -19232,8 +19223,8 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
                 ys: Vec<Limb>,
                 tp_before: Vec<Limb>,
                 out_after: Vec<Limb>| {
-        let mut out = out_before.clone();
-        let mut tp = tp_before.clone();
+        let mut out = out_before;
+        let mut tp = tp_before;
         _limbs_mul_mod_base_pow_n_minus_1(&mut out, rn, &xs, &ys, &mut tp);
         assert_eq!(out, out_after);
     };
@@ -23145,16 +23136,16 @@ fn test_limbs_mul_greater_to_out_fft() {
         assert_eq!(out, out_after);
     };
     let xs = vec![
-        18_446_744_073_709_551_608,
+        0xffff_ffff_ffff_fff8,
         u64::MAX,
         u64::MAX,
         u64::MAX,
-        4_503_599_627_370_495,
+        0xf_ffff_ffff_ffff,
         0,
         0,
         0,
         0,
-        18_446_744_073_708_503_040,
+        0xffff_ffff_fff0_0000,
         u64::MAX,
         u64::MAX,
         u64::MAX,
@@ -23163,7 +23154,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         0,
         0,
         0,
-        18_446_744_073_709_486_080,
+        0xffff_ffff_ffff_0000,
         u64::MAX,
         u64::MAX,
         u64::MAX,
@@ -23171,7 +23162,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         u64::MAX,
     ];
     let ys = vec![
-        18_446_744_073_709_551_614,
+        u64::MAX - 1,
         u64::MAX,
         u64::MAX,
         u64::MAX,
@@ -24562,17 +24553,17 @@ fn test_limbs_mul_fft_fft() {
                 tp_after: Vec<Limb>| {
         let mut ap_clone = ap_before.clone();
         let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(ap_before.len());
-        for a in ap_clone.iter_mut() {
+        for a in &mut ap_clone {
             ap.push(a);
         }
-        let ll: Vec<&[usize]> = ll.iter().map(|row| row.as_slice()).collect();
-        let mut tp = tp_before.clone();
+        let ll: Vec<&[usize]> = ll.iter().map(Vec::as_slice).collect();
+        let mut tp = tp_before;
         _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
             .zip(ap_after.iter())
-            .all(|(ref xs, ys)| &***xs == ys.as_slice()),);
+            .all(|(xs, ys)| &**xs == ys.as_slice()));
         assert_eq!(tp, tp_after);
     };
     // *xss_0_last > 1 in _limbs_mul_fft_fft
@@ -24600,16 +24591,16 @@ fn test_limbs_mul_fft_inverse() {
                 tp_after: Vec<Limb>| {
         let mut ap_clone = ap_before.clone();
         let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(ap_before.len());
-        for a in ap_clone.iter_mut() {
+        for a in &mut ap_clone {
             ap.push(a);
         }
-        let mut tp = tp_before.clone();
+        let mut tp = tp_before;
         _limbs_mul_fft_inverse(&mut ap, k, omega, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
             .zip(ap_after.iter())
-            .all(|(ref xs, ys)| &***xs == ys.as_slice()),);
+            .all(|(xs, ys)| &**xs == ys.as_slice()));
         assert_eq!(tp, tp_after);
     };
     // *xss_0_last > 1 in _limbs_mul_fft_inverse
@@ -24627,7 +24618,7 @@ fn test_limbs_mul_fft_inverse() {
 #[test]
 fn test_limbs_mul_fft_normalize_mod_f() {
     let test = |rp_before: Vec<Limb>, n: usize, ap: Vec<Limb>, rp_after: Vec<Limb>| {
-        let mut rp = rp_before.clone();
+        let mut rp = rp_before;
         _limbs_mul_fft_normalize_mod_f(&mut rp, n, &ap);
         assert_eq!(rp, rp_after);
     };
@@ -24636,7 +24627,7 @@ fn test_limbs_mul_fft_normalize_mod_f() {
         vec![1, 2, 3],
         2,
         vec![4, 5, 6, 7, 8],
-        vec![7, 18_446_744_073_709_551_614, 3],
+        vec![7, u64::MAX - 1, 3],
     );
 }
 
@@ -24656,15 +24647,15 @@ fn test_limbs_mul_fft_internal() {
                 op_after: Vec<Limb>,
                 b_after: Vec<Limb>,
                 t_after: Vec<Limb>| {
-        let mut op = op_before.clone();
+        let mut op = op_before;
         let mut ap_clone = ap_before.clone();
         let mut ap: Vec<&mut [Limb]> = Vec::with_capacity(ap_before.len());
-        for a in ap_clone.iter_mut() {
+        for a in &mut ap_clone {
             ap.push(a);
         }
-        let mut b = b_before.clone();
-        let fft_l: Vec<&[usize]> = fft_l.iter().map(|row| row.as_slice()).collect();
-        let mut t = t_before.clone();
+        let mut b = b_before;
+        let fft_l: Vec<&[usize]> = fft_l.iter().map(Vec::as_slice).collect();
+        let mut t = t_before;
         _limbs_mul_fft_internal(&mut op, pl, k, ap, &mut b, l, mp, &fft_l, &mut t, sqr);
         assert_eq!(op, op_after);
         assert_eq!(b, b_after);
@@ -24681,7 +24672,7 @@ fn test_limbs_mul_fft_internal() {
         vec![vec![0], vec![1, 2], vec![3, 4, 5, 6]],
         vec![13, 14, 15, 16, 17, 18],
         false,
-        vec![9_223_372_036_854_775_669, 4_611_686_018_427_387_916, 3],
+        vec![9_223_372_036_854_775_669, 0x4000_0000_0000_000c, 3],
         vec![
             18_446_744_073_709_551_457,
             2,
@@ -24788,7 +24779,7 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
         _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
         assert_eq!(&out[..len], out_after);
 
-        let mut out = out_before.clone();
+        let mut out = out_before;
         let mut scratch = vec![0; xs.len() << 1];
         _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(&out[..len], out_after);

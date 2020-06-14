@@ -1,4 +1,5 @@
-use malachite_base::slices::{slice_set_zero, slice_test_zero};
+use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_test_zero::slice_test_zero;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_unsigned;

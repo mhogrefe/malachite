@@ -164,5 +164,9 @@ pub mod natural {
         pub mod round_to_multiple_of_power_of_two;
         pub mod saturating_sub;
         pub mod saturating_sub_mul;
+        pub mod shl;
+        pub mod shl_round;
+        pub mod shr;
+        pub mod shr_round;
     }
 }

@@ -66,7 +66,7 @@ fn test_eq_mod_power_of_two() {
         assert_eq!(
             rug::Integer::from_str(x)
                 .unwrap()
-                .is_congruent_2pow(&rug::Integer::from_str(y).unwrap(), u32::exact_from(pow),),
+                .is_congruent_2pow(&rug::Integer::from_str(y).unwrap(), u32::exact_from(pow)),
             out
         );
     };

@@ -1,13 +1,16 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::rounding_mode::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
 
 use malachite_test::common::test_properties;
+use malachite_test::inputs::base::pairs_of_signeds_var_4;
 use malachite_test::inputs::integer::{
     integers, nonzero_integers, pairs_of_integer_and_nonzero_integer_var_1,
 };
+use malachite_test::inputs::natural::pairs_of_natural_and_positive_natural_var_1;
 
 #[test]
 fn div_exact_properties() {
@@ -50,16 +53,30 @@ fn div_exact_properties() {
                 q
             );
 
-            assert_eq!(q * y, *x);
+            assert_eq!(&q * y, *x);
+            assert_eq!((-x).div_exact(y), -&q);
+            assert_eq!(x.div_exact(-y), -q);
         },
     );
 
     test_properties(integers, |n| {
         assert_eq!(n.div_exact(Integer::ONE), *n);
+        assert_eq!(n.div_exact(Integer::NEGATIVE_ONE), -n);
     });
 
     test_properties(nonzero_integers, |n| {
         assert_eq!(Integer::ZERO.div_exact(n), 0);
         assert_eq!(n.div_exact(n), 1);
+    });
+
+    test_properties(
+        pairs_of_natural_and_positive_natural_var_1,
+        |&(ref x, ref y)| {
+            assert_eq!(Integer::from(x).div_exact(Integer::from(y)), x.div_exact(y));
+        },
+    );
+
+    test_properties(pairs_of_signeds_var_4::<SignedLimb>, |&(x, y)| {
+        assert_eq!(Integer::from(x).div_exact(Integer::from(y)), x.div_exact(y));
     });
 }

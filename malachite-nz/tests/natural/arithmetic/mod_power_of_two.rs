@@ -81,7 +81,7 @@ fn test_limbs_neg_mod_power_of_two_and_limbs_neg_mod_power_of_two_in_place() {
     test(
         &[123, 456],
         100,
-        &[4_294_967_173, 4_294_966_839, 4_294_967_295, 15],
+        &[4_294_967_173, 4_294_966_839, u32::MAX, 15],
     );
 }
 
