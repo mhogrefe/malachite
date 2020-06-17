@@ -37,13 +37,13 @@ use natural::Natural;
 ///
 /// let seed: &[_] = &[1, 2, 3, 4];
 /// let mut rng: StdRng = SeedableRng::from_seed(seed);
-/// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 4), &[5]);
-/// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 10), &[1020]);
+/// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 4), &[10]);
+/// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 10), &[1022]);
 /// assert_eq!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, 100),
-///     &[3940351, 4294965248, 4292870144, 15]);
+///     &[4294443023, 4294967295, 4293918727, 15]);
 /// ```
 ///
-/// This is mpn_random2 from mpn/generic/random2.c, GMP 6.1.2.
+/// This is mpn_random2 from mpn/generic/random2.c, GMP 6.1.2, slightly modified.
 pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     rng: &mut R,
     bits: u64,
@@ -58,15 +58,17 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
     let max_chunk_size = max(1, bits / (rng.gen_range(0, 4) + 1));
     let chunk_size_range = Range::new(1, max_chunk_size + 1);
     // Start i at a random position in the highest limb.
-    let mut i =
-        (limb_count << T::LOG_WIDTH) - u64::from(rng.gen_range(0, u32::exact_from(T::WIDTH)));
+    let mut i = (limb_count << T::LOG_WIDTH) - rng.gen_range(0, T::WIDTH) + 1;
     loop {
         let mut chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         if i == 0 {
             break;
         }
-        limbs[usize::exact_from(i >> T::LOG_WIDTH)].clear_bit(i & T::WIDTH_MASK);
+        let j = usize::exact_from(i >> T::LOG_WIDTH);
+        if j < limbs.len() {
+            limbs[j].clear_bit(i & T::WIDTH_MASK);
+        }
         chunk_size = chunk_size_range.ind_sample(rng);
         i.saturating_sub_assign(chunk_size);
         limbs_slice_add_limb_in_place(
@@ -106,10 +108,10 @@ pub fn limbs_special_random_up_to_bits<T: PrimitiveUnsigned, R: Rng>(
 ///
 /// let seed: &[_] = &[1, 2, 3, 4];
 /// let mut rng: StdRng = SeedableRng::from_seed(seed);
-/// assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 4)), "101");
-/// assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 10)), "1111111100");
+/// assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 4)), "1010");
+/// assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 10)), "1111111110");
 /// assert_eq!(format!("{:b}", special_random_natural_up_to_bits(&mut rng, 80)),
-///     "10000000000000000000010000000000000000000001111111111111111111100011111111111111");
+///     "11111111000000000000000000000000000000000000000000000000000000000111111111111111");
 /// ```
 #[cfg(feature = "32_bit_limbs")]
 pub fn special_random_natural_up_to_bits<R: Rng>(rng: &mut R, bits: u64) -> Natural {

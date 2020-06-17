@@ -10,7 +10,6 @@ macro_rules! impl_count_ones {
         }
     };
 }
-
 impl_count_ones!(u8);
 impl_count_ones!(u16);
 impl_count_ones!(u32);

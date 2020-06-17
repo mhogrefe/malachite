@@ -1,4 +1,15 @@
+use std::ops::BitXor;
+
+use num::basic::traits::Zero;
 use num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
+
+#[inline]
+pub fn _hamming_distance_unsigned<T: CountOnes>(x: T, y: T) -> u64
+where
+    T: BitXor<Output = T>,
+{
+    CountOnes::count_ones(x ^ y)
+}
 
 macro_rules! impl_hamming_distance_unsigned {
     ($t:ident) => {
@@ -19,18 +30,29 @@ macro_rules! impl_hamming_distance_unsigned {
             /// ```
             #[inline]
             fn hamming_distance(self, other: $t) -> u64 {
-                CountOnes::count_ones(self ^ other)
+                _hamming_distance_unsigned(self, other)
             }
         }
     };
 }
-
 impl_hamming_distance_unsigned!(u8);
 impl_hamming_distance_unsigned!(u16);
 impl_hamming_distance_unsigned!(u32);
 impl_hamming_distance_unsigned!(u64);
 impl_hamming_distance_unsigned!(u128);
 impl_hamming_distance_unsigned!(usize);
+
+#[inline]
+pub fn _checked_hamming_distance_signed<T: Copy + CountOnes + Ord + Zero>(x: T, y: T) -> Option<u64>
+where
+    T: BitXor<Output = T>,
+{
+    if (x >= T::ZERO) == (y >= T::ZERO) {
+        Some(CountOnes::count_ones(x ^ y))
+    } else {
+        None
+    }
+}
 
 macro_rules! impl_checked_hamming_distance_signed {
     ($t:ident) => {
@@ -53,16 +75,11 @@ macro_rules! impl_checked_hamming_distance_signed {
             /// ```
             #[inline]
             fn checked_hamming_distance(self, other: $t) -> Option<u64> {
-                if (self >= 0) == (other >= 0) {
-                    Some(CountOnes::count_ones(self ^ other))
-                } else {
-                    None
-                }
+                _checked_hamming_distance_signed(self, other)
             }
         }
     };
 }
-
 impl_checked_hamming_distance_signed!(i8);
 impl_checked_hamming_distance_signed!(i16);
 impl_checked_hamming_distance_signed!(i32);

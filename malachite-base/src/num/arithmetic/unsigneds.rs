@@ -1,45 +1,9 @@
-use num::arithmetic::traits::{
-    CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo, FloorLogTwo, IsPowerOfTwo, NextPowerOfTwo,
-    NextPowerOfTwoAssign,
-};
+use num::arithmetic::traits::{CeilingLogTwo, CheckedLogTwo, FloorLogTwo};
 use num::basic::integers::PrimitiveInteger;
-use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 
 macro_rules! impl_arithmetic_traits {
     ($t:ident) => {
-        impl IsPowerOfTwo for $t {
-            #[inline]
-            fn is_power_of_two(&self) -> bool {
-                $t::is_power_of_two(*self)
-            }
-        }
-
-        impl NextPowerOfTwo for $t {
-            type Output = $t;
-
-            #[inline]
-            fn next_power_of_two(self) -> $t {
-                $t::next_power_of_two(self)
-            }
-        }
-
-        impl CheckedNextPowerOfTwo for $t {
-            type Output = $t;
-
-            #[inline]
-            fn checked_next_power_of_two(self) -> Option<$t> {
-                $t::checked_next_power_of_two(self)
-            }
-        }
-
-        impl NextPowerOfTwoAssign for $t {
-            #[inline]
-            fn next_power_of_two_assign(&mut self) {
-                *self = $t::next_power_of_two(*self)
-            }
-        }
-
         impl CheckedLogTwo for $t {
             #[inline]
             fn checked_log_two(self) -> Option<u64> {
@@ -112,30 +76,9 @@ macro_rules! impl_arithmetic_traits {
         }
     };
 }
-
 impl_arithmetic_traits!(u8);
 impl_arithmetic_traits!(u16);
 impl_arithmetic_traits!(u32);
 impl_arithmetic_traits!(u64);
 impl_arithmetic_traits!(u128);
 impl_arithmetic_traits!(usize);
-
-#[inline]
-pub(crate) fn wide_lower_half<T: PrimitiveUnsigned>(x: T) -> T {
-    x.mod_power_of_two(T::WIDTH >> 1)
-}
-
-#[inline]
-pub(crate) fn wide_upper_half<T: PrimitiveUnsigned>(x: T) -> T {
-    x >> (T::WIDTH >> 1)
-}
-
-#[inline]
-pub(crate) fn wide_split_in_half<T: PrimitiveUnsigned>(x: T) -> (T, T) {
-    (wide_upper_half(x), wide_lower_half(x))
-}
-
-#[inline]
-pub(crate) fn wide_join_halves<T: PrimitiveUnsigned>(hi: T, lo: T) -> T {
-    (hi << (T::WIDTH >> 1)) | lo
-}

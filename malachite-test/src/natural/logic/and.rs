@@ -7,7 +7,7 @@ use malachite_nz::natural::logic::and::{
     limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
-use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -15,15 +15,6 @@ use inputs::base::{
     pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use natural::logic::{natural_op_bits, natural_op_limbs};
-
-pub fn natural_and_alt_1(x: &Natural, y: &Natural) -> Natural {
-    natural_op_bits(&|a, b| a && b, x, y)
-}
-
-pub fn natural_and_alt_2(x: &Natural, y: &Natural) -> Natural {
-    natural_op_limbs(&|a, b| a & b, x, y)
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_and_limb);

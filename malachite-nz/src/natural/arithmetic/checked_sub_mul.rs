@@ -12,7 +12,6 @@ impl Natural {
     fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
         match (self, b, c) {
             (a, _, 0) | (a, natural_zero!(), _) => Some(a.clone()),
-            (a, b, 1) => a.checked_sub(b),
             (a, b @ Natural(Small(_)), c) => a.checked_sub(b * Natural::from(c)),
             (Natural(Small(_)), _, _) => None,
             (&Natural(Large(ref a_limbs)), &Natural(Large(ref b_limbs)), c) => {
@@ -26,55 +25,34 @@ impl Natural {
         }
     }
 
-    //TODO clean
     fn sub_mul_assign_limb_no_panic(&mut self, b: Natural, c: Limb) -> bool {
-        if c == 0 || b == 0 {
-            false
-        } else if c == 1 {
-            self.sub_assign_no_panic(b)
-        } else if self.limb_count() < b.limb_count() {
-            true
-        } else {
-            let (borrow, fallback) = match (&mut *self, &b) {
-                (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => (
-                    limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0,
-                    false,
-                ),
-                _ => (false, true),
-            };
-            if fallback {
-                self.sub_assign_no_panic(b * Natural::from(c))
-            } else if borrow {
-                true
-            } else {
-                self.trim();
-                false
+        match (&mut *self, b, c) {
+            (_, _, 0) | (_, natural_zero!(), _) => false,
+            (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
+            (Natural(Small(_)), _, _) => true,
+            (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {
+                let borrow = a_limbs.len() < b_limbs.len()
+                    || limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0;
+                if !borrow {
+                    self.trim();
+                }
+                borrow
             }
         }
     }
 
     fn sub_mul_assign_limb_ref_no_panic(&mut self, b: &Natural, c: Limb) -> bool {
-        if c == 0 || *b == 0 {
-            false
-        } else if c == 1 {
-            self.sub_assign_ref_no_panic(b)
-        } else if self.limb_count() < b.limb_count() {
-            true
-        } else {
-            let (borrow, fallback) = match (&mut *self, &b) {
-                (&mut Natural(Large(ref mut a_limbs)), &Natural(Large(ref b_limbs))) => (
-                    limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0,
-                    false,
-                ),
-                _ => (false, true),
-            };
-            if fallback {
-                self.sub_assign_no_panic(b * Natural::from(c))
-            } else if borrow {
-                true
-            } else {
-                self.trim();
-                false
+        match (&mut *self, b, c) {
+            (_, _, 0) | (_, natural_zero!(), _) => false,
+            (a, b @ Natural(Small(_)), c) => a.sub_assign_no_panic(b * Natural::from(c)),
+            (Natural(Small(_)), _, _) => true,
+            (Natural(Large(ref mut a_limbs)), Natural(Large(ref b_limbs)), c) => {
+                let borrow = a_limbs.len() < b_limbs.len()
+                    || limbs_sub_mul_limb_greater_in_place_left(a_limbs, b_limbs, c) != 0;
+                if !borrow {
+                    self.trim();
+                }
+                borrow
             }
         }
     }
@@ -95,6 +73,7 @@ impl Natural {
         false
     }
 
+    //TODO clean
     pub(crate) fn sub_mul_assign_no_panic(&mut self, b: Natural, c: Natural) -> bool {
         if let Natural(Small(small_b)) = b {
             self.sub_mul_assign_limb_no_panic(c, small_b)

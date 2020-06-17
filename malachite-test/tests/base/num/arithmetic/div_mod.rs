@@ -71,13 +71,11 @@ where
         } else {
             assert_eq!((q + T::ONE) * y + r - y, x);
         }
-
         if x != T::MIN {
             let (neg_q, neg_r) = (-x).div_mod(y);
             assert_eq!(x.ceiling_div_mod(y), (-neg_q, -neg_r));
         }
-
-        if y != T::MIN {
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
             let (neg_q, r) = x.div_mod(-y);
             assert_eq!(x.ceiling_div_mod(y), (-neg_q, r));
         }
@@ -145,7 +143,7 @@ where
         if x != T::MIN {
             assert_eq!((-x).div_rem(y), (-q, -r));
         }
-        if y != T::MIN {
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
             assert_eq!(x.div_rem(-y), (-q, r));
         }
     });
@@ -261,7 +259,7 @@ where
             let (neg_q, neg_r) = (-x).ceiling_div_mod(y);
             assert_eq!(x.div_mod(y), (-neg_q, -neg_r));
         }
-        if y != T::MIN {
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
             let (neg_q, r) = x.ceiling_div_mod(-y);
             assert_eq!(x.div_mod(y), (-neg_q, r));
         }

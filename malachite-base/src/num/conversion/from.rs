@@ -1,5 +1,7 @@
 use std::num::ParseIntError;
 
+use comparison::traits::{Max, Min};
+use num::basic::traits::Zero;
 use num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
     WrappingFrom,
@@ -115,6 +117,14 @@ macro_rules! identity_conversion {
     };
 }
 
+#[inline]
+pub fn _checked_from_lossless<A, B>(value: A) -> Option<B>
+where
+    B: From<A>,
+{
+    Some(B::from(value))
+}
+
 /// This macro defines conversions from type $a to type $b, where every value of type $a is
 /// representable by a value of type $b.
 macro_rules! lossless_conversion {
@@ -136,7 +146,7 @@ macro_rules! lossless_conversion {
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
-                Some($b::from(value))
+                _checked_from_lossless(value)
             }
         }
 
@@ -226,6 +236,62 @@ macro_rules! lossless_conversion {
     };
 }
 
+#[inline]
+pub fn _checked_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> Option<B>
+where
+    A: WrappingFrom<B>,
+    B: WrappingFrom<A>,
+{
+    let result = B::wrapping_from(value);
+    if (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value {
+        Some(result)
+    } else {
+        None
+    }
+}
+
+#[inline]
+pub fn _saturating_from_lossy<A: Ord, B: Max + Min>(value: A) -> B
+where
+    A: CheckedFrom<B>,
+    B: WrappingFrom<A>,
+{
+    if let Some(b_max) = A::checked_from(B::MAX) {
+        if value >= b_max {
+            return B::MAX;
+        }
+    }
+    if let Some(b_min) = A::checked_from(B::MIN) {
+        if value <= b_min {
+            return B::MIN;
+        }
+    }
+    B::wrapping_from(value)
+}
+
+#[inline]
+pub fn _overflowing_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> (B, bool)
+where
+    A: WrappingFrom<B>,
+    B: WrappingFrom<A>,
+{
+    let result = B::wrapping_from(value);
+    (
+        result,
+        (result >= B::ZERO) != (value >= A::ZERO) || A::wrapping_from(result) != value,
+    )
+}
+
+#[inline]
+pub fn _convertible_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> bool
+where
+    A: WrappingFrom<B>,
+    B: WrappingFrom<A>,
+{
+    let result = B::wrapping_from(value);
+    (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value
+}
+
 /// This macro defines conversions from type $a to type $b, where not every value of type $a is
 /// representable by a value of type $b.
 macro_rules! lossy_conversion {
@@ -248,15 +314,9 @@ macro_rules! lossy_conversion {
         /// assert_eq!(i8::checked_from(-1_000i16), None);
         /// ```
         impl CheckedFrom<$a> for $b {
-            #[allow(unused_comparisons, clippy::cast_lossless)]
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
-                let result = value as $b;
-                if (result >= 0) == (value >= 0) && result as $a == value {
-                    Some(result)
-                } else {
-                    None
-                }
+                _checked_from_lossy(value)
             }
         }
 
@@ -303,20 +363,9 @@ macro_rules! lossy_conversion {
         /// assert_eq!(i8::saturating_from(-1_000i16), -128);
         /// ```
         impl SaturatingFrom<$a> for $b {
-            #[allow(unused_comparisons)]
             #[inline]
             fn saturating_from(value: $a) -> $b {
-                if let Some(b_max) = $a::checked_from($b::MAX) {
-                    if value >= b_max {
-                        return $b::MAX;
-                    }
-                }
-                if let Some(b_min) = $a::checked_from($b::MIN) {
-                    if value <= b_min {
-                        return $b::MIN;
-                    }
-                }
-                value as $b
+                _saturating_from_lossy(value)
             }
         }
 
@@ -338,14 +387,9 @@ macro_rules! lossy_conversion {
         /// assert_eq!(i8::overflowing_from(-1_000i16), (24, true));
         /// ```
         impl OverflowingFrom<$a> for $b {
-            #[allow(unused_comparisons, clippy::cast_lossless)]
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
-                let result = value as $b;
-                (
-                    result,
-                    (result >= 0) != (value >= 0) || result as $a != value,
-                )
+                _overflowing_from_lossy(value)
             }
         }
 
@@ -366,11 +410,9 @@ macro_rules! lossy_conversion {
         /// assert_eq!(i8::convertible_from(-1_000i16), false);
         /// ```
         impl ConvertibleFrom<$a> for $b {
-            #[allow(unused_comparisons, clippy::cast_lossless)]
             #[inline]
             fn convertible_from(value: $a) -> bool {
-                let result = value as $b;
-                (result >= 0) == (value >= 0) && result as $a == value
+                _convertible_from_lossy::<$a, $b>(value)
             }
         }
     };

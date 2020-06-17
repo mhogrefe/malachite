@@ -997,6 +997,38 @@ pub trait RoundToMultipleAssign<RHS = Self> {
     fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
+/// Calculates 2<sup>`pow`</sup>.
+pub trait PowerOfTwo {
+    fn power_of_two(pow: u64) -> Self;
+}
+
+/// Determines whether `self` == 2<pow>k</pow> for some integer k.
+pub trait IsPowerOfTwo {
+    fn is_power_of_two(&self) -> bool;
+}
+
+/// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
+/// greater than the type's maximum value, panics.
+pub trait NextPowerOfTwo {
+    type Output;
+
+    fn next_power_of_two(self) -> Self::Output;
+}
+
+/// Replaces `self` with the smallest power of two greater than or equal to `self`. If the next
+/// power of two is greater than the type's maximum value, panics.
+pub trait NextPowerOfTwoAssign {
+    fn next_power_of_two_assign(&mut self);
+}
+
+/// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
+/// greater than the type's maximum value, `None` is returned.
+pub trait CheckedNextPowerOfTwo {
+    type Output;
+
+    fn checked_next_power_of_two(self) -> Option<Self::Output>;
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -1036,31 +1068,6 @@ pub trait Pow<RHS> {
     fn pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Returns `true` iff `self` == 2<pow>k</pow> for some integer k.
-pub trait IsPowerOfTwo {
-    fn is_power_of_two(&self) -> bool;
-}
-
-/// Returns the smallest power of two greater than or equal to `self`.
-pub trait NextPowerOfTwo {
-    type Output;
-
-    fn next_power_of_two(self) -> Self::Output;
-}
-
-/// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
-/// greater than the type's maximum value, `None` is returned; otherwise the power of two is wrapped
-/// in `Some`.
-pub trait CheckedNextPowerOfTwo {
-    type Output;
-
-    fn checked_next_power_of_two(self) -> Option<Self::Output>;
-}
-
-pub trait NextPowerOfTwoAssign {
-    fn next_power_of_two_assign(&mut self);
-}
-
 pub trait CheckedLogTwo {
     fn checked_log_two(self) -> Option<u64>;
 }
@@ -1075,9 +1082,4 @@ pub trait FloorLogTwo {
 pub trait CeilingLogTwo {
     /// ceiling(log<sub>2</sub>(`self`))
     fn ceiling_log_two(self) -> u64;
-}
-
-/// Calculates 2<sup>`pow`</sup>.
-pub trait PowerOfTwo {
-    fn power_of_two(pow: u64) -> Self;
 }

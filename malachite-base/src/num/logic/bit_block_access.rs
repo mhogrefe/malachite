@@ -1,9 +1,40 @@
 use std::cmp::min;
+use std::ops::Neg;
 
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
+
+const ERROR_MESSAGE: &str = "Result exceeds width of output type";
+
+pub fn _get_bits_unsigned<T: PrimitiveInteger>(x: &T, start: u64, end: u64) -> T
+where
+    T: ModPowerOfTwo<Output = T>,
+{
+    assert!(start <= end);
+    if start >= T::WIDTH {
+        T::ZERO
+    } else {
+        (*x >> start).mod_power_of_two(end - start)
+    }
+}
+
+pub fn _assign_bits_unsigned<T: PrimitiveInteger>(x: &mut T, start: u64, end: u64, bits: &T)
+where
+    T: ModPowerOfTwo<Output = T>,
+{
+    assert!(start <= end);
+    let width = T::WIDTH;
+    let bits_width = end - start;
+    let bits = bits.mod_power_of_two(bits_width);
+    if bits != T::ZERO && LeadingZeros::leading_zeros(bits) < start {
+        panic!(ERROR_MESSAGE);
+    } else if start < width {
+        *x &= !(T::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
+        *x |= bits << start;
+    }
+}
 
 macro_rules! impl_bit_block_access_unsigned {
     ($t:ident) => {
@@ -31,13 +62,9 @@ macro_rules! impl_bit_block_access_unsigned {
             /// assert_eq!(0xabcdu16.get_bits(5, 5), 0);
             /// assert_eq!(0xabcdu16.get_bits(100, 200), 0);
             /// ```
+            #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
-                assert!(start <= end);
-                if start >= $t::WIDTH {
-                    0
-                } else {
-                    (self >> start).mod_power_of_two(end - start)
-                }
+                _get_bits_unsigned(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
@@ -70,31 +97,74 @@ macro_rules! impl_bit_block_access_unsigned {
             /// x.assign_bits(0, 100, &0x1234);
             /// assert_eq!(x, 0x1234);
             /// ```
+            #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
-                assert!(start <= end);
-                let width = $t::WIDTH;
-                let bits_width = end - start;
-                let bits = bits.mod_power_of_two(bits_width);
-                if bits != 0 && LeadingZeros::leading_zeros(bits) < start {
-                    panic!("Result exceeds width of output type");
-                } else if start >= width {
-                    // bits must be 0
-                    return;
-                } else {
-                    *self &= !($t::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
-                }
-                *self |= bits << start;
+                _assign_bits_unsigned(self, start, end, bits)
             }
         }
     };
 }
-
 impl_bit_block_access_unsigned!(u8);
 impl_bit_block_access_unsigned!(u16);
 impl_bit_block_access_unsigned!(u32);
 impl_bit_block_access_unsigned!(u64);
 impl_bit_block_access_unsigned!(u128);
 impl_bit_block_access_unsigned!(usize);
+
+pub fn _get_bits_signed<T: PrimitiveInteger, U>(x: &T, start: u64, end: u64) -> U
+where
+    T: ModPowerOfTwo<Output = U> + Neg<Output = T>,
+{
+    assert!(start <= end);
+    (if start >= T::WIDTH {
+        -T::iverson(*x < T::ZERO)
+    } else {
+        *x >> start
+    })
+    .mod_power_of_two(end - start)
+}
+
+pub fn _assign_bits_signed<T: PrimitiveInteger, U: PrimitiveInteger>(
+    x: &mut T,
+    start: u64,
+    end: u64,
+    bits: &U,
+) where
+    T: UnsignedAbs<Output = U> + WrappingFrom<U>,
+    U: BitBlockAccess<Bits = U> + ModPowerOfTwo<Output = U>,
+{
+    assert!(start <= end);
+    if *x >= T::ZERO {
+        let mut abs_x = x.unsigned_abs();
+        abs_x.assign_bits(start, end, bits);
+        if abs_x.get_highest_bit() {
+            panic!(ERROR_MESSAGE);
+        }
+        *x = T::wrapping_from(abs_x);
+    } else {
+        let width = T::WIDTH - 1;
+        let bits_width = end - start;
+        let bits = bits.mod_power_of_two(bits_width);
+        let max = U::MAX;
+        if bits_width > width + 1 {
+            panic!(ERROR_MESSAGE);
+        } else if start >= width {
+            if bits != max.mod_power_of_two(bits_width) {
+                panic!(ERROR_MESSAGE);
+            }
+        } else {
+            let lower_width = width - start;
+            if end > width && bits >> lower_width != max.mod_power_of_two(end - width) {
+                panic!(ERROR_MESSAGE);
+            } else {
+                *x &= T::wrapping_from(
+                    !(max.mod_power_of_two(min(bits_width, lower_width)) << start),
+                );
+                *x |= T::wrapping_from(bits << start);
+            }
+        }
+    }
+}
 
 macro_rules! impl_bit_block_access_signed {
     ($t:ident, $u:ident) => {
@@ -123,18 +193,9 @@ macro_rules! impl_bit_block_access_signed {
             /// assert_eq!((-0x5433i16).get_bits(5, 5), 0);
             /// assert_eq!((-0x5433i16).get_bits(100, 104), 0xf);
             /// ```
+            #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
-                assert!(start <= end);
-                (if start >= $t::WIDTH {
-                    if *self >= 0 {
-                        0
-                    } else {
-                        -1
-                    }
-                } else {
-                    self >> start
-                })
-                .mod_power_of_two(end - start)
+                _get_bits_signed(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
@@ -171,43 +232,13 @@ macro_rules! impl_bit_block_access_signed {
             /// x.assign_bits(100, 104, &0xf);
             /// assert_eq!(x, -0x5433);
             /// ```
+            #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
-                assert!(start <= end);
-                if *self >= 0 {
-                    let mut abs_self = self.unsigned_abs();
-                    abs_self.assign_bits(start, end, bits);
-                    if abs_self.get_highest_bit() {
-                        panic!("Result exceeds width of output type");
-                    }
-                    *self = $t::wrapping_from(abs_self);
-                } else {
-                    let width = $t::WIDTH - 1;
-                    let bits_width = end - start;
-                    let bits = bits.mod_power_of_two(bits_width);
-                    let max = Self::Bits::MAX;
-                    if bits_width > width + 1 {
-                        panic!("Result exceeds width of output type");
-                    } else if start >= width {
-                        if bits != max.mod_power_of_two(bits_width) {
-                            panic!("Result exceeds width of output type");
-                        }
-                    } else {
-                        let lower_width = width - start;
-                        if end > width && bits >> lower_width != max.mod_power_of_two(end - width) {
-                            panic!("Result exceeds width of output type");
-                        } else {
-                            *self &= $t::wrapping_from(
-                                !(max.mod_power_of_two(min(bits_width, lower_width)) << start),
-                            );
-                            *self |= $t::wrapping_from(bits << start);
-                        }
-                    }
-                }
+                _assign_bits_signed(self, start, end, bits)
             }
         }
     };
 }
-
 impl_bit_block_access_signed!(i8, u8);
 impl_bit_block_access_signed!(i16, u16);
 impl_bit_block_access_signed!(i32, u32);

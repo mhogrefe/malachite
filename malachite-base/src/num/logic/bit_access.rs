@@ -1,6 +1,30 @@
-use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::BitAccess;
+
+#[inline]
+pub fn _get_bit_unsigned<T: PrimitiveInteger>(x: &T, index: u64) -> bool {
+    index < T::WIDTH && *x & T::power_of_two(index) != T::ZERO
+}
+
+#[inline]
+pub fn _set_bit_unsigned<T: PrimitiveInteger>(x: &mut T, index: u64) {
+    if index < T::WIDTH {
+        *x |= T::power_of_two(index);
+    } else {
+        panic!(
+            "Cannot set bit {} in non-negative value of width {}",
+            index,
+            T::WIDTH
+        );
+    }
+}
+
+#[inline]
+pub fn _clear_bit_unsigned<T: PrimitiveInteger>(x: &mut T, index: u64) {
+    if index < T::WIDTH {
+        *x &= !T::power_of_two(index);
+    }
+}
 
 macro_rules! impl_bit_access_unsigned {
     ($t:ident) => {
@@ -50,7 +74,7 @@ macro_rules! impl_bit_access_unsigned {
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                index < Self::WIDTH && *self & $t::power_of_two(index) != 0
+                _get_bit_unsigned(self, index)
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
@@ -77,15 +101,7 @@ macro_rules! impl_bit_access_unsigned {
             /// ```
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self |= $t::power_of_two(index);
-                } else {
-                    panic!(
-                        "Cannot set bit {} in non-negative value of width {}",
-                        index,
-                        Self::WIDTH
-                    );
-                }
+                _set_bit_unsigned(self, index)
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of
@@ -111,20 +127,52 @@ macro_rules! impl_bit_access_unsigned {
             /// ```
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self &= !$t::power_of_two(index);
-                }
+                _clear_bit_unsigned(self, index)
             }
         }
     };
 }
-
 impl_bit_access_unsigned!(u8);
 impl_bit_access_unsigned!(u16);
 impl_bit_access_unsigned!(u32);
 impl_bit_access_unsigned!(u64);
 impl_bit_access_unsigned!(u128);
 impl_bit_access_unsigned!(usize);
+
+#[inline]
+pub fn _get_bit_signed<T: PrimitiveInteger>(x: &T, index: u64) -> bool {
+    if index < T::WIDTH {
+        *x & (T::ONE << index) != T::ZERO
+    } else {
+        *x < T::ZERO
+    }
+}
+
+#[inline]
+pub fn _set_bit_signed<T: PrimitiveInteger>(x: &mut T, index: u64) {
+    if index < T::WIDTH {
+        *x |= T::ONE << index;
+    } else if *x >= T::ZERO {
+        panic!(
+            "Cannot set bit {} in non-negative value of width {}",
+            index,
+            T::WIDTH
+        );
+    }
+}
+
+#[inline]
+pub fn _clear_bit_signed<T: PrimitiveInteger>(x: &mut T, index: u64) {
+    if index < T::WIDTH {
+        *x &= !(T::ONE << index);
+    } else if *x < T::ZERO {
+        panic!(
+            "Cannot clear bit {} in negative value of width {}",
+            index,
+            T::WIDTH
+        );
+    }
+}
 
 macro_rules! impl_bit_access_signed {
     ($t:ident) => {
@@ -200,11 +248,7 @@ macro_rules! impl_bit_access_signed {
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                if index < Self::WIDTH {
-                    self & (1 << index) != 0
-                } else {
-                    *self < 0
-                }
+                _get_bit_signed(self, index)
             }
 
             /// Sets the `index`th bit of a primitive signed integer, or the coefficient of
@@ -240,15 +284,7 @@ macro_rules! impl_bit_access_signed {
             /// ```
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self |= 1 << index;
-                } else if *self >= 0 {
-                    panic!(
-                        "Cannot set bit {} in non-negative value of width {}",
-                        index,
-                        Self::WIDTH
-                    );
-                }
+                _set_bit_signed(self, index)
             }
 
             /// Sets the `index`th bit of a primitive signed integer, or the coefficient of
@@ -286,20 +322,11 @@ macro_rules! impl_bit_access_signed {
             /// ```
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                if index < Self::WIDTH {
-                    *self &= !(1 << index);
-                } else if *self < 0 {
-                    panic!(
-                        "Cannot clear bit {} in negative value of width {}",
-                        index,
-                        Self::WIDTH
-                    );
-                }
+                _clear_bit_signed(self, index)
             }
         }
     };
 }
-
 impl_bit_access_signed!(i8);
 impl_bit_access_signed!(i16);
 impl_bit_access_signed!(i32);

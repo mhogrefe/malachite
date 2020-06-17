@@ -1,7 +1,7 @@
 use num::arithmetic::traits::XXDivModYIsQR;
-use num::arithmetic::unsigneds::{wide_join_halves, wide_split_in_half};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::half::{wide_join_halves, wide_split_in_half};
 use num::conversion::traits::WrappingFrom;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use num::logic::traits::LeadingZeros;

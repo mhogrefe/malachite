@@ -168,5 +168,37 @@ pub mod natural {
         pub mod shl_round;
         pub mod shr;
         pub mod shr_round;
+        pub mod sign;
+        pub mod sub;
+        pub mod sub_mul;
+    }
+    pub mod basic {
+        pub mod constants;
+        pub mod crement;
+        pub mod size;
+    }
+    pub mod comparison {
+        pub mod eq;
+        pub mod ord;
+        pub mod partial_eq_primitive_integer;
+        pub mod partial_ord_abs_primitive_integer_and_comparators;
+        pub mod partial_ord_primitive_integer;
+    }
+    pub mod conversion {
+        pub mod clone;
+        pub mod floating_point_from_natural;
+        pub mod from_floating_point;
+        pub mod from_limbs;
+        pub mod from_primitive_integer;
+        pub mod primitive_integer_from_natural;
+        pub mod serde;
+        pub mod to_limbs;
+    }
+    pub mod logic {
+        pub mod and;
+        pub mod assign_bit;
+        pub mod assign_bits;
+        pub mod bits;
+        pub mod clear_bit;
     }
 }

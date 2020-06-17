@@ -25,15 +25,15 @@ fn test_limbs_eq_mod_power_of_two_neg_limb() {
     test(&[1, 1], 3, 1, true);
     test(&[1, 1], 3, 2, true);
     test(&[1, 1], 3, 3, false);
-    test(&[1, 1], Limb::MAX, 0, true);
-    test(&[1, 1], Limb::MAX, 1, true);
-    test(&[1, 1], Limb::MAX, width, true);
-    test(&[1, 1], Limb::MAX, width + 1, true);
-    test(&[1, 2], Limb::MAX, width + 1, false);
-    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, width + 1, true);
-    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 2 * width, true);
-    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 3 * width - 1, true);
-    test(&[1, Limb::MAX, Limb::MAX], Limb::MAX, 3 * width, false);
+    test(&[1, 1], u32::MAX, 0, true);
+    test(&[1, 1], u32::MAX, 1, true);
+    test(&[1, 1], u32::MAX, width, true);
+    test(&[1, 1], u32::MAX, width + 1, true);
+    test(&[1, 2], u32::MAX, width + 1, false);
+    test(&[1, u32::MAX, u32::MAX], u32::MAX, width + 1, true);
+    test(&[1, u32::MAX, u32::MAX], u32::MAX, 2 * width, true);
+    test(&[1, u32::MAX, u32::MAX], u32::MAX, 3 * width - 1, true);
+    test(&[1, u32::MAX, u32::MAX], u32::MAX, 3 * width, false);
 }
 
 #[cfg(feature = "32_bit_limbs")]

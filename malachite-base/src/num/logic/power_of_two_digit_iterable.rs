@@ -1,13 +1,9 @@
 use std::marker::PhantomData;
 
-use named::Named;
 use num::arithmetic::traits::{DivRound, SaturatingSubAssign};
-use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::{
-    BitBlockAccess, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, SignificantBits,
-};
+use num::logic::traits::{BitBlockAccess, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
 use rounding_mode::RoundingMode;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -178,6 +174,31 @@ where
     }
 }
 
+pub fn _power_of_two_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    x: T,
+    log_base: u64,
+) -> PrimitivePowerOfTwoDigitIterator<T, U> {
+    assert_ne!(log_base, 0);
+    if log_base > U::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            U::NAME,
+            log_base
+        );
+    }
+    let significant_digits = x
+        .significant_bits()
+        .div_round(log_base, RoundingMode::Ceiling);
+    PrimitivePowerOfTwoDigitIterator {
+        value: x,
+        log_base,
+        some_remaining: significant_digits != 0,
+        i: 0,
+        j: significant_digits.saturating_sub(1) * log_base,
+        boo: PhantomData,
+    }
+}
+
 macro_rules! impl_power_of_two_digit_iterable {
     ($t:ident) => {
         macro_rules! impl_power_of_two_digit_iterable_inner {
@@ -222,34 +243,16 @@ macro_rules! impl_power_of_two_digit_iterable {
                     ///     PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
                     /// assert_eq!(digits.rev().collect::<Vec<u8>>(), vec![1, 2, 2, 3]);
                     /// ```
+                    #[inline]
                     fn power_of_two_digits(
                         self,
                         log_base: u64,
                     ) -> PrimitivePowerOfTwoDigitIterator<$t, $u> {
-                        assert_ne!(log_base, 0);
-                        if log_base > $u::WIDTH {
-                            panic!(
-                                "type {:?} is too small for a digit of width {}",
-                                $u::NAME,
-                                log_base
-                            );
-                        }
-                        let significant_digits = self
-                            .significant_bits()
-                            .div_round(log_base, RoundingMode::Ceiling);
-                        PrimitivePowerOfTwoDigitIterator {
-                            value: self,
-                            log_base,
-                            some_remaining: significant_digits != 0,
-                            i: 0,
-                            j: significant_digits.saturating_sub(1) * log_base,
-                            boo: PhantomData,
-                        }
+                        _power_of_two_digits(self, log_base)
                     }
                 }
             };
         }
-
         impl_power_of_two_digit_iterable_inner!(u8);
         impl_power_of_two_digit_iterable_inner!(u16);
         impl_power_of_two_digit_iterable_inner!(u32);
@@ -258,7 +261,6 @@ macro_rules! impl_power_of_two_digit_iterable {
         impl_power_of_two_digit_iterable_inner!(usize);
     };
 }
-
 impl_power_of_two_digit_iterable!(u8);
 impl_power_of_two_digit_iterable!(u16);
 impl_power_of_two_digit_iterable!(u32);

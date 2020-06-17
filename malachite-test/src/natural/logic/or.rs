@@ -8,6 +8,7 @@ use malachite_nz::natural::logic::or::{
     limbs_or_same_length_in_place_left, limbs_or_same_length_to_out, limbs_or_to_out,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::{natural_op_bits, natural_op_limbs};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -16,7 +17,6 @@ use inputs::base::{
     triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
 use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
-use natural::logic::{natural_op_bits, natural_op_limbs};
 
 pub fn natural_or_alt_1(x: &Natural, y: &Natural) -> Natural {
     natural_op_bits(&|a, b| a || b, x, y)

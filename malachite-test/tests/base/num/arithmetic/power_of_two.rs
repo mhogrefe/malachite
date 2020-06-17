@@ -10,6 +10,7 @@ fn unsigned_power_of_two_properties_helper<T: PrimitiveUnsigned>() {
     test_properties_no_special(small_u64s_var_2::<T>, |&pow| {
         let mut n = T::power_of_two(pow);
         assert_eq!(n.checked_log_two(), Some(pow));
+        assert!(n.is_power_of_two());
         n.clear_bit(pow);
         assert_eq!(n, T::ZERO);
     });

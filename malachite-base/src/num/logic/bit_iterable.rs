@@ -2,11 +2,10 @@ use std::cmp::min;
 use std::cmp::Ordering;
 use std::ops::Index;
 
-use num::arithmetic::traits::{PowerOfTwo, Sign};
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::{BitIterable, SignificantBits};
+use num::logic::traits::BitIterable;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {
@@ -162,6 +161,16 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     }
 }
 
+pub fn _bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> {
+    let significant_bits = x.significant_bits();
+    PrimitiveUnsignedBitIterator {
+        value: x,
+        some_remaining: significant_bits != 0,
+        i_mask: T::ONE,
+        j_mask: T::power_of_two(significant_bits.saturating_sub(1)),
+    }
+}
+
 macro_rules! impl_bit_iterable_unsigned {
     ($t:ident) => {
         impl BitIterable for $t {
@@ -192,19 +201,13 @@ macro_rules! impl_bit_iterable_unsigned {
             /// assert_eq!(105u32.bits().rev().collect::<Vec<bool>>(),
             ///     vec![true, true, false, true, false, false, true]);
             /// ```
+            #[inline]
             fn bits(self) -> PrimitiveUnsignedBitIterator<$t> {
-                let significant_bits = self.significant_bits();
-                PrimitiveUnsignedBitIterator {
-                    value: self,
-                    some_remaining: significant_bits != 0,
-                    i_mask: 1,
-                    j_mask: $t::power_of_two(significant_bits.saturating_sub(1)),
-                }
+                _bits_unsigned(self)
             }
         }
     };
 }
-
 impl_bit_iterable_unsigned!(u8);
 impl_bit_iterable_unsigned!(u16);
 impl_bit_iterable_unsigned!(u32);
@@ -321,6 +324,25 @@ impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
     }
 }
 
+pub fn _bits_signed<T, U: PrimitiveUnsigned>(x: T) -> PrimitiveSignedBitIterator<T>
+where
+    T: PrimitiveSigned<UnsignedOfEqualWidth = U>,
+    U: WrappingFrom<T>,
+{
+    let unsigned = U::wrapping_from(x);
+    let significant_bits = match x.sign() {
+        Ordering::Equal => 0,
+        Ordering::Greater => unsigned.significant_bits() + 1,
+        Ordering::Less => (!unsigned).significant_bits() + 1,
+    };
+    PrimitiveSignedBitIterator(PrimitiveUnsignedBitIterator {
+        value: unsigned,
+        some_remaining: significant_bits != 0,
+        i_mask: U::ONE,
+        j_mask: U::power_of_two(significant_bits.saturating_sub(1)),
+    })
+}
+
 macro_rules! impl_bit_iterable_signed {
     ($t:ident, $u:ident) => {
         impl BitIterable for $t {
@@ -357,24 +379,13 @@ macro_rules! impl_bit_iterable_signed {
             /// assert_eq!((-105i32).bits().rev().collect::<Vec<bool>>(),
             ///     vec![true, false, false, true, false, true, true, true]);
             /// ```
+            #[inline]
             fn bits(self) -> PrimitiveSignedBitIterator<$t> {
-                let unsigned = $u::wrapping_from(self);
-                let significant_bits = match self.sign() {
-                    Ordering::Equal => 0,
-                    Ordering::Greater => unsigned.significant_bits() + 1,
-                    Ordering::Less => (!unsigned).significant_bits() + 1,
-                };
-                PrimitiveSignedBitIterator(PrimitiveUnsignedBitIterator {
-                    value: unsigned,
-                    some_remaining: significant_bits != 0,
-                    i_mask: 1,
-                    j_mask: $u::power_of_two(significant_bits.saturating_sub(1)),
-                })
+                _bits_signed::<$t, $u>(self)
             }
         }
     };
 }
-
 impl_bit_iterable_signed!(i8, u8);
 impl_bit_iterable_signed!(i16, u16);
 impl_bit_iterable_signed!(i32, u32);

@@ -34428,7 +34428,7 @@ fn test_limbs_div() {
         );
         // bits == 0 and Barrett division in _limbs_div_to_out_balanced
         let mut ds = vec![0; 1_409];
-        ds.push(Limb::MAX);
+        ds.push(u32::MAX);
         test(
             &[10; 1_401],
             &[123; 2_800],

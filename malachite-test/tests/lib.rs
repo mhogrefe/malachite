@@ -56,6 +56,7 @@ pub mod base {
             pub mod mod_power_of_two_sub;
             pub mod mod_sub;
             pub mod neg;
+            pub mod next_power_of_two;
             pub mod overflowing_abs;
             pub mod overflowing_add;
             pub mod overflowing_add_mul;
@@ -301,9 +302,7 @@ pub mod natural {
     }
 
     pub mod basic {
-        pub mod constants;
         pub mod crement;
-        pub mod size;
     }
 
     pub mod comparison {

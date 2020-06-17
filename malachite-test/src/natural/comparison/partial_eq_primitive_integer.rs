@@ -3,6 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::comparison::partial_eq_primitive_integer::*;
 use num::BigUint;
 use rand::Rand;
 
@@ -134,13 +135,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_isize_partial_eq_natural_library_comparison
     );
-}
-
-pub fn num_partial_eq_unsigned<T>(x: &BigUint, u: T) -> bool
-where
-    BigUint: From<T>,
-{
-    *x == BigUint::from(u)
 }
 
 fn demo_natural_partial_eq_unsigned<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize)

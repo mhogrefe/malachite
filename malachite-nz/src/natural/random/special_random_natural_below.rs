@@ -32,10 +32,10 @@ use natural::Natural;
 ///     "101");
 /// assert_eq!(
 ///     format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(1_000_000u32))),
-///     "1110001111000001111"
+///     "1100000111110000"
 /// );
 /// assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::trillion())),
-///     "11111110000111111111100011111111000");
+///     "1110000000111111100000000001111110000000");
 /// ```
 pub fn special_random_natural_below<R: Rng>(rng: &mut R, n: &Natural) -> Natural {
     assert_ne!(*n, 0, "Cannot generate a Natural below 0");

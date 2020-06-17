@@ -1,6 +1,3 @@
-#[cfg(feature = "32_bit_limbs")]
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
@@ -9,50 +6,12 @@ use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
-#[cfg(feature = "32_bit_limbs")]
-use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
     pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned,
 };
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_clear_bit() {
-    let test = |limbs: &[Limb], index: u64, out: &[Limb]| {
-        let mut mut_limbs = limbs.to_vec();
-        limbs_clear_bit(&mut mut_limbs, index);
-        assert_eq!(mut_limbs, out);
-    };
-    test(&[3, 3], 33, &[3, 1]);
-    test(&[3, 1], 1, &[1, 1]);
-    test(&[3, 3], 100, &[3, 3]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_clear_bit() {
-    let test = |u, index, out| {
-        let mut n = Natural::from_str(u).unwrap();
-        n.clear_bit(index);
-        assert_eq!(n.to_string(), out);
-        assert!(n.is_valid());
-
-        let mut n = rug::Integer::from_str(u).unwrap();
-        n.set_bit(u32::exact_from(index), false);
-        assert_eq!(n.to_string(), out);
-    };
-    test("0", 10, "0");
-    test("0", 100, "0");
-    test("1024", 10, "0");
-    test("101", 0, "100");
-    test("1000000001024", 10, "1000000000000");
-    test("1000000001024", 100, "1000000001024");
-    test("1267650600228229402496703205376", 100, "1000000000000");
-    test("1267650600228229401496703205381", 100, "5");
-}
 
 #[test]
 fn limbs_clear_bit_properties() {

@@ -58,7 +58,6 @@ macro_rules! impl_basic_traits {
         }
     };
 }
-
 impl_basic_traits!(i8, u8);
 impl_basic_traits!(i16, u16);
 impl_basic_traits!(i32, u32);

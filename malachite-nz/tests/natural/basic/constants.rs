@@ -1,5 +1,6 @@
 use malachite_base::comparison::traits::Min;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+
 use malachite_nz::natural::Natural;
 
 #[test]

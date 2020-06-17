@@ -46,7 +46,6 @@ macro_rules! impl_rotate {
         }
     };
 }
-
 impl_rotate!(u8);
 impl_rotate!(u16);
 impl_rotate!(u32);

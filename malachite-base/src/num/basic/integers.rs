@@ -439,6 +439,26 @@ pub trait PrimitiveInteger:
     }
 }
 
+#[inline]
+pub fn _increment<T: Copy + One>(x: &mut T)
+where
+    T: CheckedAdd<Output = T>,
+{
+    *x = x
+        .checked_add(T::ONE)
+        .expect("Cannot increment past the maximum value.");
+}
+
+#[inline]
+pub fn _decrement<T: Copy + One>(x: &mut T)
+where
+    T: CheckedSub<Output = T>,
+{
+    *x = x
+        .checked_sub(T::ONE)
+        .expect("Cannot increment past the maximum value.");
+}
+
 /// This macro defines basic trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_basic_traits {
     ($t:ident, $width:expr) => {
@@ -525,9 +545,7 @@ macro_rules! impl_basic_traits {
             /// ```
             #[inline]
             fn increment(&mut self) {
-                *self = self
-                    .checked_add(1)
-                    .expect("Cannot increment past the maximum value.");
+                _increment(self);
             }
 
             /// Decrements `self`.
@@ -553,14 +571,11 @@ macro_rules! impl_basic_traits {
             /// ```
             #[inline]
             fn decrement(&mut self) {
-                *self = self
-                    .checked_sub(1)
-                    .expect("Cannot decrement past the minimum value.");
+                _decrement(self);
             }
         }
     };
 }
-
 impl_basic_traits!(u8, 8);
 impl_basic_traits!(u16, 16);
 impl_basic_traits!(u32, 32);

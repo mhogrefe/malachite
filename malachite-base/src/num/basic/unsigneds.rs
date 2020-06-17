@@ -6,9 +6,8 @@ use num::arithmetic::traits::{
     ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoShl,
     ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, ModPowerOfTwoSub,
     ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, RemPowerOfTwo,
-    RemPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
-    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ,
+    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
@@ -105,8 +104,6 @@ pub trait PrimitiveUnsigned:
     + PowerOfTwoDigitIterable<u128>
     + PowerOfTwoDigitIterable<usize>
     + PrimitiveInteger
-    + RemPowerOfTwo<Output = Self>
-    + RemPowerOfTwoAssign
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>
     + VecFromOtherType<u32>

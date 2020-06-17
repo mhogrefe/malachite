@@ -92,7 +92,7 @@ where
             if x != T::MIN {
                 assert_eq!(-(-x).div_round(y, -rm), q);
             }
-            if y != T::MIN {
+            if y != T::MIN && (x != T::MIN || (y != T::ONE && y != T::NEGATIVE_ONE)) {
                 assert_eq!(-x.div_round(-y, -rm), q);
             }
         },

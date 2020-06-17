@@ -2,99 +2,18 @@ use num::arithmetic::traits::ShrRound;
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::{
-    FromOtherTypeSlice, HasHalf, JoinHalves, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice,
-    WrappingFrom,
+    FromOtherTypeSlice, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice, WrappingFrom,
 };
 use rounding_mode::RoundingMode;
 
-macro_rules! impl_half_traits {
-    ($t:ident, $ht: ident) => {
-        /// Implements `HasHalf` for unsigned primitive integers.
-        impl HasHalf for $t {
-            /// The primitive integer type whose width is half of `Self`.
-            type Half = $ht;
-        }
-
-        /// Implements `JoinHalves` for unsigned primitive integers.
-        impl JoinHalves for $t {
-            /// Joins two unsigned integers to form an unsigned integer with twice the width.
-            /// `join_halves(upper, lower)`, where `upper` and `lower` are integers with w bits,
-            /// yields an integer with 2w bits whose value is `upper` * 2<sup>w</sup> + `lower`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::JoinHalves;
-            ///
-            /// assert_eq!(u16::join_halves(1, 2), 258);
-            /// assert_eq!(u32::join_halves(0xabcd, 0x1234), 0xabcd1234);
-            /// ```
-            #[inline]
-            fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
-                $t::from(upper) << $ht::WIDTH | $t::from(lower)
-            }
-        }
-
-        /// Implements `SplitInHalf` for unsigned primitive integers.
-        ///
-        /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::SplitInHalf;
-        ///
-        /// assert_eq!(258u16.split_in_half(), (1, 2));
-        /// assert_eq!(0xabcd1234u32.split_in_half(), (0xabcd, 0x1234));
-        /// ```
-        impl SplitInHalf for $t {
-            /// Extracts the lower, or least significant half, of and unsigned integer.
-            /// `n.lower_half()`, where `n` is an integer with w bits, yields an integer with w/2
-            /// bits whose value is `n` mod 2<sup>w/2</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::SplitInHalf;
-            ///
-            /// assert_eq!(258u16.lower_half(), 2);
-            /// assert_eq!(0xabcd1234u32.lower_half(), 0x1234);
-            /// ```
-            #[inline]
-            fn lower_half(&self) -> Self::Half {
-                $ht::wrapping_from(*self)
-            }
-
-            /// Extracts the upper, or most significant half, of and unsigned integer.
-            /// `n.upper_half()`, where `n` is an integer with w bits, yields an integer with w/2
-            /// bits whose value is floor(`n` / 2<sup>w/2</sup>).
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::SplitInHalf;
-            ///
-            /// assert_eq!(258u16.upper_half(), 1);
-            /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
-            /// ```
-            #[inline]
-            fn upper_half(&self) -> Self::Half {
-                $ht::wrapping_from(self >> $ht::WIDTH)
-            }
-        }
-    };
+#[inline]
+pub fn _from_other_type_slice_ident<T: Copy + Zero>(slice: &[T]) -> T {
+    if slice.is_empty() {
+        T::ZERO
+    } else {
+        slice[0]
+    }
 }
-
-impl_half_traits!(u16, u8);
-impl_half_traits!(u32, u16);
-impl_half_traits!(u64, u32);
-impl_half_traits!(u128, u64);
 
 macro_rules! impl_slice_traits_ident {
     ($a:ty) => {
@@ -117,11 +36,7 @@ macro_rules! impl_slice_traits_ident {
             /// ```
             #[inline]
             fn from_other_type_slice(slice: &[$a]) -> Self {
-                if slice.is_empty() {
-                    0
-                } else {
-                    slice[0]
-                }
+                _from_other_type_slice_ident(slice)
             }
         }
 
@@ -169,6 +84,50 @@ macro_rules! impl_slice_traits_ident {
     };
 }
 
+#[inline]
+pub fn _from_other_type_slice_large_to_small<A: Copy, B: Zero>(slice: &[A]) -> B
+where
+    B: WrappingFrom<A>,
+{
+    if slice.is_empty() {
+        B::ZERO
+    } else {
+        B::wrapping_from(slice[0])
+    }
+}
+
+pub fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
+    slice: &[A],
+) -> Vec<B>
+where
+    B: WrappingFrom<A>,
+{
+    let log_size_ratio = A::LOG_WIDTH - B::LOG_WIDTH;
+    let mut xs = vec![B::ZERO; slice.len() << log_size_ratio];
+    for (chunk, &u) in xs.chunks_exact_mut(1 << log_size_ratio).zip(slice.iter()) {
+        let mut u = u;
+        for out in chunk {
+            *out = B::wrapping_from(u);
+            u >>= B::WIDTH;
+        }
+    }
+    xs
+}
+
+pub fn _vec_from_other_type_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
+    mut value: A,
+) -> Vec<B>
+where
+    B: WrappingFrom<A>,
+{
+    let mut xs = vec![B::ZERO; 1 << (A::LOG_WIDTH - B::LOG_WIDTH)];
+    for out in &mut xs {
+        *out = B::wrapping_from(value);
+        value >>= B::WIDTH;
+    }
+    xs
+}
+
 macro_rules! impl_slice_traits_large_to_small {
     ($a:ident, $b:ident) => {
         impl FromOtherTypeSlice<$a> for $b {
@@ -188,11 +147,7 @@ macro_rules! impl_slice_traits_large_to_small {
             /// ```
             #[inline]
             fn from_other_type_slice(slice: &[$a]) -> Self {
-                if slice.is_empty() {
-                    0
-                } else {
-                    $b::wrapping_from(slice[0])
-                }
+                _from_other_type_slice_large_to_small(slice)
             }
         }
 
@@ -216,18 +171,9 @@ macro_rules! impl_slice_traits_large_to_small {
             ///     vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89]
             /// );
             /// ```
+            #[inline]
             fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                const LOG_SIZE_RATIO: u64 = $a::LOG_WIDTH - $b::LOG_WIDTH;
-                const SIZE_RATIO: usize = 1 << LOG_SIZE_RATIO;
-                let mut xs = vec![$b::ZERO; slice.len() << LOG_SIZE_RATIO];
-                for (chunk, &u) in xs.chunks_exact_mut(SIZE_RATIO).zip(slice.iter()) {
-                    let mut u = u;
-                    for out in chunk {
-                        *out = $b::wrapping_from(u);
-                        u >>= $b::WIDTH;
-                    }
-                }
-                xs
+                _vec_from_other_type_slice_large_to_small(slice)
             }
         }
 
@@ -246,17 +192,48 @@ macro_rules! impl_slice_traits_large_to_small {
             /// assert_eq!(u8::vec_from_other_type(0xcdabu16), vec![0xab, 0xcd]);
             /// ```
             #[inline]
-            fn vec_from_other_type(mut value: $a) -> Vec<Self> {
-                const SIZE_RATIO: usize = 1 << ($a::LOG_WIDTH - $b::LOG_WIDTH);
-                let mut xs = vec![$b::ZERO; SIZE_RATIO];
-                for out in xs.iter_mut() {
-                    *out = $b::wrapping_from(value);
-                    value >>= $b::WIDTH;
-                }
-                xs
+            fn vec_from_other_type(value: $a) -> Vec<Self> {
+                _vec_from_other_type_large_to_small(value)
             }
         }
     };
+}
+
+pub fn _from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
+    slice: &[A],
+) -> B
+where
+    B: WrappingFrom<A>,
+{
+    let mut result = B::ZERO;
+    let mut offset = 0;
+    for &u in slice.iter().take(1 << (B::LOG_WIDTH - A::LOG_WIDTH)) {
+        result |= B::wrapping_from(u) << offset;
+        offset += A::WIDTH;
+    }
+    result
+}
+
+pub fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
+    slice: &[A],
+) -> Vec<B>
+where
+    B: WrappingFrom<A>,
+{
+    let log_size_ratio = B::LOG_WIDTH - A::LOG_WIDTH;
+    let mut xs = vec![B::ZERO; slice.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
+    for (out, chunk) in xs.iter_mut().zip(slice.chunks(1 << log_size_ratio)) {
+        *out = _from_other_type_slice_small_to_large(chunk);
+    }
+    xs
+}
+
+#[inline]
+pub fn _vec_from_other_type_small_to_large<A, B>(value: A) -> Vec<B>
+where
+    B: WrappingFrom<A>,
+{
+    vec![B::wrapping_from(value)]
 }
 
 macro_rules! impl_slice_traits_small_to_large {
@@ -279,15 +256,9 @@ macro_rules! impl_slice_traits_small_to_large {
             /// assert_eq!(u16::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xcdab);
             /// assert_eq!(u64::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xefcdab);
             /// ```
+            #[inline]
             fn from_other_type_slice(slice: &[$a]) -> Self {
-                const SIZE_RATIO: usize = 1 << ($b::LOG_WIDTH - $a::LOG_WIDTH);
-                let mut result = 0;
-                let mut offset = 0;
-                for &u in slice.iter().take(SIZE_RATIO) {
-                    result |= $b::wrapping_from(u) << offset;
-                    offset += $a::WIDTH;
-                }
-                result
+                _from_other_type_slice_small_to_large(slice)
             }
         }
 
@@ -312,15 +283,9 @@ macro_rules! impl_slice_traits_small_to_large {
             ///     vec![0xcdab, 0x01ef, 0x4523, 0x67]
             /// );
             /// ```
+            #[inline]
             fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                const LOG_SIZE_RATIO: u64 = $b::LOG_WIDTH - $a::LOG_WIDTH;
-                const SIZE_RATIO: usize = 1 << LOG_SIZE_RATIO;
-                let mut xs =
-                    vec![$b::ZERO; slice.len().shr_round(LOG_SIZE_RATIO, RoundingMode::Ceiling)];
-                for (out, chunk) in xs.iter_mut().zip(slice.chunks(SIZE_RATIO)) {
-                    *out = $b::from_other_type_slice(chunk);
-                }
-                xs
+                _vec_from_other_type_slice_small_to_large(slice)
             }
         }
 
@@ -341,7 +306,7 @@ macro_rules! impl_slice_traits_small_to_large {
             /// ```
             #[inline]
             fn vec_from_other_type(value: $a) -> Vec<Self> {
-                vec![$b::wrapping_from(value)]
+                _vec_from_other_type_small_to_large(value)
             }
         }
     };

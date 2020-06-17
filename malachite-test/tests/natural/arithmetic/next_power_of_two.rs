@@ -77,6 +77,7 @@ fn next_power_of_two_properties() {
 
     test_properties(unsigneds::<Limb>, |&u| {
         if let Some(power) = u.checked_next_power_of_two() {
+            assert_eq!(Natural::from(u).next_power_of_two(), u.next_power_of_two());
             assert_eq!(power, Natural::from(u).next_power_of_two());
         }
     });

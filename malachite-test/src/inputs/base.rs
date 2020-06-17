@@ -228,6 +228,11 @@ pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T>
     }
 }
 
+// All unsigned `T`s that are less than or equal to the greatest power of 2 that fits in a `T`.
+pub fn unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
+    Box::new(unsigneds(gm).filter(|&x| x <= T::power_of_two(T::WIDTH - 1)))
+}
+
 pub fn signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,

@@ -39,12 +39,10 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_twos_complement_limbs_asc(xs: &[Limb]) -> Integer {
-        if xs.is_empty() {
-            Integer::ZERO
-        } else if !xs.last().unwrap().get_highest_bit() {
-            Integer::from(Natural::from_limbs_asc(xs))
-        } else {
-            -Natural::from_owned_limbs_asc(limbs_twos_complement(xs))
+        match xs {
+            &[] => Integer::ZERO,
+            &[.., last] if !last.get_highest_bit() => Integer::from(Natural::from_limbs_asc(xs)),
+            xs => -Natural::from_owned_limbs_asc(limbs_twos_complement(xs)),
         }
     }
 
@@ -116,13 +114,15 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Integer {
-        if xs.is_empty() {
-            Integer::ZERO
-        } else if !xs.last().unwrap().get_highest_bit() {
-            Integer::from(Natural::from_owned_limbs_asc(xs))
-        } else {
-            assert!(!limbs_twos_complement_in_place(&mut xs));
-            -Natural::from_owned_limbs_asc(xs)
+        match xs.as_slice() {
+            &[] => Integer::ZERO,
+            &[.., last] if !last.get_highest_bit() => {
+                Integer::from(Natural::from_owned_limbs_asc(xs))
+            }
+            _ => {
+                assert!(!limbs_twos_complement_in_place(&mut xs));
+                -Natural::from_owned_limbs_asc(xs)
+            }
         }
     }
 

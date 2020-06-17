@@ -1,8 +1,107 @@
-use named::Named;
+use std::ops::{BitOr, ShrAssign};
+
 use num::arithmetic::traits::ArithmeticCheckedShl;
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
-use num::logic::traits::{LowMask, PowerOfTwoDigits, SignificantBits};
+use num::logic::traits::{PowerOfTwoDigits, SignificantBits};
+
+pub fn _to_power_of_two_digits_asc<
+    T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
+    U: PrimitiveInteger,
+>(
+    x: &T,
+    log_base: u64,
+) -> Vec<U>
+where
+    U: WrappingFrom<T>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > U::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            U::NAME,
+            log_base
+        );
+    }
+    let mut digits = Vec::new();
+    if *x == T::ZERO {
+    } else if x.significant_bits() <= log_base {
+        digits.push(U::wrapping_from(*x));
+    } else {
+        let mut x = *x;
+        let mask = U::low_mask(log_base);
+        while x != T::ZERO {
+            digits.push(U::wrapping_from(x) & mask);
+            x >>= log_base;
+        }
+    }
+    digits
+}
+
+pub fn _to_power_of_two_digits_desc<
+    T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
+    U: PrimitiveInteger,
+>(
+    x: &T,
+    log_base: u64,
+) -> Vec<U>
+where
+    U: WrappingFrom<T>,
+{
+    let mut digits = _to_power_of_two_digits_asc(x, log_base);
+    digits.reverse();
+    digits
+}
+
+pub fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
+where
+    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > U::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            U::NAME,
+            log_base
+        );
+    }
+    let mut n = T::ZERO;
+    for &digit in digits.iter().rev() {
+        assert!(digit.significant_bits() <= log_base);
+        let shifted = n
+            .arithmetic_checked_shl(log_base)
+            .expect("value represented by digits is too large");
+        n = shifted | T::wrapping_from(digit);
+    }
+    n
+}
+
+pub fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInteger>(
+    log_base: u64,
+    digits: &[U],
+) -> T
+where
+    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > U::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            U::NAME,
+            log_base
+        );
+    }
+    let mut n = T::ZERO;
+    for &digit in digits {
+        assert!(digit.significant_bits() <= log_base);
+        let shifted = n
+            .arithmetic_checked_shl(log_base)
+            .expect("value represented by digits is too large");
+        n = shifted | T::wrapping_from(digit);
+    }
+    n
+}
 
 macro_rules! impl_power_of_two_digits {
     ($t:ident) => {
@@ -43,28 +142,9 @@ macro_rules! impl_power_of_two_digits {
                     ///     &[3, 7, 1]
                     /// );
                     /// ```
+                    #[inline]
                     fn to_power_of_two_digits_asc(&self, log_base: u64) -> Vec<$u> {
-                        assert_ne!(log_base, 0);
-                        if log_base > $u::WIDTH {
-                            panic!(
-                                "type {:?} is too small for a digit of width {}",
-                                $u::NAME,
-                                log_base
-                            );
-                        }
-                        let mut digits = Vec::new();
-                        if *self == 0 {
-                        } else if self.significant_bits() <= log_base {
-                            digits.push($u::wrapping_from(*self));
-                        } else {
-                            let mut x = *self;
-                            let mask = $u::low_mask(log_base);
-                            while x != 0 {
-                                digits.push($u::wrapping_from(x) & mask);
-                                x >>= log_base;
-                            }
-                        }
-                        digits
+                        _to_power_of_two_digits_asc(self, log_base)
                     }
 
                     /// Returns a `Vec` containing the digits of `self` in descending order: most-
@@ -101,10 +181,9 @@ macro_rules! impl_power_of_two_digits {
                     ///     &[1, 7, 3]
                     /// );
                     /// ```
+                    #[inline]
                     fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<$u> {
-                        let mut digits = self.to_power_of_two_digits_asc(log_base);
-                        digits.reverse();
-                        digits
+                        _to_power_of_two_digits_desc(self, log_base)
                     }
 
                     /// Converts a slice of digits into a value, where the base is a power of two.
@@ -137,24 +216,9 @@ macro_rules! impl_power_of_two_digits {
                     /// let digits: &[u16] = &[3, 7, 1];
                     /// assert_eq!(u32::from_power_of_two_digits_asc(3, digits), 123);
                     /// ```
+                    #[inline]
                     fn from_power_of_two_digits_asc(log_base: u64, digits: &[$u]) -> $t {
-                        assert_ne!(log_base, 0);
-                        if log_base > $u::WIDTH {
-                            panic!(
-                                "type {:?} is too small for a digit of width {}",
-                                $u::NAME,
-                                log_base
-                            );
-                        }
-                        let mut n = 0;
-                        for &digit in digits.iter().rev() {
-                            assert!(digit.significant_bits() <= log_base);
-                            let shifted = n
-                                .arithmetic_checked_shl(log_base)
-                                .expect("value represented by digits is too large");
-                            n = shifted | $t::wrapping_from(digit);
-                        }
-                        n
+                        _from_power_of_two_digits_asc(log_base, digits)
                     }
 
                     /// Converts a slice of digits into a value, where the base is a power of two.
@@ -188,28 +252,11 @@ macro_rules! impl_power_of_two_digits {
                     /// assert_eq!(u32::from_power_of_two_digits_desc(3, digits), 123);
                     /// ```
                     fn from_power_of_two_digits_desc(log_base: u64, digits: &[$u]) -> $t {
-                        assert_ne!(log_base, 0);
-                        if log_base > $u::WIDTH {
-                            panic!(
-                                "type {:?} is too small for a digit of width {}",
-                                $u::NAME,
-                                log_base
-                            );
-                        }
-                        let mut n = 0;
-                        for &digit in digits {
-                            assert!(digit.significant_bits() <= log_base);
-                            let shifted = n
-                                .arithmetic_checked_shl(log_base)
-                                .expect("value represented by digits is too large");
-                            n = shifted | $t::wrapping_from(digit);
-                        }
-                        n
+                        _from_power_of_two_digits_desc(log_base, digits)
                     }
                 }
             };
         }
-
         impl_logic_traits_inner!(u8);
         impl_logic_traits_inner!(u16);
         impl_logic_traits_inner!(u32);
@@ -218,7 +265,6 @@ macro_rules! impl_power_of_two_digits {
         impl_logic_traits_inner!(usize);
     };
 }
-
 impl_power_of_two_digits!(u8);
 impl_power_of_two_digits!(u16);
 impl_power_of_two_digits!(u32);

@@ -1,6 +1,12 @@
 use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 
+#[inline]
+fn _power_of_two_unsigned<T: PrimitiveInteger>(pow: u64) -> T {
+    assert!(pow < T::WIDTH);
+    T::ONE << pow
+}
+
 macro_rules! impl_power_of_two_unsigned {
     ($t:ident) => {
         impl PowerOfTwo for $t {
@@ -23,19 +29,23 @@ macro_rules! impl_power_of_two_unsigned {
             /// ```
             #[inline]
             fn power_of_two(pow: u64) -> $t {
-                assert!(pow < $t::WIDTH);
-                1 << pow
+                _power_of_two_unsigned(pow)
             }
         }
     };
 }
-
 impl_power_of_two_unsigned!(u8);
 impl_power_of_two_unsigned!(u16);
 impl_power_of_two_unsigned!(u32);
 impl_power_of_two_unsigned!(u64);
 impl_power_of_two_unsigned!(u128);
 impl_power_of_two_unsigned!(usize);
+
+#[inline]
+pub fn _power_of_two_signed<T: PrimitiveInteger>(pow: u64) -> T {
+    assert!(pow < T::WIDTH - 1);
+    T::ONE << pow
+}
 
 macro_rules! impl_power_of_two_signed {
     ($t:ident) => {
@@ -59,13 +69,11 @@ macro_rules! impl_power_of_two_signed {
             /// ```
             #[inline]
             fn power_of_two(pow: u64) -> $t {
-                assert!(pow < $t::WIDTH - 1);
-                1 << pow
+                _power_of_two_signed(pow)
             }
         }
     };
 }
-
 impl_power_of_two_signed!(i8);
 impl_power_of_two_signed!(i16);
 impl_power_of_two_signed!(i32);

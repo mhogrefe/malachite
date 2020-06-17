@@ -29,6 +29,7 @@ pub mod mod_power_of_two_shr;
 pub mod mod_power_of_two_sub;
 pub mod mod_sub;
 pub mod neg;
+pub mod next_power_of_two;
 pub mod overflowing_abs;
 pub mod overflowing_add;
 pub mod overflowing_add_mul;
@@ -98,6 +99,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_power_of_two_sub::register(registry);
     mod_sub::register(registry);
     neg::register(registry);
+    next_power_of_two::register(registry);
     overflowing_abs::register(registry);
     overflowing_add::register(registry);
     overflowing_add_mul::register(registry);

@@ -97,7 +97,7 @@ pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
 /// ```
 pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     assert!(!bits_slice_to_twos_complement_bits_negative(bits));
-    if !bits.is_empty() && !bits.last().unwrap() {
+    if bits.last() == Some(&false) {
         // Sign-extend with an extra true bit to indicate a negative Integer
         bits.push(true);
     }
@@ -250,12 +250,12 @@ impl BitConvertible for Integer {
     /// );
     /// ```
     fn from_bits_asc(bits: &[bool]) -> Integer {
-        if bits.is_empty() {
-            Integer::ZERO
-        } else if !bits.last().unwrap() {
-            Integer::from(Natural::from_bits_asc(bits))
-        } else {
-            -Natural::from_owned_limbs_asc(limbs_asc_from_negative_twos_complement_bits_asc(bits))
+        match bits {
+            &[] => Integer::ZERO,
+            &[.., false] => Integer::from(Natural::from_bits_asc(bits)),
+            bits => -Natural::from_owned_limbs_asc(
+                limbs_asc_from_negative_twos_complement_bits_asc(bits),
+            ),
         }
     }
 
@@ -297,12 +297,12 @@ impl BitConvertible for Integer {
     /// );
     /// ```
     fn from_bits_desc(bits: &[bool]) -> Integer {
-        if bits.is_empty() {
-            Integer::ZERO
-        } else if !bits[0] {
-            Integer::from(Natural::from_bits_desc(bits))
-        } else {
-            -Natural::from_owned_limbs_asc(limbs_asc_from_negative_twos_complement_bits_desc(bits))
+        match bits {
+            &[] => Integer::ZERO,
+            &[false, ..] => Integer::from(Natural::from_bits_desc(bits)),
+            bits => -Natural::from_owned_limbs_asc(
+                limbs_asc_from_negative_twos_complement_bits_desc(bits),
+            ),
         }
     }
 }

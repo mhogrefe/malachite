@@ -124,45 +124,45 @@ fn test_twos_complement_limbs_asc() {
     test(
         "-1701411834921604967429270619762735448065",
         vec![
-            Limb::MAX,
-            Limb::MAX - 2,
-            Limb::MAX - 3,
-            Limb::MAX - 4,
-            Limb::MAX - 5,
+            u32::MAX,
+            u32::MAX - 2,
+            u32::MAX - 3,
+            u32::MAX - 4,
+            u32::MAX - 5,
         ],
     );
-    test("4294967295", vec![Limb::MAX, 0]);
-    test("-4294967295", vec![1, Limb::MAX]);
+    test("4294967295", vec![u32::MAX, 0]);
+    test("-4294967295", vec![1, u32::MAX]);
     test("4294967296", vec![0, 1]);
-    test("-4294967296", vec![0, Limb::MAX]);
-    test("18446744073709551615", vec![Limb::MAX, Limb::MAX, 0]);
-    test("-18446744073709551615", vec![1, 0, Limb::MAX]);
+    test("-4294967296", vec![0, u32::MAX]);
+    test("18446744073709551615", vec![u32::MAX, u32::MAX, 0]);
+    test("-18446744073709551615", vec![1, 0, u32::MAX]);
     test("18446744073709551616", vec![0, 0, 1]);
-    test("-18446744073709551616", vec![0, 0, Limb::MAX]);
+    test("-18446744073709551616", vec![0, 0, u32::MAX]);
 
     let n = Integer::from_str("-1701411834921604967429270619762735448065").unwrap();
     let mut limbs = n.twos_complement_limbs();
-    assert_eq!(Some(Limb::MAX), limbs.next());
-    assert_eq!(Some(Limb::MAX - 5), limbs.next_back());
-    assert_eq!(Some(Limb::MAX - 4), limbs.next_back());
-    assert_eq!(Some(Limb::MAX - 2), limbs.next());
-    assert_eq!(Some(Limb::MAX - 3), limbs.next());
+    assert_eq!(Some(u32::MAX), limbs.next());
+    assert_eq!(Some(u32::MAX - 5), limbs.next_back());
+    assert_eq!(Some(u32::MAX - 4), limbs.next_back());
+    assert_eq!(Some(u32::MAX - 2), limbs.next());
+    assert_eq!(Some(u32::MAX - 3), limbs.next());
     assert_eq!(None, limbs.next());
     assert_eq!(None, limbs.next_back());
 
-    assert_eq!(limbs.get(0), Limb::MAX);
-    assert_eq!(limbs.get(1), Limb::MAX - 2);
-    assert_eq!(limbs.get(2), Limb::MAX - 3);
-    assert_eq!(limbs.get(3), Limb::MAX - 4);
-    assert_eq!(limbs.get(4), Limb::MAX - 5);
-    assert_eq!(limbs.get(5), Limb::MAX);
+    assert_eq!(limbs.get(0), u32::MAX);
+    assert_eq!(limbs.get(1), u32::MAX - 2);
+    assert_eq!(limbs.get(2), u32::MAX - 3);
+    assert_eq!(limbs.get(3), u32::MAX - 4);
+    assert_eq!(limbs.get(4), u32::MAX - 5);
+    assert_eq!(limbs.get(5), u32::MAX);
 
     let mut limbs = n.twos_complement_limbs();
-    assert_eq!(Some(Limb::MAX), limbs.next());
-    assert_eq!(Some(Limb::MAX - 2), limbs.next());
-    assert_eq!(Some(Limb::MAX - 3), limbs.next());
-    assert_eq!(Some(Limb::MAX - 5), limbs.next_back());
-    assert_eq!(Some(Limb::MAX - 4), limbs.next_back());
+    assert_eq!(Some(u32::MAX), limbs.next());
+    assert_eq!(Some(u32::MAX - 2), limbs.next());
+    assert_eq!(Some(u32::MAX - 3), limbs.next());
+    assert_eq!(Some(u32::MAX - 5), limbs.next_back());
+    assert_eq!(Some(u32::MAX - 4), limbs.next_back());
     assert_eq!(None, limbs.next());
     assert_eq!(None, limbs.next_back());
 }
@@ -196,19 +196,19 @@ fn test_twos_complement_limbs_desc() {
     test(
         "-1701411834921604967429270619762735448065",
         vec![
-            Limb::MAX - 5,
-            Limb::MAX - 4,
-            Limb::MAX - 3,
-            Limb::MAX - 2,
-            Limb::MAX,
+            u32::MAX - 5,
+            u32::MAX - 4,
+            u32::MAX - 3,
+            u32::MAX - 2,
+            u32::MAX,
         ],
     );
-    test("4294967295", vec![0, Limb::MAX]);
-    test("-4294967295", vec![Limb::MAX, 1]);
+    test("4294967295", vec![0, u32::MAX]);
+    test("-4294967295", vec![u32::MAX, 1]);
     test("4294967296", vec![1, 0]);
-    test("-4294967296", vec![Limb::MAX, 0]);
-    test("18446744073709551615", vec![0, Limb::MAX, Limb::MAX]);
-    test("-18446744073709551615", vec![Limb::MAX, 0, 1]);
+    test("-4294967296", vec![u32::MAX, 0]);
+    test("18446744073709551615", vec![0, u32::MAX, u32::MAX]);
+    test("-18446744073709551615", vec![u32::MAX, 0, 1]);
     test("18446744073709551616", vec![1, 0, 0]);
-    test("-18446744073709551616", vec![Limb::MAX, 0, 0]);
+    test("-18446744073709551616", vec![u32::MAX, 0, 0]);
 }

@@ -10,7 +10,6 @@ macro_rules! impl_count_zeros {
         }
     };
 }
-
 impl_count_zeros!(u8);
 impl_count_zeros!(u16);
 impl_count_zeros!(u32);

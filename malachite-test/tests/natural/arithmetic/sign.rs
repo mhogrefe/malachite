@@ -1,26 +1,13 @@
 use std::cmp::Ordering;
-use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::natural_to_rug_integer;
-use rug;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::unsigneds;
 use malachite_test::inputs::natural::naturals;
-
-#[test]
-fn test_sign() {
-    let test = |s, out| {
-        assert_eq!(Natural::from_str(s).unwrap().sign(), out);
-        assert_eq!(rug::Integer::from_str(s).unwrap().cmp0(), out);
-    };
-    test("0", Ordering::Equal);
-    test("123", Ordering::Greater);
-    test("1000000000000", Ordering::Greater);
-}
 
 #[test]
 fn sign_properties() {

@@ -1,7 +1,70 @@
-use num::arithmetic::traits::{Parity, PowerOfTwo};
+use std::ops::ShrAssign;
+
+use num::arithmetic::traits::Parity;
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::{NegativeOne, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use num::logic::traits::{BitAccess, BitConvertible, LeadingZeros, LowMask};
+use num::logic::traits::{BitConvertible, LeadingZeros};
+
+pub fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    let mut x = *x;
+    while x != T::ZERO {
+        bits.push(x.odd());
+        x >>= 1;
+    }
+    bits
+}
+
+pub fn _to_bits_desc_unsigned<T: PrimitiveInteger>(x: &T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if *x == T::ZERO {
+        return bits;
+    }
+    bits.push(true);
+    if *x == T::ONE {
+        return bits;
+    }
+    let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
+    while mask != T::ZERO {
+        bits.push(*x & mask != T::ZERO);
+        mask >>= 1;
+    }
+    bits
+}
+
+pub fn _from_bits_asc_unsigned<T: PrimitiveInteger>(bits: &[bool]) -> T {
+    let width = usize::exact_from(T::WIDTH);
+    if bits.len() > width {
+        assert!(bits[width..].iter().all(|&bit| !bit));
+    }
+    let mut n = T::ZERO;
+    let mut mask = T::ONE;
+    for &bit in bits {
+        if bit {
+            n |= mask;
+        }
+        mask <<= 1;
+    }
+    n
+}
+
+pub fn _from_bits_desc_unsigned<T: PrimitiveInteger>(mut bits: &[bool]) -> T {
+    let width = usize::exact_from(T::WIDTH);
+    if bits.len() > width {
+        let (bits_lo, bits_hi) = bits.split_at(bits.len() - width);
+        assert!(bits_lo.iter().all(|&bit| !bit));
+        bits = bits_hi;
+    }
+    let mut n = T::ZERO;
+    for &bit in bits {
+        n <<= 1;
+        if bit {
+            n |= T::ONE;
+        }
+    }
+    n
+}
 
 macro_rules! impl_bit_convertible_unsigned {
     ($t:ident) => {
@@ -23,14 +86,9 @@ macro_rules! impl_bit_convertible_unsigned {
             /// assert_eq!(2u16.to_bits_asc(), &[false, true]);
             /// assert_eq!(123u32.to_bits_asc(), &[true, true, false, true, true, true, true]);
             /// ```
+            #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
-                let mut bits = Vec::new();
-                let mut x = *self;
-                while x != 0 {
-                    bits.push(x.odd());
-                    x >>= 1;
-                }
-                bits
+                _to_bits_asc_unsigned(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in descending order: most- to least-
@@ -50,21 +108,9 @@ macro_rules! impl_bit_convertible_unsigned {
             /// assert_eq!(2u16.to_bits_desc(), &[true, false]);
             /// assert_eq!(123u32.to_bits_desc(), &[true, true, true, true, false, true, true]);
             /// ```
+            #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
-                let mut bits = Vec::new();
-                if *self == 0 {
-                    return bits;
-                }
-                bits.push(true);
-                if *self == 1 {
-                    return bits;
-                }
-                let mut mask = $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
-                while mask != 0 {
-                    bits.push(*self & mask != 0);
-                    mask >>= 1;
-                }
-                bits
+                _to_bits_desc_unsigned(self)
             }
 
             /// Converts a slice of bits into a value. The input bits are in ascending order: least-
@@ -88,20 +134,9 @@ macro_rules! impl_bit_convertible_unsigned {
             /// assert_eq!(u16::from_bits_asc(&[false, true, false]), 2);
             /// assert_eq!(u32::from_bits_asc(&[true, true, false, true, true, true, true]), 123);
             /// ```
+            #[inline]
             fn from_bits_asc(bits: &[bool]) -> $t {
-                let width = usize::exact_from($t::WIDTH);
-                if bits.len() > width {
-                    assert!(bits[width..].iter().all(|&bit| !bit));
-                }
-                let mut n = 0;
-                let mut mask = 1;
-                for &bit in bits {
-                    if bit {
-                        n |= mask;
-                    }
-                    mask <<= 1;
-                }
-                n
+                _from_bits_asc_unsigned(bits)
             }
 
             /// Converts a slice of bits into a value. The input bits are in descending order: most-
@@ -125,32 +160,124 @@ macro_rules! impl_bit_convertible_unsigned {
             /// assert_eq!(u16::from_bits_desc(&[false, true, false]), 2);
             /// assert_eq!(u32::from_bits_desc(&[true, true, true, true, false, true, true]), 123);
             /// ```
-            fn from_bits_desc(mut bits: &[bool]) -> $t {
-                let width = usize::exact_from($t::WIDTH);
-                if bits.len() > width {
-                    let (bits_lo, bits_hi) = bits.split_at(bits.len() - width);
-                    assert!(bits_lo.iter().all(|&bit| !bit));
-                    bits = bits_hi;
-                }
-                let mut n = 0;
-                for &bit in bits {
-                    n <<= 1;
-                    if bit {
-                        n |= 1;
-                    }
-                }
-                n
+            #[inline]
+            fn from_bits_desc(bits: &[bool]) -> $t {
+                _from_bits_desc_unsigned(bits)
             }
         }
     };
 }
-
 impl_bit_convertible_unsigned!(u8);
 impl_bit_convertible_unsigned!(u16);
 impl_bit_convertible_unsigned!(u32);
 impl_bit_convertible_unsigned!(u64);
 impl_bit_convertible_unsigned!(u128);
 impl_bit_convertible_unsigned!(usize);
+
+pub fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
+    x: &T,
+) -> Vec<bool> {
+    let mut bits = Vec::new();
+    let mut x = *x;
+    if x >= T::ZERO {
+        while x != T::ZERO {
+            bits.push(x.odd());
+            x >>= 1;
+        }
+        if !bits.is_empty() {
+            bits.push(false);
+        }
+    } else {
+        while x != T::NEGATIVE_ONE {
+            bits.push(x.odd());
+            x >>= 1;
+        }
+        bits.push(true);
+    }
+    bits
+}
+
+pub fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInteger>(x: &T) -> Vec<bool> {
+    let mut bits = Vec::new();
+    if *x >= T::ZERO {
+        if *x == T::ZERO {
+            return bits;
+        }
+        bits.push(false);
+        bits.push(true);
+        if *x == T::ONE {
+            return bits;
+        }
+        let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
+        while mask != T::ZERO {
+            bits.push(*x & mask != T::ZERO);
+            mask >>= 1;
+        }
+    } else {
+        bits.push(true);
+        if *x == T::NEGATIVE_ONE {
+            return bits;
+        }
+        bits.push(false);
+        if *x == T::NEGATIVE_ONE << 1 {
+            return bits;
+        }
+        let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(!*x) - 2);
+        while mask != T::ZERO {
+            bits.push(*x & mask != T::ZERO);
+            mask >>= 1;
+        }
+    }
+    bits
+}
+
+pub fn _from_bits_asc_signed<T: PrimitiveInteger, U: PrimitiveInteger>(bits: &[bool]) -> T
+where
+    T: ExactFrom<U> + WrappingFrom<U>,
+{
+    match bits {
+        &[] => T::ZERO,
+        &[.., false] => T::exact_from(_from_bits_asc_unsigned::<U>(bits)),
+        bits => {
+            let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
+            let significant_bits = bits.len() - trailing_trues;
+            assert!(significant_bits < usize::exact_from(T::WIDTH));
+            let mut u = !U::low_mask(u64::exact_from(significant_bits));
+            let mut mask = U::ONE;
+            for &bit in &bits[..significant_bits] {
+                if bit {
+                    u |= mask;
+                }
+                mask <<= 1;
+            }
+            T::wrapping_from(u)
+        }
+    }
+}
+
+pub fn _from_bits_desc_signed<T: PrimitiveInteger, U: PrimitiveInteger>(bits: &[bool]) -> T
+where
+    T: ExactFrom<U> + WrappingFrom<U>,
+{
+    match bits {
+        &[] => T::ZERO,
+        &[false, ..] => T::exact_from(_from_bits_desc_unsigned::<U>(bits)),
+        bits => {
+            let leading_trues = bits.iter().take_while(|&&bit| bit).count();
+            let significant_bits = u64::exact_from(bits.len() - leading_trues);
+            assert!(significant_bits < T::WIDTH);
+            let mut mask = U::power_of_two(significant_bits);
+            let mut u = !(mask - U::ONE);
+            for &bit in &bits[leading_trues..] {
+                mask >>= 1;
+                if bit {
+                    u |= mask;
+                }
+            }
+            T::wrapping_from(u)
+        }
+    }
+}
 
 macro_rules! impl_bit_convertible_signed {
     ($t:ident, $u:ident) => {
@@ -176,25 +303,9 @@ macro_rules! impl_bit_convertible_signed {
             ///     &[true, false, true, false, false, false, false, true]
             /// );
             /// ```
+            #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
-                let mut bits = Vec::new();
-                let mut x = *self;
-                if *self >= 0 {
-                    while x != 0 {
-                        bits.push(x.get_bit(0));
-                        x >>= 1;
-                    }
-                    if !bits.is_empty() {
-                        bits.push(false);
-                    }
-                } else {
-                    while x != -1 {
-                        bits.push(x.get_bit(0));
-                        x >>= 1;
-                    }
-                    bits.push(true);
-                }
-                bits
+                _to_bits_asc_signed(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in ascending order: most- to least-
@@ -218,40 +329,9 @@ macro_rules! impl_bit_convertible_signed {
             ///     &[true, false, false, false, false, true, false, true]
             /// );
             /// ```
+            #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
-                let mut bits = Vec::new();
-                if *self >= 0 {
-                    if *self == 0 {
-                        return bits;
-                    }
-                    bits.push(false);
-                    bits.push(true);
-                    if *self == 1 {
-                        return bits;
-                    }
-                    let mut mask =
-                        $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(*self) - 2);
-                    while mask != 0 {
-                        bits.push(*self & mask != 0);
-                        mask >>= 1;
-                    }
-                } else {
-                    bits.push(true);
-                    if *self == -1 {
-                        return bits;
-                    }
-                    bits.push(false);
-                    if *self == -2 {
-                        return bits;
-                    }
-                    let mut mask =
-                        $t::power_of_two($t::WIDTH - LeadingZeros::leading_zeros(!*self) - 2);
-                    while mask != 0 {
-                        bits.push(*self & mask != 0);
-                        mask >>= 1;
-                    }
-                }
-                bits
+                _to_bits_desc_signed(self)
             }
 
             /// Converts a slice of bits into a value. The input bits are in ascending order: least-
@@ -278,25 +358,9 @@ macro_rules! impl_bit_convertible_signed {
             ///     -123
             /// );
             /// ```
+            #[inline]
             fn from_bits_asc(bits: &[bool]) -> $t {
-                if bits.is_empty() {
-                    0
-                } else if !*bits.last().unwrap() {
-                    $t::exact_from($u::from_bits_asc(bits))
-                } else {
-                    let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
-                    let significant_bits = bits.len() - trailing_trues;
-                    assert!(significant_bits < usize::exact_from($t::WIDTH));
-                    let mut u = !$u::low_mask(u64::exact_from(significant_bits));
-                    let mut mask = 1;
-                    for &bit in &bits[..significant_bits] {
-                        if bit {
-                            u |= mask;
-                        }
-                        mask <<= 1;
-                    }
-                    $t::wrapping_from(u)
-                }
+                _from_bits_asc_signed::<$t, $u>(bits)
             }
 
             /// Converts a slice of bits into a value. The input bits are in ascending order: least-
@@ -323,25 +387,9 @@ macro_rules! impl_bit_convertible_signed {
             ///     -123
             /// );
             /// ```
+            #[inline]
             fn from_bits_desc(bits: &[bool]) -> $t {
-                if bits.is_empty() {
-                    0
-                } else if !bits[0] {
-                    $t::exact_from($u::from_bits_desc(bits))
-                } else {
-                    let leading_trues = bits.iter().take_while(|&&bit| bit).count();
-                    let significant_bits = u64::exact_from(bits.len() - leading_trues);
-                    assert!(significant_bits < $t::WIDTH);
-                    let mut mask = $u::power_of_two(significant_bits);
-                    let mut u = !(mask - 1);
-                    for &bit in &bits[leading_trues..] {
-                        mask >>= 1;
-                        if bit {
-                            u |= mask;
-                        }
-                    }
-                    $t::wrapping_from(u)
-                }
+                _from_bits_desc_signed::<$t, $u>(bits)
             }
         }
     };

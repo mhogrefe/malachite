@@ -10,7 +10,6 @@ macro_rules! impl_leading_zeros {
         }
     };
 }
-
 impl_leading_zeros!(u8);
 impl_leading_zeros!(u16);
 impl_leading_zeros!(u32);

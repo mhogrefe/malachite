@@ -73,6 +73,7 @@ pub mod num {
         pub mod mod_power_of_two_sub;
         pub mod mod_sub;
         pub mod neg;
+        pub mod next_power_of_two;
         pub mod overflowing_abs;
         pub mod overflowing_add;
         pub mod overflowing_add_mul;
@@ -117,8 +118,14 @@ pub mod num {
         pub mod crement;
         pub mod iverson;
     }
-    pub mod comparison;
-    pub mod conversion;
+    pub mod comparison {
+        pub mod ord_abs;
+    }
+    pub mod conversion {
+        pub mod from;
+        pub mod half;
+        pub mod slice;
+    }
     pub mod logic {
         pub mod bit_access;
         pub mod bit_block_access;

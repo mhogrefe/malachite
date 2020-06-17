@@ -9,6 +9,7 @@ pub mod arithmetic {
     pub mod checked_div;
     pub mod checked_mul;
     pub mod checked_neg;
+    pub mod checked_next_power_of_two;
     pub mod checked_sub;
     pub mod checked_sub_mul;
     pub mod div_exact;
@@ -19,6 +20,7 @@ pub mod arithmetic {
     pub mod eq_mod;
     pub mod eq_mod_power_of_two;
     pub mod integers;
+    pub mod is_power_of_two;
     pub mod mod_add;
     pub mod mod_is_reduced;
     pub mod mod_mul;
@@ -34,6 +36,7 @@ pub mod arithmetic {
     pub mod mod_power_of_two_sub;
     pub mod mod_sub;
     pub mod neg;
+    pub mod next_power_of_two;
     pub mod overflowing_abs;
     pub mod overflowing_add;
     pub mod overflowing_add_mul;
@@ -82,15 +85,14 @@ pub mod basic {
     pub mod unsigneds;
 }
 pub mod comparison {
-    pub mod integers;
-    pub mod signeds;
+    pub mod ord_abs;
     pub mod traits;
-    pub mod unsigneds;
 }
 pub mod conversion {
-    pub mod integers;
+    pub mod from;
+    pub mod half;
+    pub mod slice;
     pub mod traits;
-    pub mod unsigneds;
 }
 pub mod floats;
 pub mod logic {

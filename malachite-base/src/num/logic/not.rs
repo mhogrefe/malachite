@@ -24,7 +24,6 @@ macro_rules! impl_not {
         }
     };
 }
-
 impl_not!(u8);
 impl_not!(u16);
 impl_not!(u32);

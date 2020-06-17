@@ -1,6 +1,16 @@
-use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::NegativeOne;
 use num::logic::traits::LowMask;
+
+#[inline]
+pub fn _low_mask_unsigned<T: PrimitiveInteger>(bits: u64) -> T {
+    assert!(bits <= T::WIDTH);
+    if bits == T::WIDTH {
+        T::MAX
+    } else {
+        T::power_of_two(bits) - T::ONE
+    }
+}
 
 macro_rules! impl_low_mask_unsigned {
     ($t:ident) => {
@@ -26,23 +36,28 @@ macro_rules! impl_low_mask_unsigned {
             /// ```
             #[inline]
             fn low_mask(bits: u64) -> $t {
-                assert!(bits <= $t::WIDTH);
-                if bits == $t::WIDTH {
-                    $t::MAX
-                } else {
-                    $t::power_of_two(bits) - 1
-                }
+                _low_mask_unsigned(bits)
             }
         }
     };
 }
-
 impl_low_mask_unsigned!(u8);
 impl_low_mask_unsigned!(u16);
 impl_low_mask_unsigned!(u32);
 impl_low_mask_unsigned!(u64);
 impl_low_mask_unsigned!(u128);
 impl_low_mask_unsigned!(usize);
+
+pub fn _low_mask_signed<T: NegativeOne + PrimitiveInteger>(bits: u64) -> T {
+    assert!(bits <= T::WIDTH);
+    if bits == T::WIDTH {
+        T::NEGATIVE_ONE
+    } else if bits == T::WIDTH - 1 {
+        T::MAX
+    } else {
+        T::power_of_two(bits) - T::ONE
+    }
+}
 
 macro_rules! impl_low_mask_signed {
     ($t:ident) => {
@@ -68,19 +83,11 @@ macro_rules! impl_low_mask_signed {
             /// ```
             #[inline]
             fn low_mask(bits: u64) -> $t {
-                assert!(bits <= $t::WIDTH);
-                if bits == $t::WIDTH {
-                    -1
-                } else if bits == $t::WIDTH - 1 {
-                    $t::MAX
-                } else {
-                    $t::power_of_two(bits) - 1
-                }
+                _low_mask_signed(bits)
             }
         }
     };
 }
-
 impl_low_mask_signed!(i8);
 impl_low_mask_signed!(i16);
 impl_low_mask_signed!(i32);

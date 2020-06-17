@@ -1,7 +1,7 @@
 use num::arithmetic::traits::XMulYIsZZ;
-use num::arithmetic::unsigneds::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};
 
 fn _implicit_x_mul_y_is_zz<T, DT: PrimitiveUnsigned + SplitInHalf>(x: T, y: T) -> (T, T)

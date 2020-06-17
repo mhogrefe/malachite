@@ -1,5 +1,26 @@
 use num::basic::integers::PrimitiveInteger;
-use num::logic::traits::{BitScan, LowMask, TrailingZeros};
+use num::logic::traits::{BitScan, TrailingZeros};
+
+pub fn _index_of_next_false_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+    Some(if start >= T::WIDTH {
+        start
+    } else {
+        TrailingZeros::trailing_zeros(!(x | T::low_mask(start)))
+    })
+}
+
+pub fn _index_of_next_true_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+    if start >= T::WIDTH {
+        None
+    } else {
+        let index = TrailingZeros::trailing_zeros(x & !T::low_mask(start));
+        if index == T::WIDTH {
+            None
+        } else {
+            Some(index)
+        }
+    }
+}
 
 macro_rules! impl_bit_scan_unsigned {
     ($t:ident) => {
@@ -29,11 +50,7 @@ macro_rules! impl_bit_scan_unsigned {
             /// ```
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-                Some(if start >= Self::WIDTH {
-                    start
-                } else {
-                    TrailingZeros::trailing_zeros(!(self | $t::low_mask(start)))
-                })
+                _index_of_next_false_bit_unsigned(self, start)
             }
 
             /// Finds the smallest index of a `true` bit that is greater than or equal to
@@ -62,27 +79,53 @@ macro_rules! impl_bit_scan_unsigned {
             /// ```
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-                if start >= Self::WIDTH {
-                    None
-                } else {
-                    let index = TrailingZeros::trailing_zeros(self & !$t::low_mask(start));
-                    if index == Self::WIDTH {
-                        None
-                    } else {
-                        Some(index)
-                    }
-                }
+                _index_of_next_true_bit_unsigned(self, start)
             }
         }
     };
 }
-
 impl_bit_scan_unsigned!(u8);
 impl_bit_scan_unsigned!(u16);
 impl_bit_scan_unsigned!(u32);
 impl_bit_scan_unsigned!(u64);
 impl_bit_scan_unsigned!(u128);
 impl_bit_scan_unsigned!(usize);
+
+#[inline]
+pub fn _index_of_next_false_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+    if start >= T::WIDTH - 1 {
+        if x >= T::ZERO {
+            Some(start)
+        } else {
+            None
+        }
+    } else {
+        let index = TrailingZeros::trailing_zeros(!(x | T::low_mask(start)));
+        if index == T::WIDTH {
+            None
+        } else {
+            Some(index)
+        }
+    }
+}
+
+#[inline]
+pub fn _index_of_next_true_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+    if start >= T::WIDTH - 1 {
+        if x >= T::ZERO {
+            None
+        } else {
+            Some(start)
+        }
+    } else {
+        let index = TrailingZeros::trailing_zeros(x & !T::low_mask(start));
+        if index == T::WIDTH {
+            None
+        } else {
+            Some(index)
+        }
+    }
+}
 
 macro_rules! impl_bit_scan_signed {
     ($t:ident) => {
@@ -113,20 +156,7 @@ macro_rules! impl_bit_scan_signed {
             /// ```
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-                if start >= Self::WIDTH - 1 {
-                    if self >= 0 {
-                        Some(start)
-                    } else {
-                        None
-                    }
-                } else {
-                    let index = u64::from((!(self | $t::low_mask(start))).trailing_zeros());
-                    if index == $t::WIDTH {
-                        None
-                    } else {
-                        Some(index)
-                    }
-                }
+                _index_of_next_false_bit_signed(self, start)
             }
 
             /// Finds the smallest index of a `true` bit that is greater than or equal to
@@ -156,25 +186,11 @@ macro_rules! impl_bit_scan_signed {
             /// ```
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-                if start >= Self::WIDTH - 1 {
-                    if self >= 0 {
-                        None
-                    } else {
-                        Some(start)
-                    }
-                } else {
-                    let index = TrailingZeros::trailing_zeros(self & !$t::low_mask(start));
-                    if index == $t::WIDTH {
-                        None
-                    } else {
-                        Some(index)
-                    }
-                }
+                _index_of_next_true_bit_signed(self, start)
             }
         }
     };
 }
-
 impl_bit_scan_signed!(i8);
 impl_bit_scan_signed!(i16);
 impl_bit_scan_signed!(i32);
