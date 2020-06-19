@@ -11,7 +11,7 @@ macro_rules! impl_wrapping_sub {
             }
         }
 
-        impl WrappingSubAssign for $t {
+        impl WrappingSubAssign<$t> for $t {
             /// Replaces `self` with `self - other`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)

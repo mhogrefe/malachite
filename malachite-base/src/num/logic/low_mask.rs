@@ -41,12 +41,7 @@ macro_rules! impl_low_mask_unsigned {
         }
     };
 }
-impl_low_mask_unsigned!(u8);
-impl_low_mask_unsigned!(u16);
-impl_low_mask_unsigned!(u32);
-impl_low_mask_unsigned!(u64);
-impl_low_mask_unsigned!(u128);
-impl_low_mask_unsigned!(usize);
+apply_to_unsigneds!(impl_low_mask_unsigned);
 
 pub fn _low_mask_signed<T: NegativeOne + PrimitiveInteger>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);
@@ -88,9 +83,4 @@ macro_rules! impl_low_mask_signed {
         }
     };
 }
-impl_low_mask_signed!(i8);
-impl_low_mask_signed!(i16);
-impl_low_mask_signed!(i32);
-impl_low_mask_signed!(i64);
-impl_low_mask_signed!(i128);
-impl_low_mask_signed!(isize);
+apply_to_signeds!(impl_low_mask_signed);

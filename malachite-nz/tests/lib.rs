@@ -200,5 +200,25 @@ pub mod natural {
         pub mod assign_bits;
         pub mod bits;
         pub mod clear_bit;
+        pub mod count_ones;
+        pub mod flip_bit;
+        pub mod from_bits;
+        pub mod from_power_of_two_digits;
+        pub mod get_bit;
+        pub mod get_bits;
+        pub mod hamming_distance;
+        pub mod index_of_next_false_bit;
+        pub mod index_of_next_true_bit;
+        pub mod limb_count;
+        pub mod low_mask;
+        pub mod not;
+        pub mod or;
+        pub mod power_of_two_digits;
+        pub mod set_bit;
+        pub mod significant_bits;
+        pub mod to_bits;
+        pub mod to_power_of_two_digits;
+        pub mod trailing_zeros;
+        pub mod xor;
     }
 }

@@ -1029,6 +1029,18 @@ pub trait CheckedNextPowerOfTwo {
     fn checked_next_power_of_two(self) -> Option<Self::Output>;
 }
 
+/// Raises `self` to the power of `exp`.
+pub trait Pow<RHS> {
+    type Output;
+
+    fn pow(self, exp: RHS) -> Self::Output;
+}
+
+/// Replaces `self` with `self.pow(exp)`.
+pub trait PowAssign<RHS = Self> {
+    fn pow_assign(&mut self, exp: RHS);
+}
+
 /// Raises `self` to the power of `exp`, returning `None` if there is no valid result.
 pub trait CheckedPow<RHS> {
     type Output;
@@ -1043,12 +1055,24 @@ pub trait SaturatingPow<RHS> {
     fn saturating_pow(self, exp: RHS) -> Self::Output;
 }
 
+/// Saturating exponentiation. Replaces `self` with `self.pow(exp)`, saturating at the numeric
+/// bounds instead of overflowing.
+pub trait SaturatingPowAssign<RHS = Self> {
+    fn saturating_pow_assign(&mut self, exp: RHS);
+}
+
 /// Wrapping (modular) exponentiation. Raises `self` to the power of `exp`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingPow<RHS> {
     type Output;
 
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) exponentiation. Replaces `self` with `self.pow(exp)`, wrapping around at the
+/// boundary of the type.
+pub trait WrappingPowAssign<RHS = Self> {
+    fn wrapping_pow_assign(&mut self, exp: RHS);
 }
 
 /// Calculates `self.pow(exp)`.
@@ -1061,11 +1085,12 @@ pub trait OverflowingPow<RHS> {
     fn overflowing_pow(self, exp: RHS) -> (Self::Output, bool);
 }
 
-/// Raises `self` to the power of `exp`.
-pub trait Pow<RHS> {
-    type Output;
-
-    fn pow(self, exp: RHS) -> Self::Output;
+/// Replaces `self` with `self.pow(exp)`.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingPowAssign<RHS = Self> {
+    fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
 }
 
 pub trait CheckedLogTwo {

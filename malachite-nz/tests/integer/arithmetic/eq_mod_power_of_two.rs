@@ -87,12 +87,7 @@ fn test_limbs_eq_mod_power_of_two_neg_pos() {
         64,
         true,
     );
-    test(
-        &[0xabcd_abcd, 0x1234_1234],
-        &[0x0000_0000, 0xedcb_edcb],
-        64,
-        false,
-    );
+    test(&[0xabcd_abcd, 0x1234_1234], &[0, 0xedcb_edcb], 64, false);
     test(
         &[0xabcd_abcd, 0x1234_1234],
         &[0x5432_5433, 0xedcb_edcb],
@@ -113,12 +108,7 @@ fn test_limbs_eq_mod_power_of_two_neg_pos() {
         64,
         true,
     );
-    test(
-        &[0x0000_0000, 0xedcb_edcb],
-        &[0xabcd_abcd, 0x1234_1234],
-        64,
-        false,
-    );
+    test(&[0, 0xedcb_edcb], &[0xabcd_abcd, 0x1234_1234], 64, false);
     test(
         &[0x5432_5433, 0xedcb_edcb],
         &[0xabcd_abcd, 0x1234_1234],

@@ -327,9 +327,4 @@ macro_rules! impl_bit_access_signed {
         }
     };
 }
-impl_bit_access_signed!(i8);
-impl_bit_access_signed!(i16);
-impl_bit_access_signed!(i32);
-impl_bit_access_signed!(i64);
-impl_bit_access_signed!(i128);
-impl_bit_access_signed!(isize);
+apply_to_signeds!(impl_bit_access_signed);

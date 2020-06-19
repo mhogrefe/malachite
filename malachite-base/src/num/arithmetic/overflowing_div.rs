@@ -11,7 +11,7 @@ macro_rules! impl_overflowing_div {
             }
         }
 
-        impl OverflowingDivAssign for $t {
+        impl OverflowingDivAssign<$t> for $t {
             /// Replaces `self` with `self / other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an

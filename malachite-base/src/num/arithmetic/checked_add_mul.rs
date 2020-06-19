@@ -1,5 +1,14 @@
-use num::arithmetic::traits::{CheckedAddMul, UnsignedAbs};
+use num::arithmetic::traits::{CheckedAdd, CheckedAddMul, CheckedMul, UnsignedAbs, WrappingSub};
+use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
+
+#[inline]
+pub fn _checked_add_mul_unsigned<T>(x: T, y: T, z: T) -> Option<T>
+where
+    T: CheckedAdd<T, Output = T> + CheckedMul<T, Output = T>,
+{
+    y.checked_mul(z).and_then(|yz| x.checked_add(yz))
+}
 
 macro_rules! impl_checked_add_mul_unsigned {
     ($t:ident) => {
@@ -21,18 +30,42 @@ macro_rules! impl_checked_add_mul_unsigned {
             /// ```
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
-                y.checked_mul(z).and_then(|yz| self.checked_add(yz))
+                _checked_add_mul_unsigned(self, y, z)
             }
         }
     };
 }
+apply_to_unsigneds!(impl_checked_add_mul_unsigned);
 
-impl_checked_add_mul_unsigned!(u8);
-impl_checked_add_mul_unsigned!(u16);
-impl_checked_add_mul_unsigned!(u32);
-impl_checked_add_mul_unsigned!(u64);
-impl_checked_add_mul_unsigned!(u128);
-impl_checked_add_mul_unsigned!(usize);
+pub fn _checked_add_mul_signed<U: Copy + Ord, T: Copy + Ord + Zero>(x: T, y: T, z: T) -> Option<T>
+where
+    T: CheckedAdd<T, Output = T>
+        + CheckedMul<T, Output = T>
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>,
+    U: CheckedMul<U, Output = U> + WrappingSub<U, Output = U>,
+{
+    if y == T::ZERO || z == T::ZERO {
+        return Some(x);
+    }
+    let x_sign = x >= T::ZERO;
+    if x_sign == ((y >= T::ZERO) == (z >= T::ZERO)) {
+        x.checked_add(y.checked_mul(z)?)
+    } else {
+        let x = x.unsigned_abs();
+        let product = y.unsigned_abs().checked_mul(z.unsigned_abs())?;
+        let result = T::wrapping_from(if x_sign {
+            x.wrapping_sub(product)
+        } else {
+            product.wrapping_sub(x)
+        });
+        if x >= product || (x_sign == (result < T::ZERO)) {
+            Some(result)
+        } else {
+            None
+        }
+    }
+}
 
 macro_rules! impl_checked_add_mul_signed {
     ($t:ident) => {
@@ -54,34 +87,9 @@ macro_rules! impl_checked_add_mul_signed {
             /// ```
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
-                if y == 0 || z == 0 {
-                    return Some(self);
-                }
-                let x_sign = self >= 0;
-                if x_sign == ((y >= 0) == (z >= 0)) {
-                    self.checked_add(y.checked_mul(z)?)
-                } else {
-                    let x = self.unsigned_abs();
-                    let product = y.unsigned_abs().checked_mul(z.unsigned_abs())?;
-                    let result = $t::wrapping_from(if x_sign {
-                        x.wrapping_sub(product)
-                    } else {
-                        product.wrapping_sub(x)
-                    });
-                    if x >= product || (x_sign == (result < 0)) {
-                        Some(result)
-                    } else {
-                        None
-                    }
-                }
+                _checked_add_mul_signed(self, y, z)
             }
         }
     };
 }
-
-impl_checked_add_mul_signed!(i8);
-impl_checked_add_mul_signed!(i16);
-impl_checked_add_mul_signed!(i32);
-impl_checked_add_mul_signed!(i64);
-impl_checked_add_mul_signed!(i128);
-impl_checked_add_mul_signed!(isize);
+apply_to_signeds!(impl_checked_add_mul_signed);

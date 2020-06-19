@@ -1,58 +1,13 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{positive_unsigneds, vecs_of_unsigned_var_3};
 use malachite_test::inputs::natural::naturals;
-use malachite_test::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_trailing_zeros() {
-    let test = |limbs, out| {
-        assert_eq!(limbs_trailing_zeros(limbs), out);
-    };
-    test(&[4], 2);
-    test(&[0, 4], 34);
-    test(&[1, 2, 3], 0);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limbs_trailing_zeros_fail_1() {
-    limbs_trailing_zeros(&[]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limbs_trailing_zeros_fail_2() {
-    limbs_trailing_zeros(&[0, 0, 0]);
-}
-
-#[test]
-fn test_trailing_zeros() {
-    let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().trailing_zeros(), out);
-        assert_eq!(
-            natural_trailing_zeros_alt(&Natural::from_str(n).unwrap()),
-            out
-        );
-    };
-    test("0", None);
-    test("123", Some(0));
-    test("1000000000000", Some(12));
-    test("4294967295", Some(0));
-    test("4294967296", Some(32));
-    test("18446744073709551615", Some(0));
-    test("18446744073709551616", Some(64));
-}
 
 #[test]
 fn limbs_trailing_zeros_properties() {

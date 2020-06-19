@@ -10,15 +10,4 @@ macro_rules! impl_leading_zeros {
         }
     };
 }
-impl_leading_zeros!(u8);
-impl_leading_zeros!(u16);
-impl_leading_zeros!(u32);
-impl_leading_zeros!(u64);
-impl_leading_zeros!(u128);
-impl_leading_zeros!(usize);
-impl_leading_zeros!(i8);
-impl_leading_zeros!(i16);
-impl_leading_zeros!(i32);
-impl_leading_zeros!(i64);
-impl_leading_zeros!(i128);
-impl_leading_zeros!(isize);
+apply_to_primitive_ints!(impl_leading_zeros);

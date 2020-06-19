@@ -11,7 +11,7 @@ macro_rules! impl_wrapping_mul {
             }
         }
 
-        impl WrappingMulAssign for $t {
+        impl WrappingMulAssign<$t> for $t {
             /// Replaces `self` with `self * other`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)

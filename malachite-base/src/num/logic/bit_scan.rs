@@ -84,12 +84,7 @@ macro_rules! impl_bit_scan_unsigned {
         }
     };
 }
-impl_bit_scan_unsigned!(u8);
-impl_bit_scan_unsigned!(u16);
-impl_bit_scan_unsigned!(u32);
-impl_bit_scan_unsigned!(u64);
-impl_bit_scan_unsigned!(u128);
-impl_bit_scan_unsigned!(usize);
+apply_to_unsigneds!(impl_bit_scan_unsigned);
 
 #[inline]
 pub fn _index_of_next_false_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
@@ -191,9 +186,4 @@ macro_rules! impl_bit_scan_signed {
         }
     };
 }
-impl_bit_scan_signed!(i8);
-impl_bit_scan_signed!(i16);
-impl_bit_scan_signed!(i32);
-impl_bit_scan_signed!(i64);
-impl_bit_scan_signed!(i128);
-impl_bit_scan_signed!(isize);
+apply_to_signeds!(impl_bit_scan_signed);

@@ -1,7 +1,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
-use num::{BigUint, One, Zero};
+use malachite_nz_test_util::natural::logic::get_bit::num_get_bit;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
@@ -18,10 +18,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_get_bit_library_comparison
     );
-}
-
-pub fn num_get_bit(x: &BigUint, index: u64) -> bool {
-    x & (BigUint::one() << usize::exact_from(index)) != BigUint::zero()
 }
 
 fn demo_limbs_get_bit(gm: GenerationMode, limit: usize) {

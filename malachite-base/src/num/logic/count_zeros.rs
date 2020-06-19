@@ -10,15 +10,4 @@ macro_rules! impl_count_zeros {
         }
     };
 }
-impl_count_zeros!(u8);
-impl_count_zeros!(u16);
-impl_count_zeros!(u32);
-impl_count_zeros!(u64);
-impl_count_zeros!(u128);
-impl_count_zeros!(usize);
-impl_count_zeros!(i8);
-impl_count_zeros!(i16);
-impl_count_zeros!(i32);
-impl_count_zeros!(i64);
-impl_count_zeros!(i128);
-impl_count_zeros!(isize);
+apply_to_primitive_ints!(impl_count_zeros);

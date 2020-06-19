@@ -46,15 +46,4 @@ macro_rules! impl_rotate {
         }
     };
 }
-impl_rotate!(u8);
-impl_rotate!(u16);
-impl_rotate!(u32);
-impl_rotate!(u64);
-impl_rotate!(u128);
-impl_rotate!(usize);
-impl_rotate!(i8);
-impl_rotate!(i16);
-impl_rotate!(i32);
-impl_rotate!(i64);
-impl_rotate!(i128);
-impl_rotate!(isize);
+apply_to_primitive_ints!(impl_rotate);

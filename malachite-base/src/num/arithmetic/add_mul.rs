@@ -50,16 +50,4 @@ macro_rules! impl_add_mul {
         }
     };
 }
-
-impl_add_mul!(u8);
-impl_add_mul!(u16);
-impl_add_mul!(u32);
-impl_add_mul!(u64);
-impl_add_mul!(u128);
-impl_add_mul!(usize);
-impl_add_mul!(i8);
-impl_add_mul!(i16);
-impl_add_mul!(i32);
-impl_add_mul!(i64);
-impl_add_mul!(i128);
-impl_add_mul!(isize);
+apply_to_primitive_ints!(impl_add_mul);

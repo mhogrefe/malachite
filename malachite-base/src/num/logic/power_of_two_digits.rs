@@ -105,7 +105,7 @@ where
 
 macro_rules! impl_power_of_two_digits {
     ($t:ident) => {
-        macro_rules! impl_logic_traits_inner {
+        macro_rules! impl_power_of_two_digits_inner {
             ($u:ident) => {
                 impl PowerOfTwoDigits<$u> for $t {
                     /// Returns a `Vec` containing the digits of `self` in ascending order: least-
@@ -257,17 +257,7 @@ macro_rules! impl_power_of_two_digits {
                 }
             };
         }
-        impl_logic_traits_inner!(u8);
-        impl_logic_traits_inner!(u16);
-        impl_logic_traits_inner!(u32);
-        impl_logic_traits_inner!(u64);
-        impl_logic_traits_inner!(u128);
-        impl_logic_traits_inner!(usize);
+        apply_to_unsigneds!(impl_power_of_two_digits_inner);
     };
 }
-impl_power_of_two_digits!(u8);
-impl_power_of_two_digits!(u16);
-impl_power_of_two_digits!(u32);
-impl_power_of_two_digits!(u64);
-impl_power_of_two_digits!(u128);
-impl_power_of_two_digits!(usize);
+apply_to_unsigneds!(impl_power_of_two_digits);

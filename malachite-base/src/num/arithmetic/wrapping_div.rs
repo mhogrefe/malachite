@@ -11,7 +11,7 @@ macro_rules! impl_wrapping_div {
             }
         }
 
-        impl WrappingDivAssign for $t {
+        impl WrappingDivAssign<$t> for $t {
             /// Replaces `self` with `self / other`, wrapping around at the boundary of the type.
             /// Wrapping only occurs when `$t` is signed, `self` is `$t::MIN`, and `other` is -1.
             /// The "actual" result, -`$t::MIN`, can't be represented and is wrapped back to

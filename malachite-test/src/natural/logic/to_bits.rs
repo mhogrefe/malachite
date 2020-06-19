@@ -1,7 +1,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, SignificantBits};
+use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
-use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::natural::naturals;
@@ -21,22 +21,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         benchmark_natural_to_bits_desc_evaluation_strategy
     );
     register_bench!(registry, Large, benchmark_natural_to_bits_desc_algorithms);
-}
-
-pub fn to_bits_asc_naive(n: &Natural) -> Vec<bool> {
-    let mut bits = Vec::new();
-    for i in 0..n.significant_bits() {
-        bits.push(n.get_bit(i));
-    }
-    bits
-}
-
-pub fn to_bits_desc_naive(n: &Natural) -> Vec<bool> {
-    let mut bits = Vec::new();
-    for i in (0..n.significant_bits()).rev() {
-        bits.push(n.get_bit(i));
-    }
-    bits
 }
 
 fn demo_natural_to_bits_asc(gm: GenerationMode, limit: usize) {

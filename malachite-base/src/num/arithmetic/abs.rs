@@ -1,19 +1,27 @@
-use num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
-use num::basic::signeds::PrimitiveSigned;
+use num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs, WrappingAbs};
 use num::conversion::traits::WrappingFrom;
 
+#[inline]
+pub fn _unsigned_abs<U, S>(x: S) -> U
+where
+    S: WrappingAbs<Output = S>,
+    U: WrappingFrom<S>,
+{
+    U::wrapping_from(x.wrapping_abs())
+}
+
 macro_rules! impl_abs {
-    ($t:ident) => {
-        impl Abs for $t {
-            type Output = $t;
+    ($u:ident, $s:ident) => {
+        impl Abs for $s {
+            type Output = $s;
 
             #[inline]
-            fn abs(self) -> $t {
-                $t::abs(self)
+            fn abs(self) -> $s {
+                $s::abs(self)
             }
         }
 
-        impl AbsAssign for $t {
+        impl AbsAssign for $s {
             /// Replace `self` with its absolute value.
             ///
             /// Time: worst case O(1)
@@ -42,8 +50,8 @@ macro_rules! impl_abs {
             }
         }
 
-        impl UnsignedAbs for $t {
-            type Output = <$t as PrimitiveSigned>::UnsignedOfEqualWidth;
+        impl UnsignedAbs for $s {
+            type Output = $u;
 
             /// Computes the absolute value of `self` and converts it to the unsigned type of the
             /// same width. Unlike regular `abs`, this function lets you take the absolute value of
@@ -63,16 +71,10 @@ macro_rules! impl_abs {
             /// assert_eq!((-128i8).unsigned_abs(), 128u8);
             /// ```
             #[inline]
-            fn unsigned_abs(self) -> <$t as PrimitiveSigned>::UnsignedOfEqualWidth {
-                <$t as PrimitiveSigned>::UnsignedOfEqualWidth::wrapping_from($t::wrapping_abs(self))
+            fn unsigned_abs(self) -> $u {
+                _unsigned_abs::<$u, $s>(self)
             }
         }
     };
 }
-
-impl_abs!(i8);
-impl_abs!(i16);
-impl_abs!(i32);
-impl_abs!(i64);
-impl_abs!(i128);
-impl_abs!(isize);
+apply_to_unsigned_signed_pair!(impl_abs);

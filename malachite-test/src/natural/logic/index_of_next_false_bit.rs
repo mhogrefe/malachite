@@ -1,28 +1,12 @@
-use std::iter::repeat;
-
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, BitScan, SignificantBits};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{BitScan, SignificantBits};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::logic::index_of_next_false_bit::*;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use inputs::natural::pairs_of_natural_and_small_unsigned;
-
-pub fn natural_index_of_next_false_bit_alt(n: &Natural, u: u64) -> Option<u64> {
-    for (i, bit) in n
-        .bits()
-        .chain(repeat(false))
-        .enumerate()
-        .skip(usize::exact_from(u))
-    {
-        if !bit {
-            return Some(u64::wrapping_from(i));
-        }
-    }
-    unreachable!();
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_index_of_next_false_bit);

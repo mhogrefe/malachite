@@ -5,7 +5,7 @@ use num::conversion::traits::WrappingFrom;
 
 macro_rules! impl_saturating_sub_mul_unsigned {
     ($t:ident) => {
-        impl SaturatingSubMul for $t {
+        impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
@@ -27,7 +27,7 @@ macro_rules! impl_saturating_sub_mul_unsigned {
             }
         }
 
-        impl SaturatingSubMulAssign for $t {
+        impl SaturatingSubMulAssign<$t> for $t {
             /// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
@@ -64,7 +64,7 @@ impl_saturating_sub_mul_unsigned!(usize);
 
 macro_rules! impl_saturating_sub_mul_signed {
     ($t:ident) => {
-        impl SaturatingSubMul for $t {
+        impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
@@ -112,7 +112,7 @@ macro_rules! impl_saturating_sub_mul_signed {
             }
         }
 
-        impl SaturatingSubMulAssign for $t {
+        impl SaturatingSubMulAssign<$t> for $t {
             /// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of
             /// overflowing.
             ///

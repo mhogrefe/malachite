@@ -312,12 +312,7 @@ macro_rules! impl_slice_traits_small_to_large {
     };
 }
 
-impl_slice_traits_ident!(u8);
-impl_slice_traits_ident!(u16);
-impl_slice_traits_ident!(u32);
-impl_slice_traits_ident!(u64);
-impl_slice_traits_ident!(u128);
-impl_slice_traits_ident!(usize);
+apply_to_unsigneds!(impl_slice_traits_ident);
 
 impl_slice_traits_large_to_small!(u16, u8);
 impl_slice_traits_large_to_small!(u32, u8);

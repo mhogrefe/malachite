@@ -2,7 +2,7 @@ use num::arithmetic::traits::{WrappingAddAssign, WrappingAddMul, WrappingAddMulA
 
 macro_rules! impl_wrapping_add_mul {
     ($t:ident) => {
-        impl WrappingAddMul for $t {
+        impl WrappingAddMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self + y * z`, wrapping around at the boundary of the type.
@@ -24,7 +24,7 @@ macro_rules! impl_wrapping_add_mul {
             }
         }
 
-        impl WrappingAddMulAssign for $t {
+        impl WrappingAddMulAssign<$t> for $t {
             /// Replaces `self` with `self + y * z`, wrapping around at the boundary of the type.
             ///
             /// Time: worst case O(1)

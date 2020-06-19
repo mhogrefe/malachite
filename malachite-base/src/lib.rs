@@ -26,6 +26,50 @@
 )]
 #![allow(clippy::cognitive_complexity, clippy::many_single_char_names)]
 
+#[macro_export]
+macro_rules! apply_to_unsigneds {
+    ($m: tt) => {
+        $m!(u8);
+        $m!(u16);
+        $m!(u32);
+        $m!(u64);
+        $m!(u128);
+        $m!(usize);
+    };
+}
+
+#[macro_export]
+macro_rules! apply_to_signeds {
+    ($m: tt) => {
+        $m!(i8);
+        $m!(i16);
+        $m!(i32);
+        $m!(i64);
+        $m!(i128);
+        $m!(isize);
+    };
+}
+
+#[macro_export]
+macro_rules! apply_to_primitive_ints {
+    ($m: tt) => {
+        apply_to_unsigneds!($m);
+        apply_to_signeds!($m);
+    };
+}
+
+#[macro_export]
+macro_rules! apply_to_unsigned_signed_pair {
+    ($m: tt) => {
+        $m!(u8, i8);
+        $m!(u16, i16);
+        $m!(u32, i32);
+        $m!(u64, i64);
+        $m!(u128, i128);
+        $m!(usize, isize);
+    };
+}
+
 #[macro_use]
 pub mod named;
 #[macro_use]

@@ -12,10 +12,4 @@ macro_rules! impl_checked_abs {
         }
     };
 }
-
-impl_checked_abs!(i8);
-impl_checked_abs!(i16);
-impl_checked_abs!(i32);
-impl_checked_abs!(i64);
-impl_checked_abs!(i128);
-impl_checked_abs!(isize);
+apply_to_signeds!(impl_checked_abs);

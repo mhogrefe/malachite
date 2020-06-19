@@ -24,15 +24,4 @@ macro_rules! impl_not {
         }
     };
 }
-impl_not!(u8);
-impl_not!(u16);
-impl_not!(u32);
-impl_not!(u64);
-impl_not!(u128);
-impl_not!(usize);
-impl_not!(i8);
-impl_not!(i16);
-impl_not!(i32);
-impl_not!(i64);
-impl_not!(i128);
-impl_not!(isize);
+apply_to_primitive_ints!(impl_not);

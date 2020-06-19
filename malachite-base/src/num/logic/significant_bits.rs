@@ -2,6 +2,11 @@ use num::arithmetic::traits::UnsignedAbs;
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{LeadingZeros, SignificantBits};
 
+#[inline]
+pub fn _significant_bits_unsigned<T: PrimitiveInteger>(x: T) -> u64 {
+    T::WIDTH - LeadingZeros::leading_zeros(x)
+}
+
 macro_rules! impl_significant_bits_unsigned {
     ($t:ident) => {
         impl SignificantBits for $t {
@@ -21,21 +26,23 @@ macro_rules! impl_significant_bits_unsigned {
             /// ```
             #[inline]
             fn significant_bits(self) -> u64 {
-                Self::WIDTH - LeadingZeros::leading_zeros(self)
+                _significant_bits_unsigned(self)
             }
         }
     };
 }
+apply_to_unsigneds!(impl_significant_bits_unsigned);
 
-impl_significant_bits_unsigned!(u8);
-impl_significant_bits_unsigned!(u16);
-impl_significant_bits_unsigned!(u32);
-impl_significant_bits_unsigned!(u64);
-impl_significant_bits_unsigned!(u128);
-impl_significant_bits_unsigned!(usize);
+#[inline]
+pub fn _significant_bits_signed<U: SignificantBits, S>(x: S) -> u64
+where
+    S: UnsignedAbs<Output = U>,
+{
+    x.unsigned_abs().significant_bits()
+}
 
 macro_rules! impl_significant_bits_signed {
-    ($t:ident) => {
+    ($u:ident, $s:ident) => {
         /// Returns the number of significant bits of a primitive signed integer; this is the
         /// integer's width minus the number of leading zeros of its absolute value.
         ///
@@ -50,18 +57,12 @@ macro_rules! impl_significant_bits_signed {
         /// assert_eq!(0i8.significant_bits(), 0);
         /// assert_eq!((-100i64).significant_bits(), 7);
         /// ```
-        impl SignificantBits for $t {
+        impl SignificantBits for $s {
             #[inline]
             fn significant_bits(self) -> u64 {
-                self.unsigned_abs().significant_bits()
+                _significant_bits_signed(self)
             }
         }
     };
 }
-
-impl_significant_bits_signed!(i8);
-impl_significant_bits_signed!(i16);
-impl_significant_bits_signed!(i32);
-impl_significant_bits_signed!(i64);
-impl_significant_bits_signed!(i128);
-impl_significant_bits_signed!(isize);
+apply_to_unsigned_signed_pair!(impl_significant_bits_signed);

@@ -1,7 +1,7 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
-use num::{BigUint, One};
+use malachite_nz_test_util::natural::logic::set_bit::num_set_bit;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::{
@@ -22,10 +22,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_set_bit_library_comparison
     );
-}
-
-pub fn num_set_bit(x: &mut BigUint, index: u64) {
-    *x = x.clone() | (BigUint::one() << usize::exact_from(index));
 }
 
 fn demo_limbs_slice_set_bit(gm: GenerationMode, limit: usize) {

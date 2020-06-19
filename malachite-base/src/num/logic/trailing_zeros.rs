@@ -10,16 +10,4 @@ macro_rules! impl_trailing_zeros {
         }
     };
 }
-
-impl_trailing_zeros!(u8);
-impl_trailing_zeros!(u16);
-impl_trailing_zeros!(u32);
-impl_trailing_zeros!(u64);
-impl_trailing_zeros!(u128);
-impl_trailing_zeros!(usize);
-impl_trailing_zeros!(i8);
-impl_trailing_zeros!(i16);
-impl_trailing_zeros!(i32);
-impl_trailing_zeros!(i64);
-impl_trailing_zeros!(i128);
-impl_trailing_zeros!(isize);
+apply_to_primitive_ints!(impl_trailing_zeros);

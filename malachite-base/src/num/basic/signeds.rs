@@ -43,9 +43,9 @@ pub trait PrimitiveSigned:
 
 /// This macro defines basic trait implementations for signed types.
 macro_rules! impl_basic_traits {
-    ($t:ident, $ut: ident) => {
-        impl PrimitiveSigned for $t {
-            type UnsignedOfEqualWidth = $ut;
+    ($u:ident, $s: ident) => {
+        impl PrimitiveSigned for $s {
+            type UnsignedOfEqualWidth = $u;
         }
 
         /// The constant -1.
@@ -53,14 +53,9 @@ macro_rules! impl_basic_traits {
         /// Time: worst case O(1)
         ///
         /// Additional memory: worst case O(1)
-        impl NegativeOne for $t {
-            const NEGATIVE_ONE: $t = -1;
+        impl NegativeOne for $s {
+            const NEGATIVE_ONE: $s = -1;
         }
     };
 }
-impl_basic_traits!(i8, u8);
-impl_basic_traits!(i16, u16);
-impl_basic_traits!(i32, u32);
-impl_basic_traits!(i64, u64);
-impl_basic_traits!(i128, u128);
-impl_basic_traits!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_basic_traits);

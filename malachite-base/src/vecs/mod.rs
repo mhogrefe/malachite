@@ -48,3 +48,5 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
     xs.copy_within(delete_size..old_len, 0);
     xs.truncate(old_len - delete_size);
 }
+
+pub mod from_str;

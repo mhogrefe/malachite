@@ -11,7 +11,7 @@ macro_rules! impl_overflowing_mul {
             }
         }
 
-        impl OverflowingMulAssign for $t {
+        impl OverflowingMulAssign<$t> for $t {
             /// Replaces `self` with `self * other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an

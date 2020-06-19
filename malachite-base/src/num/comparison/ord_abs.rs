@@ -35,18 +35,7 @@ macro_rules! impl_partial_ord_abs {
         }
     };
 }
-impl_partial_ord_abs!(u8);
-impl_partial_ord_abs!(u16);
-impl_partial_ord_abs!(u32);
-impl_partial_ord_abs!(u64);
-impl_partial_ord_abs!(u128);
-impl_partial_ord_abs!(usize);
-impl_partial_ord_abs!(i8);
-impl_partial_ord_abs!(i16);
-impl_partial_ord_abs!(i32);
-impl_partial_ord_abs!(i64);
-impl_partial_ord_abs!(i128);
-impl_partial_ord_abs!(isize);
+apply_to_primitive_ints!(impl_partial_ord_abs);
 
 macro_rules! impl_ord_abs_unsigned {
     ($t:ident) => {
@@ -112,9 +101,4 @@ macro_rules! impl_ord_abs_signed {
         }
     };
 }
-impl_ord_abs_signed!(i8);
-impl_ord_abs_signed!(i16);
-impl_ord_abs_signed!(i32);
-impl_ord_abs_signed!(i64);
-impl_ord_abs_signed!(i128);
-impl_ord_abs_signed!(isize);
+apply_to_signeds!(impl_ord_abs_signed);

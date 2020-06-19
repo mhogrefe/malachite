@@ -35,12 +35,7 @@ macro_rules! impl_hamming_distance_unsigned {
         }
     };
 }
-impl_hamming_distance_unsigned!(u8);
-impl_hamming_distance_unsigned!(u16);
-impl_hamming_distance_unsigned!(u32);
-impl_hamming_distance_unsigned!(u64);
-impl_hamming_distance_unsigned!(u128);
-impl_hamming_distance_unsigned!(usize);
+apply_to_unsigneds!(impl_hamming_distance_unsigned);
 
 #[inline]
 pub fn _checked_hamming_distance_signed<T: Copy + CountOnes + Ord + Zero>(x: T, y: T) -> Option<u64>
@@ -80,9 +75,4 @@ macro_rules! impl_checked_hamming_distance_signed {
         }
     };
 }
-impl_checked_hamming_distance_signed!(i8);
-impl_checked_hamming_distance_signed!(i16);
-impl_checked_hamming_distance_signed!(i32);
-impl_checked_hamming_distance_signed!(i64);
-impl_checked_hamming_distance_signed!(i128);
-impl_checked_hamming_distance_signed!(isize);
+apply_to_signeds!(impl_checked_hamming_distance_signed);

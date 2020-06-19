@@ -324,10 +324,10 @@ impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
     }
 }
 
-pub fn _bits_signed<T, U: PrimitiveUnsigned>(x: T) -> PrimitiveSignedBitIterator<T>
+pub fn _bits_signed<U: PrimitiveUnsigned, S>(x: S) -> PrimitiveSignedBitIterator<S>
 where
-    T: PrimitiveSigned<UnsignedOfEqualWidth = U>,
-    U: WrappingFrom<T>,
+    S: PrimitiveSigned<UnsignedOfEqualWidth = U>,
+    U: WrappingFrom<S>,
 {
     let unsigned = U::wrapping_from(x);
     let significant_bits = match x.sign() {
@@ -344,9 +344,9 @@ where
 }
 
 macro_rules! impl_bit_iterable_signed {
-    ($t:ident, $u:ident) => {
-        impl BitIterable for $t {
-            type BitIterator = PrimitiveSignedBitIterator<$t>;
+    ($u:ident, $s:ident) => {
+        impl BitIterable for $s {
+            type BitIterator = PrimitiveSignedBitIterator<$s>;
 
             /// Returns a double-ended iterator over the bits of a primitive signed integer. The
             /// forward order is ascending, so that less significant bits appear first. There are no
@@ -380,15 +380,10 @@ macro_rules! impl_bit_iterable_signed {
             ///     vec![true, false, false, true, false, true, true, true]);
             /// ```
             #[inline]
-            fn bits(self) -> PrimitiveSignedBitIterator<$t> {
-                _bits_signed::<$t, $u>(self)
+            fn bits(self) -> PrimitiveSignedBitIterator<$s> {
+                _bits_signed::<$u, $s>(self)
             }
         }
     };
 }
-impl_bit_iterable_signed!(i8, u8);
-impl_bit_iterable_signed!(i16, u16);
-impl_bit_iterable_signed!(i32, u32);
-impl_bit_iterable_signed!(i64, u64);
-impl_bit_iterable_signed!(i128, u128);
-impl_bit_iterable_signed!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_bit_iterable_signed);

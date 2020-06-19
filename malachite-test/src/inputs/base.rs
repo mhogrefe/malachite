@@ -1242,6 +1242,14 @@ pub fn pairs_of_small_unsigneds<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigne
     }
 }
 
+// All pairs of small unsigned `T` and small `u64` such that the `T` raised to the `u64` doesn't
+// overflow.
+pub fn pairs_of_small_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, u64)> {
+    Box::new(pairs_of_small_unsigneds::<T, u64>(gm).filter(|&(x, y)| x.checked_pow(y).is_some()))
+}
+
 pub fn pairs_of_small_signed_and_small_unsigned<
     T: PrimitiveSigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -1276,6 +1284,17 @@ pub fn pairs_of_u64_and_small_unsigned_var_1<T: PrimitiveUnsigned, U: PrimitiveU
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
+}
+
+// All pairs of small signed `T` and small `u64` such that the `T` raised to the `u64` doesn't
+// overflow.
+pub fn pairs_of_small_signed_and_small_u64_var_2<T: PrimitiveSigned + Rand>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, u64)> {
+    Box::new(
+        pairs_of_small_signed_and_small_unsigned::<T, u64>(gm)
+            .filter(|&(x, y)| x.checked_pow(y).is_some()),
+    )
 }
 
 // All pairs of u64 and `usize`, where the `u64` is positive.

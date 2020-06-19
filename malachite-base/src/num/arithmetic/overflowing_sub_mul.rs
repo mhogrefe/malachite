@@ -5,7 +5,7 @@ use num::basic::integers::PrimitiveInteger;
 
 macro_rules! impl_overflowing_sub_mul_unsigned {
     ($t:ident) => {
-        impl OverflowingSubMul for $t {
+        impl OverflowingSubMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self - y * z`, returning a pair consisting of the wrapped value and a
@@ -30,7 +30,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
             }
         }
 
-        impl OverflowingSubMulAssign for $t {
+        impl OverflowingSubMulAssign<$t> for $t {
             /// Replaces `self` with `self - y * z`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
@@ -70,7 +70,7 @@ impl_overflowing_sub_mul_unsigned!(usize);
 
 macro_rules! impl_overflowing_sub_mul_signed {
     ($t:ident) => {
-        impl OverflowingSubMul for $t {
+        impl OverflowingSubMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self - y * z`, returning a pair consisting of the wrapped value and a
@@ -119,7 +119,7 @@ macro_rules! impl_overflowing_sub_mul_signed {
             }
         }
 
-        impl OverflowingSubMulAssign for $t {
+        impl OverflowingSubMulAssign<$t> for $t {
             /// Replaces `self` with `self - y * z`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an

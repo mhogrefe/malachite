@@ -11,7 +11,7 @@ macro_rules! impl_saturating_mul {
             }
         }
 
-        impl SaturatingMulAssign for $t {
+        impl SaturatingMulAssign<$t> for $t {
             /// Replaces `self` with `self * other`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
@@ -38,7 +38,6 @@ macro_rules! impl_saturating_mul {
         }
     };
 }
-
 impl_saturating_mul!(u8);
 impl_saturating_mul!(u16);
 impl_saturating_mul!(u32);

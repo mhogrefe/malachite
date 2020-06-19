@@ -12,16 +12,4 @@ macro_rules! impl_checked_neg {
         }
     };
 }
-
-impl_checked_neg!(u8);
-impl_checked_neg!(u16);
-impl_checked_neg!(u32);
-impl_checked_neg!(u64);
-impl_checked_neg!(u128);
-impl_checked_neg!(usize);
-impl_checked_neg!(i8);
-impl_checked_neg!(i16);
-impl_checked_neg!(i32);
-impl_checked_neg!(i64);
-impl_checked_neg!(i128);
-impl_checked_neg!(isize);
+apply_to_primitive_ints!(impl_checked_neg);

@@ -167,12 +167,7 @@ macro_rules! impl_bit_convertible_unsigned {
         }
     };
 }
-impl_bit_convertible_unsigned!(u8);
-impl_bit_convertible_unsigned!(u16);
-impl_bit_convertible_unsigned!(u32);
-impl_bit_convertible_unsigned!(u64);
-impl_bit_convertible_unsigned!(u128);
-impl_bit_convertible_unsigned!(usize);
+apply_to_unsigneds!(impl_bit_convertible_unsigned);
 
 pub fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
     x: &T,
@@ -231,17 +226,17 @@ pub fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInteger>(x: &T) -> Vec<boo
     bits
 }
 
-pub fn _from_bits_asc_signed<T: PrimitiveInteger, U: PrimitiveInteger>(bits: &[bool]) -> T
+pub fn _from_bits_asc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
 where
-    T: ExactFrom<U> + WrappingFrom<U>,
+    S: ExactFrom<U> + WrappingFrom<U>,
 {
     match bits {
-        &[] => T::ZERO,
-        &[.., false] => T::exact_from(_from_bits_asc_unsigned::<U>(bits)),
+        &[] => S::ZERO,
+        &[.., false] => S::exact_from(_from_bits_asc_unsigned::<U>(bits)),
         bits => {
             let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
             let significant_bits = bits.len() - trailing_trues;
-            assert!(significant_bits < usize::exact_from(T::WIDTH));
+            assert!(significant_bits < usize::exact_from(S::WIDTH));
             let mut u = !U::low_mask(u64::exact_from(significant_bits));
             let mut mask = U::ONE;
             for &bit in &bits[..significant_bits] {
@@ -250,22 +245,22 @@ where
                 }
                 mask <<= 1;
             }
-            T::wrapping_from(u)
+            S::wrapping_from(u)
         }
     }
 }
 
-pub fn _from_bits_desc_signed<T: PrimitiveInteger, U: PrimitiveInteger>(bits: &[bool]) -> T
+pub fn _from_bits_desc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
 where
-    T: ExactFrom<U> + WrappingFrom<U>,
+    S: ExactFrom<U> + WrappingFrom<U>,
 {
     match bits {
-        &[] => T::ZERO,
-        &[false, ..] => T::exact_from(_from_bits_desc_unsigned::<U>(bits)),
+        &[] => S::ZERO,
+        &[false, ..] => S::exact_from(_from_bits_desc_unsigned::<U>(bits)),
         bits => {
             let leading_trues = bits.iter().take_while(|&&bit| bit).count();
             let significant_bits = u64::exact_from(bits.len() - leading_trues);
-            assert!(significant_bits < T::WIDTH);
+            assert!(significant_bits < S::WIDTH);
             let mut mask = U::power_of_two(significant_bits);
             let mut u = !(mask - U::ONE);
             for &bit in &bits[leading_trues..] {
@@ -274,14 +269,14 @@ where
                     u |= mask;
                 }
             }
-            T::wrapping_from(u)
+            S::wrapping_from(u)
         }
     }
 }
 
 macro_rules! impl_bit_convertible_signed {
-    ($t:ident, $u:ident) => {
-        impl BitConvertible for $t {
+    ($u:ident, $s:ident) => {
+        impl BitConvertible for $s {
             /// Returns a `Vec` containing the bits of `self` in ascending order: least- to most-
             /// significant. If `self` is 0, the `Vec` is empty; otherwise, the last bit is the sign
             /// bit: `false` if `self` is non-negative and `true` if `self` is negative.
@@ -336,7 +331,7 @@ macro_rules! impl_bit_convertible_signed {
 
             /// Converts a slice of bits into a value. The input bits are in ascending order: least-
             /// to most-significant. The function panics if the input represents a number that can't
-            /// fit in $t.
+            /// fit in $s.
             ///
             /// Time: worst case O(n)
             ///
@@ -345,7 +340,7 @@ macro_rules! impl_bit_convertible_signed {
             /// where n = `bits.len()`
             ///
             /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $t.
+            /// Panics if the bits represent a value that isn't representable by $s.
             ///
             /// # Examples
             /// ```
@@ -359,13 +354,13 @@ macro_rules! impl_bit_convertible_signed {
             /// );
             /// ```
             #[inline]
-            fn from_bits_asc(bits: &[bool]) -> $t {
-                _from_bits_asc_signed::<$t, $u>(bits)
+            fn from_bits_asc(bits: &[bool]) -> $s {
+                _from_bits_asc_signed::<$u, $s>(bits)
             }
 
             /// Converts a slice of bits into a value. The input bits are in ascending order: least-
             /// to most-significant. The function panics if the input represents a number that can't
-            /// fit in $t.
+            /// fit in $s.
             ///
             /// Time: worst case O(n)
             ///
@@ -374,7 +369,7 @@ macro_rules! impl_bit_convertible_signed {
             /// where n = `bits.len()`
             ///
             /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $t.
+            /// Panics if the bits represent a value that isn't representable by $s.
             ///
             /// # Examples
             /// ```
@@ -388,16 +383,10 @@ macro_rules! impl_bit_convertible_signed {
             /// );
             /// ```
             #[inline]
-            fn from_bits_desc(bits: &[bool]) -> $t {
-                _from_bits_desc_signed::<$t, $u>(bits)
+            fn from_bits_desc(bits: &[bool]) -> $s {
+                _from_bits_desc_signed::<$u, $s>(bits)
             }
         }
     };
 }
-
-impl_bit_convertible_signed!(i8, u8);
-impl_bit_convertible_signed!(i16, u16);
-impl_bit_convertible_signed!(i32, u32);
-impl_bit_convertible_signed!(i64, u64);
-impl_bit_convertible_signed!(i128, u128);
-impl_bit_convertible_signed!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_bit_convertible_signed);

@@ -253,17 +253,7 @@ macro_rules! impl_power_of_two_digit_iterable {
                 }
             };
         }
-        impl_power_of_two_digit_iterable_inner!(u8);
-        impl_power_of_two_digit_iterable_inner!(u16);
-        impl_power_of_two_digit_iterable_inner!(u32);
-        impl_power_of_two_digit_iterable_inner!(u64);
-        impl_power_of_two_digit_iterable_inner!(u128);
-        impl_power_of_two_digit_iterable_inner!(usize);
+        apply_to_unsigneds!(impl_power_of_two_digit_iterable_inner);
     };
 }
-impl_power_of_two_digit_iterable!(u8);
-impl_power_of_two_digit_iterable!(u16);
-impl_power_of_two_digit_iterable!(u32);
-impl_power_of_two_digit_iterable!(u64);
-impl_power_of_two_digit_iterable!(u128);
-impl_power_of_two_digit_iterable!(usize);
+apply_to_unsigneds!(impl_power_of_two_digit_iterable);

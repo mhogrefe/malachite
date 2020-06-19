@@ -436,18 +436,7 @@ macro_rules! no_containment_conversion {
     };
 }
 
-identity_conversion!(u8);
-identity_conversion!(u16);
-identity_conversion!(u32);
-identity_conversion!(u64);
-identity_conversion!(u128);
-identity_conversion!(usize);
-identity_conversion!(i8);
-identity_conversion!(i16);
-identity_conversion!(i32);
-identity_conversion!(i64);
-identity_conversion!(i128);
-identity_conversion!(isize);
+apply_to_primitive_ints!(identity_conversion);
 
 proper_subset_conversion!(u8, u16);
 proper_subset_conversion!(u8, u32);
@@ -517,7 +506,6 @@ no_containment_conversion!(i32, isize);
 no_containment_conversion!(i64, isize);
 no_containment_conversion!(i128, isize);
 
-/// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_conversion_traits {
     ($t:ident) => {
         impl FromStrRadix for $t {
@@ -528,16 +516,4 @@ macro_rules! impl_conversion_traits {
         }
     };
 }
-
-impl_conversion_traits!(u8);
-impl_conversion_traits!(u16);
-impl_conversion_traits!(u32);
-impl_conversion_traits!(u64);
-impl_conversion_traits!(u128);
-impl_conversion_traits!(usize);
-impl_conversion_traits!(i8);
-impl_conversion_traits!(i16);
-impl_conversion_traits!(i32);
-impl_conversion_traits!(i64);
-impl_conversion_traits!(i128);
-impl_conversion_traits!(isize);
+apply_to_primitive_ints!(impl_conversion_traits);

@@ -17,16 +17,17 @@ use num::arithmetic::traits::{
     DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
     ModPowerOfTwoAssign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
     OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
-    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow, OverflowingSub,
-    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowerOfTwo,
-    RemPowerOfTwo, RemPowerOfTwoAssign, RoundToMultiple, RoundToMultipleAssign,
-    RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd,
-    SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
-    SaturatingMulAssign, SaturatingPow, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
-    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul,
-    SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
-    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
-    WrappingPow, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
+    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
+    OverflowingPowAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
+    OverflowingSubMulAssign, Parity, Pow, PowAssign, PowerOfTwo, RemPowerOfTwo,
+    RemPowerOfTwoAssign, RoundToMultiple, RoundToMultipleAssign, RoundToMultipleOfPowerOfTwo,
+    RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
+    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingPowAssign,
+    SaturatingSub, SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound,
+    ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, SubMul, SubMulAssign, WrappingAdd,
+    WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign,
+    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign,
+    WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
@@ -210,6 +211,7 @@ pub trait PrimitiveInteger:
     + OverflowingNeg<Output = Self>
     + OverflowingNegAssign
     + OverflowingPow<u64, Output = Self>
+    + OverflowingPowAssign<u64>
     + OverflowingSub<Self, Output = Self>
     + OverflowingSubAssign<Self>
     + OverflowingSubMul<Self, Self, Output = Self>
@@ -218,7 +220,8 @@ pub trait PrimitiveInteger:
     + PartialEq<Self>
     + PartialOrd<Self>
     + PartialOrdAbs<Self>
-    + Pow<u64>
+    + Pow<u64, Output = Self>
+    + PowAssign<u64>
     + PowerOfTwo
     + Product
     + Rem<Self, Output = Self>
@@ -261,6 +264,7 @@ pub trait PrimitiveInteger:
     + SaturatingMul<Self, Output = Self>
     + SaturatingMulAssign<Self>
     + SaturatingPow<u64, Output = Self>
+    + SaturatingPowAssign<u64>
     + SaturatingSub<Self, Output = Self>
     + SaturatingSubAssign<Self>
     + SaturatingSubMul<Self, Self, Output = Self>
@@ -394,6 +398,7 @@ pub trait PrimitiveInteger:
     + WrappingNeg<Output = Self>
     + WrappingNegAssign
     + WrappingPow<u64, Output = Self>
+    + WrappingPowAssign<u64>
     + WrappingSub<Self, Output = Self>
     + WrappingSubAssign<Self>
     + WrappingSubMul<Self, Self, Output = Self>

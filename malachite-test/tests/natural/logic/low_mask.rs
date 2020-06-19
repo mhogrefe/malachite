@@ -8,29 +8,6 @@ use malachite_nz::platform::Limb;
 use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::{small_u64s_var_4, small_unsigneds};
 
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_low_mask() {
-    let test = |bits, out: &[Limb]| assert_eq!(limbs_low_mask(bits), out);
-    test(0, &[]);
-    test(1, &[1]);
-    test(2, &[3]);
-    test(3, &[7]);
-    test(32, &[4294967295]);
-    test(100, &[4294967295, 4294967295, 4294967295, 15]);
-}
-
-#[test]
-fn test_low_mask() {
-    let test = |bits, out| assert_eq!(Natural::low_mask(bits).to_string(), out);
-    test(0, "0");
-    test(1, "1");
-    test(2, "3");
-    test(3, "7");
-    test(32, "4294967295");
-    test(100, "1267650600228229401496703205375");
-}
-
 #[test]
 fn limbs_low_mask_properties() {
     test_properties_no_special(small_unsigneds, |&bits| {

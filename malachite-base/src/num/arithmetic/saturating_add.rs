@@ -11,7 +11,7 @@ macro_rules! impl_saturating_add {
             }
         }
 
-        impl SaturatingAddAssign for $t {
+        impl SaturatingAddAssign<$t> for $t {
             /// Replaces `self` with `self + other`, saturating at the numeric bounds instead of
             /// overflowing.
             ///

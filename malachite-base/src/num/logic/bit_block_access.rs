@@ -104,12 +104,7 @@ macro_rules! impl_bit_block_access_unsigned {
         }
     };
 }
-impl_bit_block_access_unsigned!(u8);
-impl_bit_block_access_unsigned!(u16);
-impl_bit_block_access_unsigned!(u32);
-impl_bit_block_access_unsigned!(u64);
-impl_bit_block_access_unsigned!(u128);
-impl_bit_block_access_unsigned!(usize);
+apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
 pub fn _get_bits_signed<T: PrimitiveInteger, U>(x: &T, start: u64, end: u64) -> U
 where
@@ -167,8 +162,8 @@ pub fn _assign_bits_signed<T: PrimitiveInteger, U: PrimitiveInteger>(
 }
 
 macro_rules! impl_bit_block_access_signed {
-    ($t:ident, $u:ident) => {
-        impl BitBlockAccess for $t {
+    ($u:ident, $s:ident) => {
+        impl BitBlockAccess for $s {
             type Bits = $u;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
@@ -182,7 +177,7 @@ macro_rules! impl_bit_block_access_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `start < end` or `self < 0 && end - start > $t::WIDTH`.
+            /// Panics if `start < end` or `self < 0 && end - start > $s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -213,7 +208,7 @@ macro_rules! impl_bit_block_access_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `start < end`, or if `end >= $t::WIDTH` and bits `$t::WIDTH - start`
+            /// Panics if `start < end`, or if `end >= $s::WIDTH` and bits `$s::WIDTH - start`
             /// through `end - start` of `bits` are not equal to the original sign bit of `self`.
             ///
             /// # Examples
@@ -239,9 +234,4 @@ macro_rules! impl_bit_block_access_signed {
         }
     };
 }
-impl_bit_block_access_signed!(i8, u8);
-impl_bit_block_access_signed!(i16, u16);
-impl_bit_block_access_signed!(i32, u32);
-impl_bit_block_access_signed!(i64, u64);
-impl_bit_block_access_signed!(i128, u128);
-impl_bit_block_access_signed!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_bit_block_access_signed);

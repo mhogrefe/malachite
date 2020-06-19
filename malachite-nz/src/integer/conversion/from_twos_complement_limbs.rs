@@ -114,9 +114,9 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Integer {
-        match xs.as_slice() {
-            &[] => Integer::ZERO,
-            &[.., last] if !last.get_highest_bit() => {
+        match *xs.as_slice() {
+            [] => Integer::ZERO,
+            [.., last] if !last.get_highest_bit() => {
                 Integer::from(Natural::from_owned_limbs_asc(xs))
             }
             _ => {

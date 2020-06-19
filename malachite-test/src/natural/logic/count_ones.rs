@@ -1,19 +1,13 @@
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, CountOnes, SignificantBits};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::{CountOnes, SignificantBits};
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
-use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::count_ones::{
+    natural_count_ones_alt_1, natural_count_ones_alt_2,
+};
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
 use inputs::base::vecs_of_unsigned;
 use inputs::natural::naturals;
-
-pub fn natural_count_ones_alt_1(n: &Natural) -> u64 {
-    u64::wrapping_from(n.bits().filter(|&b| b).count())
-}
-
-pub fn natural_count_ones_alt_2(n: &Natural) -> u64 {
-    n.limbs().map(|limb| CountOnes::count_ones(limb)).sum()
-}
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_count_ones);
