@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,

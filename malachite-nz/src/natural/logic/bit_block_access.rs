@@ -2,8 +2,8 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
 
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;

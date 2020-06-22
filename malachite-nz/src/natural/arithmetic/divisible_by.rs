@@ -1,8 +1,7 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
 use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,

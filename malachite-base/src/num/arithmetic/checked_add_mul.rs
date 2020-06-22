@@ -12,7 +12,7 @@ where
 
 macro_rules! impl_checked_add_mul_unsigned {
     ($t:ident) => {
-        impl CheckedAddMul for $t {
+        impl CheckedAddMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self + y * z`, returning `None` if there is no valid result.
@@ -69,7 +69,7 @@ where
 
 macro_rules! impl_checked_add_mul_signed {
     ($t:ident) => {
-        impl CheckedAddMul for $t {
+        impl CheckedAddMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self + y * z`, returning `None` if there is no valid result.

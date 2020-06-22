@@ -26,6 +26,7 @@
 )]
 #![allow(clippy::cognitive_complexity, clippy::many_single_char_names)]
 
+extern crate itertools;
 #[macro_export]
 macro_rules! apply_to_unsigneds {
     ($m: tt) => {
@@ -78,8 +79,10 @@ pub mod bools;
 pub mod chars;
 pub mod comparison;
 pub mod crement;
+pub mod exhaustive;
 pub mod num;
-pub mod rounding_mode;
+pub mod orderings;
+pub mod rounding_modes;
 #[macro_use]
 pub mod slices;
 pub mod strings;

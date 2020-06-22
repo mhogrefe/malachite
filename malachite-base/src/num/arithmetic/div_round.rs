@@ -1,10 +1,52 @@
-use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs};
+use std::fmt::Display;
+use std::ops::{Add, Div, Mul, Shr, Sub};
+
+use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs, WrappingNeg};
+use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
+
+fn _div_round_unsigned<T: Copy + Display + Eq + One + Ord + Parity + Zero>(
+    x: T,
+    other: T,
+    rm: RoundingMode,
+) -> T
+where
+    T: Add<T, Output = T>
+        + Div<T, Output = T>
+        + Mul<T, Output = T>
+        + Shr<u64, Output = T>
+        + Sub<T, Output = T>,
+{
+    let quotient = x / other;
+    if rm == RoundingMode::Down || rm == RoundingMode::Floor {
+        quotient
+    } else {
+        let remainder = x - quotient * other;
+        match rm {
+            _ if remainder == T::ZERO => quotient,
+            RoundingMode::Up | RoundingMode::Ceiling => quotient + T::ONE,
+            RoundingMode::Nearest => {
+                let shifted_other = other >> 1;
+                if remainder > shifted_other
+                    || remainder == shifted_other && other.even() && quotient.odd()
+                {
+                    quotient + T::ONE
+                } else {
+                    quotient
+                }
+            }
+            RoundingMode::Exact => {
+                panic!("Division is not exact: {} / {}", x, other);
+            }
+            _ => unreachable!(),
+        }
+    }
+}
 
 macro_rules! impl_div_round_unsigned {
     ($t:ident) => {
-        impl DivRound for $t {
+        impl DivRound<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
@@ -21,7 +63,7 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// assert_eq!(10u8.div_round(4, RoundingMode::Down), 2);
             /// assert_eq!(10u16.div_round(4, RoundingMode::Up), 3);
@@ -31,35 +73,13 @@ macro_rules! impl_div_round_unsigned {
             /// assert_eq!(10usize.div_round(4, RoundingMode::Nearest), 2);
             /// assert_eq!(14u8.div_round(4, RoundingMode::Nearest), 4);
             /// ```
+            #[inline]
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
-                let quotient = self / other;
-                if rm == RoundingMode::Down || rm == RoundingMode::Floor {
-                    quotient
-                } else {
-                    let remainder = self - quotient * other;
-                    match rm {
-                        _ if remainder == 0 => quotient,
-                        RoundingMode::Up | RoundingMode::Ceiling => quotient + 1,
-                        RoundingMode::Nearest => {
-                            let shifted_other = other >> 1;
-                            if remainder > shifted_other
-                                || remainder == shifted_other && other.even() && quotient.odd()
-                            {
-                                quotient + 1
-                            } else {
-                                quotient
-                            }
-                        }
-                        RoundingMode::Exact => {
-                            panic!("Division is not exact: {} / {}", self, other);
-                        }
-                        _ => unreachable!(),
-                    }
-                }
+                _div_round_unsigned(self, other, rm)
             }
         }
 
-        impl DivRoundAssign for $t {
+        impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
             /// rounding mode. See the `RoundingMode` documentation for details.
             ///
@@ -74,7 +94,7 @@ macro_rules! impl_div_round_unsigned {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// let mut x = 10u8;
             /// x.div_round_assign(4, RoundingMode::Down);
@@ -111,16 +131,24 @@ macro_rules! impl_div_round_unsigned {
         }
     };
 }
-impl_div_round_unsigned!(u8);
-impl_div_round_unsigned!(u16);
-impl_div_round_unsigned!(u32);
-impl_div_round_unsigned!(u64);
-impl_div_round_unsigned!(u128);
-impl_div_round_unsigned!(usize);
+apply_to_unsigneds!(impl_div_round_unsigned);
+
+pub fn _div_round_signed<U, T: Copy + Ord + Zero>(x: T, other: T, rm: RoundingMode) -> T
+where
+    T: ExactFrom<U> + UnsignedAbs<Output = U> + WrappingFrom<U> + WrappingNeg<Output = T>,
+    U: DivRound<U, Output = U>,
+{
+    if (x >= T::ZERO) == (other >= T::ZERO) {
+        T::exact_from(x.unsigned_abs().div_round(other.unsigned_abs(), rm))
+    } else {
+        // Has to be wrapping so that (self, other) == (T::MIN, 1) works
+        T::wrapping_from(x.unsigned_abs().div_round(other.unsigned_abs(), -rm)).wrapping_neg()
+    }
+}
 
 macro_rules! impl_div_round_signed {
     ($t:ident) => {
-        impl DivRound for $t {
+        impl DivRound<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
@@ -137,7 +165,7 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// assert_eq!((-10i8).div_round(4, RoundingMode::Down), -2);
             /// assert_eq!((-10i16).div_round(4, RoundingMode::Up), -3);
@@ -156,17 +184,11 @@ macro_rules! impl_div_round_signed {
             /// assert_eq!((-14i16).div_round(-4, RoundingMode::Nearest), 4);
             /// ```
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
-                if (self >= 0) == (other >= 0) {
-                    $t::exact_from(self.unsigned_abs().div_round(other.unsigned_abs(), rm))
-                } else {
-                    // Has to be wrapping so that (self, other) == ($t::MIN, 1) works
-                    $t::wrapping_from(self.unsigned_abs().div_round(other.unsigned_abs(), -rm))
-                        .wrapping_neg()
-                }
+                _div_round_signed(self, other, rm)
             }
         }
 
-        impl DivRoundAssign for $t {
+        impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
             /// rounding mode.
             /// See the `RoundingMode` documentation for details.
@@ -182,7 +204,7 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// let mut x = -10i8;
             /// x.div_round_assign(4, RoundingMode::Down);
@@ -247,9 +269,4 @@ macro_rules! impl_div_round_signed {
         }
     };
 }
-impl_div_round_signed!(i8);
-impl_div_round_signed!(i16);
-impl_div_round_signed!(i32);
-impl_div_round_signed!(i64);
-impl_div_round_signed!(i128);
-impl_div_round_signed!(isize);
+apply_to_signeds!(impl_div_round_signed);

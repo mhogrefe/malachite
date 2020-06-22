@@ -5,8 +5,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_test_zero;
 
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,

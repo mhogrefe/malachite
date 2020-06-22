@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use integer::Integer;
 
@@ -32,7 +32,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::RoundingFrom;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_nz::integer::Integer;
             /// use std::str::FromStr;
             ///
@@ -91,7 +91,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::RoundingFrom;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_nz::integer::Integer;
             /// use std::str::FromStr;
             ///

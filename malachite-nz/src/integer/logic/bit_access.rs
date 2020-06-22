@@ -4,8 +4,7 @@ use malachite_base::num::arithmetic::traits::{PowerOfTwo, WrappingAddAssign, Wra
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;

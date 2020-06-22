@@ -2,7 +2,7 @@ use num::arithmetic::traits::{DivExact, DivExactAssign};
 
 macro_rules! impl_div_exact {
     ($t:ident) => {
-        impl DivExact for $t {
+        impl DivExact<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value. The first value must be exactly divisible by the
@@ -36,7 +36,7 @@ macro_rules! impl_div_exact {
             }
         }
 
-        impl DivExactAssign for $t {
+        impl DivExactAssign<$t> for $t {
             /// Divides a value by another value in place. The value being assigned to must be
             /// exactly divisible by the value on the RHS. If it isn't, this function may crash or
             /// assign a meaningless value to the first value.
@@ -75,15 +75,4 @@ macro_rules! impl_div_exact {
         }
     };
 }
-impl_div_exact!(u8);
-impl_div_exact!(u16);
-impl_div_exact!(u32);
-impl_div_exact!(u64);
-impl_div_exact!(u128);
-impl_div_exact!(usize);
-impl_div_exact!(i8);
-impl_div_exact!(i16);
-impl_div_exact!(i32);
-impl_div_exact!(i64);
-impl_div_exact!(i128);
-impl_div_exact!(isize);
+apply_to_primitive_ints!(impl_div_exact);

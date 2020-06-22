@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_div_round_unsigned() {

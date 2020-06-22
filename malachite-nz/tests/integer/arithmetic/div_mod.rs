@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::{
     DivRound, Mod,
 };
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use num::{BigInt, Integer as NumInteger};
 
 use malachite_nz::integer::Integer;

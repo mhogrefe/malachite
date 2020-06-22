@@ -33,6 +33,7 @@ extern crate malachite_base_test_util;
 pub mod bools {
     pub mod constants;
     pub mod crement;
+    pub mod exhaustive;
     pub mod not_assign;
 }
 pub mod comparison {
@@ -49,6 +50,7 @@ pub mod num {
         pub mod checked_abs;
         pub mod checked_add_mul;
         pub mod checked_neg;
+        pub mod checked_square;
         pub mod checked_sub_mul;
         pub mod div_exact;
         pub mod div_mod;
@@ -81,6 +83,7 @@ pub mod num {
         pub mod overflowing_mul;
         pub mod overflowing_neg;
         pub mod overflowing_pow;
+        pub mod overflowing_square;
         pub mod overflowing_sub;
         pub mod overflowing_sub_mul;
         pub mod parity;
@@ -94,11 +97,13 @@ pub mod num {
         pub mod saturating_mul;
         pub mod saturating_neg;
         pub mod saturating_pow;
+        pub mod saturating_square;
         pub mod saturating_sub;
         pub mod saturating_sub_mul;
         pub mod shl_round;
         pub mod shr_round;
         pub mod sign;
+        pub mod square;
         pub mod sub_mul;
         pub mod wrapping_abs;
         pub mod wrapping_add;
@@ -107,6 +112,7 @@ pub mod num {
         pub mod wrapping_mul;
         pub mod wrapping_neg;
         pub mod wrapping_pow;
+        pub mod wrapping_square;
         pub mod wrapping_sub;
         pub mod wrapping_sub_mul;
         pub mod x_mul_y_is_zz;
@@ -130,6 +136,14 @@ pub mod num {
         pub mod half;
         pub mod slice;
     }
+    pub mod exhaustive {
+        pub mod exhaustive_natural_signeds;
+        pub mod exhaustive_negative_signeds;
+        pub mod exhaustive_nonzero_signeds;
+        pub mod exhaustive_positive_primitives;
+        pub mod exhaustive_signeds;
+        pub mod exhaustive_unsigneds;
+    }
     pub mod logic {
         pub mod bit_access;
         pub mod bit_block_access;
@@ -146,10 +160,14 @@ pub mod num {
         pub mod significant_bits;
     }
 }
-pub mod rounding_mode {
+pub mod orderings {
+    pub mod exhaustive;
+}
+pub mod rounding_modes {
     pub mod clone;
     pub mod display;
     pub mod eq;
+    pub mod exhaustive;
     pub mod from_str;
     pub mod neg;
     pub mod size;

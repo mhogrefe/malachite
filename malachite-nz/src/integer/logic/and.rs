@@ -3,8 +3,7 @@ use std::ops::{BitAnd, BitAndAssign};
 
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::logic::traits::NotAssign;
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
-use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
 use integer::Integer;
 use natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};

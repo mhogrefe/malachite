@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_leading_zeros;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

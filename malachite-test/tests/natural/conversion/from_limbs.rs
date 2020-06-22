@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 

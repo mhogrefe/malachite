@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::vecs::vec_delete_left;
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;

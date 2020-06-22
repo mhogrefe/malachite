@@ -1,4 +1,4 @@
-use malachite_base::chars::contiguous_range_to_char::contiguous_range_to_char;
+use malachite_base::chars::contiguous_range_to_char;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

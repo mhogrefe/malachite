@@ -2,7 +2,7 @@ use num::arithmetic::traits::{ModSub, ModSubAssign};
 
 macro_rules! impl_mod_sub {
     ($t:ident) => {
-        impl ModSub for $t {
+        impl ModSub<$t> for $t {
             type Output = $t;
 
             /// Computes `self - other` mod `m`. Assumes the inputs are already reduced mod `m`.
@@ -31,7 +31,7 @@ macro_rules! impl_mod_sub {
             }
         }
 
-        impl ModSubAssign for $t {
+        impl ModSubAssign<$t> for $t {
             /// Replaces `self` with `self - other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///

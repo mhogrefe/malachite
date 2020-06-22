@@ -2,7 +2,7 @@ use num::arithmetic::traits::{EqMod, Mod};
 
 macro_rules! impl_eq_mod {
     ($t:ident) => {
-        impl EqMod for $t {
+        impl EqMod<$t> for $t {
             /// Returns whether a value is equivalent to another value mod a third value `m`; that
             /// is, whether `self` - `other` is a multiple of `m`. Two numbers are equal to each
             /// other mod 0 iff they are equal.

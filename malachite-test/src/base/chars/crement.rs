@@ -1,4 +1,4 @@
-use malachite_base::chars::char_to_contiguous_range::char_to_contiguous_range;
+use malachite_base::chars::char_to_contiguous_range;
 use malachite_base::crement::Crementable;
 use malachite_base::num::conversion::traits::ExactFrom;
 

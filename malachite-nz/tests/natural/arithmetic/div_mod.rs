@@ -11,7 +11,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::conversion::traits::JoinHalves;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::div_mod::{

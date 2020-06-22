@@ -1,6 +1,6 @@
-use malachite_base::slices::slice_move_left::slice_move_left;
+use malachite_base::slices::slice_move_left;
+use malachite_base_test_util::slices::slice_move_left_naive;
 
-use malachite_test::base::slices::slice_move_left::slice_move_left_naive;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{pairs_of_unsigned_vec_and_small_usize_var_1, vecs_of_unsigned};
 

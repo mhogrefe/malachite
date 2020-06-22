@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_set_zero;
 
 #[test]
 fn test_slice_set_zero() {

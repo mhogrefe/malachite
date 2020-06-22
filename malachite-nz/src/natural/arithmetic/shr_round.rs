@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
 
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
@@ -165,7 +165,7 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::rounding_mode::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round;
 ///
 /// assert_eq!(limbs_shr_round(&[1], 1, RoundingMode::Nearest), Some(vec![0]));
@@ -432,7 +432,7 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::rounding_mode::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_in_place;
 ///
 /// let mut xs = vec![1];
@@ -522,7 +522,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_nz::natural::Natural;
             ///
@@ -586,7 +586,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_nz::natural::Natural;
             ///
@@ -657,7 +657,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             /// use malachite_nz::natural::Natural;
             ///
@@ -741,7 +741,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::natural::Natural;
@@ -815,7 +815,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRound;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_nz::natural::Natural;
@@ -890,7 +890,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
             /// use malachite_base::num::basic::traits::One;
             /// use malachite_nz::natural::Natural;

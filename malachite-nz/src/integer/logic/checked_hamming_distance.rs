@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use malachite_base::num::logic::traits::{
     CheckedHammingDistance, CountOnes, CountZeros, HammingDistance,
 };
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_leading_zeros;
 
 use integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use integer::Integer;

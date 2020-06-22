@@ -1,6 +1,7 @@
 use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
+use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
@@ -11,9 +12,11 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
 };
+use malachite_base::num::exhaustive::{exhaustive_signeds, exhaustive_unsigneds};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{
@@ -22,7 +25,6 @@ use malachite_nz_test_util::common::{
 use num::BigInt;
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rug;
-use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::{random, Random};
@@ -38,10 +40,8 @@ use rust_wheels::iterators::naturals::{
     exhaustive_naturals, random_naturals, random_range_up_natural, special_random_naturals,
     special_random_range_up_natural,
 };
-use rust_wheels::iterators::primitive_ints::{
-    exhaustive_signed, exhaustive_unsigned, special_random_signed, special_random_unsigned,
-};
-use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
+use rust_wheels::iterators::primitive_ints::{special_random_signed, special_random_unsigned};
+use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
@@ -285,9 +285,10 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_integers(), exhaustive_signed()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_integers(),
+            exhaustive_signeds(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -321,9 +322,10 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_integers()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_signeds(),
+            exhaustive_integers(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -351,7 +353,7 @@ pub fn pairs_of_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_integer_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
@@ -379,7 +381,7 @@ pub(crate) fn pairs_of_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
 ) -> It<(T, Integer)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_integer(scale),
@@ -476,7 +478,7 @@ pub fn pairs_of_integer_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Int
 }
 
 fn log_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigned()))
+    Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigneds()))
 }
 
 pub fn pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -537,7 +539,7 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned<
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_integers(),
-            exhaustive_pairs(exhaustive_unsigned(), exhaustive_unsigned()),
+            exhaustive_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -566,7 +568,7 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUn
 }
 
 fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> It<(Integer, T)> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_signed()))
+    Box::new(log_pairs(exhaustive_integers(), exhaustive_signeds()))
 }
 
 pub fn pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
@@ -624,7 +626,7 @@ pub fn triples_of_integer_unsigned_and_integer<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
@@ -642,9 +644,9 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
 ) -> It<(T, Integer, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
@@ -666,7 +668,7 @@ where
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
-            exhaustive_signed(),
+            exhaustive_signeds(),
             exhaustive_integers(),
         )),
         GenerationMode::Random(scale) => random_triples_of_integer_primitive_and_integer(scale),
@@ -688,9 +690,9 @@ where
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_signed(),
+            exhaustive_signeds(),
             exhaustive_integers(),
-            exhaustive_signed(),
+            exhaustive_signeds(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
@@ -817,7 +819,7 @@ pub fn triples_of_integer_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -875,7 +877,7 @@ pub fn triples_of_integer_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 pub fn triples_of_integer_small_u64_and_bool(gm: GenerationMode) -> It<(Integer, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            exhaustive_pairs(exhaustive_integers(), exhaustive_unsigned()),
+            exhaustive_pairs(exhaustive_integers(), exhaustive_unsigneds()),
             exhaustive_bools(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -908,7 +910,7 @@ pub fn triples_of_integer_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_naturals(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -1339,7 +1341,7 @@ pub fn quadruples_of_integer_integer_integer_and_small_unsigned<T: PrimitiveUnsi
             exhaustive_integers(),
             exhaustive_integers(),
             exhaustive_integers(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
@@ -1458,7 +1460,7 @@ fn quadruples_of_integer_small_unsigned_small_unsigned_and_natural<T: PrimitiveU
     permute_1_3_4_2(reshape_2_2_to_4(match gm {
         GenerationMode::Exhaustive => Box::new(sqrt_pairs(
             exhaustive_pairs(exhaustive_integers(), exhaustive_naturals()),
-            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,

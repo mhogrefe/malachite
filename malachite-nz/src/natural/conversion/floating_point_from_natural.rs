@@ -9,7 +9,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
@@ -58,7 +58,7 @@ macro_rules! float_impls {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::num::conversion::traits::RoundingFrom;
-        /// use malachite_base::rounding_mode::RoundingMode;
+        /// use malachite_base::rounding_modes::RoundingMode;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
         ///
@@ -121,7 +121,7 @@ macro_rules! float_impls {
         /// extern crate malachite_nz;
         ///
         /// use malachite_base::num::conversion::traits::RoundingFrom;
-        /// use malachite_base::rounding_mode::RoundingMode;
+        /// use malachite_base::rounding_modes::RoundingMode;
         /// use malachite_nz::natural::Natural;
         /// use std::str::FromStr;
         ///

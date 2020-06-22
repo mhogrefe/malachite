@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
     limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,

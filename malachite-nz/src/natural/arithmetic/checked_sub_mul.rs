@@ -8,6 +8,27 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+macro_rules! large_left {
+    ($a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {
+        (
+            Natural(Large(ref mut $a_limbs)),
+            Natural(Large(ref $b_limbs)),
+            Natural(Large(ref $c_limbs)),
+        )
+    }
+}
+
+macro_rules! large_right {
+    ($self: ident, $a_limbs: ident, $b_limbs: ident, $c_limbs: ident) => {{
+        let borrow = $a_limbs.len() < $b_limbs.len() + $c_limbs.len() - 1
+            || limbs_sub_mul_in_place_left($a_limbs, $b_limbs, $c_limbs);
+        if !borrow {
+            $self.trim();
+        }
+        borrow
+    }};
+}
+
 impl Natural {
     fn checked_sub_mul_limb_ref_ref(&self, b: &Natural, c: Limb) -> Option<Natural> {
         match (self, b, c) {
@@ -57,68 +78,47 @@ impl Natural {
         }
     }
 
-    fn sub_mul_assign_helper(&mut self, b: &Natural, c: &Natural) -> bool {
-        {
-            if let Natural(Large(ref mut a_limbs)) = *self {
-                if let Natural(Large(ref b_limbs)) = *b {
-                    if let Natural(Large(ref c_limbs)) = *c {
-                        if limbs_sub_mul_in_place_left(a_limbs, b_limbs, c_limbs) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        self.trim();
-        false
-    }
-
-    //TODO clean
     pub(crate) fn sub_mul_assign_no_panic(&mut self, b: Natural, c: Natural) -> bool {
-        if let Natural(Small(small_b)) = b {
-            self.sub_mul_assign_limb_no_panic(c, small_b)
-        } else if let Natural(Small(small_c)) = c {
-            self.sub_mul_assign_limb_no_panic(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            true
-        } else {
-            self.sub_mul_assign_helper(&b, &c)
+        match (&mut *self, b, c) {
+            (a, Natural(Small(small_b)), c) => a.sub_mul_assign_limb_no_panic(c, small_b),
+            (a, b, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, small_c),
+            (Natural(Small(_)), _, _) => true,
+            large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
     pub(crate) fn sub_mul_assign_val_ref_no_panic(&mut self, b: Natural, c: &Natural) -> bool {
-        if let Natural(Small(small_b)) = b {
-            self.sub_mul_assign_limb_ref_no_panic(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.sub_mul_assign_limb_no_panic(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            true
-        } else {
-            self.sub_mul_assign_helper(&b, c)
+        match (&mut *self, &b, c) {
+            (ref mut a, Natural(Small(small_b)), c) => {
+                a.sub_mul_assign_limb_ref_no_panic(c, *small_b)
+            }
+            (ref mut a, _, Natural(Small(small_c))) => a.sub_mul_assign_limb_no_panic(b, *small_c),
+            (Natural(Small(_)), _, _) => true,
+            large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
     pub(crate) fn sub_mul_assign_ref_val_no_panic(&mut self, b: &Natural, c: Natural) -> bool {
-        if let Natural(Small(small_b)) = *b {
-            self.sub_mul_assign_limb_no_panic(c, small_b)
-        } else if let Natural(Small(small_c)) = c {
-            self.sub_mul_assign_limb_ref_no_panic(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            true
-        } else {
-            self.sub_mul_assign_helper(b, &c)
+        match (&mut *self, b, &c) {
+            (ref mut a, Natural(Small(small_b)), _) => a.sub_mul_assign_limb_no_panic(c, *small_b),
+            (ref mut a, b, Natural(Small(small_c))) => {
+                a.sub_mul_assign_limb_ref_no_panic(b, *small_c)
+            }
+            (Natural(Small(_)), _, _) => true,
+            large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 
     pub(crate) fn sub_mul_assign_ref_ref_no_panic(&mut self, b: &Natural, c: &Natural) -> bool {
-        if let Natural(Small(small_b)) = *b {
-            self.sub_mul_assign_limb_ref_no_panic(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.sub_mul_assign_limb_ref_no_panic(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            true
-        } else {
-            self.sub_mul_assign_helper(b, c)
+        match (&mut *self, b, c) {
+            (ref mut a, Natural(Small(small_b)), c) => {
+                a.sub_mul_assign_limb_ref_no_panic(c, *small_b)
+            }
+            (ref mut a, b, Natural(Small(small_c))) => {
+                a.sub_mul_assign_limb_ref_no_panic(b, *small_c)
+            }
+            (Natural(Small(_)), _, _) => true,
+            large_left!(a_limbs, b_limbs, c_limbs) => large_right!(self, a_limbs, b_limbs, c_limbs),
         }
     }
 }
@@ -302,22 +302,21 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
-        if let Natural(Small(small_b)) = *b {
-            self.checked_sub_mul_limb_ref_ref(c, small_b)
-        } else if let Natural(Small(small_c)) = *c {
-            self.checked_sub_mul_limb_ref_ref(b, small_c)
-        } else if self.limb_count() < b.limb_count() + c.limb_count() - 1 {
-            None
-        } else {
-            if let Natural(Large(ref a_limbs)) = *self {
-                if let Natural(Large(ref b_limbs)) = *b {
-                    if let Natural(Large(ref c_limbs)) = *c {
-                        return limbs_sub_mul(a_limbs, b_limbs, c_limbs)
-                            .map(Natural::from_owned_limbs_asc);
-                    }
+        match (self, b, c) {
+            (a, Natural(Small(small_b)), c) => a.checked_sub_mul_limb_ref_ref(c, *small_b),
+            (a, b, Natural(Small(small_c))) => a.checked_sub_mul_limb_ref_ref(b, *small_c),
+            (Natural(Small(_)), _, _) => None,
+            (
+                Natural(Large(ref a_limbs)),
+                Natural(Large(ref b_limbs)),
+                Natural(Large(ref c_limbs)),
+            ) => {
+                if a_limbs.len() >= b_limbs.len() + c_limbs.len() - 1 {
+                    limbs_sub_mul(a_limbs, b_limbs, c_limbs).map(Natural::from_owned_limbs_asc)
+                } else {
+                    None
                 }
             }
-            unreachable!();
         }
     }
 }

@@ -14,7 +14,7 @@ use malachite_base::num::logic::power_of_two_digit_iterable::PrimitivePowerOfTwo
 use malachite_base::num::logic::traits::{
     LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator,
 };
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use natural::logic::bit_block_access::limbs_slice_get_bits;
 use natural::logic::significant_bits::limbs_significant_bits;

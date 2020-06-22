@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::slice_test_zero;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

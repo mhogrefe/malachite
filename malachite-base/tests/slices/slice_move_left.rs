@@ -1,6 +1,6 @@
-use malachite_base_test_util::slices::slice_move_left::slice_move_left_naive;
+use malachite_base_test_util::slices::slice_move_left_naive;
 
-use malachite_base::slices::slice_move_left::slice_move_left;
+use malachite_base::slices::slice_move_left;
 
 #[test]
 fn test_slice_move_left() {

@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, NegAssign, SubMul, SubMulAssign, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::traits::Iverson;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::slice_test_zero;
 
 use integer::Integer;
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;

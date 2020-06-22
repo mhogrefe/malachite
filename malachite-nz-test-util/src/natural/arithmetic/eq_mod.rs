@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
+use malachite_base::slices::slice_trailing_zeros;
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_limb, limbs_divisible_by_val_ref,
 };

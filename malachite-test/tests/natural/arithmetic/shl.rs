@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{IsPowerOfTwo, ShlRound};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::shl::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,

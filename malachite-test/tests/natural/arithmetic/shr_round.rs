@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,

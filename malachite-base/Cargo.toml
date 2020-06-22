@@ -7,6 +7,9 @@ authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 name = "malachite_base"
 path = "src/lib.rs"
 
+[dependencies]
+itertools = "0.9.0"
+
 [profile.release]
 lto = true
 

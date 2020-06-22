@@ -11,6 +11,7 @@ pub mod arithmetic {
     pub mod checked_neg;
     pub mod checked_next_power_of_two;
     pub mod checked_pow;
+    pub mod checked_square;
     pub mod checked_sub;
     pub mod checked_sub_mul;
     pub mod div_exact;
@@ -44,6 +45,7 @@ pub mod arithmetic {
     pub mod overflowing_mul;
     pub mod overflowing_neg;
     pub mod overflowing_pow;
+    pub mod overflowing_square;
     pub mod overflowing_sub;
     pub mod overflowing_sub_mul;
     pub mod parity;
@@ -57,11 +59,13 @@ pub mod arithmetic {
     pub mod saturating_mul;
     pub mod saturating_neg;
     pub mod saturating_pow;
+    pub mod saturating_square;
     pub mod saturating_sub;
     pub mod saturating_sub_mul;
     pub mod shl_round;
     pub mod shr_round;
     pub mod sign;
+    pub mod square;
     pub mod sub_mul;
     pub mod traits;
     pub mod unsigneds;
@@ -72,6 +76,7 @@ pub mod arithmetic {
     pub mod wrapping_mul;
     pub mod wrapping_neg;
     pub mod wrapping_pow;
+    pub mod wrapping_square;
     pub mod wrapping_sub;
     pub mod wrapping_sub_mul;
     pub mod x_mul_y_is_zz;
@@ -98,6 +103,7 @@ pub mod conversion {
     pub mod slice;
     pub mod traits;
 }
+pub mod exhaustive;
 pub mod floats;
 pub mod logic {
     pub mod bit_access;

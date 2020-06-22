@@ -10,7 +10,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,

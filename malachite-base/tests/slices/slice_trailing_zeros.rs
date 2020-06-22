@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
+use malachite_base::slices::slice_trailing_zeros;
 
 #[test]
 fn test_slice_trailing_zeros() {

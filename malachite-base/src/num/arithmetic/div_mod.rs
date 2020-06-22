@@ -1,12 +1,62 @@
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
+
 use num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem, UnsignedAbs,
+    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, CheckedDiv,
+    DivAssignMod, DivAssignRem, DivMod, DivRem, UnsignedAbs, WrappingNeg,
 };
+use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+
+#[inline]
+pub fn _div_mod_unsigned<T: Copy>(x: T, other: T) -> (T, T)
+where
+    T: Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
+{
+    let q = x / other;
+    (q, x - q * other)
+}
+
+#[inline]
+pub fn _div_assign_mod_unsigned<T: Copy>(x: &mut T, other: T) -> T
+where
+    T: DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>,
+{
+    let original = *x;
+    *x /= other;
+    original - *x * other
+}
+
+#[inline]
+pub fn _ceiling_div_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: T, other: T) -> (T, T)
+where
+    T: Add<T, Output = T> + DivMod<T, DivOutput = T, ModOutput = T> + Sub<T, Output = T>,
+{
+    let (quotient, remainder) = x.div_mod(other);
+    if remainder == T::ZERO {
+        (quotient, T::ZERO)
+    } else {
+        // Here remainder != 0, so other > 1, so quotient < T::MAX.
+        (quotient + T::ONE, other - remainder)
+    }
+}
+
+pub fn _ceiling_div_assign_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: &mut T, other: T) -> T
+where
+    T: AddAssign<T> + DivAssignMod<T, ModOutput = T> + Sub<T, Output = T>,
+{
+    let remainder = x.div_assign_mod(other);
+    if remainder == T::ZERO {
+        T::ZERO
+    } else {
+        // Here remainder != 0, so other > 1, so self < T::MAX.
+        *x += T::ONE;
+        other - remainder
+    }
+}
 
 macro_rules! impl_div_mod_unsigned {
     ($t:ident) => {
-        impl DivMod for $t {
+        impl DivMod<$t> for $t {
             type DivOutput = $t;
             type ModOutput = $t;
 
@@ -34,12 +84,11 @@ macro_rules! impl_div_mod_unsigned {
             /// ```
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
-                let q = self / other;
-                (q, self - q * other)
+                _div_mod_unsigned(self, other)
             }
         }
 
-        impl DivAssignMod for $t {
+        impl DivAssignMod<$t> for $t {
             type ModOutput = $t;
 
             /// Divides a value by another value in place, returning the remainder. The quotient is
@@ -69,13 +118,11 @@ macro_rules! impl_div_mod_unsigned {
             /// ```
             #[inline]
             fn div_assign_mod(&mut self, other: $t) -> $t {
-                let original = *self;
-                *self /= other;
-                original - *self * other
+                _div_assign_mod_unsigned(self, other)
             }
         }
 
-        impl DivRem for $t {
+        impl DivRem<$t> for $t {
             type DivOutput = $t;
             type RemOutput = $t;
 
@@ -106,7 +153,7 @@ macro_rules! impl_div_mod_unsigned {
             }
         }
 
-        impl DivAssignRem for $t {
+        impl DivAssignRem<$t> for $t {
             type RemOutput = $t;
 
             /// Divides a value by another value in place, returning the remainder. The quotient is
@@ -140,7 +187,7 @@ macro_rules! impl_div_mod_unsigned {
             }
         }
 
-        impl CeilingDivNegMod for $t {
+        impl CeilingDivNegMod<$t> for $t {
             type DivOutput = $t;
             type ModOutput = $t;
 
@@ -167,17 +214,11 @@ macro_rules! impl_div_mod_unsigned {
             /// ```
             #[inline]
             fn ceiling_div_neg_mod(self, other: $t) -> ($t, $t) {
-                let (quotient, remainder) = self.div_mod(other);
-                if remainder == 0 {
-                    (quotient, 0)
-                } else {
-                    // Here remainder != 0, so other > 1, so quotient < $t::MAX.
-                    (quotient + 1, other - remainder)
-                }
+                _ceiling_div_neg_mod_unsigned(self, other)
             }
         }
 
-        impl CeilingDivAssignNegMod for $t {
+        impl CeilingDivAssignNegMod<$t> for $t {
             type ModOutput = $t;
 
             /// Divides a value by another value in place, returning the remainder of the negative
@@ -207,28 +248,87 @@ macro_rules! impl_div_mod_unsigned {
             /// ```
             #[inline]
             fn ceiling_div_assign_neg_mod(&mut self, other: $t) -> $t {
-                let remainder = self.div_assign_mod(other);
-                if remainder == 0 {
-                    0
-                } else {
-                    // Here remainder != 0, so other > 1, so self < $t::MAX.
-                    *self += 1;
-                    other - remainder
-                }
+                _ceiling_div_assign_neg_mod_unsigned(self, other)
             }
         }
     };
 }
-impl_div_mod_unsigned!(u8);
-impl_div_mod_unsigned!(u16);
-impl_div_mod_unsigned!(u32);
-impl_div_mod_unsigned!(u64);
-impl_div_mod_unsigned!(u128);
-impl_div_mod_unsigned!(usize);
+apply_to_unsigneds!(impl_div_mod_unsigned);
+
+pub fn _div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
+where
+    T: ExactFrom<U>
+        + Neg<Output = T>
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>
+        + WrappingNeg<Output = T>,
+    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
+{
+    let (quotient, remainder) = if (x >= T::ZERO) == (other >= T::ZERO) {
+        let (quotient, remainder) = x.unsigned_abs().div_mod(other.unsigned_abs());
+        (T::exact_from(quotient), remainder)
+    } else {
+        let (quotient, remainder) = x.unsigned_abs().ceiling_div_neg_mod(other.unsigned_abs());
+        (T::wrapping_from(quotient).wrapping_neg(), remainder)
+    };
+    (
+        quotient,
+        if other >= T::ZERO {
+            T::exact_from(remainder)
+        } else {
+            -T::exact_from(remainder)
+        },
+    )
+}
+
+#[inline]
+pub fn _div_rem_signed<T: Copy>(x: T, other: T) -> (T, T)
+where
+    T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
+{
+    let q = x.checked_div(other).unwrap();
+    (q, x - q * other)
+}
+
+#[inline]
+pub fn _div_assign_rem_signed<T: Copy>(x: &mut T, other: T) -> T
+where
+    T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
+{
+    let original = *x;
+    *x = x.checked_div(other).unwrap();
+    original - *x * other
+}
+
+pub fn _ceiling_div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
+where
+    T: ExactFrom<U>
+        + Neg<Output = T>
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>
+        + WrappingNeg<Output = T>,
+    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
+{
+    let (quotient, remainder) = if (x >= T::ZERO) == (other >= T::ZERO) {
+        let (quotient, remainder) = x.unsigned_abs().ceiling_div_neg_mod(other.unsigned_abs());
+        (T::exact_from(quotient), remainder)
+    } else {
+        let (quotient, remainder) = x.unsigned_abs().div_mod(other.unsigned_abs());
+        (T::wrapping_from(quotient).wrapping_neg(), remainder)
+    };
+    (
+        quotient,
+        if other >= T::ZERO {
+            -T::exact_from(remainder)
+        } else {
+            T::exact_from(remainder)
+        },
+    )
+}
 
 macro_rules! impl_div_mod_signed {
     ($t:ident) => {
-        impl DivMod for $t {
+        impl DivMod<$t> for $t {
             type DivOutput = $t;
             type ModOutput = $t;
 
@@ -262,27 +362,11 @@ macro_rules! impl_div_mod_signed {
             /// ```
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
-                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
-                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    ($t::exact_from(quotient), remainder)
-                } else {
-                    let (quotient, remainder) = self
-                        .unsigned_abs()
-                        .ceiling_div_neg_mod(other.unsigned_abs());
-                    ($t::wrapping_from(quotient).wrapping_neg(), remainder)
-                };
-                (
-                    quotient,
-                    if other >= 0 {
-                        $t::exact_from(remainder)
-                    } else {
-                        -$t::exact_from(remainder)
-                    },
-                )
+                _div_mod_signed(self, other)
             }
         }
 
-        impl DivAssignMod for $t {
+        impl DivAssignMod<$t> for $t {
             type ModOutput = $t;
 
             /// Divides a value by another value in place, returning the remainder. The quotient is
@@ -329,7 +413,7 @@ macro_rules! impl_div_mod_signed {
             }
         }
 
-        impl DivRem for $t {
+        impl DivRem<$t> for $t {
             type DivOutput = $t;
             type RemOutput = $t;
 
@@ -362,12 +446,11 @@ macro_rules! impl_div_mod_signed {
             /// ```
             #[inline]
             fn div_rem(self, other: $t) -> ($t, $t) {
-                let q = self.checked_div(other).unwrap();
-                (q, self - q * other)
+                _div_rem_signed(self, other)
             }
         }
 
-        impl DivAssignRem for $t {
+        impl DivAssignRem<$t> for $t {
             type RemOutput = $t;
 
             /// Divides a value by another value in place, returning the remainder. The quotient is
@@ -407,13 +490,11 @@ macro_rules! impl_div_mod_signed {
             /// ```
             #[inline]
             fn div_assign_rem(&mut self, other: $t) -> $t {
-                let original = *self;
-                *self = self.checked_div(other).unwrap();
-                original - *self * other
+                _div_assign_rem_signed(self, other)
             }
         }
 
-        impl CeilingDivMod for $t {
+        impl CeilingDivMod<$t> for $t {
             type DivOutput = $t;
             type ModOutput = $t;
 
@@ -447,27 +528,11 @@ macro_rules! impl_div_mod_signed {
             /// ```
             #[inline]
             fn ceiling_div_mod(self, other: $t) -> ($t, $t) {
-                let (quotient, remainder) = if (self >= 0) == (other >= 0) {
-                    let (quotient, remainder) = self
-                        .unsigned_abs()
-                        .ceiling_div_neg_mod(other.unsigned_abs());
-                    ($t::exact_from(quotient), remainder)
-                } else {
-                    let (quotient, remainder) = self.unsigned_abs().div_mod(other.unsigned_abs());
-                    ($t::wrapping_from(quotient).wrapping_neg(), remainder)
-                };
-                (
-                    quotient,
-                    if other >= 0 {
-                        -$t::exact_from(remainder)
-                    } else {
-                        $t::exact_from(remainder)
-                    },
-                )
+                _ceiling_div_mod_signed(self, other)
             }
         }
 
-        impl CeilingDivAssignMod for $t {
+        impl CeilingDivAssignMod<$t> for $t {
             type ModOutput = $t;
 
             /// Divides a value by another value in place, taking the second `Integer` by value,
@@ -515,9 +580,4 @@ macro_rules! impl_div_mod_signed {
         }
     };
 }
-impl_div_mod_signed!(i8);
-impl_div_mod_signed!(i16);
-impl_div_mod_signed!(i32);
-impl_div_mod_signed!(i64);
-impl_div_mod_signed!(i128);
-impl_div_mod_signed!(isize);
+apply_to_signeds!(impl_div_mod_signed);

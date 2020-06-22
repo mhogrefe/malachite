@@ -16,6 +16,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_i32_saturating_abs_assign);
     register_demo!(registry, demo_i64_saturating_abs_assign);
     register_demo!(registry, demo_isize_saturating_abs_assign);
+
     register_bench!(registry, None, benchmark_i8_saturating_abs);
     register_bench!(registry, None, benchmark_i16_saturating_abs);
     register_bench!(registry, None, benchmark_i32_saturating_abs);

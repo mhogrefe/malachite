@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use num::arithmetic::traits::{Parity, RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
 use num::conversion::traits::ExactFrom;
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 macro_rules! impl_round_to_multiple_unsigned {
     ($t:ident) => {
@@ -32,7 +32,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// assert_eq!(5u32.round_to_multiple(0, RoundingMode::Down), 0);
             ///
@@ -120,7 +120,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// let mut x = 5u32;
             /// x.round_to_multiple_assign(0, RoundingMode::Down);
@@ -195,7 +195,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// assert_eq!((-5i32).round_to_multiple(0, RoundingMode::Down), 0);
             ///
@@ -257,7 +257,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// let mut x = -5i32;
             /// x.round_to_multiple_assign(0, RoundingMode::Down);

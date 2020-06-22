@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_set_zero;
 
 use fail_on_untested_path;
 use natural::arithmetic::add::{

@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{
     ArithmeticCheckedShl, RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, ShrRound,
 };
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 macro_rules! impl_round_to_multiple_of_power_of_two {
     ($t:ident) => {
@@ -35,7 +35,7 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// assert_eq!(10u8.round_to_multiple_of_power_of_two(2, RoundingMode::Floor), 8);
             /// assert_eq!(10u8.round_to_multiple_of_power_of_two(2, RoundingMode::Ceiling), 12);
@@ -85,7 +85,7 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
             /// # Example
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwoAssign;
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             ///
             /// let mut x = 10u8;
             /// x.round_to_multiple_of_power_of_two_assign(2, RoundingMode::Floor);

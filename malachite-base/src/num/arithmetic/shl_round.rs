@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 macro_rules! impl_shl_round {
     ($t:ident, $u:ident) => {
@@ -25,7 +25,7 @@ macro_rules! impl_shl_round {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShlRound;
             ///
             /// assert_eq!(0x101u16.shl_round(-8i8, RoundingMode::Down), 1);
@@ -72,7 +72,7 @@ macro_rules! impl_shl_round {
             ///
             /// # Examples
             /// ```
-            /// use malachite_base::rounding_mode::RoundingMode;
+            /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
             ///
             /// let mut x = 0x101u16;

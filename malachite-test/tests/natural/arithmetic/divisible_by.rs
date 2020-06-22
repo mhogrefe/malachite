@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::slices::slice_test_zero;
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,

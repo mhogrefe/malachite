@@ -1,4 +1,5 @@
-use malachite_base::slices::slice_move_left::slice_move_left;
+use malachite_base::slices::slice_move_left;
+use malachite_base_test_util::slices::slice_move_left_naive;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
@@ -7,12 +8,6 @@ use inputs::base::pairs_of_unsigned_vec_and_small_usize_var_1;
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_slice_move_left);
     register_bench!(registry, Small, benchmark_slice_move_left_algorithms);
-}
-
-pub fn slice_move_left_naive<T: Copy>(xs: &mut [T], amount: usize) {
-    let slice = xs[amount..].to_vec();
-    let limit = xs.len() - amount;
-    xs[..limit].copy_from_slice(&slice);
 }
 
 fn demo_slice_move_left(gm: GenerationMode, limit: usize) {

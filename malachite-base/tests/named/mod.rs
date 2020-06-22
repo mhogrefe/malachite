@@ -1,5 +1,5 @@
 use malachite_base::named::Named;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 pub fn test_named() {

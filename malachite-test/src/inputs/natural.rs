@@ -1,7 +1,9 @@
 use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
+use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::crement::Crementable;
+use malachite_base::exhaustive::range::{range_down_increasing, range_increasing};
 use malachite_base::num::arithmetic::traits::{
     DivRound, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
@@ -12,21 +14,25 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
+use malachite_base::num::exhaustive::{
+    exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
+    exhaustive_unsigneds,
+};
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rug;
-use rust_wheels::iterators::bools::exhaustive_bools;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
     dependent_pairs, exhaustive_dependent_pairs_infinite, exhaustive_dependent_pairs_infinite_log,
     exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
 };
-use rust_wheels::iterators::general::{random, range_increasing};
+use rust_wheels::iterators::general::random;
 use rust_wheels::iterators::integers_geometric::{
     i32s_geometric, range_up_geometric_u32, u32s_geometric,
 };
@@ -37,11 +43,10 @@ use rust_wheels::iterators::naturals::{
     special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
-    exhaustive_natural_signed, exhaustive_positive, exhaustive_signed, exhaustive_unsigned,
-    random_natural_signed, random_range, range_down_increasing, special_random_natural_signed,
-    special_random_signed, special_random_unsigned,
+    random_natural_signed, random_range, special_random_natural_signed, special_random_signed,
+    special_random_unsigned,
 };
-use rust_wheels::iterators::rounding_modes::{exhaustive_rounding_modes, random_rounding_modes};
+use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
     exhaustive_quadruples_from_single, exhaustive_triples, exhaustive_triples_from_single,
@@ -290,7 +295,7 @@ pub fn pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_natural_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
@@ -318,7 +323,7 @@ pub(crate) fn nrm_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
 pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> {
     let ps: It<(u64, Natural)> = match gm {
         GenerationMode::Exhaustive => Box::new(
-            exhaustive_dependent_pairs_infinite_log((), exhaustive_unsigned(), |_, &pow| {
+            exhaustive_dependent_pairs_infinite_log((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
                     range_increasing(Natural::ZERO, Natural::low_mask(pow))
                         .map(Option::Some)
@@ -364,7 +369,7 @@ pub(crate) fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
 ) -> It<(T, Natural)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_naturals(),
         )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_natural(scale),
@@ -392,9 +397,10 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_naturals(), exhaustive_signed()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_naturals(),
+            exhaustive_signeds(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_natural_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -424,9 +430,10 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs(exhaustive_signed(), exhaustive_naturals()))
-        }
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_signeds(),
+            exhaustive_naturals(),
+        )),
         GenerationMode::Random(scale) => random_pairs_of_primitive_and_natural(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -458,7 +465,7 @@ where
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
             exhaustive_naturals(),
-            exhaustive_natural_signed(),
+            exhaustive_natural_signeds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -550,7 +557,7 @@ pub fn pairs_of_natural_and_positive_natural_var_2(gm: GenerationMode) -> It<(Na
 }
 
 fn log_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_unsigned()))
+    Box::new(log_pairs(exhaustive_naturals(), exhaustive_unsigneds()))
 }
 
 pub fn pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -637,7 +644,7 @@ pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>
     match gm {
         GenerationMode::Exhaustive => Box::new(log_pairs(
             exhaustive_positive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -653,7 +660,7 @@ pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>
 }
 
 fn log_pairs_of_natural_and_signed<T: PrimitiveSigned>() -> It<(Natural, T)> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_signed()))
+    Box::new(log_pairs(exhaustive_naturals(), exhaustive_signeds()))
 }
 
 pub fn pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
@@ -709,7 +716,7 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
     match gm {
         GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
             exhaustive_naturals(),
-            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -746,7 +753,7 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
             range_increasing(1, T::WIDTH),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -770,8 +777,8 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_3(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            exhaustive_positive(),
-            exhaustive_unsigned(),
+            exhaustive_positive_primitives(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -816,7 +823,7 @@ pub fn triples_of_natural_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_naturals(),
         )),
         GenerationMode::Random(scale) => random_triples_of_natural_primitive_and_natural(scale),
@@ -834,9 +841,9 @@ pub fn triples_of_unsigned_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
 ) -> It<(T, Natural, T)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
             exhaustive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_natural_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
@@ -858,7 +865,7 @@ where
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            exhaustive_signed(),
+            exhaustive_signeds(),
             exhaustive_naturals(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -885,9 +892,9 @@ where
 {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_signed(),
+            exhaustive_signeds(),
             exhaustive_naturals(),
-            exhaustive_signed(),
+            exhaustive_signeds(),
         )),
         GenerationMode::Random(scale) => random_triples_of_primitive_natural_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
@@ -906,7 +913,7 @@ pub fn triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
             exhaustive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -965,7 +972,7 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 // where n is the maximum number of significant bits of the `Natural`s.
 pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, Natural, u64)> {
     let ps: It<(u64, (Natural, Natural))> = match gm {
-        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigned(), |&pow| {
+        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
             let range = range_increasing(Natural::ZERO, Natural::low_mask(pow));
             //TODO use lex_pairs_from_single
             lex_pairs(range.clone(), range)
@@ -999,7 +1006,7 @@ pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natur
 pub fn triples_of_natural_small_u64_and_bool(gm: GenerationMode) -> It<(Natural, u64, bool)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            exhaustive_pairs(exhaustive_naturals(), exhaustive_unsigned()),
+            exhaustive_pairs(exhaustive_naturals(), exhaustive_unsigneds()),
             exhaustive_bools(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -1024,11 +1031,11 @@ pub fn triples_of_natural_small_unsigned_and_u64_var_1<T: PrimitiveUnsigned>(
 ) -> It<(Natural, T, u64)> {
     let ps: It<(u64, (Natural, T))> = match gm {
         GenerationMode::Exhaustive => Box::new(
-            exhaustive_dependent_pairs_infinite((), exhaustive_unsigned(), |_, &pow| {
+            exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
                     sqrt_pairs(
                         range_increasing(Natural::ZERO, Natural::low_mask(pow)),
-                        exhaustive_unsigned(),
+                        exhaustive_unsigneds(),
                     )
                     .map(Option::Some)
                     .chain(repeat(None)),
@@ -1077,11 +1084,11 @@ pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
 ) -> It<(Natural, T, u64)> {
     let ps: It<(u64, (Natural, T))> = match gm {
         GenerationMode::Exhaustive => Box::new(
-            exhaustive_dependent_pairs_infinite((), exhaustive_unsigned(), |_, &pow| {
+            exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
                     sqrt_pairs(
                         range_increasing(Natural::ZERO, Natural::low_mask(pow)),
-                        exhaustive_signed(),
+                        exhaustive_signeds(),
                     )
                     .map(Option::Some)
                     .chain(repeat(None)),
@@ -1604,7 +1611,7 @@ pub fn quadruples_of_three_naturals_and_u64_var_1(
     gm: GenerationMode,
 ) -> It<(Natural, Natural, Natural, u64)> {
     let ps: It<(u64, (Natural, Natural, Natural))> = match gm {
-        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigned(), |&pow| {
+        GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
             let range = range_increasing(Natural::ZERO, Natural::low_mask(pow));
             //TODO use lex_triples_from_single
             lex_triples(range.clone(), range.clone(), range)
@@ -1643,7 +1650,7 @@ pub fn quadruples_of_natural_natural_natural_and_small_unsigned<T: PrimitiveUnsi
             exhaustive_naturals(),
             exhaustive_naturals(),
             exhaustive_naturals(),
-            exhaustive_unsigned(),
+            exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
@@ -1668,7 +1675,7 @@ fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural<T: PrimitiveU
     permute_1_3_4_2(reshape_2_2_to_4(match gm {
         GenerationMode::Exhaustive => Box::new(sqrt_pairs(
             exhaustive_pairs_from_single(exhaustive_naturals()),
-            exhaustive_pairs_from_single(exhaustive_unsigned()),
+            exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -1735,7 +1742,7 @@ pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Na
             };
             Box::new(exhaustive_dependent_pairs_infinite_sqrt(
                 (),
-                exhaustive_positive(),
+                exhaustive_positive_primitives(),
                 f,
             ))
         }
@@ -1876,7 +1883,7 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
                 )
             };
             reshape_2_1_to_3(Box::new(dependent_pairs(
-                log_pairs(exhaustive_naturals(), exhaustive_positive()),
+                log_pairs(exhaustive_naturals(), exhaustive_positive_primitives()),
                 f,
             )))
         }

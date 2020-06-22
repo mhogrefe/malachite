@@ -13,6 +13,7 @@ fn unsigned_overflowing_pow_assign_properties_helper<T: PrimitiveUnsigned + Rand
         let overflow = power.overflowing_pow_assign(y);
         assert_eq!((power, overflow), x.overflowing_pow(y));
         assert_eq!(x.wrapping_pow(y), power);
+        assert_eq!(x.checked_pow(y).is_none(), overflow);
         if !overflow {
             assert_eq!(power, x.pow(y));
         }
@@ -27,6 +28,7 @@ fn signed_overflowing_pow_assign_properties_helper<T: PrimitiveSigned + Rand>() 
             let overflow = power.overflowing_pow_assign(y);
             assert_eq!((power, overflow), x.overflowing_pow(y));
             assert_eq!(x.wrapping_pow(y), power);
+            assert_eq!(x.checked_pow(y).is_none(), overflow);
             if !overflow {
                 assert_eq!(power, x.pow(y));
             }

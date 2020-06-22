@@ -24,7 +24,7 @@ macro_rules! impl_add_mul {
             }
         }
 
-        impl AddMulAssign for $t {
+        impl AddMulAssign<$t> for $t {
             /// Replaces `self` with `self + y * z`.
             ///
             /// Time: worst case O(1)

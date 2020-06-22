@@ -5,9 +5,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_set_zero::slice_set_zero;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
@@ -203,7 +202,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest(xs: &[Limb], pow: u64) ->
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::rounding_mode::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
 /// assert_eq!(
@@ -539,7 +538,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest_in_place(xs: &mut Vec<Lim
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
 ///
-/// use malachite_base::rounding_mode::RoundingMode;
+/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
 /// let mut xs = vec![1];
@@ -668,7 +667,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -728,7 +727,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -798,7 +797,7 @@ impl RoundToMultipleOfPowerOfTwoAssign<u64> for Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwoAssign;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut n = Natural::from(10u32);

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use integer::Integer;
 
@@ -33,7 +33,7 @@ impl RoundToMultiple<Integer> for Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(-5).round_to_multiple(Integer::ZERO, RoundingMode::Down), 0);
@@ -117,7 +117,7 @@ impl<'a> RoundToMultiple<&'a Integer> for Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(-5).round_to_multiple(&Integer::ZERO, RoundingMode::Down), 0);
@@ -204,7 +204,7 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!((&Integer::from(-5)).round_to_multiple(Integer::ZERO, RoundingMode::Down), 0);
@@ -302,7 +302,7 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!((&Integer::from(-5)).round_to_multiple(&Integer::ZERO, RoundingMode::Down), 0);
@@ -398,7 +398,7 @@ impl RoundToMultipleAssign<Integer> for Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-5);
@@ -499,7 +499,7 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-5);

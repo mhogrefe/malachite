@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign,
 };
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use integer::Integer;
 
@@ -33,7 +33,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10).round_to_multiple_of_power_of_two(2, RoundingMode::Floor), 8);
@@ -87,7 +87,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -153,7 +153,7 @@ impl RoundToMultipleOfPowerOfTwoAssign<u64> for Integer {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwoAssign;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut n = Integer::from(10);

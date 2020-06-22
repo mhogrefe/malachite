@@ -1,6 +1,4 @@
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
-use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero, slice_trailing_zeros};
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_unsigned;

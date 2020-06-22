@@ -4,7 +4,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::{
     FromOtherTypeSlice, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice, WrappingFrom,
 };
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 #[inline]
 pub fn _from_other_type_slice_ident<T: Copy + Zero>(slice: &[T]) -> T {

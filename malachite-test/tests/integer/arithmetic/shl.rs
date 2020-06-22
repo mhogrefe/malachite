@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{Abs, IsPowerOfTwo, ShlRound};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{

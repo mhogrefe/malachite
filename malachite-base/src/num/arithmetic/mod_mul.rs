@@ -506,7 +506,7 @@ macro_rules! impl_mod_mul {
             }
         }
 
-        impl ModMul for $t {
+        impl ModMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
@@ -530,7 +530,7 @@ macro_rules! impl_mod_mul {
             }
         }
 
-        impl ModMulAssign for $t {
+        impl ModMulAssign<$t> for $t {
             /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///

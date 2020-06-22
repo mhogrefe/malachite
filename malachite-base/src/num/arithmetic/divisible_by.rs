@@ -1,8 +1,20 @@
+use std::ops::Rem;
+
+use comparison::traits::Min;
 use num::arithmetic::traits::DivisibleBy;
+use num::basic::traits::{NegativeOne, Zero};
+
+#[inline]
+pub fn _divisible_by_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> bool
+where
+    T: Rem<T, Output = T>,
+{
+    x == T::ZERO || other != T::ZERO && x % other == T::ZERO
+}
 
 macro_rules! impl_divisible_by_unsigned {
     ($t:ident) => {
-        impl DivisibleBy for $t {
+        impl DivisibleBy<$t> for $t {
             /// Returns whether a value is divisible by another value; in other words, whether the
             /// first value is a multiple of the second. This means that zero is divisible by any
             /// number, including zero; but a nonzero number is never divisible by zero.
@@ -19,22 +31,28 @@ macro_rules! impl_divisible_by_unsigned {
             /// assert_eq!(100u16.divisible_by(3), false);
             /// assert_eq!(102u32.divisible_by(3), true);
             /// ```
+            #[inline]
             fn divisible_by(self, other: $t) -> bool {
-                self == 0 || other != 0 && self % other == 0
+                _divisible_by_unsigned(self, other)
             }
         }
     };
 }
-impl_divisible_by_unsigned!(u8);
-impl_divisible_by_unsigned!(u16);
-impl_divisible_by_unsigned!(u32);
-impl_divisible_by_unsigned!(u64);
-impl_divisible_by_unsigned!(u128);
-impl_divisible_by_unsigned!(usize);
+apply_to_unsigneds!(impl_divisible_by_unsigned);
+
+#[inline]
+pub fn _divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Zero>(x: T, other: T) -> bool
+where
+    T: Rem<T, Output = T>,
+{
+    x == T::ZERO
+        || x == T::MIN && other == T::NEGATIVE_ONE
+        || other != T::ZERO && x % other == T::ZERO
+}
 
 macro_rules! impl_divisible_by_signed {
     ($t:ident) => {
-        impl DivisibleBy for $t {
+        impl DivisibleBy<$t> for $t {
             /// Returns whether a value is divisible by another value; in other words, whether the
             /// first value is a multiple of the second. This means that zero is divisible by any
             /// number, including zero; but a nonzero number is never divisible by zero.
@@ -51,15 +69,11 @@ macro_rules! impl_divisible_by_signed {
             /// assert_eq!((-100i16).divisible_by(-3), false);
             /// assert_eq!(102i32.divisible_by(-3), true);
             /// ```
+            #[inline]
             fn divisible_by(self, other: $t) -> bool {
-                self == 0 || self == $t::MIN && other == -1 || other != 0 && self % other == 0
+                _divisible_by_signed(self, other)
             }
         }
     };
 }
-impl_divisible_by_signed!(i8);
-impl_divisible_by_signed!(i16);
-impl_divisible_by_signed!(i32);
-impl_divisible_by_signed!(i64);
-impl_divisible_by_signed!(i128);
-impl_divisible_by_signed!(isize);
+apply_to_signeds!(impl_divisible_by_signed);

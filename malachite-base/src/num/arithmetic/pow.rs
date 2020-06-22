@@ -33,20 +33,9 @@ macro_rules! impl_pow {
             /// ```
             #[inline]
             fn pow_assign(&mut self, exp: u64) {
-                *self = Pow::pow(*self, exp);
+                *self = $t::pow(*self, u32::exact_from(exp));
             }
         }
     };
 }
-impl_pow!(u8);
-impl_pow!(u16);
-impl_pow!(u32);
-impl_pow!(u64);
-impl_pow!(u128);
-impl_pow!(usize);
-impl_pow!(i8);
-impl_pow!(i16);
-impl_pow!(i32);
-impl_pow!(i64);
-impl_pow!(i128);
-impl_pow!(isize);
+apply_to_primitive_ints!(impl_pow);

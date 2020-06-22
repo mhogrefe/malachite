@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
+use malachite_base::slices::slice_trailing_zeros;
 
 use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::divisible_by::{

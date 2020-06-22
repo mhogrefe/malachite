@@ -2,7 +2,7 @@ use num::arithmetic::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo};
 
 macro_rules! impl_eq_mod_power_of_two {
     ($t:ident) => {
-        impl EqModPowerOfTwo<Self> for $t {
+        impl EqModPowerOfTwo<$t> for $t {
             /// Returns whether `self` is equal to `other` mod 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)

@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoIsReduced {
@@ -1036,7 +1036,7 @@ pub trait Pow<RHS> {
     fn pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Replaces `self` with `self.pow(exp)`.
+/// Replaces `self` with `self` ^ `exp`.
 pub trait PowAssign<RHS = Self> {
     fn pow_assign(&mut self, exp: RHS);
 }
@@ -1055,8 +1055,8 @@ pub trait SaturatingPow<RHS> {
     fn saturating_pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Saturating exponentiation. Replaces `self` with `self.pow(exp)`, saturating at the numeric
-/// bounds instead of overflowing.
+/// Saturating exponentiation. Replaces `self` with `self` ^ `exp`, saturating at the numeric bounds
+/// instead of overflowing.
 pub trait SaturatingPowAssign<RHS = Self> {
     fn saturating_pow_assign(&mut self, exp: RHS);
 }
@@ -1069,13 +1069,13 @@ pub trait WrappingPow<RHS> {
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) exponentiation. Replaces `self` with `self.pow(exp)`, wrapping around at the
+/// Wrapping (modular) exponentiation. Replaces `self` with `self` ^ `exp`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingPowAssign<RHS = Self> {
     fn wrapping_pow_assign(&mut self, exp: RHS);
 }
 
-/// Calculates `self.pow(exp)`.
+/// Calculates `self` ^ `exp`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
@@ -1085,12 +1085,75 @@ pub trait OverflowingPow<RHS> {
     fn overflowing_pow(self, exp: RHS) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self.pow(exp)`.
+/// Replaces `self` with `self` ^ `exp`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
 pub trait OverflowingPowAssign<RHS = Self> {
     fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
+}
+
+/// Squares `self`.
+pub trait Square {
+    type Output;
+
+    fn square(self) -> Self::Output;
+}
+
+/// Replaces `self` with `self` ^ 2.
+pub trait SquareAssign {
+    fn square_assign(&mut self);
+}
+
+/// Squares `self`, returning `None` if there is no valid result.
+pub trait CheckedSquare {
+    type Output;
+
+    fn checked_square(self) -> Option<Self::Output>;
+}
+
+/// Squares `self`, saturating at the numeric bounds instead of overflowing.
+pub trait SaturatingSquare {
+    type Output;
+
+    fn saturating_square(self) -> Self::Output;
+}
+
+/// Saturating squaring. Replaces `self` with `self` ^ 2, saturating at the numeric bounds instead
+/// of overflowing.
+pub trait SaturatingSquareAssign {
+    fn saturating_square_assign(&mut self);
+}
+
+/// Wrapping (modular) squaring. Squares `self`, wrapping around at the boundary of the type.
+pub trait WrappingSquare {
+    type Output;
+
+    fn wrapping_square(self) -> Self::Output;
+}
+
+/// Wrapping (modular) squaring. Replaces `self` with `self` ^ 2, wrapping around at the boundary of
+/// the type.
+pub trait WrappingSquareAssign {
+    fn wrapping_square_assign(&mut self);
+}
+
+/// Calculates `self` ^ `exp`.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// would occur. If an overflow would have occurred then the wrapped value is returned.
+pub trait OverflowingSquare {
+    type Output;
+
+    fn overflowing_square(self) -> (Self::Output, bool);
+}
+
+/// Replaces `self` with `self` ^ 2.
+///
+/// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
+/// have occurred then the wrapped value is assigned.
+pub trait OverflowingSquareAssign {
+    fn overflowing_square_assign(&mut self) -> bool;
 }
 
 pub trait CheckedLogTwo {

@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_leading_zeros;
 
 #[test]
 fn test_slice_leading_zeros() {

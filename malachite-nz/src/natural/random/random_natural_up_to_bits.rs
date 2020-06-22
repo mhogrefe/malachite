@@ -4,7 +4,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 use rand::{Rand, Rng};
 
 use natural::Natural;

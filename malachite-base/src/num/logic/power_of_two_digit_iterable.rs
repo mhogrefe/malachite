@@ -4,7 +4,7 @@ use num::arithmetic::traits::{DivRound, SaturatingSubAssign};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitBlockAccess, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
-use rounding_mode::RoundingMode;
+use rounding_modes::RoundingMode;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {

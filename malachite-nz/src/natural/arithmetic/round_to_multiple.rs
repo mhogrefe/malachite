@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 use natural::InnerNatural::Small;
 use natural::Natural;
@@ -37,7 +37,7 @@ impl RoundToMultiple<Natural> for Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(5u32).round_to_multiple(Natural::ZERO, RoundingMode::Down), 0);
@@ -108,7 +108,7 @@ impl<'a> RoundToMultiple<&'a Natural> for Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(5u32).round_to_multiple(&Natural::ZERO, RoundingMode::Down), 0);
@@ -179,7 +179,7 @@ impl<'a> RoundToMultiple<Natural> for &'a Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(5u32)).round_to_multiple(Natural::ZERO, RoundingMode::Down), 0);
@@ -288,7 +288,7 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(5u32)).round_to_multiple(&Natural::ZERO, RoundingMode::Down), 0);
@@ -395,7 +395,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(5u32);
@@ -499,7 +499,7 @@ impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     ///
     /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::rounding_mode::RoundingMode;
+    /// use malachite_base::rounding_modes::RoundingMode;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(5u32);

@@ -2,7 +2,7 @@ use num::arithmetic::traits::{SubMul, SubMulAssign, WrappingSubMul, WrappingSubM
 
 macro_rules! impl_sub_mul {
     ($t:ident) => {
-        impl SubMul for $t {
+        impl SubMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self - y * z`.
@@ -24,7 +24,7 @@ macro_rules! impl_sub_mul {
             }
         }
 
-        impl SubMulAssign for $t {
+        impl SubMulAssign<$t> for $t {
             /// Replaces `self` with `self - y * z`.
             ///
             /// Time: worst case O(1)

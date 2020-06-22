@@ -5,7 +5,7 @@ use num::basic::integers::PrimitiveInteger;
 
 macro_rules! impl_mod_power_of_two_mul {
     ($t:ident) => {
-        impl ModPowerOfTwoMul for $t {
+        impl ModPowerOfTwoMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
@@ -29,7 +29,7 @@ macro_rules! impl_mod_power_of_two_mul {
             }
         }
 
-        impl ModPowerOfTwoMulAssign for $t {
+        impl ModPowerOfTwoMulAssign<$t> for $t {
             /// Replaces `self` with `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are
             /// already reduced mod 2<sup>`pow`</sup>.
             ///

@@ -11,8 +11,8 @@ use malachite_base::num::conversion::traits::{ExactFrom, FromOtherTypeSlice, Wra
 use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, LowMask, PowerOfTwoDigits, SignificantBits,
 };
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_trailing_zeros::slice_trailing_zeros;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_trailing_zeros;
 
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

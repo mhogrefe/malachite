@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::NegativeOne;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_mode::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_shl_round() {

@@ -32,6 +32,7 @@ pub mod base {
             pub mod arithmetic_checked_shl;
             pub mod arithmetic_checked_shr;
             pub mod checked_add_mul;
+            pub mod checked_square;
             pub mod checked_sub_mul;
             pub mod div_exact;
             pub mod div_mod;
@@ -64,6 +65,7 @@ pub mod base {
             pub mod overflowing_mul;
             pub mod overflowing_neg;
             pub mod overflowing_pow;
+            pub mod overflowing_square;
             pub mod overflowing_sub;
             pub mod overflowing_sub_mul;
             pub mod parity;
@@ -77,11 +79,13 @@ pub mod base {
             pub mod saturating_mul;
             pub mod saturating_neg;
             pub mod saturating_pow;
+            pub mod saturating_square;
             pub mod saturating_sub;
             pub mod saturating_sub_mul;
             pub mod shl_round;
             pub mod shr_round;
             pub mod sign;
+            pub mod square;
             pub mod sub_mul;
             pub mod wrapping_abs;
             pub mod wrapping_add;
@@ -90,6 +94,7 @@ pub mod base {
             pub mod wrapping_mul;
             pub mod wrapping_neg;
             pub mod wrapping_pow;
+            pub mod wrapping_square;
             pub mod wrapping_sub;
             pub mod wrapping_sub_mul;
             pub mod x_mul_y_is_zz;

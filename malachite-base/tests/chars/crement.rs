@@ -1,4 +1,4 @@
-use malachite_base::chars::constants::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
+use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::comparison::traits::Max;
 use malachite_base::crement::Crementable;
 

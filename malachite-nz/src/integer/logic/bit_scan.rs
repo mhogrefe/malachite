@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
+use malachite_base::slices::slice_leading_zeros;
 
 use integer::Integer;
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};

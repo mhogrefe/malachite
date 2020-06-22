@@ -5,7 +5,7 @@ use num::basic::integers::PrimitiveInteger;
 
 macro_rules! impl_overflowing_add_mul_unsigned {
     ($t:ident) => {
-        impl OverflowingAddMul for $t {
+        impl OverflowingAddMul<$t> for $t {
             type Output = $t;
 
             /// Computes `self + y * z`, returning a pair consisting of the wrapped value and a

@@ -8,10 +8,8 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base::rounding_mode::RoundingMode;
-use malachite_base::slices::slice_leading_zeros::slice_leading_zeros;
-use malachite_base::slices::slice_set_zero::slice_set_zero;
-use malachite_base::slices::slice_test_zero::slice_test_zero;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zero};
 
 use fail_on_untested_path;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
@@ -45,6 +43,8 @@ use platform::{
     DoubleLimb, Limb, BINV_NEWTON_THRESHOLD, DC_BDIV_QR_THRESHOLD, DC_BDIV_Q_THRESHOLD,
     MU_BDIV_Q_THRESHOLD,
 };
+
+//TODO clean
 
 const INVERT_LIMB_TABLE_LOG_SIZE: u64 = 7;
 

@@ -1,4 +1,4 @@
-use malachite_base::slices::slice_set_zero::slice_set_zero;
+use malachite_base::slices::slice_set_zero;
 use malachite_nz::platform::Limb;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};

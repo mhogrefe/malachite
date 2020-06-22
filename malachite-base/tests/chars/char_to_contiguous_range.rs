@@ -1,5 +1,6 @@
-use malachite_base::chars::char_to_contiguous_range::char_to_contiguous_range;
-use malachite_base::chars::constants::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
+use malachite_base::chars::{
+    char_to_contiguous_range, CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES,
+};
 use malachite_base::comparison::traits::Max;
 
 #[test]

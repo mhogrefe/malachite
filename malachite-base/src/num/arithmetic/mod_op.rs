@@ -5,7 +5,7 @@ use num::conversion::traits::ExactFrom;
 
 macro_rules! impl_mod_unsigned {
     ($t:ident) => {
-        impl Mod for $t {
+        impl Mod<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value, returning the remainder. The quotient and
@@ -35,7 +35,7 @@ macro_rules! impl_mod_unsigned {
             }
         }
 
-        impl ModAssign for $t {
+        impl ModAssign<$t> for $t {
             /// Divides a value by another value in place, replacing `self` with the remainder. The
             /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
             ///
@@ -66,7 +66,7 @@ macro_rules! impl_mod_unsigned {
             }
         }
 
-        impl NegMod for $t {
+        impl NegMod<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value, returning the remainder of the negative of the
@@ -101,7 +101,7 @@ macro_rules! impl_mod_unsigned {
             }
         }
 
-        impl NegModAssign for $t {
+        impl NegModAssign<$t> for $t {
             /// Divides a value by another value in place, replacing `self` with the remainder of
             /// the negative of the first value divided by the second. The quotient and remainder
             /// satisfy `self` = q * `other` - r and 0 <= r < `other`.
@@ -146,7 +146,7 @@ impl_mod_unsigned!(usize);
 
 macro_rules! impl_mod_signed {
     ($t:ident) => {
-        impl Mod for $t {
+        impl Mod<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value, returning the remainder. The remainder has the
@@ -191,7 +191,7 @@ macro_rules! impl_mod_signed {
             }
         }
 
-        impl ModAssign for $t {
+        impl ModAssign<$t> for $t {
             /// Divides a value by another value in place, replacing `self` with the remainder. The
             /// remainder has the same sign as the divisor. The quotient and remainder satisfy
             /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
@@ -233,7 +233,7 @@ macro_rules! impl_mod_signed {
             }
         }
 
-        impl CeilingMod for $t {
+        impl CeilingMod<$t> for $t {
             type Output = $t;
 
             /// Divides a value by another value, returning the remainder. The remainder has the
@@ -278,7 +278,7 @@ macro_rules! impl_mod_signed {
             }
         }
 
-        impl CeilingModAssign for $t {
+        impl CeilingModAssign<$t> for $t {
             /// Divides a value by another value in place, taking the second `Integer` by value,
             /// replacing `self` with the remainder. The remainder has the opposite sign of the
             /// divisor. The quotient and remainder satisfy `self` = q * `other` + r and
