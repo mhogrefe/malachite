@@ -29,12 +29,14 @@
 #[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
+extern crate rand;
 
 pub mod bools {
     pub mod constants;
     pub mod crement;
     pub mod exhaustive;
     pub mod not_assign;
+    pub mod random;
 }
 pub mod comparison {
     pub mod macros;
@@ -159,9 +161,20 @@ pub mod num {
         pub mod rotate;
         pub mod significant_bits;
     }
+    pub mod random {
+        pub mod random_highest_bit_set_values;
+        pub mod random_masked_values;
+        pub mod random_natural_signeds;
+        pub mod random_negative_signeds;
+        pub mod random_nonzero_signeds;
+        pub mod random_positive_signeds;
+        pub mod random_positive_unsigneds;
+        pub mod standard_random_values;
+    }
 }
 pub mod orderings {
     pub mod exhaustive;
+    pub mod random;
 }
 pub mod rounding_modes {
     pub mod clone;
@@ -170,6 +183,7 @@ pub mod rounding_modes {
     pub mod exhaustive;
     pub mod from_str;
     pub mod neg;
+    pub mod random;
     pub mod size;
 }
 pub mod slices {
@@ -180,5 +194,10 @@ pub mod slices {
     pub mod slice_trailing_zeros;
     pub mod split_into_chunks;
 }
-pub mod strings;
+pub mod strings {
+    pub mod string_is_subset;
+    pub mod string_nub;
+    pub mod string_sort;
+    pub mod to_debug_string;
+}
 pub mod vecs;

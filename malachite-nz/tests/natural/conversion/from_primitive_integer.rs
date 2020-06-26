@@ -1,6 +1,7 @@
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
+use malachite_base::strings::ToDebugString;
 use num::BigUint;
 use rug;
 
@@ -39,7 +40,7 @@ fn test_checked_from_i32() {
     let test = |i: i32, out| {
         let on = Natural::checked_from(i);
         assert!(on.as_ref().map_or(true, Natural::is_valid));
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
     };
     test(0, "Some(0)");
     test(123, "Some(123)");
@@ -103,7 +104,7 @@ fn test_checked_from_i64() {
     let test = |i: i64, out| {
         let on = Natural::checked_from(i);
         assert!(on.as_ref().map_or(true, Natural::is_valid));
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
     };
     test(0, "Some(0)");
     test(123, "Some(123)");

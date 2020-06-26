@@ -303,7 +303,6 @@ macro_rules! impl_mod_mul_precomputed_fast {
         }
     };
 }
-
 impl_mod_mul_precomputed_fast!(u32, u64, _limbs_invert_limb_u32);
 impl_mod_mul_precomputed_fast!(u64, u128, _limbs_invert_limb_u64);
 
@@ -360,7 +359,6 @@ macro_rules! impl_mod_mul_precomputed_promoted {
         }
     };
 }
-
 impl_mod_mul_precomputed_promoted!(u8);
 impl_mod_mul_precomputed_promoted!(u16);
 
@@ -559,10 +557,4 @@ macro_rules! impl_mod_mul {
         }
     };
 }
-
-impl_mod_mul!(u8);
-impl_mod_mul!(u16);
-impl_mod_mul!(u32);
-impl_mod_mul!(u64);
-impl_mod_mul!(u128);
-impl_mod_mul!(usize);
+apply_to_unsigneds!(impl_mod_mul);

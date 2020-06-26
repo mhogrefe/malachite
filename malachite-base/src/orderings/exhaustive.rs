@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 use std::iter::Cloned;
 use std::slice::Iter;
 
+use orderings::ORDERINGS;
+
 /// Generates all `Ordering`s, in increasing order.
 ///
 /// Length is 3.
@@ -47,7 +49,5 @@ pub fn exhaustive_orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
 /// ```
 #[inline]
 pub fn exhaustive_orderings() -> Cloned<Iter<'static, Ordering>> {
-    [Ordering::Equal, Ordering::Less, Ordering::Greater]
-        .iter()
-        .cloned()
+    ORDERINGS.iter().cloned()
 }

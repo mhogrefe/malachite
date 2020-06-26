@@ -25,16 +25,11 @@ macro_rules! impl_divisible_by_power_of_two_unsigned {
         }
     };
 }
-impl_divisible_by_power_of_two_unsigned!(u8);
-impl_divisible_by_power_of_two_unsigned!(u16);
-impl_divisible_by_power_of_two_unsigned!(u32);
-impl_divisible_by_power_of_two_unsigned!(u64);
-impl_divisible_by_power_of_two_unsigned!(u128);
-impl_divisible_by_power_of_two_unsigned!(usize);
+apply_to_unsigneds!(impl_divisible_by_power_of_two_unsigned);
 
 macro_rules! impl_divisible_by_power_of_two_signed {
-    ($t:ident, $u:ident) => {
-        impl DivisibleByPowerOfTwo for $t {
+    ($u:ident, $s:ident) => {
+        impl DivisibleByPowerOfTwo for $s {
             /// Returns whether `self` is divisible by 2<sup>`pow`</sup>.
             ///
             /// Time: worst case O(1)
@@ -56,9 +51,4 @@ macro_rules! impl_divisible_by_power_of_two_signed {
         }
     };
 }
-impl_divisible_by_power_of_two_signed!(i8, u8);
-impl_divisible_by_power_of_two_signed!(i16, u16);
-impl_divisible_by_power_of_two_signed!(i32, u32);
-impl_divisible_by_power_of_two_signed!(i64, u64);
-impl_divisible_by_power_of_two_signed!(i128, u128);
-impl_divisible_by_power_of_two_signed!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_divisible_by_power_of_two_signed);

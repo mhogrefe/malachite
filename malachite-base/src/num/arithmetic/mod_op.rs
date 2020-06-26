@@ -1,7 +1,34 @@
+use std::ops::{Neg, Rem, RemAssign, Sub};
+
 use num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
+use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
+
+#[inline]
+pub fn _neg_mod_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> T
+where
+    T: Rem<T, Output = T> + Sub<T, Output = T>,
+{
+    let remainder = x % other;
+    if remainder == T::ZERO {
+        T::ZERO
+    } else {
+        other - remainder
+    }
+}
+
+#[inline]
+pub fn _neg_mod_assign_unsigned<T: Copy + Eq + Zero>(x: &mut T, other: T)
+where
+    T: RemAssign<T> + Sub<T, Output = T>,
+{
+    *x %= other;
+    if *x != T::ZERO {
+        *x = other - *x;
+    }
+}
 
 macro_rules! impl_mod_unsigned {
     ($t:ident) => {
@@ -92,12 +119,7 @@ macro_rules! impl_mod_unsigned {
             /// ```
             #[inline]
             fn neg_mod(self, other: $t) -> $t {
-                let remainder = self % other;
-                if remainder == 0 {
-                    0
-                } else {
-                    other - remainder
-                }
+                _neg_mod_unsigned(self, other)
             }
         }
 
@@ -129,20 +151,47 @@ macro_rules! impl_mod_unsigned {
             /// ```
             #[inline]
             fn neg_mod_assign(&mut self, other: $t) {
-                *self %= other;
-                if *self != 0 {
-                    *self = other - *self;
-                }
+                _neg_mod_assign_unsigned(self, other);
             }
         }
     };
 }
-impl_mod_unsigned!(u8);
-impl_mod_unsigned!(u16);
-impl_mod_unsigned!(u32);
-impl_mod_unsigned!(u64);
-impl_mod_unsigned!(u128);
-impl_mod_unsigned!(usize);
+apply_to_unsigneds!(impl_mod_unsigned);
+
+pub fn _mod_op_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
+where
+    T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
+    U: NegMod<U, Output = U> + Rem<U, Output = U>,
+{
+    let remainder = if (x >= T::ZERO) == (other >= T::ZERO) {
+        x.unsigned_abs() % other.unsigned_abs()
+    } else {
+        x.unsigned_abs().neg_mod(other.unsigned_abs())
+    };
+    if other >= T::ZERO {
+        T::exact_from(remainder)
+    } else {
+        -T::exact_from(remainder)
+    }
+}
+
+#[inline]
+pub fn _ceiling_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
+where
+    T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
+    U: NegMod<U, Output = U> + Rem<U, Output = U>,
+{
+    let remainder = if (x >= T::ZERO) == (other >= T::ZERO) {
+        x.unsigned_abs().neg_mod(other.unsigned_abs())
+    } else {
+        x.unsigned_abs() % other.unsigned_abs()
+    };
+    if other >= T::ZERO {
+        -T::exact_from(remainder)
+    } else {
+        T::exact_from(remainder)
+    }
+}
 
 macro_rules! impl_mod_signed {
     ($t:ident) => {
@@ -178,16 +227,7 @@ macro_rules! impl_mod_signed {
             /// ```
             #[inline]
             fn mod_op(self, other: $t) -> $t {
-                let remainder = if (self >= 0) == (other >= 0) {
-                    self.unsigned_abs() % other.unsigned_abs()
-                } else {
-                    self.unsigned_abs().neg_mod(other.unsigned_abs())
-                };
-                if other >= 0 {
-                    $t::exact_from(remainder)
-                } else {
-                    -$t::exact_from(remainder)
-                }
+                _mod_op_signed(self, other)
             }
         }
 
@@ -265,16 +305,7 @@ macro_rules! impl_mod_signed {
             /// ```
             #[inline]
             fn ceiling_mod(self, other: $t) -> $t {
-                let remainder = if (self >= 0) == (other >= 0) {
-                    self.unsigned_abs().neg_mod(other.unsigned_abs())
-                } else {
-                    self.unsigned_abs() % other.unsigned_abs()
-                };
-                if other >= 0 {
-                    -$t::exact_from(remainder)
-                } else {
-                    $t::exact_from(remainder)
-                }
+                _ceiling_mod_signed(self, other)
             }
         }
 
@@ -322,9 +353,4 @@ macro_rules! impl_mod_signed {
         }
     };
 }
-impl_mod_signed!(i8);
-impl_mod_signed!(i16);
-impl_mod_signed!(i32);
-impl_mod_signed!(i64);
-impl_mod_signed!(i128);
-impl_mod_signed!(isize);
+apply_to_signeds!(impl_mod_signed);

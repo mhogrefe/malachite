@@ -3,6 +3,8 @@ use num::arithmetic::traits::{
 };
 use num::basic::integers::PrimitiveInteger;
 
+//TODO clean
+
 macro_rules! impl_mod_power_of_two_add {
     ($t:ident) => {
         impl ModPowerOfTwoAdd<$t> for $t {

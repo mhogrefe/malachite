@@ -1,17 +1,45 @@
 use num::arithmetic::traits::{
-    CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
+    CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, CheckedNeg, ModPowerOfTwo,
+    ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
+    RemPowerOfTwoAssign, WrappingNeg,
 };
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Zero;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
-use num::logic::traits::LowMask;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
+#[inline]
+pub fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
+    if x == T::ZERO || pow >= T::WIDTH {
+        x
+    } else {
+        x & T::low_mask(pow)
+    }
+}
+
+#[inline]
+pub fn _mod_power_of_two_assign_unsigned<T: PrimitiveInteger>(x: &mut T, pow: u64) {
+    if *x != T::ZERO && pow < T::WIDTH {
+        *x &= T::low_mask(pow)
+    }
+}
+
+#[inline]
+fn _neg_mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T
+where
+    T: ModPowerOfTwo<Output = T>,
+{
+    if x != T::ZERO && pow > T::WIDTH {
+        panic!(ERROR_MESSAGE);
+    }
+    x.wrapping_neg().mod_power_of_two(pow)
+}
+
 macro_rules! impl_mod_power_of_two_unsigned {
-    ($t:ident) => {
-        impl ModPowerOfTwo for $t {
-            type Output = $t;
+    ($s:ident) => {
+        impl ModPowerOfTwo for $s {
+            type Output = $s;
 
             /// Calculates `self` mod a power of 2. In other words, returns r, where
             /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
@@ -31,16 +59,12 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// assert_eq!(1611u32.mod_power_of_two(4), 11);
             /// ```
             #[inline]
-            fn mod_power_of_two(self, pow: u64) -> $t {
-                if self == 0 || pow >= $t::WIDTH {
-                    self
-                } else {
-                    self & $t::low_mask(pow)
-                }
+            fn mod_power_of_two(self, pow: u64) -> $s {
+                _mod_power_of_two_unsigned(self, pow)
             }
         }
 
-        impl ModPowerOfTwoAssign for $t {
+        impl ModPowerOfTwoAssign for $s {
             /// Reduces `self` mod a power of 2. In other words, replaces `self` with r, where
             /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
             ///
@@ -64,14 +88,12 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// ```
             #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
-                if *self != 0 && pow < $t::WIDTH {
-                    *self &= $t::low_mask(pow)
-                }
+                _mod_power_of_two_assign_unsigned(self, pow);
             }
         }
 
-        impl RemPowerOfTwo for $t {
-            type Output = $t;
+        impl RemPowerOfTwo for $s {
+            type Output = $s;
 
             /// Calculates `self` rem a power of 2. For unsigned integers, rem is equivalent to mod.
             ///
@@ -90,12 +112,12 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// assert_eq!(1611u32.rem_power_of_two(4), 11);
             /// ```
             #[inline]
-            fn rem_power_of_two(self, pow: u64) -> $t {
+            fn rem_power_of_two(self, pow: u64) -> $s {
                 self.mod_power_of_two(pow)
             }
         }
 
-        impl RemPowerOfTwoAssign for $t {
+        impl RemPowerOfTwoAssign for $s {
             /// Reduces `self` rem a power of 2. For unsigned integers, rem is equivalent to mod.
             ///
             /// Time: worst case O(1)
@@ -122,8 +144,8 @@ macro_rules! impl_mod_power_of_two_unsigned {
             }
         }
 
-        impl NegModPowerOfTwo for $t {
-            type Output = $t;
+        impl NegModPowerOfTwo for $s {
+            type Output = $s;
 
             /// Calculates `-self` mod a power of 2. In other words, returns r, where
             /// `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
@@ -133,7 +155,7 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is nonzero and `pow` is greater than `$t::WIDTH`.
+            /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -146,15 +168,12 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// assert_eq!(1611u32.neg_mod_power_of_two(4), 5);
             /// ```
             #[inline]
-            fn neg_mod_power_of_two(self, pow: u64) -> $t {
-                if self != 0 && pow > $t::WIDTH {
-                    panic!(ERROR_MESSAGE);
-                }
-                self.wrapping_neg().mod_power_of_two(pow)
+            fn neg_mod_power_of_two(self, pow: u64) -> $s {
+                _neg_mod_power_of_two_unsigned(self, pow)
             }
         }
 
-        impl NegModPowerOfTwoAssign for $t {
+        impl NegModPowerOfTwoAssign for $s {
             /// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
             /// `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
             ///
@@ -163,7 +182,7 @@ macro_rules! impl_mod_power_of_two_unsigned {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is nonzero and `pow` is greater than `$t::WIDTH`.
+            /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -186,17 +205,58 @@ macro_rules! impl_mod_power_of_two_unsigned {
         }
     };
 }
+apply_to_unsigneds!(impl_mod_power_of_two_unsigned);
 
-impl_mod_power_of_two_unsigned!(u8);
-impl_mod_power_of_two_unsigned!(u16);
-impl_mod_power_of_two_unsigned!(u32);
-impl_mod_power_of_two_unsigned!(u64);
-impl_mod_power_of_two_unsigned!(u128);
-impl_mod_power_of_two_unsigned!(usize);
+#[inline]
+pub fn _mod_power_of_two_signed<U, S: PrimitiveInteger>(x: S, pow: u64) -> U
+where
+    U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
+{
+    if x < S::ZERO && pow > S::WIDTH {
+        panic!(ERROR_MESSAGE);
+    }
+    U::wrapping_from(x).mod_power_of_two(pow)
+}
+
+#[inline]
+pub fn _mod_power_of_two_assign_signed<U, S: Copy>(x: &mut S, pow: u64)
+where
+    S: CheckedFrom<U> + ModPowerOfTwo<Output = U>,
+{
+    *x = S::checked_from(x.mod_power_of_two(pow)).expect(ERROR_MESSAGE);
+}
+
+pub fn _rem_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
+where
+    U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
+    S: WrappingFrom<U> + WrappingNeg<Output = S>,
+{
+    if x >= S::ZERO {
+        S::wrapping_from(U::wrapping_from(x).mod_power_of_two(pow))
+    } else {
+        S::wrapping_from(U::wrapping_from(x.wrapping_neg()).mod_power_of_two(pow)).wrapping_neg()
+    }
+}
+
+pub fn _ceiling_mod_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
+where
+    U: ModPowerOfTwo<Output = U> + NegModPowerOfTwo<Output = U> + WrappingFrom<S>,
+    S: CheckedFrom<U> + CheckedNeg<Output = S> + WrappingNeg<Output = S>,
+{
+    let abs_result = if x >= S::ZERO {
+        U::wrapping_from(x).neg_mod_power_of_two(pow)
+    } else {
+        U::wrapping_from(x.wrapping_neg()).mod_power_of_two(pow)
+    };
+    S::checked_from(abs_result)
+        .expect(ERROR_MESSAGE)
+        .checked_neg()
+        .expect(ERROR_MESSAGE)
+}
 
 macro_rules! impl_mod_power_of_two_signed {
-    ($t:ident, $u:ident) => {
-        impl ModPowerOfTwo for $t {
+    ($u:ident, $s:ident) => {
+        impl ModPowerOfTwo for $s {
             type Output = $u;
 
             /// Calculates `self` mod a power of 2. In other words, returns r, where
@@ -209,7 +269,7 @@ macro_rules! impl_mod_power_of_two_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is negative and `pow` is greater than `$t::WIDTH`.
+            /// Panics if `self` is negative and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -223,14 +283,11 @@ macro_rules! impl_mod_power_of_two_signed {
             /// ```
             #[inline]
             fn mod_power_of_two(self, pow: u64) -> $u {
-                if self < 0 && pow > $t::WIDTH {
-                    panic!(ERROR_MESSAGE);
-                }
-                $u::wrapping_from(self).mod_power_of_two(pow)
+                _mod_power_of_two_signed(self, pow)
             }
         }
 
-        impl ModPowerOfTwoAssign for $t {
+        impl ModPowerOfTwoAssign for $s {
             /// Reduces `self` mod a power of 2. In other words, replsces `self` with r, where
             /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
             ///
@@ -241,7 +298,7 @@ macro_rules! impl_mod_power_of_two_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is negative and `pow` is greater than or equal to `$t::WIDTH`.
+            /// Panics if `self` is negative and `pow` is greater than or equal to `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -259,12 +316,12 @@ macro_rules! impl_mod_power_of_two_signed {
             /// ```
             #[inline]
             fn mod_power_of_two_assign(&mut self, pow: u64) {
-                *self = $t::checked_from(self.mod_power_of_two(pow)).expect(ERROR_MESSAGE);
+                _mod_power_of_two_assign_signed(self, pow);
             }
         }
 
-        impl RemPowerOfTwo for $t {
-            type Output = $t;
+        impl RemPowerOfTwo for $s {
+            type Output = $s;
 
             /// Calculates `self` rem a power of 2. In other words, returns r, where
             /// `self` = q * 2<sup>`pow`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
@@ -288,17 +345,12 @@ macro_rules! impl_mod_power_of_two_signed {
             /// assert_eq!((-1611i32).rem_power_of_two(4), -11);
             /// ```
             #[inline]
-            fn rem_power_of_two(self, pow: u64) -> $t {
-                if self >= 0 {
-                    $t::wrapping_from($u::wrapping_from(self).mod_power_of_two(pow))
-                } else {
-                    $t::wrapping_from($u::wrapping_from(self.wrapping_neg()).mod_power_of_two(pow))
-                        .wrapping_neg()
-                }
+            fn rem_power_of_two(self, pow: u64) -> $s {
+                _rem_power_of_two_signed::<$u, $s>(self, pow)
             }
         }
 
-        impl RemPowerOfTwoAssign for $t {
+        impl RemPowerOfTwoAssign for $s {
             /// Reduces `self` rem a power of 2. In other words, replaces `self` with r, where
             /// `self` = q * 2<sup>`pow`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
             /// 0 <= |r| < 2<sup>`pow`</sup>.
@@ -330,8 +382,8 @@ macro_rules! impl_mod_power_of_two_signed {
             }
         }
 
-        impl CeilingModPowerOfTwo for $t {
-            type Output = $t;
+        impl CeilingModPowerOfTwo for $s {
+            type Output = $s;
 
             /// Calculates `self` ceiling-mod a power of 2. In other words, returns r, where
             /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= -r < 2<sup>`pow`</sup>.
@@ -341,8 +393,8 @@ macro_rules! impl_mod_power_of_two_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is positive or `$t::MIN`, and `pow` is greater than or equal to
-            /// `$t::WIDTH`.
+            /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
+            /// `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -355,20 +407,12 @@ macro_rules! impl_mod_power_of_two_signed {
             /// assert_eq!((-1611i32).ceiling_mod_power_of_two(4), -11);
             /// ```
             #[inline]
-            fn ceiling_mod_power_of_two(self, pow: u64) -> $t {
-                let abs_result = if self >= 0 {
-                    $u::wrapping_from(self).neg_mod_power_of_two(pow)
-                } else {
-                    $u::wrapping_from(self.wrapping_neg()).mod_power_of_two(pow)
-                };
-                $t::checked_from(abs_result)
-                    .expect(ERROR_MESSAGE)
-                    .checked_neg()
-                    .expect(ERROR_MESSAGE)
+            fn ceiling_mod_power_of_two(self, pow: u64) -> $s {
+                _ceiling_mod_power_of_two_signed::<$u, $s>(self, pow)
             }
         }
 
-        impl CeilingModPowerOfTwoAssign for $t {
+        impl CeilingModPowerOfTwoAssign for $s {
             /// Reduces `self` ceiling-mod a power of 2. In other words, replaces `self` with r,
             /// where `self` = q * 2<sup>`pow`</sup> + r and 0 <= -r < 2<sup>`pow`</sup>.
             ///
@@ -377,8 +421,8 @@ macro_rules! impl_mod_power_of_two_signed {
             /// Additional memory: worst case O(1)
             ///
             /// # Panics
-            /// Panics if `self` is positive or `$t::MIN`, and `pow` is greater than or equal to
-            /// `$t::WIDTH`.
+            /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
+            /// `$s::WIDTH`.
             ///
             /// # Examples
             /// ```
@@ -401,10 +445,4 @@ macro_rules! impl_mod_power_of_two_signed {
         }
     };
 }
-
-impl_mod_power_of_two_signed!(i8, u8);
-impl_mod_power_of_two_signed!(i16, u16);
-impl_mod_power_of_two_signed!(i32, u32);
-impl_mod_power_of_two_signed!(i64, u64);
-impl_mod_power_of_two_signed!(i128, u128);
-impl_mod_power_of_two_signed!(isize, usize);
+apply_to_unsigned_signed_pair!(impl_mod_power_of_two_signed);

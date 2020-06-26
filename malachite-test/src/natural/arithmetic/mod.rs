@@ -42,6 +42,7 @@ pub mod shl_round;
 pub mod shr;
 pub mod shr_round;
 pub mod sign;
+pub mod square;
 pub mod sub;
 pub mod sub_mul;
 
@@ -88,6 +89,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shr::register(registry);
     shr_round::register(registry);
     sign::register(registry);
+    square::register(registry);
     sub::register(registry);
     sub_mul::register(registry);
 }

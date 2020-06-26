@@ -1,4 +1,14 @@
 use num::arithmetic::traits::{EqMod, Mod};
+use num::basic::traits::Zero;
+
+#[inline]
+pub fn _eq_mod<T: Copy + Eq + Zero>(x: T, other: T, m: T) -> bool
+where
+    T: Mod<T>,
+    <T as Mod>::Output: Eq,
+{
+    x == other || m != T::ZERO && x.mod_op(m) == other.mod_op(m)
+}
 
 macro_rules! impl_eq_mod {
     ($t:ident) => {
@@ -21,20 +31,9 @@ macro_rules! impl_eq_mod {
             /// ```
             #[inline]
             fn eq_mod(self, other: $t, m: $t) -> bool {
-                self == other || m != 0 && self.mod_op(m) == other.mod_op(m)
+                _eq_mod(self, other, m)
             }
         }
     };
 }
-impl_eq_mod!(u8);
-impl_eq_mod!(u16);
-impl_eq_mod!(u32);
-impl_eq_mod!(u64);
-impl_eq_mod!(u128);
-impl_eq_mod!(usize);
-impl_eq_mod!(i8);
-impl_eq_mod!(i16);
-impl_eq_mod!(i32);
-impl_eq_mod!(i64);
-impl_eq_mod!(i128);
-impl_eq_mod!(isize);
+apply_to_primitive_ints!(impl_eq_mod);

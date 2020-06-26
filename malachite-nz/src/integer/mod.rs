@@ -193,6 +193,7 @@ pub mod arithmetic {
     pub mod shr;
     pub mod shr_round;
     pub mod sign;
+    pub mod square;
     pub mod sub;
     pub mod sub_mul;
 }

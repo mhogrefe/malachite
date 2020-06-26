@@ -24,15 +24,4 @@ macro_rules! impl_eq_mod_power_of_two {
         }
     };
 }
-impl_eq_mod_power_of_two!(u8);
-impl_eq_mod_power_of_two!(u16);
-impl_eq_mod_power_of_two!(u32);
-impl_eq_mod_power_of_two!(u64);
-impl_eq_mod_power_of_two!(u128);
-impl_eq_mod_power_of_two!(usize);
-impl_eq_mod_power_of_two!(i8);
-impl_eq_mod_power_of_two!(i16);
-impl_eq_mod_power_of_two!(i32);
-impl_eq_mod_power_of_two!(i64);
-impl_eq_mod_power_of_two!(i128);
-impl_eq_mod_power_of_two!(isize);
+apply_to_primitive_ints!(impl_eq_mod_power_of_two);

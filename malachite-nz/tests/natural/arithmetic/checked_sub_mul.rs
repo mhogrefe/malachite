@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::CheckedSubMul;
+use malachite_base::strings::ToDebugString;
 
 use malachite_nz::natural::Natural;
 
@@ -10,35 +11,35 @@ fn test_checked_sub_mul() {
         let on = Natural::from_str(u)
             .unwrap()
             .checked_sub_mul(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = Natural::from_str(u).unwrap().checked_sub_mul(
             Natural::from_str(v).unwrap(),
             &Natural::from_str(w).unwrap(),
         );
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = Natural::from_str(u).unwrap().checked_sub_mul(
             &Natural::from_str(v).unwrap(),
             Natural::from_str(w).unwrap(),
         );
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = Natural::from_str(u).unwrap().checked_sub_mul(
             &Natural::from_str(v).unwrap(),
             &Natural::from_str(w).unwrap(),
         );
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = (&Natural::from_str(u).unwrap()).checked_sub_mul(
             &Natural::from_str(v).unwrap(),
             &Natural::from_str(w).unwrap(),
         );
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
     test("0", "0", "0", "Some(0)");

@@ -124,3 +124,4 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod traits;
 }
+pub mod random;

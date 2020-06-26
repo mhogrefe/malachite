@@ -22,6 +22,6 @@ impl Display for RoundingMode {
     /// ```
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str(&format!("{:?}", self))
+        f.write_fmt(format_args!("{:?}", self))
     }
 }

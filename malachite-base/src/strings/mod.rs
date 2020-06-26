@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::fmt::Debug;
 
 use named::Named;
 
@@ -75,3 +76,33 @@ pub fn string_is_subset(s: &str, t: &str) -> bool {
 }
 
 impl_named!(String);
+
+/// A trait that provides an ergonomic way to create the string specified by a `Debug`
+/// implementation.
+pub trait ToDebugString: Debug {
+    fn to_debug_string(&self) -> String;
+}
+
+impl<T> ToDebugString for T
+where
+    T: Debug,
+{
+    /// Returns the `String` produced by `T`s `Debug` implementation.
+    ///
+    /// Time: depends on `Debug` implementation
+    ///
+    /// Additional memory: depends on `Debug` implementation
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::ToDebugString;
+    ///
+    /// assert_eq!([1, 2, 3].to_debug_string(), "[1, 2, 3]");
+    /// assert_eq!([vec![2, 3], vec![], vec![4]].to_debug_string(), "[[2, 3], [], [4]]");
+    /// assert_eq!(Some(5).to_debug_string(), "Some(5)");
+    /// ```
+    #[inline]
+    fn to_debug_string(&self) -> String {
+        format!("{:?}", self)
+    }
+}

@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::strings::ToDebugString;
 
 #[test]
 fn test_from_str() {
     let test = |s, out| {
-        assert_eq!(format!("{:?}", RoundingMode::from_str(s)), out);
+        assert_eq!(RoundingMode::from_str(s).to_debug_string(), out);
     };
     test("Down", "Ok(Down)");
     test("Up", "Ok(Up)");

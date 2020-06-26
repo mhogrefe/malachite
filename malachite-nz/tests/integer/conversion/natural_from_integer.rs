@@ -3,6 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
+use malachite_base::strings::ToDebugString;
 
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -11,11 +12,11 @@ use malachite_nz::natural::Natural;
 fn test_checked_from_integer() {
     let test = |n, out| {
         let on = Natural::checked_from(Integer::from_str(n).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = Natural::checked_from(&Integer::from_str(n).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
     test("0", "Some(0)");

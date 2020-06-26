@@ -1,4 +1,31 @@
+use std::ops::{Add, AddAssign, Sub};
+
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
+
+#[inline]
+pub fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
+where
+    T: Add<T, Output = T> + Sub<T, Output = T>,
+{
+    let neg = m - x;
+    if neg > other {
+        x + other
+    } else {
+        other - neg
+    }
+}
+
+pub fn _mod_add_assign<T: Copy + Ord>(x: &mut T, other: T, m: T)
+where
+    T: AddAssign<T> + Sub<T, Output = T>,
+{
+    let neg = m - *x;
+    if neg > other {
+        *x += other;
+    } else {
+        *x = other - neg;
+    }
+}
 
 macro_rules! impl_mod_add {
     ($t:ident) => {
@@ -22,12 +49,7 @@ macro_rules! impl_mod_add {
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
             #[inline]
             fn mod_add(self, other: $t, m: $t) -> $t {
-                let neg = m - self;
-                if neg > other {
-                    self + other
-                } else {
-                    other - neg
-                }
+                _mod_add(self, other, m)
             }
         }
 
@@ -55,20 +77,9 @@ macro_rules! impl_mod_add {
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {
-                let neg = m - *self;
-                if neg > other {
-                    *self += other;
-                } else {
-                    *self = other - neg;
-                }
+                _mod_add_assign(self, other, m);
             }
         }
     };
 }
-
-impl_mod_add!(u8);
-impl_mod_add!(u16);
-impl_mod_add!(u32);
-impl_mod_add!(u64);
-impl_mod_add!(u128);
-impl_mod_add!(usize);
+apply_to_unsigneds!(impl_mod_add);

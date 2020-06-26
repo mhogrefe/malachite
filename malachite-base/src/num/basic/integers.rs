@@ -41,6 +41,7 @@ use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
     LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
+use random::StandardRand;
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInteger:
@@ -363,6 +364,7 @@ pub trait PrimitiveInteger:
     + Sized
     + Square<Output = Self>
     + SquareAssign
+    + StandardRand
     + Sub<Self, Output = Self>
     + SubAssign<Self>
     + SubMul<Self, Self, Output = Self>

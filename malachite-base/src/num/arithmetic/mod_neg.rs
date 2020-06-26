@@ -1,4 +1,29 @@
+use std::ops::Sub;
+
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
+use num::basic::traits::Zero;
+
+#[inline]
+pub fn _mod_neg<T: Copy + Eq + Zero>(x: T, m: T) -> T
+where
+    T: Sub<T, Output = T>,
+{
+    if x == T::ZERO {
+        T::ZERO
+    } else {
+        m - x
+    }
+}
+
+#[inline]
+pub fn _mod_neg_assign<T: Copy + Eq + Zero>(x: &mut T, m: T)
+where
+    T: Sub<T, Output = T>,
+{
+    if *x != T::ZERO {
+        *x = m - *x;
+    }
+}
 
 macro_rules! impl_mod_neg {
     ($t:ident) => {
@@ -23,11 +48,7 @@ macro_rules! impl_mod_neg {
             /// This is nmod_neg from nmod_vec.h, FLINT Dev 1.
             #[inline]
             fn mod_neg(self, m: $t) -> $t {
-                if self == 0 {
-                    0
-                } else {
-                    m - self
-                }
+                _mod_neg(self, m)
             }
         }
 
@@ -58,17 +79,9 @@ macro_rules! impl_mod_neg {
             /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assign to a.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
-                if *self != 0 {
-                    *self = m - *self;
-                }
+                _mod_neg_assign(self, m)
             }
         }
     };
 }
-
-impl_mod_neg!(u8);
-impl_mod_neg!(u16);
-impl_mod_neg!(u32);
-impl_mod_neg!(u64);
-impl_mod_neg!(u128);
-impl_mod_neg!(usize);
+apply_to_unsigneds!(impl_mod_neg);

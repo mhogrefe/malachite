@@ -49,13 +49,13 @@ fn demo_limbs_not_in_place(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_not(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("!({}) = {}", n.clone(), !n);
+        println!("!{} = {}", n.clone(), !n);
     }
 }
 
 fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("!(&{}) = {}", n, !&n);
+        println!("!&{} = {}", n, !&n);
     }
 }
 

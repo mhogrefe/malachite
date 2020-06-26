@@ -1,4 +1,6 @@
+use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Iverson;
 use malachite_nz::natural::arithmetic::div_exact::MAX_OVER_3;
 use malachite_nz::platform::Limb;
 
@@ -11,25 +13,26 @@ const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH 
 ///
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 1,
 /// no carry-in, and no return value.
-pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], xs: &[Limb]) {
-    let len = xs.len();
+pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], ns: &[Limb]) {
+    let len = ns.len();
     assert_ne!(len, 0);
     assert!(out.len() >= len);
-    let last_index = len - 1;
+    let (ns_last, ns_init) = ns.split_last().unwrap();
+    let (out_last, out_init) = out[..len].split_last_mut().unwrap();
     let mut big_carry = 0;
-    for i in 0..last_index {
-        let (diff, carry) = xs[i].overflowing_sub(big_carry);
-        big_carry = if carry { 1 } else { 0 };
-        let out_limb = diff.wrapping_mul(MODLIMB_INVERSE_3);
-        out[i] = out_limb;
-        if out_limb >= CEIL_MAX_OVER_3 {
+    for (out_q, n) in out_init.iter_mut().zip(ns_init.iter()) {
+        let (diff, carry) = n.overflowing_sub(big_carry);
+        big_carry = Limb::iverson(carry);
+        let q = diff.wrapping_mul(MODLIMB_INVERSE_3);
+        *out_q = q;
+        if q >= CEIL_MAX_OVER_3 {
             big_carry += 1;
-            if out_limb >= CEIL_2_MAX_OVER_3 {
+            if q >= CEIL_2_MAX_OVER_3 {
                 big_carry += 1;
             }
         }
     }
-    out[last_index] = xs[last_index]
+    *out_last = ns_last
         .wrapping_sub(big_carry)
         .wrapping_mul(MODLIMB_INVERSE_3);
 }
@@ -38,24 +41,23 @@ pub fn limbs_div_exact_3_to_out_alt(out: &mut [Limb], xs: &[Limb]) {
 ///
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 1,
 /// no carry-in, and no return value, where rp == up.
-pub fn limbs_div_exact_3_in_place_alt(xs: &mut [Limb]) {
-    let len = xs.len();
+pub fn limbs_div_exact_3_in_place_alt(ns: &mut [Limb]) {
+    let len = ns.len();
     assert_ne!(len, 0);
-    let last_index = len - 1;
+    let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let mut big_carry = 0;
-    for limb in xs[..last_index].iter_mut() {
-        let (diff, carry) = limb.overflowing_sub(big_carry);
-        big_carry = if carry { 1 } else { 0 };
-        let out_limb = diff.wrapping_mul(MODLIMB_INVERSE_3);
-        *limb = out_limb;
-        if out_limb >= CEIL_MAX_OVER_3 {
+    for n in ns_init.iter_mut() {
+        let (diff, carry) = n.overflowing_sub(big_carry);
+        big_carry = Limb::iverson(carry);
+        let q = diff.wrapping_mul(MODLIMB_INVERSE_3);
+        *n = q;
+        if q >= CEIL_MAX_OVER_3 {
             big_carry += 1;
-            if out_limb >= CEIL_2_MAX_OVER_3 {
+            if q >= CEIL_2_MAX_OVER_3 {
                 big_carry += 1;
             }
         }
     }
-    xs[last_index] = xs[last_index]
-        .wrapping_sub(big_carry)
-        .wrapping_mul(MODLIMB_INVERSE_3);
+    ns_last.wrapping_sub_assign(big_carry);
+    ns_last.wrapping_mul_assign(MODLIMB_INVERSE_3);
 }

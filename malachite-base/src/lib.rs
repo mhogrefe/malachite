@@ -27,6 +27,9 @@
 #![allow(clippy::cognitive_complexity, clippy::many_single_char_names)]
 
 extern crate itertools;
+extern crate rand;
+extern crate rand_chacha;
+
 #[macro_export]
 macro_rules! apply_to_unsigneds {
     ($m: tt) => {
@@ -80,8 +83,10 @@ pub mod chars;
 pub mod comparison;
 pub mod crement;
 pub mod exhaustive;
+pub mod iterators;
 pub mod num;
 pub mod orderings;
+pub mod random;
 pub mod rounding_modes;
 #[macro_use]
 pub mod slices;

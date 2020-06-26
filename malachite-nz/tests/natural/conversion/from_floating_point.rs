@@ -3,6 +3,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::strings::ToDebugString;
 
 use malachite_nz::natural::Natural;
 
@@ -344,7 +345,7 @@ fn from_f64_fail_5() {
 fn test_checked_from_f32() {
     let test = |f: f32, out| {
         let on = Natural::checked_from(f);
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
     test(f32::NAN, "None");
@@ -380,7 +381,7 @@ fn test_checked_from_f32() {
 fn test_checked_from_f64() {
     let test = |f: f64, out| {
         let on = Natural::checked_from(f);
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
     test(f64::NAN, "None");

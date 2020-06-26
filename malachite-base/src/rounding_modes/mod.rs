@@ -34,7 +34,17 @@ pub enum RoundingMode {
 
 impl_named!(RoundingMode);
 
+pub const ROUNDING_MODES: [RoundingMode; 6] = [
+    RoundingMode::Down,
+    RoundingMode::Up,
+    RoundingMode::Floor,
+    RoundingMode::Ceiling,
+    RoundingMode::Nearest,
+    RoundingMode::Exact,
+];
+
 pub mod display;
 pub mod exhaustive;
 pub mod from_str;
 pub mod neg;
+pub mod random;

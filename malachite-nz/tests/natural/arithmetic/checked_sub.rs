@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::strings::ToDebugString;
 use malachite_nz_test_util::common::biguint_to_natural;
 use malachite_nz_test_util::natural::arithmetic::checked_sub::checked_sub;
 use num::BigUint;
@@ -14,32 +15,32 @@ fn test_checked_sub_natural() {
         let on = Natural::from_str(u)
             .unwrap()
             .checked_sub(Natural::from_str(v).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = Natural::from_str(u)
             .unwrap()
             .checked_sub(&Natural::from_str(v).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = (&Natural::from_str(u).unwrap()).checked_sub(Natural::from_str(v).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = (&Natural::from_str(u).unwrap()).checked_sub(&Natural::from_str(v).unwrap());
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
         let on = checked_sub(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap())
             .map(|x| biguint_to_natural(&x));
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
 
         let on = checked_sub(
             rug::Integer::from_str(u).unwrap(),
             rug::Integer::from_str(v).unwrap(),
         );
-        assert_eq!(format!("{:?}", on), out);
+        assert_eq!(on.to_debug_string(), out);
     };
     test("0", "0", "Some(0)");
     test("0", "123", "None");
