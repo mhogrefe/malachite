@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_eq_mod() {
-    fn test<T>(x: T, y: T, m: T, out: bool)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, m: T, out: bool) {
         assert_eq!(x.eq_mod(y, m), out);
     };
     test::<u8>(0, 0, 0, true);

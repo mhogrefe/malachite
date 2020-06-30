@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_checked_sub_mul() {
-    fn test<T>(x: T, y: T, z: T, out: Option<T>)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: Option<T>) {
         assert_eq!(x.checked_sub_mul(y, z), out);
     };
     test::<u8>(100, 3, 7, Some(79));

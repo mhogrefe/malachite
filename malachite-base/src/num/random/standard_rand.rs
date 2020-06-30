@@ -9,11 +9,9 @@ macro_rules! impl_standard_rand {
             /// Generates a random primitive integer, from a uniform distribution across all
             /// possible values.
             ///
-            /// Length is infinite.
+            /// Time: worst case O(1)
             ///
-            /// Time per iteration: O(1)
-            ///
-            /// Additional memory per iteration: O(1)
+            /// Additional memory: worst case O(1)
             ///
             /// # Examples
             /// ```

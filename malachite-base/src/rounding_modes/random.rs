@@ -8,11 +8,9 @@ impl StandardRand for RoundingMode {
     /// Generates a random `RoundingMode` that has an equal probability of being any of the 6
     /// `RoundingMode`s.
     ///
-    /// Length is infinite.
+    /// Time: worst case O(1)
     ///
-    /// Time per iteration: O(1)
-    ///
-    /// Additional memory per iteration: O(1)
+    /// Additional memory: wost case O(1)
     ///
     /// # Examples
     /// ```

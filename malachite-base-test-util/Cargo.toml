@@ -2,10 +2,14 @@
 name = "malachite-base-test-util"
 version = "0.1.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
-edition = "2018"
+
+[lib]
+name = "malachite_base_test_util"
+path = "src/lib.rs"
 
 [dependencies]
 malachite-base = { path = "../malachite-base" }
+ryu = "1.0"
 
 [profile.release]
 lto = true

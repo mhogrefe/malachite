@@ -4,10 +4,7 @@ use malachite_base::num::basic::traits::One;
 
 #[test]
 fn test_overflowing_div() {
-    fn test<T>(x: T, y: T, out: T, overflow: bool)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, out: T, overflow: bool) {
         assert_eq!(x.overflowing_div(y), (out, overflow));
 
         let mut x = x;

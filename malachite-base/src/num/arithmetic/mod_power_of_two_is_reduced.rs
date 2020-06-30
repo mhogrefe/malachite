@@ -26,10 +26,4 @@ macro_rules! impl_mod_power_of_two_is_reduced {
         }
     };
 }
-
-impl_mod_power_of_two_is_reduced!(u8);
-impl_mod_power_of_two_is_reduced!(u16);
-impl_mod_power_of_two_is_reduced!(u32);
-impl_mod_power_of_two_is_reduced!(u64);
-impl_mod_power_of_two_is_reduced!(u128);
-impl_mod_power_of_two_is_reduced!(usize);
+apply_to_unsigneds!(impl_mod_power_of_two_is_reduced);

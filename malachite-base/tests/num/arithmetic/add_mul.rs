@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_add_mul() {
-    fn test<T>(x: T, y: T, z: T, out: T)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: T) {
         assert_eq!(x.add_mul(y, z), out);
 
         let mut x = x;

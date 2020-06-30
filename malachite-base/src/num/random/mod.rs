@@ -4,9 +4,8 @@ use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::Zero;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::{BitAccess, LowMask};
-use random::{standard_random_values, Seed, StandardRandomValues};
-
-pub mod standard_rand;
+use random::seed::Seed;
+use random::{standard_random_values, StandardRandomValues};
 
 /// Generates the an iterator's values but with all but the lowest `pow` bits cleared.
 #[derive(Clone, Debug)]
@@ -237,3 +236,5 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 ) -> NonzeroValues<StandardRandomValues<T>> {
     nonzero_values(standard_random_values(seed))
 }
+
+pub mod standard_rand;

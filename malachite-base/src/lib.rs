@@ -29,6 +29,7 @@
 extern crate itertools;
 extern crate rand;
 extern crate rand_chacha;
+extern crate sha3;
 
 #[macro_export]
 macro_rules! apply_to_unsigneds {

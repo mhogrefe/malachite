@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_overflowing_pow() {
-    fn test<T>(x: T, y: u64, out: T, overflow: bool)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: u64, out: T, overflow: bool) {
         assert_eq!(x.overflowing_pow(y), (out, overflow));
 
         let mut x = x;

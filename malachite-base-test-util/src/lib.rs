@@ -1,6 +1,7 @@
 #![allow(
     clippy::assertions_on_constants,
     clippy::cognitive_complexity,
+    clippy::float_cmp,
     clippy::many_single_char_names,
     clippy::range_plus_one,
     clippy::suspicious_arithmetic_impl,
@@ -34,19 +35,25 @@
     clippy::unused_self
 )]
 
+#[macro_use]
 extern crate malachite_base;
+extern crate ryu;
 
 pub mod common;
 pub mod num {
     pub mod arithmetic {
         pub mod mod_mul;
     }
+    pub mod float {
+        pub mod nice_float;
+    }
     pub mod logic {
         pub mod bit_block_access;
         pub mod bit_convertible;
     }
+    pub mod random {
+        pub mod geometric;
+    }
 }
 pub mod slices;
-pub mod stats {
-    pub mod common_values_map;
-}
+pub mod stats;

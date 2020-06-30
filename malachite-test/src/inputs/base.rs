@@ -70,6 +70,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD;
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -2526,7 +2527,7 @@ pub fn pairs_of_limb_vec_var_15(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)
     )
 }
 
-// All triples of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact`.
+// All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact`.
 pub(crate) fn pairs_of_limb_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
     Box::new(
         pairs_of_unsigned_vec_min_sizes_2(gm, 1)
@@ -2539,6 +2540,16 @@ pub(crate) fn pairs_of_limb_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec
                 (new_ns, ds)
             }),
     )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `xs` and `ys` meet the preconditions of
+// `_limbs_square_to_out_basecase`.
+pub fn pairs_of_unsigned_vec_var_17<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| {
+        !ys.is_empty() && ys.len() <= SQR_TOOM2_THRESHOLD && xs.len() >= ys.len() << 1
+    }))
 }
 
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(

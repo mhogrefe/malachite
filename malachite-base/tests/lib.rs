@@ -26,10 +26,12 @@
 )]
 #![allow(clippy::cognitive_complexity, clippy::too_many_arguments)]
 
+extern crate core;
 #[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 extern crate rand;
+extern crate rand_chacha;
 
 pub mod bools {
     pub mod constants;
@@ -146,6 +148,9 @@ pub mod num {
         pub mod exhaustive_signeds;
         pub mod exhaustive_unsigneds;
     }
+    pub mod float {
+        pub mod nice_float;
+    }
     pub mod logic {
         pub mod bit_access;
         pub mod bit_block_access;
@@ -162,6 +167,9 @@ pub mod num {
         pub mod significant_bits;
     }
     pub mod random {
+        pub mod geometric {
+            pub mod mean;
+        }
         pub mod random_highest_bit_set_values;
         pub mod random_masked_values;
         pub mod random_natural_signeds;
@@ -175,6 +183,14 @@ pub mod num {
 pub mod orderings {
     pub mod exhaustive;
     pub mod random;
+}
+pub mod random {
+    pub mod seed {
+        pub mod fork;
+        pub mod from_bytes;
+        pub mod get_rng;
+        pub mod standard_rand;
+    }
 }
 pub mod rounding_modes {
     pub mod clone;

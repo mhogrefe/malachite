@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_wrapping_pow() {
-    fn test<T>(x: T, y: u64, out: T)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: u64, out: T) {
         assert_eq!(x.wrapping_pow(y), out);
 
         let mut x = x;

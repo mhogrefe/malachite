@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_wrapping_square() {
-    fn test<T>(x: T, out: T)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, out: T) {
         assert_eq!(x.wrapping_square(), out);
 
         let mut x = x;

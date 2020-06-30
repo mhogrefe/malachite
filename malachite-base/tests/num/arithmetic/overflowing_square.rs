@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_overflowing_square() {
-    fn test<T>(x: T, out: T, overflow: bool)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, out: T, overflow: bool) {
         assert_eq!(x.overflowing_square(), (out, overflow));
 
         let mut x = x;

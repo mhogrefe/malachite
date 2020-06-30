@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_divisible_by() {
-    fn test<T>(x: T, y: T, out: bool)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, out: bool) {
         assert_eq!(x.divisible_by(y), out);
     };
     test::<u8>(0, 0, true);

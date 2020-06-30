@@ -6,11 +6,9 @@ use random::StandardRand;
 impl StandardRand for bool {
     /// Generates a random `bool` that has an equal probability of being `true` or `false`.
     ///
-    /// Length is infinite.
+    /// Time: worst case O(1)
     ///
-    /// Time per iteration: O(1)
-    ///
-    /// Additional memory per iteration: O(1)
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```

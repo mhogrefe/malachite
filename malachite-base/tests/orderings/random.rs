@@ -1,6 +1,7 @@
 use std::cmp::Ordering::{self, Equal, Greater, Less};
 
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
 
 use malachite_base::random::{standard_random_values, EXAMPLE_SEED};
 
@@ -16,7 +17,8 @@ fn test_standard_random_values() {
         ]
     );
     assert_eq!(
-        common_values_map_debug(1_000_000, 10, xs),
+        common_values_map_debug(1_000_000, 10, xs.clone()),
         &[(Greater, 333624), (Equal, 333501), (Less, 332875)]
-    )
+    );
+    assert_eq!(median(xs.take(1_000_000)), (Equal, None));
 }

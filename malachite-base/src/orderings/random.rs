@@ -10,11 +10,9 @@ impl StandardRand for Ordering {
     /// Generates a random `Ordering` that has an equal probability of being `Less`, `Greater`, or
     /// `Equal`.
     ///
-    /// Length is infinite.
+    /// Time: worst case O(1)
     ///
-    /// Time per iteration: O(1)
-    ///
-    /// Additional memory per iteration: O(1)
+    /// Additional memory: worst case O(1)
     ///
     /// # Examples
     /// ```

@@ -4,10 +4,7 @@ use malachite_base::num::basic::traits::One;
 
 #[test]
 fn test_div_exact() {
-    fn test<T>(x: T, y: T, out: T)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, out: T) {
         assert_eq!(x.div_exact(y), out);
 
         let mut x = x;

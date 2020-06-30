@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_saturating_sub_mul() {
-    fn test<T>(x: T, y: T, z: T, out: T)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: T) {
         assert_eq!(x.saturating_sub_mul(y, z), out);
 
         let mut x = x;

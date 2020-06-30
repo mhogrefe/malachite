@@ -1,7 +1,21 @@
-use num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, WrappingNegAssign,
-};
+use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign};
 use num::basic::integers::PrimitiveInteger;
+
+#[inline]
+pub fn _mod_power_of_two_neg<T: PrimitiveInteger>(x: T, pow: u64) -> T
+where
+    T: ModPowerOfTwo<Output = T>,
+{
+    assert!(pow <= T::WIDTH);
+    x.wrapping_neg().mod_power_of_two(pow)
+}
+
+#[inline]
+pub fn _mod_power_of_two_neg_assign<T: PrimitiveInteger>(x: &mut T, pow: u64) {
+    assert!(pow <= T::WIDTH);
+    x.wrapping_neg_assign();
+    x.mod_power_of_two_assign(pow);
+}
 
 macro_rules! impl_mod_power_of_two_neg {
     ($t:ident) => {
@@ -25,8 +39,7 @@ macro_rules! impl_mod_power_of_two_neg {
             /// ```
             #[inline]
             fn mod_power_of_two_neg(self, pow: u64) -> $t {
-                assert!(pow <= $t::WIDTH);
-                self.wrapping_neg().mod_power_of_two(pow)
+                _mod_power_of_two_neg(self, pow)
             }
         }
 
@@ -56,17 +69,9 @@ macro_rules! impl_mod_power_of_two_neg {
             /// ```
             #[inline]
             fn mod_power_of_two_neg_assign(&mut self, pow: u64) {
-                assert!(pow <= $t::WIDTH);
-                self.wrapping_neg_assign();
-                self.mod_power_of_two_assign(pow);
+                _mod_power_of_two_neg_assign(self, pow);
             }
         }
     };
 }
-
-impl_mod_power_of_two_neg!(u8);
-impl_mod_power_of_two_neg!(u16);
-impl_mod_power_of_two_neg!(u32);
-impl_mod_power_of_two_neg!(u64);
-impl_mod_power_of_two_neg!(u128);
-impl_mod_power_of_two_neg!(usize);
+apply_to_unsigneds!(impl_mod_power_of_two_neg);

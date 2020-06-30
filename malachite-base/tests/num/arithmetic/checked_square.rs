@@ -2,10 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 
 #[test]
 fn test_checked_square() {
-    fn test<T>(x: T, out: Option<T>)
-    where
-        T: PrimitiveInteger,
-    {
+    fn test<T: PrimitiveInteger>(x: T, out: Option<T>) {
         assert_eq!(x.checked_square(), out);
     };
     test::<u8>(0, Some(0));
