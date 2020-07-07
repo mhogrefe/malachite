@@ -7,8 +7,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_barrett_large_product, _limbs_div_limb_in_place_mod_alt,
-    _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
+    _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_limb_in_place_mod,
@@ -19,6 +18,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+};
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
 };

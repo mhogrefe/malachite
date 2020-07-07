@@ -2,41 +2,10 @@ use rand::{RngCore, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use sha3::{Digest, Sha3_256};
 
-use random::StandardRand;
-
 /// A wrapper around `ChaCha20Rng`'s seed type.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Seed {
     pub bytes: [u8; 32],
-}
-
-impl StandardRand for Seed {
-    /// Uniformly generates a random `Seed`.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::random::{EXAMPLE_SEED, StandardRand};
-    /// use malachite_base::random::seed::Seed;
-    ///
-    /// assert_eq!(
-    ///     Seed::standard_gen(&mut EXAMPLE_SEED.get_rng()),
-    ///     Seed::from_bytes([
-    ///         0x71, 0xef, 0x45, 0x6c, 0xe4, 0xd2, 0xa8, 0xa1, 0x57, 0x20, 0x6e, 0x53, 0xbc, 0x22,
-    ///         0x59, 0xee, 0x5d, 0xc8, 0x95, 0x73, 0xbd, 0x95, 0xd9, 0xc9, 0x75, 0x92, 0x1f, 0x48,
-    ///         0x97, 0xa9, 0xae, 0x21
-    ///     ])
-    /// );
-    /// ```
-    #[inline]
-    fn standard_gen(rng: &mut ChaCha20Rng) -> Seed {
-        let mut bytes = [0; 32];
-        rng.fill_bytes(&mut bytes);
-        Seed::from_bytes(bytes)
-    }
 }
 
 impl Seed {
@@ -74,9 +43,31 @@ impl Seed {
         ChaCha20Rng::from_seed(self.bytes)
     }
 
+    /// Uniformly generates a random `Seed`.
+    ///
+    /// Time: worst case O(1)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::random::EXAMPLE_SEED;
+    /// use malachite_base::random::seed::Seed;
+    ///
+    /// assert_eq!(
+    ///     EXAMPLE_SEED.next(),
+    ///     Seed::from_bytes([
+    ///         0x71, 0xef, 0x45, 0x6c, 0xe4, 0xd2, 0xa8, 0xa1, 0x57, 0x20, 0x6e, 0x53, 0xbc, 0x22,
+    ///         0x59, 0xee, 0x5d, 0xc8, 0x95, 0x73, 0xbd, 0x95, 0xd9, 0xc9, 0x75, 0x92, 0x1f, 0x48,
+    ///         0x97, 0xa9, 0xae, 0x21
+    ///     ])
+    /// );
+    /// ```
     #[inline]
-    fn next(self) -> Seed {
-        Seed::standard_gen(&mut self.get_rng())
+    pub fn next(self) -> Seed {
+        let mut bytes = [0; 32];
+        self.get_rng().fill_bytes(&mut bytes);
+        Seed::from_bytes(bytes)
     }
 
     /// Generates a new `Seed` from this seed. Passing a different `key` will, with very high
@@ -89,7 +80,7 @@ impl Seed {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::{EXAMPLE_SEED, StandardRand};
+    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::random::seed::Seed;
     ///
     /// assert_eq!(

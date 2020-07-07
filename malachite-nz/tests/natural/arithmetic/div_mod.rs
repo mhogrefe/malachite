@@ -15,22 +15,25 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
 };
 use num::{BigUint, Integer};
 use rug;
 
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt, limbs_div_limb_in_place_mod,
-    limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod_three_limb_by_two_limb,
-    limbs_invert_limb,
-};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
     _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
     limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
+};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
+    limbs_div_mod_three_limb_by_two_limb, limbs_invert_limb,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]

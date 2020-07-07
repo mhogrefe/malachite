@@ -2,10 +2,14 @@ use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
-use malachite_nz::natural::arithmetic::square::_limbs_square_to_out_basecase;
+use malachite_nz::natural::arithmetic::square::{
+    _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
+    _limbs_square_to_out_toom_2_scratch_len,
+};
+use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
 
 use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_var_17;
+use inputs::base::{pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18};
 use inputs::natural::naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -17,6 +21,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Small,
         benchmark_limbs_square_to_out_basecase_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_square_to_out_toom_2_algorithms
     );
     register_bench!(registry, Large, benchmark_natural_square_assign);
     register_bench!(registry, Large, benchmark_natural_square_algorithms);
@@ -80,6 +89,36 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
             (
                 "using _limbs_mul_greater_to_out_basecase",
                 &mut (|(mut xs, ys)| _limbs_mul_greater_to_out_basecase(&mut xs, &ys, &ys)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_square_to_out_toom_2_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_square_to_out_toom_2(&mut [Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_var_18(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "basecase",
+                &mut (|(mut out, xs)| _limbs_square_to_out_basecase_unrestricted(&mut out, &xs)),
+            ),
+            (
+                "Toom22",
+                &mut (|(mut out, xs)| {
+                    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
+                    _limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
+                }),
             ),
         ],
     );

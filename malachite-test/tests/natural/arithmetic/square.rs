@@ -1,16 +1,24 @@
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_nz::natural::arithmetic::square::_limbs_square_to_out_basecase;
+use malachite_nz::natural::arithmetic::square::{
+    _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
+    _limbs_square_to_out_toom_2_scratch_len,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
 
-use malachite_test::common::{test_properties, test_properties_no_special};
-use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_17, unsigneds_var_8};
+use malachite_test::common::{
+    test_properties, test_properties_custom_scale, test_properties_no_special,
+};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18, unsigneds_var_8,
+};
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 
 fn limbs_square_basecase_helper(out: &[Limb], xs: &[Limb]) -> Vec<Limb> {
     let mut out = out.to_vec();
     let old_out = out.clone();
-    _limbs_square_to_out_basecase(&mut out, xs);
+    _limbs_square_to_out_basecase_unrestricted(&mut out, xs);
     let n = Natural::from_limbs_asc(xs).square();
     let len = xs.len() << 1;
     let mut limbs = n.into_limbs_asc();
@@ -22,8 +30,22 @@ fn limbs_square_basecase_helper(out: &[Limb], xs: &[Limb]) -> Vec<Limb> {
 
 #[test]
 fn limbs_square_to_out_basecase_properties() {
-    test_properties(pairs_of_unsigned_vec_var_17, |&(ref out_before, ref xs)| {
-        limbs_square_basecase_helper(out_before, xs);
+    test_properties(pairs_of_unsigned_vec_var_17, |&(ref out, ref xs)| {
+        let expected_out = limbs_square_basecase_helper(out, xs);
+        let mut out = out.to_vec();
+        _limbs_square_to_out_basecase(&mut out, xs);
+        assert_eq!(out, expected_out);
+    });
+}
+
+#[test]
+fn limbs_square_to_out_toom_2_properties() {
+    test_properties_custom_scale(2_048, pairs_of_unsigned_vec_var_18, |&(ref out, ref xs)| {
+        let expected_out = limbs_square_basecase_helper(out, xs);
+        let mut out = out.to_vec();
+        let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
+        _limbs_square_to_out_toom_2(&mut out, xs, &mut scratch);
+        assert_eq!(out, expected_out);
     });
 }
 

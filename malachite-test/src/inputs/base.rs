@@ -70,10 +70,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
-use malachite_nz::natural::arithmetic::square::SQR_TOOM2_THRESHOLD;
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
 use rand::distributions::{IndependentSample, Range};
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
@@ -2542,14 +2541,25 @@ pub(crate) fn pairs_of_limb_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec
     )
 }
 
-// All pairs of `Vec<T>`, where `T` is unsigned and `xs` and `ys` meet the preconditions of
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of
 // `_limbs_square_to_out_basecase`.
 pub fn pairs_of_unsigned_vec_var_17<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| {
-        !ys.is_empty() && ys.len() <= SQR_TOOM2_THRESHOLD && xs.len() >= ys.len() << 1
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref out, ref xs)| {
+        !xs.is_empty() && xs.len() <= SQR_TOOM2_THRESHOLD && out.len() >= xs.len() << 1
     }))
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of
+// `_limbs_square_to_out_toom_2`.
+pub fn pairs_of_unsigned_vec_var_18<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 4, 2)
+            .filter(|&(ref out, ref xs)| out.len() >= xs.len() << 1),
+    )
 }
 
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
@@ -3632,6 +3642,29 @@ pub fn triples_of_limb_vec_var_58(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
             }
         }),
     )
+}
+
+fn pairs_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+    min_xs_len: u64,
+    min_ys_len: u64,
+) -> It<(Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigneds()),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, min_xs_len, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, min_ys_len, &(|seed_2| random(seed_2)))),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_xs_len)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_ys_len)),
+        )),
+    }
 }
 
 // All triples of `Vec<Limb>` that meet the preconditions for `limbs_eq_mod`, where the `Natural`

@@ -1,34 +1,34 @@
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{disc_uniform_dist_assertions, MomentStats};
 
-use malachite_base::random::{standard_random_values, EXAMPLE_SEED};
+use malachite_base::bools::random::random_bools;
+use malachite_base::random::EXAMPLE_SEED;
 
 #[allow(clippy::decimal_literal_representation)]
 #[test]
-fn test_standard_random_values() {
-    let xs = standard_random_values::<bool>(EXAMPLE_SEED);
+fn test_random_bools() {
     disc_uniform_dist_assertions(
-        xs,
+        random_bools(EXAMPLE_SEED),
         &false,
         &true,
         &[
-            false, true, false, true, false, true, false, false, true, true, false, true, true,
-            true, true, false, true, true, false, true,
+            true, false, false, false, true, true, true, false, true, true, true, true, false,
+            true, true, true, true, false, true, false,
         ],
-        &[(true, 500680), (false, 499320)],
+        &[(true, 500473), (false, 499527)],
         NiceFloat(0.5),
         (true, None),
         MomentStats {
             mean: NiceFloat(0.5),
-            stdev: NiceFloat(0.5),
+            standard_deviation: NiceFloat(0.5),
             skewness: NiceFloat(0.0),
-            kurtosis: NiceFloat(-2.0),
+            excess_kurtosis: NiceFloat(-1.9999999999999998),
         },
         MomentStats {
-            mean: NiceFloat(0.5006800000000157),
-            stdev: NiceFloat(0.49999978759972746),
-            skewness: NiceFloat(-0.0027200025154596134),
-            kurtosis: NiceFloat(-1.9999926015862308),
+            mean: NiceFloat(0.5004730000000077),
+            standard_deviation: NiceFloat(0.5000000262710417),
+            skewness: NiceFloat(-0.0018920008465908307),
+            excess_kurtosis: NiceFloat(-1.999996420332894),
         },
     );
 }

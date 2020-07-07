@@ -34,34 +34,34 @@ fn random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 fn test_random_nonzero_signeds() {
     // i8
     let values = &[
-        113, -28, 87, -68, 93, -67, 117, -105, 7, 72, -23, 12, 114, 39, 104, -28, -14, -17, -21,
-        -56,
+        113, -17, 69, 108, -28, -46, -88, -95, 87, 32, 110, 83, -68, 34, 89, -18, 93, -56, -107,
+        115,
     ];
     let common_values = &[
-        (88, 4079),
-        (121, 4067),
-        (47, 4057),
-        (-83, 4056),
-        (123, 4053),
-        (27, 4051),
-        (-73, 4048),
-        (74, 4044),
-        (-7, 4036),
-        (16, 4036),
+        (-42, 4112),
+        (86, 4092),
+        (-90, 4063),
+        (22, 4061),
+        (126, 4061),
+        (93, 4054),
+        (55, 4053),
+        (-65, 4052),
+        (36, 4049),
+        (42, 4047),
     ];
     let pop_median = NiceFloat(-0.5);
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-0.5019607843137255),
-        stdev: NiceFloat(74.04502469734098),
+        standard_deviation: NiceFloat(74.04502469734098),
         skewness: NiceFloat(0.00007944171209676364),
-        kurtosis: NiceFloat(-1.207067080672989),
+        excess_kurtosis: NiceFloat(-1.207067080672989),
     };
     let sample_moment_stats = MomentStats {
-        mean: NiceFloat(-0.49814199999998987),
-        stdev: NiceFloat(74.0199926878361),
-        skewness: NiceFloat(0.0005883357441058907),
-        kurtosis: NiceFloat(-1.206566395164229),
+        mean: NiceFloat(-0.5131950000000044),
+        standard_deviation: NiceFloat(74.04373630744782),
+        skewness: NiceFloat(-0.00024235105395531954),
+        excess_kurtosis: NiceFloat(-1.2065292546223),
     };
     random_nonzero_signeds_helper::<i8>(
         values,
@@ -74,34 +74,34 @@ fn test_random_nonzero_signeds() {
 
     // i16
     let values = &[
-        -4239, -11548, 8279, 8892, -14243, -27203, -28043, -22121, 9735, 32584, 27625, 4620,
-        -20878, -20953, 9576, 31460, -1806, -5649, 21995, 23240,
+        -4239, 27717, -11548, -24152, 8279, 21358, 8892, -4519, -14243, 29589, -27203, -13863,
+        -28043, 18463, -22121, 8622, 9735, -28591, 32584, -32655,
     ];
     let common_values = &[
-        (11780, 35),
-        (13255, 34),
-        (-14, 33),
-        (8969, 33),
-        (-1223, 32),
-        (-30479, 32),
-        (8247, 31),
-        (-2848, 31),
-        (-7646, 31),
-        (24576, 31),
+        (27447, 34),
+        (-898, 33),
+        (5606, 33),
+        (5836, 33),
+        (-15023, 33),
+        (-197, 32),
+        (3582, 32),
+        (-7314, 32),
+        (19279, 32),
+        (20588, 32),
     ];
     let pop_median = NiceFloat(-0.5);
-    let sample_median = (-3, None);
+    let sample_median = (4, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-0.5000076295109483),
-        stdev: NiceFloat(18918.757957822254),
-        skewness: NiceFloat(1.209832742724696e-9),
-        kurtosis: NiceFloat(-1.200027466379059),
+        standard_deviation: NiceFloat(18918.757957822254),
+        skewness: NiceFloat(1.2098327432880512e-9),
+        excess_kurtosis: NiceFloat(-1.200027466379059),
     };
     let sample_moment_stats = MomentStats {
-        mean: NiceFloat(7.788612999999801),
-        stdev: NiceFloat(18924.172011313593),
-        skewness: NiceFloat(0.0005778008681197786),
-        kurtosis: NiceFloat(-1.200896987198633),
+        mean: NiceFloat(5.019281000000275),
+        standard_deviation: NiceFloat(18918.558463263365),
+        skewness: NiceFloat(-0.0001978759287576409),
+        excess_kurtosis: NiceFloat(-1.1998315900739762),
     };
     random_nonzero_signeds_helper::<i16>(
         values,
@@ -150,16 +150,16 @@ fn test_random_nonzero_signeds() {
     let pop_median = NiceFloat(-0.5);
     let sample_median = (-3037682, Some(-3035621));
     let pop_moment_stats = MomentStats {
-        mean: NiceFloat(-0.5000000002328306),
-        stdev: NiceFloat(1239850262.3974571),
-        skewness: NiceFloat(-1.408419937135895e-19),
-        kurtosis: NiceFloat(-1.2000000004190956),
+        mean: NiceFloat(-0.5000000001164153),
+        standard_deviation: NiceFloat(1239850262.3974571),
+        skewness: NiceFloat(2.8168398703367104e-19),
+        excess_kurtosis: NiceFloat(-1.2000000004190956),
     };
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(-1708075.0735549931),
-        stdev: NiceFloat(1239705769.0057693),
+        standard_deviation: NiceFloat(1239705769.0057693),
         skewness: NiceFloat(0.0016706713036923025),
-        kurtosis: NiceFloat(-1.2008047456655335),
+        excess_kurtosis: NiceFloat(-1.2008047456655335),
     };
     random_nonzero_signeds_helper::<i32>(
         values,
@@ -208,16 +208,16 @@ fn test_random_nonzero_signeds() {
     let pop_median = NiceFloat(0.0);
     let sample_median = (-5305218289400184, Some(-5271053954352614));
     let pop_moment_stats = MomentStats {
-        mean: NiceFloat(0.25),
-        stdev: NiceFloat(5.325116328314171e18),
-        skewness: NiceFloat(2.0694870984063076e-58),
-        kurtosis: NiceFloat(-1.1999999999999997),
+        mean: NiceFloat(0.0),
+        standard_deviation: NiceFloat(5.325116328314171e18),
+        skewness: NiceFloat(0.0),
+        excess_kurtosis: NiceFloat(-1.1999999999999997),
     };
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(-5606718482239710.0),
-        stdev: NiceFloat(5.325063903618647e18),
+        standard_deviation: NiceFloat(5.325063903618647e18),
         skewness: NiceFloat(0.0011248693866288532),
-        kurtosis: NiceFloat(-1.200551786344892),
+        excess_kurtosis: NiceFloat(-1.200551786344892),
     };
     random_nonzero_signeds_helper::<i64>(
         values,
@@ -269,16 +269,16 @@ fn test_random_nonzero_signeds() {
         Some(-9899574809150113239535729822182407),
     );
     let pop_moment_stats = MomentStats {
-        mean: NiceFloat(0.25),
-        stdev: NiceFloat(9.82310580711434e37),
-        skewness: NiceFloat(3.296883156664058e-116),
-        kurtosis: NiceFloat(-1.1999999999999997),
+        mean: NiceFloat(0.0),
+        standard_deviation: NiceFloat(9.82310580711434e37),
+        skewness: NiceFloat(0.0),
+        excess_kurtosis: NiceFloat(-1.1999999999999997),
     };
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(8.651168263124604e34),
-        stdev: NiceFloat(9.82707680675722e37),
+        standard_deviation: NiceFloat(9.82707680675722e37),
         skewness: NiceFloat(0.00010083962773749455),
-        kurtosis: NiceFloat(-1.2019920806441844),
+        excess_kurtosis: NiceFloat(-1.2019920806441844),
     };
     random_nonzero_signeds_helper::<i128>(
         values,

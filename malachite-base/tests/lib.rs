@@ -27,6 +27,7 @@
 #![allow(clippy::cognitive_complexity, clippy::too_many_arguments)]
 
 extern crate core;
+extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
@@ -168,16 +169,22 @@ pub mod num {
     }
     pub mod random {
         pub mod geometric {
+            pub mod geometric_random_natural_signeds;
+            pub mod geometric_random_negative_signeds;
+            pub mod geometric_random_positive_unsigneds;
+            pub mod geometric_random_unsigneds;
             pub mod mean;
         }
-        pub mod random_highest_bit_set_values;
-        pub mod random_masked_values;
+        pub mod random_highest_bit_set_unsigneds;
         pub mod random_natural_signeds;
         pub mod random_negative_signeds;
         pub mod random_nonzero_signeds;
         pub mod random_positive_signeds;
         pub mod random_positive_unsigneds;
-        pub mod standard_random_values;
+        pub mod random_primitive_integers;
+        pub mod random_signed_bit_chunks;
+        pub mod random_unsigned_bit_chunks;
+        pub mod random_unsigneds_less_than;
     }
 }
 pub mod orderings {
@@ -188,8 +195,6 @@ pub mod random {
     pub mod seed {
         pub mod fork;
         pub mod from_bytes;
-        pub mod get_rng;
-        pub mod standard_rand;
     }
 }
 pub mod rounding_modes {

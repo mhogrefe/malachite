@@ -8,8 +8,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt, _limbs_div_mod_barrett,
-    _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
+    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
     _limbs_invert_newton_approx, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
     limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
@@ -22,6 +21,9 @@ use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
+use malachite_nz_test_util::natural::arithmetic::div_mod::{
+    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+};
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
 };

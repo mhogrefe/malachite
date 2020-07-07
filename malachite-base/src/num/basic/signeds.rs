@@ -10,6 +10,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::CheckedHammingDistance;
+use num::random::random_bit_chunks::RandomSignedChunkable;
 
 /// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:
@@ -30,6 +31,7 @@ pub trait PrimitiveSigned:
     + OverflowingAbs<Output = Self>
     + OverflowingAbsAssign
     + PrimitiveInteger
+    + RandomSignedChunkable
     + SaturatingAbs<Output = Self>
     + SaturatingAbsAssign
     + SaturatingNeg<Output = Self>

@@ -209,15 +209,15 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Evaluate in: -1, 0, Infinity.
 ///
-///  <--s--><--n--->
-///   ______________
-///  |_xs1_|__xs0__|
-///   |ys1_|__ys0__|
-///   <-t--><--n--->
+/// <--s--><--n--->
+///  ______________
+/// |_xs1_|__xs0__|
+///  |ys1_|__ys0__|
+///  <-t--><--n--->
 ///
-///  v0   = xs0         * ys0         # X(0)   * Y(0)
-///  vm1  = (xs0 - xs1) * (ys0 - ys1) # X(-1)  * Y(-1)
-///  vinf = xs1         * ys1         # X(inf) * Y(inf)
+/// v_0     = xs0         * ys0         # X(0)   * Y(0)
+/// v_neg_1 = (xs0 - xs1) * (ys0 - ys1) # X(-1)  * Y(-1)
+/// v_inf   = xs1         * ys1         # X(inf) * Y(inf)
 ///
 /// Time: O(n<sup>log<sub>2</sub>3</sup>)
 ///
@@ -260,14 +260,15 @@ pub fn _limbs_mul_greater_to_out_toom_22(
     } else {
         // n - s == 1
         let (xs_0_last, xs_0_init) = xs_0.split_last().unwrap();
+        let (asm1_last, asm1_init) = asm1.split_last_mut().unwrap();
         if *xs_0_last == 0 && limbs_cmp_same_length(xs_0_init, xs_1) == Ordering::Less {
-            limbs_sub_same_length_to_out(asm1, xs_1, xs_0_init);
-            asm1[s] = 0;
+            limbs_sub_same_length_to_out(asm1_init, xs_1, xs_0_init);
+            *asm1_last = 0;
             v_neg_1_neg = true;
         } else {
-            asm1[s] = *xs_0_last;
-            if limbs_sub_same_length_to_out(asm1, xs_0_init, xs_1) {
-                asm1[s].wrapping_sub_assign(1);
+            *asm1_last = *xs_0_last;
+            if limbs_sub_same_length_to_out(asm1_init, xs_0_init, xs_1) {
+                asm1_last.wrapping_sub_assign(1);
             }
         }
     }
@@ -302,11 +303,11 @@ pub fn _limbs_mul_greater_to_out_toom_22(
     // L(v_pos_inf) + H(v_pos_inf)
     let (v_pos_inf_lo, v_pos_inf_hi) = v_pos_inf.split_at_mut(n); // v_pos_inf_lo: length n
     let (v_0_lo, v_0_hi) = v_0.split_at_mut(n); // v_0_lo: length n, vo_hi: length n
-    let mut carry = 0;
-    // H(v_0) + L(v_pos_inf)
-    if limbs_slice_add_same_length_in_place_left(v_pos_inf_lo, v_0_hi) {
-        carry += 1;
-    }
+                                                // H(v_0) + L(v_pos_inf)
+    let mut carry = Limb::iverson(limbs_slice_add_same_length_in_place_left(
+        v_pos_inf_lo,
+        v_0_hi,
+    ));
     // L(v_0) + H(v_0)
     let mut carry2 = carry;
     if limbs_add_same_length_to_out(v_0_hi, v_pos_inf_lo, v_0_lo) {

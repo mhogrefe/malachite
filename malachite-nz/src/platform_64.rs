@@ -54,3 +54,5 @@ pub const MOD_1_1_TO_MOD_1_2_THRESHOLD: usize = 6;
 pub const MOD_1_2_TO_MOD_1_4_THRESHOLD: usize = 26;
 
 pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = std::usize::MAX;
+
+pub const SQR_TOOM2_THRESHOLD: usize = 43;

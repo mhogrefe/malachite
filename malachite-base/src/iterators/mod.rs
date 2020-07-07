@@ -52,11 +52,13 @@ where
 /// # Examples
 /// ```
 /// use malachite_base::iterators::nonzero_values;
-/// use malachite_base::random::{EXAMPLE_SEED, standard_random_values};
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_primitive_integers;
 ///
 /// assert_eq!(
-///     nonzero_values(standard_random_values::<u8>(EXAMPLE_SEED)).take(10).collect::<Vec<u8>>(),
-///     &[113, 228, 87, 188, 93, 189, 117, 151, 7, 72]
+///     nonzero_values(random_primitive_integers::<u8>(EXAMPLE_SEED)).take(10)
+///         .collect::<Vec<u8>>(),
+///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
 /// )
 /// ```
 #[inline]
