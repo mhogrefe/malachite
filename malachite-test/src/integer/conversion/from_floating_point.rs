@@ -4,12 +4,16 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_nz::integer::Integer;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     f32s, f64s, finite_f32s, finite_f64s, pairs_of_finite_f32_and_rounding_mode_var_2,
     pairs_of_finite_f64_and_rounding_mode_var_2,
 };
-use inputs::integer::{f32s_exactly_equal_to_integer, f64s_exactly_equal_to_integer};
+use malachite_test::inputs::integer::{
+    f32s_exactly_equal_to_integer, f64s_exactly_equal_to_integer,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_rounding_from_f32);

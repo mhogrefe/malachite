@@ -6,6 +6,7 @@ use num::random::random_unsigned_bit_chunks;
 use num::random::thrifty_random::RandomPrimitiveIntegers;
 use random::seed::Seed;
 
+/// Uniformly generates unsigned integers of up to `chunk_size` bits.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
     pub(crate) xs: RandomPrimitiveIntegers<T>,
@@ -50,6 +51,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedBitChunks<T> {
     }
 }
 
+/// Uniformly generates signed integers of up to `chunk_size` bits.
 pub trait RandomSignedChunkable: Sized {
     type AbsoluteChunks: Clone + Debug;
 

@@ -50,16 +50,4 @@ macro_rules! impl_overflowing_neg {
         }
     };
 }
-
-impl_overflowing_neg!(u8);
-impl_overflowing_neg!(u16);
-impl_overflowing_neg!(u32);
-impl_overflowing_neg!(u64);
-impl_overflowing_neg!(u128);
-impl_overflowing_neg!(usize);
-impl_overflowing_neg!(i8);
-impl_overflowing_neg!(i16);
-impl_overflowing_neg!(i32);
-impl_overflowing_neg!(i64);
-impl_overflowing_neg!(i128);
-impl_overflowing_neg!(isize);
+apply_to_primitive_ints!(impl_overflowing_neg);

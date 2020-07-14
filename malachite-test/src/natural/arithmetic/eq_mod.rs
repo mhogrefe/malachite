@@ -5,27 +5,35 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
-    _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod, limbs_eq_limb_mod_limb,
-    limbs_eq_limb_mod_ref_ref, limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref,
-    limbs_eq_mod_limb_ref_ref, limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref,
-    limbs_eq_mod_ref_ref_ref, limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref,
-    limbs_eq_mod_ref_val_val,
+    _limbs_limb_mod_exact_odd_limb, _limbs_mod_exact_odd_limb, limbs_eq_limb_mod,
+    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_limb_mod_ref_val,
+    limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref, limbs_eq_mod_limb_ref_val,
+    limbs_eq_mod_limb_val_ref, limbs_eq_mod_ref_ref_ref, limbs_eq_mod_ref_ref_val,
+    limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::eq_mod::{
-    limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
-    limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1, limbs_eq_mod_naive_2,
+    _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2,
+    limbs_eq_mod_limb_naive_1, limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1,
+    limbs_eq_mod_naive_2,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1,
+    triples_of_unsigned_vec_unsigned_and_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8, triples_of_unsigned_vec_var_55,
+    triples_of_unsigneds_var_6,
 };
-use inputs::natural::{rm_triples_of_naturals, triples_of_naturals};
+use malachite_test::inputs::natural::{rm_triples_of_naturals, triples_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_limb_mod_exact_odd_limb);
+    register_demo!(registry, demo_limbs_mod_exact_odd_limb);
     register_demo!(registry, demo_limbs_eq_limb_mod_limb);
     register_demo!(registry, demo_limbs_eq_limb_mod);
     register_demo!(registry, demo_limbs_eq_limb_mod_val_ref);
@@ -46,6 +54,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_eq_mod_ref_val_ref);
     register_demo!(registry, demo_natural_eq_mod_ref_ref_val);
     register_demo!(registry, demo_natural_eq_mod_ref_ref_ref);
+    register_bench!(registry, Small, benchmark_limbs_limb_mod_exact_odd_limb);
+    register_bench!(registry, Small, benchmark_limbs_mod_exact_odd_limb);
     register_bench!(registry, Small, benchmark_limbs_eq_limb_mod_limb_algorithms);
     register_bench!(
         registry,
@@ -68,6 +78,30 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_eq_mod_library_comparison);
     register_bench!(registry, Large, benchmark_natural_eq_mod_algorithms);
+}
+
+fn demo_limbs_limb_mod_exact_odd_limb(gm: GenerationMode, limit: usize) {
+    for (n, d, carry) in triples_of_unsigneds_var_6(gm).take(limit) {
+        println!(
+            "_limbs_limb_mod_exact_odd_limb({}, {}, {}) = {}",
+            n,
+            d,
+            carry,
+            _limbs_limb_mod_exact_odd_limb(n, d, carry)
+        );
+    }
+}
+
+fn demo_limbs_mod_exact_odd_limb(gm: GenerationMode, limit: usize) {
+    for (ref ns, d, carry) in triples_of_unsigned_vec_unsigned_and_unsigned_var_1(gm).take(limit) {
+        println!(
+            "_limbs_mod_exact_odd_limb({:?}, {}, {}) = {}",
+            ns,
+            d,
+            carry,
+            _limbs_mod_exact_odd_limb(ns, d, carry)
+        );
+    }
 }
 
 fn demo_limbs_eq_limb_mod_limb(gm: GenerationMode, limit: usize) {
@@ -318,6 +352,40 @@ fn demo_natural_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
             println!("&{} is not equal to &{} mod &{}", x, y, m);
         }
     }
+}
+
+fn benchmark_limbs_limb_mod_exact_odd_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "_limbs_limb_mod_exact_odd_limb(Limb, Limb, Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigneds_var_6::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
+        "n.significant_bits()",
+        &mut [(
+            "malachite",
+            &mut (|(n, d, carry)| no_out!(_limbs_limb_mod_exact_odd_limb(n, d, carry))),
+        )],
+    );
+}
+
+fn benchmark_limbs_mod_exact_odd_limb(gm: GenerationMode, limit: usize, file_name: &str) {
+    m_run_benchmark(
+        "_limbs_mod_exact_odd_limb(&[Limb], Limb, Limb)",
+        BenchmarkType::Single,
+        triples_of_unsigned_vec_unsigned_and_unsigned_var_1::<Limb>(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref ns, _, _)| ns.len()),
+        "ns.len()",
+        &mut [(
+            "malachite",
+            &mut (|(ref ns, d, carry)| no_out!(_limbs_mod_exact_odd_limb(ns, d, carry))),
+        )],
+    );
 }
 
 fn benchmark_limbs_eq_limb_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {

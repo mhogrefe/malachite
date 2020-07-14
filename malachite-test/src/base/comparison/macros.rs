@@ -7,8 +7,10 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_signeds, pairs_of_unsigneds, signeds, triples_of_signeds, triples_of_unsigneds,
     unsigneds,
 };

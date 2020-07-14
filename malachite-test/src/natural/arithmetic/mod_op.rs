@@ -22,8 +22,10 @@ use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
 use num::Integer;
 use rug::ops::RemRounding;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_9, pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2,
     pairs_of_nonempty_unsigned_vec_and_unsigned_var_1,
@@ -34,7 +36,7 @@ use inputs::base::{
     sextuples_of_limbs_var_1, triples_of_limb_vec_var_45, triples_of_two_limb_vecs_and_limb_var_1,
     triples_of_unsigned_vec_var_37,
 };
-use inputs::natural::{
+use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
 };

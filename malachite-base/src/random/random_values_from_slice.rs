@@ -1,5 +1,6 @@
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 
+/// Uniformly generates a random reference to a value from a nonempty slice.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromSlice<'a, T> {
     pub(crate) xs: &'a [T],

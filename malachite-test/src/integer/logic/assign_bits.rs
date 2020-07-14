@@ -5,9 +5,11 @@ use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec_var_2;
-use inputs::integer::quadruples_of_integer_small_unsigned_small_unsigned_and_natural_var_1;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::*;
+use malachite_test::inputs::integer::*;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_neg_assign_bits);

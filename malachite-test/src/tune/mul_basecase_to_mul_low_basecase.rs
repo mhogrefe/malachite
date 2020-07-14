@@ -3,8 +3,8 @@ use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::mul_low::_limbs_mul_low_same_length_basecase;
 use malachite_nz::platform::Limb;
 
-use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_47;
+use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::triples_of_unsigned_vec_var_47;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(

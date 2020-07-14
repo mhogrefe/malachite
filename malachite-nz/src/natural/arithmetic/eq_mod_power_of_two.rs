@@ -9,18 +9,20 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+//TODO clean
+
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
 /// the `pow` least-significant bits of the `Natural` and the limb are equal.
 ///
-/// This function assumes that `limbs` has length at least 2 and the last (most significant) limb is
+/// This function assumes that `xs` has length at least 2 and the last (most significant) limb is
 /// nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -32,14 +34,14 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 36), false);
 /// assert_eq!(limbs_eq_limb_mod_power_of_two(&[0b1111011, 0b111001000], 0b1111011, 100), false);
 /// ```
-pub fn limbs_eq_limb_mod_power_of_two(xs: &[Limb], limb: Limb, pow: u64) -> bool {
+pub fn limbs_eq_limb_mod_power_of_two(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= xs.len() {
         false
     } else if i == 0 {
-        xs[0].eq_mod_power_of_two(limb, pow)
+        xs[0].eq_mod_power_of_two(y, pow)
     } else {
-        xs[0] == limb && limbs_divisible_by_power_of_two(&xs[1..], pow - Limb::WIDTH)
+        xs[0] == y && limbs_divisible_by_power_of_two(&xs[1..], pow - Limb::WIDTH)
     }
 }
 

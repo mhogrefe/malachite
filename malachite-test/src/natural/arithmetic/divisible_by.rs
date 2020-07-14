@@ -11,12 +11,14 @@ use malachite_nz_test_util::natural::arithmetic::divisible_by::{
     combined_limbs_divisible_by_limb, num_divisible_by,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_14, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_unsigned_vec_var_13,
 };
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
+use malachite_test::inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_divisible_by_limb);

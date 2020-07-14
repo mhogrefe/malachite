@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod checked_from_and_exact_from;
 pub mod convertible_from;

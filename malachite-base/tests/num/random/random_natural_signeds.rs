@@ -1,6 +1,6 @@
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    disc_uniform_dist_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -10,15 +10,15 @@ use malachite_base::random::EXAMPLE_SEED;
 fn random_natural_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) {
-    disc_uniform_dist_assertions(
+    uniform_primitive_integer_assertions(
         random_natural_signeds::<T>(EXAMPLE_SEED),
-        &T::ZERO,
-        &T::MAX,
+        T::ZERO,
+        T::MAX,
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -47,7 +47,7 @@ fn test_random_natural_signeds() {
         (82, 7925),
         (102, 7924),
     ];
-    let pop_median = NiceFloat(63.5);
+    let pop_median = (63, Some(64));
     let sample_median = (63, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(63.5),
@@ -87,7 +87,7 @@ fn test_random_natural_signeds() {
         (1430, 51),
         (3511, 51),
     ];
-    let pop_median = NiceFloat(16383.5);
+    let pop_median = (16383, Some(16384));
     let sample_median = (16394, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(16383.5),
@@ -128,7 +128,7 @@ fn test_random_natural_signeds() {
         (100688553, 2),
         (103402223, 2),
     ];
-    let pop_median = NiceFloat(1073741823.5);
+    let pop_median = (1073741823, Some(1073741824));
     let sample_median = (1072627595, Some(1072629791));
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1073741823.5),
@@ -186,7 +186,7 @@ fn test_random_natural_signeds() {
         (48213785128580, 1),
         (51745785759707, 1),
     ];
-    let pop_median = NiceFloat(4.611686018427388e18);
+    let pop_median = (4611686018427387903, Some(4611686018427387904));
     let sample_median = (4611643941266241783, Some(4611644928041858554));
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(4.611686018427388e18),
@@ -244,7 +244,10 @@ fn test_random_natural_signeds() {
         (1634887730516500612018549047947720, 1),
         (2085175602444743211488924039302279, 1),
     ];
-    let pop_median = NiceFloat(8.507059173023462e37);
+    let pop_median = (
+        85070591730234615865843651857942052863,
+        Some(85070591730234615865843651857942052864),
+    );
     let sample_median = (
         84985358969888408674238551739287032693,
         Some(84985395712350170023498559520469041517),

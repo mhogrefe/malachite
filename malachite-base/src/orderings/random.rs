@@ -9,9 +9,11 @@ use random::seed::Seed;
 /// Generates a random `Ordering` that has an equal probability of being `Less`, `Greater`, or
 /// `Equal`.
 ///
-/// Time: worst case O(1)
+/// Length is infinite.
 ///
-/// Additional memory: worst case O(1)
+/// Time per iteration: worst case O(1)
+///
+/// Additional memory per iteration: worst case O(1)
 ///
 /// # Examples
 /// ```

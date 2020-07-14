@@ -24,4 +24,5 @@ where
 }
 
 pub mod common_values_map;
+pub mod median;
 pub mod moments;

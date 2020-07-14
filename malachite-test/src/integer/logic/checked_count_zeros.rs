@@ -5,9 +5,11 @@ use malachite_nz_test_util::integer::logic::checked_count_zeros::{
     integer_checked_count_zeros_alt_1, integer_checked_count_zeros_alt_2,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::nonempty_vecs_of_unsigned;
-use inputs::integer::integers;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::nonempty_vecs_of_unsigned;
+use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_count_zeros_neg);

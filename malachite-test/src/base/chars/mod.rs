@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod char_to_contiguous_range;
 pub mod contiguous_range_to_char;

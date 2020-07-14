@@ -8,9 +8,11 @@ use malachite_nz::natural::arithmetic::mod_power_of_two_mul::{
 };
 use malachite_nz::natural::Natural;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_limb_vec_limb_vec_and_u64_var_16;
-use inputs::natural::triples_of_natural_natural_and_u64_var_1;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::triples_of_limb_vec_limb_vec_and_u64_var_16;
+use malachite_test::inputs::natural::triples_of_natural_natural_and_u64_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_power_of_two_mul);

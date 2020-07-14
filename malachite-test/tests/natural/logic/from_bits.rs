@@ -9,10 +9,12 @@ use malachite_nz::natural::logic::bit_convertible::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::logic::from_bits::{
+    from_bits_asc_naive, from_bits_desc_naive,
+};
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
-use malachite_test::natural::logic::from_bits::{from_bits_asc_naive, from_bits_desc_naive};
 
 #[test]
 fn limbs_asc_from_bits_asc_properties() {

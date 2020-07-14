@@ -4,9 +4,11 @@ use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1;
-use inputs::natural::triples_of_natural_small_unsigned_and_small_unsigned_var_1;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1;
+use malachite_test::inputs::natural::triples_of_natural_small_unsigned_and_small_unsigned_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_slice_get_bits);

@@ -7,9 +7,11 @@ use malachite_nz::integer::logic::bit_convertible::{
 };
 use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
-use inputs::integer::integers;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
+use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_bits_to_twos_complement_bits_non_negative);

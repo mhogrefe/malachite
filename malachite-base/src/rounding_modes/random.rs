@@ -8,9 +8,11 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 /// Generates a random `RoundingMode` that has an equal probability of being any of the 6
 /// `RoundingMode`s.
 ///
-/// Time: worst case O(1)
+/// Length is infinite.
 ///
-/// Additional memory: wost case O(1)
+/// Time per iteration: worst case O(1)
+///
+/// Additional memory per iteration: wost case O(1)
 ///
 /// # Examples
 /// ```

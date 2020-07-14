@@ -1,5 +1,5 @@
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
-use malachite_base_test_util::stats::moments::{disc_uniform_dist_assertions, MomentStats};
+use malachite_base_test_util::stats::moments::{uniform_bool_assertions, MomentStats};
 
 use malachite_base::bools::random::random_bools;
 use malachite_base::random::EXAMPLE_SEED;
@@ -7,16 +7,16 @@ use malachite_base::random::EXAMPLE_SEED;
 #[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_bools() {
-    disc_uniform_dist_assertions(
+    uniform_bool_assertions(
         random_bools(EXAMPLE_SEED),
-        &false,
-        &true,
+        false,
+        true,
         &[
             true, false, false, false, true, true, true, false, true, true, true, true, false,
             true, true, true, true, false, true, false,
         ],
         &[(true, 500473), (false, 499527)],
-        NiceFloat(0.5),
+        (false, Some(true)),
         (true, None),
         MomentStats {
             mean: NiceFloat(0.5),

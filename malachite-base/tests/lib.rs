@@ -45,6 +45,9 @@ pub mod comparison {
     pub mod macros;
 }
 pub mod chars;
+pub mod iterators {
+    pub mod nonzero_values;
+}
 pub mod named;
 pub mod num {
     pub mod arithmetic {
@@ -171,7 +174,10 @@ pub mod num {
         pub mod geometric {
             pub mod geometric_random_natural_signeds;
             pub mod geometric_random_negative_signeds;
+            pub mod geometric_random_nonzero_signeds;
+            pub mod geometric_random_positive_signeds;
             pub mod geometric_random_positive_unsigneds;
+            pub mod geometric_random_signeds;
             pub mod geometric_random_unsigneds;
             pub mod mean;
         }
@@ -192,6 +198,8 @@ pub mod orderings {
     pub mod random;
 }
 pub mod random {
+    pub mod random_values_from_slice;
+    pub mod random_values_from_vec;
     pub mod seed {
         pub mod fork;
         pub mod from_bytes;

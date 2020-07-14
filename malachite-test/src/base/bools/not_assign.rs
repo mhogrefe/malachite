@@ -1,7 +1,7 @@
 use malachite_base::num::logic::traits::NotAssign;
 
-use common::{DemoBenchRegistry, NoSpecialGenerationMode};
-use inputs::base::bools;
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
+use malachite_test::inputs::base::bools;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_bool_not_assign);

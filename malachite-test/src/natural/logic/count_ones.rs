@@ -5,9 +5,11 @@ use malachite_nz_test_util::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_unsigned;
-use inputs::natural::naturals;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::vecs_of_unsigned;
+use malachite_test::inputs::natural::naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_count_ones);

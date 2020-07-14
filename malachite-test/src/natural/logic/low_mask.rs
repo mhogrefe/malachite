@@ -5,10 +5,10 @@ use malachite_base::num::logic::traits::LowMask;
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::small_unsigneds;
+use malachite_test::inputs::base::small_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_limbs_low_mask);

@@ -3,7 +3,10 @@ use malachite_base_test_util::stats::moments::{
     negative_truncated_geometric_dist_assertions, CheckedToF64, MomentStats,
 };
 
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::random::geometric::geometric_random_negative_signeds;
 use malachite_base::random::EXAMPLE_SEED;
 
@@ -12,17 +15,20 @@ fn geometric_random_negative_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
     abs_um_denominator: u64,
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
-) {
+) where
+    T: WrappingFrom<<T as UnsignedAbs>::Output>,
+    <T as UnsignedAbs>::Output: CheckedToF64 + PrimitiveUnsigned,
+{
     negative_truncated_geometric_dist_assertions(
         geometric_random_negative_signeds::<T>(EXAMPLE_SEED, abs_um_numerator, abs_um_denominator),
         abs_um_numerator,
         abs_um_denominator,
-        &T::NEGATIVE_ONE,
-        &T::MIN,
+        T::NEGATIVE_ONE,
+        T::MIN,
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -40,7 +46,7 @@ fn test_geometric_random_negative_signeds() {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2,
     ];
     let common_values = &[(-1, 984537), (-2, 15210), (-3, 253)];
-    let pop_median = NiceFloat(-1.0);
+    let pop_median = (-1, None);
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-1.015625),
@@ -80,7 +86,7 @@ fn test_geometric_random_negative_signeds() {
         (-8, 5),
         (-9, 1),
     ];
-    let pop_median = NiceFloat(-1.0);
+    let pop_median = (-1, None);
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-1.2345),
@@ -121,7 +127,7 @@ fn test_geometric_random_negative_signeds() {
         (-9, 1932),
         (-10, 942),
     ];
-    let pop_median = NiceFloat(-1.0);
+    let pop_median = (-2, Some(-1));
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-2.0),
@@ -163,7 +169,7 @@ fn test_geometric_random_negative_signeds() {
         (-9, 15914),
         (-10, 15665),
     ];
-    let pop_median = NiceFloat(-37.0);
+    let pop_median = (-37, None);
     let sample_median = (-37, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-44.32782748571844),
@@ -205,7 +211,7 @@ fn test_geometric_random_negative_signeds() {
         (-18, 8254),
         (-9, 8249),
     ];
-    let pop_median = NiceFloat(-62.0);
+    let pop_median = (-62, None);
     let sample_median = (-63, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(-63.134440160748206),

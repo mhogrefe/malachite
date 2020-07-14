@@ -21,8 +21,10 @@ use malachite_nz_test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     odd_limbs, pairs_of_limb_vec_and_positive_limb_var_2, pairs_of_limb_vec_var_16,
     pairs_of_limb_vec_var_8, pairs_of_unsigned_vec_var_12, quadruples_of_limb_vec_var_4,
     quadruples_of_limb_vec_var_5, quadruples_of_three_limb_vecs_and_limb_var_3,
@@ -32,7 +34,7 @@ use inputs::base::{
     triples_of_limb_vec_var_51, triples_of_limb_vec_var_53, triples_of_limb_vec_var_54,
     vecs_of_limb_var_4,
 };
-use inputs::natural::{
+use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural_var_1, pairs_of_natural_and_positive_natural_var_1,
 };
 

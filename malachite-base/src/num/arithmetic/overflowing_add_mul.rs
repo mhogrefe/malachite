@@ -1,7 +1,19 @@
 use num::arithmetic::traits::{
-    OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign, UnsignedAbs,
+    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
+    OverflowingMul, UnsignedAbs, WrappingAdd, WrappingMul,
 };
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Zero;
+
+#[inline]
+pub fn _overflowing_add_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
+where
+    T: OverflowingAdd<T, Output = T> + OverflowingMul<T, Output = T>,
+{
+    let (product, overflow_1) = y.overflowing_mul(z);
+    let (result, overflow_2) = x.overflowing_add(product);
+    (result, overflow_1 | overflow_2)
+}
 
 macro_rules! impl_overflowing_add_mul_unsigned {
     ($t:ident) => {
@@ -24,9 +36,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
             /// ```
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
-                let (product, overflow_1) = y.overflowing_mul(z);
-                let (result, overflow_2) = self.overflowing_add(product);
-                (result, overflow_1 | overflow_2)
+                _overflowing_add_mul_unsigned(self, y, z)
             }
         }
 
@@ -60,13 +70,48 @@ macro_rules! impl_overflowing_add_mul_unsigned {
         }
     };
 }
+apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-impl_overflowing_add_mul_unsigned!(u8);
-impl_overflowing_add_mul_unsigned!(u16);
-impl_overflowing_add_mul_unsigned!(u32);
-impl_overflowing_add_mul_unsigned!(u64);
-impl_overflowing_add_mul_unsigned!(u128);
-impl_overflowing_add_mul_unsigned!(usize);
+#[allow(unstable_name_collisions)]
+pub fn _overflowing_add_mul_signed<U: PrimitiveInteger, S: Copy + Eq + Ord + Zero>(
+    x: S,
+    y: S,
+    z: S,
+) -> (S, bool)
+where
+    S: OverflowingAdd<S, Output = S>
+        + OverflowingMul<S, Output = S>
+        + UnsignedAbs<Output = U>
+        + WrappingAdd<S, Output = S>
+        + WrappingMul<S, Output = S>,
+{
+    if y == S::ZERO || z == S::ZERO {
+        return (x, false);
+    }
+    let x_sign = x >= S::ZERO;
+    if x_sign == ((y >= S::ZERO) == (z >= S::ZERO)) {
+        let (product, overflow_1) = y.overflowing_mul(z);
+        let (result, overflow_2) = x.overflowing_add(product);
+        (result, overflow_1 | overflow_2)
+    } else {
+        let result = x.wrapping_add(y.wrapping_mul(z));
+        let overflow = {
+            let x = x.unsigned_abs();
+            match y.unsigned_abs().checked_mul(z.unsigned_abs()) {
+                Some(product) => {
+                    x < product
+                        && if x_sign {
+                            !x.wrapping_sub(product).get_highest_bit()
+                        } else {
+                            product.wrapping_sub(x).get_highest_bit()
+                        }
+                }
+                None => true,
+            }
+        };
+        (result, overflow)
+    }
+}
 
 macro_rules! impl_overflowing_add_mul_signed {
     ($t:ident) => {
@@ -88,34 +133,8 @@ macro_rules! impl_overflowing_add_mul_signed {
             /// assert_eq!((-127i8).overflowing_add_mul(-2, 100), (-71, true));
             /// ```
             #[inline]
-            #[allow(unstable_name_collisions)]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
-                if y == 0 || z == 0 {
-                    return (self, false);
-                }
-                let x_sign = self >= 0;
-                if x_sign == ((y >= 0) == (z >= 0)) {
-                    let (product, overflow_1) = y.overflowing_mul(z);
-                    let (result, overflow_2) = self.overflowing_add(product);
-                    (result, overflow_1 | overflow_2)
-                } else {
-                    let result = self.wrapping_add(y.wrapping_mul(z));
-                    let overflow = {
-                        let x = self.unsigned_abs();
-                        match y.unsigned_abs().checked_mul(z.unsigned_abs()) {
-                            Some(product) => {
-                                x < product
-                                    && if x_sign {
-                                        !x.wrapping_sub(product).get_highest_bit()
-                                    } else {
-                                        product.wrapping_sub(x).get_highest_bit()
-                                    }
-                            }
-                            None => true,
-                        }
-                    };
-                    (result, overflow)
-                }
+                _overflowing_add_mul_signed(self, y, z)
             }
         }
 
@@ -150,10 +169,4 @@ macro_rules! impl_overflowing_add_mul_signed {
         }
     };
 }
-
-impl_overflowing_add_mul_signed!(i8);
-impl_overflowing_add_mul_signed!(i16);
-impl_overflowing_add_mul_signed!(i32);
-impl_overflowing_add_mul_signed!(i64);
-impl_overflowing_add_mul_signed!(i128);
-impl_overflowing_add_mul_signed!(isize);
+apply_to_signeds!(impl_overflowing_add_mul_signed);

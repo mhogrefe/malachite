@@ -55,7 +55,7 @@ pub struct DemoBenchRegistry {
 }
 
 impl DemoBenchRegistry {
-    pub(crate) fn register_demo(&mut self, name: &'static str, f: DemoFn) {
+    pub fn register_demo(&mut self, name: &'static str, f: DemoFn) {
         assert!(
             self.demo_map.insert(name, f).is_none(),
             "Duplicate demo with name {}",
@@ -67,7 +67,7 @@ impl DemoBenchRegistry {
         self.demo_map.get(name)
     }
 
-    pub(crate) fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
+    pub fn register_bench(&mut self, scale_type: ScaleType, name: &'static str, f: BenchFn) {
         f(GenerationMode::Exhaustive, 0, "validation");
         assert!(
             self.bench_map.insert(name, (scale_type, f)).is_none(),
@@ -80,7 +80,7 @@ impl DemoBenchRegistry {
         self.bench_map.get(name)
     }
 
-    pub(crate) fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
+    pub fn register_no_special_demo(&mut self, name: &'static str, f: NoSpecialDemoFn) {
         assert!(
             self.no_special_demo_map.insert(name, f).is_none(),
             "Duplicate demo with name {}",
@@ -92,7 +92,7 @@ impl DemoBenchRegistry {
         self.no_special_demo_map.get(name)
     }
 
-    pub(crate) fn register_no_special_bench(
+    pub fn register_no_special_bench(
         &mut self,
         scale_type: ScaleType,
         name: &'static str,
@@ -137,24 +137,28 @@ impl DemoBenchRegistry {
     }
 }
 
+#[macro_export]
 macro_rules! register_demo {
     ($registry:ident, $f:ident) => {{
         $registry.register_demo(stringify!($f), &$f);
     }};
 }
 
+#[macro_export]
 macro_rules! register_ns_demo {
     ($registry:ident, $f:ident) => {{
         $registry.register_no_special_demo(stringify!($f), &$f);
     }};
 }
 
+#[macro_export]
 macro_rules! register_bench {
     ($registry:ident, $st:ident, $f:ident) => {{
         $registry.register_bench(ScaleType::$st, stringify!($f), &$f);
     }};
 }
 
+#[macro_export]
 macro_rules! register_ns_bench {
     ($registry:ident, $st:ident, $f:ident) => {{
         $registry.register_no_special_bench(ScaleType::$st, stringify!($f), &$f);
@@ -168,7 +172,7 @@ pub enum NoSpecialGenerationMode {
 }
 
 impl NoSpecialGenerationMode {
-    pub(crate) fn name(self) -> &'static str {
+    pub fn name(self) -> &'static str {
         match self {
             NoSpecialGenerationMode::Exhaustive => "exhaustive",
             NoSpecialGenerationMode::Random(_) => "random",
@@ -184,7 +188,7 @@ pub enum GenerationMode {
 }
 
 impl GenerationMode {
-    pub(crate) fn name(self) -> &'static str {
+    pub fn name(self) -> &'static str {
         match self {
             GenerationMode::Exhaustive => "exhaustive",
             GenerationMode::Random(_) => "random",
@@ -192,7 +196,7 @@ impl GenerationMode {
         }
     }
 
-    pub(crate) fn get_scale(self) -> Option<u32> {
+    pub fn get_scale(self) -> Option<u32> {
         match self {
             GenerationMode::Exhaustive => None,
             GenerationMode::Random(scale) => Some(scale),
@@ -200,7 +204,7 @@ impl GenerationMode {
         }
     }
 
-    pub(crate) fn with_scale(self, scale: u32) -> GenerationMode {
+    pub fn with_scale(self, scale: u32) -> GenerationMode {
         match self {
             GenerationMode::Exhaustive => GenerationMode::Exhaustive,
             GenerationMode::Random(_) => GenerationMode::Random(scale),
@@ -217,7 +221,7 @@ pub enum BenchmarkType {
     Algorithms,
 }
 
-pub(crate) fn m_run_benchmark<'a, I: Iterator>(
+pub fn m_run_benchmark<'a, I: Iterator>(
     title: &'a str,
     benchmark_type: BenchmarkType,
     generator: I,
@@ -274,6 +278,7 @@ pub(crate) fn m_run_benchmark<'a, I: Iterator>(
     run_benchmark(options);
 }
 
+#[macro_export]
 macro_rules! no_out {
     ($e:expr) => {{
         $e;

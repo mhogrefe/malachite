@@ -7,8 +7,10 @@ use malachite_nz_test_util::integer::comparison::partial_eq_primitive_integer::*
 use num::BigInt;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::integer::{
     nrm_pairs_of_integer_and_signed, nrm_pairs_of_integer_and_unsigned,
     pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_signed_and_integer,
     pairs_of_unsigned_and_integer, rm_pairs_of_signed_and_integer,

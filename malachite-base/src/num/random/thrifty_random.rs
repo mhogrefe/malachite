@@ -5,6 +5,7 @@ use rand_chacha::ChaCha20Rng;
 
 use num::basic::integers::PrimitiveInteger;
 
+/// Generates random primitive integers uniformly.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ThriftyRandomState {
     x: u32,

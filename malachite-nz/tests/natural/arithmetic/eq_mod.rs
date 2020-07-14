@@ -2,6 +2,8 @@ use std::str::FromStr;
 
 use malachite_base::num::arithmetic::traits::EqMod;
 #[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::eq_mod::_combined_limbs_eq_limb_mod_limb;
+#[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
     limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1, limbs_eq_mod_naive_2,
@@ -9,11 +11,10 @@ use malachite_nz_test_util::natural::arithmetic::eq_mod::{
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::eq_mod::{
-    _combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod, limbs_eq_limb_mod_limb,
-    limbs_eq_limb_mod_ref_ref, limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref,
-    limbs_eq_mod_limb_ref_ref, limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref,
-    limbs_eq_mod_ref_ref_ref, limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref,
-    limbs_eq_mod_ref_val_val,
+    limbs_eq_limb_mod, limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref,
+    limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref, limbs_eq_mod_ref_ref_ref,
+    limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;

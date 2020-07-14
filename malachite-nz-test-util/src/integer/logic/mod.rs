@@ -46,6 +46,7 @@ pub mod and;
 pub mod checked_count_ones;
 pub mod checked_count_zeros;
 pub mod checked_hamming_distance;
+pub mod from_bits;
 pub mod index_of_next_false_bit;
 pub mod index_of_next_true_bit;
 pub mod or;

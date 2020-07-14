@@ -8,8 +8,10 @@ use malachite_base::num::conversion::traits::{
 };
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     triples_of_signed_signed_and_rounding_mode_var_1,
     triples_of_unsigned_unsigned_and_rounding_mode_var_1,
 };

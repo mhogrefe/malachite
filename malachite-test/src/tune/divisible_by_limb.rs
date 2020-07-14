@@ -5,8 +5,8 @@ use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::platform::Limb;
 
-use common::GenerationMode;
-use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
+use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(

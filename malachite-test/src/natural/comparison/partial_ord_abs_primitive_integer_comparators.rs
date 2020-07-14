@@ -6,8 +6,10 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::natural::{
     pairs_of_natural_and_signed, pairs_of_natural_and_unsigned, pairs_of_signed_and_natural,
     pairs_of_unsigned_and_natural,
 };

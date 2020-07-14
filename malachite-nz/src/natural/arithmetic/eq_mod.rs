@@ -24,47 +24,75 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
-/// divisor must be odd. //TODO test
-pub fn limbs_limb_mod_exact_odd_limb(x: Limb, d: Limb, carry: Limb) -> Limb {
-    if x > carry {
-        let result = (x - carry) % d;
+/// See the description for `_limbs_mod_exact_odd_limb`. divisor must be odd.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c, where size == 1.
+pub fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
+    if n > carry {
+        let result = (n - carry) % d;
         if result == 0 {
             0
         } else {
             d - result
         }
     } else {
-        (carry - x) % d
+        (carry - n) % d
     }
 }
 
-/// divisor must be odd. //TODO test
+/// Calculates an r satisfying
+///
+/// r * B ^ k + n - c == q * d
+///
+/// where B = 2<sup>`Limb::WIDTH`</sup>, k is either `ns.len()` or `ns.len()` - 1 (the caller won't
+/// know which), c is `carry`, and q is the quotient (discarded). `d` must be odd and `carry` can be
+/// any limb value.
+///
+/// If c < d then r will be in the range 0 <= r < d, or if c >= d then 0 <= r <= d.
+///
+/// This slightly strange function suits the initial N x 1 reduction for GCDs or Jacobi symbols
+/// since the factors of 2 in B ^ k can be ignored, leaving -r == a mod d (by passing c = 0). For a
+/// GCD the factor of -1 on r can be ignored, or for the Jacobi symbol it can be accounted for. The
+/// function also suits divisibility and congruence testing, since if r = 0 (or r = d) is obtained,
+/// then a === c mod d.
+///
+/// ns must be nonempty and divisor must be odd.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `xs.len()`
 ///
 /// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c.
-pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
-    let len = xs.len();
+pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
+    let len = ns.len();
     if len == 1 {
-        return limbs_limb_mod_exact_odd_limb(xs[0], d, carry);
+        return _limbs_limb_mod_exact_odd_limb(ns[0], d, carry);
     }
     let d_inv = limbs_modular_invert_limb(d);
     let d_double = DoubleLimb::from(d);
-    let last_index = len - 1;
-    for &limb in &xs[..last_index] {
-        let (diff, small_carry) = limb.overflowing_sub(carry);
+    let (xs_last, xs_init) = ns.split_last().unwrap();
+    let xs_last = *xs_last;
+    for x in xs_init {
+        let (diff, small_carry) = x.overflowing_sub(carry);
         carry = (DoubleLimb::from(diff.wrapping_mul(d_inv)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
         }
     }
-    let last = xs[last_index];
-    if last <= d {
-        if carry >= last {
-            carry - last
+    if xs_last <= d {
+        if carry >= xs_last {
+            carry - xs_last
         } else {
-            carry.wrapping_add(d - last)
+            carry.wrapping_add(d - xs_last)
         }
     } else {
-        let (diff, small_carry) = last.overflowing_sub(carry);
+        let (diff, small_carry) = xs_last.overflowing_sub(carry);
         carry = (DoubleLimb::from(diff.wrapping_mul(d_inv)) * d_double).upper_half();
         if small_carry {
             carry.wrapping_add_assign(1);
@@ -73,33 +101,20 @@ pub fn limbs_mod_exact_odd_limb(xs: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     }
 }
 
-/// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
-///
-/// limbs.len() must be greater than 1; m must be nonzero.
-///
-/// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is non-negative.
-pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], limb: Limb, m: Limb) -> bool {
-    if xs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        limbs_mod_limb(xs, m) == limb % m
-    } else {
-        limbs_eq_limb_mod_limb(xs, limb, m)
-    }
-}
-
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is equal to a limb mod a given `Limb` `m`.
 ///
-/// This function assumes that `m` is nonzero, `limbs` has at least two elements, and the last
-/// element of `limbs` is nonzero.
+/// This function assumes that `m` is nonzero, `xs` has at least two elements, and the last element
+/// of `xs` is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if the length of `limbs` is less than 2 or `m` is zero.
+/// Panics if the length of `xs` is less than 2 or `m` is zero.
 ///
 /// # Example
 /// ```
@@ -119,9 +134,9 @@ pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
         if !xs[0].wrapping_sub(y).divisible_by_power_of_two(twos) {
             return false;
         }
-        limbs_mod_exact_odd_limb(xs, m >> twos, y)
+        _limbs_mod_exact_odd_limb(xs, m >> twos, y)
     } else {
-        limbs_mod_exact_odd_limb(xs, m, y)
+        _limbs_mod_exact_odd_limb(xs, m, y)
     };
     r == 0 || r == m
 }
@@ -157,7 +172,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
                     r == y % m_0
                 }
             } else {
-                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
+                let r = _limbs_mod_exact_odd_limb(xs, m_0, y);
                 r == 0 || r == m_0
             });
         }

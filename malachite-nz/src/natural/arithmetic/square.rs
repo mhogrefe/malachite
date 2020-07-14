@@ -1,16 +1,22 @@
 use std::cmp::{max, Ordering};
 
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, Square, SquareAssign, WrappingAddAssign, WrappingSubAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::rounding_modes::RoundingMode;
 
+use fail_on_untested_path;
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
+    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use natural::arithmetic::mul::poly_interpolate::_limbs_mul_toom_interpolate_5_points;
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use natural::arithmetic::shl::limbs_slice_shl_in_place;
 use natural::arithmetic::sub::{
@@ -214,6 +220,193 @@ pub fn _limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     } else {
         assert!(!limbs_sub_limb_in_place(out_hi, 1));
     }
+}
+
+/// This function can be used to determine whether the size of the input slice to
+/// `_limbs_square_to_out_toom_3` is valid.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+pub fn _limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
+    let n = xs_len.div_round(3, RoundingMode::Ceiling);
+    xs_len > n << 1 && xs_len <= 3 * n
+}
+
+/// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.1.2.
+pub const fn _limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
+    3 * xs_len + Limb::WIDTH as usize
+}
+
+//TODO
+const SQR_TOOM4_THRESHOLD: usize = 28;
+
+//TODO
+const SMALLER_RECURSION_TOOM_3: bool = true;
+
+/// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+pub const TOOM3_MAYBE_SQR_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
+
+/// This is MAYBE_sqr_basecase from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+pub const TOOM3_MAYBE_SQR_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
+
+/// This is TOOM3_SQR_REC from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+fn _limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let n = xs.len();
+    if TOOM3_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
+        _limbs_square_to_out_basecase(out, xs);
+    } else if !TOOM3_MAYBE_SQR_TOOM3 || n < SQR_TOOM3_THRESHOLD {
+        _limbs_square_to_out_toom_2(out, xs, scratch);
+    } else {
+        _limbs_square_to_out_toom_3(out, xs, scratch);
+    }
+}
+
+/// xs_len >= 3
+/// This is mpn_toom3_sqr from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+pub fn _limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let xs_len = xs.len();
+    let n = xs_len.div_round(3, RoundingMode::Ceiling);
+    let s = xs_len - (n << 1);
+    assert_ne!(s, 0);
+    assert!(s <= n);
+    split_into_chunks!(xs, n, [xs_0, xs_1], xs_2);
+    let (gp, remainder) = scratch.split_at_mut(2 * n + 2);
+    let (asm1, as1) = remainder.split_at_mut(2 * n + 2);
+    let gp = &mut gp[..n];
+    let mut cy = if limbs_add_to_out(gp, &xs_0[..n], &xs_2[..s]) {
+        1
+    } else {
+        0
+    };
+    as1[n] = cy
+        + if limbs_add_same_length_to_out(as1, gp, &xs_1[..n]) {
+            1
+        } else {
+            0
+        };
+    if cy == 0 && limbs_cmp_same_length(gp, &xs_1[..n]) == Ordering::Less {
+        limbs_sub_same_length_to_out(asm1, &xs_1[..n], gp);
+        asm1[n] = 0;
+    } else {
+        cy -= if limbs_sub_same_length_to_out(asm1, gp, &xs_1[..n]) {
+            1
+        } else {
+            0
+        };
+        asm1[n] = cy;
+    }
+    let as2 = &mut out[n + 1..];
+    let mut cy = if limbs_add_same_length_to_out(as2, &xs_2[..s], &as1[..s]) {
+        1
+    } else {
+        0
+    };
+    if s != n {
+        cy = if limbs_add_limb_to_out(&mut as2[s..n], &as1[s..n], cy) {
+            1
+        } else {
+            0
+        };
+    }
+    cy.wrapping_add_assign(as1[n]);
+    cy = cy.arithmetic_checked_shl(1).unwrap();
+    cy.wrapping_add_assign(limbs_slice_shl_in_place(&mut as2[..n], 1));
+    cy.wrapping_sub_assign(
+        if limbs_sub_same_length_in_place_left(&mut as2[..n], &xs_0[..n]) {
+            1
+        } else {
+            0
+        },
+    );
+    as2[n] = cy;
+    assert!(as1[n] <= 2);
+    assert!(asm1[n] <= 1);
+    let (scratch_lo, scratch_out) = scratch.split_at_mut(5 * n + 5);
+    if SMALLER_RECURSION_TOOM_3 {
+        let (vm1, v2) = scratch_lo.split_at_mut(2 * n + 1);
+        let asm1 = &mut v2[1..];
+        _limbs_square_to_out_toom_3_recursive(vm1, &asm1[..n], scratch_out);
+        let mut cy = if asm1[n] != 0 {
+            asm1[n].wrapping_add(
+                if limbs_slice_add_same_length_in_place_left(&mut vm1[n..2 * n], &asm1[..n]) {
+                    1
+                } else {
+                    0
+                },
+            )
+        } else {
+            0
+        };
+        if asm1[n] != 0 {
+            cy.wrapping_add_assign(
+                if limbs_slice_add_same_length_in_place_left(&mut vm1[n..2 * n], &asm1[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+        }
+        vm1[2 * n] = cy;
+    } else {
+        fail_on_untested_path("_limbs_square_to_out_toom_3, !SMALLER_RECURSION");
+        let (vm1, asm1) = scratch_lo.split_at_mut(2 * n + 2);
+        _limbs_square_to_out_toom_3_recursive(vm1, &asm1[..n + 1], scratch_out);
+    }
+    let v2 = &mut scratch_lo[2 * n + 1..];
+    _limbs_square_to_out_toom_3_recursive(v2, &as2[..n + 1], scratch_out);
+    let vinf = &mut out[4 * n..];
+    _limbs_square_to_out_toom_3_recursive(vinf, &xs_2[..s], scratch_out);
+    let vinf0 = vinf[0];
+    let (as1, scratch_out) = &mut scratch[4 * n + 4..].split_at_mut(n + 1);
+    if SMALLER_RECURSION_TOOM_3 {
+        let v1 = &mut out[2 * n..];
+        _limbs_square_to_out_toom_3_recursive(v1, &as1[..n], scratch_out);
+        if as1[n] == 1 {
+            cy = as1[n].wrapping_add(
+                if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &as1[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+        } else if as1[n] != 0 {
+            cy = as1[n].arithmetic_checked_shl(1).unwrap();
+            cy.wrapping_add_assign(limbs_slice_add_mul_limb_same_length_in_place_left(
+                &mut v1[n..2 * n],
+                &as1[..n],
+                2,
+            ));
+        } else {
+            cy = 0;
+        }
+        if as1[n] == 1 {
+            cy.wrapping_add_assign(
+                if limbs_slice_add_same_length_in_place_left(&mut v1[n..2 * n], &as1[..n]) {
+                    1
+                } else {
+                    0
+                },
+            );
+        } else if as1[n] != 0 {
+            cy.wrapping_add_assign(limbs_slice_add_mul_limb_same_length_in_place_left(
+                &mut v1[n..2 * n],
+                &as1[..n],
+                2,
+            ));
+        }
+        v1[2 * n] = cy;
+    } else {
+        cy = out[4 * n + 1];
+        _limbs_square_to_out_toom_3_recursive(&mut out[2 * n..], &as1[..n + 1], scratch_out);
+        out[4 * n + 1] = cy;
+    }
+    let (vm1, remainder) = scratch.split_at_mut(2 * n + 1);
+    let (v2, scratch_out) = remainder.split_at_mut(3 * n + 4);
+    _limbs_square_to_out_toom_3_recursive(out, &xs[..n], scratch_out); // v0, 2n limbs
+    _limbs_mul_toom_interpolate_5_points(out, v2, vm1, n, s << 1, false, vinf0);
 }
 
 impl Square for Natural {

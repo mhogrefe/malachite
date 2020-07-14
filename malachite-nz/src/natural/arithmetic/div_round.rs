@@ -42,8 +42,7 @@ use platform::Limb;
 /// assert_eq!(limbs_limb_div_round_limbs(0, &[123, 456], RoundingMode::Exact), Some(0));
 /// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Exact), None);
 /// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Nearest), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[123, 1], RoundingMode::Nearest),
-///     Some(1));
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[123, 1], RoundingMode::Nearest), Some(1));
 /// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX, 1],
 ///     RoundingMode::Nearest), Some(0));
 ///
@@ -53,17 +52,17 @@ use platform::Limb;
 /// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xffff_fffd, 1],
 ///     RoundingMode::Nearest), Some(1));
 /// ```
-pub fn limbs_limb_div_round_limbs(limb: Limb, xs: &[Limb], rm: RoundingMode) -> Option<Limb> {
-    if limb == 0 {
+pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
+    if n == 0 {
         Some(0)
     } else {
         match rm {
             RoundingMode::Down | RoundingMode::Floor => Some(0),
             RoundingMode::Up | RoundingMode::Ceiling => Some(1),
             RoundingMode::Exact => None,
-            // 1 if 2 * limb > Natural::from_limbs_asc(limbs); otherwise, 0
+            // 1 if 2 * n > Natural::from_limbs_asc(ds); otherwise, 0
             RoundingMode::Nearest => Some(Limb::iverson(
-                xs.len() == 2 && xs[1] == 1 && limb.get_highest_bit() && (limb << 1) > xs[0],
+                ds.len() == 2 && ds[1] == 1 && n.get_highest_bit() && (n << 1) > ds[0],
             )),
         }
     }

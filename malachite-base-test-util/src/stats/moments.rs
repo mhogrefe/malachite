@@ -1,10 +1,20 @@
-use std::fmt::{self, Debug, Display, Formatter};
-use std::hash::Hash;
-use std::ops::Sub;
+use std::fmt::{self, Debug, Formatter};
+
+use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
+use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 
 use num::float::nice_float::NiceFloat;
 use stats::common_values_map::common_values_map;
 use stats::median;
+use stats::median::{
+    deleted_uniform_primitive_integer_median, double_geometric_median,
+    double_nonzero_geometric_median, truncated_geometric_median, uniform_bool_median,
+    uniform_primitive_integer_median,
+};
 
 // Panics if the input exceeds the finite range of f64.
 pub trait CheckedToF64 {
@@ -110,6 +120,20 @@ where
     }
 }
 
+pub fn mean<I: Iterator>(xs: I) -> NiceFloat<f64>
+where
+    I::Item: CheckedToF64,
+{
+    let mut n: usize = 1;
+    let mut m = 0.0;
+    for x in xs {
+        let d_n = (x.checked_to_f64() - m) / n.checked_to_f64();
+        m += d_n;
+        n += 1;
+    }
+    NiceFloat(m)
+}
+
 fn moment_stats_from_raw_moments(
     mean: f64,
     p_2_mean: f64,
@@ -132,22 +156,18 @@ fn moment_stats_from_raw_moments(
 }
 
 #[inline]
-pub fn pop_disc_uniform_dist_median<T: CheckedToF64>(a: &T, b: &T) -> NiceFloat<f64> {
-    NiceFloat((a.checked_to_f64() + b.checked_to_f64()) / 2.0)
+fn pop_uniform_mean<T: CheckedToF64>(a: &T, b: &T) -> f64 {
+    (a.checked_to_f64() + b.checked_to_f64()) / 2.0
 }
 
-fn pop_disc_uniform_dist_mean<T: CheckedToF64>(a: &T, b: &T) -> f64 {
-    pop_disc_uniform_dist_median(a, b).unwrap()
-}
-
-fn pop_disc_uniform_dist_standard_deviation<T: CheckedToF64>(a: &T, b: &T) -> f64 {
+fn pop_uniform_standard_deviation<T: CheckedToF64>(a: &T, b: &T) -> f64 {
     let a = a.checked_to_f64();
     let b = b.checked_to_f64();
     let n = b - a + 1.0;
     ((n * n - 1.0) / 12.0).sqrt()
 }
 
-fn pop_disc_uniform_dist_skewness<T: CheckedToF64>(a: &T, b: &T) -> f64 {
+fn pop_uniform_skewness<T: CheckedToF64>(a: &T, b: &T) -> f64 {
     let a = a.checked_to_f64();
     let b = b.checked_to_f64();
     if a == b {
@@ -157,7 +177,7 @@ fn pop_disc_uniform_dist_skewness<T: CheckedToF64>(a: &T, b: &T) -> f64 {
     }
 }
 
-fn pop_disc_uniform_dist_excess_kurtosis<T: CheckedToF64>(a: &T, b: &T) -> f64 {
+fn pop_uniform_excess_kurtosis<T: CheckedToF64>(a: &T, b: &T) -> f64 {
     let a = a.checked_to_f64();
     let b = b.checked_to_f64();
     if a == b {
@@ -171,27 +191,25 @@ fn pop_disc_uniform_dist_excess_kurtosis<T: CheckedToF64>(a: &T, b: &T) -> f64 {
 
 pub fn pop_disc_uniform_dist_moment_stats<T: CheckedToF64>(a: &T, b: &T) -> MomentStats {
     MomentStats {
-        mean: NiceFloat(pop_disc_uniform_dist_mean(a, b)),
-        standard_deviation: NiceFloat(pop_disc_uniform_dist_standard_deviation(a, b)),
-        skewness: NiceFloat(pop_disc_uniform_dist_skewness(a, b)),
-        excess_kurtosis: NiceFloat(pop_disc_uniform_dist_excess_kurtosis(a, b)),
+        mean: NiceFloat(pop_uniform_mean(a, b)),
+        standard_deviation: NiceFloat(pop_uniform_standard_deviation(a, b)),
+        skewness: NiceFloat(pop_uniform_skewness(a, b)),
+        excess_kurtosis: NiceFloat(pop_uniform_excess_kurtosis(a, b)),
     }
 }
 
-pub fn disc_uniform_dist_assertions<I: Clone + Iterator>(
+pub fn uniform_bool_assertions<I: Clone + Iterator<Item = bool>>(
     xs: I,
-    a: &I::Item,
-    b: &I::Item,
-    expected_values: &[I::Item],
-    expected_common_values: &[(I::Item, usize)],
-    expected_pop_median: NiceFloat<f64>,
-    expected_sample_median: (I::Item, Option<I::Item>),
+    a: bool,
+    b: bool,
+    expected_values: &[bool],
+    expected_common_values: &[(bool, usize)],
+    expected_pop_median: (bool, Option<bool>),
+    expected_sample_median: (bool, Option<bool>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
-) where
-    I::Item: CheckedToF64 + Debug + Display + Eq + Hash + Ord,
-{
-    let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
+) {
+    let actual_values = xs.clone().take(20).collect::<Vec<bool>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
     let actual_sample_median = median(xs.clone().take(1_000_000));
     let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
@@ -199,9 +217,9 @@ pub fn disc_uniform_dist_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            pop_disc_uniform_dist_median(a, b),
+            uniform_bool_median(a, b),
             actual_sample_median,
-            pop_disc_uniform_dist_moment_stats(a, b),
+            pop_disc_uniform_dist_moment_stats(&a, &b),
             actual_sample_moment_stats
         ),
         (
@@ -215,18 +233,41 @@ pub fn disc_uniform_dist_assertions<I: Clone + Iterator>(
     );
 }
 
-pub fn pop_deleted_disc_uniform_dist_median<T: CheckedToF64>(
-    a: &T,
-    b: &T,
-    c: &T,
-) -> NiceFloat<f64> {
-    let undeleted_median = pop_disc_uniform_dist_median(a, b).0;
-    let c = c.checked_to_f64();
-    NiceFloat(if c >= undeleted_median {
-        undeleted_median
-    } else {
-        undeleted_median + 0.5
-    })
+pub fn uniform_primitive_integer_assertions<I: Clone + Iterator>(
+    xs: I,
+    a: I::Item,
+    b: I::Item,
+    expected_values: &[I::Item],
+    expected_common_values: &[(I::Item, usize)],
+    expected_pop_median: (I::Item, Option<I::Item>),
+    expected_sample_median: (I::Item, Option<I::Item>),
+    expected_pop_moment_stats: MomentStats,
+    expected_sample_moment_stats: MomentStats,
+) where
+    I::Item: CheckedToF64 + PrimitiveInteger,
+{
+    let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
+    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1_000_000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    assert_eq!(
+        (
+            actual_values.as_slice(),
+            actual_common_values.as_slice(),
+            uniform_primitive_integer_median(a, b),
+            actual_sample_median,
+            pop_disc_uniform_dist_moment_stats(&a, &b),
+            actual_sample_moment_stats
+        ),
+        (
+            expected_values,
+            expected_common_values,
+            expected_pop_median,
+            expected_sample_median,
+            expected_pop_moment_stats,
+            expected_sample_moment_stats
+        )
+    );
 }
 
 fn pop_deleted_disc_uniform_dist_mean<T: CheckedToF64>(a: &T, b: &T, c: &T) -> f64 {
@@ -274,7 +315,7 @@ fn pop_deleted_disc_uniform_dist_4_mean<T: CheckedToF64>(a: &T, b: &T, c: &T) ->
         / (30.0 * (a - b))
 }
 
-fn pop_deleted_disc_uniform_dist_moment_stats<T: CheckedToF64 + Ord>(
+fn deleted_uniform_primitive_integer_moment_stats<T: CheckedToF64 + Ord>(
     a: &T,
     b: &T,
     c: &T,
@@ -289,19 +330,19 @@ fn pop_deleted_disc_uniform_dist_moment_stats<T: CheckedToF64 + Ord>(
     )
 }
 
-pub fn deleted_disc_uniform_dist_assertions<I: Clone + Iterator>(
+pub fn deleted_uniform_primitive_integer_assertions<I: Clone + Iterator>(
     xs: I,
-    a: &I::Item,
-    b: &I::Item,
-    c: &I::Item,
+    a: I::Item,
+    b: I::Item,
+    c: I::Item,
     expected_values: &[I::Item],
     expected_common_values: &[(I::Item, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (I::Item, Option<I::Item>),
     expected_sample_median: (I::Item, Option<I::Item>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item: CheckedToF64 + Debug + Display + Eq + Hash + Ord,
+    I::Item: CheckedToF64 + PrimitiveInteger,
 {
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
@@ -311,9 +352,9 @@ pub fn deleted_disc_uniform_dist_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            pop_deleted_disc_uniform_dist_median(a, b, c),
+            deleted_uniform_primitive_integer_median(a, b, c),
             actual_sample_median,
-            pop_deleted_disc_uniform_dist_moment_stats(a, b, c),
+            deleted_uniform_primitive_integer_moment_stats(&a, &b, &c),
             actual_sample_moment_stats
         ),
         (
@@ -325,18 +366,6 @@ pub fn deleted_disc_uniform_dist_assertions<I: Clone + Iterator>(
             expected_sample_moment_stats
         )
     );
-}
-
-pub fn pop_truncated_geometric_dist_median(
-    unadjusted_mean: f64,
-    min: f64,
-    max: f64,
-) -> NiceFloat<f64> {
-    let m = max - min;
-    let p = 1.0 / ((unadjusted_mean - min) + 1.0);
-    let c = 1.0 - (1.0 - p).powf(m + 1.0);
-    let q = 1.0 - p;
-    NiceFloat(((1.0 - c / 2.0).log(q) - 1.0).ceil() + min)
 }
 
 // unadjusted_mean is what the mean would be if the distribution were not truncated.
@@ -412,20 +441,19 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
     xs: I,
     um_numerator: u64,
     um_denominator: u64,
-    min: &I::Item,
-    max: &I::Item,
+    min: I::Item,
+    max: I::Item,
     expected_values: &[I::Item],
     expected_common_values: &[(I::Item, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (I::Item, Option<I::Item>),
     expected_sample_median: (I::Item, Option<I::Item>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item:
-        CheckedToF64 + Copy + Debug + Display + Eq + Hash + Ord + Sub<I::Item, Output = I::Item>,
+    I::Item: CheckedToF64 + PrimitiveInteger,
 {
-    let min = min.checked_to_f64();
-    let max = max.checked_to_f64();
+    let min_64 = min.checked_to_f64();
+    let max_64 = max.checked_to_f64();
     let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
@@ -435,9 +463,9 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            pop_truncated_geometric_dist_median(unadjusted_mean, min, max),
+            truncated_geometric_median(unadjusted_mean, min, max),
             actual_sample_median,
-            pop_truncated_geometric_dist_moment_stats(unadjusted_mean, min, max),
+            pop_truncated_geometric_dist_moment_stats(unadjusted_mean, min_64, max_64),
             actual_sample_moment_stats
         ),
         (
@@ -451,40 +479,55 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
     );
 }
 
-pub fn negative_truncated_geometric_dist_assertions<I: Clone + Iterator>(
+pub fn negative_truncated_geometric_dist_assertions<
+    I: Clone,
+    S: CheckedToF64 + PrimitiveSigned,
+    U: CheckedToF64 + PrimitiveUnsigned,
+>(
     xs: I,
     abs_um_numerator: u64,
     abs_um_denominator: u64,
-    abs_min: &I::Item,
-    abs_max: &I::Item,
-    expected_values: &[I::Item],
-    expected_common_values: &[(I::Item, usize)],
-    expected_pop_median: NiceFloat<f64>,
-    expected_sample_median: (I::Item, Option<I::Item>),
+    abs_min: S,
+    abs_max: S,
+    expected_values: &[S],
+    expected_common_values: &[(S, usize)],
+    expected_pop_median: (S, Option<S>),
+    expected_sample_median: (S, Option<S>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item:
-        CheckedToF64 + Copy + Debug + Display + Eq + Hash + Ord + Sub<I::Item, Output = I::Item>,
+    I: Iterator<Item = S>,
+    S: UnsignedAbs<Output = U> + WrappingFrom<U>,
 {
-    let abs_min = -abs_min.checked_to_f64();
-    let abs_max = -abs_max.checked_to_f64();
+    let abs_min_64 = -abs_min.checked_to_f64();
+    let abs_max_64 = -abs_max.checked_to_f64();
     let abs_unadjusted_mean = abs_um_numerator as f64 / abs_um_denominator as f64;
-    let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
+    let actual_values = xs.clone().take(20).collect::<Vec<S>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
     let actual_sample_median = median(xs.clone().take(1_000_000));
     let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
     let mut pop_sample_moment_stats =
-        pop_truncated_geometric_dist_moment_stats(abs_unadjusted_mean, abs_min, abs_max);
+        pop_truncated_geometric_dist_moment_stats(abs_unadjusted_mean, abs_min_64, abs_max_64);
     pop_sample_moment_stats.mean = NiceFloat(-pop_sample_moment_stats.mean.0);
     pop_sample_moment_stats.skewness = NiceFloat(-pop_sample_moment_stats.skewness.0);
+    let (x, y) = truncated_geometric_median(
+        abs_unadjusted_mean,
+        abs_min.unsigned_abs(),
+        abs_max.unsigned_abs(),
+    );
+    let (x, y) = if let Some(y) = y {
+        (
+            S::wrapping_from(y.wrapping_neg()),
+            Some(S::wrapping_from(x.wrapping_neg())),
+        )
+    } else {
+        (S::wrapping_from(x.wrapping_neg()), None)
+    };
     assert_eq!(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            NiceFloat(
-                -pop_truncated_geometric_dist_median(abs_unadjusted_mean, abs_min, abs_max).0
-            ),
+            (x, y),
             actual_sample_median,
             pop_sample_moment_stats,
             actual_sample_moment_stats
@@ -492,6 +535,244 @@ pub fn negative_truncated_geometric_dist_assertions<I: Clone + Iterator>(
         (
             expected_values,
             expected_common_values,
+            expected_pop_median,
+            expected_sample_median,
+            expected_pop_moment_stats,
+            expected_sample_moment_stats
+        )
+    );
+}
+
+fn pop_double_nonzero_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    (qpa * (1.0 + a * p) - qpb * (1.0 + b * p)) / ((-2.0 + qpa + qpb) * p)
+}
+
+fn pop_double_nonzero_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    (2.0 + (p * (2.0 - qpa + a * qpa * (2.0 + a * p) + qpb * (-1.0 + b * (2.0 + b * p))))
+        / (-2.0 + qpa + qpb))
+        / (p * p)
+}
+
+fn pop_double_nonzero_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    (qpa * (6.0 + p * (-6.0 + p + a * (6.0 + p * (-3.0 + a * (3.0 + a * p)))))
+        - qpb * (6.0 + p * (-6.0 + p + b * (6.0 + p * (-3.0 + b * (3.0 + b * p))))))
+        / ((-2.0 + qpa + qpb) * p * p * p)
+}
+
+fn pop_double_nonzero_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let a_2 = a * a;
+    let a_3 = a_2 * a;
+    let a_4 = a_2 * a_2;
+    let b_2 = b * b;
+    let b_4 = b_2 * b_2;
+    let p_2 = p * p;
+    let p_3 = p_2 * p;
+    let p_4 = p_2 * p_2;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    1.0 / p_4
+        * (24.0
+            + 1.0 / (-2.0 + qpa + qpb)
+                * p
+                * (-6.0 * a_2 * qpa * (-2.0 + p) * p + 4.0 * a_3 * qpa * p_2 + a_4 * qpa * p_3
+                    - (-2.0 + qpa) * (36.0 + (-14.0 + p) * p)
+                    + 4.0 * a * qpa * (6.0 + (-6.0 + p) * p)
+                    + qpb
+                        * (-36.0
+                            + 24.0 * b
+                            + 2.0 * (7.0 + 6.0 * (-2.0 + b) * b) * p
+                            + (-1.0 + 2.0 * b * (2.0 + b * (-3.0 + 2.0 * b))) * p_2
+                            + b_4 * p_3)))
+}
+
+fn pop_double_nonzero_truncated_geometric_dist_moment_stats(
+    unadjusted_mean: f64,
+    min: f64,
+    max: f64,
+) -> MomentStats {
+    assert!(min < 0.0);
+    assert!(max > 0.0);
+    assert!(unadjusted_mean > 1.0); // unadjusted_mean may be arbitrarily large
+    moment_stats_from_raw_moments(
+        pop_double_nonzero_truncated_geometric_dist_mean(unadjusted_mean - 1.0, -min, max),
+        pop_double_nonzero_truncated_geometric_dist_2_mean(unadjusted_mean - 1.0, -min, max),
+        pop_double_nonzero_truncated_geometric_dist_3_mean(unadjusted_mean - 1.0, -min, max),
+        pop_double_nonzero_truncated_geometric_dist_4_mean(unadjusted_mean - 1.0, -min, max),
+    )
+}
+
+pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
+    xs: I,
+    um_numerator: u64,
+    um_denominator: u64,
+    min: I::Item,
+    max: I::Item,
+    expected_values: &[I::Item],
+    expected_common_values: &[(I::Item, usize)],
+    expected_abs_mean: NiceFloat<f64>,
+    expected_pop_median: (I::Item, Option<I::Item>),
+    expected_sample_median: (I::Item, Option<I::Item>),
+    expected_pop_moment_stats: MomentStats,
+    expected_sample_moment_stats: MomentStats,
+) where
+    I::Item: CheckedToF64 + PrimitiveSigned,
+{
+    let min_64 = min.checked_to_f64();
+    let max_64 = max.checked_to_f64();
+    let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
+    let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
+    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
+    let actual_abs_mean = mean(xs.clone().map(Abs::abs).take(1_000_000));
+    let actual_sample_median = median(xs.clone().take(1_000_000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    assert_eq!(
+        (
+            actual_values.as_slice(),
+            actual_common_values.as_slice(),
+            actual_abs_mean,
+            double_nonzero_geometric_median(unadjusted_mean, min, max),
+            actual_sample_median,
+            pop_double_nonzero_truncated_geometric_dist_moment_stats(
+                unadjusted_mean,
+                min_64,
+                max_64
+            ),
+            actual_sample_moment_stats
+        ),
+        (
+            expected_values,
+            expected_common_values,
+            expected_abs_mean,
+            expected_pop_median,
+            expected_sample_median,
+            expected_pop_moment_stats,
+            expected_sample_moment_stats
+        )
+    );
+}
+
+fn pop_double_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    q * (qpa * (1.0 + a * p) - q.powf(b) * (1.0 + b * p))
+        / (p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
+}
+
+fn pop_double_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    q * (2.0 * (-2.0 + qpa + qpb)
+        + p * (2.0 - qpa + a * qpa * (2.0 + a * p) + qpb * (-1.0 + b * (2.0 + b * p))))
+        / (p * p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
+}
+
+fn pop_double_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    q * (qpa * (6.0 + p * (-6.0 + p + a * (6.0 + p * (-3.0 + a * (3.0 + a * p)))))
+        - qpb * (6.0 + p * (-6.0 + p + b * (6.0 + p * (-3.0 + b * (3.0 + b * p))))))
+        / (p * p * p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
+}
+
+fn pop_double_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+    let p = 1.0 / (unadjusted_mean + 1.0);
+    let q = 1.0 - p;
+    let qpa = q.powf(a);
+    let qpb = q.powf(b);
+    let a_2 = a * a;
+    let a_3 = a_2 * a;
+    let a_4 = a_2 * a_2;
+    let b_2 = b * b;
+    let b_4 = b_2 * b_2;
+    let p_2 = p * p;
+    let p_3 = p_2 * p;
+    let p_4 = p_2 * p_2;
+    q * (24.0 * (-2.0 + qpa + qpb)
+        + p * (-6.0 * a_2 * qpa * (-2.0 + p) * p + 4.0 * a_3 * qpa * p_2 + a_4 * qpa * p_3
+            - (-2.0 + qpa) * (36.0 + (-14.0 + p) * p)
+            + 4.0 * a * qpa * (6.0 + (-6.0 + p) * p)
+            + qpb
+                * (-36.0
+                    + 24.0 * b
+                    + 2.0 * (7.0 + 6.0 * (-2.0 + b) * b) * p
+                    + (-1.0 + 2.0 * b * (2.0 + b * (-3.0 + 2.0 * b))) * p_2
+                    + b_4 * p_3)))
+        / (p_4 * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
+}
+
+fn pop_double_truncated_geometric_dist_moment_stats(
+    unadjusted_mean: f64,
+    min: f64,
+    max: f64,
+) -> MomentStats {
+    assert!(min < 0.0);
+    assert!(max > 0.0);
+    assert!(unadjusted_mean > 0.0); // unadjusted_mean may be arbitrarily large
+    moment_stats_from_raw_moments(
+        pop_double_truncated_geometric_dist_mean(unadjusted_mean, -min, max),
+        pop_double_truncated_geometric_dist_2_mean(unadjusted_mean, -min, max),
+        pop_double_truncated_geometric_dist_3_mean(unadjusted_mean, -min, max),
+        pop_double_truncated_geometric_dist_4_mean(unadjusted_mean, -min, max),
+    )
+}
+
+pub fn double_truncated_geometric_dist_assertions<I: Clone + Iterator>(
+    xs: I,
+    um_numerator: u64,
+    um_denominator: u64,
+    min: I::Item,
+    max: I::Item,
+    expected_values: &[I::Item],
+    expected_common_values: &[(I::Item, usize)],
+    expected_natural_mean: NiceFloat<f64>,
+    expected_pop_median: (I::Item, Option<I::Item>),
+    expected_sample_median: (I::Item, Option<I::Item>),
+    expected_pop_moment_stats: MomentStats,
+    expected_sample_moment_stats: MomentStats,
+) where
+    I::Item: CheckedToF64 + PrimitiveSigned,
+{
+    let min_64 = min.checked_to_f64();
+    let max_64 = max.checked_to_f64();
+    let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
+    let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
+    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
+    let actual_natural_mean = mean(xs.clone().filter(|&x| x >= I::Item::ZERO).take(1_000_000));
+    let actual_sample_median = median(xs.clone().take(1_000_000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    assert_eq!(
+        (
+            actual_values.as_slice(),
+            actual_common_values.as_slice(),
+            actual_natural_mean,
+            double_geometric_median(unadjusted_mean, min, max),
+            actual_sample_median,
+            pop_double_truncated_geometric_dist_moment_stats(unadjusted_mean, min_64, max_64),
+            actual_sample_moment_stats
+        ),
+        (
+            expected_values,
+            expected_common_values,
+            expected_natural_mean,
             expected_pop_median,
             expected_sample_median,
             expected_pop_moment_stats,

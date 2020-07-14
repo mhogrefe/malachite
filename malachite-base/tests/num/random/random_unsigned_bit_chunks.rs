@@ -1,10 +1,11 @@
 use itertools::{assert_equal, Itertools};
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    disc_uniform_dist_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::bools::random::random_bools;
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::random::random_unsigned_bit_chunks;
@@ -14,16 +15,16 @@ fn random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     chunk_size: u64,
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) {
     let xs = random_unsigned_bit_chunks(EXAMPLE_SEED, chunk_size);
-    disc_uniform_dist_assertions(
+    uniform_primitive_integer_assertions(
         xs.clone(),
-        &T::ZERO,
-        &T::low_mask(chunk_size),
+        T::ZERO,
+        T::low_mask(chunk_size),
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -49,7 +50,7 @@ fn test_random_unsigned_bit_chunks() {
     // u8, chunk_size = 0
     let values = &[0; 20];
     let common_values = &[(0, 1_000_000)];
-    let pop_median = NiceFloat(0.0);
+    let pop_median = (0, None);
     let sample_median = (0, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(0.0),
@@ -76,7 +77,7 @@ fn test_random_unsigned_bit_chunks() {
     // u16, chunk_size = 1
     let values = &[1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0];
     let common_values = &[(1, 500473), (0, 499527)];
-    let pop_median = NiceFloat(0.5);
+    let pop_median = (0, Some(1));
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(0.5),
@@ -103,7 +104,7 @@ fn test_random_unsigned_bit_chunks() {
     // u32, chunk_size = 2
     let values = &[1, 0, 3, 1, 3, 3, 2, 3, 1, 1, 0, 1, 0, 3, 2, 1, 0, 1, 2, 3];
     let common_values = &[(1, 250314), (3, 250015), (2, 249955), (0, 249716)];
-    let pop_median = NiceFloat(1.5);
+    let pop_median = (1, Some(2));
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.5),
@@ -139,7 +140,7 @@ fn test_random_unsigned_bit_chunks() {
         (2, 124542),
         (1, 124403),
     ];
-    let pop_median = NiceFloat(3.5);
+    let pop_median = (3, Some(4));
     let sample_median = (4, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(3.5),
@@ -179,7 +180,7 @@ fn test_random_unsigned_bit_chunks() {
         (82, 7925),
         (102, 7924),
     ];
-    let pop_median = NiceFloat(63.5);
+    let pop_median = (63, Some(64));
     let sample_median = (63, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(63.5),
@@ -219,7 +220,7 @@ fn test_random_unsigned_bit_chunks() {
         (36, 4035),
         (42, 4032),
     ];
-    let pop_median = NiceFloat(127.5);
+    let pop_median = (127, Some(128));
     let sample_median = (127, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(127.5),
@@ -243,3 +244,19 @@ fn test_random_unsigned_bit_chunks() {
         sample_moment_stats,
     );
 }
+
+macro_rules! random_unsigned_bit_chunks_fail {
+    ($t:ident, $random_unsigned_bit_chunks_fail:ident) => {
+        #[test]
+        #[should_panic]
+        fn $random_unsigned_bit_chunks_fail() {
+            random_unsigned_bit_chunks::<$t>(EXAMPLE_SEED, $t::WIDTH + 1);
+        }
+    };
+}
+random_unsigned_bit_chunks_fail!(u8, random_unsigned_bit_chunks_u8_fail);
+random_unsigned_bit_chunks_fail!(u16, random_unsigned_bit_chunks_u16_fail);
+random_unsigned_bit_chunks_fail!(u32, random_unsigned_bit_chunks_u32_fail);
+random_unsigned_bit_chunks_fail!(u64, random_unsigned_bit_chunks_u64_fail);
+random_unsigned_bit_chunks_fail!(u128, random_unsigned_bit_chunks_u128_fail);
+random_unsigned_bit_chunks_fail!(usize, random_unsigned_bit_chunks_usize_fail);

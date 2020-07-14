@@ -6,8 +6,10 @@ use malachite_base::num::logic::traits::{
 };
 use malachite_nz::natural::Natural;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_u64_var_3, pairs_of_natural_and_small_unsigned_var_3,
     triples_of_natural_small_u64_and_small_u64_var_2,
     triples_of_natural_small_u64_and_small_u64_var_3,

@@ -70,6 +70,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::square::_limbs_square_to_out_toom_3_input_size_valid;
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
@@ -644,6 +645,13 @@ pub fn triples_of_unsigneds_var_5<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, T)> {
     Box::new(triples_of_unsigneds::<T>(gm).filter(|&(x, y, m)| !x.eq_mod(y, m)))
+}
+
+// All triples of `T`s, where `T` is unsigned and the second `T` is odd.
+pub fn triples_of_unsigneds_var_6<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(T, T, T)> {
+    Box::new(triples_of_unsigneds::<T>(gm).filter(|&(_, d, _)| d.odd()))
 }
 
 pub fn pairs_of_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
@@ -1240,7 +1248,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub(crate) fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
     gm: NoSpecialGenerationMode,
 ) -> It<(T, T)> {
     match gm {
@@ -2527,7 +2535,7 @@ pub fn pairs_of_limb_vec_var_15(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)
 }
 
 // All pairs of `Vec<Limb>`, where `ns` and `ds` meet the preconditions of `limbs_div_exact`.
-pub(crate) fn pairs_of_limb_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
+pub fn pairs_of_limb_vec_var_16(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>)> {
     Box::new(
         pairs_of_unsigned_vec_min_sizes_2(gm, 1)
             .filter(|&(_, ref ds)| *ds.last().unwrap() != 0)
@@ -2559,6 +2567,18 @@ pub fn pairs_of_unsigned_vec_var_18<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_unsigned_vec_min_sizes(gm, 4, 2)
             .filter(|&(ref out, ref xs)| out.len() >= xs.len() << 1),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of
+// `_limbs_square_to_out_toom_3`.
+pub fn pairs_of_unsigned_vec_var_19<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 6, 3).filter(|&(ref out, ref xs)| {
+            out.len() >= xs.len() << 1 && _limbs_square_to_out_toom_3_input_size_valid(xs.len())
+        }),
     )
 }
 
@@ -3054,7 +3074,7 @@ pub fn triples_of_unsigned_vec_var_29<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
 // `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_33`.
-pub(crate) fn triples_of_unsigned_vec_var_30<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_30<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 10, 5).filter(
@@ -3068,7 +3088,7 @@ pub(crate) fn triples_of_unsigned_vec_var_30<T: PrimitiveUnsigned + Rand>(
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
 // `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_33` and
 // `_limbs_mul_greater_to_out_toom_44`.
-pub(crate) fn triples_of_unsigned_vec_var_31<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_31<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 10, 5).filter(
@@ -3082,7 +3102,7 @@ pub(crate) fn triples_of_unsigned_vec_var_31<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
 // `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_6h`.
-pub(crate) fn triples_of_unsigned_vec_var_32<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_32<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 84, 42).filter(
@@ -3095,7 +3115,7 @@ pub(crate) fn triples_of_unsigned_vec_var_32<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
 // `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_8h`.
-pub(crate) fn triples_of_unsigned_vec_var_33<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_33<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 172, 86).filter(
@@ -3109,7 +3129,7 @@ pub(crate) fn triples_of_unsigned_vec_var_33<T: PrimitiveUnsigned + Rand>(
 // Some triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, `out`, `xs`,
 // and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_8h`, and `out`, `xs`, and `ys`
 // would trigger the actual FFT code of `_limbs_mul_greater_to_out_fft`.
-pub(crate) fn triples_of_unsigned_vec_var_34<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_34<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 172, 86).filter(
@@ -3123,7 +3143,7 @@ pub(crate) fn triples_of_unsigned_vec_var_34<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the preconditions
 // of `_limbs_mul_greater_to_out_toom_32` and `_limbs_mul_greater_to_out_toom_43`.
-pub(crate) fn triples_of_unsigned_vec_var_35<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_35<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 11, 8).filter(
@@ -3137,7 +3157,7 @@ pub(crate) fn triples_of_unsigned_vec_var_35<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the preconditions
 // of `_limbs_mul_greater_to_out_toom_42` and `_limbs_mul_greater_to_out_toom_53`.
-pub(crate) fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(
@@ -3258,9 +3278,7 @@ pub fn triples_of_limb_vec_var_39(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
 // All triples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`,`qs`, `ns`, and `ds`, meet certain
 // preconditions that enable comparing the performance of divide-and-conquer division and Barrett
 // division.
-pub(crate) fn triples_of_limb_vec_var_40(
-    gm: GenerationMode,
-) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+pub fn triples_of_limb_vec_var_40(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_quadruples(
             exhaustive_vecs_min_length(3, exhaustive_unsigneds()),
@@ -3407,9 +3425,7 @@ pub fn triples_of_limb_vec_var_43(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
 // `_limbs_div_to_out` and both the balanced and unbalanced div helper functions.
-pub(crate) fn triples_of_limb_vec_var_44(
-    gm: GenerationMode,
-) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+pub fn triples_of_limb_vec_var_44(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(triples_of_limb_vec_var_43(gm).filter(|(_, n, d)| n.len() < (d.len() - 1) << 1))
 }
 
@@ -3461,7 +3477,7 @@ pub fn triples_of_unsigned_vec_var_46<T: PrimitiveUnsigned + Rand>(
 // All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
 // sum of the lengths of the second and third, and the second and third are equally long and
 // nonempty.
-pub(crate) fn triples_of_unsigned_vec_var_47<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_47<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
@@ -3495,7 +3511,7 @@ pub fn triples_of_unsigned_vec_var_48<T: PrimitiveUnsigned + Rand>(
 
 // All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
 // second, and the second and third are equally long and have length at least 2.
-pub(crate) fn triples_of_unsigned_vec_var_49<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_49<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_var_46(gm).filter(|(_, xs, _)| xs.len() > 1))
@@ -3537,7 +3553,7 @@ pub fn triples_of_limb_vec_var_51(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
 
 // All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same
 // length, which is at least 2.
-pub(crate) fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
+pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     Box::new(triples_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _, _)| xs.len() >= 2))
@@ -3564,9 +3580,7 @@ pub fn triples_of_limb_vec_var_53(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of both
 // `limbs_div_to_out` and `limbs_div_exact_to_out`.
-pub(crate) fn triples_of_limb_vec_var_54(
-    gm: GenerationMode,
-) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+pub fn triples_of_limb_vec_var_54(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(triples_of_limb_vec_var_53(gm).filter(|&(_, _, ref ds)| ds.len() > 1))
 }
 
@@ -3935,7 +3949,7 @@ pub fn quadruples_of_limb_vec_var_2(
 
 // All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet certain preconditions that
 // enable comparing the performance of two kinds of Barrett division.
-pub(crate) fn quadruples_of_limb_vec_var_3(
+pub fn quadruples_of_limb_vec_var_3(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(quadruples_of_limb_vec_var_1(gm).filter(|(_, _, n, d)| 2 * d.len() > n.len() + 1))
@@ -3980,7 +3994,7 @@ pub fn quadruples_of_limb_vec_var_4(
 // All quadruples of `Vec<Limb>`, where `qs`, `rs`, `ns`, and `ds` meet the preconditions of
 // `_limbs_modular_div_mod_barrett` and `qs`, `ns`, and `ds` would meet the preconditions of
 // `_limbs_modular_div_mod_divide_and_conquer`, given the correct `inverse`.
-pub(crate) fn quadruples_of_limb_vec_var_5(
+pub fn quadruples_of_limb_vec_var_5(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> = match gm {
@@ -4014,7 +4028,7 @@ pub(crate) fn quadruples_of_limb_vec_var_5(
     }))
 }
 
-pub(crate) fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
+pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
     let qs: It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, u32)> = match gm {
@@ -4528,7 +4542,7 @@ pub fn quadruples_of_three_limb_vecs_and_limb_var_6(
 
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Vec<Limb>`, and `Limb`, where `is`, `scratch`, `ds`,
 // and `inverse` meet the preconditions of `_limbs_modular_invert_small`.
-pub(crate) fn quadruples_of_three_limb_vecs_and_limb_var_7(
+pub fn quadruples_of_three_limb_vecs_and_limb_var_7(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
     let vs: It<Vec<Limb>> =
@@ -4637,7 +4651,7 @@ pub fn pairs_of_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
 
 // All pairs of `Vec<T>` and `T`, where `T` is unsigned, the `Vec` has length at least 2, and the
 // most-significant bit of the `T` is set.
-pub(crate) fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_unsigned_vec_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T)> {
     match gm {
@@ -4828,7 +4842,7 @@ pub fn pairs_of_limb_vec_and_positive_limb_var_2(gm: GenerationMode) -> It<(Vec<
 
 // All pairs of `Vec<T>` and `T`, where `T` is unsigned, the `Vec` has length at least 2, the most-
 // significant bit of the `T` is unset, and the `T` is positive.
-pub(crate) fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
+pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_3<
     T: PrimitiveUnsigned + Rand + SampleRange,
 >(
     gm: GenerationMode,
@@ -5513,6 +5527,17 @@ pub fn triples_of_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand
     }
 }
 
+// All triples of `Vec<T>`, `T`, and `T` where `T` is unsigned, the `Vec` is nonempty, and the first
+// `T` is odd.
+pub fn triples_of_unsigned_vec_unsigned_and_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, T, T)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_and_unsigned::<T>(gm)
+            .filter(|&(ref ns, d, _)| !ns.is_empty() && d.odd()),
+    )
+}
+
 // All triples of `Vec<Limb>`, `Limb`, and `u64` such that the number of significant bits of neither
 // the `Vec` nor the `Limb` exceeds the `u64`.
 pub fn triples_of_limb_vec_limb_and_u64_var_1(gm: GenerationMode) -> It<(Vec<Limb>, Limb, u64)> {
@@ -5956,7 +5981,7 @@ pub(crate) fn triples_of_unsigned_vec_unsigned_and_small_unsigned<
 
 // All triples of `Vec<T>`, T, and small `U`, where `T` and `U` are unsigned, the `Vec` is
 // non-empty, and its last element is nonzero.
-pub(crate) fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1<
+pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned,
 >(
@@ -6520,9 +6545,7 @@ fn triples_of_unsigned_unsigned_vec_and_rounding_mode<T: PrimitiveUnsigned + Ran
 
 // All triples of `T`, `Vec<T>`, and `RoundingMode`, where `T` is unsigned and the `Vec` has length
 // greater than one and its last element is nonzero.
-pub(crate) fn triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1<
-    T: PrimitiveUnsigned + Rand,
->(
+pub fn triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, Vec<T>, RoundingMode)> {
     Box::new(
@@ -7168,7 +7191,7 @@ pub fn strings(gm: NoSpecialGenerationMode) -> It<String> {
     }
 }
 
-pub(crate) fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
+pub fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => {
             Box::new(exhaustive_strings_with_chars(exhaustive_ascii_chars()))
@@ -7208,7 +7231,7 @@ pub fn pairs_of_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
     }
 }
 
-pub(crate) fn pairs_of_ascii_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
+pub fn pairs_of_ascii_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
             exhaustive_strings_with_chars(exhaustive_ascii_chars()),

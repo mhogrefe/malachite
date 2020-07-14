@@ -4,8 +4,8 @@ use malachite_nz::natural::arithmetic::div::{
 };
 use malachite_nz::platform::{Limb, DC_DIVAPPR_Q_THRESHOLD};
 
-use common::GenerationMode;
-use inputs::base::quadruples_of_three_limb_vecs_and_limb_var_2;
+use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::quadruples_of_three_limb_vecs_and_limb_var_2;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(

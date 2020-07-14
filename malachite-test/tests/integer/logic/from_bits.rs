@@ -5,10 +5,12 @@ use malachite_base_test_util::num::logic::bit_convertible::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::integer::logic::from_bits::{
+    from_bits_asc_naive, from_bits_desc_naive,
+};
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::vecs_of_bool;
-use malachite_test::integer::logic::from_bits::{from_bits_asc_naive, from_bits_desc_naive};
 
 #[test]
 fn from_bits_asc_properties() {

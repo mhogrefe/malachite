@@ -4,8 +4,8 @@ use malachite_nz::natural::arithmetic::mod_op::{
 };
 use malachite_nz::platform::Limb;
 
-use common::GenerationMode;
-use inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
+use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_positive_unsigned_var_1;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(

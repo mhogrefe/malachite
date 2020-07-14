@@ -12,9 +12,11 @@ use malachite_nz_test_util::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs_naive, limbs_precompute_mod_mul_two_limbs_alt,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{nonuples_of_limbs_var_1, pairs_of_unsigneds_var_6};
-use inputs::natural::triples_of_naturals_var_4;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{nonuples_of_limbs_var_1, pairs_of_unsigneds_var_6};
+use malachite_test::inputs::natural::triples_of_naturals_var_4;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_precompute_mod_mul_two_limbs);

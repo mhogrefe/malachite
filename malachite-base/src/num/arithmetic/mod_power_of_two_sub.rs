@@ -1,7 +1,21 @@
-use num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, WrappingSubAssign,
-};
+use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoSub, ModPowerOfTwoSubAssign};
 use num::basic::integers::PrimitiveInteger;
+
+#[inline]
+pub fn _mod_power_of_two_sub<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
+where
+    T: ModPowerOfTwo<Output = T>,
+{
+    assert!(pow <= T::WIDTH);
+    x.wrapping_sub(other).mod_power_of_two(pow)
+}
+
+#[inline]
+pub fn _mod_power_of_two_sub_assign<T: PrimitiveInteger>(x: &mut T, other: T, pow: u64) {
+    assert!(pow <= T::WIDTH);
+    x.wrapping_sub_assign(other);
+    x.mod_power_of_two_assign(pow);
+}
 
 macro_rules! impl_mod_power_of_two_sub {
     ($t:ident) => {
@@ -24,8 +38,7 @@ macro_rules! impl_mod_power_of_two_sub {
             /// ```
             #[inline]
             fn mod_power_of_two_sub(self, other: $t, pow: u64) -> $t {
-                assert!(pow <= $t::WIDTH);
-                self.wrapping_sub(other).mod_power_of_two(pow)
+                _mod_power_of_two_sub(self, other, pow)
             }
         }
 
@@ -51,17 +64,9 @@ macro_rules! impl_mod_power_of_two_sub {
             /// ```
             #[inline]
             fn mod_power_of_two_sub_assign(&mut self, other: $t, pow: u64) {
-                assert!(pow <= $t::WIDTH);
-                self.wrapping_sub_assign(other);
-                self.mod_power_of_two_assign(pow);
+                _mod_power_of_two_sub_assign(self, other, pow);
             }
         }
     };
 }
-
-impl_mod_power_of_two_sub!(u8);
-impl_mod_power_of_two_sub!(u16);
-impl_mod_power_of_two_sub!(u32);
-impl_mod_power_of_two_sub!(u64);
-impl_mod_power_of_two_sub!(u128);
-impl_mod_power_of_two_sub!(usize);
+apply_to_unsigneds!(impl_mod_power_of_two_sub);

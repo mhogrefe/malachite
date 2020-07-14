@@ -4,10 +4,10 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{signeds_var_2, unsigneds_var_8};
+use malachite_test::inputs::base::{signeds_var_2, unsigneds_var_8};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_u8_square);

@@ -5,10 +5,11 @@ use malachite_base::slices::slice_trailing_zeros;
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_limb, limbs_divisible_by_val_ref,
 };
+use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::arithmetic::sub::{limbs_sub, limbs_sub_limb};
 use malachite_nz::natural::comparison::ord::limbs_cmp;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
 pub fn limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     assert!(xs.len() > 1);
@@ -80,4 +81,17 @@ pub fn limbs_eq_mod_naive_2(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     .0;
     diff.truncate(diff.len() - slice_trailing_zeros(&diff));
     diff.len() >= ms.len() && limbs_divisible_by_val_ref(&mut diff, ms)
+}
+
+/// Benchmarks show that this is never faster than just calling `limbs_eq_limb_mod_limb`.
+///
+/// xs.len() must be greater than 1; m must be nonzero.
+///
+/// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is non-negative.
+pub fn _combined_limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
+    if xs.len() < BMOD_1_TO_MOD_1_THRESHOLD {
+        limbs_mod_limb(xs, m) == y % m
+    } else {
+        limbs_eq_limb_mod_limb(xs, y, m)
+    }
 }

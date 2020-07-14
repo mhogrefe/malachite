@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod string_is_subset;
 pub mod string_nub;

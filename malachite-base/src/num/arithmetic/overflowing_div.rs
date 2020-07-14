@@ -44,16 +44,4 @@ macro_rules! impl_overflowing_div {
         }
     };
 }
-
-impl_overflowing_div!(u8);
-impl_overflowing_div!(u16);
-impl_overflowing_div!(u32);
-impl_overflowing_div!(u64);
-impl_overflowing_div!(u128);
-impl_overflowing_div!(usize);
-impl_overflowing_div!(i8);
-impl_overflowing_div!(i16);
-impl_overflowing_div!(i32);
-impl_overflowing_div!(i64);
-impl_overflowing_div!(i128);
-impl_overflowing_div!(isize);
+apply_to_primitive_ints!(impl_overflowing_div);

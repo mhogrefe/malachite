@@ -1,6 +1,6 @@
-use common::{DemoBenchRegistry, NoSpecialGenerationMode};
-use hash::hash;
-use inputs::base::rounding_modes;
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
+use malachite_test::hash::hash;
+use malachite_test::inputs::base::rounding_modes;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_rounding_mode_hash);

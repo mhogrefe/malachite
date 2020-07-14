@@ -3,11 +3,13 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz_test_util::natural::logic::set_bit::num_set_bit;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned,
 };
-use inputs::natural::{
+use malachite_test::inputs::natural::{
     nm_pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned,
 };
 

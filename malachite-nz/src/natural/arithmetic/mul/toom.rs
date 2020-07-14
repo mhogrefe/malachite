@@ -668,7 +668,7 @@ pub fn _limbs_mul_same_length_to_out_toom_33_recursive(
     }
 }
 
-const SMALLER_RECURSION: bool = true;
+const SMALLER_RECURSION_TOOM_33_AND_53: bool = true;
 
 /// This function can be used to determine whether the sizes of the input slices to
 /// `_limbs_mul_greater_to_out_toom_33` are valid.
@@ -816,7 +816,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
     assert!(*bsm1_last <= 1);
     assert!(*as2_last <= 6);
     assert!(*bs2_last <= 6);
-    if SMALLER_RECURSION {
+    if SMALLER_RECURSION_TOOM_33_AND_53 {
         _limbs_mul_same_length_to_out_toom_33_recursive(v_neg_1, asm1_init, bsm1_init, scratch_out);
         let (v_neg_1_last, v_neg_1_init) = v_neg_1[n..2 * n + 1].split_last_mut().unwrap();
         let mut carry = 0;
@@ -831,7 +831,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
         }
         *v_neg_1_last = carry;
     } else {
-        fail_on_untested_path("_limbs_mul_greater_to_out_toom_33, !SMALLER_RECURSION 1");
+        fail_on_untested_path("_limbs_mul_greater_to_out_toom_33, !SMALLER_RECURSION");
         _limbs_mul_same_length_to_out_toom_33_recursive(v_neg_1, asm1, bsm1, scratch_out);
     }
     let (v_2, scratch_out) = scratch[2 * n + 1..].split_at_mut(3 * n + 4);
@@ -852,7 +852,7 @@ pub fn _limbs_mul_greater_to_out_toom_33(
     let (as1, scratch_out) = scratch[m << 2..].split_at_mut(n + 1);
     let (bs1, v_1) = out.split_at_mut(n << 1);
     let bs1 = &bs1[..n + 1];
-    if SMALLER_RECURSION {
+    if SMALLER_RECURSION_TOOM_33_AND_53 {
         let (as1_last, as1_init) = as1.split_last().unwrap();
         let (bs1_last, bs1_init) = bs1.split_last().unwrap();
         // v_1, 2 * n + 1 limbs
@@ -879,7 +879,6 @@ pub fn _limbs_mul_greater_to_out_toom_33(
         }
         v_1_hi[0] = carry;
     } else {
-        fail_on_untested_path("_limbs_mul_greater_to_out_toom_33, !SMALLER_RECURSION 2");
         let carry = v_1[2 * n + 1];
         _limbs_mul_same_length_to_out_toom_33_recursive(v_1, as1, bs1, scratch_out);
         v_1[2 * n + 1] = carry;
@@ -1888,7 +1887,7 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     limbs_mul_same_length_to_out(&mut scratch[m << 1..], ash, bsh);
     let v_neg_1 = &mut scratch[3 * m..m << 2];
     let (v_neg_1_last, v_neg_1_init) = v_neg_1.split_last_mut().unwrap();
-    if SMALLER_RECURSION {
+    if SMALLER_RECURSION_TOOM_33_AND_53 {
         limbs_mul_same_length_to_out(v_neg_1_init, asm1_init, bsm1_init);
         let v_neg_1_init = &mut v_neg_1_init[n..];
         let mut carry = match *asm1_last {
@@ -1909,16 +1908,16 @@ pub fn _limbs_mul_greater_to_out_toom_53(
         }
         *v_neg_1_last = carry;
     } else {
-        fail_on_untested_path("_limbs_mul_greater_to_out_toom_53, !SMALLER_RECURSION 1");
+        fail_on_untested_path("_limbs_mul_greater_to_out_toom_53, !SMALLER_RECURSION");
         *v_neg_1_last = 0;
         if (*asm1_last | *bsm1_last) == 0 {
             limbs_mul_same_length_to_out(v_neg_1_init, asm1_init, bsm1_init);
         } else {
-            limbs_mul_same_length_to_out(v_neg_1, asm1, bsm1);
+            limbs_mul_same_length_to_out(&mut scratch[3 * m..8 * n + 5], asm1, bsm1);
         }
     }
     // v_1, 2 * n + 1 limbs
-    if SMALLER_RECURSION {
+    if SMALLER_RECURSION_TOOM_33_AND_53 {
         limbs_mul_same_length_to_out(v_1, as1_init, bs1_init);
         split_into_chunks_mut!(v_1, n, [_unused, v_1_lo], v_1_hi);
         let mut carry = match *as1_last {
@@ -1949,7 +1948,6 @@ pub fn _limbs_mul_greater_to_out_toom_53(
         }
         v_1_hi[0] = carry;
     } else {
-        fail_on_untested_path("_limbs_mul_greater_to_out_toom_53, !SMALLER_RECURSION 2");
         v_1[n << 1] = 0;
         if (*as1_last | *bs1_last) == 0 {
             limbs_mul_same_length_to_out(v_1, as1_init, bs1_init);

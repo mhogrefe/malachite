@@ -9,12 +9,14 @@ use malachite_nz_test_util::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_1,
     pairs_of_unsigned_vec_var_2,
 };
-use inputs::natural::{pairs_of_naturals, rm_pairs_of_naturals};
+use malachite_test::inputs::natural::{pairs_of_naturals, rm_pairs_of_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_hamming_distance_limb);

@@ -6,8 +6,10 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_signed_and_nonzero_signed, pairs_of_signeds_var_2,
     pairs_of_unsigned_and_positive_unsigned,
 };

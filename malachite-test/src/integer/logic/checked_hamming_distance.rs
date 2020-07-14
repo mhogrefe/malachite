@@ -10,11 +10,13 @@ use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
     rug_checked_hamming_distance,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_var_6,
 };
-use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use malachite_test::inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_hamming_distance_limb_neg);

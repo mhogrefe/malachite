@@ -12,7 +12,7 @@ fn geometric_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigne
     um_denominator: u64,
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
@@ -21,8 +21,8 @@ fn geometric_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigne
         geometric_random_positive_unsigneds::<T>(EXAMPLE_SEED, um_numerator, um_denominator),
         um_numerator,
         um_denominator,
-        &T::ONE,
-        &T::MAX,
+        T::ONE,
+        T::MAX,
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -38,7 +38,7 @@ fn test_geometric_random_positive_unsigneds() {
     // u64, um = 65 / 64
     let values = &[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2];
     let common_values = &[(1, 984537), (2, 15210), (3, 253)];
-    let pop_median = NiceFloat(1.0);
+    let pop_median = (1, None);
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.015625),
@@ -76,7 +76,7 @@ fn test_geometric_random_positive_unsigneds() {
         (8, 5),
         (9, 1),
     ];
-    let pop_median = NiceFloat(1.0);
+    let pop_median = (1, None);
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.2345),
@@ -115,7 +115,7 @@ fn test_geometric_random_positive_unsigneds() {
         (9, 1932),
         (10, 942),
     ];
-    let pop_median = NiceFloat(1.0);
+    let pop_median = (1, Some(2));
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(2.0),
@@ -156,7 +156,7 @@ fn test_geometric_random_positive_unsigneds() {
         (9, 13961),
         (10, 13836),
     ];
-    let pop_median = NiceFloat(43.0);
+    let pop_median = (43, None);
     let sample_median = (43, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(59.318470051671945),
@@ -197,7 +197,7 @@ fn test_geometric_random_positive_unsigneds() {
         (12, 4415),
         (25, 4407),
     ];
-    let pop_median = NiceFloat(120.0);
+    let pop_median = (120, None);
     let sample_median = (120, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(122.58449448192029),

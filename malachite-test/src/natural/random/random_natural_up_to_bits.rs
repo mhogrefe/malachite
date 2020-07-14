@@ -8,10 +8,10 @@ use rust_wheels::iterators::adaptors::{
 };
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{small_positive_unsigneds, small_unsigneds};
+use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_limbs_random_up_to_bits);

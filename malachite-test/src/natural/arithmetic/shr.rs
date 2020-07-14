@@ -9,12 +9,14 @@ use malachite_nz::natural::arithmetic::shr::{
 };
 use malachite_nz::platform::Limb;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
 };
-use inputs::natural::{
+use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_signed, pairs_of_natural_and_small_unsigned,
     rm_pairs_of_natural_and_small_signed, rm_pairs_of_natural_and_small_unsigned,
 };

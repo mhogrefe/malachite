@@ -7,8 +7,10 @@ use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::quadruples_of_unsigneds;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::quadruples_of_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_xx_sub_yy_is_zz);

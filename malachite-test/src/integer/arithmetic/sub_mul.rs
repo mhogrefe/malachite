@@ -11,12 +11,14 @@ use malachite_nz::integer::arithmetic::sub_mul::{
 };
 use malachite_nz::integer::Integer;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3,
     triples_of_unsigned_vec_var_29,
 };
-use inputs::integer::triples_of_integers;
+use malachite_test::inputs::integer::triples_of_integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_overflowing_sub_mul_limb);

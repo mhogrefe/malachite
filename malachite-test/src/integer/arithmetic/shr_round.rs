@@ -2,8 +2,10 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::integer::{
     triples_of_integer_small_signed_and_rounding_mode_var_2,
     triples_of_integer_small_unsigned_and_rounding_mode_var_1,
 };

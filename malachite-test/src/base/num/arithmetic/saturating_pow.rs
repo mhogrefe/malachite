@@ -6,10 +6,12 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use rand::Rand;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{pairs_of_small_signed_and_small_unsigned, pairs_of_small_unsigneds};
+use malachite_test::inputs::base::{
+    pairs_of_small_signed_and_small_unsigned, pairs_of_small_unsigneds,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_u8_saturating_pow_assign);

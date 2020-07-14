@@ -1,6 +1,4 @@
-use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_desc_alt,
 };
@@ -8,9 +6,14 @@ use malachite_nz::natural::logic::bit_convertible::{
     limbs_asc_from_bits_asc, limbs_asc_from_bits_desc,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::from_bits::{
+    from_bits_asc_naive, from_bits_desc_naive,
+};
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_bool;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::vecs_of_bool;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_asc_from_bits_asc);
@@ -21,33 +24,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Large, benchmark_limbs_asc_from_bits_desc);
     register_bench!(registry, Large, benchmark_natural_from_bits_asc_algorithms);
     register_bench!(registry, Large, benchmark_natural_from_bits_desc_algorithms);
-}
-
-pub fn from_bits_asc_naive(bits: &[bool]) -> Natural {
-    let mut n = Natural::ZERO;
-    for i in bits
-        .iter()
-        .enumerate()
-        .filter(|(_, &bit)| bit)
-        .map(|p| u64::exact_from(p.0))
-    {
-        n.set_bit(i);
-    }
-    n
-}
-
-pub fn from_bits_desc_naive(bits: &[bool]) -> Natural {
-    let mut n = Natural::ZERO;
-    for i in bits
-        .iter()
-        .rev()
-        .enumerate()
-        .filter(|(_, &bit)| bit)
-        .map(|p| u64::exact_from(p.0))
-    {
-        n.set_bit(i);
-    }
-    n
 }
 
 fn demo_limbs_asc_from_bits_asc(gm: GenerationMode, limit: usize) {

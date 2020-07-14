@@ -7,12 +7,14 @@ use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
     limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
 };
-use inputs::integer::{
+use malachite_test::inputs::integer::{
     rm_triples_of_integer_integer_and_small_unsigned, triples_of_integer_integer_and_small_unsigned,
 };
 

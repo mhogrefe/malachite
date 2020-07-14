@@ -5,12 +5,14 @@ use malachite_nz::natural::Natural;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode,
     ScaleType,
 };
-use inputs::base::{pairs_of_u64_and_unsigned_vec_var_3, pairs_of_u64_and_unsigned_vec_var_4};
-use inputs::natural::pairs_of_u64_and_natural_vec_var_1;
+use malachite_test::inputs::base::{
+    pairs_of_u64_and_unsigned_vec_var_3, pairs_of_u64_and_unsigned_vec_var_4,
+};
+use malachite_test::inputs::natural::pairs_of_u64_and_natural_vec_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_natural_from_power_of_two_digits_asc_u8);

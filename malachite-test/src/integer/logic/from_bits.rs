@@ -1,77 +1,22 @@
-use malachite_base::num::basic::traits::{NegativeOne, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_desc_alt,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::from_bits::{
+    from_bits_asc_naive, from_bits_desc_naive,
+};
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_bool;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::vecs_of_bool;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_from_bits_asc);
     register_demo!(registry, demo_integer_from_bits_desc);
     register_bench!(registry, Large, benchmark_integer_from_bits_asc_algorithms);
     register_bench!(registry, Large, benchmark_integer_from_bits_desc_algorithms);
-}
-
-pub fn from_bits_asc_naive(bits: &[bool]) -> Integer {
-    if bits.is_empty() {
-        return Integer::ZERO;
-    }
-    let mut n;
-    if *bits.last().unwrap() {
-        n = Integer::NEGATIVE_ONE;
-        for i in
-            bits.iter()
-                .enumerate()
-                .filter_map(|(i, &bit)| if bit { None } else { Some(u64::exact_from(i)) })
-        {
-            n.clear_bit(i);
-        }
-    } else {
-        n = Integer::ZERO;
-        for i in
-            bits.iter()
-                .enumerate()
-                .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
-        {
-            n.set_bit(i);
-        }
-    };
-    n
-}
-
-pub fn from_bits_desc_naive(bits: &[bool]) -> Integer {
-    if bits.is_empty() {
-        return Integer::ZERO;
-    }
-    let mut n;
-    if bits[0] {
-        n = Integer::NEGATIVE_ONE;
-        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
-            if bit {
-                None
-            } else {
-                Some(u64::exact_from(i))
-            }
-        }) {
-            n.clear_bit(i);
-        }
-    } else {
-        n = Integer::ZERO;
-        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
-            if bit {
-                Some(u64::exact_from(i))
-            } else {
-                None
-            }
-        }) {
-            n.set_bit(i);
-        }
-    };
-    n
 }
 
 fn demo_integer_from_bits_asc(gm: GenerationMode, limit: usize) {

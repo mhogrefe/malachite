@@ -50,10 +50,4 @@ macro_rules! impl_overflowing_abs {
         }
     };
 }
-
-impl_overflowing_abs!(i8);
-impl_overflowing_abs!(i16);
-impl_overflowing_abs!(i32);
-impl_overflowing_abs!(i64);
-impl_overflowing_abs!(i128);
-impl_overflowing_abs!(isize);
+apply_to_signeds!(impl_overflowing_abs);

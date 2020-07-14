@@ -8,11 +8,16 @@ use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 use num::random::thrifty_random::RandomPrimitiveIntegers;
 use random::seed::Seed;
 
-/// Generates the an iterator's values but with all but the lowest `pow` bits cleared.
+/// Uniformly generates unsigned integers of up to `chunk_size` bits.
+///
+/// Length is infinite.
 ///
 /// Time per iteration: O(1)
 ///
 /// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `chunk_size` is greater than `T::WIDTH`.
 ///
 /// # Examples
 /// ```
@@ -28,6 +33,7 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     seed: Seed,
     chunk_size: u64,
 ) -> RandomUnsignedBitChunks<T> {
+    assert!(chunk_size <= T::WIDTH);
     RandomUnsignedBitChunks {
         xs: random_primitive_integers(seed),
         x: T::ZERO,
@@ -38,16 +44,41 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     }
 }
 
+/// Uniformly generates signed integers of up to `chunk_size` bits. The generated values will all be
+/// non-negative unless `chunk_size` is equal to `T::WIDTH`.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `chunk_size` is greater than `T::WIDTH`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_signed_bit_chunks;
+///
+/// assert_eq!(
+///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3).take(10).collect::<Vec<i8>>(),
+///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
+/// )
+/// ```
 pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
     seed: Seed,
     chunk_size: u64,
 ) -> RandomSignedBitChunks<T> {
+    assert!(chunk_size <= T::WIDTH);
     RandomSignedBitChunks {
         xs: T::new_absolute_chunks(seed, chunk_size),
     }
 }
 
-/// Generates the an iterator's values but with the highest bit set.
+/// Generates an iterator's values, but with the highest bit set.
+///
+/// Length is infinite.
 ///
 /// Time per iteration: O(1)
 ///
@@ -73,14 +104,13 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
     }
 }
 
-/// Generates random values from a distribution defined by `T`'s `StandardRand` trait.
+/// Generates random primitive integers uniformly.
 ///
 /// Length is infinite.
 ///
-/// Time per iteration: worst case time for `<T as StandardRand>::gen::<T>(ChaCha20Rng)`
+/// Time per iteration: O(1)
 ///
-/// Additional memory per iteration: worst case additional memory for
-/// `<T as StandardRand>::gen::<T>(ChaCha20Rng)`
+/// Additional memory per iteration: O(1)
 ///
 /// # Examples
 /// ```
@@ -230,6 +260,25 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
     nonzero_values(random_primitive_integers(seed))
 }
 
+/// Uniformly generates random unsigned integers less than `limit`, unless `limit` is 0, in which
+/// case any integer may be generated.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_unsigneds_less_than;
+///
+/// assert_eq!(
+///     random_unsigneds_less_than::<u8>(EXAMPLE_SEED, 10).take(10).collect::<Vec<u8>>(),
+///     &[1, 7, 5, 4, 6, 4, 2, 8, 1, 7]
+/// )
+/// ```
 #[inline]
 pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
     seed: Seed,

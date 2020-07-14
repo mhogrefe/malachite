@@ -2,8 +2,10 @@ use rand::{RngCore, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use sha3::{Digest, Sha3_256};
 
+//TODO finish docs and tests
+
 /// A wrapper around `ChaCha20Rng`'s seed type.
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Seed {
     pub bytes: [u8; 32],
 }

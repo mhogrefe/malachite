@@ -32,10 +32,4 @@ macro_rules! impl_neg {
         }
     };
 }
-
-impl_neg!(i8);
-impl_neg!(i16);
-impl_neg!(i32);
-impl_neg!(i64);
-impl_neg!(i128);
-impl_neg!(isize);
+apply_to_signeds!(impl_neg);

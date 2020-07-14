@@ -52,11 +52,11 @@ use malachite_nz::natural::arithmetic::mul::{
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode,
     ScaleType,
 };
-use inputs::base::{
+use malachite_test::inputs::base::{
     pairs_of_small_unsigneds_single, pairs_of_unsigned_vec_and_unsigned,
     pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
     quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
@@ -72,7 +72,9 @@ use inputs::base::{
     triples_of_unsigned_vec_var_36, triples_of_unsigned_vec_var_46, triples_of_unsigned_vec_var_47,
     triples_of_unsigned_vec_var_48, triples_of_unsigned_vec_var_49, triples_of_unsigned_vec_var_52,
 };
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
+use malachite_test::inputs::natural::{
+    nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mul_limb);

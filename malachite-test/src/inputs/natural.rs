@@ -76,11 +76,11 @@ pub fn naturals(gm: GenerationMode) -> It<Natural> {
     }
 }
 
-pub(crate) fn rm_naturals(gm: GenerationMode) -> It<(rug::Integer, Natural)> {
+pub fn rm_naturals(gm: GenerationMode) -> It<(rug::Integer, Natural)> {
     Box::new(naturals(gm).map(|n| (natural_to_rug_integer(&n), n)))
 }
 
-pub(crate) fn nrm_naturals(gm: GenerationMode) -> It<(BigUint, rug::Integer, Natural)> {
+pub fn nrm_naturals(gm: GenerationMode) -> It<(BigUint, rug::Integer, Natural)> {
     Box::new(naturals(gm).map(|n| (natural_to_biguint(&n), natural_to_rug_integer(&n), n)))
 }
 
@@ -94,14 +94,14 @@ pub fn positive_naturals(gm: GenerationMode) -> It<Natural> {
     }
 }
 
-pub(crate) fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
+pub fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
 where
     Natural: From<T>,
 {
     Box::new(unsigneds::<T>(gm).map(Natural::from))
 }
 
-pub(crate) fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
+pub fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
 where
     Natural: ExactFrom<T>,
     T::UnsignedOfEqualWidth: Rand,
@@ -123,7 +123,7 @@ pub fn pairs_of_naturals(gm: GenerationMode) -> It<(Natural, Natural)> {
     }
 }
 
-pub(crate) fn nrm_pairs_of_naturals(
+pub fn nrm_pairs_of_naturals(
     gm: GenerationMode,
 ) -> It<(
     (BigUint, BigUint),
@@ -139,7 +139,7 @@ pub(crate) fn nrm_pairs_of_naturals(
     }))
 }
 
-pub(crate) fn rm_pairs_of_naturals(
+pub fn rm_pairs_of_naturals(
     gm: GenerationMode,
 ) -> It<((rug::Integer, rug::Integer), (Natural, Natural))> {
     Box::new(pairs_of_naturals(gm).map(|(x, y)| {
@@ -157,7 +157,7 @@ pub fn pairs_of_naturals_var_1(gm: GenerationMode) -> It<(Natural, Natural)> {
 }
 
 //TODO use subset_pairs
-pub(crate) fn rm_pairs_of_naturals_var_1(
+pub fn rm_pairs_of_naturals_var_1(
     gm: GenerationMode,
 ) -> It<((rug::Integer, rug::Integer), (Natural, Natural))> {
     Box::new(pairs_of_naturals_var_1(gm).map(|(x, y)| {
@@ -169,7 +169,7 @@ pub(crate) fn rm_pairs_of_naturals_var_1(
 }
 
 //TODO use subset_pairs
-pub(crate) fn nrm_pairs_of_naturals_var_1(
+pub fn nrm_pairs_of_naturals_var_1(
     gm: GenerationMode,
 ) -> It<(
     (BigUint, BigUint),
@@ -206,7 +206,7 @@ pub fn triples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural)
     }
 }
 
-pub(crate) fn rm_triples_of_naturals(
+pub fn rm_triples_of_naturals(
     gm: GenerationMode,
 ) -> It<(
     (rug::Integer, rug::Integer, rug::Integer),
@@ -306,7 +306,7 @@ pub fn pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub(crate) fn nrm_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
+pub fn nrm_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((BigUint, T), (rug::Integer, T), (Natural, T))> {
     Box::new(pairs_of_natural_and_unsigned(gm).map(|(x, y)| {
@@ -364,7 +364,7 @@ pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> 
     permute_2_1(ps)
 }
 
-pub(crate) fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+pub fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, Natural)> {
     match gm {
@@ -381,7 +381,7 @@ pub(crate) fn pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub(crate) fn rm_pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+pub fn rm_pairs_of_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((T, rug::Integer), (T, Natural))> {
     Box::new(
@@ -410,7 +410,7 @@ where
     }
 }
 
-pub(crate) fn rm_pairs_of_natural_and_signed<T: PrimitiveSigned + Rand>(
+pub fn rm_pairs_of_natural_and_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<((rug::Integer, T), (Natural, T))>
 where
@@ -422,7 +422,7 @@ where
     )
 }
 
-pub(crate) fn pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
+pub fn pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, Natural)>
 where
@@ -443,7 +443,7 @@ where
     }
 }
 
-pub(crate) fn rm_pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
+pub fn rm_pairs_of_signed_and_natural<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<((T, rug::Integer), (T, Natural))>
 where
@@ -499,7 +499,7 @@ pub fn pairs_of_natural_and_positive_natural(gm: GenerationMode) -> It<(Natural,
     }
 }
 
-pub(crate) fn rm_pairs_of_natural_and_positive_natural(
+pub fn rm_pairs_of_natural_and_positive_natural(
     gm: GenerationMode,
 ) -> It<((rug::Integer, rug::Integer), (Natural, Natural))> {
     Box::new(pairs_of_natural_and_positive_natural(gm).map(|(x, y)| {
@@ -510,7 +510,7 @@ pub(crate) fn rm_pairs_of_natural_and_positive_natural(
     }))
 }
 
-pub(crate) fn nrm_pairs_of_natural_and_positive_natural(
+pub fn nrm_pairs_of_natural_and_positive_natural(
     gm: GenerationMode,
 ) -> It<(
     (BigUint, BigUint),
@@ -532,7 +532,7 @@ pub fn pairs_of_natural_and_positive_natural_var_1(gm: GenerationMode) -> It<(Na
     Box::new(pairs_of_natural_and_positive_natural(gm).map(|(x, y)| (x * &y, y)))
 }
 
-pub(crate) fn nrm_pairs_of_natural_and_positive_natural_var_1(
+pub fn nrm_pairs_of_natural_and_positive_natural_var_1(
     gm: GenerationMode,
 ) -> It<(
     (BigUint, BigUint),
@@ -578,7 +578,7 @@ pub fn pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub(crate) fn rm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+pub fn rm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((rug::Integer, T), (Natural, T))> {
     Box::new(
@@ -681,7 +681,7 @@ pub fn pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
     }
 }
 
-pub(crate) fn rm_pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
+pub fn rm_pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<((rug::Integer, T), (Natural, T))> {
     Box::new(
@@ -690,7 +690,7 @@ pub(crate) fn rm_pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
     )
 }
 
-pub(crate) fn nm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+pub fn nm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((BigUint, T), (Natural, T))> {
     Box::new(
@@ -698,7 +698,7 @@ pub(crate) fn nm_pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand
     )
 }
 
-pub(crate) fn nrm_pairs_of_natural_and_small_unsigned(
+pub fn nrm_pairs_of_natural_and_small_unsigned(
     gm: GenerationMode,
 ) -> It<((BigUint, u64), (rug::Integer, u64), (Natural, u64))> {
     Box::new(pairs_of_natural_and_small_unsigned(gm).map(|(x, y)| {
@@ -930,7 +930,7 @@ pub fn triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand
     }
 }
 
-pub(crate) fn rm_triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+pub fn rm_triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((rug::Integer, rug::Integer, T), (Natural, Natural, T))> {
     Box::new(
@@ -1130,7 +1130,7 @@ pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
     reshape_2_1_to_3(permute_2_1(ps))
 }
 
-pub(crate) fn rm_triples_of_natural_small_u64_and_bool(
+pub fn rm_triples_of_natural_small_u64_and_bool(
     gm: GenerationMode,
 ) -> It<((rug::Integer, u64, bool), (Natural, u64, bool))> {
     Box::new(

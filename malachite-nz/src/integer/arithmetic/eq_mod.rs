@@ -10,7 +10,7 @@ use natural::arithmetic::add::{limbs_add, limbs_add_limb};
 use natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
 };
-use natural::arithmetic::eq_mod::{limbs_eq_limb_mod_limb, limbs_mod_exact_odd_limb};
+use natural::arithmetic::eq_mod::{_limbs_mod_exact_odd_limb, limbs_eq_limb_mod_limb};
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
@@ -118,7 +118,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
                         y % m_0
                     }
             } else {
-                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
+                let r = _limbs_mod_exact_odd_limb(xs, m_0, y);
                 r == 0 || r == m_0
             });
         }

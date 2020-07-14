@@ -4,8 +4,10 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::integer::{
     integers, integers_exactly_equal_to_f32, integers_exactly_equal_to_f64,
     pairs_of_integer_and_rounding_mode_var_1_f32, pairs_of_integer_and_rounding_mode_var_1_f64,
 };

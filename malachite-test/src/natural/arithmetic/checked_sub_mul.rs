@@ -4,8 +4,10 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::Natural;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::triples_of_naturals;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::natural::triples_of_naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_checked_sub_mul);

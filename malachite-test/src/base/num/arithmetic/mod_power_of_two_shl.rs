@@ -2,10 +2,10 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwoShl, ModPowerOfTwoShlAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{
+use malachite_test::inputs::base::{
     triples_of_unsigned_small_signed_and_small_unsigned_var_1,
     triples_of_unsigned_small_unsigned_and_small_unsigned_var_3,
 };

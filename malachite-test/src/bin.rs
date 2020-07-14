@@ -1,9 +1,25 @@
+#![allow(unused_must_use)]
+
+extern crate itertools;
+#[macro_use]
+extern crate malachite_base;
+#[macro_use]
+extern crate malachite_base_test_util;
+extern crate malachite_bench;
+extern crate malachite_nz;
+extern crate malachite_nz_test_util;
+#[macro_use]
 extern crate malachite_test;
+extern crate num;
+extern crate rand;
+extern crate rug;
+extern crate rust_wheels;
+extern crate time;
 
 use std::env;
 
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
-use malachite_test::tune::tune;
+use tune::tune;
 
 fn optionally_tune(args: &[String]) -> bool {
     if args.len() == 3 && args[1] == "tune" {
@@ -37,7 +53,7 @@ pub fn main() {
     let item_name = args.last().unwrap();
 
     let mut registry = DemoBenchRegistry::default();
-    malachite_test::register(&mut registry);
+    register(&mut registry);
 
     if item_name == "all" {
         registry.benchmark_all(limit);
@@ -57,3 +73,14 @@ pub fn main() {
         panic!("Invalid item: {}", item_name);
     }
 }
+
+fn register(registry: &mut DemoBenchRegistry) {
+    base::register(registry);
+    integer::register(registry);
+    natural::register(registry);
+}
+
+pub mod base;
+pub mod integer;
+pub mod natural;
+pub mod tune;

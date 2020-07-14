@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod bit_access;
 pub mod bit_block_access;

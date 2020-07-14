@@ -8,8 +8,10 @@ use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     quadruples_of_signed_small_u64_small_u64_and_unsigned_var_1,
     quadruples_of_unsigned_small_u64_small_u64_and_unsigned_var_1,
     triples_of_signed_small_unsigned_and_small_unsigned_var_1,

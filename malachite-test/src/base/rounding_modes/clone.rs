@@ -1,5 +1,5 @@
-use common::{DemoBenchRegistry, NoSpecialGenerationMode};
-use inputs::base::{pairs_of_rounding_modes, rounding_modes};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
+use malachite_test::inputs::base::{pairs_of_rounding_modes, rounding_modes};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_rounding_mode_clone);

@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod clone;
 pub mod floating_point_from_integer;

@@ -8,7 +8,7 @@ use natural::arithmetic::div_exact::{
     _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
     limbs_modular_invert_limb,
 };
-use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
+use natural::arithmetic::eq_mod::_limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::InnerNatural::{Large, Small};
@@ -18,13 +18,13 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by a given limb.
 ///
-/// This function assumes that `limbs` has at least two elements and that `limb` is nonzero.
+/// This function assumes that `ns` has at least two elements and that `d` is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `ns.len()`
 ///
 /// # Example
 /// ```
@@ -36,13 +36,13 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative and the
 /// ABOVE_THRESHOLD branch is excluded.
-pub fn limbs_divisible_by_limb(xs: &[Limb], d: Limb) -> bool {
-    assert!(xs.len() > 1);
+pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
+    assert!(ns.len() > 1);
     if d.even() {
         let twos = TrailingZeros::trailing_zeros(d);
-        xs[0].divisible_by_power_of_two(twos) && limbs_mod_exact_odd_limb(xs, d >> twos, 0) == 0
+        ns[0].divisible_by_power_of_two(twos) && _limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
     } else {
-        limbs_mod_exact_odd_limb(xs, d, 0) == 0
+        _limbs_mod_exact_odd_limb(ns, d, 0) == 0
     }
 }
 
@@ -103,7 +103,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -112,7 +112,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                limbs_mod_exact_odd_limb(ns, d_low, 0)
+                _limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
                 limbs_mod_limb(ns, d_low)
             } == 0;
@@ -212,7 +212,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -221,7 +221,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                limbs_mod_exact_odd_limb(ns, d_low, 0)
+                _limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
                 limbs_mod_limb(ns, d_low)
             } == 0;
@@ -322,7 +322,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -331,7 +331,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                limbs_mod_exact_odd_limb(ns, d_low, 0)
+                _limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
                 limbs_mod_limb(ns, d_low)
             } == 0;
@@ -429,7 +429,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -438,7 +438,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
             return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                limbs_mod_exact_odd_limb(ns, d_low, 0)
+                _limbs_mod_exact_odd_limb(ns, d_low, 0)
             } else {
                 limbs_mod_limb(ns, d_low)
             } == 0;

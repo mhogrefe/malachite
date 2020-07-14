@@ -1,9 +1,9 @@
 use malachite_base::strings::string_nub;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{ascii_strings, strings};
+use malachite_test::inputs::base::{ascii_strings, strings};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_string_nub);

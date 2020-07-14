@@ -1,5 +1,6 @@
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 
+/// Uniformly generates a random value from a nonempty `Vec`.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromVec<T: Clone> {
     pub(crate) xs: Vec<T>,

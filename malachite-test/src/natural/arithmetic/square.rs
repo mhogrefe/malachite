@@ -8,9 +8,11 @@ use malachite_nz::natural::arithmetic::square::{
 };
 use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18};
-use inputs::natural::naturals;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18};
+use malachite_test::inputs::natural::naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_square_to_out_basecase);

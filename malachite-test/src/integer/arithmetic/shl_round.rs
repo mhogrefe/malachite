@@ -2,8 +2,10 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::triples_of_integer_small_signed_and_rounding_mode_var_1;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::integer::triples_of_integer_small_signed_and_rounding_mode_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_integer_shl_round_assign_i8);

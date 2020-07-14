@@ -1,34 +1,14 @@
-use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
-use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::integer::conversion::to_twos_complement_limbs::*;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
-use inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
-
-pub fn limbs_twos_complement_in_place_alt_1(limbs: &mut [Limb]) -> bool {
-    let i = limbs.iter().cloned().take_while(|&x| x == 0).count();
-    let len = limbs.len();
-    if i == len {
-        return true;
-    }
-    limbs[i].wrapping_neg_assign();
-    let j = i + 1;
-    if j != len {
-        limbs_not_in_place(&mut limbs[j..]);
-    }
-    false
-}
-
-pub fn limbs_twos_complement_in_place_alt_2(limbs: &mut [Limb]) -> bool {
-    let carry = limbs_sub_limb_in_place(limbs, 1);
-    limbs_not_in_place(limbs);
-    carry
-}
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
+use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_twos_complement);

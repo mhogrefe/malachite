@@ -33,6 +33,7 @@ pub fn natural_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Natural, y: &N
 
 pub mod and;
 pub mod count_ones;
+pub mod from_bits;
 pub mod get_bit;
 pub mod hamming_distance;
 pub mod index_of_next_false_bit;

@@ -7,11 +7,13 @@ use malachite_nz::integer::logic::bit_access::{
 };
 use malachite_nz::platform::Limb;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_limb_vec_and_small_u64_var_3, pairs_of_unsigned_vec_and_small_unsigned_var_1,
 };
-use inputs::integer::pairs_of_integer_and_small_unsigned;
+use malachite_test::inputs::integer::pairs_of_integer_and_small_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_slice_clear_bit_neg);

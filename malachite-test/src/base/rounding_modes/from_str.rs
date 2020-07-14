@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use malachite_base::rounding_modes::RoundingMode;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{strings, strings_var_1};
+use malachite_test::inputs::base::{strings, strings_var_1};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_rounding_mode_from_str);

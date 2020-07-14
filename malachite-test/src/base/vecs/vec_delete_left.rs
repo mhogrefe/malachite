@@ -1,8 +1,10 @@
 use malachite_base::vecs::vec_delete_left;
 use malachite_nz::platform::Limb;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_usize_var_1;
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_usize_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_vec_delete_left);

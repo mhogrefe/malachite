@@ -3,9 +3,11 @@ use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::platform::Limb;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
-use inputs::integer::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
+use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
 };
 

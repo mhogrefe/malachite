@@ -6,9 +6,11 @@ use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_vec_next_power_of_two_in_place,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_unsigned_var_1;
-use inputs::natural::{naturals, rm_naturals};
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::natural::{naturals, rm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_next_power_of_two);

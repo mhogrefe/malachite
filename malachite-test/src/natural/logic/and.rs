@@ -9,12 +9,16 @@ use malachite_nz::natural::logic::and::{
 };
 use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
     pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
 };
-use inputs::natural::{nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals};
+use malachite_test::inputs::natural::{
+    nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals,
+};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_and_limb);

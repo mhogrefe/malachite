@@ -6,8 +6,8 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
 };
 use malachite_nz::platform::Limb;
 
-use common::GenerationMode;
-use inputs::base::triples_of_unsigned_vec_var_52;
+use malachite_test::common::GenerationMode;
+use malachite_test::inputs::base::triples_of_unsigned_vec_var_52;
 
 pub(crate) fn tune() -> Vec<String> {
     let result = compare_two(

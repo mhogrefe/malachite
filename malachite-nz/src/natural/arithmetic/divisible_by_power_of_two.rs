@@ -10,13 +10,13 @@ use platform::Limb;
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by 2 raised to a given power.
 ///
-/// This function assumes that `limbs` is nonempty and does not only contain zeros.
+/// This function assumes that `xs` is nonempty and does not only contain zeros.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = min(pow, `limbs.len()`)
+/// where n = min(pow, `xs.len()`)
 ///
 /// # Example
 /// ```
@@ -31,10 +31,10 @@ use platform::Limb;
 ///
 /// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, GMP 6.1.2, where a is non-negative.
 pub fn limbs_divisible_by_power_of_two(xs: &[Limb], pow: u64) -> bool {
-    let zero_limbs = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    zero_limbs < xs.len()
-        && slice_test_zero(&xs[..zero_limbs])
-        && xs[zero_limbs].divisible_by_power_of_two(pow & Limb::WIDTH_MASK)
+    let zeros = usize::exact_from(pow >> Limb::LOG_WIDTH);
+    zeros < xs.len()
+        && slice_test_zero(&xs[..zeros])
+        && xs[zeros].divisible_by_power_of_two(pow & Limb::WIDTH_MASK)
 }
 
 impl<'a> DivisibleByPowerOfTwo for &'a Natural {

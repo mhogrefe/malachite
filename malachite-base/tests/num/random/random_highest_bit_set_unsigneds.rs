@@ -1,6 +1,6 @@
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    disc_uniform_dist_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -10,15 +10,15 @@ use malachite_base::random::EXAMPLE_SEED;
 fn random_highest_bit_set_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) {
-    disc_uniform_dist_assertions(
+    uniform_primitive_integer_assertions(
         random_highest_bit_set_unsigneds(EXAMPLE_SEED),
-        &T::power_of_two(T::WIDTH - 1),
-        &T::MAX,
+        T::power_of_two(T::WIDTH - 1),
+        T::MAX,
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -48,7 +48,7 @@ fn test_random_highest_bit_set_unsigneds() {
         (210, 7925),
         (230, 7924),
     ];
-    let pop_median = NiceFloat(191.5);
+    let pop_median = (191, Some(192));
     let sample_median = (191, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(191.5),
@@ -88,7 +88,7 @@ fn test_random_highest_bit_set_unsigneds() {
         (34198, 51),
         (36279, 51),
     ];
-    let pop_median = NiceFloat(49151.5);
+    let pop_median = (49151, Some(49152));
     let sample_median = (49162, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(49151.5),
@@ -129,7 +129,7 @@ fn test_random_highest_bit_set_unsigneds() {
         (2248172201, 2),
         (2250885871, 2),
     ];
-    let pop_median = NiceFloat(3221225471.5);
+    let pop_median = (3221225471, Some(3221225472));
     let sample_median = (3220111243, Some(3220113439));
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(3221225471.5),
@@ -187,7 +187,7 @@ fn test_random_highest_bit_set_unsigneds() {
         (9223420250639904388, 1),
         (9223423782640535515, 1),
     ];
-    let pop_median = NiceFloat(1.3835058055282164e19);
+    let pop_median = (13835058055282163711, Some(13835058055282163712));
     let sample_median = (13835015978121017591, Some(13835016964896634362));
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.3835058055282164e19),
@@ -245,7 +245,10 @@ fn test_random_highest_bit_set_unsigneds() {
         (170142818348199748232299322264932053448, 1),
         (170143268636071676474898792639923408007, 1),
     ];
-    let pop_median = NiceFloat(2.5521177519070385e38);
+    let pop_median = (
+        255211775190703847597530955573826158591,
+        Some(255211775190703847597530955573826158592),
+    );
     let sample_median = (
         255126542430357640405925855455171138421,
         Some(255126579172819401755185863236353147245),

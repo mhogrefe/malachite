@@ -1,8 +1,8 @@
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
 
-use common::{DemoBenchRegistry, NoSpecialGenerationMode};
-use inputs::base::triples_of_unsigned_vec_usize_usize_var_1;
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
+use malachite_test::inputs::base::triples_of_unsigned_vec_usize_usize_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_split_into_chunks);

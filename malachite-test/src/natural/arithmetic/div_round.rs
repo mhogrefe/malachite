@@ -6,9 +6,11 @@ use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use num::Integer;
 use rug::ops::DivRounding;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1;
-use inputs::natural::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1;
+use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
     rm_pairs_of_natural_and_positive_natural,
     triples_of_natural_positive_natural_and_rounding_mode_var_1,

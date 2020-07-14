@@ -3,9 +3,11 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::platform::Limb;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::vecs_of_unsigned_var_1;
-use inputs::natural::{naturals, nrm_naturals};
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::vecs_of_unsigned_var_1;
+use malachite_test::inputs::natural::{naturals, nrm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_significant_bits);

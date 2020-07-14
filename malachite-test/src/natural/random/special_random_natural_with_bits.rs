@@ -4,10 +4,10 @@ use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string_binary};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::small_unsigneds;
+use malachite_test::inputs::base::small_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_natural_special_random_natural_with_bits);

@@ -2,8 +2,10 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::integer::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_signed, pairs_of_integer_and_small_unsigned,
     rm_pairs_of_integer_and_small_signed, rm_pairs_of_integer_and_small_unsigned,
 };

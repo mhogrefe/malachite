@@ -9,8 +9,10 @@ use malachite_nz_test_util::natural::comparison::partial_ord_primitive_integer::
 use num::BigUint;
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::natural::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_signed, pairs_of_natural_and_unsigned,
     pairs_of_signed_and_natural, pairs_of_unsigned_and_natural, rm_pairs_of_natural_and_signed,
     rm_pairs_of_signed_and_natural, rm_pairs_of_unsigned_and_natural,

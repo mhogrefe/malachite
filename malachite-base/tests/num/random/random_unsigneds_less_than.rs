@@ -1,6 +1,6 @@
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    disc_uniform_dist_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -11,15 +11,15 @@ fn random_unsigneds_less_than_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     limit: T,
     expected_values: &[T],
     expected_common_values: &[(T, usize)],
-    expected_pop_median: NiceFloat<f64>,
+    expected_pop_median: (T, Option<T>),
     expected_sample_median: (T, Option<T>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) {
-    disc_uniform_dist_assertions(
+    uniform_primitive_integer_assertions(
         random_unsigneds_less_than(EXAMPLE_SEED, limit),
-        &T::ZERO,
-        &limit.wrapping_sub(T::ONE),
+        T::ZERO,
+        limit.wrapping_sub(T::ONE),
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -35,7 +35,7 @@ fn test_random_unsigneds_less_than() {
     // u8, limit = 1
     let values = &[0; 20];
     let common_values = &[(0, 1_000_000)];
-    let pop_median = NiceFloat(0.0);
+    let pop_median = (0, None);
     let sample_median = (0, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(0.0),
@@ -62,7 +62,7 @@ fn test_random_unsigneds_less_than() {
     // u16, limit = 2
     let values = &[1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0];
     let common_values = &[(1, 500473), (0, 499527)];
-    let pop_median = NiceFloat(0.5);
+    let pop_median = (0, Some(1));
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(0.5),
@@ -89,7 +89,7 @@ fn test_random_unsigneds_less_than() {
     // u32, limit = 3
     let values = &[1, 0, 1, 2, 1, 1, 0, 1, 0, 2, 1, 0, 1, 2, 2, 0, 1, 0, 2, 2];
     let common_values = &[(1, 333784), (2, 333516), (0, 332700)];
-    let pop_median = NiceFloat(1.0);
+    let pop_median = (1, None);
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.0),
@@ -116,7 +116,7 @@ fn test_random_unsigneds_less_than() {
     // u64, limit = 4
     let values = &[1, 0, 3, 1, 3, 3, 2, 3, 1, 1, 0, 1, 0, 3, 2, 1, 0, 1, 2, 3];
     let common_values = &[(1, 250314), (3, 250015), (2, 249955), (0, 249716)];
-    let pop_median = NiceFloat(1.5);
+    let pop_median = (1, Some(2));
     let sample_median = (1, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(1.5),
@@ -154,7 +154,7 @@ fn test_random_unsigneds_less_than() {
         (7, 99715),
         (3, 99568),
     ];
-    let pop_median = NiceFloat(4.5);
+    let pop_median = (4, Some(5));
     let sample_median = (5, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(4.5),
@@ -194,7 +194,7 @@ fn test_random_unsigneds_less_than() {
         (36, 4035),
         (42, 4032),
     ];
-    let pop_median = NiceFloat(127.5);
+    let pop_median = (127, Some(128));
     let sample_median = (127, None);
     let pop_moment_stats = MomentStats {
         mean: NiceFloat(127.5),

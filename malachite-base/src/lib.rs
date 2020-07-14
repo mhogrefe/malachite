@@ -93,3 +93,4 @@ pub mod rounding_modes;
 pub mod slices;
 pub mod strings;
 pub mod vecs;
+pub mod voids;

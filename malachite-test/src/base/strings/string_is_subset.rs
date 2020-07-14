@@ -1,9 +1,9 @@
 use malachite_base::strings::string_is_subset;
 
-use common::{
+use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
 };
-use inputs::base::{pairs_of_ascii_strings, pairs_of_strings};
+use malachite_test::inputs::base::{pairs_of_ascii_strings, pairs_of_strings};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_string_is_subset);

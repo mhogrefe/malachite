@@ -42,16 +42,4 @@ macro_rules! impl_overflowing_mul {
         }
     };
 }
-
-impl_overflowing_mul!(u8);
-impl_overflowing_mul!(u16);
-impl_overflowing_mul!(u32);
-impl_overflowing_mul!(u64);
-impl_overflowing_mul!(u128);
-impl_overflowing_mul!(usize);
-impl_overflowing_mul!(i8);
-impl_overflowing_mul!(i16);
-impl_overflowing_mul!(i32);
-impl_overflowing_mul!(i64);
-impl_overflowing_mul!(i128);
-impl_overflowing_mul!(isize);
+apply_to_primitive_ints!(impl_overflowing_mul);

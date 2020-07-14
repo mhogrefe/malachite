@@ -1,4 +1,17 @@
-use num::arithmetic::traits::{ModSub, ModSubAssign};
+use num::arithmetic::traits::{ModSub, ModSubAssign, WrappingAdd, WrappingSub};
+
+#[inline]
+pub fn _mod_sub<T: Copy + Ord>(x: T, other: T, m: T) -> T
+where
+    T: WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>,
+{
+    let diff = x.wrapping_sub(other);
+    if x < other {
+        m.wrapping_add(diff)
+    } else {
+        diff
+    }
+}
 
 macro_rules! impl_mod_sub {
     ($t:ident) => {
@@ -22,12 +35,7 @@ macro_rules! impl_mod_sub {
             /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
             #[inline]
             fn mod_sub(self, other: $t, m: $t) -> $t {
-                let diff = self.wrapping_sub(other);
-                if self < other {
-                    m.wrapping_add(diff)
-                } else {
-                    diff
-                }
+                _mod_sub(self, other, m)
             }
         }
 
@@ -60,10 +68,4 @@ macro_rules! impl_mod_sub {
         }
     };
 }
-
-impl_mod_sub!(u8);
-impl_mod_sub!(u16);
-impl_mod_sub!(u32);
-impl_mod_sub!(u64);
-impl_mod_sub!(u128);
-impl_mod_sub!(usize);
+apply_to_unsigneds!(impl_mod_sub);

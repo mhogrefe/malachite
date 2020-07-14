@@ -14,14 +14,16 @@ use malachite_nz::integer::logic::xor::{
 };
 use malachite_nz_test_util::integer::logic::xor::{integer_xor_alt_1, integer_xor_alt_2};
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_and_unsigned_var_2,
     pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_7,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3,
 };
-use inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
+use malachite_test::inputs::integer::{pairs_of_integers, rm_pairs_of_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_neg_xor_limb);

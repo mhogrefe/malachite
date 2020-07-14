@@ -9,8 +9,10 @@ use malachite_base_test_util::num::logic::bit_convertible::{
 };
 use rand::Rand;
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     signeds, unsigneds, vecs_of_bool_var_2, vecs_of_bool_var_3, vecs_of_bool_var_4,
     vecs_of_bool_var_5,
 };

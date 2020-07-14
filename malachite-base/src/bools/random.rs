@@ -30,9 +30,11 @@ impl Iterator for RandomBools {
 
 /// Generates a random `bool` that has an equal probability of being `true` or `false`.
 ///
-/// Time: worst case O(1)
+/// Length is infinite.
 ///
-/// Additional memory: worst case O(1)
+/// Time per iteration: worst case O(1)
+///
+/// Additional memory per iteration: worst case O(1)
 ///
 /// # Examples
 /// ```

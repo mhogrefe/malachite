@@ -14,15 +14,17 @@ use malachite_nz_test_util::natural::arithmetic::sub::{
     limbs_sub_same_length_to_out_with_overlap_naive,
 };
 
-use common::{m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType};
-use inputs::base::{
+use malachite_test::common::{
+    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
+};
+use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_usize_var_1, pairs_of_unsigned_vec_and_unsigned,
     pairs_of_unsigned_vec_var_1, pairs_of_unsigned_vec_var_3,
     triples_of_unsigned_vec_unsigned_and_small_usize_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_3,
     triples_of_unsigned_vec_var_9,
 };
-use inputs::natural::{
+use malachite_test::inputs::natural::{
     nrm_pairs_of_naturals_var_1, pairs_of_naturals_var_1, rm_pairs_of_naturals_var_1,
 };
 

@@ -1,4 +1,4 @@
-use common::DemoBenchRegistry;
+use malachite_test::common::DemoBenchRegistry;
 
 pub mod abs_comparators;
 pub mod cmp_abs_and_partial_cmp_abs;
