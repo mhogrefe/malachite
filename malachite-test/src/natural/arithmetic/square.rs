@@ -4,14 +4,17 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
-    _limbs_square_to_out_toom_2_scratch_len,
+    _limbs_square_to_out_toom_2_scratch_len, _limbs_square_to_out_toom_3,
+    _limbs_square_to_out_toom_3_scratch_len,
 };
 use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
 
 use malachite_test::common::{
     m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
 };
-use malachite_test::inputs::base::{pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18, pairs_of_unsigned_vec_var_19,
+};
 use malachite_test::inputs::natural::naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -28,6 +31,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_square_to_out_toom_2_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_square_to_out_toom_3_algorithms
     );
     register_bench!(registry, Large, benchmark_natural_square_assign);
     register_bench!(registry, Large, benchmark_natural_square_algorithms);
@@ -116,10 +124,43 @@ fn benchmark_limbs_square_to_out_toom_2_algorithms(
                 &mut (|(mut out, xs)| _limbs_square_to_out_basecase_unrestricted(&mut out, &xs)),
             ),
             (
-                "Toom22",
+                "Toom2",
                 &mut (|(mut out, xs)| {
                     let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
                     _limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
+                }),
+            ),
+        ],
+    );
+}
+
+fn benchmark_limbs_square_to_out_toom_3_algorithms(
+    gm: GenerationMode,
+    limit: usize,
+    file_name: &str,
+) {
+    m_run_benchmark(
+        "_limbs_square_to_out_toom_3(&mut [Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_var_19(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "Toom2",
+                &mut (|(mut out, xs)| {
+                    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
+                    _limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
+                }),
+            ),
+            (
+                "Toom3",
+                &mut (|(mut out, xs)| {
+                    let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(xs.len())];
+                    _limbs_square_to_out_toom_3(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],

@@ -222,3 +222,54 @@ fn test_geometric_random_positive_signeds() {
         sample_moment_stats,
     );
 }
+
+macro_rules! geometric_random_positive_signeds_fail {
+    (
+        $t:ident,
+        $geometric_random_positive_signeds_fail_1:ident,
+        $geometric_random_positive_signeds_fail_2:ident
+    ) => {
+        #[test]
+        #[should_panic]
+        fn $geometric_random_positive_signeds_fail_1() {
+            geometric_random_positive_signeds::<$t>(EXAMPLE_SEED, 1, 0);
+        }
+
+        #[test]
+        #[should_panic]
+        fn $geometric_random_positive_signeds_fail_2() {
+            geometric_random_positive_signeds::<$t>(EXAMPLE_SEED, 2, 3);
+        }
+    };
+}
+
+geometric_random_positive_signeds_fail!(
+    i8,
+    geometric_random_positive_signeds_i8_fail_1,
+    geometric_random_positive_signeds_i8_fail_2
+);
+geometric_random_positive_signeds_fail!(
+    i16,
+    geometric_random_positive_signeds_i16_fail_1,
+    geometric_random_positive_signeds_i16_fail_2
+);
+geometric_random_positive_signeds_fail!(
+    i32,
+    geometric_random_positive_signeds_i32_fail_1,
+    geometric_random_positive_signeds_i32_fail_2
+);
+geometric_random_positive_signeds_fail!(
+    i64,
+    geometric_random_positive_signeds_i64_fail_1,
+    geometric_random_positive_signeds_i64_fail_2
+);
+geometric_random_positive_signeds_fail!(
+    i128,
+    geometric_random_positive_signeds_i128_fail_1,
+    geometric_random_positive_signeds_i128_fail_2
+);
+geometric_random_positive_signeds_fail!(
+    isize,
+    geometric_random_positive_signeds_isize_fail_1,
+    geometric_random_positive_signeds_isize_fail_2
+);

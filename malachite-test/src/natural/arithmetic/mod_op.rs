@@ -9,15 +9,15 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
-    _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3, _limbs_mod_limb_any_leading_zeros,
-    _limbs_mod_limb_any_leading_zeros_1, _limbs_mod_limb_any_leading_zeros_2,
-    _limbs_mod_limb_at_least_1_leading_zero, _limbs_mod_limb_at_least_2_leading_zeros,
-    _limbs_mod_limb_small_normalized, _limbs_mod_limb_small_normalized_large,
-    _limbs_mod_limb_small_small, _limbs_mod_limb_small_unnormalized,
-    _limbs_mod_limb_small_unnormalized_large, _limbs_mod_schoolbook, limbs_mod,
-    limbs_mod_by_two_limb_normalized, limbs_mod_limb, limbs_mod_three_limb_by_two_limb,
-    limbs_mod_to_out,
+    _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
+    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
+    _limbs_mod_limb_small_normalized_large, _limbs_mod_limb_small_small,
+    _limbs_mod_limb_small_unnormalized, _limbs_mod_limb_small_unnormalized_large,
+    _limbs_mod_schoolbook, limbs_mod, limbs_mod_by_two_limb_normalized, limbs_mod_limb,
+    limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
 };
+use malachite_nz_test_util::natural::arithmetic::mod_op::_limbs_mod_limb_alt_3;
 use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
 use num::Integer;
 use rug::ops::RemRounding;

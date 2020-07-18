@@ -105,8 +105,8 @@ fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
     limbs_mul_same_length_to_out(scratch, xs, ys);
     split_into_chunks_mut!(scratch, n, [scratch_lo, scratch_hi], _unused);
     if limbs_add_same_length_to_out(out, scratch_lo, scratch_hi) {
-        // If cy == 1, then the value of out is at most B ^ n - 2, so there can be no overflow when
-        // adding in the carry.
+        // If carry == 1, then the value of out is at most B ^ n - 2, so there can be no overflow
+        // when adding in the carry.
         limbs_slice_add_limb_in_place(&mut out[..n], 1);
     }
 }

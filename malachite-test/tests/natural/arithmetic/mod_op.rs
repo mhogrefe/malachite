@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_nz::natural::arithmetic::div_mod::_limbs_div_mod_barrett_scratch_len;
 use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
-    _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
     _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
     _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
     _limbs_mod_limb_small_unnormalized, _limbs_mod_schoolbook, limbs_mod,
@@ -18,6 +18,7 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
+use malachite_nz_test_util::natural::arithmetic::mod_op::_limbs_mod_limb_alt_3;
 use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
 use num::Integer;
 use rug::ops::RemRounding;

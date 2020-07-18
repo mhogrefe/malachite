@@ -43,15 +43,4 @@ macro_rules! impl_parity {
         }
     };
 }
-impl_parity!(u8);
-impl_parity!(u16);
-impl_parity!(u32);
-impl_parity!(u64);
-impl_parity!(u128);
-impl_parity!(usize);
-impl_parity!(i8);
-impl_parity!(i16);
-impl_parity!(i32);
-impl_parity!(i64);
-impl_parity!(i128);
-impl_parity!(isize);
+apply_to_primitive_ints!(impl_parity);

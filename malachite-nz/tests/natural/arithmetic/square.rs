@@ -3735,13 +3735,13 @@ fn test_limbs_square_to_out_toom_3() {
     #[cfg(feature = "32_bit_limbs")]
     {
         test(&[0; 3], &[10; 7], &[0, 0, 0, 0, 0, 0, 10]);
-        // cy != 0 || limbs_cmp_same_length(gp, &xs_1[..n]) != Ordering::Less
+        // carry != 0 || limbs_cmp_same_length(scratch_lo, xs_1) != Ordering::Less
         // s == n
         // SMALLER_RECURSION_TOOM_3
         // TOOM3_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD in
         //      _limbs_square_to_out_toom_3_recursive
-        // SMALLER_RECURSION_TOOM_3 && asm1[n] == 0
-        // SMALLER_RECURSION_TOOM_3 && as1[n] == 0
+        // SMALLER_RECURSION_TOOM_3 && *asm1_last == 0
+        // SMALLER_RECURSION_TOOM_3 && *as1_last == 0
         test(&[1; 3], &[10; 7], &[1, 2, 3, 2, 1, 0, 10]);
         // s != n
         test(&[1; 5], &[10; 11], &[1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 10]);
@@ -3750,13 +3750,13 @@ fn test_limbs_square_to_out_toom_3() {
             &[10; 7],
             &[15_129, 112_176, 402_030, 719_568, 622_521, 0, 10],
         );
-        // cy == 0 && limbs_cmp_same_length(gp, &xs_1[..n]) == Ordering::Less
+        // carry == 0 && limbs_cmp_same_length(scratch_lo, xs_1) == Ordering::Less
         test(
             &[0, 0, 0, 1, 1],
             &[10; 12],
             &[0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 10, 10],
         );
-        // SMALLER_RECURSION_TOOM_3 && as1[n] == 1
+        // SMALLER_RECURSION_TOOM_3 && *as1_last == 1
         test(
             &[
                 565_087_108,
@@ -3784,7 +3784,7 @@ fn test_limbs_square_to_out_toom_3() {
                 10,
             ],
         );
-        // SMALLER_RECURSION_TOOM_3 && asm1[n] != 0
+        // SMALLER_RECURSION_TOOM_3 && *asm1_last != 0
         test(
             &[
                 1_863_564_690,
@@ -3848,7 +3848,7 @@ fn test_limbs_square_to_out_toom_3() {
                 10,
             ],
         );
-        // SMALLER_RECURSION_TOOM_3 && as1[n] != 1 && as1[n] != 0
+        // SMALLER_RECURSION_TOOM_3 && *as1_last != 1 && *as1_last != 0
         test(
             &[
                 1_340_632_901,

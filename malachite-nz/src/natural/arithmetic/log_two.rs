@@ -9,14 +9,14 @@ use platform::Limb;
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// floor of the base-2 logarithm of the `Natural`.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -32,16 +32,16 @@ pub fn limbs_floor_log_two(xs: &[Limb]) -> u64 {
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// ceiling of the base-2 logarithm of the `Natural`.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```

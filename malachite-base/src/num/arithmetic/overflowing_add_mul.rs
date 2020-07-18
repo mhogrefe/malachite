@@ -72,7 +72,6 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-#[allow(unstable_name_collisions)]
 pub fn _overflowing_add_mul_signed<U: PrimitiveInteger, S: Copy + Eq + Ord + Zero>(
     x: S,
     y: S,

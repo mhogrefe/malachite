@@ -34,12 +34,7 @@ macro_rules! impl_power_of_two_unsigned {
         }
     };
 }
-impl_power_of_two_unsigned!(u8);
-impl_power_of_two_unsigned!(u16);
-impl_power_of_two_unsigned!(u32);
-impl_power_of_two_unsigned!(u64);
-impl_power_of_two_unsigned!(u128);
-impl_power_of_two_unsigned!(usize);
+apply_to_unsigneds!(impl_power_of_two_unsigned);
 
 #[inline]
 pub fn _power_of_two_signed<T: PrimitiveInteger>(pow: u64) -> T {
@@ -74,9 +69,4 @@ macro_rules! impl_power_of_two_signed {
         }
     };
 }
-impl_power_of_two_signed!(i8);
-impl_power_of_two_signed!(i16);
-impl_power_of_two_signed!(i32);
-impl_power_of_two_signed!(i64);
-impl_power_of_two_signed!(i128);
-impl_power_of_two_signed!(isize);
+apply_to_signeds!(impl_power_of_two_signed);

@@ -1841,10 +1841,10 @@ pub fn _limbs_mul_greater_to_out_toom_53(
     }
     // Compute bs2 and bsm2.
     let (out_lo_last, out_lo_init) = out_lo.split_last_mut().unwrap();
-    let cy = limbs_shl_to_out(out_lo_init, ys_2, 2);
+    let carry = limbs_shl_to_out(out_lo_init, ys_2, 2);
     let (bs2_last, bs2_init) = bs2.split_last_mut().unwrap();
     *bs2_last = Limb::iverson(limbs_add_to_out(bs2_init, ys_0, &out_lo_init[..t]));
-    assert!(!limbs_slice_add_limb_in_place(&mut bs2[t..], cy));
+    assert!(!limbs_slice_add_limb_in_place(&mut bs2[t..], carry));
     *out_lo_last = limbs_shl_to_out(out_lo_init, ys_1, 1);
     if limbs_cmp_same_length(bs2, out_lo) == Ordering::Less {
         assert!(!limbs_sub_same_length_to_out(bsm2, out_lo, bs2));

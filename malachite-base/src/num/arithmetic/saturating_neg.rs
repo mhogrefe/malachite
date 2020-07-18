@@ -5,34 +5,12 @@ macro_rules! impl_saturating_neg {
         impl SaturatingNeg for $t {
             type Output = $t;
 
-            /// Computes `-self`, saturating at the numeric bounds instead of overflowing. For
-            /// signed types, that means that this is ordinary negation, except that the negative
-            /// of the smallest representable value is the largest representable value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingNeg;
-            ///
-            /// assert_eq!(0i8.saturating_neg(), 0);
-            /// assert_eq!(100i64.saturating_neg(), -100);
-            /// assert_eq!((-100i64).saturating_neg(), 100);
-            /// assert_eq!((-128i8).saturating_neg(), 127);
-            /// ```
             #[inline]
             fn saturating_neg(self) -> $t {
-                if self == $t::MIN {
-                    $t::MAX
-                } else {
-                    -self
-                }
+                $t::saturating_neg(self)
             }
         }
 
-        #[allow(unstable_name_collisions)]
         impl SaturatingNegAssign for $t {
             /// Replaces `self` with its negative, saturating at the numeric bounds instead of
             /// overflowing.

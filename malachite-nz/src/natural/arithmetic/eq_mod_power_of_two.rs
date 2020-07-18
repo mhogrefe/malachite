@@ -9,8 +9,6 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-//TODO clean
-
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
 /// the `pow` least-significant bits of the `Natural` and the limb are equal.
@@ -41,7 +39,8 @@ pub fn limbs_eq_limb_mod_power_of_two(xs: &[Limb], y: Limb, pow: u64) -> bool {
     } else if i == 0 {
         xs[0].eq_mod_power_of_two(y, pow)
     } else {
-        xs[0] == y && limbs_divisible_by_power_of_two(&xs[1..], pow - Limb::WIDTH)
+        let (xs_head, xs_tail) = xs.split_first().unwrap();
+        *xs_head == y && limbs_divisible_by_power_of_two(xs_tail, pow - Limb::WIDTH)
     }
 }
 
@@ -52,7 +51,9 @@ fn limbs_eq_mod_power_of_two_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> 
     if i >= len {
         xs == ys
     } else {
-        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & Limb::WIDTH_MASK)
+        let (xs_last, xs_init) = xs[..i + 1].split_last().unwrap();
+        let (ys_last, ys_init) = ys[..i + 1].split_last().unwrap();
+        xs_init == ys_init && xs_last.eq_mod_power_of_two(*ys_last, pow & Limb::WIDTH_MASK)
     }
 }
 
@@ -64,13 +65,16 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
     if i >= xs_len {
         false
     } else if i >= ys_len {
-        &xs[..ys_len] == ys
+        let (xs_lo, xs_hi) = xs.split_at(ys_len);
+        xs_lo == ys
             && limbs_divisible_by_power_of_two(
-                &xs[ys_len..],
+                xs_hi,
                 pow - Limb::WIDTH * u64::wrapping_from(ys_len),
             )
     } else {
-        xs[..i] == ys[..i] && xs[i].eq_mod_power_of_two(ys[i], pow & Limb::WIDTH_MASK)
+        let (xs_last, xs_init) = xs[..i + 1].split_last().unwrap();
+        let (ys_last, ys_init) = ys[..i + 1].split_last().unwrap();
+        xs_init == ys_init && xs_last.eq_mod_power_of_two(*ys_last, pow & Limb::WIDTH_MASK)
     }
 }
 

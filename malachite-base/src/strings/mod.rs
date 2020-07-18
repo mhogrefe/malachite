@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use std::fmt::Debug;
+use std::fmt::{Binary, Debug};
 
 use named::Named;
 
@@ -104,5 +104,34 @@ where
     #[inline]
     fn to_debug_string(&self) -> String {
         format!("{:?}", self)
+    }
+}
+
+/// A trait that provides an ergonomic way to create the string specified by a `Binary`
+/// implementation.
+pub trait ToBinaryString: Binary {
+    fn to_binary_string(&self) -> String;
+}
+
+impl<T> ToBinaryString for T
+where
+    T: Binary,
+{
+    /// Returns the `String` produced by `T`s `Binary` implementation.
+    ///
+    /// Time: depends on `Debug` implementation
+    ///
+    /// Additional memory: depends on `Binary` implementation
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::ToBinaryString;
+    ///
+    /// assert_eq!(5u64.to_binary_string(), "101");
+    /// assert_eq!((-100i16).to_binary_string(), "1111111110011100");
+    /// ```
+    #[inline]
+    fn to_binary_string(&self) -> String {
+        format!("{:b}", self)
     }
 }

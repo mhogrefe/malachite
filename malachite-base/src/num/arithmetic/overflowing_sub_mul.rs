@@ -1,9 +1,18 @@
 use num::arithmetic::traits::{
-    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, UnsignedAbs,
+    OverflowingMul, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
+    OverflowingSubMulAssign, UnsignedAbs, WrappingMul, WrappingSub,
 };
 use num::basic::integers::PrimitiveInteger;
+use num::basic::traits::Zero;
 
-//TODO
+pub fn _overflowing_sub_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
+where
+    T: OverflowingMul<T, Output = T> + OverflowingSub<T, Output = T>,
+{
+    let (product, overflow_1) = y.overflowing_mul(z);
+    let (result, overflow_2) = x.overflowing_sub(product);
+    (result, overflow_1 | overflow_2)
+}
 
 macro_rules! impl_overflowing_sub_mul_unsigned {
     ($t:ident) => {
@@ -26,9 +35,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
             /// ```
             #[inline]
             fn overflowing_sub_mul(self, y: $t, z: $t) -> ($t, bool) {
-                let (product, overflow_1) = y.overflowing_mul(z);
-                let (result, overflow_2) = self.overflowing_sub(product);
-                (result, overflow_1 | overflow_2)
+                _overflowing_sub_mul_unsigned(self, y, z)
             }
         }
 
@@ -62,13 +69,47 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
         }
     };
 }
+apply_to_unsigneds!(impl_overflowing_sub_mul_unsigned);
 
-impl_overflowing_sub_mul_unsigned!(u8);
-impl_overflowing_sub_mul_unsigned!(u16);
-impl_overflowing_sub_mul_unsigned!(u32);
-impl_overflowing_sub_mul_unsigned!(u64);
-impl_overflowing_sub_mul_unsigned!(u128);
-impl_overflowing_sub_mul_unsigned!(usize);
+pub fn _overflowing_sub_mul<U: PrimitiveInteger, S: Copy + Ord + Zero>(
+    x: S,
+    y: S,
+    z: S,
+) -> (S, bool)
+where
+    S: OverflowingMul<S, Output = S>
+        + OverflowingSub<S, Output = S>
+        + UnsignedAbs<Output = U>
+        + WrappingMul<S, Output = S>
+        + WrappingSub<S, Output = S>,
+{
+    if y == S::ZERO || z == S::ZERO {
+        return (x, false);
+    }
+    let x_sign = x >= S::ZERO;
+    if x_sign == ((y >= S::ZERO) != (z >= S::ZERO)) {
+        let (product, overflow_1) = y.overflowing_mul(z);
+        let (result, overflow_2) = x.overflowing_sub(product);
+        (result, overflow_1 | overflow_2)
+    } else {
+        let result = x.wrapping_sub(y.wrapping_mul(z));
+        let overflow = {
+            let x = x.unsigned_abs();
+            match y.unsigned_abs().checked_mul(z.unsigned_abs()) {
+                Some(product) => {
+                    x < product
+                        && if x_sign {
+                            !x.wrapping_sub(product).get_highest_bit()
+                        } else {
+                            product.wrapping_sub(x).get_highest_bit()
+                        }
+                }
+                None => true,
+            }
+        };
+        (result, overflow)
+    }
+}
 
 macro_rules! impl_overflowing_sub_mul_signed {
     ($t:ident) => {
@@ -90,34 +131,8 @@ macro_rules! impl_overflowing_sub_mul_signed {
             /// assert_eq!((-127i8).overflowing_sub_mul(2, 100), (-71, true));
             /// ```
             #[inline]
-            #[allow(unstable_name_collisions)]
             fn overflowing_sub_mul(self, y: $t, z: $t) -> ($t, bool) {
-                if y == 0 || z == 0 {
-                    return (self, false);
-                }
-                let x_sign = self >= 0;
-                if x_sign == ((y >= 0) != (z >= 0)) {
-                    let (product, overflow_1) = y.overflowing_mul(z);
-                    let (result, overflow_2) = self.overflowing_sub(product);
-                    (result, overflow_1 | overflow_2)
-                } else {
-                    let result = self.wrapping_sub(y.wrapping_mul(z));
-                    let overflow = {
-                        let x = self.unsigned_abs();
-                        match y.unsigned_abs().checked_mul(z.unsigned_abs()) {
-                            Some(product) => {
-                                x < product
-                                    && if x_sign {
-                                        !x.wrapping_sub(product).get_highest_bit()
-                                    } else {
-                                        product.wrapping_sub(x).get_highest_bit()
-                                    }
-                            }
-                            None => true,
-                        }
-                    };
-                    (result, overflow)
-                }
+                _overflowing_sub_mul(self, y, z)
             }
         }
 
@@ -152,10 +167,4 @@ macro_rules! impl_overflowing_sub_mul_signed {
         }
     };
 }
-
-impl_overflowing_sub_mul_signed!(i8);
-impl_overflowing_sub_mul_signed!(i16);
-impl_overflowing_sub_mul_signed!(i32);
-impl_overflowing_sub_mul_signed!(i64);
-impl_overflowing_sub_mul_signed!(i128);
-impl_overflowing_sub_mul_signed!(isize);
+apply_to_signeds!(impl_overflowing_sub_mul_signed);

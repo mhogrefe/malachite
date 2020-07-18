@@ -3,6 +3,8 @@ use num::arithmetic::traits::{
 };
 use rounding_modes::RoundingMode;
 
+//TODO clean
+
 macro_rules! impl_round_to_multiple_of_power_of_two {
     ($t:ident) => {
         impl RoundToMultipleOfPowerOfTwo<u64> for $t {

@@ -1,8 +1,76 @@
 use std::cmp::Ordering;
+use std::fmt::Display;
+use std::ops::{Rem, Shr, Sub};
 
-use num::arithmetic::traits::{Parity, RoundToMultiple, RoundToMultipleAssign, UnsignedAbs};
+use comparison::traits::Min;
+use num::arithmetic::traits::{
+    CheckedAdd, CheckedNeg, OverflowingAdd, Parity, RoundToMultiple, RoundToMultipleAssign,
+    UnsignedAbs,
+};
+use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
+use num::logic::traits::TrailingZeros;
 use rounding_modes::RoundingMode;
+
+pub fn _round_to_multiple_unsigned<T: Copy + Display + Eq + Ord + Parity + TrailingZeros + Zero>(
+    x: T,
+    other: T,
+    rm: RoundingMode,
+) -> T
+where
+    T: CheckedAdd<T, Output = T>
+        + OverflowingAdd<T, Output = T>
+        + Rem<T, Output = T>
+        + Shr<u64, Output = T>
+        + Sub<T, Output = T>,
+{
+    match (x, other) {
+        (x, y) if x == y => x,
+        (x, y) if y == T::ZERO => match rm {
+            RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => T::ZERO,
+            _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
+        },
+        (x, y) => {
+            let r = x % y;
+            if r == T::ZERO {
+                x
+            } else {
+                let floor = x - r;
+                match rm {
+                    RoundingMode::Down | RoundingMode::Floor => floor,
+                    RoundingMode::Up | RoundingMode::Ceiling => floor.checked_add(y).unwrap(),
+                    RoundingMode::Nearest => {
+                        match r.cmp(&(y >> 1)) {
+                            Ordering::Less => floor,
+                            Ordering::Greater => floor.checked_add(y).unwrap(),
+                            Ordering::Equal => {
+                                if y.odd() {
+                                    floor
+                                } else {
+                                    // The even multiple of y will have more trailing zeros.
+                                    let (ceiling, overflow) = floor.overflowing_add(y);
+                                    if floor.trailing_zeros() > ceiling.trailing_zeros() {
+                                        floor
+                                    } else if overflow {
+                                        panic!(
+                                            "Cannot round {} to {} using RoundingMode {}",
+                                            x, y, rm
+                                        );
+                                    } else {
+                                        ceiling
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    RoundingMode::Exact => {
+                        panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
+                    }
+                }
+            }
+        }
+    }
+}
 
 macro_rules! impl_round_to_multiple_unsigned {
     ($t:ident) => {
@@ -44,55 +112,9 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// assert_eq!(10usize.round_to_multiple(4, RoundingMode::Nearest), 8);
             /// assert_eq!(14u8.round_to_multiple(4, RoundingMode::Nearest), 16);
             /// ```
+            #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
-                match (self, other) {
-                    (x, y) if x == y => x,
-                    (x, 0) => match rm {
-                        RoundingMode::Down | RoundingMode::Floor | RoundingMode::Nearest => 0,
-                        _ => panic!("Cannot round {} to zero using RoundingMode {}", x, rm),
-                    }
-                    (x, y) => {
-                        let r = x % y;
-                        if r == 0 {
-                            x
-                        } else {
-                            let floor = x - r;
-                            match rm {
-                                RoundingMode::Down | RoundingMode::Floor => floor,
-                                RoundingMode::Up | RoundingMode::Ceiling => {
-                                    floor.checked_add(y).unwrap()
-                                }
-                                RoundingMode::Nearest => {
-                                    match r.cmp(&(y >> 1)) {
-                                        Ordering::Less => floor,
-                                        Ordering::Greater => floor.checked_add(y).unwrap(),
-                                        Ordering::Equal => if y.odd() {
-                                            floor
-                                        } else {
-                                            // The even multiple of y will have more trailing zeros.
-                                            let (ceiling, overflow) = floor.overflowing_add(y);
-                                            if floor.trailing_zeros() > ceiling.trailing_zeros() {
-                                                floor
-                                            } else if overflow {
-                                                panic!(
-                                                    "Cannot round {} to {} using RoundingMode {}",
-                                                    x,
-                                                    y,
-                                                    rm
-                                                );
-                                            } else {
-                                                ceiling
-                                            }
-                                        }
-                                    }
-                                },
-                                RoundingMode::Exact => {
-                                    panic!("Cannot round {} to {} using RoundingMode {}", x, y, rm)
-                                }
-                            }
-                        }
-                    }
-                }
+                _round_to_multiple_unsigned(self, other, rm)
             }
         }
 
@@ -161,12 +183,30 @@ macro_rules! impl_round_to_multiple_unsigned {
         }
     };
 }
-impl_round_to_multiple_unsigned!(u8);
-impl_round_to_multiple_unsigned!(u16);
-impl_round_to_multiple_unsigned!(u32);
-impl_round_to_multiple_unsigned!(u64);
-impl_round_to_multiple_unsigned!(u128);
-impl_round_to_multiple_unsigned!(usize);
+apply_to_unsigneds!(impl_round_to_multiple_unsigned);
+
+pub fn _round_to_multiple_signed<U: Eq, S: Copy + Min + Ord + Zero>(
+    x: S,
+    other: S,
+    rm: RoundingMode,
+) -> S
+where
+    U: RoundToMultiple<U, Output = U>,
+    S: CheckedNeg<Output = S> + ExactFrom<U> + UnsignedAbs<Output = U>,
+{
+    if x >= S::ZERO {
+        S::exact_from(x.unsigned_abs().round_to_multiple(other.unsigned_abs(), rm))
+    } else {
+        let abs_result = x
+            .unsigned_abs()
+            .round_to_multiple(other.unsigned_abs(), -rm);
+        if abs_result == S::MIN.unsigned_abs() {
+            S::MIN
+        } else {
+            S::exact_from(abs_result).checked_neg().unwrap()
+        }
+    }
+}
 
 macro_rules! impl_round_to_multiple_signed {
     ($t:ident) => {
@@ -215,22 +255,9 @@ macro_rules! impl_round_to_multiple_signed {
             /// assert_eq!((-10i8).round_to_multiple(-4, RoundingMode::Nearest), -8);
             /// assert_eq!((-14i16).round_to_multiple(-4, RoundingMode::Nearest), -16);
             /// ```
+            #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
-                if self >= 0 {
-                    $t::exact_from(
-                        self.unsigned_abs()
-                            .round_to_multiple(other.unsigned_abs(), rm),
-                    )
-                } else {
-                    let abs_result = self
-                        .unsigned_abs()
-                        .round_to_multiple(other.unsigned_abs(), -rm);
-                    if abs_result == $t::MIN.unsigned_abs() {
-                        $t::MIN
-                    } else {
-                        $t::exact_from(abs_result).checked_neg().unwrap()
-                    }
-                }
+                _round_to_multiple_signed(self, other, rm)
             }
         }
 
@@ -326,9 +353,4 @@ macro_rules! impl_round_to_multiple_signed {
         }
     };
 }
-impl_round_to_multiple_signed!(i8);
-impl_round_to_multiple_signed!(i16);
-impl_round_to_multiple_signed!(i32);
-impl_round_to_multiple_signed!(i64);
-impl_round_to_multiple_signed!(i128);
-impl_round_to_multiple_signed!(isize);
+apply_to_signeds!(impl_round_to_multiple_signed);

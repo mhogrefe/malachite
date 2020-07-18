@@ -18,25 +18,21 @@ use platform::{DoubleLimb, Limb};
 /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
 pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
-    let out_limbs = &mut [0; 3];
+    let out = &mut [0; 3];
     let bits = LeadingZeros::leading_zeros(m_1);
     if bits == 0 {
         xs[4] = 1;
-        assert!(!limbs_div_mod_by_two_limb_normalized(
-            out_limbs,
-            xs,
-            &[m_0, m_1]
-        ));
+        assert!(!limbs_div_mod_by_two_limb_normalized(out, xs, &[m_0, m_1]));
     } else {
         xs[4] = Limb::power_of_two(bits);
         assert!(!limbs_div_mod_by_two_limb_normalized(
-            out_limbs,
+            out,
             xs,
             &[m_0 << bits, (m_1 << bits) | (m_0 >> (Limb::WIDTH - bits))]
         ));
     }
-    assert_ne!(out_limbs[2], 0);
-    (out_limbs[2], out_limbs[1], out_limbs[0])
+    assert_ne!(out[2], 0);
+    (out[2], out[1], out[0])
 }
 
 /// Standard Barrett reduction: (set r = `Limb::WIDTH`)

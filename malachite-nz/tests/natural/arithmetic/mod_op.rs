@@ -6,6 +6,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::JoinHalves;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::mod_op::_limbs_mod_limb_alt_3;
 use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
 use num::{BigUint, Integer};
 use rug;
@@ -20,11 +22,10 @@ use malachite_nz::natural::arithmetic::mod_op::{
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_op::{
-    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_alt_3,
-    _limbs_mod_limb_any_leading_zeros_1, _limbs_mod_limb_any_leading_zeros_2,
-    _limbs_mod_limb_at_least_1_leading_zero, _limbs_mod_limb_at_least_2_leading_zeros,
-    _limbs_mod_limb_small_normalized, _limbs_mod_limb_small_unnormalized, limbs_mod_limb,
-    limbs_mod_three_limb_by_two_limb,
+    _limbs_mod_limb_alt_1, _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
+    _limbs_mod_limb_any_leading_zeros_2, _limbs_mod_limb_at_least_1_leading_zero,
+    _limbs_mod_limb_at_least_2_leading_zeros, _limbs_mod_limb_small_normalized,
+    _limbs_mod_limb_small_unnormalized, limbs_mod_limb, limbs_mod_three_limb_by_two_limb,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]

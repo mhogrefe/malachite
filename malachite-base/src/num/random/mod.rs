@@ -299,4 +299,5 @@ pub mod geometric;
 pub mod random_bit_chunks;
 pub mod random_highest_bit_set_values;
 pub mod random_unsigneds_less_than;
+pub mod striped;
 pub mod thrifty_random;

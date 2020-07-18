@@ -8,16 +8,16 @@ use platform::Limb;
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is an integer power of 2.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
