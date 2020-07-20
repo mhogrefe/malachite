@@ -21,6 +21,8 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+//TODO clean
+
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     xs.resize(
         usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)),

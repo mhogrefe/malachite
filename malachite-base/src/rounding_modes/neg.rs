@@ -1,6 +1,5 @@
-use std::ops::Neg;
-
 use rounding_modes::RoundingMode;
+use std::ops::Neg;
 
 /// Returns the negative of a `RoundingMode`. The negative is defined so that for an odd function f,
 /// f(x, -rm) = -f(-x, rm). Floor and ceiling are swapped, and the other modes are unchanged.

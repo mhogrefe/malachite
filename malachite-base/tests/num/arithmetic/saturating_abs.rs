@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn saturating_abs_helper<T: PrimitiveSigned>() {
+fn saturating_abs_assign_helper<T: PrimitiveSigned>() {
     let test = |n: T, out| {
         assert_eq!(n.saturating_abs(), out);
 
@@ -18,11 +18,6 @@ fn saturating_abs_helper<T: PrimitiveSigned>() {
 }
 
 #[test]
-fn test_saturating_abs() {
-    saturating_abs_helper::<i8>();
-    saturating_abs_helper::<i16>();
-    saturating_abs_helper::<i32>();
-    saturating_abs_helper::<i64>();
-    saturating_abs_helper::<i128>();
-    saturating_abs_helper::<isize>();
+fn test_saturating_abs_assign() {
+    apply_fn_to_signeds!(saturating_abs_assign_helper);
 }

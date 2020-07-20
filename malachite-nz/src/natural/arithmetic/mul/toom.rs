@@ -187,11 +187,9 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[inline]
 pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0
-        && xs_len > 1
-        && xs_len >= ys_len
-        && xs_len.shr_round(1, RoundingMode::Ceiling) < ys_len
+    xs_len >= ys_len && xs_len + 1 < ys_len << 1
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -201,9 +199,7 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
-/// 3. xs_len' < 2 * `ys`.len(), where xs_len' is `xs`.len() rounded up to the next even number.
-/// 4. `xs`.len() > 1
-/// 5. `ys`.len() > 0
+/// 3. `xs`.len() + 1 < 2 * `ys`.len()
 ///
 /// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
 ///
@@ -369,19 +365,9 @@ pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[inline]
 pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0 && xs_len >= ys_len + 2 && {
-        let n = 1 + if xs_len << 1 >= 3 * ys_len {
-            (xs_len - 1) / 3
-        } else {
-            (ys_len - 1) >> 1
-        };
-        xs_len >= n << 1
-            && ys_len <= n << 1
-            && xs_len + 6 <= 3 * ys_len
-            && xs_len <= ys_len + n
-            && xs_len + ys_len >= n << 2
-    }
+    xs_len > ys_len + 1 && (xs_len == 6 || ys_len > 4) && xs_len << 1 < 3 * (ys_len + 1)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -390,9 +376,9 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_32_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
-/// 2. `xs`.len() >= `ys`.len()
-/// 3. Others; see `_limbs_mul_greater_to_out_toom_32_input_sizes_valid`. The gist is that `xs` must
-/// be less than 3 times as long as `ys`.
+/// 2. `xs`.len() > `ys`.len() + 1
+/// 4. `xs`.len() == 6 or `ys`.len() > 4
+/// 3. 2 * `xs`.len() < 3 * (`ys`.len() + 1)
 ///
 /// This uses the Toom-32 aka Toom-2.5 algorithm.
 ///

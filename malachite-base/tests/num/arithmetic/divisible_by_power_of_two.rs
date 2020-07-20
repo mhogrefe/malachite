@@ -42,23 +42,6 @@ fn divisible_by_power_of_two_signed_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_divisible_by_power_of_two() {
-    divisible_by_power_of_two_primitive_helper::<u8>();
-    divisible_by_power_of_two_primitive_helper::<u16>();
-    divisible_by_power_of_two_primitive_helper::<u32>();
-    divisible_by_power_of_two_primitive_helper::<u64>();
-    divisible_by_power_of_two_primitive_helper::<u128>();
-    divisible_by_power_of_two_primitive_helper::<usize>();
-    divisible_by_power_of_two_primitive_helper::<i8>();
-    divisible_by_power_of_two_primitive_helper::<i16>();
-    divisible_by_power_of_two_primitive_helper::<i32>();
-    divisible_by_power_of_two_primitive_helper::<i64>();
-    divisible_by_power_of_two_primitive_helper::<i128>();
-    divisible_by_power_of_two_primitive_helper::<isize>();
-
-    divisible_by_power_of_two_signed_helper::<i8>();
-    divisible_by_power_of_two_signed_helper::<i16>();
-    divisible_by_power_of_two_signed_helper::<i32>();
-    divisible_by_power_of_two_signed_helper::<i64>();
-    divisible_by_power_of_two_signed_helper::<i128>();
-    divisible_by_power_of_two_signed_helper::<isize>();
+    apply_fn_to_primitive_ints!(divisible_by_power_of_two_primitive_helper);
+    apply_fn_to_signeds!(divisible_by_power_of_two_signed_helper);
 }

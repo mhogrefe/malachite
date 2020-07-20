@@ -25,12 +25,7 @@ fn exhaustive_nonzero_signeds_long_helper<T: PrimitiveSigned>(last_20: &[T]) {
 
 #[test]
 fn test_exhaustive_nonzero_signeds() {
-    exhaustive_nonzero_signeds_helper::<i8>();
-    exhaustive_nonzero_signeds_helper::<i16>();
-    exhaustive_nonzero_signeds_helper::<i32>();
-    exhaustive_nonzero_signeds_helper::<i64>();
-    exhaustive_nonzero_signeds_helper::<i128>();
-    exhaustive_nonzero_signeds_helper::<isize>();
+    apply_fn_to_signeds!(exhaustive_nonzero_signeds_helper);
 
     exhaustive_nonzero_signeds_long_helper::<i8>(&[
         -118, 119, -119, 120, -120, 121, -121, 122, -122, 123, -123, 124, -124, 125, -125, 126,

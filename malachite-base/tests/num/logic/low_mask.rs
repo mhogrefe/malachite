@@ -31,31 +31,9 @@ fn low_mask_signed_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_low_mask() {
-    low_mask_primitive_helper::<u8>();
-    low_mask_primitive_helper::<u16>();
-    low_mask_primitive_helper::<u32>();
-    low_mask_primitive_helper::<u64>();
-    low_mask_primitive_helper::<u128>();
-    low_mask_primitive_helper::<usize>();
-    low_mask_primitive_helper::<i8>();
-    low_mask_primitive_helper::<i16>();
-    low_mask_primitive_helper::<i32>();
-    low_mask_primitive_helper::<i64>();
-    low_mask_primitive_helper::<i128>();
-    low_mask_primitive_helper::<isize>();
-
-    low_mask_unsigned_helper::<u8>();
-    low_mask_unsigned_helper::<u16>();
-    low_mask_unsigned_helper::<u32>();
-    low_mask_unsigned_helper::<u64>();
-    low_mask_unsigned_helper::<u128>();
-    low_mask_unsigned_helper::<usize>();
-    low_mask_signed_helper::<i8>();
-    low_mask_signed_helper::<i16>();
-    low_mask_signed_helper::<i32>();
-    low_mask_signed_helper::<i64>();
-    low_mask_signed_helper::<i128>();
-    low_mask_signed_helper::<isize>();
+    apply_fn_to_primitive_ints!(low_mask_primitive_helper);
+    apply_fn_to_unsigneds!(low_mask_unsigned_helper);
+    apply_fn_to_signeds!(low_mask_signed_helper);
 }
 
 macro_rules! low_mask_fail {

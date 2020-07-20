@@ -113,10 +113,5 @@ fn mod_mul_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_mul() {
-    mod_mul_helper::<u8>();
-    mod_mul_helper::<u16>();
-    mod_mul_helper::<u32>();
-    mod_mul_helper::<u64>();
-    mod_mul_helper::<u128>();
-    mod_mul_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_mul_helper);
 }

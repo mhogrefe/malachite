@@ -11,10 +11,6 @@ extern crate rug;
 extern crate rust_wheels;
 
 pub mod base {
-    pub mod bools {
-        pub mod not_assign;
-    }
-
     pub mod chars {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;
@@ -27,12 +23,10 @@ pub mod base {
 
     pub mod num {
         pub mod arithmetic {
-            pub mod abs;
             pub mod add_mul;
             pub mod arithmetic_checked_shl;
             pub mod arithmetic_checked_shr;
             pub mod checked_add_mul;
-            pub mod checked_square;
             pub mod checked_sub_mul;
             pub mod div_exact;
             pub mod div_mod;
@@ -41,7 +35,6 @@ pub mod base {
             pub mod divisible_by_power_of_two;
             pub mod eq_mod;
             pub mod eq_mod_power_of_two;
-            pub mod log_two;
             pub mod mod_add;
             pub mod mod_is_reduced;
             pub mod mod_mul;
@@ -143,7 +136,6 @@ pub mod base {
             pub mod power_of_two_digit_iterable;
             pub mod power_of_two_digits;
             pub mod rotate;
-            pub mod significant_bits;
         }
     }
 
@@ -330,7 +322,6 @@ pub mod natural {
         pub mod floating_point_from_natural;
         pub mod from_floating_point;
         pub mod from_limbs;
-        pub mod from_primitive_integer;
         pub mod primitive_integer_from_natural;
         pub mod serde;
         pub mod to_limbs;

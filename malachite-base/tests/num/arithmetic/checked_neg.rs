@@ -14,10 +14,5 @@ fn checked_neg_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_checked_neg() {
-    checked_neg_helper::<i8>();
-    checked_neg_helper::<i16>();
-    checked_neg_helper::<i32>();
-    checked_neg_helper::<i64>();
-    checked_neg_helper::<i128>();
-    checked_neg_helper::<isize>();
+    apply_fn_to_signeds!(checked_neg_helper);
 }

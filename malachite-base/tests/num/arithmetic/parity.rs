@@ -25,25 +25,8 @@ fn even_signed_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_even() {
-    even_primitive_helper::<u8>();
-    even_primitive_helper::<u16>();
-    even_primitive_helper::<u32>();
-    even_primitive_helper::<u64>();
-    even_primitive_helper::<u128>();
-    even_primitive_helper::<usize>();
-    even_primitive_helper::<i8>();
-    even_primitive_helper::<i16>();
-    even_primitive_helper::<i32>();
-    even_primitive_helper::<i64>();
-    even_primitive_helper::<i128>();
-    even_primitive_helper::<isize>();
-
-    even_signed_helper::<i8>();
-    even_signed_helper::<i16>();
-    even_signed_helper::<i32>();
-    even_signed_helper::<i64>();
-    even_signed_helper::<i128>();
-    even_signed_helper::<isize>();
+    apply_fn_to_primitive_ints!(even_primitive_helper);
+    apply_fn_to_signeds!(even_signed_helper);
 }
 
 fn odd_primitive_helper<T: PrimitiveInteger>() {
@@ -70,23 +53,6 @@ fn odd_signed_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_odd() {
-    odd_primitive_helper::<u8>();
-    odd_primitive_helper::<u16>();
-    odd_primitive_helper::<u32>();
-    odd_primitive_helper::<u64>();
-    odd_primitive_helper::<u128>();
-    odd_primitive_helper::<usize>();
-    odd_primitive_helper::<i8>();
-    odd_primitive_helper::<i16>();
-    odd_primitive_helper::<i32>();
-    odd_primitive_helper::<i64>();
-    odd_primitive_helper::<i128>();
-    odd_primitive_helper::<isize>();
-
-    odd_signed_helper::<i8>();
-    odd_signed_helper::<i16>();
-    odd_signed_helper::<i32>();
-    odd_signed_helper::<i64>();
-    odd_signed_helper::<i128>();
-    odd_signed_helper::<isize>();
+    apply_fn_to_primitive_ints!(odd_primitive_helper);
+    apply_fn_to_signeds!(odd_signed_helper);
 }

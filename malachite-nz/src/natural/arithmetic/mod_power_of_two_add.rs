@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoShlAssign, ShrRound,
+    ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -52,7 +52,7 @@ pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Li
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -89,7 +89,7 @@ pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, 
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// Panics if `xs` is empty.
@@ -522,9 +522,8 @@ impl<'a, 'b> ModPowerOfTwoAdd<&'a Natural> for &'b Natural {
     /// ```
     fn mod_power_of_two_add(self, other: &'a Natural, pow: u64) -> Natural {
         match (self, other) {
-            //TODO use mod_power_of_two_shl
             (x, y) if x as *const Natural == y as *const Natural => {
-                (self << 1u64).mod_power_of_two(pow)
+                self.mod_power_of_two_shl(1, pow)
             }
             (x, &Natural(Small(y))) => x.mod_power_of_two_add_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_add_limb_ref(x, pow),

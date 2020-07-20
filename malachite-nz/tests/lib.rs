@@ -33,6 +33,7 @@
     clippy::unused_self
 )]
 
+#[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 extern crate malachite_nz;

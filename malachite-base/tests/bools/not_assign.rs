@@ -1,3 +1,5 @@
+use malachite_base_test_util::generators::bool_gen;
+
 use malachite_base::num::logic::traits::NotAssign;
 
 #[test]
@@ -8,4 +10,16 @@ fn test_bool_not_assign() {
     };
     test(false, true);
     test(true, false);
+}
+
+#[test]
+fn bool_not_assign_properties() {
+    bool_gen().test_properties(|b| {
+        let mut mut_b = b;
+        mut_b.not_assign();
+        assert_ne!(mut_b, b);
+        assert_eq!(mut_b, !b);
+        mut_b.not_assign();
+        assert_eq!(mut_b, b);
+    });
 }

@@ -211,23 +211,6 @@ fn eq_mod_power_of_two_signed_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_eq_mod_power_of_two() {
-    eq_mod_power_of_two_primitive_helper::<u8>();
-    eq_mod_power_of_two_primitive_helper::<u16>();
-    eq_mod_power_of_two_primitive_helper::<u32>();
-    eq_mod_power_of_two_primitive_helper::<u64>();
-    eq_mod_power_of_two_primitive_helper::<u128>();
-    eq_mod_power_of_two_primitive_helper::<usize>();
-    eq_mod_power_of_two_primitive_helper::<i8>();
-    eq_mod_power_of_two_primitive_helper::<i16>();
-    eq_mod_power_of_two_primitive_helper::<i32>();
-    eq_mod_power_of_two_primitive_helper::<i64>();
-    eq_mod_power_of_two_primitive_helper::<i128>();
-    eq_mod_power_of_two_primitive_helper::<isize>();
-
-    eq_mod_power_of_two_signed_helper::<i8>();
-    eq_mod_power_of_two_signed_helper::<i16>();
-    eq_mod_power_of_two_signed_helper::<i32>();
-    eq_mod_power_of_two_signed_helper::<i64>();
-    eq_mod_power_of_two_signed_helper::<i128>();
-    eq_mod_power_of_two_signed_helper::<isize>();
+    apply_fn_to_primitive_ints!(eq_mod_power_of_two_primitive_helper);
+    apply_fn_to_signeds!(eq_mod_power_of_two_signed_helper);
 }

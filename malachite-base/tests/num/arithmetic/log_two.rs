@@ -1,3 +1,5 @@
+use malachite_base_test_util::generators::unsigned_gen_var_1;
+
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -37,7 +39,6 @@ macro_rules! floor_log_two_fail {
         }
     };
 }
-
 floor_log_two_fail!(u8, floor_log_two_u8_fail);
 floor_log_two_fail!(u16, floor_log_two_u16_fail);
 floor_log_two_fail!(u32, floor_log_two_u32_fail);
@@ -79,10 +80,36 @@ macro_rules! ceiling_log_two_fail {
         }
     };
 }
-
 ceiling_log_two_fail!(u8, ceiling_log_two_u8_fail);
 ceiling_log_two_fail!(u16, ceiling_log_two_u16_fail);
 ceiling_log_two_fail!(u32, ceiling_log_two_u32_fail);
 ceiling_log_two_fail!(u64, ceiling_log_two_u64_fail);
 ceiling_log_two_fail!(u128, ceiling_log_two_u128_fail);
 ceiling_log_two_fail!(usize, ceiling_log_two_usize_fail);
+
+fn floor_log_two_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_gen_var_1::<T>().test_properties(|n| {
+        let floor_log_two = n.floor_log_two();
+        assert_eq!(floor_log_two, n.significant_bits() - 1);
+        assert!(floor_log_two < T::WIDTH);
+        assert_eq!(floor_log_two == 0, n == T::ONE);
+    });
+}
+
+#[test]
+fn floor_log_two_properties() {
+    apply_fn_to_unsigneds!(floor_log_two_properties_helper);
+}
+
+fn ceiling_log_two_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_gen_var_1::<T>().test_properties(|n| {
+        let ceiling_log_two = n.ceiling_log_two();
+        assert!(ceiling_log_two <= T::WIDTH);
+        assert_eq!(ceiling_log_two == 0, n == T::ONE);
+    });
+}
+
+#[test]
+fn ceiling_log_two_properties() {
+    apply_fn_to_unsigneds!(ceiling_log_two_properties_helper);
+}

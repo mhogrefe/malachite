@@ -33,10 +33,5 @@ fn mod_add_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_add() {
-    mod_add_helper::<u8>();
-    mod_add_helper::<u16>();
-    mod_add_helper::<u32>();
-    mod_add_helper::<u64>();
-    mod_add_helper::<u128>();
-    mod_add_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_add_helper);
 }

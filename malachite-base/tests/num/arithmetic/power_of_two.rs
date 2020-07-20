@@ -21,25 +21,8 @@ fn power_of_two_unsigned_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_power_of_two() {
-    power_of_two_primitive_helper::<u8>();
-    power_of_two_primitive_helper::<u16>();
-    power_of_two_primitive_helper::<u32>();
-    power_of_two_primitive_helper::<u64>();
-    power_of_two_primitive_helper::<u128>();
-    power_of_two_primitive_helper::<usize>();
-    power_of_two_primitive_helper::<i8>();
-    power_of_two_primitive_helper::<i16>();
-    power_of_two_primitive_helper::<i32>();
-    power_of_two_primitive_helper::<i64>();
-    power_of_two_primitive_helper::<i128>();
-    power_of_two_primitive_helper::<isize>();
-
-    power_of_two_unsigned_helper::<u8>();
-    power_of_two_unsigned_helper::<u16>();
-    power_of_two_unsigned_helper::<u32>();
-    power_of_two_unsigned_helper::<u64>();
-    power_of_two_unsigned_helper::<u128>();
-    power_of_two_unsigned_helper::<usize>();
+    apply_fn_to_primitive_ints!(power_of_two_primitive_helper);
+    apply_fn_to_unsigneds!(power_of_two_unsigned_helper);
 }
 
 macro_rules! power_of_two_unsigned_fail {

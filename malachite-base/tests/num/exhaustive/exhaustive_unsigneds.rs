@@ -25,12 +25,7 @@ fn exhaustive_unsigneds_long_helper<T: PrimitiveUnsigned>(last_20: &[T]) {
 
 #[test]
 fn test_exhaustive_unsigneds() {
-    exhaustive_unsigneds_helper::<u8>();
-    exhaustive_unsigneds_helper::<u16>();
-    exhaustive_unsigneds_helper::<u32>();
-    exhaustive_unsigneds_helper::<u64>();
-    exhaustive_unsigneds_helper::<u128>();
-    exhaustive_unsigneds_helper::<usize>();
+    apply_fn_to_unsigneds!(exhaustive_unsigneds_helper);
 
     exhaustive_unsigneds_long_helper::<u8>(&[
         236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253,

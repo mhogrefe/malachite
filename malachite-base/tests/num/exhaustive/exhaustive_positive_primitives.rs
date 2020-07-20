@@ -29,18 +29,7 @@ fn exhaustive_positive_primitives_long_helper<T: PrimitiveInteger>(last_20: &[T]
 
 #[test]
 fn test_exhaustive_positive_primitives() {
-    exhaustive_positive_primitives_helper::<u8>();
-    exhaustive_positive_primitives_helper::<u16>();
-    exhaustive_positive_primitives_helper::<u32>();
-    exhaustive_positive_primitives_helper::<u64>();
-    exhaustive_positive_primitives_helper::<u128>();
-    exhaustive_positive_primitives_helper::<usize>();
-    exhaustive_positive_primitives_helper::<i8>();
-    exhaustive_positive_primitives_helper::<i16>();
-    exhaustive_positive_primitives_helper::<i32>();
-    exhaustive_positive_primitives_helper::<i64>();
-    exhaustive_positive_primitives_helper::<i128>();
-    exhaustive_positive_primitives_helper::<isize>();
+    apply_fn_to_primitive_ints!(exhaustive_positive_primitives_helper);
 
     exhaustive_positive_primitives_long_helper::<u8>(&[
         236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253,

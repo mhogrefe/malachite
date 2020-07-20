@@ -3,7 +3,13 @@ use num::arithmetic::traits::{
 };
 use rounding_modes::RoundingMode;
 
-//TODO clean
+#[inline]
+pub fn _round_to_multiple_of_power_of_two<T>(x: T, pow: u64, rm: RoundingMode) -> T
+where
+    T: ArithmeticCheckedShl<u64, Output = T> + ShrRound<u64, Output = T>,
+{
+    x.shr_round(pow, rm).arithmetic_checked_shl(pow).unwrap()
+}
 
 macro_rules! impl_round_to_multiple_of_power_of_two {
     ($t:ident) => {
@@ -54,7 +60,7 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
             /// ```
             #[inline]
             fn round_to_multiple_of_power_of_two(self, pow: u64, rm: RoundingMode) -> $t {
-                self.shr_round(pow, rm).arithmetic_checked_shl(pow).unwrap()
+                _round_to_multiple_of_power_of_two(self, pow, rm)
             }
         }
 
@@ -144,16 +150,4 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
         }
     };
 }
-
-impl_round_to_multiple_of_power_of_two!(u8);
-impl_round_to_multiple_of_power_of_two!(u16);
-impl_round_to_multiple_of_power_of_two!(u32);
-impl_round_to_multiple_of_power_of_two!(u64);
-impl_round_to_multiple_of_power_of_two!(u128);
-impl_round_to_multiple_of_power_of_two!(usize);
-impl_round_to_multiple_of_power_of_two!(i8);
-impl_round_to_multiple_of_power_of_two!(i16);
-impl_round_to_multiple_of_power_of_two!(i32);
-impl_round_to_multiple_of_power_of_two!(i64);
-impl_round_to_multiple_of_power_of_two!(i128);
-impl_round_to_multiple_of_power_of_two!(isize);
+apply_to_primitive_ints!(impl_round_to_multiple_of_power_of_two);

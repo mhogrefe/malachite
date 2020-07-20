@@ -55,7 +55,7 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
     }
     // Should really be max_len / sqrt(2); 0.75 * max_len is close enough
     let limit = max_len.checked_mul(3).unwrap() >> 2;
-    let mut product_limbs = if xs_len >= limit && ys_len >= limit {
+    let mut product = if xs_len >= limit && ys_len >= limit {
         if xs_len != max_len {
             xs.resize(max_len, 0);
         }
@@ -68,8 +68,8 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
     } else {
         limbs_mul(xs, ys)
     };
-    limbs_vec_mod_power_of_two_in_place(&mut product_limbs, pow);
-    product_limbs
+    limbs_vec_mod_power_of_two_in_place(&mut product, pow);
+    product
 }
 
 /// Interpreting a slice of `Limb` and a `Vec<Limb>`s as the limbs (in ascending order) of two
@@ -114,7 +114,7 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
     }
     // Should really be max_len / sqrt(2); 0.75 * max_len is close enough
     let limit = max_len.checked_mul(3).unwrap() >> 2;
-    let mut product_limbs = if xs_len >= limit && ys_len >= limit {
+    let mut product = if xs_len >= limit && ys_len >= limit {
         if xs_len != max_len {
             xs.resize(max_len, 0);
         }
@@ -126,14 +126,14 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
             ys_adjusted_vec[..ys_len].copy_from_slice(ys);
             &ys_adjusted_vec
         };
-        let mut product_limbs = vec![0; max_len];
-        limbs_mul_low_same_length(&mut product_limbs, xs, ys_adjusted);
-        product_limbs
+        let mut product = vec![0; max_len];
+        limbs_mul_low_same_length(&mut product, xs, ys_adjusted);
+        product
     } else {
         limbs_mul(xs, ys)
     };
-    limbs_vec_mod_power_of_two_in_place(&mut product_limbs, pow);
-    product_limbs
+    limbs_vec_mod_power_of_two_in_place(&mut product, pow);
+    product
 }
 
 /// Interpreting two slices of `Limb` as the limbs (in ascending order) of two `Natural`s, returns a
@@ -177,7 +177,7 @@ pub fn limbs_mod_power_of_two_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) ->
     }
     // Should really be max_len / sqrt(2); 0.75 * max_len is close enough
     let limit = max_len.checked_mul(3).unwrap() >> 2;
-    let mut product_limbs = if xs_len >= limit && ys_len >= limit {
+    let mut product = if xs_len >= limit && ys_len >= limit {
         let mut xs_adjusted_vec;
         let mut ys_adjusted_vec;
         let xs_adjusted = if xs_len == max_len {
@@ -194,14 +194,14 @@ pub fn limbs_mod_power_of_two_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) ->
             ys_adjusted_vec[..ys_len].copy_from_slice(ys);
             &ys_adjusted_vec
         };
-        let mut product_limbs = vec![0; max_len];
-        limbs_mul_low_same_length(&mut product_limbs, xs_adjusted, ys_adjusted);
-        product_limbs
+        let mut product = vec![0; max_len];
+        limbs_mul_low_same_length(&mut product, xs_adjusted, ys_adjusted);
+        product
     } else {
         limbs_mul(xs, ys)
     };
-    limbs_vec_mod_power_of_two_in_place(&mut product_limbs, pow);
-    product_limbs
+    limbs_vec_mod_power_of_two_in_place(&mut product, pow);
+    product
 }
 
 impl Natural {
@@ -270,6 +270,7 @@ impl ModPowerOfTwoMul<Natural> for Natural {
     ///     "12"
     /// );
     /// ```
+    #[inline]
     fn mod_power_of_two_mul(mut self, other: Natural, pow: u64) -> Natural {
         self.mod_power_of_two_mul_assign(other, pow);
         self
@@ -306,6 +307,7 @@ impl<'a> ModPowerOfTwoMul<&'a Natural> for Natural {
     ///     "12"
     /// );
     /// ```
+    #[inline]
     fn mod_power_of_two_mul(mut self, other: &'a Natural, pow: u64) -> Natural {
         self.mod_power_of_two_mul_assign(other, pow);
         self
@@ -342,6 +344,7 @@ impl<'a> ModPowerOfTwoMul<Natural> for &'a Natural {
     ///     "12"
     /// );
     /// ```
+    #[inline]
     fn mod_power_of_two_mul(self, mut other: Natural, pow: u64) -> Natural {
         other.mod_power_of_two_mul_assign(self, pow);
         other

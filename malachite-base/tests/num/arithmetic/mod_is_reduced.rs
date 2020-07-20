@@ -17,12 +17,7 @@ fn mod_is_reduced_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_is_reduced() {
-    mod_is_reduced_helper::<u8>();
-    mod_is_reduced_helper::<u16>();
-    mod_is_reduced_helper::<u32>();
-    mod_is_reduced_helper::<u64>();
-    mod_is_reduced_helper::<u128>();
-    mod_is_reduced_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_is_reduced_helper);
 }
 
 macro_rules! mod_is_reduced_fail {

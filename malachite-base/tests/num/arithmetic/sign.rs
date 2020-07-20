@@ -24,23 +24,6 @@ fn signed_sign_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_sign() {
-    primitive_sign_helper::<u8>();
-    primitive_sign_helper::<u16>();
-    primitive_sign_helper::<u32>();
-    primitive_sign_helper::<u64>();
-    primitive_sign_helper::<u128>();
-    primitive_sign_helper::<usize>();
-    primitive_sign_helper::<i8>();
-    primitive_sign_helper::<i16>();
-    primitive_sign_helper::<i32>();
-    primitive_sign_helper::<i64>();
-    primitive_sign_helper::<i128>();
-    primitive_sign_helper::<isize>();
-
-    signed_sign_helper::<i8>();
-    signed_sign_helper::<i16>();
-    signed_sign_helper::<i32>();
-    signed_sign_helper::<i64>();
-    signed_sign_helper::<i128>();
-    signed_sign_helper::<isize>();
+    apply_fn_to_primitive_ints!(primitive_sign_helper);
+    apply_fn_to_signeds!(signed_sign_helper);
 }

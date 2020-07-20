@@ -132,12 +132,7 @@ macro_rules! impl_bit_access_unsigned {
         }
     };
 }
-impl_bit_access_unsigned!(u8);
-impl_bit_access_unsigned!(u16);
-impl_bit_access_unsigned!(u32);
-impl_bit_access_unsigned!(u64);
-impl_bit_access_unsigned!(u128);
-impl_bit_access_unsigned!(usize);
+apply_to_unsigneds!(impl_bit_access_unsigned);
 
 #[inline]
 pub fn _get_bit_signed<T: PrimitiveInteger>(x: &T, index: u64) -> bool {

@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoIsReduced {

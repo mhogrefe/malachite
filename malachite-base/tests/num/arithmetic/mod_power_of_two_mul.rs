@@ -20,10 +20,5 @@ fn mod_power_of_two_mul_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_power_of_two_mul() {
-    mod_power_of_two_mul_helper::<u8>();
-    mod_power_of_two_mul_helper::<u16>();
-    mod_power_of_two_mul_helper::<u32>();
-    mod_power_of_two_mul_helper::<u64>();
-    mod_power_of_two_mul_helper::<u128>();
-    mod_power_of_two_mul_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_power_of_two_mul_helper);
 }

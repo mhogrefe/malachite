@@ -19,10 +19,5 @@ fn wrapping_abs_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_wrapping_neg() {
-    wrapping_abs_helper::<i8>();
-    wrapping_abs_helper::<i16>();
-    wrapping_abs_helper::<i32>();
-    wrapping_abs_helper::<i64>();
-    wrapping_abs_helper::<i128>();
-    wrapping_abs_helper::<isize>();
+    apply_fn_to_signeds!(wrapping_abs_helper);
 }

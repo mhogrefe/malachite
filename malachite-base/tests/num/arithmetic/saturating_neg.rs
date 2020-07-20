@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn saturating_neg_helper<T: PrimitiveSigned>() {
+fn saturating_neg_assign_helper<T: PrimitiveSigned>() {
     let test = |n: T, out| {
         assert_eq!(n.saturating_neg(), out);
 
@@ -18,11 +18,6 @@ fn saturating_neg_helper<T: PrimitiveSigned>() {
 }
 
 #[test]
-fn test_saturating_neg() {
-    saturating_neg_helper::<i8>();
-    saturating_neg_helper::<i16>();
-    saturating_neg_helper::<i32>();
-    saturating_neg_helper::<i64>();
-    saturating_neg_helper::<i128>();
-    saturating_neg_helper::<isize>();
+fn test_saturating_neg_assign() {
+    apply_fn_to_signeds!(saturating_neg_assign_helper);
 }

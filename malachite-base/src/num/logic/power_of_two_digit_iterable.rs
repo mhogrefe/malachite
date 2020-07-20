@@ -1,10 +1,9 @@
-use std::marker::PhantomData;
-
 use num::arithmetic::traits::{DivRound, SaturatingSubAssign};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitBlockAccess, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
 use rounding_modes::RoundingMode;
+use std::marker::PhantomData;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {

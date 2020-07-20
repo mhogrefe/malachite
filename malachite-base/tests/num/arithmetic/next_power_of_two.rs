@@ -22,10 +22,5 @@ fn next_power_of_two_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_next_power_of_two() {
-    next_power_of_two_helper::<u8>();
-    next_power_of_two_helper::<u16>();
-    next_power_of_two_helper::<u32>();
-    next_power_of_two_helper::<u64>();
-    next_power_of_two_helper::<u128>();
-    next_power_of_two_helper::<usize>();
+    apply_fn_to_unsigneds!(next_power_of_two_helper);
 }

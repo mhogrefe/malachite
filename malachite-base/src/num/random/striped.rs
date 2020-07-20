@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use bools::random::{random_bools, RandomBools};
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::signeds::PrimitiveSigned;
@@ -8,6 +6,7 @@ use num::random::geometric::mean_to_p_with_min;
 use num::random::random_unsigneds_less_than;
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 use random::seed::Seed;
+use std::marker::PhantomData;
 
 /// A `StripedBitSource` generates bits in a way that lets you control the mean length of a run (a
 /// consecutive series of 0s or 1s). If the mean is set to 2, the bits are generated as if by fair
@@ -228,6 +227,40 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
     }
 }
 
+/// Generates random unsigned integers from a striped distribution. The way this distribution works
+/// is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is generated
+/// whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first `T::WIDTH`
+/// bits are selected to create a `T` value.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely values are 0 (000...) and `T::MAX` (111...). The least
+/// likely values are floor(T::MAX / 3) (01010...) and floor(2 * T::MAX / 3) (10101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_unsigneds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["1", "1001100", "1111111", "11000011", "0", "10000000", "1111", "1110110", "0",
+///     "11111000"]
+/// )
+/// ```
 pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     m_numerator: u64,
@@ -239,6 +272,40 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
     }
 }
 
+/// Generates random positive unsigned integers from a striped distribution. The way this
+/// distribution works is that given m = `m_numerator` / `m_denominator`, an random infinite bit
+/// sequence is generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then
+/// the first `T::WIDTH` bits are selected to create a `T` value.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely value is 0 `T::MAX` (111...). The least likely values
+/// are floor(T::MAX / 3) (01010...) and floor(2 * T::MAX / 3) (10101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_positive_unsigneds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["1", "1001100", "1111111", "11000011", "10000000", "1111", "1110110", "11111000",
+///     "11111111", "11111101"]
+/// )
+/// ```
 pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     m_numerator: u64,
@@ -247,6 +314,43 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
     nonzero_values(striped_random_unsigneds(seed, m_numerator, m_denominator))
 }
 
+/// Generates random signed integers from a striped distribution. The way this distribution works is
+/// that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is generated
+/// whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
+/// `T::WIDTH - 1` bits are selected to create a `T` value; the sign bit is selected separately, and
+/// is equally likely to be 0 or 1.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely values are 0 (0000...), `T::MAX` (0111...), `T::MIN`
+/// (1000...), and -1 (1111...). The least likely values are floor(`T::MAX` / 3) (001010...),
+/// floor(2 * `T::MAX` / 3) (010101...), floor(-2 * `T::MAX` / 3) (101010...), and
+/// floor(-`T::MAX` / 3) (110101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_signeds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
+///     "111101", "11111100"]
+/// )
+/// ```
 pub fn striped_random_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -259,6 +363,39 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random natural (non-negative) signed integers from a striped distribution. The way
+/// this distribution works is that given m = `m_numerator` / `m_denominator`, an random infinite
+/// bit sequence is generated whose mean length of bit runs (blocks of equal adjacent bits) is m.
+/// Then the first `T::WIDTH - 1` bits are selected to create a `T` value.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely values are 0 (0000...), and `T::MAX` (0111...). The
+/// least likely values are floor(`T::MAX` / 3) (001010...) and floor(2 * `T::MAX` / 3) (010101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_natural_signeds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["0", "101100", "110000", "1111100", "1111", "1111110", "0", "111", "11101", "1100000"]
+/// )
+/// ```
 pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -270,6 +407,40 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random positive signed integers from a striped distribution. The way this distribution
+/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
+/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
+/// `T::WIDTH - 1` bits are selected to create a `T` value.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely value is 0 (0000...). The least likely values are
+/// floor(`T::MAX` / 3) (001010...) and floor(2 * `T::MAX` / 3) (010101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_positive_signeds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["101100", "110000", "1111100", "1111", "1111110", "111", "11101", "1100000", "1111111",
+///     "1100000"]
+/// )
+/// ```
 pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -282,6 +453,41 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
     ))
 }
 
+/// Generates random negative signed integers from a striped distribution. The way this distribution
+/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
+/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
+/// `T::WIDTH - 1` bits are selected to create a `T` value.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely values are `T::MIN` (1000...), and -1 (1111...). The
+/// least likely values are floor(-2 * `T::MAX` / 3) (101010...) and floor(-`T::MAX` / 3)
+/// (110101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_negative_signeds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["10000000", "10101100", "10110000", "11111100", "10001111", "11111110", "10000000",
+///     "10000111", "10011101", "11100000"]
+/// )
+/// ```
 pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -293,6 +499,43 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random nonzero signed integers from a striped distribution. The way this distribution
+/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
+/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
+/// `T::WIDTH - 1` bits are selected to create a `T` value; the sign bit is selected separately, and
+/// is equally likely to be 0 or 1.
+///
+/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
+/// bits are preferred, and the most likely values are `T::MAX` (0111...), `T::MIN` (1000...), and
+/// -1 (1111...). The least likely values are floor(`T::MAX` / 3) (001010...),
+/// floor(2 * `T::MAX` / 3) (010101...), floor(-2 * `T::MAX` / 3) (101010...), and
+/// floor(-`T::MAX` / 3) (110101...).
+///
+/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
+/// the most likely and least likely values are swapped.
+///
+/// Length is infinite.
+///
+/// Time per iteration: O(1)
+///
+/// Additional memory per iteration: O(1)
+///
+/// # Panics
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_nonzero_signeds;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
+///     "111101", "11111100"]
+/// )
+/// ```
 pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,

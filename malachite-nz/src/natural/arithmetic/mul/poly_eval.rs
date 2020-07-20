@@ -25,7 +25,8 @@ use platform::Limb;
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c, GMP 6.1.2.
+/// This is mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c, GMP 6.1.2, where s is
+/// omitted from the inputs because it can be determined from ap and n.
 pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     v_1: &mut [Limb],
     v_neg_1: &mut [Limb],
@@ -62,7 +63,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 ///
 /// where n = `n`
 ///
-/// This is mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c, GMP 6.1.2.
+/// This is mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c, GMP 6.1.2, where s is
+/// omitted from the inputs because it can be determined from ap and n.
 pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],

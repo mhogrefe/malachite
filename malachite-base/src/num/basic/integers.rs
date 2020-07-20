@@ -1,12 +1,3 @@
-use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
-use std::hash::Hash;
-use std::iter::{Product, Sum};
-use std::ops::{
-    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
-    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-};
-use std::str::FromStr;
-
 use comparison::traits::{Max, Min};
 use crement::Crementable;
 use named::Named;
@@ -42,6 +33,14 @@ use num::logic::traits::{
     LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
 use num::random::thrifty_random::ThriftyRandom;
+use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
+use std::hash::Hash;
+use std::iter::{Product, Sum};
+use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+};
+use std::str::FromStr;
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInteger:

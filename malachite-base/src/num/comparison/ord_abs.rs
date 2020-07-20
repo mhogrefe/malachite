@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use std::cmp::Ordering;
 
 #[inline]
 pub fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
@@ -62,12 +61,7 @@ macro_rules! impl_ord_abs_unsigned {
         }
     };
 }
-impl_ord_abs_unsigned!(u8);
-impl_ord_abs_unsigned!(u16);
-impl_ord_abs_unsigned!(u32);
-impl_ord_abs_unsigned!(u64);
-impl_ord_abs_unsigned!(u128);
-impl_ord_abs_unsigned!(usize);
+apply_to_unsigneds!(impl_ord_abs_unsigned);
 
 #[inline]
 pub fn _cmp_abs_signed<T: Copy + UnsignedAbs>(x: &T, y: &T) -> Ordering

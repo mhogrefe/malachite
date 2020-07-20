@@ -1,3 +1,5 @@
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -56,4 +58,31 @@ fn test_significant_bits() {
         i128::wrapping_from(isize::MAX),
         i128::wrapping_from(isize::MIN),
     );
+}
+
+fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|n| {
+        let significant_bits = n.significant_bits();
+        assert!(significant_bits <= T::WIDTH);
+        assert_eq!(significant_bits == 0, n == T::ZERO);
+        if n != T::ZERO {
+            assert_eq!(significant_bits, n.floor_log_two() + 1)
+        }
+    });
+}
+
+fn significant_bits_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|n| {
+        let significant_bits = n.significant_bits();
+        assert!(significant_bits <= T::WIDTH);
+        assert_eq!(significant_bits == 0, n == T::ZERO);
+        assert_eq!(significant_bits == T::WIDTH, n == T::MIN);
+        assert_eq!(n.wrapping_neg().significant_bits(), significant_bits);
+    });
+}
+
+#[test]
+fn significant_bits_properties() {
+    apply_fn_to_unsigneds!(significant_bits_properties_helper_unsigned);
+    apply_fn_to_signeds!(significant_bits_properties_helper_signed);
 }

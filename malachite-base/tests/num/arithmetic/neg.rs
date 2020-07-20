@@ -15,10 +15,5 @@ fn neg_assign_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_neg_assign() {
-    neg_assign_helper::<i8>();
-    neg_assign_helper::<i16>();
-    neg_assign_helper::<i32>();
-    neg_assign_helper::<i64>();
-    neg_assign_helper::<i128>();
-    neg_assign_helper::<isize>();
+    apply_fn_to_signeds!(neg_assign_helper);
 }

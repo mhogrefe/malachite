@@ -38,6 +38,7 @@ extern crate malachite_base;
 extern crate ryu;
 
 pub mod common;
+pub mod generators;
 pub mod num {
     pub mod arithmetic {
         pub mod mod_mul;

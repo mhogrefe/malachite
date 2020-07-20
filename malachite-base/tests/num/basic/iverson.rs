@@ -9,16 +9,5 @@ macro_rules! test_iverson {
 
 #[test]
 fn test_iverson() {
-    test_iverson!(u8);
-    test_iverson!(u16);
-    test_iverson!(u32);
-    test_iverson!(u64);
-    test_iverson!(u128);
-    test_iverson!(usize);
-    test_iverson!(i8);
-    test_iverson!(i16);
-    test_iverson!(i32);
-    test_iverson!(i64);
-    test_iverson!(i128);
-    test_iverson!(isize);
+    apply_to_primitive_ints!(test_iverson);
 }

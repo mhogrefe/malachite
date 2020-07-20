@@ -47,18 +47,8 @@ fn get_bit_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_get_bit() {
-    get_bit_helper_unsigned::<u8>();
-    get_bit_helper_unsigned::<u16>();
-    get_bit_helper_unsigned::<u32>();
-    get_bit_helper_unsigned::<u64>();
-    get_bit_helper_unsigned::<u128>();
-    get_bit_helper_unsigned::<usize>();
-    get_bit_helper_signed::<i8>();
-    get_bit_helper_signed::<i16>();
-    get_bit_helper_signed::<i32>();
-    get_bit_helper_signed::<i64>();
-    get_bit_helper_signed::<i128>();
-    get_bit_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(get_bit_helper_unsigned);
+    apply_fn_to_signeds!(get_bit_helper_signed);
 }
 
 fn set_bit_helper_unsigned<T: PrimitiveInteger>() {
@@ -99,18 +89,8 @@ fn set_bit_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_set_bit() {
-    set_bit_helper_unsigned::<u8>();
-    set_bit_helper_unsigned::<u16>();
-    set_bit_helper_unsigned::<u32>();
-    set_bit_helper_unsigned::<u64>();
-    set_bit_helper_unsigned::<u128>();
-    set_bit_helper_unsigned::<usize>();
-    set_bit_helper_signed::<i8>();
-    set_bit_helper_signed::<i16>();
-    set_bit_helper_signed::<i32>();
-    set_bit_helper_signed::<i64>();
-    set_bit_helper_signed::<i128>();
-    set_bit_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(set_bit_helper_unsigned);
+    apply_fn_to_signeds!(set_bit_helper_signed);
 }
 
 macro_rules! set_bit_fail_helper {
@@ -175,18 +155,8 @@ fn clear_bit_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_clear_bit() {
-    clear_bit_helper_unsigned::<u8>();
-    clear_bit_helper_unsigned::<u16>();
-    clear_bit_helper_unsigned::<u32>();
-    clear_bit_helper_unsigned::<u64>();
-    clear_bit_helper_unsigned::<u128>();
-    clear_bit_helper_unsigned::<usize>();
-    clear_bit_helper_signed::<i8>();
-    clear_bit_helper_signed::<i16>();
-    clear_bit_helper_signed::<i32>();
-    clear_bit_helper_signed::<i64>();
-    clear_bit_helper_signed::<i128>();
-    clear_bit_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(clear_bit_helper_unsigned);
+    apply_fn_to_signeds!(clear_bit_helper_signed);
 }
 
 macro_rules! clear_bit_fail_helper {
@@ -254,18 +224,8 @@ fn assign_bit_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_assign_bit() {
-    assign_bit_helper_unsigned::<u8>();
-    assign_bit_helper_unsigned::<u16>();
-    assign_bit_helper_unsigned::<u32>();
-    assign_bit_helper_unsigned::<u64>();
-    assign_bit_helper_unsigned::<u128>();
-    assign_bit_helper_unsigned::<usize>();
-    assign_bit_helper_signed::<i8>();
-    assign_bit_helper_signed::<i16>();
-    assign_bit_helper_signed::<i32>();
-    assign_bit_helper_signed::<i64>();
-    assign_bit_helper_signed::<i128>();
-    assign_bit_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(assign_bit_helper_unsigned);
+    apply_fn_to_signeds!(assign_bit_helper_signed);
 }
 
 macro_rules! assign_bit_fail_helper_unsigned {
@@ -350,18 +310,8 @@ fn flip_bit_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_flip_bit() {
-    flip_bit_helper_unsigned::<u8>();
-    flip_bit_helper_unsigned::<u16>();
-    flip_bit_helper_unsigned::<u32>();
-    flip_bit_helper_unsigned::<u64>();
-    flip_bit_helper_unsigned::<u128>();
-    flip_bit_helper_unsigned::<usize>();
-    flip_bit_helper_signed::<i8>();
-    flip_bit_helper_signed::<i16>();
-    flip_bit_helper_signed::<i32>();
-    flip_bit_helper_signed::<i64>();
-    flip_bit_helper_signed::<i128>();
-    flip_bit_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(flip_bit_helper_unsigned);
+    apply_fn_to_signeds!(flip_bit_helper_signed);
 }
 
 macro_rules! flip_bit_fail_helper_unsigned {

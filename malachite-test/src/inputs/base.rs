@@ -70,7 +70,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
-use malachite_nz::natural::arithmetic::square::_limbs_square_to_out_toom_3_input_size_valid;
+use malachite_nz::natural::arithmetic::square::{
+    _limbs_square_to_out_toom_3_input_size_valid, _limbs_square_to_out_toom_4_input_size_valid,
+};
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
@@ -122,6 +124,7 @@ use inputs::common::{
     reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, reshape_3_3_3_to_9, reshape_4_4_4_to_12,
 };
 
+//TODO replace with bool_gen in Malachite
 pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
     match gm {
         NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_bools()),
@@ -131,6 +134,7 @@ pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
 
 pub(crate) type It<T> = Box<dyn Iterator<Item = T>>;
 
+//TODO replace with unsigned_gen in Malachite
 pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_unsigneds()),
@@ -139,6 +143,7 @@ pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     }
 }
 
+//TODO replace with signed_gen in Malachite
 pub fn signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -151,6 +156,7 @@ where
     }
 }
 
+//TODO replace with unsigned_gen_var_1 in Malachite
 pub fn positive_unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_positive_primitives()),
@@ -209,6 +215,7 @@ where
     Box::new(signeds(gm).filter(|&i| i != T::MAX))
 }
 
+//TODO replace with signed_gen_var_1 in Malachite
 pub fn signeds_no_min<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
     T::UnsignedOfEqualWidth: Rand,
@@ -2578,6 +2585,18 @@ pub fn pairs_of_unsigned_vec_var_19<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_unsigned_vec_min_sizes(gm, 6, 3).filter(|&(ref out, ref xs)| {
             out.len() >= xs.len() << 1 && _limbs_square_to_out_toom_3_input_size_valid(xs.len())
+        }),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of
+// `_limbs_square_to_out_toom_4`.
+pub fn pairs_of_unsigned_vec_var_20<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 8, 4).filter(|&(ref out, ref xs)| {
+            out.len() >= xs.len() << 1 && _limbs_square_to_out_toom_4_input_size_valid(xs.len())
         }),
     )
 }

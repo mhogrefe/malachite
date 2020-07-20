@@ -14,10 +14,5 @@ fn mod_power_of_two_is_reduced_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_power_of_two_is_reduced() {
-    mod_power_of_two_is_reduced_helper::<u8>();
-    mod_power_of_two_is_reduced_helper::<u16>();
-    mod_power_of_two_is_reduced_helper::<u32>();
-    mod_power_of_two_is_reduced_helper::<u64>();
-    mod_power_of_two_is_reduced_helper::<u128>();
-    mod_power_of_two_is_reduced_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_power_of_two_is_reduced_helper);
 }

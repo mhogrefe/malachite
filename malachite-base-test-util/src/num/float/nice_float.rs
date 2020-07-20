@@ -1,13 +1,11 @@
+use malachite_base::num::floats::PrimitiveFloat;
+use num::float::nice_float::FloatType::{
+    NegativeFinite, NegativeInfinity, NegativeZero, PositiveFinite, PositiveInfinity, PositiveZero,
+};
 use std::cmp::Ordering;
 use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::str::FromStr;
-
-use malachite_base::num::floats::PrimitiveFloat;
-
-use num::float::nice_float::FloatType::{
-    NegativeFinite, NegativeInfinity, NegativeZero, PositiveFinite, PositiveInfinity, PositiveZero,
-};
 
 pub trait FmtRyuString: Copy {
     fn fmt_ryu_string(self, f: &mut Formatter<'_>) -> fmt::Result;

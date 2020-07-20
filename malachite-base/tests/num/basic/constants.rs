@@ -19,19 +19,8 @@ macro_rules! test_signed_constants {
 
 #[test]
 fn test_constants() {
-    test_unsigned_constants!(u8);
-    test_unsigned_constants!(u16);
-    test_unsigned_constants!(u32);
-    test_unsigned_constants!(u64);
-    test_unsigned_constants!(u128);
-    test_unsigned_constants!(usize);
-
-    test_signed_constants!(i8);
-    test_signed_constants!(i16);
-    test_signed_constants!(i32);
-    test_signed_constants!(i64);
-    test_signed_constants!(i128);
-    test_signed_constants!(isize);
+    apply_to_unsigneds!(test_unsigned_constants);
+    apply_to_signeds!(test_signed_constants);
 }
 
 #[test]

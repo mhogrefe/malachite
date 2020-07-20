@@ -77,6 +77,50 @@ macro_rules! apply_to_unsigned_signed_pair {
     };
 }
 
+#[macro_export]
+macro_rules! apply_fn_to_unsigneds {
+    ($f: ident) => {
+        $f::<u8>();
+        $f::<u16>();
+        $f::<u32>();
+        $f::<u64>();
+        $f::<u128>();
+        $f::<usize>();
+    };
+}
+
+#[macro_export]
+macro_rules! apply_fn_to_signeds {
+    ($f: ident) => {
+        $f::<i8>();
+        $f::<i16>();
+        $f::<i32>();
+        $f::<i64>();
+        $f::<i128>();
+        $f::<isize>();
+    };
+}
+
+#[macro_export]
+macro_rules! apply_fn_to_primitive_ints {
+    ($f: ident) => {
+        apply_fn_to_unsigneds!($f);
+        apply_fn_to_signeds!($f);
+    };
+}
+
+#[macro_export]
+macro_rules! apply_fn_to_unsigned_signed_pair {
+    ($f: ident) => {
+        $f::<u8, i8>();
+        $f::<u16, i16>();
+        $f::<u32, i32>();
+        $f::<u64, i64>();
+        $f::<u128, i128>();
+        $f::<usize, isize>();
+    };
+}
+
 #[macro_use]
 pub mod named;
 #[macro_use]

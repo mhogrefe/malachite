@@ -19,10 +19,5 @@ fn overflowing_abs_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_overflowing_abs() {
-    overflowing_abs_helper::<i8>();
-    overflowing_abs_helper::<i16>();
-    overflowing_abs_helper::<i32>();
-    overflowing_abs_helper::<i64>();
-    overflowing_abs_helper::<i128>();
-    overflowing_abs_helper::<isize>();
+    apply_fn_to_signeds!(overflowing_abs_helper);
 }

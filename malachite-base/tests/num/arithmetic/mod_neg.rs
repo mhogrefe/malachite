@@ -18,10 +18,5 @@ fn mod_neg_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_neg() {
-    mod_neg_helper::<u8>();
-    mod_neg_helper::<u16>();
-    mod_neg_helper::<u32>();
-    mod_neg_helper::<u64>();
-    mod_neg_helper::<u128>();
-    mod_neg_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_neg_helper);
 }

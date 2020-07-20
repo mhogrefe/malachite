@@ -1,9 +1,7 @@
-use std::fmt::Debug;
-
+use num::basic::integers::PrimitiveInteger;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
-
-use num::basic::integers::PrimitiveInteger;
+use std::fmt::Debug;
 
 /// Generates random primitive integers uniformly.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]

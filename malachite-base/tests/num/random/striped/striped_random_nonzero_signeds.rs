@@ -374,3 +374,54 @@ fn test_striped_random_nonzero_signeds() {
         sample_moment_stats,
     );
 }
+
+macro_rules! striped_random_nonzero_signeds_fail {
+    (
+        $t:ident,
+        $striped_random_nonzero_signeds_fail_1:ident,
+        $striped_random_nonzero_signeds_fail_2:ident
+    ) => {
+        #[test]
+        #[should_panic]
+        fn $striped_random_nonzero_signeds_fail_1() {
+            striped_random_nonzero_signeds::<$t>(EXAMPLE_SEED, 1, 0);
+        }
+
+        #[test]
+        #[should_panic]
+        fn $striped_random_nonzero_signeds_fail_2() {
+            striped_random_nonzero_signeds::<$t>(EXAMPLE_SEED, 2, 3);
+        }
+    };
+}
+
+striped_random_nonzero_signeds_fail!(
+    i8,
+    striped_random_nonzero_signeds_u8_fail_1,
+    striped_random_nonzero_signeds_u8_fail_2
+);
+striped_random_nonzero_signeds_fail!(
+    i16,
+    striped_random_nonzero_signeds_u16_fail_1,
+    striped_random_nonzero_signeds_u16_fail_2
+);
+striped_random_nonzero_signeds_fail!(
+    i32,
+    striped_random_nonzero_signeds_u32_fail_1,
+    striped_random_nonzero_signeds_u32_fail_2
+);
+striped_random_nonzero_signeds_fail!(
+    i64,
+    striped_random_nonzero_signeds_u64_fail_1,
+    striped_random_nonzero_signeds_u64_fail_2
+);
+striped_random_nonzero_signeds_fail!(
+    i128,
+    striped_random_nonzero_signeds_u128_fail_1,
+    striped_random_nonzero_signeds_u128_fail_2
+);
+striped_random_nonzero_signeds_fail!(
+    isize,
+    striped_random_nonzero_signeds_usize_fail_1,
+    striped_random_nonzero_signeds_usize_fail_2
+);

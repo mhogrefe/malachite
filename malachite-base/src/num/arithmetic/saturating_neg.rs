@@ -46,10 +46,4 @@ macro_rules! impl_saturating_neg {
         }
     };
 }
-
-impl_saturating_neg!(i8);
-impl_saturating_neg!(i16);
-impl_saturating_neg!(i32);
-impl_saturating_neg!(i64);
-impl_saturating_neg!(i128);
-impl_saturating_neg!(isize);
+apply_to_signeds!(impl_saturating_neg);

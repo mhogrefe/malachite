@@ -353,3 +353,54 @@ fn test_striped_random_positive_unsigneds() {
         sample_moment_stats,
     );
 }
+
+macro_rules! striped_random_positive_unsigneds_fail {
+    (
+        $t:ident,
+        $striped_random_positive_unsigneds_fail_1:ident,
+        $striped_random_positive_unsigneds_fail_2:ident
+    ) => {
+        #[test]
+        #[should_panic]
+        fn $striped_random_positive_unsigneds_fail_1() {
+            striped_random_positive_unsigneds::<$t>(EXAMPLE_SEED, 1, 0);
+        }
+
+        #[test]
+        #[should_panic]
+        fn $striped_random_positive_unsigneds_fail_2() {
+            striped_random_positive_unsigneds::<$t>(EXAMPLE_SEED, 2, 3);
+        }
+    };
+}
+
+striped_random_positive_unsigneds_fail!(
+    u8,
+    striped_random_positive_unsigneds_u8_fail_1,
+    striped_random_positive_unsigneds_u8_fail_2
+);
+striped_random_positive_unsigneds_fail!(
+    u16,
+    striped_random_positive_unsigneds_u16_fail_1,
+    striped_random_positive_unsigneds_u16_fail_2
+);
+striped_random_positive_unsigneds_fail!(
+    u32,
+    striped_random_positive_unsigneds_u32_fail_1,
+    striped_random_positive_unsigneds_u32_fail_2
+);
+striped_random_positive_unsigneds_fail!(
+    u64,
+    striped_random_positive_unsigneds_u64_fail_1,
+    striped_random_positive_unsigneds_u64_fail_2
+);
+striped_random_positive_unsigneds_fail!(
+    u128,
+    striped_random_positive_unsigneds_u128_fail_1,
+    striped_random_positive_unsigneds_u128_fail_2
+);
+striped_random_positive_unsigneds_fail!(
+    usize,
+    striped_random_positive_unsigneds_usize_fail_1,
+    striped_random_positive_unsigneds_usize_fail_2
+);

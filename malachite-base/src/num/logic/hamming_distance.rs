@@ -1,7 +1,6 @@
-use std::ops::BitXor;
-
 use num::basic::traits::Zero;
 use num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
+use std::ops::BitXor;
 
 #[inline]
 pub fn _hamming_distance_unsigned<T: CountOnes>(x: T, y: T) -> u64

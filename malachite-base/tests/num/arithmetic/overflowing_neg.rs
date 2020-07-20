@@ -38,17 +38,6 @@ fn signed_overflowing_neg_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_overflowing_neg() {
-    unsigned_overflowing_neg_helper::<u8>();
-    unsigned_overflowing_neg_helper::<u16>();
-    unsigned_overflowing_neg_helper::<u32>();
-    unsigned_overflowing_neg_helper::<u64>();
-    unsigned_overflowing_neg_helper::<u128>();
-    unsigned_overflowing_neg_helper::<usize>();
-
-    signed_overflowing_neg_helper::<i8>();
-    signed_overflowing_neg_helper::<i16>();
-    signed_overflowing_neg_helper::<i32>();
-    signed_overflowing_neg_helper::<i64>();
-    signed_overflowing_neg_helper::<i128>();
-    signed_overflowing_neg_helper::<isize>();
+    apply_fn_to_unsigneds!(unsigned_overflowing_neg_helper);
+    apply_fn_to_signeds!(signed_overflowing_neg_helper);
 }

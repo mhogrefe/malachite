@@ -2,6 +2,8 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
 use malachite_base::strings::ToDebugString;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_nz_test_util::common::{biguint_to_natural, rug_integer_to_natural};
 use num::BigUint;
 use rug;
 
@@ -137,4 +139,53 @@ fn test_convertible_from_i64() {
     test(-123, false);
     test(i64::MAX, true);
     test(i64::MIN, false);
+}
+
+macro_rules! unsigned_properties {
+    ($t: ident) => {
+        unsigned_gen::<$t>().test_properties(|u| {
+            let n = Natural::from(u);
+            assert!(n.is_valid());
+            assert_eq!($t::exact_from(&n), u);
+            assert_eq!(Natural::from(u128::exact_from(u)), n);
+        });
+    };
+}
+
+macro_rules! signed_properties {
+    ($t: ident) => {
+        signed_gen::<$t>().test_properties(|i| {
+            let on = Natural::checked_from(i);
+            assert!(on.as_ref().map_or(true, Natural::is_valid));
+            assert_eq!(on.is_some(), i >= 0);
+            assert_eq!(Natural::convertible_from(i), i >= 0);
+            let n = Natural::saturating_from(i);
+            assert!(n.is_valid());
+            if let Some(x) = on.as_ref() {
+                assert_eq!(*x, n);
+                assert_eq!($t::exact_from(x), i);
+                assert_eq!(Natural::exact_from(i128::exact_from(i)), n);
+            } else {
+                assert_eq!(n, 0);
+            }
+        });
+    };
+}
+
+#[test]
+fn from_primitive_integer_properties() {
+    unsigned_gen::<u32>().test_properties(|u| {
+        let n = Natural::from(u);
+        assert_eq!(biguint_to_natural(&BigUint::from(u)), n);
+        assert_eq!(rug_integer_to_natural(&rug::Integer::from(u)), n);
+    });
+
+    unsigned_gen::<u64>().test_properties(|u| {
+        let n = Natural::from(u);
+        assert_eq!(biguint_to_natural(&BigUint::from(u)), n);
+        assert_eq!(rug_integer_to_natural(&rug::Integer::from(u)), n);
+    });
+
+    apply_to_unsigneds!(unsigned_properties);
+    apply_to_signeds!(signed_properties);
 }

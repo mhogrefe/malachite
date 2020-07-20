@@ -35,12 +35,7 @@ fn exhaustive_negative_signeds_long_helper<T: PrimitiveSigned>(last_20: &[T]) {
 
 #[test]
 fn test_exhaustive_negative_signeds() {
-    exhaustive_negative_signeds_helper::<i8>();
-    exhaustive_negative_signeds_helper::<i16>();
-    exhaustive_negative_signeds_helper::<i32>();
-    exhaustive_negative_signeds_helper::<i64>();
-    exhaustive_negative_signeds_helper::<i128>();
-    exhaustive_negative_signeds_helper::<isize>();
+    apply_fn_to_signeds!(exhaustive_negative_signeds_helper);
 
     exhaustive_negative_signeds_long_helper::<i8>(&[
         -109, -110, -111, -112, -113, -114, -115, -116, -117, -118, -119, -120, -121, -122, -123,

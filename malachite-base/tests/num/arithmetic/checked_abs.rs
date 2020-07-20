@@ -14,10 +14,5 @@ fn checked_abs_helper<T: PrimitiveSigned>() {
 
 #[test]
 fn test_checked_abs() {
-    checked_abs_helper::<i8>();
-    checked_abs_helper::<i16>();
-    checked_abs_helper::<i32>();
-    checked_abs_helper::<i64>();
-    checked_abs_helper::<i128>();
-    checked_abs_helper::<isize>();
+    apply_fn_to_signeds!(checked_abs_helper);
 }

@@ -31,18 +31,8 @@ fn increment_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_increment() {
-    increment_helper_unsigned::<u8>();
-    increment_helper_unsigned::<u16>();
-    increment_helper_unsigned::<u32>();
-    increment_helper_unsigned::<u64>();
-    increment_helper_unsigned::<u128>();
-    increment_helper_unsigned::<usize>();
-    increment_helper_signed::<i8>();
-    increment_helper_signed::<i16>();
-    increment_helper_signed::<i32>();
-    increment_helper_signed::<i64>();
-    increment_helper_signed::<i128>();
-    increment_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(increment_helper_unsigned);
+    apply_fn_to_signeds!(increment_helper_signed);
 }
 
 macro_rules! increment_fail {
@@ -98,18 +88,8 @@ fn decrement_helper_signed<T: PrimitiveSigned>() {
 
 #[test]
 fn test_decrement() {
-    decrement_helper_unsigned::<u8>();
-    decrement_helper_unsigned::<u16>();
-    decrement_helper_unsigned::<u32>();
-    decrement_helper_unsigned::<u64>();
-    decrement_helper_unsigned::<u128>();
-    decrement_helper_unsigned::<usize>();
-    decrement_helper_signed::<i8>();
-    decrement_helper_signed::<i16>();
-    decrement_helper_signed::<i32>();
-    decrement_helper_signed::<i64>();
-    decrement_helper_signed::<i128>();
-    decrement_helper_signed::<isize>();
+    apply_fn_to_unsigneds!(decrement_helper_unsigned);
+    apply_fn_to_signeds!(decrement_helper_signed);
 }
 
 macro_rules! decrement_fail {

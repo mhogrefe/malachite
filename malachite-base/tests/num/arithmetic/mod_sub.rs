@@ -28,10 +28,5 @@ fn mod_sub_helper<T: PrimitiveUnsigned>() {
 
 #[test]
 fn test_mod_sub() {
-    mod_sub_helper::<u8>();
-    mod_sub_helper::<u16>();
-    mod_sub_helper::<u32>();
-    mod_sub_helper::<u64>();
-    mod_sub_helper::<u128>();
-    mod_sub_helper::<usize>();
+    apply_fn_to_unsigneds!(mod_sub_helper);
 }
