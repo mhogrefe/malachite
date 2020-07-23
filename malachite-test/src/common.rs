@@ -2,8 +2,6 @@ use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::fs;
 
-use malachite_bench::benchmarks::{run_benchmark, BenchmarkOptions, BenchmarkSeriesOptions};
-
 pub const SMALL_LIMIT: usize = 1_000;
 pub const LARGE_LIMIT: usize = 10_000;
 
@@ -211,78 +209,6 @@ impl GenerationMode {
             GenerationMode::SpecialRandom(_) => GenerationMode::SpecialRandom(scale),
         }
     }
-}
-
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum BenchmarkType {
-    Single,
-    LibraryComparison,
-    EvaluationStrategy,
-    Algorithms,
-}
-
-pub fn m_run_benchmark<'a, I: Iterator>(
-    title: &'a str,
-    benchmark_type: BenchmarkType,
-    generator: I,
-    generation_mode_name: &'a str,
-    limit: usize,
-    file_name: &'a str,
-    bucketing_function: &'a dyn Fn(&I::Item) -> usize,
-    bucketing_label: &'a str,
-    series: &mut [(&'a str, &'a mut dyn FnMut(I::Item))],
-) where
-    I::Item: Clone,
-{
-    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
-        panic!(
-            "Bad benchmark: {}. \
-             Benchmarks should have type Single iff they have only one series.",
-            title
-        );
-    }
-    if limit == 0 {
-        return;
-    }
-    let title = match benchmark_type {
-        BenchmarkType::Single => title.to_string(),
-        BenchmarkType::LibraryComparison => format!("{} library comparison", title),
-        BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
-        BenchmarkType::Algorithms => format!("{} algorithms", title),
-    };
-    println!("benchmarking {} {}", generation_mode_name, title);
-    let colors = vec![
-        "green", "blue", "red", "black", "orange", "yellow", "gray", "purple",
-    ];
-    if series.len() > colors.len() {
-        panic!("not enough available colors");
-    }
-    let mut series_options = Vec::new();
-    for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {
-        series_options.push(BenchmarkSeriesOptions {
-            name: label,
-            function,
-            color,
-        });
-    }
-    let options = BenchmarkOptions {
-        generator,
-        title: &title,
-        limit,
-        bucketing_function,
-        x_axis_label: bucketing_label,
-        y_axis_label: "time (ns)",
-        file_name: format!("benchmarks/{}", file_name),
-        series_options,
-    };
-    run_benchmark(options);
-}
-
-#[macro_export]
-macro_rules! no_out {
-    ($e:expr) => {{
-        $e;
-    }};
 }
 
 pub fn test_properties<T, G: Fn(GenerationMode) -> Box<dyn Iterator<Item = T>>, F: FnMut(&T)>(

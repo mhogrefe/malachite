@@ -1,10 +1,9 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::platform::Limb;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -80,7 +79,7 @@ fn demo_natural_limbs_index(gm: GenerationMode, limit: usize) {
 
 #[allow(unknown_lints, unused_collect)]
 fn benchmark_natural_limbs_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.limbs()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),
@@ -112,7 +111,7 @@ fn benchmark_natural_limbs_rev_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.limbs().rev()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),
@@ -139,7 +138,7 @@ fn benchmark_natural_limbs_rev_evaluation_strategy(
 }
 
 fn benchmark_natural_limbs_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.limbs().size_hint()",
         BenchmarkType::Single,
         naturals(gm),
@@ -156,7 +155,7 @@ fn benchmark_natural_limbs_size_hint(gm: GenerationMode, limit: usize, file_name
 }
 
 fn benchmark_natural_limbs_index_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.limbs().index()",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),

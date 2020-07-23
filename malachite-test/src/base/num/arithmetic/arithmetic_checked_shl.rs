@@ -1,10 +1,9 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_signed, pairs_of_signed_and_small_unsigned,
     pairs_of_unsigned_and_small_signed, pairs_of_unsigned_and_small_unsigned,
@@ -249,7 +248,7 @@ macro_rules! arithmetic_checked_shl_u_u {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_unsigned_and_small_unsigned::<$t, $u>(gm),
@@ -436,7 +435,7 @@ macro_rules! arithmetic_checked_shl_u_i {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_unsigned_and_small_signed::<$t, $u>(gm),
@@ -623,7 +622,7 @@ macro_rules! arithmetic_checked_shl_i_u {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_signed_and_small_unsigned::<$t, $u>(gm),
@@ -810,7 +809,7 @@ macro_rules! arithmetic_checked_shl_i_i {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_signed_and_small_signed::<$t, $u>(gm),

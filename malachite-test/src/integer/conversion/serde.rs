@@ -3,10 +3,9 @@ extern crate serde_json;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -26,7 +25,7 @@ fn demo_integer_serialize_json(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_serialize_json(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "serde_json::to_string(&Natural)",
         BenchmarkType::Single,
         integers(gm),

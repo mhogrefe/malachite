@@ -2601,6 +2601,19 @@ pub fn pairs_of_unsigned_vec_var_20<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of both
+// `_limbs_square_to_out_toom_3` && `_limbs_square_to_out_toom_4`.
+pub fn pairs_of_unsigned_vec_var_21<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 14, 7).filter(|&(ref out, ref xs)| {
+            let xs_len = xs.len();
+            out.len() >= xs_len << 1 && (xs_len == 7 || xs_len == 8 || xs_len > 9)
+        }),
+    )
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {
@@ -2860,12 +2873,12 @@ pub fn triples_of_unsigned_vec_var_12<T: PrimitiveUnsigned + Rand>(
 pub fn triples_of_unsigned_vec_var_13<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 10, 5, 5).filter(
-        |&(ref out, ref xs, ref ys)| {
+    Box::new(
+        triples_of_unsigned_vec_min_sizes(gm, 6, 3, 3).filter(|&(ref out, ref xs, ref ys)| {
             out.len() >= xs.len() + ys.len()
                 && _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
+        }),
+    )
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the

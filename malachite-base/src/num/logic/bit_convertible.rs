@@ -1,9 +1,10 @@
+use std::ops::ShrAssign;
+
 use num::arithmetic::traits::Parity;
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::{NegativeOne, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitConvertible, LeadingZeros};
-use std::ops::ShrAssign;
 
 pub fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();

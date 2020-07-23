@@ -1,12 +1,11 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz_test_util::integer::logic::checked_count_ones::{
     integer_checked_count_ones_alt_1, integer_checked_count_ones_alt_2,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -29,7 +28,7 @@ fn benchmark_integer_checked_count_ones_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.checked_count_ones()",
         BenchmarkType::Algorithms,
         integers(gm),

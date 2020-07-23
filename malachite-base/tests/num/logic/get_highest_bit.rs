@@ -1,4 +1,8 @@
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
 pub fn test_get_highest_bit() {
@@ -7,4 +11,22 @@ pub fn test_get_highest_bit() {
     assert_eq!(4_000_000_000u32.get_highest_bit(), true);
     assert_eq!(2_000_000_000i32.get_highest_bit(), false);
     assert_eq!((-2_000_000_000i32).get_highest_bit(), true);
+}
+
+fn get_highest_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|u| {
+        assert_eq!(u.get_highest_bit(), u >= T::power_of_two(T::WIDTH - 1));
+    });
+}
+
+fn get_highest_bit_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|i| {
+        assert_eq!(i.get_highest_bit(), i < T::ZERO);
+    });
+}
+
+#[test]
+fn get_highest_bit_properties() {
+    apply_fn_to_unsigneds!(get_highest_bit_properties_helper_unsigned);
+    apply_fn_to_signeds!(get_highest_bit_properties_helper_signed);
 }

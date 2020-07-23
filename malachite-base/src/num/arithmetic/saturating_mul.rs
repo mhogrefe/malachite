@@ -38,15 +38,4 @@ macro_rules! impl_saturating_mul {
         }
     };
 }
-impl_saturating_mul!(u8);
-impl_saturating_mul!(u16);
-impl_saturating_mul!(u32);
-impl_saturating_mul!(u64);
-impl_saturating_mul!(u128);
-impl_saturating_mul!(usize);
-impl_saturating_mul!(i8);
-impl_saturating_mul!(i16);
-impl_saturating_mul!(i32);
-impl_saturating_mul!(i64);
-impl_saturating_mul!(i128);
-impl_saturating_mul!(isize);
+apply_to_primitive_ints!(impl_saturating_mul);

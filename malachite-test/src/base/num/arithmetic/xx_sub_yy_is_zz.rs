@@ -3,13 +3,12 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::xx_sub_yy_is_zz::_explicit_xx_sub_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::quadruples_of_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -47,7 +46,7 @@ fn benchmark_xx_sub_yy_is_zz_algorithms<T: PrimitiveUnsigned + Rand + SampleRang
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "{}.xx_sub_yy_is_zz({}, {}, {}, {})",
             T::NAME,

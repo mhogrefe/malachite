@@ -1,10 +1,9 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     triples_of_signed_small_signed_and_rounding_mode_var_1,
     triples_of_signed_small_unsigned_and_rounding_mode_var_1,
@@ -449,7 +448,7 @@ macro_rules! shr_round_u_u {
         }
 
         fn $benchmark_shr_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -466,7 +465,7 @@ macro_rules! shr_round_u_u {
         }
 
         fn $benchmark_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -716,7 +715,7 @@ macro_rules! shr_round_u_i {
         }
 
         fn $benchmark_shr_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -733,7 +732,7 @@ macro_rules! shr_round_u_i {
         }
 
         fn $benchmark_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -983,7 +982,7 @@ macro_rules! shr_round_i_u {
         }
 
         fn $benchmark_shr_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -1000,7 +999,7 @@ macro_rules! shr_round_i_u {
         }
 
         fn $benchmark_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_unsigned_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -1250,7 +1249,7 @@ macro_rules! shr_round_i_i {
         }
 
         fn $benchmark_shr_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_1::<$t, $u>(gm),
@@ -1267,7 +1266,7 @@ macro_rules! shr_round_i_i {
         }
 
         fn $benchmark_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shr_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_1::<$t, $u>(gm),

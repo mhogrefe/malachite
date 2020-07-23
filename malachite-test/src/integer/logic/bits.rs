@@ -1,9 +1,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -36,7 +35,7 @@ fn demo_integer_bits_index(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_bits_get_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.bits()[u64]",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_small_unsigned(gm),

@@ -4,11 +4,10 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_small_signed_and_small_unsigned, pairs_of_small_unsigneds,
 };
@@ -64,7 +63,7 @@ fn benchmark_unsigned_saturating_pow_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.saturating_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_small_unsigneds::<T, u64>(gm),
@@ -82,7 +81,7 @@ fn benchmark_signed_saturating_pow_assign<T: PrimitiveSigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.saturating_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_small_signed_and_small_unsigned::<T, u64>(gm),

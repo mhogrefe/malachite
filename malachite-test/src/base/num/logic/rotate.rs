@@ -1,11 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{pairs_of_signed_and_unsigned, pairs_of_unsigned_and_unsigned};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -96,7 +95,7 @@ fn benchmark_unsigned_rotate_left<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rotate_left(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_unsigned::<T, u64>(gm),
@@ -120,7 +119,7 @@ fn benchmark_signed_rotate_left<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rotate_left(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_unsigned::<T, u64>(gm),
@@ -141,7 +140,7 @@ fn benchmark_unsigned_rotate_right<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rotate_right(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_unsigned::<T, u64>(gm),
@@ -165,7 +164,7 @@ fn benchmark_signed_rotate_right<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rotate_right(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_unsigned::<T, u64>(gm),

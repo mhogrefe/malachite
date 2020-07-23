@@ -1,9 +1,8 @@
 use malachite_base::slices::slice_set_zero;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::platform::Limb;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -20,7 +19,7 @@ fn demo_slice_set_zero(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_slice_set_zero(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "slice_set_zero(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned::<Limb>(gm),

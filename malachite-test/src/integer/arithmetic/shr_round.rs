@@ -1,10 +1,9 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     triples_of_integer_small_signed_and_rounding_mode_var_2,
     triples_of_integer_small_unsigned_and_rounding_mode_var_1,
@@ -168,7 +167,7 @@ macro_rules! demos_and_benches_u {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_integer_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -189,7 +188,7 @@ macro_rules! demos_and_benches_u {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_integer_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -309,7 +308,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm),
@@ -330,7 +329,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_integer_small_signed_and_rounding_mode_var_2::<$t>(gm),

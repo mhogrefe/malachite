@@ -1,10 +1,9 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 
@@ -35,7 +34,7 @@ fn demo_natural_clear_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_clear_bit(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -52,7 +51,7 @@ fn benchmark_limbs_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) 
 }
 
 fn benchmark_natural_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.clear_bit(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),

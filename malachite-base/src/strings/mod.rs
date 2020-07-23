@@ -1,6 +1,7 @@
-use named::Named;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug};
+
+use named::Named;
 
 /// Returns a `String` with the same characters and multiplicities, but in order.
 ///

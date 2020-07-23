@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_unsigned, rm_pairs_of_integer_and_small_unsigned,
 };
@@ -38,7 +37,7 @@ fn benchmark_integer_divisible_by_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.divisible_by_power_of_two(u64)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned(gm),
@@ -67,7 +66,7 @@ fn benchmark_integer_divisible_by_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.divisible_by_power_of_two(u64)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_small_unsigned(gm),

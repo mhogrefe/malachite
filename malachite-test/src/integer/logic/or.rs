@@ -2,6 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::logic::or::{
     limbs_neg_or_limb, limbs_neg_or_limb_in_place, limbs_neg_or_limb_to_out, limbs_neg_or_neg_limb,
     limbs_or_neg_neg, limbs_or_neg_neg_in_place_either, limbs_or_neg_neg_to_out, limbs_or_pos_neg,
@@ -11,9 +12,7 @@ use malachite_nz::integer::logic::or::{
 };
 use malachite_nz_test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_and_unsigned_var_2,
     pairs_of_unsigned_vec_var_6, triples_of_limb_vec_var_6, triples_of_limb_vec_var_8,
@@ -317,7 +316,7 @@ fn demo_integer_or_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_neg_or_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_or_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_unsigned_var_2(gm),
@@ -334,7 +333,7 @@ fn benchmark_limbs_neg_or_limb(gm: GenerationMode, limit: usize, file_name: &str
 }
 
 fn benchmark_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_or_limb_to_out(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_3(gm),
@@ -351,7 +350,7 @@ fn benchmark_limbs_neg_or_limb_to_out(gm: GenerationMode, limit: usize, file_nam
 }
 
 fn benchmark_limbs_neg_or_limb_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_or_limb_in_place(&mut [Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_unsigned_var_2(gm),
@@ -368,7 +367,7 @@ fn benchmark_limbs_neg_or_limb_in_place(gm: GenerationMode, limit: usize, file_n
 }
 
 fn benchmark_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_pos_or_neg_limb(&[Limb], SignedLimb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_positive_unsigned_var_2(gm),
@@ -385,7 +384,7 @@ fn benchmark_limbs_pos_or_neg_limb(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_or_neg_limb(&[Limb], SignedLimb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_positive_unsigned_var_2(gm),
@@ -402,7 +401,7 @@ fn benchmark_limbs_neg_or_neg_limb(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_limbs_or_pos_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_pos_neg(&[u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -419,7 +418,7 @@ fn benchmark_limbs_or_pos_neg(gm: GenerationMode, limit: usize, file_name: &str)
 }
 
 fn benchmark_limbs_or_pos_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_pos_neg_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
         triples_of_limb_vec_var_6(gm),
@@ -440,7 +439,7 @@ fn benchmark_limbs_slice_or_pos_neg_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_or_pos_neg_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -457,7 +456,7 @@ fn benchmark_limbs_slice_or_pos_neg_in_place_left(
 }
 
 fn benchmark_limbs_vec_or_pos_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_or_pos_neg_in_place_left(&Vec<u32>, &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -474,7 +473,7 @@ fn benchmark_limbs_vec_or_pos_neg_in_place_left(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_or_pos_neg_in_place_right(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_pos_neg_in_place_right(&[u32], &mut [u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -491,7 +490,7 @@ fn benchmark_limbs_or_pos_neg_in_place_right(gm: GenerationMode, limit: usize, f
 }
 
 fn benchmark_limbs_or_neg_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_neg_neg(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -508,7 +507,7 @@ fn benchmark_limbs_or_neg_neg(gm: GenerationMode, limit: usize, file_name: &str)
 }
 
 fn benchmark_limbs_or_neg_neg_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_neg_neg_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_limb_vec_var_8(gm),
@@ -529,7 +528,7 @@ fn benchmark_limbs_slice_or_neg_neg_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_or_neg_neg_in_place_left(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -546,7 +545,7 @@ fn benchmark_limbs_slice_or_neg_neg_in_place_left(
 }
 
 fn benchmark_limbs_vec_or_neg_neg_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_or_neg_neg_in_place_left(&mut Vec<Limb>, &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -563,7 +562,7 @@ fn benchmark_limbs_vec_or_neg_neg_in_place_left(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_or_neg_neg_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_or_neg_neg_in_place_either(&mut [Limb], &mut [Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -584,7 +583,7 @@ fn benchmark_integer_or_assign_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer |= Integer",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
@@ -607,7 +606,7 @@ fn benchmark_integer_or_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer |= Integer",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integers(gm),
@@ -624,7 +623,7 @@ fn benchmark_integer_or_assign_evaluation_strategy(
 }
 
 fn benchmark_integer_or_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer | Integer",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
@@ -643,7 +642,7 @@ fn benchmark_integer_or_library_comparison(gm: GenerationMode, limit: usize, fil
 }
 
 fn benchmark_integer_or_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer | Integer",
         BenchmarkType::Algorithms,
         pairs_of_integers(gm),
@@ -667,7 +666,7 @@ fn benchmark_integer_or_algorithms(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_integer_or_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer | Integer",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integers(gm),

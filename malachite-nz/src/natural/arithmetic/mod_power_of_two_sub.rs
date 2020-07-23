@@ -1,3 +1,5 @@
+use std::mem::swap;
+
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ShrRound,
 };
@@ -20,8 +22,6 @@ use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-
-//TODO clean
 
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     xs.resize(
@@ -237,9 +237,9 @@ impl Natural {
             (&Natural(Small(small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
                 if overflow {
-                    let mut out_limbs = limbs_low_mask(pow);
-                    out_limbs[0] = diff;
-                    Natural(Large(out_limbs))
+                    let mut out = limbs_low_mask(pow);
+                    out[0] = diff;
+                    Natural(Large(out))
                 } else {
                     Natural(Small(diff))
                 }
@@ -261,9 +261,9 @@ impl Natural {
             (&Natural(Small(small)), other, _) => {
                 let (diff, overflow) = other.overflowing_sub(small);
                 if overflow {
-                    let mut out_limbs = limbs_low_mask(pow);
-                    out_limbs[0] = diff;
-                    Natural(Large(out_limbs))
+                    let mut out = limbs_low_mask(pow);
+                    out[0] = diff;
+                    Natural(Large(out))
                 } else {
                     Natural(Small(diff))
                 }
@@ -284,9 +284,9 @@ impl Natural {
             (&mut Natural(Small(ref mut small)), other, _) => {
                 let (diff, overflow) = small.overflowing_sub(other);
                 if overflow {
-                    let mut out_limbs = limbs_low_mask(pow);
-                    out_limbs[0] = diff;
-                    *self = Natural(Large(out_limbs));
+                    let mut out = limbs_low_mask(pow);
+                    out[0] = diff;
+                    *self = Natural(Large(out));
                 } else {
                     *small = diff;
                 }
@@ -309,9 +309,9 @@ impl Natural {
             (&mut Natural(Small(ref mut small)), other, _) => {
                 let (diff, overflow) = other.overflowing_sub(*small);
                 if overflow {
-                    let mut out_limbs = limbs_low_mask(pow);
-                    out_limbs[0] = diff;
-                    *self = Natural(Large(out_limbs))
+                    let mut out = limbs_low_mask(pow);
+                    out[0] = diff;
+                    *self = Natural(Large(out))
                 } else {
                     *small = diff
                 }
@@ -500,13 +500,11 @@ impl ModPowerOfTwoSubAssign<Natural> for Natural {
                 y.mod_power_of_two_right_sub_assign_limb(x, pow);
                 *self = other;
             }
-            (&mut Natural(Large(ref mut xs)), _) => {
-                if let Natural(Large(mut ys)) = other {
-                    if limbs_mod_power_of_two_sub_in_place_either(xs, &mut ys, pow) {
-                        *xs = ys;
-                    }
-                    self.trim();
+            (&mut Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_mod_power_of_two_sub_in_place_either(xs, ys, pow) {
+                    swap(xs, ys)
                 }
+                self.trim();
             }
         }
     }

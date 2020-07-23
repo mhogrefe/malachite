@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -35,7 +34,7 @@ fn demo_integer_odd(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_even(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.even()",
         BenchmarkType::Single,
         integers(gm),
@@ -49,7 +48,7 @@ fn benchmark_integer_even(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_integer_odd(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.odd()",
         BenchmarkType::Single,
         integers(gm),

@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bools::random::{random_bools, RandomBools};
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::signeds::PrimitiveSigned;
@@ -6,7 +8,6 @@ use num::random::geometric::mean_to_p_with_min;
 use num::random::random_unsigneds_less_than;
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 use random::seed::Seed;
-use std::marker::PhantomData;
 
 /// A `StripedBitSource` generates bits in a way that lets you control the mean length of a run (a
 /// consecutive series of 0s or 1s). If the mean is set to 2, the bits are generated as if by fair

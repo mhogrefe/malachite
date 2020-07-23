@@ -1,9 +1,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::hash::hash;
 use malachite_test::inputs::integer::{integers, nrm_integers};
 
@@ -19,7 +18,7 @@ fn demo_integer_hash(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_hash_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer hash",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),

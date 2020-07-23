@@ -4,14 +4,13 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::shr::{
     limbs_shr, limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
 use malachite_nz::platform::Limb;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_u64_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_u64_var_6,
@@ -187,7 +186,7 @@ fn demo_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -209,7 +208,7 @@ fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_to_out(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm),
@@ -226,7 +225,7 @@ fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str)
 }
 
 fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_shr_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_u64_var_2(gm),
@@ -243,7 +242,7 @@ fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_nam
 }
 
 fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_shr_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -293,7 +292,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_natural_and_small_unsigned::<$t>(gm),
@@ -386,7 +385,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_natural_and_small_signed::<i32>(gm),
@@ -450,7 +449,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural >>= u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
@@ -467,7 +466,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
 }
 
 fn benchmark_natural_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural >> u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
@@ -488,7 +487,7 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural >>= i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_signed::<i32>(gm),
@@ -505,7 +504,7 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
 }
 
 fn benchmark_natural_shr_i32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural >> i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_signed::<i32>(gm),

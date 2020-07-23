@@ -3,13 +3,12 @@ use std::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
     limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2,
     triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
@@ -79,7 +78,7 @@ fn demo_integer_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_eq_mod_power_of_two_neg_limb(&[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2(gm),
@@ -98,7 +97,7 @@ fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_eq_mod_power_of_two_neg_pos(&[u32], &[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -119,7 +118,7 @@ fn benchmark_integer_eq_mod_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.eq_mod_power_of_two(&Integer, u64)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_integer_integer_and_small_unsigned::<u64>(gm),
@@ -148,7 +147,7 @@ fn benchmark_integer_eq_mod_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.eq_mod_power_of_two(&Integer, u64)",
         BenchmarkType::Algorithms,
         triples_of_integer_integer_and_small_unsigned::<u64>(gm),

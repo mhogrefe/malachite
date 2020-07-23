@@ -1,14 +1,13 @@
 use malachite_base::num::arithmetic::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
     limbs_vec_next_power_of_two_in_place,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned_var_1;
 use malachite_test::inputs::natural::{naturals, rm_naturals};
 
@@ -103,7 +102,7 @@ fn demo_natural_next_power_of_two_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_next_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_next_power_of_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -124,7 +123,7 @@ fn benchmark_limbs_slice_next_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_next_power_of_two_in_place(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -145,7 +144,7 @@ fn benchmark_limbs_vec_next_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_next_power_of_two_in_place(&mut Vec<u32>)",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -162,7 +161,7 @@ fn benchmark_limbs_vec_next_power_of_two_in_place(
 }
 
 fn benchmark_natural_next_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.next_power_of_two_assign()",
         BenchmarkType::Single,
         naturals(gm),
@@ -180,7 +179,7 @@ fn benchmark_natural_next_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.next_power_of_two()",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -201,7 +200,7 @@ fn benchmark_natural_next_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.next_power_of_two()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),

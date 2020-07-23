@@ -1,11 +1,10 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use num::Signed;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, nrm_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -65,7 +64,7 @@ fn demo_integer_unsigned_abs_ref_out(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.abs_assign()",
         BenchmarkType::Single,
         integers(gm),
@@ -79,7 +78,7 @@ fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &st
 }
 
 fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.abs()",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -97,7 +96,7 @@ fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.abs()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -114,7 +113,7 @@ fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, f
 }
 
 fn benchmark_integer_unsigned_abs(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.unsigned_abs()",
         BenchmarkType::Single,
         integers(gm),
@@ -132,7 +131,7 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.unsigned_abs()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),

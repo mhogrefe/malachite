@@ -1,12 +1,11 @@
 use malachite_base::num::arithmetic::traits::{Mod, ModNeg, ModNegAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::pairs_of_naturals_var_2;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -79,7 +78,7 @@ fn benchmark_natural_mod_neg_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.mod_neg_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals_var_2(gm),
@@ -106,7 +105,7 @@ fn benchmark_natural_mod_neg_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.mod_neg(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals_var_2(gm),
@@ -137,7 +136,7 @@ fn benchmark_natural_mod_neg_evaluation_strategy(
 }
 
 fn benchmark_natural_mod_neg_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.mod_neg(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_naturals_var_2(gm),

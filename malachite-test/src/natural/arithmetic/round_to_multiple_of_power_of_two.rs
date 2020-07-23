@@ -7,6 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{
     limbs_round_to_multiple_of_power_of_two, limbs_round_to_multiple_of_power_of_two_down,
     limbs_round_to_multiple_of_power_of_two_down_in_place,
@@ -19,9 +20,7 @@ use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
     triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
@@ -259,7 +258,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_down(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -282,7 +281,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_up(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -303,7 +302,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -326,7 +325,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -349,7 +348,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_down_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -372,7 +371,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -395,7 +394,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -418,7 +417,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_round_to_multiple_of_power_of_two_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -443,7 +442,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.round_to_multiple_of_power_of_two_assign(u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),
@@ -464,7 +463,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::Algorithms,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),
@@ -495,7 +494,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),

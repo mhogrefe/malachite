@@ -4,11 +4,10 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{natural_signeds, signeds, unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -559,7 +558,7 @@ fn benchmark_checked_from_unsigned<T: PrimitiveUnsigned + Rand, U: Named>(
 ) where
     U: CheckedFrom<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.checked_from({})", U::NAME, T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -581,7 +580,7 @@ fn benchmark_checked_from_signed<T: PrimitiveSigned + Rand, U: Named>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as PrimitiveSigned>::UnsignedOfEqualWidth: Rand,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.checked_from({})", U::NAME, T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -601,7 +600,7 @@ fn benchmark_exact_from_unsigned<T: PrimitiveUnsigned + Rand, U: Named>(
 ) where
     U: CheckedFrom<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.exact_from({})", U::NAME, T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -623,7 +622,7 @@ fn benchmark_exact_from_signed<T: PrimitiveSigned + Rand, U: Named>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as PrimitiveSigned>::UnsignedOfEqualWidth: Rand,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.exact_from({})", U::NAME, T::NAME),
         BenchmarkType::Single,
         natural_signeds::<T>(gm),

@@ -1,9 +1,10 @@
+use std::fmt::Debug;
+
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::random::random_unsigned_bit_chunks;
 use num::random::thrifty_random::RandomPrimitiveIntegers;
 use random::seed::Seed;
-use std::fmt::Debug;
 
 /// Uniformly generates unsigned integers of up to `chunk_size` bits.
 #[derive(Clone, Debug)]

@@ -2,10 +2,9 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     nrm_pairs_of_integers, pairs_of_integers, rm_pairs_of_integers,
 };
@@ -80,7 +79,7 @@ fn benchmark_integer_add_assign_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer += Integer",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
@@ -103,7 +102,7 @@ fn benchmark_integer_add_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer += Integer",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integers(gm),
@@ -120,7 +119,7 @@ fn benchmark_integer_add_assign_evaluation_strategy(
 }
 
 fn benchmark_integer_add_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer + Integer",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integers(gm),
@@ -140,7 +139,7 @@ fn benchmark_integer_add_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_add_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer + Integer",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integers(gm),

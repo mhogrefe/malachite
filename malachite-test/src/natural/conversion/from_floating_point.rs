@@ -2,11 +2,10 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
     pairs_of_finite_f64_and_rounding_mode_var_1,
@@ -116,7 +115,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural::rounding_from({}, RoundingMode)", stringify!($f)),
                 BenchmarkType::Single,
                 $pairs_of_float_and_rounding_mode_var_1(gm),
@@ -133,7 +132,7 @@ macro_rules! float_demos_and_benches {
         }
 
         fn $benchmark_natural_from_float(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural::from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats_var_1(gm),
@@ -151,7 +150,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural::checked_from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats(gm),
@@ -165,7 +164,7 @@ macro_rules! float_demos_and_benches {
         }
 
         fn $benchmark_natural_exact_from_float(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural::exact_from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats_exactly_equal_to_natural(gm),
@@ -183,7 +182,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural::convertible_from({})", stringify!($f)),
                 BenchmarkType::Algorithms,
                 $floats(gm),

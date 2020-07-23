@@ -1,8 +1,7 @@
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::Integer;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -67,7 +66,7 @@ fn benchmark_integer_from_twos_complement_limbs_asc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from_twos_complement_limbs_asc(&[u32])",
         BenchmarkType::EvaluationStrategy,
         vecs_of_unsigned(gm),
@@ -98,7 +97,7 @@ fn benchmark_integer_from_twos_complement_limbs_desc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from_twos_complement_limbs_desc(&[u32])",
         BenchmarkType::EvaluationStrategy,
         vecs_of_unsigned(gm),

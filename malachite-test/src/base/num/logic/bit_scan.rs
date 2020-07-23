@@ -1,11 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_unsigned_and_small_unsigned,
 };
@@ -119,7 +118,7 @@ fn benchmark_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.index_of_next_false_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -140,7 +139,7 @@ fn benchmark_unsigned_index_of_next_true_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.index_of_next_true_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -164,7 +163,7 @@ fn benchmark_signed_index_of_next_false_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.index_of_next_false_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -188,7 +187,7 @@ fn benchmark_signed_index_of_next_true_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.index_of_next_true_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),

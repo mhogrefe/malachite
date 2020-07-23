@@ -4,11 +4,10 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigits, SignificantBits,
 };
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_u64_var_3, pairs_of_natural_and_small_unsigned_var_3,
 };
@@ -197,7 +196,7 @@ fn benchmark_to_power_of_two_digits_asc_algorithms<
 ) where
     Natural: PowerOfTwoDigits<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc(&Natural, u64)",
             T::NAME
@@ -240,7 +239,7 @@ fn benchmark_natural_to_power_of_two_digits_asc_natural_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&Natural, u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned_var_3(gm),
@@ -283,7 +282,7 @@ fn benchmark_natural_to_power_of_two_digits_desc_natural(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(&Natural, u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned_var_3(gm),
@@ -326,7 +325,7 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!(
                     "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc(&Natural, u64)",
                     $t::NAME
@@ -381,7 +380,7 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!(
                     "PowerOfTwoDigits::<{}>::to_power_of_two_digits_desc(&Natural, u64)",
                     $t::NAME

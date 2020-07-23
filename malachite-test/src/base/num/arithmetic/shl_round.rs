@@ -1,10 +1,9 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     triples_of_signed_small_signed_and_rounding_mode_var_2,
     triples_of_unsigned_small_signed_and_rounding_mode_var_2,
@@ -247,7 +246,7 @@ macro_rules! shl_round_u_i {
         }
 
         fn $benchmark_shl_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shl_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -264,7 +263,7 @@ macro_rules! shl_round_u_i {
         }
 
         fn $benchmark_shl_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shl_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -514,7 +513,7 @@ macro_rules! shl_round_i_i {
         }
 
         fn $benchmark_shl_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shl_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -531,7 +530,7 @@ macro_rules! shl_round_i_i {
         }
 
         fn $benchmark_shl_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}.shl_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),

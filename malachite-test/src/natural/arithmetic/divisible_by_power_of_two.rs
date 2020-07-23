@@ -3,11 +3,10 @@ use std::cmp::min;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned_var_1;
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_small_unsigned, rm_pairs_of_natural_and_small_unsigned,
@@ -51,7 +50,7 @@ fn demo_natural_divisible_by_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_divisible_by_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_exact(&[u32], u32)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -72,7 +71,7 @@ fn benchmark_natural_divisible_by_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.divisible_by_power_of_two(u64)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned(gm),
@@ -101,7 +100,7 @@ fn benchmark_natural_divisible_by_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.divisible_by_power_of_two(u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),

@@ -3,14 +3,13 @@ use malachite_base::num::arithmetic::traits::{
     RemPowerOfTwoAssign,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
     limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use malachite_test::inputs::natural::pairs_of_natural_and_small_unsigned;
 
@@ -231,7 +230,7 @@ fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -252,7 +251,7 @@ fn benchmark_limbs_slice_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -273,7 +272,7 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -290,7 +289,7 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
 }
 
 fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -311,7 +310,7 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -328,7 +327,7 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
 }
 
 fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -349,7 +348,7 @@ fn benchmark_natural_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),
@@ -372,7 +371,7 @@ fn benchmark_natural_mod_power_of_two_evaluation_strategy(
 }
 
 fn benchmark_natural_rem_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.rem_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -393,7 +392,7 @@ fn benchmark_natural_rem_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.rem_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),
@@ -420,7 +419,7 @@ fn benchmark_natural_neg_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.neg_mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -441,7 +440,7 @@ fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.neg_mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),

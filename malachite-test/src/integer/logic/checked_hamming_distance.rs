@@ -2,6 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{CheckedHammingDistance, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::logic::checked_hamming_distance::{
     limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
 };
@@ -10,9 +11,7 @@ use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
     rug_checked_hamming_distance,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_2, pairs_of_unsigned_vec_var_6,
 };
@@ -70,7 +69,7 @@ fn demo_integer_checked_hamming_distance(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_hamming_distance_limb_neg(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_positive_unsigned_var_2(gm),
@@ -87,7 +86,7 @@ fn benchmark_limbs_hamming_distance_limb_neg(gm: GenerationMode, limit: usize, f
 }
 
 fn benchmark_limbs_hamming_distance_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_hamming_distance_neg(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_6(gm),
@@ -108,7 +107,7 @@ fn benchmark_integer_checked_hamming_distance_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.checked_hamming_distance(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integers(gm),
@@ -137,7 +136,7 @@ fn benchmark_integer_checked_hamming_distance_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.checked_hamming_distance(&Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integers(gm),

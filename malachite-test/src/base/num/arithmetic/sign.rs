@@ -1,11 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -52,7 +51,7 @@ fn benchmark_unsigned_sign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -73,7 +72,7 @@ fn benchmark_signed_sign<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),

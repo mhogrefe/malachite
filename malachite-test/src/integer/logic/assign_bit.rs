@@ -2,10 +2,9 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     rm_triples_of_integer_small_u64_and_bool, triples_of_integer_small_u64_and_bool,
 };
@@ -35,7 +34,7 @@ fn benchmark_integer_assign_bit_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.assign_bit(u64, bool)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_integer_small_u64_and_bool(gm),

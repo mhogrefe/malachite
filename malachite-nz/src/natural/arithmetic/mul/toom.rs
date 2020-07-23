@@ -194,12 +194,14 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_22_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
 /// 3. `xs`.len() + 1 < 2 * `ys`.len()
+///
+/// The smallest allowable `xs` length is 2. The smallest allowable `ys` length is also 2.
 ///
 /// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
 ///
@@ -372,13 +374,15 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_32_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() > `ys`.len() + 1
-/// 4. `xs`.len() == 6 or `ys`.len() > 4
 /// 3. 2 * `xs`.len() < 3 * (`ys`.len() + 1)
+/// 4. `xs`.len() == 6 or `ys`.len() > 4
+///
+/// The smallest allowable `xs` length is 6. The smallest allowable `ys` length is 4.
 ///
 /// This uses the Toom-32 aka Toom-2.5 algorithm.
 ///
@@ -663,17 +667,19 @@ const SMALLER_RECURSION_TOOM_33_AND_53: bool = true;
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    xs_len >= ys_len && ys_len > xs_len.div_round(3, RoundingMode::Ceiling) << 1
+    xs_len >= ys_len && xs_len.div_round(3, RoundingMode::Ceiling) << 1 < ys_len
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_33_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
-/// 3. `ys`.len() > 2 * (`xs`.len() / 3), where the division rounds up.
+/// 3. 2 * ceiling(`xs`.len() / 3) < `ys`.len()
+///
+/// The smallest allowable `xs` length is 3. The smallest allowable `ys` length is also 3.
 ///
 /// This uses the Toom-33 aka Toom-3 algorithm.
 ///
@@ -882,14 +888,9 @@ pub fn _limbs_mul_greater_to_out_toom_33(
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0 && xs_len >= ys_len && {
-        let n: usize = if xs_len >= ys_len << 1 {
-            xs_len.shr_round(2, RoundingMode::Ceiling)
-        } else {
-            ys_len.shr_round(1, RoundingMode::Ceiling)
-        };
-        xs_len > 3 * n && xs_len <= n << 2 && ys_len > n && ys_len <= n << 1
-    }
+    !(xs_len == 9 && ys_len == 4)
+        && xs_len + 3 < ys_len << 2
+        && xs_len.div_round(3, RoundingMode::Ceiling) > ys_len.shr_round(1, RoundingMode::Ceiling)
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -924,13 +925,15 @@ pub fn _limbs_mul_same_length_to_out_toom_42_recursive(out: &mut [Limb], xs: &[L
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_42_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
-/// 2. `xs`.len() >= `ys`.len()
-/// 3. Others; see `_limbs_mul_greater_to_out_toom_42_input_sizes_valid`. The gist is that `xs` must
-/// be less than 4 times as long as `ys`.
+/// 2. ceiling(`xs`.len() / 3) > ceiling(`ys`.len() / 2)
+/// 3. `xs`.len() + 3 < 4 * `ys`.len()
+/// 4. (`xs`.len(), `ys`.len()) != (9, 4)
+///
+/// The smallest allowable `xs` length is 4. The smallest allowable `ys` length is 2.
 ///
 /// This uses the Toom-42 algorithm.
 ///
@@ -1084,18 +1087,13 @@ pub fn _limbs_mul_greater_to_out_toom_42(
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0 && xs_len >= ys_len && {
-        let n = 1 + if 3 * xs_len >= (ys_len << 2) {
-            (xs_len - 1) >> 2
-        } else {
-            (ys_len - 1) / 3
-        };
-        xs_len > 3 * n
-            && xs_len <= n << 2
-            && ys_len > n << 1
-            && ys_len <= 3 * n
-            && xs_len + ys_len >= 5 * (n + 1)
-    }
+    !(xs_len == 16 && ys_len == 13)
+        && xs_len.div_round(3, RoundingMode::Ceiling) > ys_len.div_round(3, RoundingMode::Ceiling)
+        && {
+            let xs_len_div_4: usize = xs_len.shr_round(2, RoundingMode::Ceiling);
+            xs_len_div_4 < ys_len.shr_round(1, RoundingMode::Ceiling)
+                && xs_len + ys_len >= 5 * (xs_len_div_4 + 1)
+        }
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -1117,13 +1115,16 @@ pub fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_43_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
-/// 2. `xs`.len() >= `ys`.len()
-/// 3. Others; see `_limbs_mul_greater_to_out_toom_43_input_sizes_valid`. The gist is that `xs` must
-/// be less than twice as long as `ys`.
+/// 2. ceiling(`xs`.len() / 3) > ceiling(`ys`.len() / 3)
+/// 3. ceiling(`xs`.len() / 4) < ceiling(`ys`.len() / 2)
+/// 4. (`xs`.len(), `ys`.len()) != (16, 13)
+/// 5. `xs`.len() + `ys`.len() >= 5 * (ceiling(`xs`.len() / 4) + 1)
+///
+/// The smallest allowable `xs` length is 11. The smallest allowable `ys` length is 8.
 ///
 /// This uses the Toom-43 algorithm.
 ///
@@ -1292,7 +1293,7 @@ pub fn _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_44_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -1509,7 +1510,7 @@ pub fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_52_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -1712,7 +1713,7 @@ pub fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_53_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -2025,7 +2026,7 @@ fn _limbs_mul_greater_to_out_toom_54_recursive(p: &mut [Limb], a: &[Limb], b: &[
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_54_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -2166,7 +2167,7 @@ pub fn _limbs_mul_greater_to_out_toom_62_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_62_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -2498,7 +2499,7 @@ fn _limbs_mul_greater_to_out_toom_63_recursive(p: &mut [Limb], a: &[Limb], b: &[
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_63_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -2802,7 +2803,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_6h_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
@@ -3180,7 +3181,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len: usize, ys_len: usiz
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. A "scratch" slice is provided for the algorithm to use. An upper bound for the number of
+/// slice. A scratch slice is provided for the algorithm to use. An upper bound for the number of
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_8h_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()

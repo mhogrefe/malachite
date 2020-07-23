@@ -1,9 +1,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::hash::hash;
 use malachite_test::inputs::natural::{naturals, nrm_naturals};
 
@@ -19,7 +18,7 @@ fn demo_natural_hash(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_hash_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural hash",
         BenchmarkType::LibraryComparison,
         nrm_naturals(gm),

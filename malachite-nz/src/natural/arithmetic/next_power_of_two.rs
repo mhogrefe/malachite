@@ -10,16 +10,16 @@ use platform::Limb;
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural`.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -31,24 +31,24 @@ use platform::Limb;
 /// ```
 pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
     let xs_last = xs.last().unwrap();
-    let mut result_limbs;
-    if let Some(limb) = xs_last.checked_next_power_of_two() {
-        result_limbs = vec![0; xs.len() - 1];
-        if limb == *xs_last && !slice_test_zero(&xs[..xs.len() - 1]) {
-            if let Some(limb) = limb.arithmetic_checked_shl(1) {
-                result_limbs.push(limb)
+    let mut out;
+    if let Some(x) = xs_last.checked_next_power_of_two() {
+        out = vec![0; xs.len() - 1];
+        if x == *xs_last && !slice_test_zero(&xs[..xs.len() - 1]) {
+            if let Some(x) = x.arithmetic_checked_shl(1) {
+                out.push(x)
             } else {
-                result_limbs.push(0);
-                result_limbs.push(1);
+                out.push(0);
+                out.push(1);
             }
         } else {
-            result_limbs.push(limb);
+            out.push(x);
         }
     } else {
-        result_limbs = vec![0; xs.len()];
-        result_limbs.push(1);
+        out = vec![0; xs.len()];
+        out.push(1);
     }
-    result_limbs
+    out
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
@@ -56,40 +56,40 @@ pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
 /// slice. If the input slice is to small to hold the result, the limbs are all set to zero and the
 /// carry bit, `true`, is returned. Otherwise, `false` is returned.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::next_power_of_two::*;
 ///
-/// let mut limbs = vec![3];
-/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), false);
-/// assert_eq!(limbs, &[4]);
+/// let mut xs = vec![3];
+/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut xs), false);
+/// assert_eq!(xs, &[4]);
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), false);
-/// assert_eq!(limbs, &[0, 512]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut xs), false);
+/// assert_eq!(xs, &[0, 512]);
 ///
-/// let mut limbs = vec![123, 456, u32::MAX];
-/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut limbs), true);
-/// assert_eq!(limbs, &[0, 0, 0]);
+/// let mut xs = vec![123, 456, u32::MAX];
+/// assert_eq!(limbs_slice_next_power_of_two_in_place(&mut xs), true);
+/// assert_eq!(xs, &[0, 0, 0]);
 /// ```
 pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
-    if let Some(limb) = xs_last.checked_next_power_of_two() {
-        if limb == *xs_last && !slice_test_zero(xs_init) {
+    if let Some(x) = xs_last.checked_next_power_of_two() {
+        if x == *xs_last && !slice_test_zero(xs_init) {
             slice_set_zero(xs_init);
-            if let Some(limb) = limb.arithmetic_checked_shl(1) {
-                *xs_last = limb;
+            if let Some(x) = x.arithmetic_checked_shl(1) {
+                *xs_last = x;
                 false
             } else {
                 *xs_last = 0;
@@ -97,7 +97,7 @@ pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
             }
         } else {
             slice_set_zero(xs_init);
-            *xs_last = limb;
+            *xs_last = x;
             false
         }
     } else {
@@ -111,32 +111,32 @@ pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
 /// `Vec`.
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::arithmetic::next_power_of_two::limbs_vec_next_power_of_two_in_place;
 ///
-/// let mut limbs = vec![3];
-/// limbs_vec_next_power_of_two_in_place(&mut limbs);
-/// assert_eq!(limbs, &[4]);
+/// let mut xs = vec![3];
+/// limbs_vec_next_power_of_two_in_place(&mut xs);
+/// assert_eq!(xs, &[4]);
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_vec_next_power_of_two_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0, 512]);
+/// let mut xs = vec![123, 456];
+/// limbs_vec_next_power_of_two_in_place(&mut xs);
+/// assert_eq!(xs, &[0, 512]);
 ///
-/// let mut limbs = vec![123, 456, u32::MAX];
-/// limbs_vec_next_power_of_two_in_place(&mut limbs);
-/// assert_eq!(limbs, &[0, 0, 0, 1]);
+/// let mut xs = vec![123, 456, u32::MAX];
+/// limbs_vec_next_power_of_two_in_place(&mut xs);
+/// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_vec_next_power_of_two_in_place(xs: &mut Vec<Limb>) {
     if limbs_slice_next_power_of_two_in_place(xs) {

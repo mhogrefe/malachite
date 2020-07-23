@@ -3,10 +3,9 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::pairs_of_naturals;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -101,7 +100,7 @@ fn benchmark_natural_saturating_sub_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),
@@ -128,7 +127,7 @@ fn benchmark_natural_saturating_sub_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),

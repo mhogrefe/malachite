@@ -1,8 +1,7 @@
 use malachite_base::slices::slice_trailing_zeros;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -21,7 +20,7 @@ fn demo_slice_trailing_zeros(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_slice_trailing_zeros(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "slice_trailing_zeros(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned::<u32>(gm),

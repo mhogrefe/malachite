@@ -1,11 +1,10 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz_test_util::natural::logic::get_bit::num_get_bit;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
 use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_small_unsigned, pairs_of_natural_and_small_unsigned,
@@ -40,7 +39,7 @@ fn demo_natural_get_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_get_bit(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -57,7 +56,7 @@ fn benchmark_limbs_get_bit(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_natural_get_bit_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.get_bit(u64)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_small_unsigned(gm),

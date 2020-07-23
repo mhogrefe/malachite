@@ -1,4 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::random::special_random_natural_up_to_bits::*;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{
@@ -6,9 +7,7 @@ use rust_wheels::iterators::adaptors::{
 };
 use rust_wheels::iterators::common::EXAMPLE_SEED;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -53,7 +52,7 @@ fn benchmark_limbs_special_random_up_to_bits(
     file_name: &str,
 ) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    m_run_benchmark(
+    run_benchmark(
         "limbs_special_random_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_positive_unsigneds(gm),
@@ -75,7 +74,7 @@ fn benchmark_natural_special_random_natural_up_to_bits(
     file_name: &str,
 ) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    m_run_benchmark(
+    run_benchmark(
         "special_random_natural_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_unsigneds(gm),

@@ -2,6 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
@@ -9,9 +10,7 @@ use malachite_nz::integer::logic::bit_block_access::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     triples_of_limb_vec_small_unsigned_and_small_unsigned_var_2,
     triples_of_positive_unsigned_small_unsigned_and_small_unsigned_var_1,
@@ -111,7 +110,7 @@ fn demo_integer_get_bits_owned(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_neg_limb_get_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_limb_get_bits(Limb, u64, u64)",
         BenchmarkType::Single,
         triples_of_positive_unsigned_small_unsigned_and_small_unsigned_var_1(gm),
@@ -132,7 +131,7 @@ fn benchmark_limbs_neg_get_bits_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_neg_get_bits(&[Limb], u64, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_limb_vec_small_unsigned_and_small_unsigned_var_2(gm),
@@ -161,7 +160,7 @@ fn benchmark_integer_get_bits_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.get_bits(u64, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integer_small_unsigned_and_small_unsigned_var_1(gm),
@@ -184,7 +183,7 @@ fn benchmark_integer_get_bits_evaluation_strategy(
 }
 
 fn benchmark_integer_get_bits_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.get_bits(u64, u64)",
         BenchmarkType::Algorithms,
         triples_of_integer_small_unsigned_and_small_unsigned_var_1(gm),

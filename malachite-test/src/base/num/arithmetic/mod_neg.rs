@@ -1,10 +1,9 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigneds_var_5;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -50,7 +49,7 @@ fn benchmark_mod_neg<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_neg(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),
@@ -68,7 +67,7 @@ fn benchmark_mod_neg_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_neg_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),

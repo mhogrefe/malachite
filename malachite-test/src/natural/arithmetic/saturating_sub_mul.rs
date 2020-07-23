@@ -1,12 +1,11 @@
 use malachite_base::num::arithmetic::traits::{SaturatingSubMul, SaturatingSubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::triples_of_naturals_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -170,7 +169,7 @@ fn benchmark_natural_saturating_sub_mul_assign_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_mul_assign(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -197,7 +196,7 @@ fn benchmark_natural_saturating_sub_mul_assign_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_mul_assign(Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -224,7 +223,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_mul_assign(&Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -251,7 +250,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_mul_assign(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -278,7 +277,7 @@ fn benchmark_natural_saturating_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.saturating_sub_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_1(gm),

@@ -1,6 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod bools;
 pub mod chars;
 pub mod comparison;
 pub mod num;
@@ -10,7 +9,6 @@ pub mod strings;
 pub mod vecs;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    bools::register(registry);
     chars::register(registry);
     comparison::register(registry);
     num::register(registry);

@@ -2,7 +2,8 @@ use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::{
-    exhaustive_positive_primitives, exhaustive_signeds, exhaustive_unsigneds,
+    exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
+    exhaustive_unsigneds,
 };
 
 use generators::common::It;
@@ -27,6 +28,10 @@ pub fn exhaustive_signed_gen<T: PrimitiveSigned>() -> It<T> {
 
 pub fn exhaustive_signed_gen_var_1<T: PrimitiveSigned>() -> It<T> {
     Box::new(exhaustive_signeds().filter(|&x| x != T::MIN))
+}
+
+pub fn exhaustive_signed_gen_var_2<T: PrimitiveSigned>() -> It<T> {
+    Box::new(exhaustive_natural_signeds())
 }
 
 // -- PrimitiveUnsigned --

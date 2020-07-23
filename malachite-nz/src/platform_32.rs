@@ -57,3 +57,4 @@ pub const BMOD_1_TO_MOD_1_THRESHOLD: usize = 31;
 
 pub const SQR_TOOM2_THRESHOLD: usize = 222;
 pub const SQR_TOOM3_THRESHOLD: usize = 205;
+pub const SQR_TOOM4_THRESHOLD: usize = 1170;

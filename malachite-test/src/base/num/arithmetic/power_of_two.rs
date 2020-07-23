@@ -1,10 +1,9 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{small_u64s_var_2, small_u64s_var_3};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -52,7 +51,7 @@ fn benchmark_unsigned_power_of_two<T: PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         small_u64s_var_2::<T>(gm),
@@ -70,7 +69,7 @@ fn benchmark_signed_power_of_two<T: PrimitiveSigned>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         small_u64s_var_3::<T>(gm),

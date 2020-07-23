@@ -9,7 +9,6 @@ name = "malachite_bench"
 path = "src/lib.rs"
 
 [dependencies]
-gnuplot = "0.0.26"
 streaming-stats = "0.2.2"
 time = "0.1.40"
 

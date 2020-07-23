@@ -3,12 +3,11 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::Integer;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_signed, pairs_of_integer_and_unsigned, pairs_of_signed_and_integer,
     pairs_of_unsigned_and_integer,
@@ -348,7 +347,7 @@ fn benchmark_integer_lt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: PartialOrdAbs<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.lt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_unsigned::<T>(gm),
@@ -366,7 +365,7 @@ fn benchmark_unsigned_lt_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.lt_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_integer::<T>(gm),
@@ -388,7 +387,7 @@ fn benchmark_integer_lt_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.lt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_signed::<T>(gm),
@@ -409,7 +408,7 @@ fn benchmark_signed_lt_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.lt_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_integer::<T>(gm),
@@ -429,7 +428,7 @@ fn benchmark_integer_gt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: PartialOrdAbs<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.gt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_unsigned::<T>(gm),
@@ -447,7 +446,7 @@ fn benchmark_unsigned_gt_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.gt_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_integer::<T>(gm),
@@ -469,7 +468,7 @@ fn benchmark_integer_gt_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.gt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_signed::<T>(gm),
@@ -490,7 +489,7 @@ fn benchmark_signed_gt_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.gt_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_integer::<T>(gm),
@@ -510,7 +509,7 @@ fn benchmark_integer_le_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: PartialOrdAbs<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.le_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_unsigned::<T>(gm),
@@ -528,7 +527,7 @@ fn benchmark_unsigned_le_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.le_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_integer::<T>(gm),
@@ -550,7 +549,7 @@ fn benchmark_integer_le_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.le_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_signed::<T>(gm),
@@ -571,7 +570,7 @@ fn benchmark_signed_le_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.le_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_integer::<T>(gm),
@@ -591,7 +590,7 @@ fn benchmark_integer_ge_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: PartialOrdAbs<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.ge_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_unsigned::<T>(gm),
@@ -609,7 +608,7 @@ fn benchmark_unsigned_ge_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ge_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_integer::<T>(gm),
@@ -631,7 +630,7 @@ fn benchmark_integer_ge_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer.ge_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_signed::<T>(gm),
@@ -652,7 +651,7 @@ fn benchmark_signed_ge_abs_integer<T: PartialOrdAbs<Integer> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ge_abs(&Integer)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_integer::<T>(gm),

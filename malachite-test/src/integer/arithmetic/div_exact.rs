@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     nrm_pairs_of_integer_and_nonzero_integer_var_1, pairs_of_integer_and_nonzero_integer_var_1,
 };
@@ -89,7 +88,7 @@ fn benchmark_integer_div_exact_assign_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_exact_assign(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer_var_1(gm.with_scale(512)),
@@ -110,7 +109,7 @@ fn benchmark_integer_div_exact_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_exact_assign(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer_var_1(gm.with_scale(512)),
@@ -137,7 +136,7 @@ fn benchmark_integer_div_exact_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer_var_1(gm.with_scale(512)),
@@ -155,7 +154,7 @@ fn benchmark_integer_div_exact_library_comparison(
 }
 
 fn benchmark_integer_div_exact_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer_var_1(gm.with_scale(512)),
@@ -176,7 +175,7 @@ fn benchmark_integer_div_exact_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_exact(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer_var_1(gm.with_scale(512)),

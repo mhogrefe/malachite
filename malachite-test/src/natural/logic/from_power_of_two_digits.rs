@@ -1,13 +1,13 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::Natural;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
 use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode,
-    ScaleType,
+    DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode, ScaleType,
 };
 use malachite_test::inputs::base::{
     pairs_of_u64_and_unsigned_vec_var_3, pairs_of_u64_and_unsigned_vec_var_4,
@@ -159,7 +159,7 @@ fn benchmark_from_power_of_two_digits_asc_algorithms<
 ) where
     Natural: PowerOfTwoDigits<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_asc(&[{}], u64)",
             T::NAME
@@ -195,7 +195,7 @@ fn benchmark_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleR
 ) where
     Natural: PowerOfTwoDigits<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_desc(&[{}], u64)",
             T::NAME
@@ -221,7 +221,7 @@ fn benchmark_natural_from_power_of_two_digits_asc_natural_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::from_power_of_two_digits_asc(u64, &[Natural])",
         BenchmarkType::Algorithms,
         pairs_of_u64_and_natural_vec_var_1(gm),
@@ -254,7 +254,7 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::from_power_of_two_digits_desc(u64, &[Natural])",
         BenchmarkType::Single,
         pairs_of_u64_and_natural_vec_var_1(gm),

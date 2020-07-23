@@ -1,13 +1,12 @@
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
     limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1,
     triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1,
@@ -73,7 +72,7 @@ fn demo_natural_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_eq_limb_mod_power_of_two(&[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1(gm),
@@ -92,7 +91,7 @@ fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_eq_mod_power_of_two(&[u32], &[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -113,7 +112,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.eq_mod_power_of_two(&Natural, u64)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_natural_natural_and_small_unsigned::<u64>(gm),
@@ -142,7 +141,7 @@ fn benchmark_natural_eq_mod_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.eq_mod_power_of_two(&Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_natural_and_small_unsigned::<u64>(gm),

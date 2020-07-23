@@ -61,23 +61,23 @@ fn test_significant_bits() {
 }
 
 fn significant_bits_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_gen::<T>().test_properties(|n| {
-        let significant_bits = n.significant_bits();
+    unsigned_gen::<T>().test_properties(|u| {
+        let significant_bits = u.significant_bits();
         assert!(significant_bits <= T::WIDTH);
-        assert_eq!(significant_bits == 0, n == T::ZERO);
-        if n != T::ZERO {
-            assert_eq!(significant_bits, n.floor_log_two() + 1)
+        assert_eq!(significant_bits == 0, u == T::ZERO);
+        if u != T::ZERO {
+            assert_eq!(significant_bits, u.floor_log_two() + 1)
         }
     });
 }
 
 fn significant_bits_properties_helper_signed<T: PrimitiveSigned>() {
-    signed_gen::<T>().test_properties(|n| {
-        let significant_bits = n.significant_bits();
+    signed_gen::<T>().test_properties(|i| {
+        let significant_bits = i.significant_bits();
         assert!(significant_bits <= T::WIDTH);
-        assert_eq!(significant_bits == 0, n == T::ZERO);
-        assert_eq!(significant_bits == T::WIDTH, n == T::MIN);
-        assert_eq!(n.wrapping_neg().significant_bits(), significant_bits);
+        assert_eq!(significant_bits == 0, i == T::ZERO);
+        assert_eq!(significant_bits == T::WIDTH, i == T::MIN);
+        assert_eq!(i.wrapping_neg().significant_bits(), significant_bits);
     });
 }
 

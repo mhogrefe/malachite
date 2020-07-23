@@ -129,7 +129,6 @@ pub mod base {
             pub mod bit_convertible;
             pub mod bit_iterable;
             pub mod bit_scan;
-            pub mod get_highest_bit;
             pub mod hamming_distance;
             pub mod low_mask;
             pub mod not_assign;

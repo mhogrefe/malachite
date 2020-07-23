@@ -1,12 +1,12 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
 use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode,
-    ScaleType,
+    DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode, ScaleType,
 };
 use malachite_test::inputs::base::{
     pairs_of_u64_and_unsigned_vec_var_1, pairs_of_u64_and_unsigned_vec_var_2,
@@ -702,7 +702,7 @@ fn benchmark_to_power_of_two_digits_asc_evaluation_strategy<
     T: PowerOfTwoDigits<U>,
     T: PowerOfTwoDigitIterable<U>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc(&{}, u64)",
             U::NAME,
@@ -752,7 +752,7 @@ fn benchmark_to_power_of_two_digits_desc_evaluation_strategy<
     T: PowerOfTwoDigits<U>,
     T: PowerOfTwoDigitIterable<U>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "PowerOfTwoDigits::<{}>::to_power_of_two_digits_desc(&{}, u64)",
             U::NAME,
@@ -802,7 +802,7 @@ fn benchmark_from_power_of_two_digits_asc<
 ) where
     T: PowerOfTwoDigits<U>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "{}::from_power_of_two_digits_asc(u64, &[{}])",
             T::NAME,
@@ -834,7 +834,7 @@ fn benchmark_from_power_of_two_digits_desc<
 ) where
     T: PowerOfTwoDigits<U>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "{}::from_power_of_two_digits_desc(u64, &[{}])",
             T::NAME,

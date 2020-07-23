@@ -2,11 +2,10 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, natural_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -138,7 +137,7 @@ fn benchmark_natural_checked_from_integer_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::checked_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -165,7 +164,7 @@ fn benchmark_natural_exact_from_integer_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::exact_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -192,7 +191,7 @@ fn benchmark_natural_saturating_from_integer_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::saturating_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -219,7 +218,7 @@ fn benchmark_natural_convertible_from_integer_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::convertible_from(Integer)",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -246,7 +245,7 @@ fn benchmark_natural_convertible_from_integer_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural::convertible_from(Integer)",
         BenchmarkType::Algorithms,
         integers(gm),

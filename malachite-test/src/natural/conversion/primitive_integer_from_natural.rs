@@ -3,10 +3,9 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{naturals, naturals_var_1, naturals_var_2, rm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -833,7 +832,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $checked_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::checked_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -856,7 +855,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $checked_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::checked_from(Natural)", $t::NAME),
                 BenchmarkType::Algorithms,
                 naturals(gm),
@@ -883,7 +882,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $exact_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::exact_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 $exact_from_generator::<$t>(gm),
@@ -906,7 +905,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $wrapping_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::wrapping_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -929,7 +928,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $wrapping_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::wrapping_from(Natural)", $t::NAME),
                 BenchmarkType::Algorithms,
                 naturals(gm),
@@ -951,7 +950,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $saturating_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::saturating_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -974,7 +973,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $overflowing_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::overflowing_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -997,7 +996,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $overflowing_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::overflowing_from(Natural)", $t::NAME),
                 BenchmarkType::Algorithms,
                 naturals(gm),
@@ -1017,7 +1016,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $convertible_from_es_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::convertible_from(Natural)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -1040,7 +1039,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $convertible_from_a_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("{}::convertible_from(Natural)", $t::NAME),
                 BenchmarkType::Algorithms,
                 naturals(gm),
@@ -1327,7 +1326,7 @@ fn benchmark_u32_checked_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "u32::checked_from(Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1348,7 +1347,7 @@ fn benchmark_u32_wrapping_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "u32::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1369,7 +1368,7 @@ fn benchmark_u64_checked_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "u64::checked_from(Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1390,7 +1389,7 @@ fn benchmark_u64_wrapping_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "u64::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1411,7 +1410,7 @@ fn benchmark_i32_checked_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "i32::checked_from(Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1432,7 +1431,7 @@ fn benchmark_i32_wrapping_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "i32::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1453,7 +1452,7 @@ fn benchmark_i64_checked_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "i64::checked_from(Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -1474,7 +1473,7 @@ fn benchmark_i64_wrapping_from_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "i64::wrapping_from(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),

@@ -3,11 +3,10 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{triples_of_signeds, triples_of_unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -67,7 +66,7 @@ fn benchmark_checked_sub_mul_unsigned<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.checked_sub_mul({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds::<T>(gm),
@@ -91,7 +90,7 @@ fn benchmark_checked_sub_mul_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.checked_sub_mul({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds::<T>(gm),

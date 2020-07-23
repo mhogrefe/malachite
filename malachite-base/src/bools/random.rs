@@ -1,6 +1,7 @@
-use num::arithmetic::traits::Parity;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
+
+use num::arithmetic::traits::Parity;
 use random::seed::Seed;
 
 /// Generates random `bools` uniformly.

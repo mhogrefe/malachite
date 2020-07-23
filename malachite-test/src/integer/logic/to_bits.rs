@@ -1,5 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
@@ -7,9 +8,7 @@ use malachite_nz::integer::logic::bit_convertible::{
 };
 use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{vecs_of_bool, vecs_of_bool_var_1};
 use malachite_test::inputs::integer::integers;
 
@@ -99,7 +98,7 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "bits_to_twos_complement_bits_non_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool(gm),
@@ -120,7 +119,7 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "bits_slice_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool(gm),
@@ -141,7 +140,7 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "bits_vec_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool_var_1(gm),
@@ -162,7 +161,7 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -182,7 +181,7 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
 }
 
 fn benchmark_integer_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_bits_asc()",
         BenchmarkType::Algorithms,
         integers(gm),
@@ -204,7 +203,7 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -227,7 +226,7 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
 }
 
 fn benchmark_integer_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_bits_desc()",
         BenchmarkType::Algorithms,
         integers(gm),

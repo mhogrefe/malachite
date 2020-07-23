@@ -2,14 +2,13 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::natural::comparison::partial_eq_primitive_integer::*;
 use num::BigUint;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_unsigned, pairs_of_natural_and_signed, pairs_of_natural_and_unsigned,
     pairs_of_signed_and_natural, pairs_of_unsigned_and_natural, rm_pairs_of_natural_and_signed,
@@ -205,7 +204,7 @@ fn benchmark_natural_partial_eq_unsigned_library_comparison<T: PrimitiveUnsigned
     rug::Integer: PartialEq<T>,
     BigUint: From<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Natural == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_unsigned::<T>(gm),
@@ -232,7 +231,7 @@ fn benchmark_unsigned_partial_eq_natural_library_comparison<
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{} == Natural", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_natural::<T>(gm),
@@ -258,7 +257,7 @@ fn benchmark_natural_partial_eq_signed_library_comparison<T: PrimitiveSigned + R
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Natural == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_signed::<T>(gm),
@@ -284,7 +283,7 @@ fn benchmark_signed_partial_eq_natural_library_comparison<
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{} == Natural", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_signed_and_natural::<T>(gm),

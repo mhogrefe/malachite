@@ -3,6 +3,8 @@ use num::basic::integers::PrimitiveInteger;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
+//TODO clean
+
 macro_rules! impl_shl_round {
     ($t:ident, $u:ident) => {
         impl ShlRound<$u> for $t {

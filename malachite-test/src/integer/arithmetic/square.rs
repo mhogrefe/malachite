@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::integers;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -41,7 +40,7 @@ fn demo_integer_square_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_square_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.square_assign()",
         BenchmarkType::Single,
         integers(gm),
@@ -55,7 +54,7 @@ fn benchmark_integer_square_assign(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_integer_square_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.square()",
         BenchmarkType::Algorithms,
         integers(gm),
@@ -72,7 +71,7 @@ fn benchmark_integer_square_algorithms(gm: GenerationMode, limit: usize, file_na
 }
 
 fn benchmark_integer_square_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.square()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),

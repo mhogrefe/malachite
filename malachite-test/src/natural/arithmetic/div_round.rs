@@ -2,13 +2,12 @@ use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRou
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
 use num::Integer;
 use rug::ops::DivRounding;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1;
 use malachite_test::inputs::natural::{
     nrm_pairs_of_natural_and_positive_natural, pairs_of_natural_and_positive_natural,
@@ -151,7 +150,7 @@ fn demo_natural_div_round_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_limb_div_round_limbs(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_limb_div_round_limbs(Limb, &[Limb], RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_unsigned_vec_and_rounding_mode_var_1(gm),
@@ -172,7 +171,7 @@ fn benchmark_natural_div_round_down_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_positive_natural(gm),
@@ -196,7 +195,7 @@ fn benchmark_natural_div_round_floor_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Floor)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -221,7 +220,7 @@ fn benchmark_natural_div_round_ceiling_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_positive_natural(gm),
@@ -245,7 +244,7 @@ fn benchmark_natural_div_round_ceiling_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round(Natural, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -272,7 +271,7 @@ fn benchmark_natural_div_round_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),
@@ -307,7 +306,7 @@ fn benchmark_natural_div_round_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_round_assign(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_positive_natural_and_rounding_mode_var_1(gm),

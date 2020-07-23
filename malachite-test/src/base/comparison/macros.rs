@@ -4,12 +4,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signeds, pairs_of_unsigneds, signeds, triples_of_signeds, triples_of_unsigneds,
     unsigneds,
@@ -261,7 +260,7 @@ fn benchmark_unsigned_max_1<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max!({})", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -282,7 +281,7 @@ fn benchmark_signed_max_1<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max!({})", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -300,7 +299,7 @@ fn benchmark_unsigned_min_1<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({})", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -321,7 +320,7 @@ fn benchmark_signed_min_1<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({})", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -339,7 +338,7 @@ fn benchmark_unsigned_max_2<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max_2({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -360,7 +359,7 @@ fn benchmark_signed_max_2<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max_2({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -378,7 +377,7 @@ fn benchmark_unsigned_min_2<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -399,7 +398,7 @@ fn benchmark_signed_min_2<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({}, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -418,7 +417,7 @@ fn benchmark_unsigned_max_3<'a, T: PrimitiveUnsigned + Rand>(
     file_name: &str,
     bucketing_function: &'a dyn Fn(&(T, T, T)) -> usize,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max!({}, {}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds::<T>(gm),
@@ -440,7 +439,7 @@ fn benchmark_signed_max_3<'a, T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("max!({}, {}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds::<T>(gm),
@@ -459,7 +458,7 @@ fn benchmark_unsigned_min_3<'a, T: PrimitiveUnsigned + Rand>(
     file_name: &str,
     bucketing_function: &'a dyn Fn(&(T, T, T)) -> usize,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({}, {}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds::<T>(gm),
@@ -481,7 +480,7 @@ fn benchmark_signed_min_3<'a, T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("min!({}, {}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds::<T>(gm),

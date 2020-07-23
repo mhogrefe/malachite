@@ -2,14 +2,13 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rand::Rand;
 use rug;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{signeds, unsigneds};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -71,7 +70,7 @@ fn benchmark_integer_from_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: From<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Integer::from({})", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -105,7 +104,7 @@ macro_rules! demo_and_bench_signed {
         }
 
         fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer::from({})", $t::NAME),
                 BenchmarkType::Single,
                 signeds::<$t>(gm),
@@ -137,7 +136,7 @@ fn benchmark_integer_from_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from(u32)",
         BenchmarkType::LibraryComparison,
         unsigneds::<u32>(gm),
@@ -159,7 +158,7 @@ fn benchmark_integer_from_u64_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from(u64)",
         BenchmarkType::LibraryComparison,
         unsigneds::<u64>(gm),
@@ -181,7 +180,7 @@ fn benchmark_integer_from_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from(i32)",
         BenchmarkType::LibraryComparison,
         signeds::<i32>(gm),
@@ -203,7 +202,7 @@ fn benchmark_integer_from_i64_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer::from(i32)",
         BenchmarkType::LibraryComparison,
         signeds::<i64>(gm),

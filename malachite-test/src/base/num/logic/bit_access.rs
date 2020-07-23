@@ -1,11 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_unsigned, pairs_of_signed_and_u64_width_range,
     pairs_of_signed_and_u64_width_range_var_1, pairs_of_signed_and_u64_width_range_var_2,
@@ -237,7 +236,7 @@ fn benchmark_unsigned_get_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.get_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -258,7 +257,7 @@ fn benchmark_signed_get_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.get_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -276,7 +275,7 @@ fn benchmark_unsigned_set_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.set_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_u64_width_range::<T>(gm),
@@ -297,7 +296,7 @@ fn benchmark_signed_set_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.set_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range_var_1::<T>(gm),
@@ -315,7 +314,7 @@ fn benchmark_unsigned_clear_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -336,7 +335,7 @@ fn benchmark_signed_clear_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.clear_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range_var_2::<T>(gm),
@@ -354,7 +353,7 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
         triples_of_unsigned_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
@@ -378,7 +377,7 @@ fn benchmark_signed_assign_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
         triples_of_signed_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
@@ -399,7 +398,7 @@ fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_u64_width_range::<T>(gm),
@@ -420,7 +419,7 @@ fn benchmark_signed_flip_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range::<T>(gm),

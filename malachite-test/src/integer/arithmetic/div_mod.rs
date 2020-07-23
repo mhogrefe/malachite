@@ -5,11 +5,10 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use num::Integer;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     nrm_pairs_of_integer_and_nonzero_integer, pairs_of_integer_and_nonzero_integer,
     rm_pairs_of_integer_and_nonzero_integer,
@@ -266,7 +265,7 @@ fn benchmark_integer_div_assign_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_assign_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -289,7 +288,7 @@ fn benchmark_integer_div_assign_mod_evaluation_strategy(
 }
 
 fn benchmark_integer_div_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer(gm),
@@ -307,7 +306,7 @@ fn benchmark_integer_div_mod_library_comparison(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_integer_div_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -331,7 +330,7 @@ fn benchmark_integer_div_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -366,7 +365,7 @@ fn benchmark_integer_div_assign_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_assign_rem(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -389,7 +388,7 @@ fn benchmark_integer_div_assign_rem_evaluation_strategy(
 }
 
 fn benchmark_integer_div_rem_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer(gm),
@@ -407,7 +406,7 @@ fn benchmark_integer_div_rem_library_comparison(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_integer_div_rem_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -428,7 +427,7 @@ fn benchmark_integer_div_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.div_rem(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -463,7 +462,7 @@ fn benchmark_integer_ceiling_div_assign_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.ceiling_div_assign_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -490,7 +489,7 @@ fn benchmark_integer_ceiling_div_mod_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_nonzero_integer(gm),
@@ -510,7 +509,7 @@ fn benchmark_integer_ceiling_div_mod_library_comparison(
 }
 
 fn benchmark_integer_ceiling_div_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -536,7 +535,7 @@ fn benchmark_integer_ceiling_div_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.ceiling_div_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),

@@ -1,10 +1,9 @@
 use std::str::FromStr;
 
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{strings, strings_var_1};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -34,7 +33,7 @@ fn demo_rounding_mode_from_str_targeted(gm: NoSpecialGenerationMode, limit: usiz
 }
 
 fn benchmark_rounding_mode_from_str(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "from_str(&str)",
         BenchmarkType::Single,
         strings(gm),

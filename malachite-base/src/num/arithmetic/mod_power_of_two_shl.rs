@@ -1,10 +1,11 @@
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+
 use num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoShl, ModPowerOfTwoShlAssign, UnsignedAbs,
 };
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 pub fn _mod_power_of_two_shl_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
     x: T,

@@ -5,12 +5,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     quadruples_of_signed_small_u64_small_u64_and_unsigned_var_1,
     quadruples_of_unsigned_small_u64_small_u64_and_unsigned_var_1,
@@ -144,7 +143,7 @@ fn benchmark_unsigned_get_bits_algorithms<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.get_bits(u64, u64)", T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigned_small_unsigned_and_small_unsigned_var_1::<T, u64>(gm),
@@ -174,7 +173,7 @@ fn benchmark_signed_get_bits_algorithms<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.get_bits(u64, u64)", T::NAME),
         BenchmarkType::Algorithms,
         triples_of_signed_small_unsigned_and_small_unsigned_var_1::<T, u64>(gm),
@@ -205,7 +204,7 @@ fn benchmark_unsigned_assign_bits_algorithms<T: PrimitiveUnsigned + Rand>(
 ) where
     T: BitBlockAccess<Bits = T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.assign_bits(u64, u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         quadruples_of_unsigned_small_u64_small_u64_and_unsigned_var_1::<T, T>(gm),
@@ -241,7 +240,7 @@ fn benchmark_signed_assign_bits_algorithms<T: PrimitiveSigned + Rand, U: Primiti
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as UnsignedAbs>::Output: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.assign_bits(u64, u64, {})", T::NAME, U::NAME),
         BenchmarkType::Algorithms,
         quadruples_of_signed_small_u64_small_u64_and_unsigned_var_1::<T, U>(gm),

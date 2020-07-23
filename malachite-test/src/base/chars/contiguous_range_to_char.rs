@@ -1,9 +1,8 @@
 use malachite_base::chars::contiguous_range_to_char;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -22,7 +21,7 @@ fn demo_contiguous_range_to_char(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_contiguous_range_to_char(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "contiguous_range_to_char(char)",
         BenchmarkType::Single,
         unsigneds(gm),

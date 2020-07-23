@@ -1,8 +1,7 @@
 use malachite_base::strings::string_sort;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{ascii_strings, strings};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -24,7 +23,7 @@ fn demo_ascii_string_sort(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_string_sort(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "string_sort(&str)",
         BenchmarkType::Single,
         strings(gm),

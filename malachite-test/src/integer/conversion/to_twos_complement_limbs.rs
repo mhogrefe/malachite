@@ -1,12 +1,11 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::integer::conversion::to_twos_complement_limbs::*;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{vecs_of_unsigned, vecs_of_unsigned_var_3};
 use malachite_test::inputs::integer::{integers, pairs_of_integer_and_small_unsigned};
 
@@ -179,7 +178,7 @@ fn demo_integer_twos_complement_limbs_get(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_twos_complement(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_twos_complement(&[Limb])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_3(gm),
@@ -200,7 +199,7 @@ fn benchmark_limbs_maybe_sign_extend_non_negative_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_maybe_sign_extend_non_negative_in_place(&mut [Limb])",
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
@@ -221,7 +220,7 @@ fn benchmark_limbs_twos_complement_in_place_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_twos_complement_in_place(&mut [Limb])",
         BenchmarkType::Algorithms,
         vecs_of_unsigned_var_3(gm),
@@ -252,7 +251,7 @@ fn benchmark_limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut [Limb])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_3(gm),
@@ -275,7 +274,7 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_twos_complement_limbs_asc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -306,7 +305,7 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.to_twos_complement_limbs_desc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -337,7 +336,7 @@ fn benchmark_integer_twos_complement_limbs_get_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.twos_complement_limbs().get()",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_small_unsigned(gm),

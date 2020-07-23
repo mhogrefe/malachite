@@ -4,12 +4,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signeds_var_2, pairs_of_unsigned_and_positive_unsigned,
 };
@@ -285,7 +284,7 @@ fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned + Rand + SampleRan
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -309,7 +308,7 @@ fn benchmark_div_mod_signed_algorithms<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_signeds_var_2::<T>(gm),
@@ -333,7 +332,7 @@ fn benchmark_div_assign_mod_unsigned<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -357,7 +356,7 @@ fn benchmark_div_assign_mod_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds_var_2::<T>(gm),
@@ -378,7 +377,7 @@ fn benchmark_div_rem_unsigned_algorithms<T: PrimitiveUnsigned + Rand + SampleRan
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_rem({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -402,7 +401,7 @@ fn benchmark_div_rem_signed_algorithms<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_rem({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_signeds_var_2::<T>(gm),
@@ -423,7 +422,7 @@ fn benchmark_div_assign_rem_unsigned<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_assign_rem({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -447,7 +446,7 @@ fn benchmark_div_assign_rem_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.div_assign_rem({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds_var_2::<T>(gm),
@@ -468,7 +467,7 @@ fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned + Rand + Sample
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_div_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -498,7 +497,7 @@ fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned + Rand + SampleRange>
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_signeds_var_2::<T>(gm),
@@ -525,7 +524,7 @@ fn benchmark_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned + Rand + SampleRang
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_div_assign_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -549,7 +548,7 @@ fn benchmark_ceiling_div_assign_mod<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds_var_2::<T>(gm),

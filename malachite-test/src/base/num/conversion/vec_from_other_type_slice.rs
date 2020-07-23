@@ -3,11 +3,10 @@ use std::fmt::Debug;
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -148,7 +147,7 @@ fn bench_vec_from_other_type_slice<T: PrimitiveUnsigned + Rand, U: Named>(
 ) where
     U: VecFromOtherTypeSlice<T>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.from_other_type_slice(&[{}])", U::NAME, T::NAME),
         BenchmarkType::Single,
         vecs_of_unsigned(gm),

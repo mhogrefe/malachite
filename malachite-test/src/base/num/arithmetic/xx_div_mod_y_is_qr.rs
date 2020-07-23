@@ -1,13 +1,12 @@
 use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::triples_of_unsigneds_var_2;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -48,7 +47,7 @@ fn benchmark_xx_div_mod_y_is_qr_algorithms<T: PrimitiveUnsigned + Rand + SampleR
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!(
             "{}.xx_div_mod_y_is_qr({}, {}, {})",
             T::NAME,

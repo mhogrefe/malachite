@@ -2,12 +2,11 @@ use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::small_unsigneds;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -30,7 +29,7 @@ fn demo_natural_low_mask(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_low_mask(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("limbs_low_mask(u64)"),
         BenchmarkType::Single,
         small_unsigneds(gm),
@@ -48,7 +47,7 @@ fn benchmark_natural_low_mask_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("Natural.low_mask(u64)"),
         BenchmarkType::Algorithms,
         small_unsigneds(gm),

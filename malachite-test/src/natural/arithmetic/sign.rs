@@ -3,10 +3,9 @@ use std::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{naturals, nrm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -25,7 +24,7 @@ fn demo_natural_sign(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_sign_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.sign()",
         BenchmarkType::LibraryComparison,
         nrm_naturals(gm),

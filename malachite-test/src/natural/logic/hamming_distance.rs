@@ -2,6 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{HammingDistance, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_limb, limbs_hamming_distance_same_length,
 };
@@ -9,9 +10,7 @@ use malachite_nz_test_util::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec_var_1,
     pairs_of_unsigned_vec_var_2,
@@ -87,7 +86,7 @@ fn demo_natural_hamming_distance(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_hamming_distance_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_hamming_distance_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
@@ -104,7 +103,7 @@ fn benchmark_limbs_hamming_distance_limb(gm: GenerationMode, limit: usize, file_
 }
 
 fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_hamming_distance_same_length(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
@@ -121,7 +120,7 @@ fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_hamming_distance(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_hamming_distance(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_2(gm),
@@ -142,7 +141,7 @@ fn benchmark_natural_hamming_distance_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_naturals(gm),
@@ -171,7 +170,7 @@ fn benchmark_natural_hamming_distance_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::Algorithms,
         pairs_of_naturals(gm),

@@ -2,6 +2,7 @@ use std::cmp::{max, min};
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
     limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
@@ -9,9 +10,7 @@ use malachite_nz::natural::logic::and::{
 };
 use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_nonempty_unsigned_vec_and_unsigned, pairs_of_unsigned_vec,
     pairs_of_unsigned_vec_var_1, triples_of_unsigned_vec_var_3, triples_of_unsigned_vec_var_4,
@@ -200,7 +199,7 @@ fn demo_natural_and_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_and_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_and_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
@@ -217,7 +216,7 @@ fn benchmark_limbs_and_limb(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_limbs_and(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_and(&[u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -231,7 +230,7 @@ fn benchmark_limbs_and(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_limbs_and_same_length_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_and_same_length_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_3(gm),
@@ -248,7 +247,7 @@ fn benchmark_limbs_and_same_length_to_out(gm: GenerationMode, limit: usize, file
 }
 
 fn benchmark_limbs_and_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_and_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_4(gm),
@@ -269,7 +268,7 @@ fn benchmark_limbs_slice_and_same_length_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_and_same_length_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
@@ -286,7 +285,7 @@ fn benchmark_limbs_slice_and_same_length_in_place_left(
 }
 
 fn benchmark_limbs_slice_and_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_slice_and_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -303,7 +302,7 @@ fn benchmark_limbs_slice_and_in_place_left(gm: GenerationMode, limit: usize, fil
 }
 
 fn benchmark_limbs_vec_and_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_and_in_place_left(&Vec<u32>, &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -320,7 +319,7 @@ fn benchmark_limbs_vec_and_in_place_left(gm: GenerationMode, limit: usize, file_
 }
 
 fn benchmark_limbs_and_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_and_in_place_either(&mut [u32], &mut [u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -341,7 +340,7 @@ fn benchmark_natural_and_assign_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural &= Natural",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_naturals(gm),
@@ -364,7 +363,7 @@ fn benchmark_natural_and_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural &= Natural",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),
@@ -381,7 +380,7 @@ fn benchmark_natural_and_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_and_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural & Natural",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),
@@ -401,7 +400,7 @@ fn benchmark_natural_and_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_natural_and_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural & Natural",
         BenchmarkType::Algorithms,
         pairs_of_naturals(gm),
@@ -425,7 +424,7 @@ fn benchmark_natural_and_algorithms(gm: GenerationMode, limit: usize, file_name:
 }
 
 fn benchmark_natural_and_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural & Natural",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),

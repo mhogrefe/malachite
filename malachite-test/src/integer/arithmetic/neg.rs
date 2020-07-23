@@ -1,10 +1,9 @@
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, nrm_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -37,7 +36,7 @@ fn demo_integer_neg_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.neg_assign()",
         BenchmarkType::Single,
         integers(gm),
@@ -51,7 +50,7 @@ fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &st
 }
 
 fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "-Integer",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -69,7 +68,7 @@ fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_neg_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "-Integer",
         BenchmarkType::EvaluationStrategy,
         integers(gm),

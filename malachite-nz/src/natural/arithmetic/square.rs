@@ -30,7 +30,7 @@ use natural::arithmetic::sub::{
 };
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural;
-use platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD};
+use platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD};
 
 const SQR_TOOM6_THRESHOLD: usize = 351;
 const SQR_TOOM8_THRESHOLD: usize = 454;
@@ -144,6 +144,8 @@ fn _limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [L
 /// 1. `out`.len() >= 2 * `xs`.len()
 /// 2. `xs`.len() > 1
 ///
+/// The smallest allowable `xs` length is 2.
+///
 /// Evaluate in: -1, 0, infinity.
 ///
 /// <-s--><--n-->
@@ -236,10 +238,6 @@ pub const fn _limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
-//TODO
-const SQR_TOOM4_THRESHOLD: usize = 28;
-
-//TODO
 const SMALLER_RECURSION_TOOM_3: bool = true;
 
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
@@ -267,13 +265,12 @@ fn _limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch:
 /// "scratch" slice is provided for the algorithm to use. An upper bound for the number of scratch
 /// limbs needed is provided by `_limbs_square_to_out_toom_3_scratch_len`. The following
 /// restrictions on the input slices must be met:
-///
 /// 1. `out`.len() >= 2 * `xs`.len()
 /// 2. `xs`.len() == 3 or `xs`.len() > 4
 ///
-/// Evaluate in: -1, 0, infinity.
+/// The smallest allowable `xs` length is 3.
 ///
-///  Evaluate in: -1, 0, +1, +2, +inf
+/// Evaluate in: -1, 0, +1, +2, +inf
 ///
 /// <-s--><--n--><--n-->
 ///  ____ ______ ______
@@ -284,7 +281,6 @@ fn _limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch:
 /// v_neg_1 = (xs_0 - xs_1 + xs_2) ^ 2         # X(-1)^2  |xh| <= 1
 /// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2) ^ 2 # X(2)^2    xh  <= 6
 /// v_inf   = xs_2 ^ 2                         # X(inf)^2
-///
 ///
 /// Time: O(n<sup>log<sub>3</sub>5</sup>)
 ///
@@ -405,10 +401,6 @@ pub const fn _limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
-/// This is MAYBE_sqr_basecase from mpn/generic/toom4_sqr.c, GMP 6.1.2.
-pub const TOOM4_MAYBE_SQR_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM2_THRESHOLD;
-
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
@@ -420,7 +412,7 @@ pub const TOOM4_MAYBE_SQR_TOOM4: bool =
 // This is TOOM4_SQR_REC from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 fn _limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
-    if TOOM4_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
+    if n < SQR_TOOM2_THRESHOLD {
         _limbs_square_to_out_basecase(out, xs);
     } else if TOOM4_MAYBE_SQR_TOOM2 && n < SQR_TOOM3_THRESHOLD {
         _limbs_square_to_out_toom_2(out, xs, scratch);
@@ -431,6 +423,39 @@ fn _limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch:
     }
 }
 
+/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+/// "scratch" slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// limbs needed is provided by `_limbs_square_to_out_toom_4_scratch_len`. The following
+/// restrictions on the input slices must be met:
+/// 1. `out`.len() >= 2 * `xs`.len()
+/// 2. `xs`.len() is 4, 7, or 8, or `xs`.len() > 9.
+///
+/// The smallest allowable `xs` length is 4.
+///
+///  Evaluate in: -1, -1/2, 0, +1/2, +1, +2, +inf
+///
+/// <-s--><--n--><--n--><--n-->
+///  ____ ______ ______ ______
+/// |xs_3|_xs_2_|_xs_1_|_xs_0_|
+///
+/// v_0     = xs_0 ^ 2                                    # X(0) ^ 2
+/// v_1     = (xs_0 + xs_1 + xs_2 + xs_3) ^ 2             # X(1) ^ 2     xh <= 3
+/// v_neg_1 = (xs_0 - xs_1 + xs_2 - xs_3) ^ 2             # X(-1) ^ 2    |xh| <= 1
+/// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3) ^ 2 # X(2) ^ 2     xh <= 14
+/// vh      = (8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3) ^ 2 # X(1/2) ^ 2   xh <= 14
+/// vmh     = (8 * xs_0 - 4 * xs_1 + 2 * xs_2 - xs_3) ^ 2 # X(-1/2) ^ 2  -4 <= xh <= 9
+/// v_inf   = xs_3 ^ 2                                    # X(inf) ^ 2
+///
+/// Time: O(n<sup>log<sub>4</sub>7</sup>)
+///
+/// Additional memory: O(n)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// May panic if the input slice conditions are not met.
+///
 /// This is mpn_toom4_sqr from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub fn _limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
@@ -438,56 +463,53 @@ pub fn _limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     let s = xs_len - 3 * n;
     assert_ne!(s, 0);
     assert!(s <= n);
-    split_into_chunks!(xs, n, [a0, a1, a2], a3);
-    // Total scratch need: 8 * n + 5 + scratch for recursive calls. This
-    // gives roughly 32 * n / 3 + log term.
-    // Compute apx = a0 + 2 * a1 + 4 * a2 + 8 * a3 and amx = a0 - 2 * a1 + 4 * a2 - 8 * a3.
-    let (apx, remainder) = out.split_at_mut(2 * n);
-    let apx = &mut apx[..n + 1];
-    let (v1, amx) = remainder.split_at_mut(2 * n + 2);
-    let (scratch_lo, tp) = scratch.split_at_mut(8 * n + 5);
-    _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(apx, amx, xs, n, &mut tp[..n + 1]);
-    _limbs_square_to_out_toom_4_recursive(scratch_lo, &apx[..n + 1], tp);
-    _limbs_square_to_out_toom_4_recursive(&mut scratch_lo[2 * n + 1..], &amx[..n + 1], tp);
-    // Compute apx = 8 a0 + 4 a1 + 2 a2 + a3 = (((2*a0 + a1) * 2 + a2) * 2 + a3
-    let mut cy = limbs_shl_to_out(apx, &a0[..n], 1);
-    cy.wrapping_add_assign(
-        if limbs_slice_add_same_length_in_place_left(&mut apx[..n], &a1[..n]) {
-            1
-        } else {
-            0
-        },
-    );
+    let m = n + 1;
+    let k = m + n;
+    split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
+    // Total scratch need: 8 * n + 5 + scratch for recursive calls. This gives roughly
+    // 32 * n / 3 + log term.
+    // Compute apx = xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3
+    // and amx = xs_0 - 2 * xs_1 + 4 * xs_2 - 8 * xs_3.
+    let (apx, remainder) = out.split_at_mut(n << 1);
+    let apx = &mut apx[..m];
+    let (v1, amx) = remainder.split_at_mut(m << 1);
+    let amx = &mut amx[..m];
+    let (scratch_lo, tp) = scratch.split_at_mut((k << 2) + 1);
+    _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(apx, amx, xs, n, &mut tp[..m]);
+    _limbs_square_to_out_toom_4_recursive(scratch_lo, apx, tp);
+    let scratch_lo = &mut scratch_lo[k..];
+    _limbs_square_to_out_toom_4_recursive(scratch_lo, amx, tp);
+    // Compute apx = 8 xs_0 + 4 xs_1 + 2 xs_2 + xs_3 = (((2 xs_0 + xs_1) * 2 + xs_2) * 2 + xs_3
+    let (apx_last, apx_init) = apx.split_last_mut().unwrap();
+    let mut cy = limbs_shl_to_out(apx_init, xs_0, 1);
+    if limbs_slice_add_same_length_in_place_left(apx_init, xs_1) {
+        cy.wrapping_add_assign(1);
+    }
     cy = cy.arithmetic_checked_shl(1).unwrap();
-    cy.wrapping_add_assign(limbs_slice_shl_in_place(&mut apx[..n], 1));
-    cy.wrapping_add_assign(
-        if limbs_slice_add_same_length_in_place_left(&mut apx[..n], &a2[..n]) {
-            1
-        } else {
-            0
-        },
-    );
+    cy.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
+    if limbs_slice_add_same_length_in_place_left(apx_init, xs_2) {
+        cy.wrapping_add_assign(1);
+    }
     cy = cy.arithmetic_checked_shl(1).unwrap();
-    cy.wrapping_add_assign(limbs_slice_shl_in_place(&mut apx[..n], 1));
-    apx[n] = cy.wrapping_add(
-        if limbs_slice_add_greater_in_place_left(&mut apx[..n], &a3[..s]) {
-            1
-        } else {
-            0
-        },
-    );
-    assert!(apx[n] < 15);
-    _limbs_square_to_out_toom_4_recursive(&mut scratch_lo[4 * n + 2..], &apx[..n + 1], tp);
-    // Compute apx = a0 + a1 + a2 + a3 and amx = a0 - a1 + a2 - a3.
-    _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(apx, amx, xs, n, &mut tp[..n + 1]);
-    _limbs_square_to_out_toom_4_recursive(v1, &apx[..n + 1], tp);
-    _limbs_square_to_out_toom_4_recursive(&mut scratch_lo[6 * n + 3..], &amx[..n + 1], tp);
-    let (v0, vinf) = out.split_at_mut(2 * n);
-    let vinf = &mut vinf[4 * n..];
-    _limbs_square_to_out_toom_4_recursive(v0, &a0[..n], tp);
-    _limbs_square_to_out_toom_4_recursive(vinf, &a3[..s], tp);
-    split_into_chunks_mut!(scratch, 2 * n + 1, [v2, vm2, vh, vm1], tp);
-    _limbs_mul_toom_interpolate_7_points(out, n, 2 * s, false, vm2, false, vm1, v2, vh, tp);
+    cy.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
+    if limbs_slice_add_greater_in_place_left(apx_init, xs_3) {
+        cy.wrapping_add_assign(1);
+    }
+    *apx_last = cy;
+    assert!(*apx_last < 15);
+    let scratch_lo = &mut scratch_lo[k..];
+    _limbs_square_to_out_toom_4_recursive(scratch_lo, apx, tp);
+    // Compute apx = xs_0 + xs_1 + xs_2 + xs_3 and amx = xs_0 - xs_1 + xs_2 - xs_3.
+    _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(apx, amx, xs, n, &mut tp[..m]);
+    _limbs_square_to_out_toom_4_recursive(v1, apx, tp);
+    let scratch_lo = &mut scratch_lo[k..];
+    _limbs_square_to_out_toom_4_recursive(scratch_lo, amx, tp);
+    let (v0, vinf) = out.split_at_mut(n << 1);
+    let vinf = &mut vinf[n << 2..];
+    _limbs_square_to_out_toom_4_recursive(v0, xs_0, tp);
+    _limbs_square_to_out_toom_4_recursive(vinf, xs_3, tp);
+    split_into_chunks_mut!(scratch, k, [v2, vm2, vh, vm1], tp);
+    _limbs_mul_toom_interpolate_7_points(out, n, s << 1, false, vm2, false, vm1, v2, vh, tp);
 }
 
 impl Square for Natural {

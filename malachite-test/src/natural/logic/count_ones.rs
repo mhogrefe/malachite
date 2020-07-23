@@ -1,13 +1,12 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{CountOnes, SignificantBits};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz_test_util::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
 };
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
 use malachite_test::inputs::natural::naturals;
 
@@ -35,7 +34,7 @@ fn demo_natural_count_ones(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_count_ones(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_count_ones(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
@@ -52,7 +51,7 @@ fn benchmark_limbs_count_ones(gm: GenerationMode, limit: usize, file_name: &str)
 }
 
 fn benchmark_natural_count_ones_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.count_ones()",
         BenchmarkType::Algorithms,
         naturals(gm),

@@ -1,9 +1,11 @@
-use exhaustive::range::{range_decreasing, range_increasing, RangeDecreasing, RangeIncreasing};
+use std::iter::{once, Chain, Once};
+
 use itertools::{Interleave, Itertools};
+
+use exhaustive::range::{range_decreasing, range_increasing, RangeDecreasing, RangeIncreasing};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use std::iter::{once, Chain, Once};
 
 /// Generates all positive values of a primitive integer type, in ascending order.
 ///

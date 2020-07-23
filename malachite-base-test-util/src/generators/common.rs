@@ -1,16 +1,48 @@
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 pub const SMALL_LIMIT: usize = 1_000;
 pub const LARGE_LIMIT: usize = 10_000;
 
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum GenMode {
+    Exhaustive,
+    Random,
+    SpecialRandom,
+}
+
+impl GenMode {
+    pub fn name(self) -> &'static str {
+        match self {
+            GenMode::Exhaustive => "exhaustive",
+            GenMode::Random => "random",
+            GenMode::SpecialRandom => "special_random",
+        }
+    }
+}
+
 pub type It<T> = Box<dyn Iterator<Item = T>>;
 
-pub struct GenConfig(BTreeMap<&'static str, u64>);
+#[derive(Clone, Debug)]
+pub struct GenConfig(HashMap<String, u64>);
 
 impl GenConfig {
+    pub fn new() -> GenConfig {
+        GenConfig(HashMap::new())
+    }
+
+    pub fn insert(&mut self, key: String, value: u64) {
+        self.0.insert(key, value);
+    }
+
     pub fn get_or(&self, key: &'static str, default: u64) -> u64 {
         *self.0.get(key).unwrap_or(&default)
+    }
+}
+
+impl Default for GenConfig {
+    fn default() -> GenConfig {
+        GenConfig::new()
     }
 }
 
@@ -63,6 +95,18 @@ impl<T> Generator<T> {
 
     #[inline]
     pub fn test_properties<F: FnMut(T)>(&self, test: F) {
-        self.test_properties_with_config(&GenConfig(BTreeMap::new()), test)
+        self.test_properties_with_config(&GenConfig::new(), test)
+    }
+
+    pub fn get(&self, gm: GenMode, config: &GenConfig) -> It<T> {
+        match gm {
+            GenMode::Exhaustive => (self.exhaustive)(),
+            GenMode::Random => (self.random)(config),
+            GenMode::SpecialRandom => {
+                (self
+                    .special_random
+                    .expect("special_random mode unsupported"))(config)
+            }
+        }
     }
 }

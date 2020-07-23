@@ -1,10 +1,9 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_small_signed, pairs_of_integer_and_small_unsigned,
     rm_pairs_of_integer_and_small_signed, rm_pairs_of_integer_and_small_unsigned,
@@ -156,7 +155,7 @@ macro_rules! demos_and_benches_u {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_integer_and_small_unsigned::<$t>(gm),
@@ -214,7 +213,7 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer >>= u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned::<u32>(gm),
@@ -231,7 +230,7 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
 }
 
 fn benchmark_integer_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer >> u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned::<u32>(gm),
@@ -281,7 +280,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Integer >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_integer_and_small_signed::<i32>(gm),
@@ -345,7 +344,7 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer >>= i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_signed::<i32>(gm),
@@ -362,7 +361,7 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
 }
 
 fn benchmark_integer_shr_i32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer >> i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_signed::<i32>(gm),

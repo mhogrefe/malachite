@@ -1,11 +1,10 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -71,7 +70,7 @@ fn demo_integer_divisible_by_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_divisible_by_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integers(gm),
@@ -95,7 +94,7 @@ fn benchmark_integer_divisible_by_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integers(gm),
@@ -130,7 +129,7 @@ fn benchmark_integer_divisible_by_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.divisible_by(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integers(gm),

@@ -6,6 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
@@ -26,9 +27,7 @@ use malachite_nz_test_util::natural::arithmetic::div_mod::{
 };
 use num::Integer;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_9, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_unsigneds_var_2, quadruples_of_limb_vec_var_1, quadruples_of_limb_vec_var_2,
@@ -549,7 +548,7 @@ fn demo_natural_ceiling_div_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_invert_limb(Limb)",
         BenchmarkType::Single,
         unsigneds_var_1::<Limb>(gm),
@@ -563,7 +562,7 @@ fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str
 }
 
 fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_limb_mod(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -584,7 +583,7 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_limb_to_out_mod(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -621,7 +620,7 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_limb_in_place_mod(&mut [Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -656,7 +655,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_mod_by_two_limb_normalized(&mut [Limb], &mut [Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_37(gm),
@@ -675,7 +674,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
 }
 
 fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_mod_schoolbook(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         quadruples_of_three_limb_vecs_and_limb_var_1(gm),
@@ -698,7 +697,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         quadruples_of_three_limb_vecs_and_limb_var_2(gm.with_scale(512)),
@@ -727,7 +726,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
 }
 
 fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_invert_basecase_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Single,
         triples_of_limb_vec_var_38(gm),
@@ -750,7 +749,7 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_invert_newton_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_39(gm.with_scale(2_048)),
@@ -777,7 +776,7 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
 }
 
 fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_invert_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_38(gm.with_scale(2_048)),
@@ -804,7 +803,7 @@ fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Single,
         quadruples_of_limb_vec_var_1(gm),
@@ -834,7 +833,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_40(gm.with_scale(4_096)),
@@ -887,7 +886,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_barrett_large_product(\
          &mut [Limb], &[Limb], &[Limb], &[Limb], usize, usize)",
         BenchmarkType::Algorithms,
@@ -926,7 +925,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "_limbs_div_mod_barrett_helper(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         quadruples_of_limb_vec_var_3(gm.with_scale(2_048)),
@@ -971,7 +970,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
 }
 
 fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_limb_vec_var_9(gm),
@@ -988,7 +987,7 @@ fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
 }
 
 fn benchmark_limbs_div_mod_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_div_mod_to_out(&mut [Limb], &mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         quadruples_of_limb_vec_var_2(gm),
@@ -1009,7 +1008,7 @@ fn benchmark_natural_div_assign_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_assign_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1032,7 +1031,7 @@ fn benchmark_natural_div_assign_mod_evaluation_strategy(
 }
 
 fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_mod(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -1050,7 +1049,7 @@ fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_natural_div_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -1071,7 +1070,7 @@ fn benchmark_natural_div_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1106,7 +1105,7 @@ fn benchmark_natural_div_assign_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_assign_rem(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1129,7 +1128,7 @@ fn benchmark_natural_div_assign_rem_evaluation_strategy(
 }
 
 fn benchmark_natural_div_rem_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_rem(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -1151,7 +1150,7 @@ fn benchmark_natural_div_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.div_rem(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1186,7 +1185,7 @@ fn benchmark_natural_ceiling_div_assign_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.ceiling_div_assign_neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1213,7 +1212,7 @@ fn benchmark_natural_ceiling_div_neg_mod_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_positive_natural(gm),
@@ -1240,7 +1239,7 @@ fn benchmark_natural_ceiling_div_neg_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -1269,7 +1268,7 @@ fn benchmark_natural_ceiling_div_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),

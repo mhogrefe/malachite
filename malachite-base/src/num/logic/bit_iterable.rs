@@ -1,10 +1,11 @@
+use std::cmp::min;
+use std::cmp::Ordering;
+use std::ops::Index;
+
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::BitIterable;
-use std::cmp::min;
-use std::cmp::Ordering;
-use std::ops::Index;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {

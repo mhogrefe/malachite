@@ -1,11 +1,10 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned_var_1;
 use malachite_test::inputs::natural::positive_naturals;
 
@@ -53,7 +52,7 @@ fn demo_natural_ceiling_log_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_floor_log_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -70,7 +69,7 @@ fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &s
 }
 
 fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_ceiling_log_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -87,7 +86,7 @@ fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.floor_log_two()",
         BenchmarkType::Single,
         positive_naturals(gm),
@@ -101,7 +100,7 @@ fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: 
 }
 
 fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.ceiling_log_two()",
         BenchmarkType::Single,
         positive_naturals(gm),

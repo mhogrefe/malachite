@@ -1,8 +1,7 @@
 use malachite_base::strings::string_is_subset;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{pairs_of_ascii_strings, pairs_of_strings};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
@@ -34,7 +33,7 @@ fn demo_ascii_string_is_subset(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_string_is_subset(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "string_is_subset(&str, &str)",
         BenchmarkType::Single,
         pairs_of_strings(gm),

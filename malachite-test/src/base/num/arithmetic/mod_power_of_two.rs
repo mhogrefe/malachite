@@ -2,12 +2,11 @@ use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_u64_var_2, pairs_of_signed_and_small_u64_var_3,
     pairs_of_signed_and_small_u64_var_4, pairs_of_signed_and_small_unsigned,
@@ -350,7 +349,7 @@ fn benchmark_mod_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -375,7 +374,7 @@ fn benchmark_mod_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as ModPowerOfTwo>::Output: PrimitiveUnsigned,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_2::<T>(gm),
@@ -396,7 +395,7 @@ fn benchmark_mod_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -420,7 +419,7 @@ fn benchmark_mod_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_3::<T>(gm),
@@ -441,7 +440,7 @@ fn benchmark_rem_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rem_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -465,7 +464,7 @@ fn benchmark_rem_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rem_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -486,7 +485,7 @@ fn benchmark_rem_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rem_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -510,7 +509,7 @@ fn benchmark_rem_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.rem_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -531,7 +530,7 @@ fn benchmark_neg_mod_power_of_two<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.neg_mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_4::<T>(gm),
@@ -552,7 +551,7 @@ fn benchmark_neg_mod_power_of_two_assign<T: PrimitiveUnsigned + Rand + SampleRan
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.neg_mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_4::<T>(gm),
@@ -576,7 +575,7 @@ fn benchmark_ceiling_mod_power_of_two<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_4::<T>(gm),
@@ -600,7 +599,7 @@ fn benchmark_ceiling_mod_power_of_two_assign<T: PrimitiveSigned + Rand + SampleR
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    m_run_benchmark(
+    run_benchmark(
         &format!("{}.ceiling_mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_4::<T>(gm),

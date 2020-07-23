@@ -4,6 +4,7 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,
@@ -11,9 +12,7 @@ use malachite_nz::natural::arithmetic::shr_round::{
 };
 use malachite_nz::platform::Limb;
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_small_unsigned, pairs_of_unsigned_vec_and_small_unsigned_var_1,
     triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1,
@@ -240,7 +239,7 @@ fn demo_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_round_up(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -262,7 +261,7 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
 }
 
 fn benchmark_limbs_shr_round_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_round_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -284,7 +283,7 @@ fn benchmark_limbs_shr_round_nearest(gm: GenerationMode, limit: usize, file_name
 }
 
 fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_exact(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -306,7 +305,7 @@ fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) 
 }
 
 fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_shr_round(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -328,7 +327,7 @@ fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) 
 }
 
 fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_shr_round_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -349,7 +348,7 @@ fn benchmark_limbs_vec_shr_round_nearest_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_shr_round_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -366,7 +365,7 @@ fn benchmark_limbs_vec_shr_round_nearest_in_place(
 }
 
 fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_shr_exact_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -383,7 +382,7 @@ fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file
 }
 
 fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "limbs_vec_shr_round_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -457,7 +456,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_natural_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -478,7 +477,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_natural_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -598,7 +597,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_natural_small_signed_and_rounding_mode_var_2::<$t>(gm),
@@ -619,7 +618,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            m_run_benchmark(
+            run_benchmark(
                 &format!("Natural.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_natural_small_signed_and_rounding_mode_var_2::<$t>(gm),

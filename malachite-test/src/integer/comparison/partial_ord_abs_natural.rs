@@ -3,10 +3,9 @@ use std::cmp::{max, Ordering};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
     pairs_of_integer_and_natural, pairs_of_natural_and_integer, rm_pairs_of_integer_and_natural,
     rm_pairs_of_natural_and_integer,
@@ -52,7 +51,7 @@ fn benchmark_integer_partial_cmp_abs_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Integer.partial_cmp_abs(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_natural(gm),
@@ -78,7 +77,7 @@ fn benchmark_natural_partial_cmp_abs_integer_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.partial_cmp_abs(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_integer(gm),

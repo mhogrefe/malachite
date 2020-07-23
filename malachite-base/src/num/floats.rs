@@ -1,3 +1,11 @@
+use std::fmt::{Debug, Display, LowerExp, UpperExp};
+use std::iter::{Product, Sum};
+use std::num::FpCategory;
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
+use std::str::FromStr;
+
 use comparison::traits::{Max, Min};
 use crement::Crementable;
 use named::Named;
@@ -7,13 +15,6 @@ use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, ExactInto};
-use std::fmt::{Debug, Display, LowerExp, UpperExp};
-use std::iter::{Product, Sum};
-use std::num::FpCategory;
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
-};
-use std::str::FromStr;
 
 //TODO docs
 pub trait PrimitiveFloat:

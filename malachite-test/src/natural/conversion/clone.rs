@@ -2,10 +2,9 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
-use malachite_test::common::{
-    m_run_benchmark, BenchmarkType, DemoBenchRegistry, GenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{
     naturals, nrm_naturals, nrm_pairs_of_naturals, pairs_of_naturals,
 };
@@ -36,7 +35,7 @@ fn demo_natural_clone_from(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_clone_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.clone()",
         BenchmarkType::LibraryComparison,
         nrm_naturals(gm),
@@ -58,7 +57,7 @@ fn benchmark_natural_clone_from_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    m_run_benchmark(
+    run_benchmark(
         "Natural.clone_from(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),

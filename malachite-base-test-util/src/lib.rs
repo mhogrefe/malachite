@@ -33,10 +33,15 @@
     clippy::unused_self
 )]
 
+extern crate clap;
+extern crate gnuplot;
+extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 extern crate ryu;
+extern crate time;
 
+pub mod bench;
 pub mod common;
 pub mod generators;
 pub mod num {
@@ -54,5 +59,6 @@ pub mod num {
         pub mod geometric;
     }
 }
+pub mod runner;
 pub mod slices;
 pub mod stats;
