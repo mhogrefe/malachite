@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
@@ -108,66 +107,6 @@ impl NegativeOne for Integer {
 // Implement `Named` for `Integer`.
 impl_named!(Integer);
 
-impl Crementable for Integer {
-    /// Increments `self`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `self.significant_bits()`
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::crement::Crementable;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// let mut i = Integer::from(10);
-    /// i.increment();
-    /// assert_eq!(i, 11);
-    ///
-    /// let mut i = Integer::from(-5);
-    /// i.increment();
-    /// assert_eq!(i, -4);
-    /// ```
-    #[inline]
-    fn increment(&mut self) {
-        self.add_assign_limb(1);
-    }
-
-    /// Decrements `self`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `self.significant_bits()`
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::crement::Crementable;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// let mut i = Integer::from(10);
-    /// i.decrement();
-    /// assert_eq!(i, 9);
-    ///
-    /// let mut i = Integer::from(-5);
-    /// i.decrement();
-    /// assert_eq!(i, -6);
-    /// ```
-    #[inline]
-    fn decrement(&mut self) {
-        self.sub_assign_limb(1);
-    }
-}
-
 pub mod arithmetic {
     pub mod abs;
     pub mod add;
@@ -210,6 +149,8 @@ pub mod comparison {
 }
 
 pub mod conversion;
+
+pub mod exhaustive;
 
 pub mod logic {
     pub mod and;

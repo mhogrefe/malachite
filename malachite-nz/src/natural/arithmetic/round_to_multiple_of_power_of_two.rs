@@ -67,7 +67,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_down(xs: &[Limb], pow: u64) -> Ve
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(limbs.len(), pow / Limb::WIDTH)
+/// where n = max(xs.len(), pow / Limb::WIDTH)
 ///
 /// # Example
 /// ```
@@ -150,7 +150,7 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even(
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(limbs.len(), pow / Limb::WIDTH)
+/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
 /// # Example
 /// ```
@@ -195,7 +195,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest(xs: &[Limb], pow: u64) ->
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(`limb`.len(), `pow` / Limb::WIDTH)
+/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
 /// # Example
 /// ```
@@ -352,7 +352,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_down_in_place(xs: &mut Vec<Limb>,
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(limbs.len(), pow / Limb::WIDTH)
+/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
 /// # Example
 /// ```
@@ -460,7 +460,7 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even_in_place(
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(limbs.len(), pow / Limb::WIDTH)
+/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
 /// # Example
 /// ```
@@ -524,14 +524,14 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest_in_place(xs: &mut Vec<Lim
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup> to the input `Vec`,
 /// using a specified rounding format. If the original value is not already a multiple of the power
-/// of two, and the `RoundingMode` is `Exact`, the value of `limbs` becomes unspecified and `false`
-/// is returned. Otherwise, `true` is returned. The limbs should not all be zero.
+/// of two, and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `false` is
+/// returned. Otherwise, `true` is returned. The limbs should not all be zero.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = max(limbs.len(), pow / Limb::WIDTH)
+/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
 /// # Example
 /// ```

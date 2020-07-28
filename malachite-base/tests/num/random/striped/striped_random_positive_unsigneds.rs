@@ -21,11 +21,11 @@ fn striped_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>
         .clone()
         .map(|x| x.to_binary_string())
         .take(20)
-        .collect::<Vec<String>>();
+        .collect::<Vec<_>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone())
         .iter()
         .map(|(x, frequency)| (x.to_binary_string(), *frequency))
-        .collect::<Vec<(String, usize)>>();
+        .collect::<Vec<_>>();
     let actual_sample_median = median(xs.clone().take(1_000_000));
     let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
     assert_eq!(
@@ -39,11 +39,11 @@ fn striped_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>
             expected_values
                 .iter()
                 .map(|x| x.to_string())
-                .collect::<Vec<String>>(),
+                .collect::<Vec<_>>(),
             expected_common_values
                 .iter()
                 .map(|(x, frequency)| (x.to_string(), *frequency))
-                .collect::<Vec<(String, usize)>>(),
+                .collect::<Vec<_>>(),
             expected_sample_median,
             expected_sample_moment_stats
         )

@@ -100,7 +100,6 @@ pub mod base {
         }
 
         pub mod basic {
-            pub mod crement;
             pub mod iverson;
         }
 
@@ -196,10 +195,6 @@ pub mod integer {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
-    }
-
-    pub mod basic {
-        pub mod crement;
     }
 
     pub mod comparison {
@@ -301,10 +296,6 @@ pub mod natural {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
-    }
-
-    pub mod basic {
-        pub mod crement;
     }
 
     pub mod comparison {

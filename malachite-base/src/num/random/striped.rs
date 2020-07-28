@@ -257,7 +257,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 ///
 /// assert_eq!(
 ///     striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["1", "1001100", "1111111", "11000011", "0", "10000000", "1111", "1110110", "0",
 ///     "11111000"]
 /// )
@@ -302,7 +302,7 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// assert_eq!(
 ///     striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["1", "1001100", "1111111", "11000011", "10000000", "1111", "1110110", "11111000",
 ///     "11111111", "11111101"]
 /// )
@@ -347,7 +347,7 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// assert_eq!(
 ///     striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
 ///     "111101", "11111100"]
 /// )
@@ -393,7 +393,7 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 ///
 /// assert_eq!(
 ///     striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["0", "101100", "110000", "1111100", "1111", "1111110", "0", "111", "11101", "1100000"]
 /// )
 /// ```
@@ -437,7 +437,7 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// assert_eq!(
 ///     striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["101100", "110000", "1111100", "1111", "1111110", "111", "11101", "1100000", "1111111",
 ///     "1100000"]
 /// )
@@ -484,7 +484,7 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// assert_eq!(
 ///     striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["10000000", "10101100", "10110000", "11111100", "10001111", "11111110", "10000000",
 ///     "10000111", "10011101", "11100000"]
 /// )
@@ -532,7 +532,7 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// assert_eq!(
 ///     striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect::<Vec<String>>(),
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
 ///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
 ///     "111101", "11111100"]
 /// )

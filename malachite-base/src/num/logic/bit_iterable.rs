@@ -193,12 +193,12 @@ macro_rules! impl_bit_iterable_unsigned {
             ///
             /// assert!(0u8.bits().next().is_none());
             /// // 105 = 1101001b
-            /// assert_eq!(105u32.bits().collect::<Vec<bool>>(),
+            /// assert_eq!(105u32.bits().collect::<Vec<_>>(),
             ///     vec![true, false, false, true, false, true, true]);
             ///
             /// assert!(0u8.bits().next_back().is_none());
             /// // 105 = 1101001b
-            /// assert_eq!(105u32.bits().rev().collect::<Vec<bool>>(),
+            /// assert_eq!(105u32.bits().rev().collect::<Vec<_>>(),
             ///     vec![true, true, false, true, false, false, true]);
             /// ```
             #[inline]
@@ -360,18 +360,18 @@ macro_rules! impl_bit_iterable_signed {
             ///
             /// assert_eq!(0i8.bits().next(), None);
             /// // 105 = 01101001b, with a leading false bit to indicate sign
-            /// assert_eq!(105i32.bits().collect::<Vec<bool>>(),
+            /// assert_eq!(105i32.bits().collect::<Vec<_>>(),
             ///     vec![true, false, false, true, false, true, true, false]);
             /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-            /// assert_eq!((-105i32).bits().collect::<Vec<bool>>(),
+            /// assert_eq!((-105i32).bits().collect::<Vec<_>>(),
             ///     vec![true, true, true, false, true, false, false, true]);
             ///
             /// assert_eq!(0i8.bits().next_back(), None);
             /// // 105 = 01101001b, with a leading false bit to indicate sign
-            /// assert_eq!(105i32.bits().rev().collect::<Vec<bool>>(),
+            /// assert_eq!(105i32.bits().rev().collect::<Vec<_>>(),
             ///     vec![false, true, true, false, true, false, false, true]);
             /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-            /// assert_eq!((-105i32).bits().rev().collect::<Vec<bool>>(),
+            /// assert_eq!((-105i32).bits().rev().collect::<Vec<_>>(),
             ///     vec![true, false, false, true, false, true, true, true]);
             /// ```
             #[inline]

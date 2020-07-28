@@ -114,7 +114,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
 ///
 /// where m = `n` * `degree`
 ///
-/// This is mpn_toom_eval_pm1 from mpn/generic/toom_eval_pm1.c, GMP 6.1.2.
+/// This is mpn_toom_eval_pm1 from mpn/generic/toom_eval_pm1.c, GMP 6.1.2, where hn is omitted from
+/// the inputs because it can be determined from xp and n.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     v_1: &mut [Limb],
     v_neg_1: &mut [Limb],
@@ -224,7 +225,8 @@ fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &
 ///
 /// where m = `n` * `degree`
 ///
-/// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c, GMP 6.1.2.
+/// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c, GMP 6.1.2, where hn is omitted from
+/// the inputs because it can be determined from xp and n.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
@@ -321,7 +323,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
 ///
 /// where m = `n` * `degree`
 ///
-/// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c, GMP 6.1.2.
+/// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c, GMP 6.1.2, where hn is omitted
+/// from the inputs because it can be determined from xp and n.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_2_pow: &mut [Limb],
     v_neg_2_pow: &mut [Limb],
@@ -424,7 +427,8 @@ pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
 ///
 /// where m = `n` * `degree`
 ///
-/// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c, GMP 6.1.2.
+/// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c, GMP 6.1.2, where t is
+/// omitted from the inputs because it can be determined from ap and n.
 pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     v_2_pow_neg: &mut [Limb],
     v_neg_2_pow_neg: &mut [Limb],

@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use malachite_base::comparison::traits::Min;
-use malachite_base::crement::Crementable;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
@@ -136,58 +135,6 @@ impl Min for Natural {
 // Implement `Named` for `Natural`.
 impl_named!(Natural);
 
-impl Crementable for Natural {
-    /// Increments `self`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `self.significant_bits()`
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    ///
-    /// use malachite_base::crement::Crementable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let mut i = Natural::from(10u32);
-    /// i.increment();
-    /// assert_eq!(i, 11);
-    /// ```
-    #[inline]
-    fn increment(&mut self) {
-        self.add_assign_limb(1);
-    }
-
-    /// Decrements `self`.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Panics
-    /// Panics if `self` == 0`.
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::crement::Crementable;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// let mut i = Natural::from(10u32);
-    /// i.decrement();
-    /// assert_eq!(i, 9);
-    /// ```
-    #[inline]
-    fn decrement(&mut self) {
-        self.sub_assign_limb(1);
-    }
-}
-
 macro_rules! mutate_with_possible_promotion {
     ($n:ident, $small:ident, $large:ident, $process_small:expr, $process_large:expr) => {
         if let Natural(Small(ref mut $small)) = *$n {
@@ -263,6 +210,8 @@ pub mod comparison {
     pub mod partial_ord_abs_primitive_integer;
     pub mod partial_ord_primitive_integer;
 }
+
+pub mod exhaustive;
 
 pub mod logic {
     pub mod and;

@@ -8,7 +8,6 @@ use std::ops::{
 use std::str::FromStr;
 
 use comparison::traits::{Max, Min};
-use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{
     AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedAdd, CheckedAddMul,
@@ -373,7 +372,6 @@ pub trait PrimitiveInteger:
     + TrailingZeros
     + Two
     + UpperHex
-    + Crementable
     + WrappingAdd<Self, Output = Self>
     + WrappingAddAssign<Self>
     + WrappingAddMul<Self, Self, Output = Self>
@@ -457,26 +455,6 @@ pub trait PrimitiveInteger:
     }
 }
 
-#[inline]
-pub fn _increment<T: Copy + One>(x: &mut T)
-where
-    T: CheckedAdd<Output = T>,
-{
-    *x = x
-        .checked_add(T::ONE)
-        .expect("Cannot increment past the maximum value.");
-}
-
-#[inline]
-pub fn _decrement<T: Copy + One>(x: &mut T)
-where
-    T: CheckedSub<Output = T>,
-{
-    *x = x
-        .checked_sub(T::ONE)
-        .expect("Cannot increment past the maximum value.");
-}
-
 /// This macro defines basic trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_basic_traits {
     ($t:ident, $width:expr) => {
@@ -537,60 +515,6 @@ macro_rules! impl_basic_traits {
         /// Additional memory: worst case O(1)
         impl Max for $t {
             const MAX: $t = std::$t::MAX;
-        }
-
-        impl Crementable for $t {
-            /// Increments `self`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `self` == `self::MAX`.
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::crement::Crementable;
-            ///
-            /// let mut i = 10;
-            /// i.increment();
-            /// assert_eq!(i, 11);
-            ///
-            /// let mut i = -5;
-            /// i.increment();
-            /// assert_eq!(i, -4);
-            /// ```
-            #[inline]
-            fn increment(&mut self) {
-                _increment(self);
-            }
-
-            /// Decrements `self`.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if `self` == `self::MIN`.
-            ///
-            /// # Example
-            /// ```
-            /// use malachite_base::crement::Crementable;
-            ///
-            /// let mut i = 10;
-            /// i.decrement();
-            /// assert_eq!(i, 9);
-            ///
-            /// let mut i = -5;
-            /// i.decrement();
-            /// assert_eq!(i, -6);
-            /// ```
-            #[inline]
-            fn decrement(&mut self) {
-                _decrement(self);
-            }
         }
     };
 }

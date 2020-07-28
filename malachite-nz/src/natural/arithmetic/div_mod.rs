@@ -1,7 +1,6 @@
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 
-use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYIsZZ, XXDivModYIsQR,
@@ -2633,7 +2632,7 @@ impl CeilingDivAssignNegMod<Natural> for Natural {
         if r == 0 {
             Natural::ZERO
         } else {
-            self.increment();
+            *self += Natural::ONE;
             other - r
         }
     }
@@ -2685,7 +2684,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Natural> for Natural {
         if r == 0 {
             Natural::ZERO
         } else {
-            self.increment();
+            *self += Natural::ONE;
             other - r
         }
     }

@@ -303,7 +303,7 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
 /// use malachite_base::num::random::geometric::geometric_random_unsigneds;
 ///
 /// assert_eq!(
-///     geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<u64>>(),
+///     geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
@@ -345,7 +345,7 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// assert_eq!(
 ///     geometric_random_positive_unsigneds::<u64>(EXAMPLE_SEED, 2, 1)
-///         .take(10).collect::<Vec<u64>>(),
+///         .take(10).collect::<Vec<_>>(),
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
@@ -388,7 +388,7 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// use malachite_base::num::random::geometric::geometric_random_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<i64>>(),
+///     geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
 ///     &[-1, -1, -1, 1, -2, 1, 0, 0, 0, 0]
 /// )
 /// ```
@@ -430,7 +430,7 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 /// use malachite_base::num::random::geometric::geometric_random_natural_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<i64>>(),
+///     geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
@@ -471,7 +471,7 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 /// use malachite_base::num::random::geometric::geometric_random_positive_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<i64>>(),
+///     geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
@@ -513,7 +513,7 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// use malachite_base::num::random::geometric::geometric_random_negative_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<i64>>(),
+///     geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
 ///     &[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2]
 /// )
 /// ```
@@ -562,7 +562,7 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// use malachite_base::num::random::geometric::geometric_random_nonzero_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<i64>>(),
+///     geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
 ///     &[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1]
 /// )
 /// ```

@@ -57,7 +57,7 @@ where
 ///
 /// assert_eq!(
 ///     nonzero_values(random_primitive_integers::<u8>(EXAMPLE_SEED)).take(10)
-///         .collect::<Vec<u8>>(),
+///         .collect::<Vec<_>>(),
 ///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
 /// )
 /// ```

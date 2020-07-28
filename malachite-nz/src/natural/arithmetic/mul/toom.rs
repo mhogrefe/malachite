@@ -69,7 +69,7 @@ pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 ///
 /// This is mpn_toom_couple_handling from mpn/generic/toom_couple_handling.c, GMP 6.1.2. The
 /// argument `n` is excluded as it is just the length of ys.
-fn _limbs_toom_couple_handling(
+pub(crate) fn _limbs_toom_couple_handling(
     xs: &mut [Limb],
     ys: &mut [Limb],
     y_sign: bool,

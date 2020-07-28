@@ -32,6 +32,7 @@
     clippy::unused_self
 )]
 
+extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 extern crate rand;

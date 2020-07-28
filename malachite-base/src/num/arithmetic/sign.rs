@@ -28,16 +28,4 @@ macro_rules! impl_sign {
         }
     };
 }
-
-impl_sign!(u8);
-impl_sign!(u16);
-impl_sign!(u32);
-impl_sign!(u64);
-impl_sign!(u128);
-impl_sign!(usize);
-impl_sign!(i8);
-impl_sign!(i16);
-impl_sign!(i32);
-impl_sign!(i64);
-impl_sign!(i128);
-impl_sign!(isize);
+apply_to_primitive_ints!(impl_sign);

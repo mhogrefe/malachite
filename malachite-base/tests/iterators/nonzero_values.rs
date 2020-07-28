@@ -3,10 +3,7 @@ use malachite_base::iterators::nonzero_values;
 #[test]
 pub fn test_nonzero_values() {
     let test = |xs: &[u32], out: &[u32]| {
-        assert_eq!(
-            nonzero_values(xs.iter().cloned()).collect::<Vec<u32>>(),
-            out
-        );
+        assert_eq!(nonzero_values(xs.iter().cloned()).collect::<Vec<_>>(), out);
     };
     test(&[], &[]);
     test(&[1, 2, 3], &[1, 2, 3]);

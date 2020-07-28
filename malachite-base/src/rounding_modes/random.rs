@@ -22,7 +22,7 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 /// use malachite_base::rounding_modes::random::random_rounding_modes;
 ///
 /// assert_eq!(
-///     random_rounding_modes(EXAMPLE_SEED).take(10).collect::<Vec<RoundingMode>>(),
+///     random_rounding_modes(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
 ///     &[Up, Exact, Ceiling, Up, Floor, Nearest, Exact, Up, Floor, Exact]
 /// )
 /// ```

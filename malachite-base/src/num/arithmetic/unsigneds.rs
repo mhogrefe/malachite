@@ -76,9 +76,4 @@ macro_rules! impl_arithmetic_traits {
         }
     };
 }
-impl_arithmetic_traits!(u8);
-impl_arithmetic_traits!(u16);
-impl_arithmetic_traits!(u32);
-impl_arithmetic_traits!(u64);
-impl_arithmetic_traits!(u128);
-impl_arithmetic_traits!(usize);
+apply_to_unsigneds!(impl_arithmetic_traits);

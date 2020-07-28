@@ -1,11 +1,10 @@
 use std::cmp::Ordering;
 
-use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::basic::traits::{Iverson, One};
 use malachite_base::rounding_modes::RoundingMode;
 
 use natural::Natural;
@@ -80,7 +79,7 @@ fn div_round_nearest(q: Natural, r: Natural, d: &Natural) -> Natural {
 fn div_round_assign_nearest(q: &mut Natural, r: Natural, d: &Natural) {
     let compare = (r << 1u64).cmp(d);
     if compare == Ordering::Greater || compare == Ordering::Equal && q.odd() {
-        q.increment();
+        *q += Natural::ONE;
     }
 }
 
@@ -477,7 +476,7 @@ impl DivRoundAssign<Natural> for Natural {
             if r != 0 {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
-                        self.increment();
+                        *self += Natural::ONE;
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
                     RoundingMode::Nearest => div_round_assign_nearest(self, r, &other),
@@ -555,7 +554,7 @@ impl<'a> DivRoundAssign<&'a Natural> for Natural {
             if r != 0 {
                 match rm {
                     RoundingMode::Ceiling | RoundingMode::Up => {
-                        self.increment();
+                        *self += Natural::ONE;
                     }
                     RoundingMode::Exact => panic!("Division is not exact"),
                     RoundingMode::Nearest => div_round_assign_nearest(self, r, other),

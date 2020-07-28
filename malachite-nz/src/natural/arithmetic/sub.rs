@@ -653,12 +653,6 @@ impl Natural {
             sub_panic(self, other);
         })
     }
-
-    pub(crate) fn sub_assign_limb(&mut self, other: Limb) {
-        if self.sub_assign_limb_no_panic(other) {
-            sub_panic(self, other);
-        }
-    }
 }
 
 /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.

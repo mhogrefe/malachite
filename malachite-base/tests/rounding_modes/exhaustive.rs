@@ -4,7 +4,7 @@ use malachite_base::rounding_modes::RoundingMode;
 #[test]
 fn test_exhaustive_rounding_modes() {
     assert_eq!(
-        exhaustive_rounding_modes().collect::<Vec<RoundingMode>>(),
+        exhaustive_rounding_modes().collect::<Vec<_>>(),
         &[
             RoundingMode::Down,
             RoundingMode::Up,

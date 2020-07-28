@@ -3,7 +3,8 @@ use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
     _limbs_square_to_out_toom_2_scratch_len, _limbs_square_to_out_toom_3,
     _limbs_square_to_out_toom_3_scratch_len, _limbs_square_to_out_toom_4,
-    _limbs_square_to_out_toom_4_scratch_len,
+    _limbs_square_to_out_toom_4_scratch_len, _limbs_square_to_out_toom_6,
+    _limbs_square_to_out_toom_6_scratch_len,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -14,7 +15,7 @@ use malachite_test::common::{
 };
 use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18, pairs_of_unsigned_vec_var_19,
-    pairs_of_unsigned_vec_var_20, unsigneds_var_8,
+    pairs_of_unsigned_vec_var_20, pairs_of_unsigned_vec_var_22, unsigneds_var_8,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals};
 
@@ -71,6 +72,23 @@ fn limbs_square_to_out_toom_4_properties() {
         let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(xs.len())];
         _limbs_square_to_out_toom_4(&mut out, xs, &mut scratch);
         assert_eq!(out, expected_out);
+    });
+}
+
+#[test]
+fn limbs_square_to_out_toom_6_properties() {
+    test_properties_custom_scale(2_048, pairs_of_unsigned_vec_var_22, |&(ref out, ref xs)| {
+        let expected_out = limbs_square_basecase_helper(out, xs);
+        let mut out = out.to_vec();
+        let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(xs.len())];
+        _limbs_square_to_out_toom_6(&mut out, xs, &mut scratch);
+        assert_eq!(
+            out,
+            expected_out,
+            "test(&{:?}, &[10; {}], &[666]);",
+            xs,
+            2 * xs.len() + 4
+        );
     });
 }
 

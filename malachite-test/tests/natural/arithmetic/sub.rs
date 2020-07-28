@@ -1,7 +1,6 @@
-use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 use malachite_nz::integer::Integer;
@@ -289,14 +288,14 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
                 let mut n = Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys));
                 if borrow_in {
-                    n.decrement();
+                    n -= Integer::ONE;
                 }
                 assert!(n < 0);
                 n.mod_power_of_two(u64::exact_from(len) << Limb::LOG_WIDTH)
             } else {
                 let mut n = Natural::from_limbs_asc(xs) - Natural::from_limbs_asc(ys);
                 if borrow_in {
-                    n.decrement();
+                    n -= Natural::ONE;
                 }
                 n
             };
@@ -330,7 +329,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
                 Natural::from_owned_limbs_asc(xs_old) - Natural::from_limbs_asc(ys)
             };
             if borrow_in {
-                expected_result.decrement();
+                expected_result -= Natural::ONE;
             }
             assert_eq!(n, expected_result);
         },

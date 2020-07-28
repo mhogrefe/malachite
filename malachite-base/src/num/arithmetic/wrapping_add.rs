@@ -37,16 +37,4 @@ macro_rules! impl_wrapping_add {
         }
     };
 }
-
-impl_wrapping_add!(u8);
-impl_wrapping_add!(u16);
-impl_wrapping_add!(u32);
-impl_wrapping_add!(u64);
-impl_wrapping_add!(u128);
-impl_wrapping_add!(usize);
-impl_wrapping_add!(i8);
-impl_wrapping_add!(i16);
-impl_wrapping_add!(i32);
-impl_wrapping_add!(i64);
-impl_wrapping_add!(i128);
-impl_wrapping_add!(isize);
+apply_to_primitive_ints!(impl_wrapping_add);

@@ -1,9 +1,6 @@
 use std::fmt::Display;
 
-use comparison::traits::{Max, Min};
 use crement::Crementable;
-
-//TODO to be replaced by std ranges once relevant traits are stable
 
 #[derive(Clone)]
 pub struct RangeIncreasing<T: Crementable> {
@@ -73,34 +70,4 @@ pub fn range_decreasing<T: Display + Crementable>(a: T, b: T) -> RangeDecreasing
         i: b,
         done: false,
     }
-}
-
-#[inline]
-pub fn range_up_increasing<T: Crementable + Display + Max>(a: T) -> RangeIncreasing<T> {
-    range_increasing(a, T::MAX)
-}
-
-#[inline]
-pub fn range_up_decreasing<T: Crementable + Display + Max>(a: T) -> RangeDecreasing<T> {
-    range_decreasing(a, T::MAX)
-}
-
-#[inline]
-pub fn range_down_increasing<T: Crementable + Display + Min>(b: T) -> RangeIncreasing<T> {
-    range_increasing(T::MIN, b)
-}
-
-#[inline]
-pub fn range_down_decreasing<T: Crementable + Display + Min>(b: T) -> RangeDecreasing<T> {
-    range_decreasing(T::MIN, b)
-}
-
-#[inline]
-pub fn increasing<T: Crementable + Display + Max + Min>() -> RangeIncreasing<T> {
-    range_increasing(T::MIN, T::MAX)
-}
-
-#[inline]
-pub fn decreasing<T: Crementable + Display + Max + Min>() -> RangeDecreasing<T> {
-    range_decreasing(T::MIN, T::MAX)
 }

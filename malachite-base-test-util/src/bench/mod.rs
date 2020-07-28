@@ -1,8 +1,9 @@
+use std::collections::{BTreeMap, HashMap};
+use std::iter::Iterator;
+
 use gnuplot::{AxesCommon, Caption, Color, Figure};
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::ExactFrom;
-use std::collections::{BTreeMap, HashMap};
-use std::iter::Iterator;
 use time::precise_time_ns;
 
 fn escape_label_string(s: &str) -> String {

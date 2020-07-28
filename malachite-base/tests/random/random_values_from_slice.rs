@@ -12,7 +12,7 @@ fn test_random_values_from_slice() {
                 common_values: &[(u32, usize)],
                 actual_median: (u32, Option<u32>)| {
         let xs = random_values_from_slice(EXAMPLE_SEED, slice).cloned();
-        let expected_values = xs.clone().take(20).collect::<Vec<u32>>();
+        let expected_values = xs.clone().take(20).collect::<Vec<_>>();
         let expected_common_values = common_values_map_debug(1_000_000, 10, xs.clone());
         let expected_median = median(xs.take(1_000_000));
         assert_eq!(

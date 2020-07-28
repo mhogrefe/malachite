@@ -17,7 +17,13 @@ use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_nz::integer::exhaustive::{
+    exhaustive_integer_range_to_infinity, exhaustive_integer_range_to_negative_infinity,
+    exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
+    exhaustive_nonzero_integers,
+};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::exhaustive::exhaustive_naturals;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_rug_integer,
@@ -29,15 +35,13 @@ use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::dependent_pairs;
 use rust_wheels::iterators::general::{random, Random};
 use rust_wheels::iterators::integers::{
-    exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
-    exhaustive_nonzero_integers, random_integers, random_natural_integers,
-    random_negative_integers, random_nonzero_integers, range_down_decreasing_integer,
-    range_up_increasing_integer, special_random_integers, special_random_natural_integers,
-    special_random_negative_integers, special_random_nonzero_integers,
+    random_integers, random_natural_integers, random_negative_integers, random_nonzero_integers,
+    special_random_integers, special_random_natural_integers, special_random_negative_integers,
+    special_random_nonzero_integers,
 };
 use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
-    exhaustive_naturals, random_naturals, random_range_up_natural, special_random_naturals,
+    random_naturals, random_range_up_natural, special_random_naturals,
     special_random_range_up_natural,
 };
 use rust_wheels::iterators::primitive_ints::{special_random_signed, special_random_unsigned};
@@ -1049,8 +1053,8 @@ macro_rules! float_gen {
             let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
             let xs: It<Integer> = match gm {
                 GenerationMode::Exhaustive => Box::new(
-                    range_up_increasing_integer(Integer::from(&n))
-                        .interleave(range_down_decreasing_integer(-n)),
+                    exhaustive_integer_range_to_infinity(Integer::from(&n))
+                        .interleave(exhaustive_integer_range_to_negative_infinity(-n)),
                 ),
                 GenerationMode::Random(scale) => {
                     Box::new($random_integers_not_exactly_equal_to_float_f(scale))

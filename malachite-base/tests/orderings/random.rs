@@ -1,4 +1,4 @@
-use std::cmp::Ordering::{self, Equal, Greater, Less};
+use std::cmp::Ordering::{Equal, Greater, Less};
 
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
@@ -10,7 +10,7 @@ use malachite_base::random::EXAMPLE_SEED;
 #[test]
 fn test_random_orderings() {
     let xs = random_orderings(EXAMPLE_SEED);
-    let values = xs.clone().take(20).collect::<Vec<Ordering>>();
+    let values = xs.clone().take(20).collect::<Vec<_>>();
     let common_values = common_values_map_debug(1_000_000, 10, xs.clone());
     let median = median(xs.take(1_000_000));
     assert_eq!(

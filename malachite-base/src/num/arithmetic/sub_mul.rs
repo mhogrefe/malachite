@@ -50,16 +50,4 @@ macro_rules! impl_sub_mul {
         }
     };
 }
-
-impl_sub_mul!(u8);
-impl_sub_mul!(u16);
-impl_sub_mul!(u32);
-impl_sub_mul!(u64);
-impl_sub_mul!(u128);
-impl_sub_mul!(usize);
-impl_sub_mul!(i8);
-impl_sub_mul!(i16);
-impl_sub_mul!(i32);
-impl_sub_mul!(i64);
-impl_sub_mul!(i128);
-impl_sub_mul!(isize);
+apply_to_primitive_ints!(impl_sub_mul);

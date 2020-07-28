@@ -73,8 +73,6 @@ pub mod integer {
     }
     pub mod basic {
         pub mod constants;
-        pub mod decrement;
-        pub mod increment;
         pub mod size;
     }
     pub mod comparison {
@@ -99,6 +97,19 @@ pub mod integer {
         pub mod primitive_integer_from_integer;
         pub mod serde;
         pub mod to_twos_complement_limbs;
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_integer_range;
+        pub mod exhaustive_integer_range_to_infinity;
+        pub mod exhaustive_integer_range_to_negative_infinity;
+        pub mod exhaustive_integers;
+        pub mod exhaustive_natural_integers;
+        pub mod exhaustive_negative_integers;
+        pub mod exhaustive_nonzero_integers;
+        pub mod exhaustive_positive_integers;
+        pub mod integer_decreasing_range_to_negative_infinity;
+        pub mod integer_increasing_range;
+        pub mod integer_increasing_range_to_infinity;
     }
     pub mod logic {
         pub mod and;
@@ -175,7 +186,6 @@ pub mod natural {
     }
     pub mod basic {
         pub mod constants;
-        pub mod crement;
         pub mod size;
     }
     pub mod comparison {
@@ -194,6 +204,12 @@ pub mod natural {
         pub mod primitive_integer_from_natural;
         pub mod serde;
         pub mod to_limbs;
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_natural_range;
+        pub mod exhaustive_natural_range_to_infinity;
+        pub mod exhaustive_naturals;
+        pub mod exhaustive_positive_naturals;
     }
     pub mod logic {
         pub mod and;

@@ -22,7 +22,7 @@ use random::seed::Seed;
 /// use std::cmp::Ordering::{self, Less, Greater, Equal};
 ///
 /// assert_eq!(
-///     random_orderings(EXAMPLE_SEED).take(10).collect::<Vec<Ordering>>(),
+///     random_orderings(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
 ///     &[Less, Equal, Less, Greater, Less, Less, Equal, Less, Equal, Greater]
 /// )
 /// ```

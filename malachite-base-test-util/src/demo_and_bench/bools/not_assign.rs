@@ -1,4 +1,5 @@
 use malachite_base::num::logic::traits::NotAssign;
+
 use malachite_base_test_util::generators::bool_gen;
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;

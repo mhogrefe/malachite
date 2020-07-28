@@ -17,7 +17,7 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 /// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// assert_eq!(
-///     exhaustive_rounding_modes().collect::<Vec<RoundingMode>>(),
+///     exhaustive_rounding_modes().collect::<Vec<_>>(),
 ///     &[
 ///         RoundingMode::Down, RoundingMode::Up, RoundingMode::Floor, RoundingMode::Ceiling,
 ///         RoundingMode::Nearest, RoundingMode::Exact,

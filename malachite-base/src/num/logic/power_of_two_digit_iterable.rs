@@ -233,7 +233,7 @@ macro_rules! impl_power_of_two_digit_iterable {
                     /// // 107 = 1101011b
                     /// let mut digits =
                     ///     PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-                    /// assert_eq!(digits.collect::<Vec<u8>>(), vec![3, 2, 2, 1]);
+                    /// assert_eq!(digits.collect::<Vec<_>>(), vec![3, 2, 2, 1]);
                     ///
                     /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
                     /// assert!(digits.next_back().is_none());
@@ -241,7 +241,7 @@ macro_rules! impl_power_of_two_digit_iterable {
                     /// // 107 = 1101011b
                     /// let mut digits =
                     ///     PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-                    /// assert_eq!(digits.rev().collect::<Vec<u8>>(), vec![1, 2, 2, 3]);
+                    /// assert_eq!(digits.rev().collect::<Vec<_>>(), vec![1, 2, 2, 3]);
                     /// ```
                     #[inline]
                     fn power_of_two_digits(

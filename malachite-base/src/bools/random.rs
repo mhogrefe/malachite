@@ -42,7 +42,7 @@ impl Iterator for RandomBools {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_bools(EXAMPLE_SEED).take(10).collect::<Vec<bool>>(),
+///     random_bools(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
 ///     &[true, false, false, false, true, true, true, false, true, true]
 /// )
 /// ```

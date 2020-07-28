@@ -1,9 +1,10 @@
 use std::ops::Not;
 
-use malachite_base::crement::Crementable;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
 
 use integer::Integer;
+use natural::Natural;
 
 impl Not for Integer {
     type Output = Integer;
@@ -114,10 +115,10 @@ impl NotAssign for Integer {
     fn not_assign(&mut self) {
         if self.sign {
             self.sign = false;
-            self.abs.increment();
+            self.abs += Natural::ONE;
         } else {
             self.sign = true;
-            self.abs.decrement();
+            self.abs -= Natural::ONE;
         }
     }
 }

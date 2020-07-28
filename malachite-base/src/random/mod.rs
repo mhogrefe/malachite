@@ -28,7 +28,7 @@ pub const EXAMPLE_SEED: Seed = Seed::from_bytes([
 ///
 /// let xs = &[2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect::<Vec<u32>>(),
+///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect::<Vec<_>>(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -62,7 +62,7 @@ pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlic
 ///
 /// let xs = vec![2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect::<Vec<u32>>(),
+///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect::<Vec<_>>(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```

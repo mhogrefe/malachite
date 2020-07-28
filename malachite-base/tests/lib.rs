@@ -38,7 +38,6 @@ extern crate rand_chacha;
 
 pub mod bools {
     pub mod constants;
-    pub mod crement;
     pub mod exhaustive;
     pub mod not_assign;
     pub mod random;
@@ -135,7 +134,6 @@ pub mod num {
     }
     pub mod basic {
         pub mod constants;
-        pub mod crement;
         pub mod iverson;
     }
     pub mod comparison {
@@ -151,8 +149,12 @@ pub mod num {
         pub mod exhaustive_negative_signeds;
         pub mod exhaustive_nonzero_signeds;
         pub mod exhaustive_positive_primitives;
+        pub mod exhaustive_signed_range;
+        pub mod exhaustive_signed_range_to_max;
         pub mod exhaustive_signeds;
         pub mod exhaustive_unsigneds;
+        pub mod primitive_integer_increasing_range;
+        pub mod primitive_integer_increasing_range_to_max;
     }
     pub mod float {
         pub mod nice_float;

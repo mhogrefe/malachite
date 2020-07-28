@@ -46,10 +46,4 @@ macro_rules! impl_wrapping_abs {
         }
     };
 }
-
-impl_wrapping_abs!(i8);
-impl_wrapping_abs!(i16);
-impl_wrapping_abs!(i32);
-impl_wrapping_abs!(i64);
-impl_wrapping_abs!(i128);
-impl_wrapping_abs!(isize);
+apply_to_signeds!(impl_wrapping_abs);

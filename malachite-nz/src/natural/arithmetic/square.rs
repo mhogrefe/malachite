@@ -19,11 +19,17 @@ use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
     _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1, _limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
 use natural::arithmetic::mul::poly_interpolate::{
-    _limbs_mul_toom_interpolate_5_points, _limbs_mul_toom_interpolate_7_points,
+    _limbs_mul_toom_interpolate_12_points, _limbs_mul_toom_interpolate_5_points,
+    _limbs_mul_toom_interpolate_7_points,
 };
-use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
+use natural::arithmetic::mul::toom::{
+    _limbs_toom_couple_handling, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY,
+};
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
@@ -34,16 +40,6 @@ use platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_T
 
 const SQR_TOOM6_THRESHOLD: usize = 351;
 const SQR_TOOM8_THRESHOLD: usize = 454;
-
-// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn _limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
-    (n << 1)
-        + max(
-            (SQR_TOOM6_THRESHOLD << 1) + usize::wrapping_from(Limb::WIDTH) * 6,
-            _limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD),
-        )
-        - (SQR_TOOM6_THRESHOLD << 1)
-}
 
 // This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
 pub(crate) fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
@@ -138,7 +134,7 @@ fn _limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [L
 
 /// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// "scratch" slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
 /// limbs needed is provided by `_limbs_square_to_out_toom_2_scratch_len`. The following
 /// restrictions on the input slices must be met:
 /// 1. `out`.len() >= 2 * `xs`.len()
@@ -213,12 +209,12 @@ pub fn _limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     }
     assert!(carry.wrapping_add(1) <= 3);
     assert!(carry2 <= 2);
-    assert!(!limbs_slice_add_limb_in_place(&mut out[n << 1..], carry2));
+    let carry3 = limbs_slice_add_limb_in_place(&mut out[n << 1..], carry2);
     let out_hi = &mut out[3 * n..];
     if carry <= 2 {
         assert!(!limbs_slice_add_limb_in_place(out_hi, carry));
-    } else {
-        assert!(!limbs_sub_limb_in_place(out_hi, 1));
+    } else if limbs_sub_limb_in_place(out_hi, 1) {
+        assert!(carry3);
     }
 }
 
@@ -262,7 +258,7 @@ fn _limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch:
 
 /// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// "scratch" slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
 /// limbs needed is provided by `_limbs_square_to_out_toom_3_scratch_len`. The following
 /// restrictions on the input slices must be met:
 /// 1. `out`.len() >= 2 * `xs`.len()
@@ -401,6 +397,10 @@ pub const fn _limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
+/// This is MAYBE_sqr_basecase from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+pub const TOOM4_MAYBE_SQR_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM2_THRESHOLD;
+
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
@@ -413,6 +413,8 @@ pub const TOOM4_MAYBE_SQR_TOOM4: bool =
 fn _limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
     if n < SQR_TOOM2_THRESHOLD {
+        // We don't check TOOM4_MAYBE_SQR_BASECASE because we never want the Toom functions to
+        // handle very small inputs.
         _limbs_square_to_out_basecase(out, xs);
     } else if TOOM4_MAYBE_SQR_TOOM2 && n < SQR_TOOM3_THRESHOLD {
         _limbs_square_to_out_toom_2(out, xs, scratch);
@@ -425,7 +427,7 @@ fn _limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch:
 
 /// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// "scratch" slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
 /// limbs needed is provided by `_limbs_square_to_out_toom_4_scratch_len`. The following
 /// restrictions on the input slices must be met:
 /// 1. `out`.len() >= 2 * `xs`.len()
@@ -510,6 +512,155 @@ pub fn _limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     _limbs_square_to_out_toom_4_recursive(vinf, xs_3, tp);
     split_into_chunks_mut!(scratch, k, [v2, vm2, vh, vm1], tp);
     _limbs_mul_toom_interpolate_7_points(out, n, s << 1, false, vm2, false, vm1, v2, vh, tp);
+}
+
+/// This function can be used to determine whether the size of the input slice to
+/// `_limbs_square_to_out_toom_6` is valid.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+#[inline]
+pub fn _limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
+    xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
+}
+
+// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.1.2.
+pub fn _limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
+    (n << 1)
+        + max(
+            (SQR_TOOM6_THRESHOLD << 1) + usize::wrapping_from(Limb::WIDTH) * 6,
+            _limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD),
+        )
+        - (SQR_TOOM6_THRESHOLD << 1)
+}
+
+/// This is SQR_TOOM6_MAX from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
+
+/// This is MAYBE_sqr_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM2_THRESHOLD;
+
+/// This is MAYBE_sqr_above_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_ABOVE_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM2_THRESHOLD;
+
+/// This is MAYBE_sqr_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_TOOM2: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM3_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM3_THRESHOLD;
+
+/// This is MAYBE_sqr_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM4_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM4_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom4 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM6_THRESHOLD;
+
+// This is TOOM6_SQR_REC from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+fn _limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let n = xs.len();
+    if TOOM6_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
+        _limbs_square_to_out_basecase(out, xs);
+    } else if TOOM6_MAYBE_SQR_TOOM2 && (!TOOM6_MAYBE_SQR_ABOVE_TOOM2 || n < SQR_TOOM3_THRESHOLD) {
+        _limbs_square_to_out_toom_2(out, xs, scratch);
+    } else if TOOM6_MAYBE_SQR_TOOM3 && (!TOOM6_MAYBE_SQR_ABOVE_TOOM3 || n < SQR_TOOM4_THRESHOLD) {
+        _limbs_square_to_out_toom_3(out, xs, scratch);
+    } else if !TOOM6_MAYBE_SQR_ABOVE_TOOM4 || n < SQR_TOOM6_THRESHOLD {
+        _limbs_square_to_out_toom_4(out, xs, scratch);
+    } else {
+        _limbs_square_to_out_toom_6(out, xs, scratch);
+    }
+}
+
+/// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub fn _limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let xs_len = xs.len();
+    assert!(xs_len >= 18);
+    let n = 1 + (xs_len - 1) / 6;
+    assert!(xs_len > 5 * n);
+    let s = xs_len - 5 * n;
+    assert!(s <= n);
+    assert!(10 * n + 3 <= xs_len << 1);
+    let (out_lo, remainder) = out.split_at_mut(3 * n);
+    let (r4, r2) = remainder.split_at_mut(4 * n);
+    let (v0, v2) = r2.split_at_mut(2 * n + 2);
+    // +/- 1/2
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        &mut v2[..n + 1],
+        v0,
+        5,
+        xs,
+        n,
+        1,
+        &mut out_lo[..n + 1],
+    );
+    split_into_chunks_mut!(scratch, 3 * n + 1, [r5, r3, r1], wse);
+    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1/2) ^ 2 * 2 ^
+    _limbs_square_to_out_toom_6_recursive(r5, &v2[..n + 1], wse); // X(1/2) ^ 2 * 2 ^
+    _limbs_toom_couple_handling(r5, &mut out_lo[..2 * n + 1], false, n, 1, 0);
+    // +/- 1
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+        &mut v2[..n + 1],
+        v0,
+        5,
+        xs,
+        n,
+        &mut out_lo[..n + 1],
+    );
+    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1) ^ 2
+    _limbs_square_to_out_toom_6_recursive(r3, &v2[..n + 1], wse); // X(1) ^ 2
+    _limbs_toom_couple_handling(r3, &mut out_lo[..2 * n + 1], false, n, 0, 0);
+    // +/- 4
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+        &mut v2[..n + 1],
+        v0,
+        5,
+        xs,
+        n,
+        2,
+        &mut out_lo[..n + 1],
+    );
+    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-4) ^ 2
+    _limbs_square_to_out_toom_6_recursive(r1, &v2[..n + 1], wse); // X(4) ^ 2
+    _limbs_toom_couple_handling(r1, &mut out_lo[..2 * n + 1], false, n, 2, 4);
+    // +/- 1/4
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        &mut v2[..n + 1],
+        v0,
+        5,
+        xs,
+        n,
+        2,
+        &mut out_lo[..n + 1],
+    );
+    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1/4) ^ 2 * 4 ^
+    _limbs_square_to_out_toom_6_recursive(r4, &v2[..n + 1], wse); // X(1/4) ^ 2 * 4 ^
+    _limbs_toom_couple_handling(r4, &mut out_lo[..2 * n + 1], false, n, 2, 0);
+    // +/- 2
+    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
+        &mut v2[..n + 1],
+        v0,
+        5,
+        xs,
+        n,
+        &mut out_lo[..n + 1],
+    );
+    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-2) ^ 2
+    let (v0, v2) = r2.split_at_mut(2 * n + 2);
+    _limbs_square_to_out_toom_6_recursive(v0, &v2[..n + 1], wse); // X(2) ^ 2
+    _limbs_toom_couple_handling(r2, &mut out_lo[..2 * n + 1], false, n, 1, 2);
+    _limbs_square_to_out_toom_6_recursive(out_lo, &xs[..n], wse); // X(0) ^ 2
+    _limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
 }
 
 impl Square for Natural {

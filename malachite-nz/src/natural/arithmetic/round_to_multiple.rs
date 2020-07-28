@@ -7,8 +7,6 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::InnerNatural::Small;
 use natural::Natural;
 
-//TODO clean
-
 impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;
 

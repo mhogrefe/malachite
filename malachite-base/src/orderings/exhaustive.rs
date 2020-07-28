@@ -18,7 +18,7 @@ use orderings::ORDERINGS;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     exhaustive_orderings_increasing().collect::<Vec<Ordering>>(),
+///     exhaustive_orderings_increasing().collect::<Vec<_>>(),
 ///     &[Ordering::Less, Ordering::Equal, Ordering::Greater]
 /// );
 /// ```
@@ -43,7 +43,7 @@ pub fn exhaustive_orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     exhaustive_orderings().collect::<Vec<Ordering>>(),
+///     exhaustive_orderings().collect::<Vec<_>>(),
 ///     &[Ordering::Equal, Ordering::Less, Ordering::Greater]
 /// );
 /// ```
