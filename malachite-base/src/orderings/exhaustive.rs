@@ -14,16 +14,16 @@ use orderings::ORDERINGS;
 ///
 /// # Examples
 /// ```
-/// use malachite_base::orderings::exhaustive::exhaustive_orderings_increasing;
+/// use malachite_base::orderings::exhaustive::orderings_increasing;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     exhaustive_orderings_increasing().collect::<Vec<_>>(),
+///     orderings_increasing().collect::<Vec<_>>(),
 ///     &[Ordering::Less, Ordering::Equal, Ordering::Greater]
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
+pub fn orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
     [Ordering::Less, Ordering::Equal, Ordering::Greater]
         .iter()
         .cloned()

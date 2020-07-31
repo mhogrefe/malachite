@@ -7,7 +7,6 @@ use std::ops::{
 use std::str::FromStr;
 
 use comparison::traits::{Max, Min};
-use crement::Crementable;
 use named::Named;
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, NegAssign, PowerOfTwo};
 use num::basic::integers::PrimitiveInteger;
@@ -50,7 +49,6 @@ pub trait PrimitiveFloat:
     + Sum<Self>
     + Two
     + UpperExp
-    + Crementable
     + Zero
 {
     type UnsignedOfEqualWidth: PrimitiveUnsigned;
@@ -252,24 +250,6 @@ macro_rules! float_traits {
                 *self = -*self;
             }
         }
-
-        impl Crementable for $t {
-            fn increment(&mut self) {
-                self.abs_assign_negative_zeros();
-                if *self == $t::POSITIVE_INFINITY {
-                    panic!("Can't increment positive infinity");
-                }
-                *self = $t::from_ordered_representation(self.to_ordered_representation() + 1);
-            }
-
-            fn decrement(&mut self) {
-                self.abs_assign_negative_zeros();
-                if *self == $t::NEGATIVE_INFINITY {
-                    panic!("Can't decrement positive infinity");
-                }
-                *self = $t::from_ordered_representation(self.to_ordered_representation() - 1);
-            }
-        }
     };
 }
 
@@ -281,6 +261,26 @@ float_traits!(
     2.225_073_858_507_201e-308,
     2.225_073_858_507_201_4e-308
 );
+
+pub fn increment_float<T: PrimitiveFloat>(f: &mut T) {
+    f.abs_assign_negative_zeros();
+    if *f == T::POSITIVE_INFINITY {
+        panic!("Can't increment positive infinity");
+    }
+    *f = T::from_ordered_representation(
+        f.to_ordered_representation() + T::UnsignedOfEqualWidth::ONE,
+    );
+}
+
+pub fn decrement_float<T: PrimitiveFloat>(f: &mut T) {
+    f.abs_assign_negative_zeros();
+    if *f == T::NEGATIVE_INFINITY {
+        panic!("Can't decrement positive infinity");
+    }
+    *f = T::from_ordered_representation(
+        f.to_ordered_representation() - T::UnsignedOfEqualWidth::ONE,
+    );
+}
 
 /// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
 macro_rules! impl01_float {

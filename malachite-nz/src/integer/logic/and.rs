@@ -966,36 +966,6 @@ pub fn limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
     }
 }
 
-impl BitAnd<Integer> for Integer {
-    type Output = Integer;
-
-    /// Takes the bitwise and of two `Integer`s, taking both by value.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// where n = `self.significant_bits() + other.significant_bits()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::basic::traits::One;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
-    /// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
-    ///     "-1000000004096");
-    /// ```
-    #[inline]
-    fn bitand(mut self, other: Integer) -> Integer {
-        self &= other;
-        self
-    }
-}
-
 impl Natural {
     fn and_assign_pos_limb_neg(&mut self, other: Limb) {
         match *self {
@@ -1113,6 +1083,36 @@ impl Natural {
                 Natural::from_owned_limbs_asc(limbs_and_neg_neg(xs, ys))
             }
         }
+    }
+}
+
+impl BitAnd<Integer> for Integer {
+    type Output = Integer;
+
+    /// Takes the bitwise and of two `Integer`s, taking both by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits() + other.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!((Integer::from(-123) & Integer::from(-456)).to_string(), "-512");
+    /// assert_eq!((-Integer::trillion() & -(Integer::trillion() + Integer::ONE)).to_string(),
+    ///     "-1000000004096");
+    /// ```
+    #[inline]
+    fn bitand(mut self, other: Integer) -> Integer {
+        self &= other;
+        self
     }
 }
 

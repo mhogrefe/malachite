@@ -13,6 +13,8 @@ use natural::comparison::ord::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
+//TODO clean
+
 /// Given the limbs of two `Natural`s a and b, and a limb c, returns the limbs of a - b * c. If
 /// b * c > a, `None` is returned.
 ///

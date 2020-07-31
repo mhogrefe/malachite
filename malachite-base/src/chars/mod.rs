@@ -1,6 +1,6 @@
 use comparison::traits::{Max, Min};
-use crement::Crementable;
 use named::Named;
+use strings::ToDebugString;
 
 // The number of Unicode scalar values, or 1,112,064.
 pub const NUMBER_OF_CHARS: u32 = (1 << 20) + (1 << 16) - SURROGATE_RANGE_SIZE;
@@ -94,60 +94,93 @@ pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     }
 }
 
-impl Crementable for char {
-    /// Increments this `char`, skipping over the surrogate range.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Panics
-    /// Panics if `self` is `char::MAX`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::crement::Crementable;
-    ///
-    /// let mut c = '\u{0}';
-    /// c.increment();
-    /// assert_eq!(c, '\u{1}');
-    ///
-    /// let mut c = 'a';
-    /// c.increment();
-    /// assert_eq!(c, 'b');
-    /// ```
-    fn increment(&mut self) {
-        *self = contiguous_range_to_char(char_to_contiguous_range(*self) + 1)
-            .expect("Cannot increment char::MAX")
-    }
+/// Increments this `char`, skipping over the surrogate range.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `self` is `char::MAX`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::chars::increment_char;
+///
+/// let mut c = '\u{0}';
+/// increment_char(&mut c);
+/// assert_eq!(c, '\u{1}');
+///
+/// let mut c = 'a';
+/// increment_char(&mut c);
+/// assert_eq!(c, 'b');
+/// ```
+#[inline]
+pub fn increment_char(c: &mut char) {
+    *c = contiguous_range_to_char(char_to_contiguous_range(*c) + 1)
+        .expect("Cannot increment char::MAX")
+}
 
-    /// Decrements this `char`, skipping over the surrogate range.
-    ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
-    ///
-    /// # Panics
-    /// Panics if `self` is `'\u{0}'`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::crement::Crementable;
-    ///
-    /// let mut c = '\u{1}';
-    /// c.decrement();
-    /// assert_eq!(c, '\u{0}');
-    ///
-    /// let mut c = 'b';
-    /// c.decrement();
-    /// assert_eq!(c, 'a');
-    /// ```
-    #[allow(clippy::panic_params)]
-    fn decrement(&mut self) {
-        if *self == char::MIN {
-            panic!("Cannot decrement char '{}'", *self);
-        } else {
-            *self = contiguous_range_to_char(char_to_contiguous_range(*self) - 1).unwrap();
+/// Decrements this `char`, skipping over the surrogate range.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+///
+/// # Panics
+/// Panics if `self` is `'\u{0}'`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::chars::decrement_char;
+///
+/// let mut c = '\u{1}';
+/// decrement_char(&mut c);
+/// assert_eq!(c, '\u{0}');
+///
+/// let mut c = 'b';
+/// decrement_char(&mut c);
+/// assert_eq!(c, 'a');
+/// ```
+#[inline]
+pub fn decrement_char(c: &mut char) {
+    if *c == char::MIN {
+        panic!("Cannot decrement char '{}'", *c);
+    } else {
+        *c = contiguous_range_to_char(char_to_contiguous_range(*c) - 1).unwrap();
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub enum CharType {
+    AsciiLower,
+    AsciiUpper,
+    AsciiNumeric,
+    AsciiNonAlphanumericGraphic,
+    NonAsciiGraphic,
+    NonGraphic,
+}
+
+fn debug_starts_with_slash(c: char) -> bool {
+    // Skip the first `char`, which is always a single quote
+    c.to_debug_string().chars().nth(1) == Some('\\')
+}
+
+impl CharType {
+    pub fn contains(self, c: char) -> bool {
+        match self {
+            CharType::AsciiLower => c.is_ascii_lowercase(),
+            CharType::AsciiUpper => c.is_ascii_uppercase(),
+            CharType::AsciiNumeric => c.is_ascii_digit(),
+            CharType::AsciiNonAlphanumericGraphic => {
+                c.is_ascii() && !c.is_ascii_alphanumeric() && !c.is_ascii_control()
+            }
+            CharType::NonAsciiGraphic => !c.is_ascii() && !debug_starts_with_slash(c),
+            CharType::NonGraphic => {
+                c.is_ascii_control() || !c.is_ascii() && debug_starts_with_slash(c)
+            }
         }
     }
 }
+
+pub mod exhaustive;

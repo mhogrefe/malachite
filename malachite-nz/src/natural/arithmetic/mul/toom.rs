@@ -201,6 +201,8 @@ pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len
 /// 2. `xs`.len() >= `ys`.len()
 /// 3. `xs`.len() + 1 < 2 * `ys`.len()
 ///
+/// Approximately, `ys`.len() < `xs`.len() < 2 * `ys`.len().
+///
 /// The smallest allowable `xs` length is 2. The smallest allowable `ys` length is also 2.
 ///
 /// This uses the Toom-22, aka Toom-2, aka Karatsuba algorithm.
@@ -381,6 +383,8 @@ pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len
 /// 2. `xs`.len() > `ys`.len() + 1
 /// 3. 2 * `xs`.len() < 3 * (`ys`.len() + 1)
 /// 4. `xs`.len() == 6 or `ys`.len() > 4
+///
+/// Approximately, `ys`.len() < `xs`.len() < 3 / 2 * `ys`.len().
 ///
 /// The smallest allowable `xs` length is 6. The smallest allowable `ys` length is 4.
 ///
@@ -679,6 +683,8 @@ pub fn _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs_len: usize, ys_len
 /// 2. `xs`.len() >= `ys`.len()
 /// 3. 2 * ceiling(`xs`.len() / 3) < `ys`.len()
 ///
+/// Approximately, `ys`.len() < `xs`.len() < 3 / 2 * `ys`.len().
+///
 /// The smallest allowable `xs` length is 3. The smallest allowable `ys` length is also 3.
 ///
 /// This uses the Toom-33 aka Toom-3 algorithm.
@@ -933,6 +939,8 @@ pub fn _limbs_mul_same_length_to_out_toom_42_recursive(out: &mut [Limb], xs: &[L
 /// 3. `xs`.len() + 3 < 4 * `ys`.len()
 /// 4. (`xs`.len(), `ys`.len()) != (9, 4)
 ///
+/// Approximately, 3 / 2 * `ys`.len() < `xs`.len() < 4 * `ys`.len().
+///
 /// The smallest allowable `xs` length is 4. The smallest allowable `ys` length is 2.
 ///
 /// This uses the Toom-42 algorithm.
@@ -1124,6 +1132,8 @@ pub fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usiz
 /// 4. (`xs`.len(), `ys`.len()) != (16, 13)
 /// 5. `xs`.len() + `ys`.len() >= 5 * (ceiling(`xs`.len() / 4) + 1)
 ///
+/// Approximately, `ys`.len() < `xs`.len() < 2 * `ys`.len().
+///
 /// The smallest allowable `xs` length is 11. The smallest allowable `ys` length is 8.
 ///
 /// This uses the Toom-43 algorithm.
@@ -1276,7 +1286,7 @@ fn _limbs_mul_same_length_to_out_toom_44_recursive(out: &mut [Limb], xs: &[Limb]
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0 && xs_len >= ys_len && 3usize * xs_len.shr_round(2, RoundingMode::Ceiling) < ys_len
+    xs_len >= ys_len && 3usize * xs_len.shr_round(2, RoundingMode::Ceiling) < ys_len
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -1298,8 +1308,11 @@ pub fn _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
 /// 2. `xs`.len() >= `ys`.len()
-/// 3. See `_limbs_mul_greater_to_out_toom_44_input_sizes_valid`. The gist is that 3 times
-///    `xs.len()` must be less than 4 times `ys.len()`.
+/// 3. 3 * ceiling(`xs`.len() / 4) < `ys`.len()
+///
+/// Approximately, `ys`.len() < `xs`.len() < 4 / 3 * `ys`.len().
+///
+/// The smallest allowable `xs` length is 4. The smallest allowable `ys` length is also 4.
 ///
 /// This uses the Toom-44 algorithm.
 ///
@@ -1477,18 +1490,9 @@ pub fn _limbs_mul_greater_to_out_toom_44(
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    ys_len != 0 && xs_len >= ys_len && {
-        let n = 1 + if xs_len << 1 >= 5 * ys_len {
-            (xs_len - 1) / 5
-        } else {
-            (ys_len - 1) >> 1
-        };
-        xs_len > n << 2
-            && xs_len <= 5 * n
-            && ys_len > n
-            && ys_len <= n << 1
-            && xs_len + ys_len >= 5 * (n + 1)
-    }
+    xs_len + 4 < 5 * ys_len
+        && xs_len.shr_round(2, RoundingMode::Ceiling) > ys_len.shr_round(1, RoundingMode::Ceiling)
+        && xs_len + ys_len >= 5 * (xs_len.div_round(5, RoundingMode::Ceiling) + 1)
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -1514,9 +1518,13 @@ pub fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usiz
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_52_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
-/// 2. `xs`.len() >= `ys`.len()
-/// 3. See `_limbs_mul_greater_to_out_toom_52_input_sizes_valid`. The gist is that `xs` must be less
-/// than five times as long as `ys`.
+/// 2. ceiling(`xs`.len() / 4) > ceiling(`ys`.len() / 2)
+/// 3. `xs`.len() + 4 < 5 * `ys`.len()
+/// 4. `xs`.len() + `ys`.len() >= 5 * (ceiling(`xs`.len() / 5) + 1)
+///
+/// Approximately, 2 * `ys`.len() < `xs`.len() < 5 * `ys`.len().
+///
+/// The smallest allowable `xs` length is 14. The smallest allowable `ys` length is 5.
 ///
 /// This uses the Toom-52 algorithm.
 ///
@@ -1684,14 +1692,9 @@ pub fn _limbs_mul_greater_to_out_toom_52(
 ///
 /// Additional memory: worst case O(1)
 pub fn _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
-    xs_len != 0 && xs_len >= ys_len && {
-        let n = 1 + if 3 * xs_len >= 5 * ys_len {
-            (xs_len - 1) / 5
-        } else {
-            (ys_len - 1) / 3
-        };
-        xs_len > n << 2 && xs_len <= 5 * n && ys_len > n << 1 && ys_len <= 3 * n
-    }
+    !(xs_len == 16 && ys_len == 9)
+        && xs_len.shr_round(2, RoundingMode::Ceiling) > ys_len.div_round(3, RoundingMode::Ceiling)
+        && xs_len.div_round(5, RoundingMode::Ceiling) < ys_len.shr_round(1, RoundingMode::Ceiling)
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -1717,13 +1720,17 @@ pub fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usiz
 /// scratch limbs needed is provided by `_limbs_mul_greater_to_out_toom_53_scratch_len`. The
 /// following restrictions on the input slices must be met:
 /// 1. `out`.len() >= `xs`.len() + `ys`.len()
-/// 2. `xs`.len() >= `ys`.len()
-/// 3. See `_limbs_mul_greater_to_out_toom_53_input_sizes_valid`. The gist is that 2 times
-/// `xs.len()` must be less than 5 times `ys.len()`.
+/// 2. ceiling(`xs`.len() / 4) > ceiling(`xs`.len() / 3)
+/// 3. ceiling(`xs`.len() / 5) < ceiling(`ys`.len() / 2)
+/// 4. (`xs`.len(), `ys`.len()) != (16, 9)
+///
+/// Approximately, 4 / 3 * `ys`.len() < `xs`.len() < 5 / 2 * `ys`.len().
+///
+/// The smallest allowable `xs` length is 5. The smallest allowable `ys` length is 3.
 ///
 /// This uses the Toom-53 algorithm.
 ///
-///  Evaluate in: 0, 1, -1, 2, -2, 1 / 2, Infinity.
+/// Evaluate in: 0, 1, -1, 2, -2, 1 / 2, Infinity.
 ///
 /// <-s-><--n--><--n--><--n--><--n-->
 ///  _________________________________

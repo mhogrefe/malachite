@@ -190,8 +190,6 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], 
     }
 }
 
-//TODO clean
-
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)

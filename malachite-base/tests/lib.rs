@@ -15,7 +15,6 @@
     clippy::needless_borrow,
     clippy::needless_continue,
     clippy::needless_pass_by_value,
-    clippy::non_ascii_literal,
     clippy::print_stdout,
     clippy::redundant_closure_for_method_calls,
     clippy::single_match_else,
@@ -45,7 +44,18 @@ pub mod bools {
 pub mod comparison {
     pub mod macros;
 }
-pub mod chars;
+pub mod chars {
+    pub mod char_to_contiguous_range;
+    pub mod char_type;
+    pub mod constants;
+    pub mod contiguous_range_to_char;
+    pub mod exhaustive {
+        pub mod ascii_chars_increasing;
+        pub mod chars_increasing;
+        pub mod exhaustive_ascii_chars;
+        pub mod exhaustive_chars;
+    }
+}
 pub mod iterators {
     pub mod nonzero_values;
 }

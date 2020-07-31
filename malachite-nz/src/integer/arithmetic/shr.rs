@@ -126,12 +126,7 @@ macro_rules! impl_shr_unsigned {
         }
     };
 }
-impl_shr_unsigned!(u8);
-impl_shr_unsigned!(u16);
-impl_shr_unsigned!(u32);
-impl_shr_unsigned!(u64);
-impl_shr_unsigned!(u128);
-impl_shr_unsigned!(usize);
+apply_to_unsigneds!(impl_shr_unsigned);
 
 macro_rules! impl_shr_signed {
     ($t:ident) => {
@@ -263,9 +258,4 @@ macro_rules! impl_shr_signed {
         }
     };
 }
-impl_shr_signed!(i8);
-impl_shr_signed!(i16);
-impl_shr_signed!(i32);
-impl_shr_signed!(i64);
-impl_shr_signed!(i128);
-impl_shr_signed!(isize);
+apply_to_signeds!(impl_shr_signed);

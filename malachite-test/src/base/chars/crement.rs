@@ -1,5 +1,4 @@
-use malachite_base::chars::char_to_contiguous_range;
-use malachite_base::crement::Crementable;
+use malachite_base::chars::{char_to_contiguous_range, decrement_char, increment_char};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 
@@ -7,31 +6,31 @@ use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleTy
 use malachite_test::inputs::base::{chars_not_max, chars_not_min};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_ns_demo!(registry, demo_char_increment);
-    register_ns_demo!(registry, demo_char_decrement);
-    register_ns_bench!(registry, None, benchmark_char_increment);
-    register_ns_bench!(registry, None, benchmark_char_decrement);
+    register_ns_demo!(registry, demo_increment_char);
+    register_ns_demo!(registry, demo_decrement_char);
+    register_ns_bench!(registry, None, benchmark_increment_char);
+    register_ns_bench!(registry, None, benchmark_decrement_char);
 }
 
-fn demo_char_increment(gm: NoSpecialGenerationMode, limit: usize) {
+fn demo_increment_char(gm: NoSpecialGenerationMode, limit: usize) {
     for mut c in chars_not_max(gm).take(limit) {
         let c_old = c;
-        c.increment();
-        println!("c := {:?}; c.increment(); c = {:?}", c_old, c);
+        increment_char(&mut c);
+        println!("c := {:?}; increment_char(&mut c); c = {:?}", c_old, c);
     }
 }
 
-fn demo_char_decrement(gm: NoSpecialGenerationMode, limit: usize) {
+fn demo_decrement_char(gm: NoSpecialGenerationMode, limit: usize) {
     for mut c in chars_not_min(gm).take(limit) {
         let c_old = c;
-        c.decrement();
-        println!("c := {:?}; c.decrement(); c = {:?}", c_old, c);
+        decrement_char(&mut c);
+        println!("c := {:?}; decrement_char(&mut c); c = {:?}", c_old, c);
     }
 }
 
-fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
+fn benchmark_increment_char(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     run_benchmark(
-        "char.increment()",
+        "increment_char(&mut char)",
         BenchmarkType::Single,
         chars_not_max(gm),
         gm.name(),
@@ -39,13 +38,13 @@ fn benchmark_char_increment(gm: NoSpecialGenerationMode, limit: usize, file_name
         file_name,
         &(|&c| usize::exact_from(char_to_contiguous_range(c))),
         "char_to_contiguous_range(char)",
-        &mut [("malachite", &mut (|mut c| c.increment()))],
+        &mut [("malachite", &mut (|mut c| increment_char(&mut c)))],
     );
 }
 
-fn benchmark_char_decrement(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
+fn benchmark_decrement_char(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     run_benchmark(
-        "char.decrement()",
+        "increment_char(&mut char)",
         BenchmarkType::Single,
         chars_not_min(gm),
         gm.name(),
@@ -53,6 +52,6 @@ fn benchmark_char_decrement(gm: NoSpecialGenerationMode, limit: usize, file_name
         file_name,
         &(|&c| usize::exact_from(char_to_contiguous_range(c))),
         "char_to_contiguous_range(char)",
-        &mut [("malachite", &mut (|mut c| c.decrement()))],
+        &mut [("malachite", &mut (|mut c| decrement_char(&mut c)))],
     );
 }

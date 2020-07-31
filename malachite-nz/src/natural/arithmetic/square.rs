@@ -36,9 +36,11 @@ use natural::arithmetic::sub::{
 };
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural;
-use platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD};
+use platform::{
+    DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD,
+    SQR_TOOM6_THRESHOLD,
+};
 
-const SQR_TOOM6_THRESHOLD: usize = 351;
 const SQR_TOOM8_THRESHOLD: usize = 454;
 
 // This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
@@ -582,6 +584,25 @@ fn _limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch:
     }
 }
 
+/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// limbs needed is provided by `_limbs_square_to_out_toom_6_scratch_len`. The following
+/// restrictions on the input slices must be met:
+/// 1. `out`.len() >= 2 * `xs`.len()
+/// 2. `xs`.len() is 18, or `xs.len()` > 21 but `xs`.len() is not 25, 26, or 31.
+///
+/// The smallest allowable `xs` length is 18.
+///
+/// Time: O(n<sup>log<sub>6</sub>11</sup>)
+///
+/// Additional memory: O(n)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// May panic if the input slice conditions are not met.
+///
 /// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub fn _limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
@@ -591,74 +612,56 @@ pub fn _limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     let s = xs_len - 5 * n;
     assert!(s <= n);
     assert!(10 * n + 3 <= xs_len << 1);
+    let m = n + 1;
+    let k = m + n;
     let (out_lo, remainder) = out.split_at_mut(3 * n);
-    let (r4, r2) = remainder.split_at_mut(4 * n);
-    let (v0, v2) = r2.split_at_mut(2 * n + 2);
+    let (r4, r2) = remainder.split_at_mut(n << 2);
+    let (v0, v2) = r2.split_at_mut(m << 1);
+    let v0 = &mut v0[..m];
+    let v2 = &mut v2[..m];
     // +/- 1/2
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        &mut v2[..n + 1],
+        v2,
         v0,
         5,
         xs,
         n,
         1,
-        &mut out_lo[..n + 1],
+        &mut out_lo[..m],
     );
     split_into_chunks_mut!(scratch, 3 * n + 1, [r5, r3, r1], wse);
-    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1/2) ^ 2 * 2 ^
-    _limbs_square_to_out_toom_6_recursive(r5, &v2[..n + 1], wse); // X(1/2) ^ 2 * 2 ^
-    _limbs_toom_couple_handling(r5, &mut out_lo[..2 * n + 1], false, n, 1, 0);
+    _limbs_square_to_out_toom_6_recursive(out_lo, v0, wse); // X(-1/2) ^ 2 * 2 ^
+    _limbs_square_to_out_toom_6_recursive(r5, v2, wse); // X(1/2) ^ 2 * 2 ^
+    _limbs_toom_couple_handling(r5, &mut out_lo[..k], false, n, 1, 0);
     // +/- 1
-    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
-        &mut v2[..n + 1],
-        v0,
-        5,
-        xs,
-        n,
-        &mut out_lo[..n + 1],
-    );
-    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1) ^ 2
-    _limbs_square_to_out_toom_6_recursive(r3, &v2[..n + 1], wse); // X(1) ^ 2
-    _limbs_toom_couple_handling(r3, &mut out_lo[..2 * n + 1], false, n, 0, 0);
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 5, xs, n, &mut out_lo[..m]);
+    _limbs_square_to_out_toom_6_recursive(out_lo, v0, wse); // X(-1) ^ 2
+    _limbs_square_to_out_toom_6_recursive(r3, v2, wse); // X(1) ^ 2
+    _limbs_toom_couple_handling(r3, &mut out_lo[..k], false, n, 0, 0);
     // +/- 4
-    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-        &mut v2[..n + 1],
-        v0,
-        5,
-        xs,
-        n,
-        2,
-        &mut out_lo[..n + 1],
-    );
-    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-4) ^ 2
-    _limbs_square_to_out_toom_6_recursive(r1, &v2[..n + 1], wse); // X(4) ^ 2
-    _limbs_toom_couple_handling(r1, &mut out_lo[..2 * n + 1], false, n, 2, 4);
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 5, xs, n, 2, &mut out_lo[..m]);
+    _limbs_square_to_out_toom_6_recursive(out_lo, v0, wse); // X(-4) ^ 2
+    _limbs_square_to_out_toom_6_recursive(r1, v2, wse); // X(4) ^ 2
+    _limbs_toom_couple_handling(r1, &mut out_lo[..k], false, n, 2, 4);
     // +/- 1/4
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        &mut v2[..n + 1],
+        v2,
         v0,
         5,
         xs,
         n,
         2,
-        &mut out_lo[..n + 1],
+        &mut out_lo[..m],
     );
-    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-1/4) ^ 2 * 4 ^
-    _limbs_square_to_out_toom_6_recursive(r4, &v2[..n + 1], wse); // X(1/4) ^ 2 * 4 ^
-    _limbs_toom_couple_handling(r4, &mut out_lo[..2 * n + 1], false, n, 2, 0);
+    _limbs_square_to_out_toom_6_recursive(out_lo, v0, wse); // X(-1/4) ^ 2 * 4 ^
+    _limbs_square_to_out_toom_6_recursive(r4, v2, wse); // X(1/4) ^ 2 * 4 ^
+    _limbs_toom_couple_handling(r4, &mut out_lo[..k], false, n, 2, 0);
     // +/- 2
-    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
-        &mut v2[..n + 1],
-        v0,
-        5,
-        xs,
-        n,
-        &mut out_lo[..n + 1],
-    );
-    _limbs_square_to_out_toom_6_recursive(out_lo, &v0[..n + 1], wse); // X(-2) ^ 2
-    let (v0, v2) = r2.split_at_mut(2 * n + 2);
-    _limbs_square_to_out_toom_6_recursive(v0, &v2[..n + 1], wse); // X(2) ^ 2
-    _limbs_toom_couple_handling(r2, &mut out_lo[..2 * n + 1], false, n, 1, 2);
+    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 5, xs, n, &mut out_lo[..m]);
+    _limbs_square_to_out_toom_6_recursive(out_lo, v0, wse); // X(-2) ^ 2
+    let (v0, v2) = r2.split_at_mut(m << 1);
+    _limbs_square_to_out_toom_6_recursive(v0, &v2[..m], wse); // X(2) ^ 2
+    _limbs_toom_couple_handling(r2, &mut out_lo[..k], false, n, 1, 2);
     _limbs_square_to_out_toom_6_recursive(out_lo, &xs[..n], wse); // X(0) ^ 2
     _limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
 }

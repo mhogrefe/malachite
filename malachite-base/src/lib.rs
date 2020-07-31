@@ -15,7 +15,6 @@
     clippy::needless_borrow,
     clippy::needless_continue,
     clippy::needless_pass_by_value,
-    clippy::non_ascii_literal,
     clippy::print_stdout,
     clippy::redundant_closure_for_method_calls,
     clippy::single_match_else,
@@ -128,8 +127,6 @@ pub mod bools;
 #[macro_use]
 pub mod chars;
 pub mod comparison;
-pub mod crement;
-pub mod exhaustive;
 pub mod iterators;
 pub mod num;
 pub mod orderings;

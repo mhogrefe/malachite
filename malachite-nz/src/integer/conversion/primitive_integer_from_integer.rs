@@ -611,10 +611,4 @@ macro_rules! impl_from {
         }
     };
 }
-
-impl_from!(u8, i8);
-impl_from!(u16, i16);
-impl_from!(u32, i32);
-impl_from!(u64, i64);
-impl_from!(u128, i128);
-impl_from!(usize, isize);
+apply_to_unsigned_signed_pair!(impl_from);

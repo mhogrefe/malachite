@@ -64,6 +64,7 @@ macro_rules! impl_unsigned {
         }
     };
 }
+apply_to_unsigneds!(impl_unsigned);
 
 macro_rules! impl_signed {
     ($t: ident) => {
@@ -123,15 +124,4 @@ macro_rules! impl_signed {
         }
     };
 }
-
-impl_unsigned!(u8);
-impl_unsigned!(u16);
-impl_unsigned!(u32);
-impl_unsigned!(u64);
-impl_unsigned!(usize);
-
-impl_signed!(i8);
-impl_signed!(i16);
-impl_signed!(i32);
-impl_signed!(i64);
-impl_signed!(isize);
+apply_to_signeds!(impl_signed);

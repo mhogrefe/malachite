@@ -241,9 +241,4 @@ macro_rules! impl_shl_round_signed {
         }
     };
 }
-impl_shl_round_signed!(i8);
-impl_shl_round_signed!(i16);
-impl_shl_round_signed!(i32);
-impl_shl_round_signed!(i64);
-impl_shl_round_signed!(i128);
-impl_shl_round_signed!(isize);
+apply_to_signeds!(impl_shl_round_signed);

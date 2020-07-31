@@ -2,7 +2,6 @@ use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 use malachite_base::bools::exhaustive::exhaustive_bools;
-use malachite_base::crement::Crementable;
 use malachite_base::num::arithmetic::traits::{
     DivRound, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PowerOfTwo,
 };
@@ -17,7 +16,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
     exhaustive_unsigneds, primitive_integer_increasing_range,
 };
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
@@ -1253,7 +1252,7 @@ macro_rules! float_gen {
                 }
                 let n_below = on_below.unwrap();
                 let mut f_above = f_below;
-                f_above.increment();
+                increment_float(&mut f_above);
                 let on_above = Natural::checked_from(f_above);
                 if on_above.is_none() {
                     return None;

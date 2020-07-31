@@ -109,12 +109,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
         }
     };
 }
-impl_mod_power_of_two_shl_unsigned!(u8);
-impl_mod_power_of_two_shl_unsigned!(u16);
-impl_mod_power_of_two_shl_unsigned!(u32);
-impl_mod_power_of_two_shl_unsigned!(u64);
-impl_mod_power_of_two_shl_unsigned!(u128);
-impl_mod_power_of_two_shl_unsigned!(usize);
+apply_to_unsigneds!(impl_mod_power_of_two_shl_unsigned);
 
 macro_rules! impl_mod_power_of_two_shl_signed {
     ($t:ident) => {
@@ -222,9 +217,4 @@ macro_rules! impl_mod_power_of_two_shl_signed {
         }
     };
 }
-impl_mod_power_of_two_shl_signed!(i8);
-impl_mod_power_of_two_shl_signed!(i16);
-impl_mod_power_of_two_shl_signed!(i32);
-impl_mod_power_of_two_shl_signed!(i64);
-impl_mod_power_of_two_shl_signed!(i128);
-impl_mod_power_of_two_shl_signed!(isize);
+apply_to_signeds!(impl_mod_power_of_two_shl_signed);

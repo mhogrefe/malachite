@@ -1,6 +1,22 @@
-use num::arithmetic::traits::{WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign};
+use num::arithmetic::traits::{
+    WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingMul,
+};
 
-//TODO
+#[inline]
+pub fn _wrapping_add_mul<T>(x: T, y: T, z: T) -> T
+where
+    T: WrappingAdd<T, Output = T> + WrappingMul<T, Output = T>,
+{
+    x.wrapping_add(y.wrapping_mul(z))
+}
+
+#[inline]
+pub fn _wrapping_add_mul_assign<T>(x: &mut T, y: T, z: T)
+where
+    T: WrappingAddAssign<T> + WrappingMul<T, Output = T>,
+{
+    x.wrapping_add_assign(y.wrapping_mul(z));
+}
 
 macro_rules! impl_wrapping_add_mul {
     ($t:ident) => {
@@ -22,7 +38,7 @@ macro_rules! impl_wrapping_add_mul {
             /// ```
             #[inline]
             fn wrapping_add_mul(self, y: $t, z: $t) -> $t {
-                self.wrapping_add(y.wrapping_mul(z))
+                _wrapping_add_mul(self, y, z)
             }
         }
 
@@ -47,21 +63,9 @@ macro_rules! impl_wrapping_add_mul {
             /// ```
             #[inline]
             fn wrapping_add_mul_assign(&mut self, y: $t, z: $t) {
-                self.wrapping_add_assign(y.wrapping_mul(z));
+                _wrapping_add_mul_assign(self, y, z);
             }
         }
     };
 }
-
-impl_wrapping_add_mul!(u8);
-impl_wrapping_add_mul!(u16);
-impl_wrapping_add_mul!(u32);
-impl_wrapping_add_mul!(u64);
-impl_wrapping_add_mul!(u128);
-impl_wrapping_add_mul!(usize);
-impl_wrapping_add_mul!(i8);
-impl_wrapping_add_mul!(i16);
-impl_wrapping_add_mul!(i32);
-impl_wrapping_add_mul!(i64);
-impl_wrapping_add_mul!(i128);
-impl_wrapping_add_mul!(isize);
+apply_to_primitive_ints!(impl_wrapping_add_mul);

@@ -269,12 +269,7 @@ impl_partial_ord_limb!(u64);
 impl_partial_ord_larger_than_limb!(u128);
 impl_partial_ord_larger_than_limb_or_usize!(usize);
 
-impl_signed!(i8);
-impl_signed!(i16);
-impl_signed!(i32);
-impl_signed!(i64);
-impl_signed!(i128);
-impl_signed!(isize);
+apply_to_signeds!(impl_signed);
 
 impl PartialOrd<usize> for Natural {
     /// Compares a `Natural` to a `usize`.

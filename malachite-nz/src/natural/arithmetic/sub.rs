@@ -14,7 +14,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Example
 /// ```
@@ -28,23 +28,23 @@ use platform::Limb;
 /// This is mpn_sub_1 from gmp.h, GMP 6.1.2, where the result is returned.
 pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
-    let mut result_limbs = Vec::with_capacity(len);
+    let mut out = Vec::with_capacity(len);
     for i in 0..len {
         let (diff, overflow) = xs[i].overflowing_sub(y);
-        result_limbs.push(diff);
+        out.push(diff);
         if overflow {
             y = 1;
         } else {
             y = 0;
-            result_limbs.extend_from_slice(&xs[i + 1..]);
+            out.extend_from_slice(&xs[i + 1..]);
             break;
         }
     }
-    (result_limbs, y != 0)
+    (out, y != 0)
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Limb` from the `Natural`, writing the `in_limbs.len()` limbs of the result to an output slice.
+/// `Limb` from the `Natural`, writing the `xs.len()` limbs of the result to an output slice.
 /// Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
 /// `Natural`. The output slice must be at least as long as the input slice.
 ///
@@ -52,10 +52,10 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs`.
+/// Panics if `out` is shorter than `xs`.
 ///
 /// # Example
 /// ```
@@ -105,17 +105,17 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 78), false);
-/// assert_eq!(limbs, &[45, 456]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 78), false);
+/// assert_eq!(xs, &[45, 456]);
 ///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 789), false);
-/// assert_eq!(limbs, &[4_294_966_630, 455]);
+/// let mut xs = vec![123, 456];
+/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 789), false);
+/// assert_eq!(xs, &[4_294_966_630, 455]);
 ///
-/// let mut limbs = vec![1];
-/// assert_eq!(limbs_sub_limb_in_place(&mut limbs, 2), true);
-/// assert_eq!(limbs, &[u32::MAX]);
+/// let mut xs = vec![1];
+/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 2), true);
+/// assert_eq!(xs, &[u32::MAX]);
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.1.2, where the result is written to the input slice.
@@ -168,18 +168,18 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let mut diff_limbs = Vec::with_capacity(xs_len);
+    let mut out = Vec::with_capacity(xs_len);
     let mut borrow = false;
-    for i in 0..ys_len {
-        diff_limbs.push(sub_and_borrow(xs[i], ys[i], &mut borrow));
+    for (&x, &y) in xs.iter().zip(ys.iter()) {
+        out.push(sub_and_borrow(x, y, &mut borrow));
     }
     if xs_len != ys_len {
-        diff_limbs.extend_from_slice(&xs[ys_len..]);
+        out.extend_from_slice(&xs[ys_len..]);
         if borrow {
-            borrow = limbs_sub_limb_in_place(&mut diff_limbs[ys_len..], 1);
+            borrow = limbs_sub_limb_in_place(&mut out[ys_len..], 1);
         }
     }
-    (diff_limbs, borrow)
+    (out, borrow)
 }
 
 /// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -216,8 +216,8 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
     let mut borrow = false;
-    for i in 0..len {
-        out[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
+    for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
+        *out = sub_and_borrow(x, y, &mut borrow);
     }
     borrow
 }
@@ -296,11 +296,10 @@ pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the first input.
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
-    let len = xs.len();
-    assert_eq!(len, ys.len());
+    assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
-    for i in 0..len {
-        xs[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        *x = sub_and_borrow(*x, y, &mut borrow);
     }
     borrow
 }
@@ -377,11 +376,10 @@ pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the second input.
 pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
-    let len = ys.len();
-    assert_eq!(xs.len(), len);
+    assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
-    for i in 0..len {
-        ys[i] = sub_and_borrow(xs[i], ys[i], &mut borrow);
+    for (&x, y) in xs.iter().zip(ys.iter_mut()) {
+        *y = sub_and_borrow(x, *y, &mut borrow);
     }
     borrow
 }
@@ -630,7 +628,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_right(
 ) -> bool {
     let mut borrow = limbs_sub_same_length_in_place_right(xs, ys);
     if borrow_in {
-        borrow |= limbs_sub_limb_in_place(&mut ys[..xs.len()], 1);
+        borrow |= limbs_sub_limb_in_place(ys, 1);
     }
     borrow
 }
@@ -655,130 +653,130 @@ impl Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-/// assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-/// assert_eq!(
-///     (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
-///     "2000000000000"
-/// );
-/// ```
 impl Sub<Natural> for Natural {
     type Output = Natural;
 
+    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+    /// assert_eq!((Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(
+    ///     (Natural::trillion() * Natural::from(3u32) - Natural::trillion()).to_string(),
+    ///     "2000000000000"
+    /// );
+    /// ```
     fn sub(self, other: Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
-/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
-/// `Natural` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-/// assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-/// assert_eq!(
-///     (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
-///     "2000000000000"
-/// );
-/// ```
 impl<'a> Sub<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by value and the right
+    /// `Natural` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+    /// assert_eq!((Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(
+    ///     (Natural::trillion() * Natural::from(3u32) - &Natural::trillion()).to_string(),
+    ///     "2000000000000"
+    /// );
+    /// ```
     fn sub(self, other: &'a Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
-/// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
-/// `Natural` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
-/// assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
-/// assert_eq!(
-///     (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
-///     "2000000000000"
-/// );
-/// ```
 impl<'a> Sub<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Subtracts a `Natural` from a `Natural`, taking the left `Natural` by reference and the right
+    /// `Natural` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) - Natural::ZERO).to_string(), "123");
+    /// assert_eq!((&Natural::from(456u32) - Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(
+    ///     (&(Natural::trillion() * Natural::from(3u32)) - Natural::trillion()).to_string(),
+    ///     "2000000000000"
+    /// );
+    /// ```
     fn sub(self, other: Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
     }
 }
 
-/// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
-/// assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
-/// assert_eq!(
-///     (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
-///     "2000000000000"
-/// );
-/// ```
 impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Subtracts a `Natural` from a `Natural`, taking both `Natural`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) - &Natural::ZERO).to_string(), "123");
+    /// assert_eq!((&Natural::from(456u32) - &Natural::from(123u32)).to_string(), "333");
+    /// assert_eq!(
+    ///     (&(Natural::trillion() * Natural::from(3u32)) - &Natural::trillion()).to_string(),
+    ///     "2000000000000"
+    /// );
+    /// ```
     fn sub(self, other: &'a Natural) -> Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);
@@ -786,29 +784,29 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Panics
-/// Panics if `other` is greater than `self`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::trillion() * Natural::from(10u32);
-/// x -= Natural::trillion();
-/// x -= (Natural::trillion() * Natural::from(2u32));
-/// x -= (Natural::trillion() * Natural::from(3u32));
-/// x -= (Natural::trillion() * Natural::from(4u32));
-/// assert_eq!(x.to_string(), "0");
-/// ```
 impl SubAssign<Natural> for Natural {
+    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::trillion() * Natural::from(10u32);
+    /// x -= Natural::trillion();
+    /// x -= (Natural::trillion() * Natural::from(2u32));
+    /// x -= (Natural::trillion() * Natural::from(3u32));
+    /// x -= (Natural::trillion() * Natural::from(4u32));
+    /// assert_eq!(x.to_string(), "0");
+    /// ```
     fn sub_assign(&mut self, other: Natural) {
         if self.sub_assign_no_panic(other) {
             panic!("Cannot subtract a Natural from a smaller Natural");
@@ -816,29 +814,30 @@ impl SubAssign<Natural> for Natural {
     }
 }
 
-/// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits()`
-///
-/// # Panics
-/// Panics if `other` is greater than `self`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::trillion() * Natural::from(10u32);
-/// x -= &Natural::trillion();
-/// x -= &(Natural::trillion() * Natural::from(2u32));
-/// x -= &(Natural::trillion() * Natural::from(3u32));
-/// x -= &(Natural::trillion() * Natural::from(4u32));
-/// assert_eq!(x.to_string(), "0");
-/// ```
 impl<'a> SubAssign<&'a Natural> for Natural {
+    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by
+    /// reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits()`
+    ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::trillion() * Natural::from(10u32);
+    /// x -= &Natural::trillion();
+    /// x -= &(Natural::trillion() * Natural::from(2u32));
+    /// x -= &(Natural::trillion() * Natural::from(3u32));
+    /// x -= &(Natural::trillion() * Natural::from(4u32));
+    /// assert_eq!(x.to_string(), "0");
+    /// ```
     fn sub_assign(&mut self, other: &'a Natural) {
         if self.sub_assign_ref_no_panic(other) {
             panic!("Cannot subtract a Natural from a smaller Natural");

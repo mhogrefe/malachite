@@ -710,12 +710,7 @@ macro_rules! impl_natural_shr_round_unsigned {
         }
     };
 }
-impl_natural_shr_round_unsigned!(u8);
-impl_natural_shr_round_unsigned!(u16);
-impl_natural_shr_round_unsigned!(u32);
-impl_natural_shr_round_unsigned!(u64);
-impl_natural_shr_round_unsigned!(u128);
-impl_natural_shr_round_unsigned!(usize);
+apply_to_unsigneds!(impl_natural_shr_round_unsigned);
 
 macro_rules! impl_natural_shr_round_signed {
     ($t:ident) => {
@@ -944,9 +939,4 @@ macro_rules! impl_natural_shr_round_signed {
         }
     };
 }
-impl_natural_shr_round_signed!(i8);
-impl_natural_shr_round_signed!(i16);
-impl_natural_shr_round_signed!(i32);
-impl_natural_shr_round_signed!(i64);
-impl_natural_shr_round_signed!(i128);
-impl_natural_shr_round_signed!(isize);
+apply_to_signeds!(impl_natural_shr_round_signed);

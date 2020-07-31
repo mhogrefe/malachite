@@ -1,9 +1,26 @@
+use comparison::traits::{Max, Min};
 use num::arithmetic::traits::{
-    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, UnsignedAbs,
+    CheckedMul, SaturatingMul, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    SaturatingSubMulAssign, UnsignedAbs, WrappingSub,
 };
+use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-//TODO
+#[inline]
+pub fn _saturating_sub_mul_unsigned<T>(x: T, y: T, z: T) -> T
+where
+    T: SaturatingMul<T, Output = T> + SaturatingSub<T, Output = T>,
+{
+    x.saturating_sub(y.saturating_mul(z))
+}
+
+#[inline]
+pub fn _saturating_sub_mul_assign_unsigned<T>(x: &mut T, y: T, z: T)
+where
+    T: SaturatingMul<T, Output = T> + SaturatingSubAssign<T>,
+{
+    x.saturating_sub_assign(y.saturating_mul(z));
+}
 
 macro_rules! impl_saturating_sub_mul_unsigned {
     ($t:ident) => {
@@ -25,7 +42,7 @@ macro_rules! impl_saturating_sub_mul_unsigned {
             /// ```
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
-                self.saturating_sub(y.saturating_mul(z))
+                _saturating_sub_mul_unsigned(self, y, z)
             }
         }
 
@@ -56,13 +73,47 @@ macro_rules! impl_saturating_sub_mul_unsigned {
         }
     };
 }
+apply_to_unsigneds!(impl_saturating_sub_mul_unsigned);
 
-impl_saturating_sub_mul_unsigned!(u8);
-impl_saturating_sub_mul_unsigned!(u16);
-impl_saturating_sub_mul_unsigned!(u32);
-impl_saturating_sub_mul_unsigned!(u64);
-impl_saturating_sub_mul_unsigned!(u128);
-impl_saturating_sub_mul_unsigned!(usize);
+pub fn _saturating_sub_mul_signed<U: Copy + Ord, S: Copy + Eq + Max + Min + Ord + Zero>(
+    x: S,
+    y: S,
+    z: S,
+) -> S
+where
+    U: CheckedMul<U, Output = U> + WrappingSub<U, Output = U>,
+    S: SaturatingMul<S, Output = S>
+        + SaturatingSub<S, Output = S>
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>,
+{
+    if y == S::ZERO || z == S::ZERO {
+        return x;
+    }
+    let x_sign = x >= S::ZERO;
+    if x_sign == ((y >= S::ZERO) != (z >= S::ZERO)) {
+        x.saturating_sub(y.saturating_mul(z))
+    } else {
+        let x = x.unsigned_abs();
+        let product = if let Some(product) = y.unsigned_abs().checked_mul(z.unsigned_abs()) {
+            product
+        } else {
+            return if x_sign { S::MIN } else { S::MAX };
+        };
+        let result = S::wrapping_from(if x_sign {
+            x.wrapping_sub(product)
+        } else {
+            product.wrapping_sub(x)
+        });
+        if x >= product || (x_sign == (result < S::ZERO)) {
+            result
+        } else if x_sign {
+            S::MIN
+        } else {
+            S::MAX
+        }
+    }
+}
 
 macro_rules! impl_saturating_sub_mul_signed {
     ($t:ident) => {
@@ -84,33 +135,7 @@ macro_rules! impl_saturating_sub_mul_signed {
             /// ```
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
-                if y == 0 || z == 0 {
-                    return self;
-                }
-                let x_sign = self >= 0;
-                if x_sign == ((y >= 0) != (z >= 0)) {
-                    self.saturating_sub(y.saturating_mul(z))
-                } else {
-                    let x = self.unsigned_abs();
-                    let product =
-                        if let Some(product) = y.unsigned_abs().checked_mul(z.unsigned_abs()) {
-                            product
-                        } else {
-                            return if x_sign { $t::MIN } else { $t::MAX };
-                        };
-                    let result = $t::wrapping_from(if x_sign {
-                        x.wrapping_sub(product)
-                    } else {
-                        product.wrapping_sub(x)
-                    });
-                    if x >= product || (x_sign == (result < 0)) {
-                        result
-                    } else if x_sign {
-                        $t::MIN
-                    } else {
-                        $t::MAX
-                    }
-                }
+                _saturating_sub_mul_signed(self, y, z)
             }
         }
 
@@ -141,10 +166,4 @@ macro_rules! impl_saturating_sub_mul_signed {
         }
     };
 }
-
-impl_saturating_sub_mul_signed!(i8);
-impl_saturating_sub_mul_signed!(i16);
-impl_saturating_sub_mul_signed!(i32);
-impl_saturating_sub_mul_signed!(i64);
-impl_saturating_sub_mul_signed!(i128);
-impl_saturating_sub_mul_signed!(isize);
+apply_to_signeds!(impl_saturating_sub_mul_signed);

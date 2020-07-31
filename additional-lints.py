@@ -83,4 +83,4 @@ filename_list.sort()
 line_count = 0
 for filename in filename_list:
     line_count += lint(filename)
-print str(line_count) + ' lines checked'
+print(f'{line_count} lines checked')

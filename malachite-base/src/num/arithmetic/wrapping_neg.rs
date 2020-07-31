@@ -45,16 +45,4 @@ macro_rules! impl_wrapping_neg {
         }
     };
 }
-
-impl_wrapping_neg!(u8);
-impl_wrapping_neg!(u16);
-impl_wrapping_neg!(u32);
-impl_wrapping_neg!(u64);
-impl_wrapping_neg!(u128);
-impl_wrapping_neg!(usize);
-impl_wrapping_neg!(i8);
-impl_wrapping_neg!(i16);
-impl_wrapping_neg!(i32);
-impl_wrapping_neg!(i64);
-impl_wrapping_neg!(i128);
-impl_wrapping_neg!(isize);
+apply_to_primitive_ints!(impl_wrapping_neg);

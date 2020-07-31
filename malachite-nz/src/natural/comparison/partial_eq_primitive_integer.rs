@@ -215,12 +215,7 @@ impl_partial_eq_limb!(u64);
 impl_partial_eq_larger_than_limb!(u128);
 impl_partial_eq_larger_than_limb_or_usize!(usize);
 
-impl_signed!(i8);
-impl_signed!(i16);
-impl_signed!(i32);
-impl_signed!(i64);
-impl_signed!(i128);
-impl_signed!(isize);
+apply_to_signeds!(impl_signed);
 
 impl PartialEq<usize> for Natural {
     /// Determines whether a `Natural` is equal to a `usize`.

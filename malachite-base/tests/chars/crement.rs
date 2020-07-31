@@ -1,11 +1,10 @@
 use malachite_base::chars::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::comparison::traits::Max;
-use malachite_base::crement::Crementable;
 
 #[test]
-fn test_char_increment() {
+fn test_increment_char() {
     let test = |mut c: char, out| {
-        c.increment();
+        increment_char(&mut c);
         assert_eq!(c, out);
     };
     test('\u{0}', '\u{1}');
@@ -17,15 +16,15 @@ fn test_char_increment() {
 
 #[test]
 #[should_panic]
-fn char_increment_fail() {
+fn increment_char_fail() {
     let mut c = char::MAX;
-    c.increment();
+    increment_char(&mut c);
 }
 
 #[test]
-fn test_char_decrement() {
+fn test_decrement_char() {
     let test = |mut c: char, out| {
-        c.decrement();
+        decrement_char(&mut c);
         assert_eq!(c, out);
     };
     test('\u{1}', '\u{0}');
@@ -37,7 +36,7 @@ fn test_char_decrement() {
 
 #[test]
 #[should_panic]
-fn char_decrement_fail() {
+fn decrement_char_fail() {
     let mut c = '\u{0}';
-    c.decrement();
+    decrement_char(&mut c);
 }

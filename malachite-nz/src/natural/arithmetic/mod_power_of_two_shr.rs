@@ -110,9 +110,4 @@ macro_rules! impl_mod_power_of_two_shr_signed {
         }
     };
 }
-impl_mod_power_of_two_shr_signed!(i8);
-impl_mod_power_of_two_shr_signed!(i16);
-impl_mod_power_of_two_shr_signed!(i32);
-impl_mod_power_of_two_shr_signed!(i64);
-impl_mod_power_of_two_shr_signed!(i128);
-impl_mod_power_of_two_shr_signed!(isize);
+apply_to_signeds!(impl_mod_power_of_two_shr_signed);

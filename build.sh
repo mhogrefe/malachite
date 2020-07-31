@@ -34,4 +34,4 @@ cargo fmt &&
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path &&
 cargo test --release --features fail_on_untested_path &&
 cd .. &&
-python additional-lints.py
+python3 additional-lints.py

@@ -5,6 +5,7 @@ use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
+use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
 use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, DivRound, EqMod, ModPowerOfTwo, Parity,
@@ -81,7 +82,7 @@ use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
 use rand::distributions::{IndependentSample, Range};
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
-use rust_wheels::iterators::chars::{exhaustive_ascii_chars, exhaustive_chars, random_ascii_chars};
+use rust_wheels::iterators::chars::random_ascii_chars;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
     dependent_pairs, exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
