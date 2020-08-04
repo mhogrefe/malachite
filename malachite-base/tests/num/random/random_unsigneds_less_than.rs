@@ -177,44 +177,20 @@ fn test_random_unsigneds_less_than() {
         pop_moment_stats,
         sample_moment_stats,
     );
-
-    // u8, limit = 0
-    let values = &[
-        113, 239, 69, 108, 228, 210, 168, 161, 87, 32, 110, 83, 188, 34, 89, 238, 93, 200, 149, 115,
-    ];
-    let common_values = &[
-        (214, 4097),
-        (86, 4078),
-        (166, 4049),
-        (22, 4048),
-        (126, 4047),
-        (55, 4040),
-        (93, 4037),
-        (191, 4036),
-        (36, 4035),
-        (42, 4032),
-    ];
-    let pop_median = (127, Some(128));
-    let sample_median = (127, None);
-    let pop_moment_stats = MomentStats {
-        mean: NiceFloat(127.5),
-        standard_deviation: NiceFloat(73.90027063549903),
-        skewness: NiceFloat(0.0),
-        excess_kurtosis: NiceFloat(-1.200036621652552),
-    };
-    let sample_moment_stats = MomentStats {
-        mean: NiceFloat(127.4588370000015),
-        standard_deviation: NiceFloat(73.908735397844),
-        skewness: NiceFloat(0.0004407839380447086),
-        excess_kurtosis: NiceFloat(-1.200418003526934),
-    };
-    random_unsigneds_less_than_helper::<u8>(
-        0,
-        values,
-        common_values,
-        pop_median,
-        sample_median,
-        pop_moment_stats,
-        sample_moment_stats,
-    );
 }
+
+macro_rules! random_unsigneds_less_than_fail {
+    ($t:ident, $random_unsigneds_less_than_fail:ident) => {
+        #[test]
+        #[should_panic]
+        fn $random_unsigneds_less_than_fail() {
+            random_unsigneds_less_than::<$t>(EXAMPLE_SEED, 0);
+        }
+    };
+}
+random_unsigneds_less_than_fail!(u8, random_unsigneds_less_than_u8_fail);
+random_unsigneds_less_than_fail!(u16, random_unsigneds_less_than_u16_fail);
+random_unsigneds_less_than_fail!(u32, random_unsigneds_less_than_u32_fail);
+random_unsigneds_less_than_fail!(u64, random_unsigneds_less_than_u64_fail);
+random_unsigneds_less_than_fail!(u128, random_unsigneds_less_than_u128_fail);
+random_unsigneds_less_than_fail!(usize, random_unsigneds_less_than_usize_fail);

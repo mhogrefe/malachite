@@ -3,8 +3,7 @@ use std::cmp::Ordering;
 use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 
-#[inline]
-pub fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
+fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
     Some(x.cmp_abs(y))
 }
 
@@ -64,8 +63,7 @@ macro_rules! impl_ord_abs_unsigned {
 }
 apply_to_unsigneds!(impl_ord_abs_unsigned);
 
-#[inline]
-pub fn _cmp_abs_signed<T: Copy + UnsignedAbs>(x: &T, y: &T) -> Ordering
+fn _cmp_abs_signed<T: Copy + UnsignedAbs>(x: &T, y: &T) -> Ordering
 where
     <T as UnsignedAbs>::Output: Ord,
 {

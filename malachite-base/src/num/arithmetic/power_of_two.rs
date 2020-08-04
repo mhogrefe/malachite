@@ -1,7 +1,6 @@
 use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInteger;
 
-#[inline]
 fn _power_of_two_unsigned<T: PrimitiveInteger>(pow: u64) -> T {
     assert!(pow < T::WIDTH);
     T::ONE << pow
@@ -36,8 +35,7 @@ macro_rules! impl_power_of_two_unsigned {
 }
 apply_to_unsigneds!(impl_power_of_two_unsigned);
 
-#[inline]
-pub fn _power_of_two_signed<T: PrimitiveInteger>(pow: u64) -> T {
+fn _power_of_two_signed<T: PrimitiveInteger>(pow: u64) -> T {
     assert!(pow < T::WIDTH - 1);
     T::ONE << pow
 }

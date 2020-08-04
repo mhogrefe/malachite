@@ -6,7 +6,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
 
-pub fn _arithmetic_checked_shl_unsigned_unsigned<
+fn _arithmetic_checked_shl_unsigned_unsigned<
     T: PrimitiveInteger,
     U: Copy + Ord + WrappingFrom<u64>,
 >(
@@ -66,7 +66,7 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_unsigned {
 }
 apply_to_unsigneds!(impl_arithmetic_checked_shl_unsigned_unsigned);
 
-pub fn _arithmetic_checked_shl_unsigned_signed<
+fn _arithmetic_checked_shl_unsigned_signed<
     T: PrimitiveInteger,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + UnsignedAbs + Zero,
@@ -129,7 +129,7 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_signed {
 }
 apply_to_unsigneds!(impl_arithmetic_checked_shl_unsigned_signed);
 
-pub fn _arithmetic_checked_shl_signed_unsigned<U: Eq, S: Copy + Min + Ord + Zero, B>(
+fn _arithmetic_checked_shl_signed_unsigned<U: Eq, S: Copy + Min + Ord + Zero, B>(
     x: S,
     bits: B,
 ) -> Option<S>
@@ -190,7 +190,7 @@ macro_rules! impl_arithmetic_checked_shl_signed_unsigned {
 }
 apply_to_signeds!(impl_arithmetic_checked_shl_signed_unsigned);
 
-pub fn _arithmetic_checked_shl_signed_signed<
+fn _arithmetic_checked_shl_signed_signed<
     T: PrimitiveInteger,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + Zero,

@@ -1,4 +1,4 @@
-use malachite_base::chars::{decrement_char, increment_char};
+use malachite_base::chars::crement::{decrement_char, increment_char};
 
 use malachite_test::common::test_properties_no_limit_exhaustive_no_special;
 use malachite_test::inputs::base::{chars_not_max, chars_not_min};

@@ -8,7 +8,7 @@ use num::logic::traits::{BitBlockAccess, LeadingZeros};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-pub fn _get_bits_unsigned<T: PrimitiveInteger>(x: &T, start: u64, end: u64) -> T
+fn _get_bits_unsigned<T: PrimitiveInteger>(x: &T, start: u64, end: u64) -> T
 where
     T: ModPowerOfTwo<Output = T>,
 {
@@ -20,7 +20,7 @@ where
     }
 }
 
-pub fn _assign_bits_unsigned<T: PrimitiveInteger>(x: &mut T, start: u64, end: u64, bits: &T)
+fn _assign_bits_unsigned<T: PrimitiveInteger>(x: &mut T, start: u64, end: u64, bits: &T)
 where
     T: ModPowerOfTwo<Output = T>,
 {
@@ -106,7 +106,7 @@ macro_rules! impl_bit_block_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-pub fn _get_bits_signed<T: PrimitiveInteger, U>(x: &T, start: u64, end: u64) -> U
+fn _get_bits_signed<T: PrimitiveInteger, U>(x: &T, start: u64, end: u64) -> U
 where
     T: ModPowerOfTwo<Output = U> + Neg<Output = T>,
 {
@@ -119,7 +119,7 @@ where
     .mod_power_of_two(end - start)
 }
 
-pub fn _assign_bits_signed<T: PrimitiveInteger, U: PrimitiveInteger>(
+fn _assign_bits_signed<T: PrimitiveInteger, U: PrimitiveInteger>(
     x: &mut T,
     start: u64,
     end: u64,

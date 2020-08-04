@@ -5,8 +5,8 @@ use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
+use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
-use malachite_base::chars::NUMBER_OF_CHARS;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, DivRound, EqMod, ModPowerOfTwo, Parity,
     PowerOfTwo, RoundToMultiple, UnsignedAbs,
@@ -74,7 +74,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
 };
 use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_3_input_size_valid, _limbs_square_to_out_toom_4_input_size_valid,
-    _limbs_square_to_out_toom_6_input_size_valid,
+    _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
 };
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use malachite_nz::natural::Natural;
@@ -2656,6 +2656,18 @@ pub fn pairs_of_unsigned_vec_var_22<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_unsigned_vec_min_sizes(gm, 36, 18).filter(|&(ref out, ref xs)| {
             out.len() >= xs.len() << 1 && _limbs_square_to_out_toom_6_input_size_valid(xs.len())
+        }),
+    )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` meet the preconditions of
+// `_limbs_square_to_out_toom_8`.
+pub fn pairs_of_unsigned_vec_var_23<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 80, 40).filter(|&(ref out, ref xs)| {
+            out.len() >= xs.len() << 1 && _limbs_square_to_out_toom_8_input_size_valid(xs.len())
         }),
     )
 }

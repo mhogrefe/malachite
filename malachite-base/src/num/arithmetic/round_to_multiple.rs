@@ -12,7 +12,7 @@ use num::conversion::traits::ExactFrom;
 use num::logic::traits::TrailingZeros;
 use rounding_modes::RoundingMode;
 
-pub fn _round_to_multiple_unsigned<T: Copy + Display + Eq + Ord + Parity + TrailingZeros + Zero>(
+fn _round_to_multiple_unsigned<T: Copy + Display + Eq + Ord + Parity + TrailingZeros + Zero>(
     x: T,
     other: T,
     rm: RoundingMode,
@@ -185,7 +185,7 @@ macro_rules! impl_round_to_multiple_unsigned {
 }
 apply_to_unsigneds!(impl_round_to_multiple_unsigned);
 
-pub fn _round_to_multiple_signed<U: Eq, S: Copy + Min + Ord + Zero>(
+fn _round_to_multiple_signed<U: Eq, S: Copy + Min + Ord + Zero>(
     x: S,
     other: S,
     rm: RoundingMode,

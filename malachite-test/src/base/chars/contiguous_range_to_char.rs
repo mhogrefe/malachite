@@ -1,4 +1,4 @@
-use malachite_base::chars::contiguous_range_to_char;
+use malachite_base::chars::crement::contiguous_range_to_char;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 

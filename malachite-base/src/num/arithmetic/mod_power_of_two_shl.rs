@@ -7,7 +7,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 
-pub fn _mod_power_of_two_shl_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
+fn _mod_power_of_two_shl_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
     x: T,
     other: U,
     pow: u64,
@@ -23,7 +23,7 @@ where
     }
 }
 
-pub fn _mod_power_of_two_shl_assign_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
+fn _mod_power_of_two_shl_assign_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
     x: &mut T,
     other: U,
     pow: u64,
@@ -98,7 +98,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_two_shl_unsigned);
 
-pub fn _mod_power_of_two_shl_signed<
+fn _mod_power_of_two_shl_signed<
     T: PrimitiveInteger,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + Zero,
@@ -125,7 +125,7 @@ where
     }
 }
 
-pub fn _mod_power_of_two_shl_assign_signed<
+fn _mod_power_of_two_shl_assign_signed<
     T: PrimitiveInteger,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + Zero,

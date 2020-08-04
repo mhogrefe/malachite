@@ -6,8 +6,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
-#[inline]
-pub fn _shl_round<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
     x: T,
     bits: S,
     rm: RoundingMode,
@@ -28,8 +27,7 @@ where
     }
 }
 
-#[inline]
-pub fn _shl_round_assign<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round_assign<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
     x: &mut T,
     bits: S,
     rm: RoundingMode,

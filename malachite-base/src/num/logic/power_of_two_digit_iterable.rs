@@ -174,7 +174,7 @@ where
     }
 }
 
-pub fn _power_of_two_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn _power_of_two_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     x: T,
     log_base: u64,
 ) -> PrimitivePowerOfTwoDigitIterator<T, U> {

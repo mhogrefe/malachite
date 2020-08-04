@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{EqMod, Mod};
 use num::basic::traits::Zero;
 
-#[inline]
-pub fn _eq_mod<T: Copy + Eq + Zero>(x: T, other: T, m: T) -> bool
+fn _eq_mod<T: Copy + Eq + Zero>(x: T, other: T, m: T) -> bool
 where
     T: Mod<T>,
     <T as Mod>::Output: Eq,

@@ -2,8 +2,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::NegativeOne;
 use num::logic::traits::LowMask;
 
-#[inline]
-pub fn _low_mask_unsigned<T: PrimitiveInteger>(bits: u64) -> T {
+fn _low_mask_unsigned<T: PrimitiveInteger>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);
     if bits == T::WIDTH {
         T::MAX
@@ -43,7 +42,7 @@ macro_rules! impl_low_mask_unsigned {
 }
 apply_to_unsigneds!(impl_low_mask_unsigned);
 
-pub fn _low_mask_signed<T: NegativeOne + PrimitiveInteger>(bits: u64) -> T {
+fn _low_mask_signed<T: NegativeOne + PrimitiveInteger>(bits: u64) -> T {
     assert!(bits <= T::WIDTH);
     if bits == T::WIDTH {
         T::NEGATIVE_ONE

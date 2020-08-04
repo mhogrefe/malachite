@@ -6,8 +6,7 @@ use num::arithmetic::traits::{
 use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 
-#[inline]
-pub fn _neg_mod_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> T
+fn _neg_mod_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> T
 where
     T: Rem<T, Output = T> + Sub<T, Output = T>,
 {
@@ -19,8 +18,7 @@ where
     }
 }
 
-#[inline]
-pub fn _neg_mod_assign_unsigned<T: Copy + Eq + Zero>(x: &mut T, other: T)
+fn _neg_mod_assign_unsigned<T: Copy + Eq + Zero>(x: &mut T, other: T)
 where
     T: RemAssign<T> + Sub<T, Output = T>,
 {
@@ -158,7 +156,7 @@ macro_rules! impl_mod_unsigned {
 }
 apply_to_unsigneds!(impl_mod_unsigned);
 
-pub fn _mod_op_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
+fn _mod_op_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
 where
     T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
     U: NegMod<U, Output = U> + Rem<U, Output = U>,
@@ -175,8 +173,7 @@ where
     }
 }
 
-#[inline]
-pub fn _ceiling_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
+fn _ceiling_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
 where
     T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
     U: NegMod<U, Output = U> + Rem<U, Output = U>,

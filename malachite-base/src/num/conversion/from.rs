@@ -117,8 +117,7 @@ macro_rules! identity_conversion {
     };
 }
 
-#[inline]
-pub fn _checked_from_lossless<A, B>(value: A) -> Option<B>
+fn _checked_from_lossless<A, B>(value: A) -> Option<B>
 where
     B: From<A>,
 {
@@ -236,8 +235,7 @@ macro_rules! lossless_conversion {
     };
 }
 
-#[inline]
-pub fn _checked_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> Option<B>
+fn _checked_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> Option<B>
 where
     A: WrappingFrom<B>,
     B: WrappingFrom<A>,
@@ -250,8 +248,7 @@ where
     }
 }
 
-#[inline]
-pub fn _saturating_from_lossy<A: Ord, B: Max + Min>(value: A) -> B
+fn _saturating_from_lossy<A: Ord, B: Max + Min>(value: A) -> B
 where
     A: CheckedFrom<B>,
     B: WrappingFrom<A>,
@@ -269,8 +266,7 @@ where
     B::wrapping_from(value)
 }
 
-#[inline]
-pub fn _overflowing_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> (B, bool)
+fn _overflowing_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> (B, bool)
 where
     A: WrappingFrom<B>,
     B: WrappingFrom<A>,
@@ -282,8 +278,7 @@ where
     )
 }
 
-#[inline]
-pub fn _convertible_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> bool
+fn _convertible_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> bool
 where
     A: WrappingFrom<B>,
     B: WrappingFrom<A>,

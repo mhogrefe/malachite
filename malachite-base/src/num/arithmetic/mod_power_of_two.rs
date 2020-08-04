@@ -9,8 +9,7 @@ use num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-#[inline]
-pub fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
+fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
     if x == T::ZERO || pow >= T::WIDTH {
         x
     } else {
@@ -18,8 +17,7 @@ pub fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
     }
 }
 
-#[inline]
-pub fn _mod_power_of_two_assign_unsigned<T: PrimitiveInteger>(x: &mut T, pow: u64) {
+fn _mod_power_of_two_assign_unsigned<T: PrimitiveInteger>(x: &mut T, pow: u64) {
     if *x != T::ZERO && pow < T::WIDTH {
         *x &= T::low_mask(pow)
     }
@@ -207,8 +205,7 @@ macro_rules! impl_mod_power_of_two_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_two_unsigned);
 
-#[inline]
-pub fn _mod_power_of_two_signed<U, S: PrimitiveInteger>(x: S, pow: u64) -> U
+fn _mod_power_of_two_signed<U, S: PrimitiveInteger>(x: S, pow: u64) -> U
 where
     U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
 {
@@ -218,15 +215,14 @@ where
     U::wrapping_from(x).mod_power_of_two(pow)
 }
 
-#[inline]
-pub fn _mod_power_of_two_assign_signed<U, S: Copy>(x: &mut S, pow: u64)
+fn _mod_power_of_two_assign_signed<U, S: Copy>(x: &mut S, pow: u64)
 where
     S: CheckedFrom<U> + ModPowerOfTwo<Output = U>,
 {
     *x = S::checked_from(x.mod_power_of_two(pow)).expect(ERROR_MESSAGE);
 }
 
-pub fn _rem_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
+fn _rem_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
 where
     U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
     S: WrappingFrom<U> + WrappingNeg<Output = S>,
@@ -238,7 +234,7 @@ where
     }
 }
 
-pub fn _ceiling_mod_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
+fn _ceiling_mod_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
 where
     U: ModPowerOfTwo<Output = U> + NegModPowerOfTwo<Output = U> + WrappingFrom<S>,
     S: CheckedFrom<U> + CheckedNeg<Output = S> + WrappingNeg<Output = S>,

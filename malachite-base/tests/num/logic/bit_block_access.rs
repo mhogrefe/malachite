@@ -185,45 +185,50 @@ pub fn test_assign_bits_signed() {
 }
 
 macro_rules! assign_bits_fail_helper_signed {
-    ($t:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident, $fail_4:ident, $fail_5:ident) => {
+    (
+        $u:ident,
+        $s:ident,
+        $fail_1:ident,
+        $fail_2:ident,
+        $fail_3:ident,
+        $fail_4:ident,
+        $fail_5:ident
+    ) => {
         #[test]
         #[should_panic]
         fn $fail_1() {
-            $t::from(100i8).assign_bits(7, 5, &3);
+            $s::from(100i8).assign_bits(7, 5, &3);
         }
 
         #[test]
         #[should_panic]
         fn $fail_2() {
-            $t::from(100i8).assign_bits(
-                0,
-                $t::WIDTH,
-                &<$t as PrimitiveSigned>::UnsignedOfEqualWidth::MAX,
-            );
+            $s::from(100i8).assign_bits(0, $s::WIDTH, &$u::MAX);
         }
 
         #[test]
         #[should_panic]
         fn $fail_3() {
-            $t::from(-100i8).assign_bits(0, $t::WIDTH + 1, &0);
+            $s::from(-100i8).assign_bits(0, $s::WIDTH + 1, &0);
         }
 
         #[test]
         #[should_panic]
         fn $fail_4() {
-            $t::from(-100i8).assign_bits($t::WIDTH + 1, $t::WIDTH + 2, &0);
+            $s::from(-100i8).assign_bits($s::WIDTH + 1, $s::WIDTH + 2, &0);
         }
 
         #[test]
         #[should_panic]
         fn $fail_5() {
-            let half_width = $t::WIDTH >> 1;
-            $t::from(-100i8).assign_bits(half_width, 3 * half_width - 4, &0);
+            let half_width = $s::WIDTH >> 1;
+            $s::from(-100i8).assign_bits(half_width, 3 * half_width - 4, &0);
         }
     };
 }
 
 assign_bits_fail_helper_signed!(
+    u8,
     i8,
     assign_bits_i8_fail_1,
     assign_bits_i8_fail_2,
@@ -232,6 +237,7 @@ assign_bits_fail_helper_signed!(
     assign_bits_i8_fail_5
 );
 assign_bits_fail_helper_signed!(
+    u16,
     i16,
     assign_bits_i16_fail_1,
     assign_bits_i16_fail_2,
@@ -240,6 +246,7 @@ assign_bits_fail_helper_signed!(
     assign_bits_i16_fail_5
 );
 assign_bits_fail_helper_signed!(
+    u32,
     i32,
     assign_bits_i32_fail_1,
     assign_bits_i32_fail_2,
@@ -248,6 +255,7 @@ assign_bits_fail_helper_signed!(
     assign_bits_i32_fail_5
 );
 assign_bits_fail_helper_signed!(
+    u64,
     i64,
     assign_bits_i64_fail_1,
     assign_bits_i64_fail_2,
@@ -256,6 +264,7 @@ assign_bits_fail_helper_signed!(
     assign_bits_i64_fail_5
 );
 assign_bits_fail_helper_signed!(
+    u128,
     i128,
     assign_bits_i128_fail_1,
     assign_bits_i128_fail_2,
@@ -264,6 +273,7 @@ assign_bits_fail_helper_signed!(
     assign_bits_i128_fail_5
 );
 assign_bits_fail_helper_signed!(
+    usize,
     isize,
     assign_bits_isize_fail_1,
     assign_bits_isize_fail_2,

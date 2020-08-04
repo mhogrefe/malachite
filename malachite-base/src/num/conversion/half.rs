@@ -5,7 +5,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 
 #[inline]
-pub fn _join_halves<T, H: PrimitiveInteger>(upper: H, lower: H) -> T
+fn _join_halves<T, H: PrimitiveInteger>(upper: H, lower: H) -> T
 where
     T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>,
 {
@@ -13,7 +13,7 @@ where
 }
 
 #[inline]
-pub fn _upper_half<T: Copy, H: PrimitiveInteger>(x: &T) -> H
+fn _upper_half<T: Copy, H: PrimitiveInteger>(x: &T) -> H
 where
     T: Shr<u64, Output = T>,
     H: WrappingFrom<T>,

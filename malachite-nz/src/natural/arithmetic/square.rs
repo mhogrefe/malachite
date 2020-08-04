@@ -15,6 +15,7 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::mul::fft::SQR_FFT_MODF_THRESHOLD;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
@@ -24,11 +25,11 @@ use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
 use natural::arithmetic::mul::poly_interpolate::{
-    _limbs_mul_toom_interpolate_12_points, _limbs_mul_toom_interpolate_5_points,
-    _limbs_mul_toom_interpolate_7_points,
+    _limbs_mul_toom_interpolate_12_points, _limbs_mul_toom_interpolate_16_points,
+    _limbs_mul_toom_interpolate_5_points, _limbs_mul_toom_interpolate_7_points,
 };
 use natural::arithmetic::mul::toom::{
-    _limbs_toom_couple_handling, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY,
+    _limbs_toom_couple_handling, BIT_CORRECTION, TUNE_PROGRAM_BUILD, WANT_FAT_BINARY,
 };
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::{
@@ -42,16 +43,6 @@ use platform::{
 };
 
 const SQR_TOOM8_THRESHOLD: usize = 454;
-
-// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
-    ((n * 15) >> 3)
-        + max(
-            ((SQR_TOOM8_THRESHOLD * 15) >> 3) + usize::wrapping_from(Limb::WIDTH) * 6,
-            _limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD),
-        )
-        - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
-}
 
 /// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
 #[inline]
@@ -664,6 +655,259 @@ pub fn _limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     _limbs_toom_couple_handling(r2, &mut out_lo[..k], false, n, 1, 2);
     _limbs_square_to_out_toom_6_recursive(out_lo, &xs[..n], wse); // X(0) ^ 2
     _limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
+}
+
+pub const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
+
+/// This function can be used to determine whether the size of the input slice to
+/// `_limbs_square_to_out_toom_8` is valid.
+///
+/// Time: worst case O(1)
+///
+/// Additional memory: worst case O(1)
+#[inline]
+pub fn _limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
+    xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
+}
+
+// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
+pub fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
+    ((n * 15) >> 3)
+        + max(
+            ((SQR_TOOM8_THRESHOLD * 15) >> 3) + usize::wrapping_from(Limb::WIDTH) * 6,
+            _limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD),
+        )
+        - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
+}
+
+/// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn sqr_toom8_max() -> usize {
+    if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
+        (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
+    } else {
+        usize::MAX
+    }
+}
+
+/// This is MAYBE_sqr_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub const TOOM8_MAYBE_SQR_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
+
+/// This is MAYBE_sqr_above_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn toom8_maybe_sqr_above_basecase() -> bool {
+    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM2_THRESHOLD
+}
+
+/// This is MAYBE_sqr_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub const TOOM8_MAYBE_SQR_TOOM2: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn toom8_maybe_sqr_above_toom2() -> bool {
+    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM3_THRESHOLD
+}
+
+/// This is MAYBE_sqr_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub const TOOM8_MAYBE_SQR_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn toom8_maybe_sqr_above_toom3() -> bool {
+    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM4_THRESHOLD
+}
+
+/// This is MAYBE_sqr_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub const TOOM8_MAYBE_SQR_TOOM4: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
+
+/// This is MAYBE_sqr_above_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn toom8_maybe_sqr_above_toom4() -> bool {
+    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM6_THRESHOLD
+}
+
+/// This is MAYBE_sqr_above_toom6 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn toom8_maybe_sqr_above_toom6() -> bool {
+    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM8_THRESHOLD
+}
+
+// This is TOOM8_SQR_REC from mpn/generic/toom8_sqr.c, GMP 6.1.2, when f is false.
+fn _limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let n = xs.len();
+    if TOOM8_MAYBE_SQR_BASECASE && (!toom8_maybe_sqr_above_basecase() || n < SQR_TOOM2_THRESHOLD) {
+        _limbs_square_to_out_basecase(out, xs);
+    } else if TOOM8_MAYBE_SQR_TOOM2 && (!toom8_maybe_sqr_above_toom2() || n < SQR_TOOM3_THRESHOLD) {
+        _limbs_square_to_out_toom_2(out, xs, scratch);
+    } else if TOOM8_MAYBE_SQR_TOOM3 && (!toom8_maybe_sqr_above_toom3() || n < SQR_TOOM4_THRESHOLD) {
+        _limbs_square_to_out_toom_3(out, xs, scratch);
+    } else if TOOM8_MAYBE_SQR_TOOM4 && (!toom8_maybe_sqr_above_toom4() || n < SQR_TOOM6_THRESHOLD) {
+        _limbs_square_to_out_toom_4(out, xs, scratch);
+    } else if !toom8_maybe_sqr_above_toom6() || n < SQR_TOOM8_THRESHOLD {
+        _limbs_square_to_out_toom_6(out, xs, scratch);
+    } else {
+        _limbs_square_to_out_toom_8(out, xs, scratch);
+    }
+}
+
+/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+/// limbs needed is provided by `_limbs_square_to_out_toom_8_scratch_len`. The following
+/// restrictions on the input slices must be met:
+/// 1. `out`.len() >= 2 * `xs`.len()
+/// 2. `xs`.len() is 40, or `xs.len()` > 43 but `xs`.len() is not 49, 50, or 57.
+///
+/// The smallest allowable `xs` length is 40.
+///
+/// Time: O(n<sup>log<sub>8</sub>15</sup>)
+///
+/// Additional memory: O(n)
+///
+/// where n = `xs.len()`
+///
+/// # Panics
+/// May panic if the input slice conditions are not met.
+///
+/// This is mpn_toom8_sqr from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub fn _limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let xs_len = xs.len();
+    assert!(xs_len >= 40);
+    let n = 1 + ((xs_len - 1) >> 3);
+    assert!(xs_len > 7 * n);
+    let s = xs_len - 7 * n;
+    assert!(s <= n);
+    assert!(s << 1 > 3);
+    let (pp_lo, remainder) = out.split_at_mut(3 * n);
+    split_into_chunks_mut!(remainder, 4 * n, [r6, r4], pp_hi);
+    let (v0, v2) = pp_hi.split_at_mut(2 * n + 2);
+    // $\pm1/8$
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        3,
+        &mut pp_lo[..n + 1],
+    );
+    let (r7_r5, remainder) = scratch.split_at_mut(6 * n + 2);
+    let (r3, r1_wse) = remainder.split_at_mut(3 * n + 1);
+    let (r1, wse) = r1_wse.split_at_mut(3 * n + 1);
+    // A(-1/8)*B(-1/8)*8^., A(+1/8)*B(+1/8)*8^.
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    _limbs_square_to_out_toom_8_recursive(r7_r5, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(
+        r7_r5,
+        &mut pp_lo[..2 * n + 1 + if BIT_CORRECTION { 1 } else { 0 }],
+        false,
+        n,
+        3,
+        0,
+    );
+    // $\pm1/4$
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        2,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-1/4)*B(-1/4)*4^., A(+1/4)*B(+1/4)*4^.
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    let (r7, r5) = r7_r5.split_at_mut(3 * n + 1);
+    _limbs_square_to_out_toom_8_recursive(r5, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(r5, &mut pp_lo[..2 * n + 1], false, n, 2, 0);
+    // $\pm2$
+    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-2)*B(-2), A(+2)*B(+2)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    _limbs_square_to_out_toom_8_recursive(r3, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], false, n, 1, 2);
+    // $\pm8$
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        3,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-8)*B(-8), A(+8)*B(+8)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    _limbs_square_to_out_toom_8_recursive(r1, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(
+        r1_wse,
+        &mut pp_lo[..2 * n + 1 + if BIT_CORRECTION { 1 } else { 0 }],
+        false,
+        n,
+        3,
+        6,
+    );
+    // $\pm1/2$
+    _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        1,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-1/2)*B(-1/2)*2^., A(+1/2)*B(+1/2)*2^.
+    let (r1, wse) = r1_wse.split_at_mut(3 * n + 1);
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    _limbs_square_to_out_toom_8_recursive(r6, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(r6, &mut pp_lo[..2 * n + 1], false, n, 1, 0);
+    // $\pm1$
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-1)*B(-1), A(1)*B(1)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    _limbs_square_to_out_toom_8_recursive(r4, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(r4, &mut pp_lo[..2 * n + 1], false, n, 0, 0);
+    // $\pm4$
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+        &mut v2[..n + 1],
+        v0,
+        7,
+        xs,
+        n,
+        2,
+        &mut pp_lo[..n + 1],
+    );
+    // A(-4)*B(-4), A(+4)*B(+4)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
+    let (r2, v2) = pp_hi.split_at_mut(2 * n + 2);
+    _limbs_square_to_out_toom_8_recursive(r2, &v2[..n + 1], wse);
+    _limbs_toom_couple_handling(pp_hi, &mut pp_lo[..2 * n + 1], false, n, 2, 4);
+    // A(0)*B(0)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, &xs[..n], wse);
+    _limbs_mul_toom_interpolate_16_points(
+        out,
+        r1,
+        r3,
+        r5,
+        r7,
+        n,
+        s << 1,
+        false,
+        &mut wse[..3 * n + 1],
+    );
 }
 
 impl Square for Natural {

@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoAdd, ModPowerOfTwoAddAssign};
 use num::basic::integers::PrimitiveInteger;
 
-#[inline]
-pub fn _mod_power_of_two_add<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
+fn _mod_power_of_two_add<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
 where
     T: ModPowerOfTwo<Output = T>,
 {
@@ -10,8 +9,7 @@ where
     x.wrapping_add(other).mod_power_of_two(pow)
 }
 
-#[inline]
-pub fn _mod_power_of_two_add_assign<T: PrimitiveInteger>(x: &mut T, other: T, pow: u64) {
+fn _mod_power_of_two_add_assign<T: PrimitiveInteger>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_add_assign(other);
     x.mod_power_of_two_assign(pow);

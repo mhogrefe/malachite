@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoMulAssign};
 use num::basic::integers::PrimitiveInteger;
 
-#[inline]
-pub fn _mod_power_of_two_mul<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
+fn _mod_power_of_two_mul<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
 where
     T: ModPowerOfTwo<Output = T>,
 {

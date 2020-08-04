@@ -1,21 +1,13 @@
 use comparison::traits::{Max, Min};
 use named::Named;
 
-/// The minimum value of a `bool`, false.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
 impl Min for bool {
+    /// The minimum value of a `bool`: $\text{false}$.
     const MIN: bool = false;
 }
 
-/// The maximum value of a `bool`, true.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
 impl Max for bool {
+    /// The maximum value of a `bool`: $\text{true}$.
     const MAX: bool = true;
 }
 

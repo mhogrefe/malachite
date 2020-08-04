@@ -1,7 +1,6 @@
 use num::arithmetic::traits::{ModSub, ModSubAssign, WrappingAdd, WrappingSub};
 
-#[inline]
-pub fn _mod_sub<T: Copy + Ord>(x: T, other: T, m: T) -> T
+fn _mod_sub<T: Copy + Ord>(x: T, other: T, m: T) -> T
 where
     T: WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>,
 {

@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs, WrappingAbs};
 use num::conversion::traits::WrappingFrom;
 
-#[inline]
-pub fn _unsigned_abs<U, S>(x: S) -> U
+fn _unsigned_abs<U, S>(x: S) -> U
 where
     S: WrappingAbs<Output = S>,
     U: WrappingFrom<S>,

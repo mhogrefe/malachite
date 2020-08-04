@@ -137,7 +137,7 @@ impl StripedBitSource {
 
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsigneds<T: PrimitiveUnsigned> {
-    phantom_data: PhantomData<T>,
+    phantom_data: PhantomData<*const T>,
     bits: StripedBitSource,
 }
 
@@ -159,7 +159,7 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsigneds<T> {
 
 #[derive(Clone, Debug)]
 pub struct StripedRandomSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<T>,
+    phantom_data: PhantomData<*const T>,
     bits: StripedBitSource,
     bs: RandomBools,
 }
@@ -185,7 +185,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomSigneds<T> {
 
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<T>,
+    phantom_data: PhantomData<*const T>,
     bits: StripedBitSource,
 }
 
@@ -207,7 +207,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
 
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<T>,
+    phantom_data: PhantomData<*const T>,
     bits: StripedBitSource,
 }
 

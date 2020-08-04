@@ -122,10 +122,14 @@ macro_rules! apply_fn_to_unsigned_signed_pair {
 
 #[macro_use]
 pub mod named;
+
+/// This module contains functions for working with `bool`s.
 #[macro_use]
 pub mod bools;
+/// This module contains functions for working with `char`s.
 #[macro_use]
 pub mod chars;
+/// This module contains macros and traits related to comparing values.
 pub mod comparison;
 pub mod iterators;
 pub mod num;

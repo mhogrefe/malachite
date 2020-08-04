@@ -1,16 +1,19 @@
+use chars::crement::increment_char;
+use chars::CharType;
+use comparison::traits::{Max, Min};
 use std::ops::RangeInclusive;
 
-use chars::{increment_char, CharType};
-use comparison::traits::{Max, Min};
-
-/// Generates all ASCII `char`s, in ascending order. For a "friendlier" order (e.g. nonprintable
-/// `char`s coming last), use `exhaustive_ascii_char`s.
+/// Generates all ASCII `char`s, in ascending order. For a friendlier order (*e.g.* nonprintable
+/// `char`s coming last), try `exhaustive_ascii_char`s.
 ///
-/// Length is 128.
+/// The output length is 128.
 ///
-/// Time: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
 ///
-/// Additional memory: worst case O(1) per iteration
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -30,11 +33,14 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
 /// Generates all `char`s, in ascending order. For a "friendlier" order (e.g. nonprintable `char`s
 /// coming last), use `exhaustive_char`s.
 ///
-/// Length is 0x10f800 == 1,112,064.
+/// The output length is 1,112,064.
 ///
-/// Time: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
 ///
-/// Additional memory: worst case O(1) per iteration
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -54,8 +60,9 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
     char::MIN..=char::MAX
 }
 
-/// Generates all `char`s, in a "friendly" order, so that more familiar characters come first. The
-/// order is
+/// Generates all `char`s, in a friendly order, so that more familiar characters come first.
+///
+/// The order is
 /// 1. Lowercase ASCII letters
 /// 2. Uppercase ASCII letters
 /// 3. ASCII digits
@@ -64,6 +71,9 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
 /// 5. (only if `ascii_only` is false) "Printable" Non-ASCII characters; all non-ASCII characters
 ///     whose `Debug` representations don't start with '\\'
 /// 6. All remaining characters.
+///
+/// This `struct` is created by the `exhaustive_chars` and `exhaustive_ascii_chars` methods. See
+/// their documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveChars {
     ascii_only: bool,
@@ -151,7 +161,8 @@ impl Iterator for ExhaustiveChars {
     }
 }
 
-/// Generates all ASCII `char`s, in a "friendly" order, so that more familiar characters come first.
+/// Generates all ASCII `char`s, in a friendly order, so that more familiar characters come first.
+///
 /// The order is
 /// 1. Lowercase ASCII letters
 /// 2. Uppercase ASCII letters
@@ -160,13 +171,16 @@ impl Iterator for ExhaustiveChars {
 ///     whitespace
 /// 5. All remaining characters.
 ///
-/// Within each group, the characters are ordered with the usual order.
+/// Within each group, the characters are ordered according to their usual order.
 ///
-/// Length is 128.
+/// The output length is 128.
 ///
-/// Time: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
 ///
-/// Additional memory: worst case O(1) per iteration
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -188,8 +202,9 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
     }
 }
 
-/// Generates all `char`s, in a "friendly" order, so that more familiar characters come first. The
-/// order is
+/// Generates all `char`s, in a "friendly" order, so that more familiar characters come first.
+///
+/// The order is
 /// 1. Lowercase ASCII letters
 /// 2. Uppercase ASCII letters
 /// 3. ASCII digits
@@ -199,13 +214,16 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
 ///     don't start with '\\'
 /// 6. All remaining characters.
 ///
-/// Within each group, the characters are ordered with the usual order.
+/// Within each group, the characters are ordered according to their usual order.
 ///
-/// Length is 0x10f800 == 1,112,064.
+/// The output length is 1,112,064.
 ///
-/// Time: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
 ///
-/// Additional memory: worst case O(1) per iteration
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```

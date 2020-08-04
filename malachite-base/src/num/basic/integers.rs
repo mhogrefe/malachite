@@ -40,7 +40,7 @@ use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
     LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
-use num::random::thrifty_random::ThriftyRandom;
+use num::random::random_primitive_integers::HasRandomPrimitiveIntegers;
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInteger:
@@ -368,7 +368,7 @@ pub trait PrimitiveInteger:
     + SubMul<Self, Self, Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
-    + ThriftyRandom
+    + HasRandomPrimitiveIntegers
     + TrailingZeros
     + Two
     + UpperHex

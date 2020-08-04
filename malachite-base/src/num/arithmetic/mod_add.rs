@@ -2,8 +2,7 @@ use std::ops::{Add, AddAssign, Sub};
 
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
 
-#[inline]
-pub fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
+fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
 where
     T: Add<T, Output = T> + Sub<T, Output = T>,
 {
@@ -15,7 +14,7 @@ where
     }
 }
 
-pub fn _mod_add_assign<T: Copy + Ord>(x: &mut T, other: T, m: T)
+fn _mod_add_assign<T: Copy + Ord>(x: &mut T, other: T, m: T)
 where
     T: AddAssign<T> + Sub<T, Output = T>,
 {

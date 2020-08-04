@@ -133,7 +133,7 @@ macro_rules! impl_div_round_unsigned {
 }
 apply_to_unsigneds!(impl_div_round_unsigned);
 
-pub fn _div_round_signed<U, T: Copy + Ord + Zero>(x: T, other: T, rm: RoundingMode) -> T
+fn _div_round_signed<U, T: Copy + Ord + Zero>(x: T, other: T, rm: RoundingMode) -> T
 where
     T: ExactFrom<U> + UnsignedAbs<Output = U> + WrappingFrom<U> + WrappingNeg<Output = T>,
     U: DivRound<U, Output = U>,

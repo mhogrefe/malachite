@@ -28,7 +28,7 @@ use natural::logic::not::limbs_not_to_out;
 use platform::{Limb, SQR_TOOM3_THRESHOLD};
 
 //TODO double check this
-const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
+pub(crate) const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
 pub fn _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len: usize) -> bool {
     xs_len != 0 && xs_len >= ys_len && {

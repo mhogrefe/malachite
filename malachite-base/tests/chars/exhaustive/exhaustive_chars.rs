@@ -1,4 +1,5 @@
-use malachite_base::chars::{exhaustive::exhaustive_chars, NUMBER_OF_CHARS};
+use malachite_base::chars::constants::NUMBER_OF_CHARS;
+use malachite_base::chars::exhaustive::exhaustive_chars;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 #[test]

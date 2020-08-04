@@ -4,8 +4,7 @@ use comparison::traits::Min;
 use num::arithmetic::traits::DivisibleBy;
 use num::basic::traits::{NegativeOne, Zero};
 
-#[inline]
-pub fn _divisible_by_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> bool
+fn _divisible_by_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> bool
 where
     T: Rem<T, Output = T>,
 {
@@ -40,8 +39,7 @@ macro_rules! impl_divisible_by_unsigned {
 }
 apply_to_unsigneds!(impl_divisible_by_unsigned);
 
-#[inline]
-pub fn _divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Zero>(x: T, other: T) -> bool
+fn _divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Zero>(x: T, other: T) -> bool
 where
     T: Rem<T, Output = T>,
 {

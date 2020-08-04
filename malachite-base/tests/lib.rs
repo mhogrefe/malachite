@@ -57,6 +57,12 @@ pub mod chars {
     }
 }
 pub mod iterators {
+    pub mod comparison {
+        pub mod is_strictly_ascending;
+        pub mod is_strictly_descending;
+        pub mod is_weakly_ascending;
+        pub mod is_weakly_descending;
+    }
     pub mod nonzero_values;
 }
 pub mod named;
@@ -203,7 +209,11 @@ pub mod num {
         pub mod random_positive_unsigneds;
         pub mod random_primitive_integers;
         pub mod random_signed_bit_chunks;
+        pub mod random_signed_range;
+        pub mod random_signed_range_to_max;
         pub mod random_unsigned_bit_chunks;
+        pub mod random_unsigned_range;
+        pub mod random_unsigned_range_to_max;
         pub mod random_unsigneds_less_than;
         pub mod striped {
             pub mod striped_bit_source;

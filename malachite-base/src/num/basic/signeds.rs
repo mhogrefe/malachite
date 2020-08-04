@@ -11,6 +11,7 @@ use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::CheckedHammingDistance;
 use num::random::random_bit_chunks::RandomSignedChunkable;
+use num::random::random_signed_range::HasRandomSignedRange;
 
 /// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:
@@ -25,6 +26,7 @@ pub trait PrimitiveSigned:
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
     + From<i8>
+    + HasRandomSignedRange
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne

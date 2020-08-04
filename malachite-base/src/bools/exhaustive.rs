@@ -3,11 +3,14 @@ use std::slice::Iter;
 
 /// Generates both `bool`s.
 ///
-/// Length is 2.
+/// The output length is 2.
 ///
-/// Time: worst case O(1) per iteration
+/// # Worst-case complexity
+/// $T(i) = \mathcal{O}(1)$
 ///
-/// Additional memory: worst case O(1) per iteration
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```

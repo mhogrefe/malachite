@@ -5,7 +5,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-pub fn _arithmetic_checked_shr_unsigned_signed<
+fn _arithmetic_checked_shr_unsigned_signed<
     T: PrimitiveInteger,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + Zero,
@@ -68,7 +68,7 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
 }
 apply_to_unsigneds!(impl_arithmetic_checked_shr_unsigned_signed);
 
-pub fn _arithmetic_checked_shr_signed_signed<
+fn _arithmetic_checked_shr_signed_signed<
     T: PrimitiveInteger,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + Zero,

@@ -12,6 +12,7 @@ pub struct RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
 impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         loop {
             let x = self.xs.next();

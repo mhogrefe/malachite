@@ -1,11 +1,9 @@
 use num::logic::traits::NotAssign;
 
 impl NotAssign for bool {
-    /// Replaces a `bool` with its negation.
+    /// Replaces a `bool` by its opposite.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// `b.not_assign()` is equivalent to `b = !b`.
     ///
     /// # Examples
     /// ```

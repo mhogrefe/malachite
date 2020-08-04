@@ -3,8 +3,7 @@ use std::ops::Sub;
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
 use num::basic::traits::Zero;
 
-#[inline]
-pub fn _mod_neg<T: Copy + Eq + Zero>(x: T, m: T) -> T
+fn _mod_neg<T: Copy + Eq + Zero>(x: T, m: T) -> T
 where
     T: Sub<T, Output = T>,
 {
@@ -15,8 +14,7 @@ where
     }
 }
 
-#[inline]
-pub fn _mod_neg_assign<T: Copy + Eq + Zero>(x: &mut T, m: T)
+fn _mod_neg_assign<T: Copy + Eq + Zero>(x: &mut T, m: T)
 where
     T: Sub<T, Output = T>,
 {

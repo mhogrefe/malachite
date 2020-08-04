@@ -4,17 +4,30 @@ use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::random_bit_chunks::{RandomSignedBitChunks, RandomUnsignedBitChunks};
 use num::random::random_highest_bit_set_values::RandomHighestBitSetValues;
+use num::random::random_primitive_integers::RandomPrimitiveIntegers;
+use num::random::random_signed_range::RandomSignedRange;
+use num::random::random_unsigned_range::RandomUnsignedRange;
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
-use num::random::thrifty_random::RandomPrimitiveIntegers;
 use random::seed::Seed;
 
 /// Uniformly generates unsigned integers of up to `chunk_size` bits.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{-c} & 0 \\leq x < 2^c \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $c$ is `chunk_size`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Panics
 /// Panics if `chunk_size` is greater than `T::WIDTH`.
@@ -44,14 +57,27 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     }
 }
 
-/// Uniformly generates signed integers of up to `chunk_size` bits. The generated values will all be
+/// Uniformly generates signed integers of up to `chunk_size` bits.
+///
+/// The generated values will all be
 /// non-negative unless `chunk_size` is equal to `T::WIDTH`.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{-c} & c = W \\ \\text{or} \\ (c < W \\ \\text{and} \\ 0 \\leq x < 2^c) \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $c$ is `chunk_size` and $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Panics
 /// Panics if `chunk_size` is greater than `T::WIDTH`.
@@ -76,13 +102,24 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
     }
 }
 
-/// Generates an iterator's values, but with the highest bit set.
+/// Uniformly generates unsigned integers whose highest bit is set.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{1-W} & 2^{W-1} \\leq x < 2^W \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -104,13 +141,18 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
     }
 }
 
-/// Generates random primitive integers uniformly.
+/// Uniformly generates random primitive integers.
 ///
-/// Length is infinite.
+/// $P(x) = 2^{-W}$, where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -130,14 +172,24 @@ pub fn random_primitive_integers<T: PrimitiveInteger>(seed: Seed) -> RandomPrimi
     }
 }
 
-/// Generates random positive unsigned integers from a uniform distribution across all possible
-/// values.
+/// Uniformly generates random positive unsigned integers.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     \\frac{1}{2^W-1} & x > 0 \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -156,14 +208,24 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
     nonzero_values(random_primitive_integers(seed))
 }
 
-/// Generates random positive signed integers from a uniform distribution across all possible
-/// values.
+/// Uniformly generates random positive signed integers.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     \\frac{1}{2^{W-1}-1} & x > 0 \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -182,14 +244,24 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
     nonzero_values(random_natural_signeds(seed))
 }
 
-/// Generates random negative signed integers from a uniform distribution across all possible
-/// values.
+/// Uniformly generates random negative signed integers.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{1-W} & x < 0\\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -211,14 +283,24 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
     }
 }
 
-/// Generates random natural (i.e. non-negative) signed integers from a uniform distribution across
-/// all possible values.
+/// Uniformly generates random natural (non-negative) signed integers.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{1-W} & x \geq 0 \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -235,13 +317,24 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
     random_signed_bit_chunks(seed, T::WIDTH - 1)
 }
 
-/// Generates random nonzero signed integers from a uniform distribution across all possible values.
+/// Uniformly generates random nonzero signed integers.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     \\frac{1}{2^W-1} & x \\neq 0 \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -260,14 +353,28 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
     nonzero_values(random_primitive_integers(seed))
 }
 
-/// Uniformly generates random unsigned integers less than `limit`, unless `limit` is 0, in which
-/// case any integer may be generated.
+/// Uniformly generates random unsigned integers less than a positive `limit`.
 ///
-/// Length is infinite.
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{\\ell} & x < \\ell \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $\ell$ is `limit`.
 ///
-/// Time per iteration: O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: O(1)
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
+///
+/// # Panics
+///
+/// Panics if `limit` is 0.
 ///
 /// # Examples
 /// ```
@@ -279,25 +386,208 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 ///     &[1, 7, 5, 4, 6, 4, 2, 8, 1, 7]
 /// )
 /// ```
-#[inline]
 pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
     seed: Seed,
     limit: T,
 ) -> RandomUnsignedsLessThan<T> {
-    let chunk_size = if limit == T::ZERO {
-        T::WIDTH
-    } else {
-        limit.ceiling_log_two()
-    };
+    if limit == T::ZERO {
+        panic!("limit cannot be 0.");
+    }
     RandomUnsignedsLessThan {
-        xs: random_unsigned_bit_chunks(seed, chunk_size),
+        xs: random_unsigned_bit_chunks(seed, limit.ceiling_log_two()),
         limit,
+    }
+}
+
+/// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
+///
+/// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
+/// use `random_unsigned_range_to_max`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{b-a} & a \leq x < b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
+///
+/// # Panics
+///
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_unsigned_range;
+///
+/// assert_eq!(
+///     random_unsigned_range::<u8>(EXAMPLE_SEED, 10, 20).take(10).collect::<Vec<_>>(),
+///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
+/// )
+/// ```
+pub fn random_unsigned_range<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+) -> RandomUnsignedRange<T> {
+    if a >= b {
+        panic!("a must be less than b. a: {}, b: {}", a, b);
+    }
+    RandomUnsignedRange {
+        xs: random_unsigneds_less_than(seed, b - a),
+        a,
+    }
+}
+
+/// Uniformly generates random unsigned integers greater than or equal to `a`.
+///
+/// `a` cannot be zero.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{2^W-a} & x \geq a \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
+///
+/// # Panics
+///
+/// Panics if $a = 0$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_unsigned_range_to_max;
+///
+/// assert_eq!(
+///     random_unsigned_range_to_max::<u8>(EXAMPLE_SEED, 10).take(10).collect::<Vec<_>>(),
+///     &[123, 249, 79, 118, 238, 220, 178, 171, 97, 42]
+/// )
+/// ```
+pub fn random_unsigned_range_to_max<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+) -> RandomUnsignedRange<T> {
+    if a == T::ZERO {
+        panic!("a cannot be 0.");
+    }
+    RandomUnsignedRange {
+        xs: random_unsigneds_less_than(seed, a.wrapping_neg()),
+        a,
+    }
+}
+
+/// Uniformly generates random signed integers in the half-open interval $[a, b)$.
+///
+/// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
+/// use `random_signed_range_to_max`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{b-a} & a \leq x < b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
+///
+/// # Panics
+///
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_signed_range;
+///
+/// assert_eq!(
+///     random_signed_range::<i8>(EXAMPLE_SEED, -100, 100).take(10).collect::<Vec<_>>(),
+///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
+/// )
+/// ```
+#[inline]
+pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> RandomSignedRange<T> {
+    RandomSignedRange {
+        xs: T::new_unsigned_range(seed, a, b),
+    }
+}
+
+/// Uniformly generates random signed integers greater than or equal to `a`.
+///
+/// `a` cannot be `T::MIN`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{2^{W-1}-a} & x \geq a \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(1)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $i$ is the iteration number.
+///
+/// # Panics
+///
+/// Panics if `a` is `T::MIN`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_signed_range_to_max;
+///
+/// assert_eq!(
+///     random_signed_range_to_max::<i16>(EXAMPLE_SEED, i16::MIN + 1).take(10).collect::<Vec<_>>(),
+///     &[28530, -5050, 21221, 8617, -24488, -11409, -23875, 28250, 18526, -3178]
+/// )
+/// ```
+#[inline]
+pub fn random_signed_range_to_max<T: PrimitiveSigned>(seed: Seed, a: T) -> RandomSignedRange<T> {
+    if a == T::MIN {
+        panic!("a cannot be T::MIN.");
+    }
+    RandomSignedRange {
+        xs: T::new_unsigned_range_to_max(seed, a),
     }
 }
 
 pub mod geometric;
 pub mod random_bit_chunks;
 pub mod random_highest_bit_set_values;
+pub mod random_primitive_integers;
+pub mod random_signed_range;
+pub mod random_unsigned_range;
 pub mod random_unsigneds_less_than;
 pub mod striped;
-pub mod thrifty_random;

@@ -63,24 +63,24 @@ pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
         .then_with(|| limbs_cmp_same_length(xs, ys))
 }
 
-/// Compares a `Natural` to another `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = min(`self.significant_bits()`, `other.significant_bits()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::Natural;
-///
-/// assert!(Natural::from(123u32) > Natural::from(122u32));
-/// assert!(Natural::from(123u32) >= Natural::from(122u32));
-/// assert!(Natural::from(123u32) < Natural::from(124u32));
-/// assert!(Natural::from(123u32) <= Natural::from(124u32));
-/// ```
 impl PartialOrd for Natural {
+    /// Compares a `Natural` to another `Natural`.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert!(Natural::from(123u32) > Natural::from(122u32));
+    /// assert!(Natural::from(123u32) >= Natural::from(122u32));
+    /// assert!(Natural::from(123u32) < Natural::from(124u32));
+    /// assert!(Natural::from(123u32) <= Natural::from(124u32));
+    /// ```
     #[inline]
     fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
         Some(self.cmp(other))

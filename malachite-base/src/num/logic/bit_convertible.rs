@@ -6,7 +6,7 @@ use num::basic::traits::{NegativeOne, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitConvertible, LeadingZeros};
 
-pub fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
+fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     let mut x = *x;
     while x != T::ZERO {
@@ -16,7 +16,7 @@ pub fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &
     bits
 }
 
-pub fn _to_bits_desc_unsigned<T: PrimitiveInteger>(x: &T) -> Vec<bool> {
+fn _to_bits_desc_unsigned<T: PrimitiveInteger>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     if *x == T::ZERO {
         return bits;
@@ -33,7 +33,7 @@ pub fn _to_bits_desc_unsigned<T: PrimitiveInteger>(x: &T) -> Vec<bool> {
     bits
 }
 
-pub fn _from_bits_asc_unsigned<T: PrimitiveInteger>(bits: &[bool]) -> T {
+fn _from_bits_asc_unsigned<T: PrimitiveInteger>(bits: &[bool]) -> T {
     let width = usize::exact_from(T::WIDTH);
     if bits.len() > width {
         assert!(bits[width..].iter().all(|&bit| !bit));
@@ -49,7 +49,7 @@ pub fn _from_bits_asc_unsigned<T: PrimitiveInteger>(bits: &[bool]) -> T {
     n
 }
 
-pub fn _from_bits_desc_unsigned<T: PrimitiveInteger>(mut bits: &[bool]) -> T {
+fn _from_bits_desc_unsigned<T: PrimitiveInteger>(mut bits: &[bool]) -> T {
     let width = usize::exact_from(T::WIDTH);
     if bits.len() > width {
         let (bits_lo, bits_hi) = bits.split_at(bits.len() - width);
@@ -169,7 +169,7 @@ macro_rules! impl_bit_convertible_unsigned {
 }
 apply_to_unsigneds!(impl_bit_convertible_unsigned);
 
-pub fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
+fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
     x: &T,
 ) -> Vec<bool> {
     let mut bits = Vec::new();
@@ -192,7 +192,7 @@ pub fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign
     bits
 }
 
-pub fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInteger>(x: &T) -> Vec<bool> {
+fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInteger>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     if *x >= T::ZERO {
         if *x == T::ZERO {
@@ -226,7 +226,7 @@ pub fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInteger>(x: &T) -> Vec<boo
     bits
 }
 
-pub fn _from_bits_asc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
+fn _from_bits_asc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
 where
     S: ExactFrom<U> + WrappingFrom<U>,
 {
@@ -250,7 +250,7 @@ where
     }
 }
 
-pub fn _from_bits_desc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
+fn _from_bits_desc_signed<U: PrimitiveInteger, S: PrimitiveInteger>(bits: &[bool]) -> S
 where
     S: ExactFrom<U> + WrappingFrom<U>,
 {

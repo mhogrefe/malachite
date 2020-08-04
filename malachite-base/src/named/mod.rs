@@ -5,30 +5,29 @@ pub trait Named {
     const NAME: &'static str;
 }
 
-/// Implements `Named` for a type.
+/// The name of a type, as given by the `stringify` macro. It doesn't work very well for types whose
+/// names contain several tokens, like `(u8, u8)`, `&str`, or `Vec<bool>`.
+///
+/// # Example
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::named::Named;
+///
+/// # // The `-> ()` is used to fool clippy into not falsely warning
+/// # // `clippy::needless_doctest_main`.
+/// fn main() -> () {
+///     assert_eq!(u8::NAME, "u8");
+///     assert_eq!(String::NAME, "String");
+/// }
+/// ```
 #[macro_export]
 macro_rules! impl_named {
     ($t:ident) => {
         impl Named for $t {
-            /// Returns the name of a type.
+            /// The name of this type, as given by the `stringify` macro.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Example
-            /// ```
-            /// #[macro_use]
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::named::Named;
-            ///
-            /// // Fool clippy into not falsely warning clippy::needless_doctest_main
-            /// fn main() -> () {
-            ///     assert_eq!(u8::NAME, "u8");
-            ///     assert_eq!(i64::NAME, "i64");
-            /// }
-            /// ```
+            /// See the documentation for the `impl_named` macro for more details.
             const NAME: &'static str = stringify!($t);
         }
     };

@@ -5,6 +5,7 @@ cargo fmt &&
 cargo clippy --tests &&
 cargo test --release &&
 cargo doc &&
+RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-base-test-util &&
 cargo update &&

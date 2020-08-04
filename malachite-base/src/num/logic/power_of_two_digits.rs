@@ -6,7 +6,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{PowerOfTwoDigits, SignificantBits};
 
-pub fn _to_power_of_two_digits_asc<
+fn _to_power_of_two_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
     U: PrimitiveInteger,
 >(
@@ -39,7 +39,7 @@ where
     digits
 }
 
-pub fn _to_power_of_two_digits_desc<
+fn _to_power_of_two_digits_desc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
     U: PrimitiveInteger,
 >(
@@ -54,7 +54,7 @@ where
     digits
 }
 
-pub fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
+fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
 where
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
 {
@@ -77,10 +77,7 @@ where
     n
 }
 
-pub fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInteger>(
-    log_base: u64,
-    digits: &[U],
-) -> T
+fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
 where
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
 {

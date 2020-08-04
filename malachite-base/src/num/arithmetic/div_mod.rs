@@ -7,8 +7,7 @@ use num::arithmetic::traits::{
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 
-#[inline]
-pub fn _div_mod_unsigned<T: Copy>(x: T, other: T) -> (T, T)
+fn _div_mod_unsigned<T: Copy>(x: T, other: T) -> (T, T)
 where
     T: Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
 {
@@ -16,8 +15,7 @@ where
     (q, x - q * other)
 }
 
-#[inline]
-pub fn _div_assign_mod_unsigned<T: Copy>(x: &mut T, other: T) -> T
+fn _div_assign_mod_unsigned<T: Copy>(x: &mut T, other: T) -> T
 where
     T: DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>,
 {
@@ -26,8 +24,7 @@ where
     original - *x * other
 }
 
-#[inline]
-pub fn _ceiling_div_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: T, other: T) -> (T, T)
+fn _ceiling_div_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: T, other: T) -> (T, T)
 where
     T: Add<T, Output = T> + DivMod<T, DivOutput = T, ModOutput = T> + Sub<T, Output = T>,
 {
@@ -40,7 +37,7 @@ where
     }
 }
 
-pub fn _ceiling_div_assign_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: &mut T, other: T) -> T
+fn _ceiling_div_assign_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: &mut T, other: T) -> T
 where
     T: AddAssign<T> + DivAssignMod<T, ModOutput = T> + Sub<T, Output = T>,
 {
@@ -255,7 +252,7 @@ macro_rules! impl_div_mod_unsigned {
 }
 apply_to_unsigneds!(impl_div_mod_unsigned);
 
-pub fn _div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
+fn _div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
 where
     T: ExactFrom<U>
         + Neg<Output = T>
@@ -281,8 +278,7 @@ where
     )
 }
 
-#[inline]
-pub fn _div_rem_signed<T: Copy>(x: T, other: T) -> (T, T)
+fn _div_rem_signed<T: Copy>(x: T, other: T) -> (T, T)
 where
     T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
 {
@@ -290,8 +286,7 @@ where
     (q, x - q * other)
 }
 
-#[inline]
-pub fn _div_assign_rem_signed<T: Copy>(x: &mut T, other: T) -> T
+fn _div_assign_rem_signed<T: Copy>(x: &mut T, other: T) -> T
 where
     T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
 {
@@ -300,7 +295,7 @@ where
     original - *x * other
 }
 
-pub fn _ceiling_div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
+fn _ceiling_div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
 where
     T: ExactFrom<U>
         + Neg<Output = T>

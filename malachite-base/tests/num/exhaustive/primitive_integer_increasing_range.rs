@@ -58,13 +58,9 @@ where
     i8: ExactFrom<T>,
     usize: WrappingFrom<T>,
 {
-    primitive_integer_increasing_range_helper_helper(T::ZERO, T::ZERO, &[]);
-    primitive_integer_increasing_range_helper_helper(T::ZERO, T::ONE, &[0]);
-    primitive_integer_increasing_range_helper_helper(
-        T::ZERO,
-        T::exact_from(10),
-        &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    );
+    primitive_integer_increasing_range_helper_helper(T::exact_from(5), T::exact_from(5), &[]);
+    primitive_integer_increasing_range_helper_helper(T::exact_from(5), T::exact_from(6), &[5]);
+    primitive_integer_increasing_range_helper_helper(T::ONE, T::exact_from(7), &[1, 2, 3, 4, 5, 6]);
     primitive_integer_increasing_range_helper_helper(
         T::exact_from(10),
         T::exact_from(20),

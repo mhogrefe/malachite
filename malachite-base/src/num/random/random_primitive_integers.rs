@@ -1,18 +1,16 @@
-use std::fmt::Debug;
-
+use num::basic::integers::PrimitiveInteger;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
+use std::fmt::Debug;
 
-use num::basic::integers::PrimitiveInteger;
-
-/// Generates random primitive integers uniformly.
+/// Uniformly generates random primitive integers.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ThriftyRandomState {
     x: u32,
     bits_left: u64,
 }
 
-pub trait ThriftyRandom {
+pub trait HasRandomPrimitiveIntegers {
     type State: Clone + Debug;
 
     fn new_state() -> Self::State;
@@ -20,9 +18,9 @@ pub trait ThriftyRandom {
     fn get_random(rng: &mut ChaCha20Rng, state: &mut Self::State) -> Self;
 }
 
-macro_rules! impl_trivial_thrifty_random {
+macro_rules! impl_trivial_random_primitive_integers {
     ($t: ident) => {
-        impl ThriftyRandom for $t {
+        impl HasRandomPrimitiveIntegers for $t {
             type State = ();
 
             #[inline]
@@ -37,14 +35,14 @@ macro_rules! impl_trivial_thrifty_random {
         }
     };
 }
-impl_trivial_thrifty_random!(u32);
-impl_trivial_thrifty_random!(u64);
-impl_trivial_thrifty_random!(u128);
-impl_trivial_thrifty_random!(usize);
-impl_trivial_thrifty_random!(i32);
-impl_trivial_thrifty_random!(i64);
-impl_trivial_thrifty_random!(i128);
-impl_trivial_thrifty_random!(isize);
+impl_trivial_random_primitive_integers!(u32);
+impl_trivial_random_primitive_integers!(u64);
+impl_trivial_random_primitive_integers!(u128);
+impl_trivial_random_primitive_integers!(usize);
+impl_trivial_random_primitive_integers!(i32);
+impl_trivial_random_primitive_integers!(i64);
+impl_trivial_random_primitive_integers!(i128);
+impl_trivial_random_primitive_integers!(isize);
 
 fn _get_random<T: PrimitiveInteger>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
@@ -57,9 +55,9 @@ fn _get_random<T: PrimitiveInteger>(rng: &mut ChaCha20Rng, state: &mut ThriftyRa
     T::wrapping_from(state.x)
 }
 
-macro_rules! impl_thrifty_thrifty_random {
+macro_rules! impl_thrifty_random_primitive_integers {
     ($t: ident) => {
-        impl ThriftyRandom for $t {
+        impl HasRandomPrimitiveIntegers for $t {
             type State = ThriftyRandomState;
 
             #[inline]
@@ -74,18 +72,22 @@ macro_rules! impl_thrifty_thrifty_random {
         }
     };
 }
-impl_thrifty_thrifty_random!(u8);
-impl_thrifty_thrifty_random!(u16);
-impl_thrifty_thrifty_random!(i8);
-impl_thrifty_thrifty_random!(i16);
+impl_thrifty_random_primitive_integers!(u8);
+impl_thrifty_random_primitive_integers!(u16);
+impl_thrifty_random_primitive_integers!(i8);
+impl_thrifty_random_primitive_integers!(i16);
 
+/// Uniformly generates random primitive integers.
+///
+/// This `struct` is created by the `random_primitive_integers` method. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
-pub struct RandomPrimitiveIntegers<T: ThriftyRandom> {
+pub struct RandomPrimitiveIntegers<T: HasRandomPrimitiveIntegers> {
     pub(crate) rng: ChaCha20Rng,
     pub(crate) state: T::State,
 }
 
-impl<T: ThriftyRandom> Iterator for RandomPrimitiveIntegers<T> {
+impl<T: HasRandomPrimitiveIntegers> Iterator for RandomPrimitiveIntegers<T> {
     type Item = T;
 
     #[inline]

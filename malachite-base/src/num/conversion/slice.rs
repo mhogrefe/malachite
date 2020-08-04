@@ -6,8 +6,7 @@ use num::conversion::traits::{
 };
 use rounding_modes::RoundingMode;
 
-#[inline]
-pub fn _from_other_type_slice_ident<T: Copy + Zero>(slice: &[T]) -> T {
+fn _from_other_type_slice_ident<T: Copy + Zero>(slice: &[T]) -> T {
     if slice.is_empty() {
         T::ZERO
     } else {
@@ -84,8 +83,7 @@ macro_rules! impl_slice_traits_ident {
     };
 }
 
-#[inline]
-pub fn _from_other_type_slice_large_to_small<A: Copy, B: Zero>(slice: &[A]) -> B
+fn _from_other_type_slice_large_to_small<A: Copy, B: Zero>(slice: &[A]) -> B
 where
     B: WrappingFrom<A>,
 {
@@ -96,7 +94,7 @@ where
     }
 }
 
-pub fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
+fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
     slice: &[A],
 ) -> Vec<B>
 where
@@ -114,7 +112,7 @@ where
     xs
 }
 
-pub fn _vec_from_other_type_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
+fn _vec_from_other_type_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
     mut value: A,
 ) -> Vec<B>
 where
@@ -214,7 +212,7 @@ where
     result
 }
 
-pub fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
+fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
     slice: &[A],
 ) -> Vec<B>
 where
@@ -228,8 +226,7 @@ where
     xs
 }
 
-#[inline]
-pub fn _vec_from_other_type_small_to_large<A, B>(value: A) -> Vec<B>
+fn _vec_from_other_type_small_to_large<A, B>(value: A) -> Vec<B>
 where
     B: WrappingFrom<A>,
 {
@@ -311,7 +308,6 @@ macro_rules! impl_slice_traits_small_to_large {
         }
     };
 }
-
 apply_to_unsigneds!(impl_slice_traits_ident);
 
 impl_slice_traits_large_to_small!(u16, u8);

@@ -1,7 +1,7 @@
 use num::basic::integers::PrimitiveInteger;
 use num::logic::traits::{BitScan, TrailingZeros};
 
-pub fn _index_of_next_false_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+fn _index_of_next_false_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
     Some(if start >= T::WIDTH {
         start
     } else {
@@ -9,7 +9,7 @@ pub fn _index_of_next_false_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) 
     })
 }
 
-pub fn _index_of_next_true_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+fn _index_of_next_true_bit_unsigned<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH {
         None
     } else {
@@ -86,8 +86,7 @@ macro_rules! impl_bit_scan_unsigned {
 }
 apply_to_unsigneds!(impl_bit_scan_unsigned);
 
-#[inline]
-pub fn _index_of_next_false_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+fn _index_of_next_false_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             Some(start)
@@ -104,8 +103,7 @@ pub fn _index_of_next_false_bit_signed<T: PrimitiveInteger>(x: T, start: u64) ->
     }
 }
 
-#[inline]
-pub fn _index_of_next_true_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
+fn _index_of_next_true_bit_signed<T: PrimitiveInteger>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             None

@@ -8,7 +8,7 @@ use num::basic::traits::{One, Zero};
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
-pub fn _shr_round_unsigned_unsigned<
+fn _shr_round_unsigned_unsigned<
     T: PrimitiveInteger,
     U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
 >(
@@ -69,7 +69,7 @@ where
     }
 }
 
-pub fn _shr_round_assign_unsigned_unsigned<
+fn _shr_round_assign_unsigned_unsigned<
     T: PrimitiveInteger,
     U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
 >(
@@ -237,7 +237,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
 }
 apply_to_unsigneds!(impl_shr_round_unsigned_unsigned);
 
-pub fn _shr_round_signed_unsigned<U: Copy + Eq + Zero, S: Copy + Eq + Min + Ord + Zero, B>(
+fn _shr_round_signed_unsigned<U: Copy + Eq + Zero, S: Copy + Eq + Min + Ord + Zero, B>(
     x: S,
     bits: B,
     rm: RoundingMode,
@@ -368,7 +368,7 @@ macro_rules! impl_shr_round_signed_unsigned {
 }
 apply_to_signeds!(impl_shr_round_signed_unsigned);
 
-pub fn _shr_round_primitive_signed<
+fn _shr_round_primitive_signed<
     T: PrimitiveInteger,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + Zero,
@@ -393,7 +393,7 @@ where
     }
 }
 
-pub fn _shr_round_assign_primitive_signed<
+fn _shr_round_assign_primitive_signed<
     T: PrimitiveInteger,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + Zero,

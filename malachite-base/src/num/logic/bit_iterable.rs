@@ -1,5 +1,6 @@
 use std::cmp::min;
 use std::cmp::Ordering;
+use std::marker::PhantomData;
 use std::ops::Index;
 
 use num::basic::signeds::PrimitiveSigned;
@@ -161,7 +162,7 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     }
 }
 
-pub fn _bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> {
+fn _bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> {
     let significant_bits = x.significant_bits();
     PrimitiveUnsignedBitIterator {
         value: x,
@@ -211,11 +212,12 @@ macro_rules! impl_bit_iterable_unsigned {
 apply_to_unsigneds!(impl_bit_iterable_unsigned);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct PrimitiveSignedBitIterator<T: PrimitiveSigned>(
-    PrimitiveUnsignedBitIterator<T::UnsignedOfEqualWidth>,
-);
+pub struct PrimitiveSignedBitIterator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
+    phantom: PhantomData<*const S>,
+    xs: PrimitiveUnsignedBitIterator<U>,
+}
 
-impl<T: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<T> {
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<U, S> {
     type Item = bool;
 
     /// A function to iterate through the bits of a primitive signed integer in ascending order
@@ -244,11 +246,13 @@ impl<T: PrimitiveSigned> Iterator for PrimitiveSignedBitIterator<T> {
     /// assert_eq!(bits.next(), None);
     /// ```
     fn next(&mut self) -> Option<bool> {
-        self.0.next()
+        self.xs.next()
     }
 }
 
-impl<T: PrimitiveSigned> DoubleEndedIterator for PrimitiveSignedBitIterator<T> {
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
+    for PrimitiveSignedBitIterator<U, S>
+{
     /// A function to iterate through the bits of a primitive signed integer in descending order
     /// (most-significant first).
     ///
@@ -275,11 +279,11 @@ impl<T: PrimitiveSigned> DoubleEndedIterator for PrimitiveSignedBitIterator<T> {
     /// assert_eq!(bits.next_back(), None);
     /// ```
     fn next_back(&mut self) -> Option<bool> {
-        self.0.next_back()
+        self.xs.next_back()
     }
 }
 
-impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<U, S> {
     type Output = bool;
 
     /// A function to retrieve bits by index. The index is the power of 2 of which the bit is a
@@ -311,7 +315,7 @@ impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
     /// assert_eq!(bits[100], true);
     /// ```
     fn index(&self, index: u64) -> &bool {
-        if self.0[min(index, T::WIDTH - 1)] {
+        if self.xs[min(index, U::WIDTH - 1)] {
             &true
         } else {
             &false
@@ -319,9 +323,8 @@ impl<T: PrimitiveSigned> Index<u64> for PrimitiveSignedBitIterator<T> {
     }
 }
 
-pub fn _bits_signed<U: PrimitiveUnsigned, S>(x: S) -> PrimitiveSignedBitIterator<S>
+fn _bits_signed<U: PrimitiveUnsigned, S: PrimitiveSigned>(x: S) -> PrimitiveSignedBitIterator<U, S>
 where
-    S: PrimitiveSigned<UnsignedOfEqualWidth = U>,
     U: WrappingFrom<S>,
 {
     let unsigned = U::wrapping_from(x);
@@ -330,18 +333,21 @@ where
         Ordering::Greater => unsigned.significant_bits() + 1,
         Ordering::Less => (!unsigned).significant_bits() + 1,
     };
-    PrimitiveSignedBitIterator(PrimitiveUnsignedBitIterator {
-        value: unsigned,
-        some_remaining: significant_bits != 0,
-        i_mask: U::ONE,
-        j_mask: U::power_of_two(significant_bits.saturating_sub(1)),
-    })
+    PrimitiveSignedBitIterator {
+        phantom: PhantomData,
+        xs: PrimitiveUnsignedBitIterator {
+            value: unsigned,
+            some_remaining: significant_bits != 0,
+            i_mask: U::ONE,
+            j_mask: U::power_of_two(significant_bits.saturating_sub(1)),
+        },
+    }
 }
 
 macro_rules! impl_bit_iterable_signed {
     ($u:ident, $s:ident) => {
         impl BitIterable for $s {
-            type BitIterator = PrimitiveSignedBitIterator<$s>;
+            type BitIterator = PrimitiveSignedBitIterator<$u, $s>;
 
             /// Returns a double-ended iterator over the bits of a primitive signed integer. The
             /// forward order is ascending, so that less significant bits appear first. There are no
@@ -375,7 +381,7 @@ macro_rules! impl_bit_iterable_signed {
             ///     vec![true, false, false, true, false, true, true, true]);
             /// ```
             #[inline]
-            fn bits(self) -> PrimitiveSignedBitIterator<$s> {
+            fn bits(self) -> PrimitiveSignedBitIterator<$u, $s> {
                 _bits_signed::<$u, $s>(self)
             }
         }

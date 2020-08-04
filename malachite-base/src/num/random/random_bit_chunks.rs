@@ -1,12 +1,14 @@
-use std::fmt::Debug;
-
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
+use num::random::random_primitive_integers::RandomPrimitiveIntegers;
 use num::random::random_unsigned_bit_chunks;
-use num::random::thrifty_random::RandomPrimitiveIntegers;
 use random::seed::Seed;
+use std::fmt::Debug;
 
 /// Uniformly generates unsigned integers of up to `chunk_size` bits.
+///
+/// This `struct` is created by the `random_unsigned_bit_chunks` method. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
     pub(crate) xs: RandomPrimitiveIntegers<T>,
@@ -77,6 +79,10 @@ macro_rules! impl_random_signed_chunkable {
 }
 apply_to_unsigned_signed_pair!(impl_random_signed_chunkable);
 
+/// Uniformly generates signed integers of up to `chunk_size` bits.
+///
+/// This `struct` is created by the `random_signed_bit_chunks` method. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedBitChunks<T: RandomSignedChunkable> {
     pub(crate) xs: T::AbsoluteChunks,

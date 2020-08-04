@@ -6,16 +6,14 @@ use num::arithmetic::traits::{
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-#[inline]
-pub fn _saturating_sub_mul_unsigned<T>(x: T, y: T, z: T) -> T
+fn _saturating_sub_mul_unsigned<T>(x: T, y: T, z: T) -> T
 where
     T: SaturatingMul<T, Output = T> + SaturatingSub<T, Output = T>,
 {
     x.saturating_sub(y.saturating_mul(z))
 }
 
-#[inline]
-pub fn _saturating_sub_mul_assign_unsigned<T>(x: &mut T, y: T, z: T)
+fn _saturating_sub_mul_assign_unsigned<T>(x: &mut T, y: T, z: T)
 where
     T: SaturatingMul<T, Output = T> + SaturatingSubAssign<T>,
 {
@@ -75,7 +73,7 @@ macro_rules! impl_saturating_sub_mul_unsigned {
 }
 apply_to_unsigneds!(impl_saturating_sub_mul_unsigned);
 
-pub fn _saturating_sub_mul_signed<U: Copy + Ord, S: Copy + Eq + Max + Min + Ord + Zero>(
+fn _saturating_sub_mul_signed<U: Copy + Ord, S: Copy + Eq + Max + Min + Ord + Zero>(
     x: S,
     y: S,
     z: S,

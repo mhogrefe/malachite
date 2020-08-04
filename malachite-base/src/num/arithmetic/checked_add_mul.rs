@@ -2,8 +2,7 @@ use num::arithmetic::traits::{CheckedAdd, CheckedAddMul, CheckedMul, UnsignedAbs
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-#[inline]
-pub fn _checked_add_mul_unsigned<T>(x: T, y: T, z: T) -> Option<T>
+fn _checked_add_mul_unsigned<T>(x: T, y: T, z: T) -> Option<T>
 where
     T: CheckedAdd<T, Output = T> + CheckedMul<T, Output = T>,
 {
@@ -37,7 +36,7 @@ macro_rules! impl_checked_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_checked_add_mul_unsigned);
 
-pub fn _checked_add_mul_signed<U: Copy + Ord, T: Copy + Ord + Zero>(x: T, y: T, z: T) -> Option<T>
+fn _checked_add_mul_signed<U: Copy + Ord, T: Copy + Ord + Zero>(x: T, y: T, z: T) -> Option<T>
 where
     T: CheckedAdd<T, Output = T>
         + CheckedMul<T, Output = T>

@@ -13,10 +13,8 @@ use natural::comparison::ord::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
-//TODO clean
-
-/// Given the limbs of two `Natural`s a and b, and a limb c, returns the limbs of a - b * c. If
-/// b * c > a, `None` is returned.
+/// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
+/// y * z > x, `None` is returned.
 ///
 /// Time: worst case O(n)
 ///
@@ -38,10 +36,10 @@ use platform::{DoubleLimb, Limb};
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
 /// negative, and w is returned instead of overwriting the first input.
-pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Option<Vec<Limb>> {
+pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<Vec<Limb>> {
     let ys_len = ys.len();
     let mut result = xs.to_vec();
-    let borrow = limbs_sub_mul_limb_same_length_in_place_left(&mut result[..ys_len], ys, limb);
+    let borrow = limbs_sub_mul_limb_same_length_in_place_left(&mut result[..ys_len], ys, z);
     if borrow == 0 {
         Some(result)
     } else if xs.len() == ys_len || limbs_sub_limb_in_place(&mut result[ys_len..], borrow) {
@@ -51,8 +49,8 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Optio
     }
 }
 
-/// Given the equal-length limbs of two `Natural`s a and b, and a limb c, calculates a - b * c and
-/// writes the limbs of the result to the first (left) input slice. If b * c > a, a nonzero borrow
+/// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
+/// writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow
 /// is returned.
 ///
 /// Time: worst case O(n)
@@ -82,25 +80,20 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], limb: Limb) -> Optio
 /// ```
 ///
 /// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
-pub fn limbs_sub_mul_limb_same_length_in_place_left(
-    xs: &mut [Limb],
-    ys: &[Limb],
-    limb: Limb,
-) -> Limb {
+pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb], z: Limb) -> Limb {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = 0;
-    let double_limb = DoubleLimb::from(limb);
+    let z = DoubleLimb::from(z);
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
-        let (upper, mut lower) = (DoubleLimb::from(y) * double_limb).split_in_half();
+        let (upper, mut lower) = (DoubleLimb::from(y) * z).split_in_half();
         lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);
         } else {
             borrow = upper;
         }
-        let limb = *x;
-        lower = limb.wrapping_sub(lower);
-        if lower > limb {
+        lower = x.wrapping_sub(lower);
+        if lower > *x {
             borrow.wrapping_add_assign(1);
         }
         *x = lower;
@@ -108,8 +101,8 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(
     borrow
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, calculates a - b * c and writes the
-/// limbs of the result to the first (left) input slice. If b * c > a, a nonzero borrow is returned.
+/// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
+/// limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is returned.
 ///
 /// Time: worst case O(n)
 ///
@@ -149,8 +142,8 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
     }
 }
 
-/// Given the equal-length limbs of two `Natural`s a and b, and a limb c, calculates a - b * c and
-/// writes the limbs of the result to the second (right) input slice. If b * c > a, a nonzero borrow
+/// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
+/// writes the limbs of the result to the second (right) input slice. If y * z > x, a nonzero borrow
 /// is returned.
 ///
 /// Time: worst case O(n)
@@ -185,22 +178,21 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 pub fn limbs_sub_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
-    limb: Limb,
+    z: Limb,
 ) -> Limb {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = 0;
-    let double_limb = DoubleLimb::from(limb);
+    let z = DoubleLimb::from(z);
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
-        let (upper, mut lower) = (DoubleLimb::from(*y) * double_limb).split_in_half();
+        let (upper, mut lower) = (DoubleLimb::from(*y) * z).split_in_half();
         lower.wrapping_add_assign(borrow);
         if lower < borrow {
             borrow = upper.wrapping_add(1);
         } else {
             borrow = upper;
         }
-        let limb = x;
-        lower = limb.wrapping_sub(lower);
-        if lower > limb {
+        lower = x.wrapping_sub(lower);
+        if lower > x {
             borrow.wrapping_add_assign(1);
         }
         *y = lower;
@@ -208,8 +200,8 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
     borrow
 }
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, calculates a - b * c and writes the
-/// limbs of the result to the second (right) input `Vec`. If b * c > a, a nonzero borrow is
+/// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
+/// limbs of the result to the second (right) input `Vec`. If y * z > x, a nonzero borrow is
 /// returned.
 ///
 /// Time: worst case O(n)
@@ -241,14 +233,10 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
 /// negative, and the result is written to the second input rather than the first.
-pub fn limbs_sub_mul_limb_greater_in_place_right(
-    xs: &[Limb],
-    ys: &mut Vec<Limb>,
-    limb: Limb,
-) -> Limb {
+pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) -> Limb {
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at(ys_len);
-    let borrow = limbs_sub_mul_limb_same_length_in_place_right(xs_lo, ys, limb);
+    let borrow = limbs_sub_mul_limb_same_length_in_place_right(xs_lo, ys, z);
     if xs_hi.is_empty() {
         borrow
     } else {
@@ -263,8 +251,8 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(
     }
 }
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, returns the limbs of
-/// a - b * c. If a < b * c, `None` is returned. `ys` and `zs` should have length at least 2, and
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
+/// x - y * z. If x < y * z, `None` is returned. `ys` and `zs` should have length at least 2, and
 /// the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the latter condition is
 /// false, the result would be `None` and there's no point in calling this function). None of the
 /// slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
@@ -300,9 +288,9 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
     }
 }
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s a, b, and c, computes a - b * c. The
-/// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if a <
-/// b * c, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
+/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x - y * z. The
+/// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if
+/// x < y * z, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
 /// length at least 2, and the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the
 /// latter condition is false, the result would be negative and there would be no point in calling
 /// this function). None of the slices should have any trailing zeros. The result, if it exists,
@@ -354,17 +342,17 @@ fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
 impl SubMul<Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self`, b, and c by value.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
+    /// taking `self`, y, and z by value.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -383,8 +371,8 @@ impl SubMul<Natural, Natural> for Natural {
     ///     "995705032704"
     /// );
     /// ```
-    fn sub_mul(self, b: Natural, c: Natural) -> Natural {
-        self.checked_sub_mul(b, c)
+    fn sub_mul(self, y: Natural, z: Natural) -> Natural {
+        self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
@@ -392,17 +380,17 @@ impl SubMul<Natural, Natural> for Natural {
 impl<'a> SubMul<Natural, &'a Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self` and b by value and c by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
+    /// taking `self` and y by value and z by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -422,8 +410,8 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     ///     "995705032704"
     /// );
     /// ```
-    fn sub_mul(self, b: Natural, c: &'a Natural) -> Natural {
-        self.checked_sub_mul(b, c)
+    fn sub_mul(self, y: Natural, z: &'a Natural) -> Natural {
+        self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
@@ -431,17 +419,17 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
 impl<'a> SubMul<&'a Natural, Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self` and c value and b by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
+    /// taking `self` and z value and y by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -460,8 +448,8 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     ///     "995705032704"
     /// );
     /// ```
-    fn sub_mul(self, b: &'a Natural, c: Natural) -> Natural {
-        self.checked_sub_mul(b, c)
+    fn sub_mul(self, y: &'a Natural, z: Natural) -> Natural {
+        self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
@@ -469,17 +457,17 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
 impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self` by value and b and c by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
+    /// taking `self` by value and y and z by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -499,8 +487,8 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     ///     "995705032704"
     /// );
     /// ```
-    fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        self.checked_sub_mul(b, c)
+    fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+        self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
     }
 }
@@ -508,17 +496,17 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
 impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     type Output = Natural;
 
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), taking
-    /// `self`, b, and c by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`),
+    /// taking `self`, y, and z by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -538,25 +526,25 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     "995705032704"
     /// );
     /// ```
-    fn sub_mul(self, b: &'a Natural, c: &'b Natural) -> Natural {
-        self.checked_sub_mul(b, c).unwrap_or_else(|| {
-            sub_mul_panic(self, b, c);
+    fn sub_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
+        self.checked_sub_mul(y, z).unwrap_or_else(|| {
+            sub_mul_panic(self, y, z);
         })
     }
 }
 
 impl SubMulAssign<Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
-    /// place, taking b and c by value.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
+    /// place, taking y and z by value.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -574,25 +562,25 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// x.sub_mul_assign(Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
-    fn sub_mul_assign(&mut self, b: Natural, c: Natural) {
-        if self.sub_mul_assign_no_panic(b, c) {
+    fn sub_mul_assign(&mut self, y: Natural, z: Natural) {
+        if self.sub_mul_assign_no_panic(y, z) {
             panic!("Natural sub_mul_assign cannot have a negative result");
         }
     }
 }
 
 impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
-    /// place, taking b by value and c by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
+    /// place, taking y by value and z by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -610,25 +598,25 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// x.sub_mul_assign(Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
-    fn sub_mul_assign(&mut self, b: Natural, c: &'a Natural) {
-        if self.sub_mul_assign_val_ref_no_panic(b, c) {
+    fn sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
+        if self.sub_mul_assign_val_ref_no_panic(y, z) {
             panic!("Natural sub_mul_assign cannot have a negative result");
         }
     }
 }
 
 impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
-    /// place, taking b by reference and c by value.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
+    /// place, taking y by reference and z by value.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -646,25 +634,25 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// x.sub_mul_assign(&Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
-    fn sub_mul_assign(&mut self, b: &'a Natural, c: Natural) {
-        if self.sub_mul_assign_ref_val_no_panic(b, c) {
+    fn sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
+        if self.sub_mul_assign_ref_val_no_panic(y, z) {
             panic!("Natural sub_mul_assign cannot have a negative result");
         }
     }
 }
 
 impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
-    /// Subtracts the product of a `Natural` (b) and a `Natural` (c) from a `Natural` (self), in
-    /// place, taking b and c by reference.
+    /// Subtracts the product of a `Natural` (y) and a `Natural` (z) from a `Natural` (`self`), in
+    /// place, taking y and z by reference.
     ///
     /// Time: O(n * log(n) * log(log(n)))
     ///
     /// Additional memory: O(n * log(n))
     ///
-    /// where n = max(`b.significant_bits()`, `zs.significant_bits()`)
+    /// where n = max(`y.significant_bits()`, `z.significant_bits()`)
     ///
     /// # Panics
-    /// Panics if `b * c` is greater than `self`.
+    /// Panics if `y * z` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -682,8 +670,8 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// x.sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
-    fn sub_mul_assign(&mut self, b: &'a Natural, c: &'b Natural) {
-        if self.sub_mul_assign_ref_ref_no_panic(b, c) {
+    fn sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {
+        if self.sub_mul_assign_ref_ref_no_panic(y, z) {
             panic!("Natural sub_mul_assign cannot have a negative result");
         }
     }

@@ -17,6 +17,8 @@ use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 
+//TODO clean
+
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {
         // Returns whether `n` > `$f::MAX_FINITE`.

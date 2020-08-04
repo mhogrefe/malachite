@@ -5,8 +5,7 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 
-#[inline]
-pub fn _overflowing_add_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
+fn _overflowing_add_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
 where
     T: OverflowingAdd<T, Output = T> + OverflowingMul<T, Output = T>,
 {
@@ -72,7 +71,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-pub fn _overflowing_add_mul_signed<U: PrimitiveInteger, S: Copy + Eq + Ord + Zero>(
+fn _overflowing_add_mul_signed<U: PrimitiveInteger, S: Copy + Eq + Ord + Zero>(
     x: S,
     y: S,
     z: S,
