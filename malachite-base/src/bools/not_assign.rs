@@ -3,7 +3,7 @@ use num::logic::traits::NotAssign;
 impl NotAssign for bool {
     /// Replaces a `bool` by its opposite.
     ///
-    /// `b.not_assign()` is equivalent to `b = !b`.
+    /// $b_\mathrm{after}=\lnot b_\mathrm{before}$
     ///
     /// # Examples
     /// ```

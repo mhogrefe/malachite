@@ -59,3 +59,4 @@ pub const SQR_TOOM2_THRESHOLD: usize = 222;
 pub const SQR_TOOM3_THRESHOLD: usize = 205;
 pub const SQR_TOOM4_THRESHOLD: usize = 1170;
 pub const SQR_TOOM6_THRESHOLD: usize = 512;
+pub const SQR_TOOM8_THRESHOLD: usize = 644;

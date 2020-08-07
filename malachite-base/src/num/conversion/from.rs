@@ -1,11 +1,10 @@
-use std::num::ParseIntError;
-
 use comparison::traits::{Max, Min};
 use num::basic::traits::Zero;
 use num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
     WrappingFrom,
 };
+use std::num::ParseIntError;
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {

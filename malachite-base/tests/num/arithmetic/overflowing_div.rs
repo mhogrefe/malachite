@@ -1,6 +1,6 @@
-use malachite_base::num::arithmetic::traits::OverflowingDivAssign;
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 
 #[test]
 fn test_overflowing_div() {
@@ -20,24 +20,11 @@ fn test_overflowing_div() {
     test::<i8>(-128, -1, -128, true);
 }
 
-macro_rules! overflowing_div_assign_fail {
-    ($t:ident, $overflowing_div_assign_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $overflowing_div_assign_fail() {
-            $t::ONE.overflowing_div_assign(0);
-        }
-    };
+fn overflowing_div_assign_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.overflowing_div_assign(T::ZERO));
 }
-overflowing_div_assign_fail!(u8, overflowing_div_assign_u8_fail);
-overflowing_div_assign_fail!(u16, overflowing_div_assign_u16_fail);
-overflowing_div_assign_fail!(u32, overflowing_div_assign_u32_fail);
-overflowing_div_assign_fail!(u64, overflowing_div_assign_u64_fail);
-overflowing_div_assign_fail!(u128, overflowing_div_assign_u128_fail);
-overflowing_div_assign_fail!(usize, overflowing_div_assign_usize_fail);
-overflowing_div_assign_fail!(i8, overflowing_div_assign_i8_fail);
-overflowing_div_assign_fail!(i16, overflowing_div_assign_i16_fail);
-overflowing_div_assign_fail!(i32, overflowing_div_assign_i32_fail);
-overflowing_div_assign_fail!(i64, overflowing_div_assign_i64_fail);
-overflowing_div_assign_fail!(i128, overflowing_div_assign_i128_fail);
-overflowing_div_assign_fail!(isize, overflowing_div_assign_isize_fail);
+
+#[test]
+fn overflowing_div_assign_fail() {
+    apply_fn_to_primitive_ints!(overflowing_div_assign_fail_helper);
+}

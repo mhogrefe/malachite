@@ -33,6 +33,14 @@ extern crate rand_chacha;
 extern crate sha3;
 
 #[macro_export]
+macro_rules! assert_panic {
+    ($e: expr) => {
+        let result = catch_unwind(|| $e);
+        assert!(result.is_err());
+    };
+}
+
+#[macro_export]
 macro_rules! apply_to_unsigneds {
     ($m: tt) => {
         $m!(u8);
@@ -120,6 +128,7 @@ macro_rules! apply_fn_to_unsigned_signed_pair {
     };
 }
 
+/// This module contains the `Named` trait, for getting a type's name.
 #[macro_use]
 pub mod named;
 
@@ -131,6 +140,7 @@ pub mod bools;
 pub mod chars;
 /// This module contains macros and traits related to comparing values.
 pub mod comparison;
+/// This module contains functions and adaptors for iterators.
 pub mod iterators;
 pub mod num;
 pub mod orderings;

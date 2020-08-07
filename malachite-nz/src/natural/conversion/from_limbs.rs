@@ -4,7 +4,7 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-// Returns the length of `limbs`, excluding trailing zeros.
+// Returns the length of `xs`, excluding trailing zeros.
 fn limbs_significant_length(xs: &[Limb]) -> usize {
     xs.iter()
         .enumerate()
@@ -14,17 +14,17 @@ fn limbs_significant_length(xs: &[Limb]) -> usize {
 }
 
 impl Natural {
-    /// Converts a slice of limbs to a `Natural`, in ascending
-    /// order, so that less significant limbs have lower indices in the input slice.
+    /// Converts a slice of limbs to a `Natural`, in ascending order, so that less significant limbs
+    /// have lower indices in the input slice.
     ///
-    /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
-    /// `from_owned_limbs_asc` is more efficient.
+    /// This function borrows `xs`. If taking ownership of `xs` is possible, `from_owned_limbs_asc`
+    /// is more efficient.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// This method is more efficient than `Natural::from_limbs_desc`.
     ///
@@ -46,17 +46,17 @@ impl Natural {
         }
     }
 
-    /// Converts a slice of limbs to a `Natural`, in descending
-    /// order, so that less significant limbs have higher indices in the input slice.
+    /// Converts a slice of limbs to a `Natural`, in descending order, so that less significant
+    /// limbs have higher indices in the input slice.
     ///
-    /// This function borrows `limbs`. If taking ownership of `limbs` is possible,
-    /// `from_owned_limbs_desc` is more efficient.
+    /// This function borrows `xs`. If taking ownership of `xs` is possible, `from_owned_limbs_desc`
+    /// is more efficient.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(n)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// This method is less efficient than `Natural::from_limbs_asc`.
     ///
@@ -73,17 +73,17 @@ impl Natural {
         Natural::from_limbs_asc(&xs.iter().cloned().rev().collect::<Vec<Limb>>())
     }
 
-    /// Converts a `Vec` of limbs to a `Natural`, in ascending
-    /// order, so that less significant limbs have lower indices in the input `Vec`.
+    /// Converts a `Vec` of limbs to a `Natural`, in ascending order, so that less significant limbs
+    /// have lower indices in the input `Vec`.
     ///
-    /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
+    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
     /// `from_limbs_asc`.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// This method is more efficient than `Natural::from_limbs_desc`.
     ///
@@ -109,17 +109,17 @@ impl Natural {
         }
     }
 
-    /// Converts a `Vec` of limbs to a `Natural`, in descending
-    /// order, so that less significant limbs have higher indices in the input `Vec`.
+    /// Converts a `Vec` of limbs to a `Natural`, in descending order, so that less significant
+    /// limbs have higher indices in the input `Vec`.
     ///
-    /// This function takes ownership of `limbs`. If it's necessary to borrow `limbs` instead, use
+    /// This function takes ownership of `xs`. If it's necessary to borrow `xs` instead, use
     /// `from_limbs_desc`.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `limbs.len()`
+    /// where n = `xs.len()`
     ///
     /// This method is less efficient than `Natural::from_limbs_asc`.
     ///

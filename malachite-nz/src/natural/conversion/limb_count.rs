@@ -4,8 +4,7 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 
 impl Natural {
-    /// Returns the number of limbs of a `Natural`. Zero has 0
-    /// limbs.
+    /// Returns the number of limbs of a `Natural`. Zero has 0 limbs.
     ///
     /// Time: worst case O(1)
     ///

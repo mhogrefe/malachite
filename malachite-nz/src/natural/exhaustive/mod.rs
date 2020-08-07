@@ -2,7 +2,10 @@ use malachite_base::num::basic::traits::{One, Zero};
 
 use natural::Natural;
 
-/// Generates all `Natural`s in a finite interval, in ascending order.
+/// Generates all `Natural`s in an interval.
+///
+/// This `struct` is created by the `exhaustive_natural_range` and
+/// `exhaustive_natural_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRange {
     a: Natural,
@@ -34,15 +37,25 @@ impl DoubleEndedIterator for ExhaustiveNaturalRange {
     }
 }
 
-/// Generates all `Natural`s in the half-open interval [`a`, `b`), in ascending order. `a` must be
-/// less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate all
-/// `Natural`s in an infinite interval, use `exhaustive_natural_range_to_infinity`.
+/// Generates all `Natural`s in the half-open interval $[a, b)$, in ascending order.
 ///
-/// Length is `b` - `a`.
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate
+/// all `Natural`s in an infinite interval, use `exhaustive_natural_range_to_infinity`.
 ///
-/// Time for the ith iteration: worst case O(i)
+/// The output is $(k)_{k=a}^{b-1}$.
 ///
-/// Additional memory for the ith iteration: amortized O(1)
+/// The output length is $b - a$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the least-significant limb of the previously-generated value is
+/// `Limb::MAX`, the worst case space and time complexities are constant.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -70,7 +83,60 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
     ExhaustiveNaturalRange { a, b }
 }
 
+/// Generates all `Natural`s in the closed interval $[a, b]$, in ascending order.
+///
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range contains a single
+/// element. To generate all `Natural`s in an infinite interval, use
+/// `exhaustive_natural_range_to_infinity`.
+///
+/// The output is $(k)_{k=a}^{b}$.
+///
+/// The output length is $b - a + 1$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the least-significant limb of the previously-generated value is
+/// `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::conversion::traits::ExactFrom;
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(
+///     exhaustive_natural_inclusive_range(Natural::exact_from(5), Natural::exact_from(10))
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[5, 6, 7, 8, 9, 10]"
+/// )
+/// ```
+#[inline]
+pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveNaturalRange {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    ExhaustiveNaturalRange {
+        a,
+        b: b + Natural::ONE,
+    }
+}
+
 /// Generates all `Natural`s greater than or equal to some `Natural`, in ascending order.
+///
+/// This `struct` is created by the `exhaustive_natural_range_to_infinity` method. See its
+/// documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRangeToInfinity {
     a: Natural,
@@ -88,11 +154,20 @@ impl Iterator for ExhaustiveNaturalRangeToInfinity {
 
 /// Generates all `Natural`s greater than or equal to `a`, in ascending order.
 ///
-/// Length is infinite.
+/// The output is $(k)_{k=a}^{\infty}$.
 ///
-/// Time for the ith iteration: worst case O(i)
+/// The output length is infinite.
 ///
-/// Additional memory for the ith iteration: amortized O(1)
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the least-significant limb of the previously-generated value is
+/// `Limb::MAX`, the worst case space and time complexities are constant.
 ///
 /// # Examples
 /// ```
@@ -116,11 +191,20 @@ pub const fn exhaustive_natural_range_to_infinity(a: Natural) -> ExhaustiveNatur
 
 /// Generates all `Natural`s in ascending order.
 ///
-/// Length is infinite.
+/// The output is $(k)_{k=0}^{\infty}$.
 ///
-/// Time for the ith iteration: worst case O(i)
+/// The output length is infinite.
 ///
-/// Additional memory for the ith iteration: amortized O(1)
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the least-significant limb of the previously-generated value is
+/// `Limb::MAX`, the worst case space and time complexities are constant.
 ///
 /// # Examples
 /// ```
@@ -141,11 +225,20 @@ pub const fn exhaustive_naturals() -> ExhaustiveNaturalRangeToInfinity {
 
 /// Generates all positive `Natural`s in ascending order.
 ///
-/// Length is infinite.
+/// The output is $(k)_{k=1}^{\infty}$.
 ///
-/// Time for the ith iteration: worst case O(i)
+/// The output length is infinite.
 ///
-/// Additional memory for the ith iteration: amortized O(1)
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the least-significant limb of the previously-generated value is
+/// `Limb::MAX`, the worst case space and time complexities are constant.
 ///
 /// # Examples
 /// ```

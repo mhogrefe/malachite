@@ -1,13 +1,14 @@
-use std::iter::Rev;
-use std::iter::{once, Chain, Once};
-
 use itertools::{Interleave, Itertools};
-
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
+use std::iter::Rev;
+use std::iter::{once, Chain, Once};
 
-/// Generates all values of a primitive integer type in an interval, in ascending order.
+/// Generates all primitive integers in an interval.
+///
+/// This `struct` is created by the `primitive_integer_increasing_range` and
+/// `primitive_integer_increasing_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveIntegerIncreasingRange<T: PrimitiveInteger> {
     a: Option<T>,
@@ -43,16 +44,22 @@ impl<T: PrimitiveInteger> DoubleEndedIterator for PrimitiveIntegerIncreasingRang
     }
 }
 
-/// Generates all values of a primitive integer type in the half-open interval [`a`, `b`), in
-/// ascending order. `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is
-/// empty. This function cannot create a range that includes `T::MAX`; for that, use
-/// `primitive_integer_increasing_range_to_max`.
+/// Generates all primitive integers in the half-open interval $[a, b)$, in ascending order.
 ///
-/// Length is `b` - `a`.
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. This
+/// function cannot create a range that includes `T::MAX`; for that, use
+/// `primitive_integer_increasing_inclusive_range`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output is $(k)_{k=a}^{b-1}$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $b - a$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -80,36 +87,53 @@ pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
     }
 }
 
-/// Generates all values of a primitive integer type in the closed interval [`a`, `T::MAX`], in
-/// ascending order.
+/// Generates all primitive integers in the closed interval $[a, b]$, in ascending order.
 ///
-/// Length is 2<sup>`T::WIDTH`</sup> - `a`.
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range contains a single
+/// element.
 ///
-/// Time: worst case O(1) per iteration
+/// The output is $(k)_{k=a}^{b}$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $b - a + 1$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::exhaustive::primitive_integer_increasing_range_to_max;
+/// use malachite_base::num::exhaustive::primitive_integer_increasing_inclusive_range;
 ///
 /// assert_eq!(
-///     primitive_integer_increasing_range_to_max::<i8>(120).collect::<Vec<_>>(),
-///     &[120, 121, 122, 123, 124, 125, 126, 127]
+///     primitive_integer_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 /// )
 /// ```
 #[inline]
-pub fn primitive_integer_increasing_range_to_max<T: PrimitiveInteger>(
+pub fn primitive_integer_increasing_inclusive_range<T: PrimitiveInteger>(
     a: T,
+    b: T,
 ) -> PrimitiveIntegerIncreasingRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
     PrimitiveIntegerIncreasingRange {
         a: Some(a),
-        b: None,
+        b: b.checked_add(T::ONE),
     }
 }
 
 /// Generates all values of a signed integer type in an interval, in order of ascending absolute
-/// value. When two numbers have the same absolute value, the positive one comes first.
+/// value.
+///
+/// This `struct` is created by the `exhaustive_signed_range` and
+/// `exhaustive_signed_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveSignedRange<T: PrimitiveSigned> {
     NonNegative(PrimitiveIntegerIncreasingRange<T>),
@@ -129,17 +153,25 @@ impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
     }
 }
 
-/// Generates all values of a signed integer type in the half-open interval [`a`, `b`), in order of
-/// ascending absolute value. When two numbers have the same absolute value, the positive one comes
-/// first. `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. This
-/// function cannot create a range that includes `T::MAX`; for that, use
-/// `exhaustive_signed_range_to_max`.
+/// Generates all signed integers in the half-open interval $[a, b)$, in order of ascending absolute
+/// value.
 ///
-/// Length is `b` - `a`.
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range is empty. This function cannot create
+/// a range that includes `T::MAX`; for that, use `exhaustive_signed_inclusive_range`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a)$ and $i < j$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $b - a$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -171,45 +203,71 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
     }
 }
 
-/// Generates all values of a signed integer type in the closed interval [`a`, `T::MAX`], in order
-/// of ascending absolute value. When two numbers have the same absolute value, the positive one
-/// comes first.
+/// Generates all signed integers in the closed interval $[a, b]$, in order of ascending absolute
+/// value.
 ///
-/// Length is 2<sup>`T::WIDTH`</sup> - `a`.
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range contains a single element.
 ///
-/// Time: worst case O(1) per iteration
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a]$ and $i < j$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $b - a + 1$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::exhaustive::exhaustive_signed_range_to_max;
+/// use malachite_base::num::exhaustive::exhaustive_signed_inclusive_range;
 ///
 /// assert_eq!(
-///     exhaustive_signed_range_to_max::<i8>(-2).take(10).collect::<Vec<_>>(),
-///     &[0, 1, -1, 2, -2, 3, 4, 5, 6, 7]
+///     exhaustive_signed_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
 /// )
 /// ```
-pub fn exhaustive_signed_range_to_max<T: PrimitiveSigned>(a: T) -> ExhaustiveSignedRange<T> {
+pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
+    a: T,
+    b: T,
+) -> ExhaustiveSignedRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
     if a >= T::ZERO {
-        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_range_to_max(a))
+        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_inclusive_range(a, b))
+    } else if b <= T::ZERO {
+        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_inclusive_range(a, b).rev())
     } else {
         ExhaustiveSignedRange::BothSigns(
             once(T::ZERO).chain(
-                primitive_integer_increasing_range_to_max(T::ONE)
-                    .interleave(primitive_integer_increasing_range(a, T::ZERO).rev()),
+                primitive_integer_increasing_inclusive_range(T::ONE, b).interleave(
+                    primitive_integer_increasing_inclusive_range(a, T::NEGATIVE_ONE).rev(),
+                ),
             ),
         )
     }
 }
 
-/// Generates all values of an unsigned integer type, in ascending order.
+/// Generates all unsigned integers in ascending order.
 ///
-/// Length is 2 ^ `T::WIDTH`.
+/// The output is $(k)_{k=0}^{2^W-1}$, where $W$ is `T::WIDTH`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output length is $2^W$, where $W$ is `T::WIDTH`.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -222,16 +280,23 @@ pub fn exhaustive_signed_range_to_max<T: PrimitiveSigned>(a: T) -> ExhaustiveSig
 /// ```
 #[inline]
 pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_range_to_max(T::ZERO)
+    primitive_integer_increasing_inclusive_range(T::ZERO, T::MAX)
 }
 
-/// Generates all positive values of a primitive integer type, in ascending order.
+/// Generates all positive primitive integers in ascending order.
 ///
-/// Length is 2 ^ `T::WIDTH` - 1 if `T` is unsigned, and 2 ^ (`T::WIDTH` - 1) - 1 if `T` is signed.
+/// Let $L=2^W-1$ if `T` is unsigned and $L=2^{W-1}-1$ if `T` is signed, where $W$ is `T::WIDTH`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output is $(k)_{k=1}^{L}$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $L$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -244,20 +309,29 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntegerIncreasin
 /// ```
 #[inline]
 pub fn exhaustive_positive_primitives<T: PrimitiveInteger>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_range_to_max(T::ONE)
+    primitive_integer_increasing_inclusive_range(T::ONE, T::MAX)
 }
 
+#[doc(hidden)]
 pub type PrimitiveIntegerUpDown<T> =
     Interleave<PrimitiveIntegerIncreasingRange<T>, Rev<PrimitiveIntegerIncreasingRange<T>>>;
 
-/// Generates all values of a signed integer type, in order of ascending absolute value. When two
-/// numbers have the same absolute value, the positive one comes first.
+/// Generates all signed integers in order of ascending absolute value.
 ///
-/// Length is 2 ^ `T::WIDTH`.
+/// When two numbers have the same absolute value, the positive one comes first.
 ///
-/// Time: worst case O(1) per iteration
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [-2^{W-1}, 2^{W-1})$, where $W$ is `T::WIDTH`, and $i < j$.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// The output length is $2^W$, where $W$ is `T::WIDTH`.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -273,13 +347,18 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveInteg
     once(T::ZERO).chain(exhaustive_nonzero_signeds())
 }
 
-/// Generates all natural values of a signed integer type, in ascending order.
+/// Generates all natural (non-negative) signed integers in ascending order.
 ///
-/// Length is 2 ^ (`T::WIDTH` - 1).
+/// The output is $(k)_{k=0}^{2^{W-1}-1}$, where $W$ is `T::WIDTH`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -292,16 +371,21 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveInteg
 /// ```
 #[inline]
 pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_range_to_max(T::ZERO)
+    primitive_integer_increasing_inclusive_range(T::ZERO, T::MAX)
 }
 
-/// Generates all negative values of a signed integer type, in descending order.
+/// Generates all negative signed integers in descending order.
 ///
-/// Length is 2 ^ (`T::WIDTH` - 1).
+/// The output is $(-k)_{k=1}^{2^{W-1}}$, where $W$ is `T::WIDTH`.
 ///
-/// Time: worst case O(1) per iteration
+/// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -318,14 +402,22 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveInteger
     primitive_integer_increasing_range(T::MIN, T::ZERO).rev()
 }
 
-/// Generates all nonzero values of a signed integer type, in order of ascending absolute value.
+/// Generates all nonzero signed integers in order of ascending absolute value.
+///
 /// When two numbers have the same absolute value, the positive one comes first.
 ///
-/// Length is 2 ^ `T::WIDTH` - 1.
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [-2^{W-1}, 2^{W-1}) \\setminus \\{0\\}$, where $W$ is `T::WIDTH`, and $i < j$.
 ///
-/// Time: worst case O(1) per iteration
+/// The output length is $2^W-1$, where $W$ is `T::WIDTH`.
 ///
-/// Additional memory: worst case O(1) per iteration
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```

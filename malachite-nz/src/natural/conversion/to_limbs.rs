@@ -181,9 +181,8 @@ impl<'a> Index<usize> for LimbIterator<'a> {
 }
 
 impl Natural {
-    /// Returns the limbs of a `Natural`, in ascending order, so
-    /// that less significant limbs have lower indices in the output vector. There are no trailing
-    /// zero limbs.
+    /// Returns the limbs of a `Natural`, in ascending order, so that less significant limbs have
+    /// lower indices in the output vector. There are no trailing zero limbs.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible, `into_limbs_asc` is
     /// more efficient.
@@ -217,9 +216,8 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in descending order, so
-    /// that less significant limbs have higher indices in the output vector. There are no leading
-    /// zero limbs.
+    /// Returns the limbs of a `Natural`, in descending order, so that less significant limbs have
+    /// higher indices in the output vector. There are no leading zero limbs.
     ///
     /// This function borrows `self`. If taking ownership of `self` is possible, `into_limbs_desc`
     /// is more efficient.
@@ -253,9 +251,8 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in ascending order, so
-    /// that less significant limbs have lower indices in the output vector. There are no trailing
-    /// zero limbs.
+    /// Returns the limbs of a `Natural`, in ascending order, so that less significant limbs have
+    /// lower indices in the output vector. There are no trailing zero limbs.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// `to_limbs_asc`.
@@ -287,9 +284,8 @@ impl Natural {
         }
     }
 
-    /// Returns the limbs of a `Natural`, in descending order, so
-    /// that less significant limbs have higher indices in the output vector. There are no leading
-    /// zero limbs.
+    /// Returns the limbs of a `Natural`, in descending order, so that less significant limbs have
+    /// higher indices in the output vector. There are no leading zero limbs.
     ///
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// `to_limbs_desc`.
@@ -326,9 +322,9 @@ impl Natural {
         }
     }
 
-    /// Returns a double-ended iterator over the limbs of a
-    /// `Natural`. The forward order is ascending, so that less significant limbs appear first.
-    /// There are no trailing zero limbs going forward, or leading zeros going backward.
+    /// Returns a double-ended iterator over the limbs of a `Natural`. The forward order is
+    /// ascending, so that less significant limbs appear first. There are no trailing zero limbs
+    /// going forward, or leading zeros going backward.
     ///
     /// If it's necessary to get a `Vec` of all the limbs, consider using `to_limbs_asc`,
     /// `to_limbs_desc`, `into_limbs_asc`, or `into_limbs_desc` instead.

@@ -1,9 +1,7 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem,
-};
+use std::panic::catch_unwind;
+
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
@@ -103,70 +101,6 @@ fn test_div_mod_and_div_rem_unsigned() {
     test::<u128>(0, 1_000_000_000_000_000_000_000_000, 0, 0);
     test::<u128>(123, 1_000_000_000_000_000_000_000_000, 0, 123);
 }
-
-macro_rules! div_mod_unsigned_fail {
-    ($t:ident, $div_mod_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_mod_unsigned_fail() {
-            $t::ONE.div_mod(0);
-        }
-    };
-}
-div_mod_unsigned_fail!(u8, div_mod_unsigned_u8_fail);
-div_mod_unsigned_fail!(u16, div_mod_unsigned_u16_fail);
-div_mod_unsigned_fail!(u32, div_mod_unsigned_u32_fail);
-div_mod_unsigned_fail!(u64, div_mod_unsigned_u64_fail);
-div_mod_unsigned_fail!(u128, div_mod_unsigned_u128_fail);
-div_mod_unsigned_fail!(usize, div_mod_unsigned_usize_fail);
-
-macro_rules! div_assign_mod_unsigned_fail {
-    ($t:ident, $div_assign_mod_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_assign_mod_unsigned_fail() {
-            $t::ONE.div_assign_mod(0);
-        }
-    };
-}
-div_assign_mod_unsigned_fail!(u8, div_assign_mod_unsigned_u8_fail);
-div_assign_mod_unsigned_fail!(u16, div_assign_mod_unsigned_u16_fail);
-div_assign_mod_unsigned_fail!(u32, div_assign_mod_unsigned_u32_fail);
-div_assign_mod_unsigned_fail!(u64, div_assign_mod_unsigned_u64_fail);
-div_assign_mod_unsigned_fail!(u128, div_assign_mod_unsigned_u128_fail);
-div_assign_mod_unsigned_fail!(usize, div_assign_mod_unsigned_usize_fail);
-
-macro_rules! div_rem_unsigned_fail {
-    ($t:ident, $div_rem_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_rem_unsigned_fail() {
-            $t::ONE.div_rem(0);
-        }
-    };
-}
-div_rem_unsigned_fail!(u8, div_rem_unsigned_u8_fail);
-div_rem_unsigned_fail!(u16, div_rem_unsigned_u16_fail);
-div_rem_unsigned_fail!(u32, div_rem_unsigned_u32_fail);
-div_rem_unsigned_fail!(u64, div_rem_unsigned_u64_fail);
-div_rem_unsigned_fail!(u128, div_rem_unsigned_u128_fail);
-div_rem_unsigned_fail!(usize, div_rem_unsigned_usize_fail);
-
-macro_rules! div_assign_rem_unsigned_fail {
-    ($t:ident, $div_assign_rem_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_assign_rem_unsigned_fail() {
-            $t::ONE.div_assign_rem(0);
-        }
-    };
-}
-div_assign_rem_unsigned_fail!(u8, div_assign_rem_unsigned_u8_fail);
-div_assign_rem_unsigned_fail!(u16, div_assign_rem_unsigned_u16_fail);
-div_assign_rem_unsigned_fail!(u32, div_assign_rem_unsigned_u32_fail);
-div_assign_rem_unsigned_fail!(u64, div_assign_rem_unsigned_u64_fail);
-div_assign_rem_unsigned_fail!(u128, div_assign_rem_unsigned_u128_fail);
-div_assign_rem_unsigned_fail!(usize, div_assign_rem_unsigned_usize_fail);
 
 #[test]
 fn test_div_mod_signed() {
@@ -510,77 +444,21 @@ fn test_div_mod_signed() {
     test::<i128>(-123, -1_000_000_000_000_000_000_000_000, 0, -123);
 }
 
-macro_rules! div_mod_signed_fail {
-    ($t:ident, $div_mod_signed_fail_1:ident, $div_mod_signed_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_mod_signed_fail_1() {
-            $t::ONE.div_mod(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_mod_signed_fail_2() {
-            $t::MIN.div_mod(-1);
-        }
-    };
+fn div_mod_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.div_mod(T::ZERO));
+    assert_panic!(T::ONE.div_assign_mod(T::ZERO));
 }
-div_mod_signed_fail!(i8, div_mod_signed_i8_fail_1, div_mod_signed_i8_fail_2);
-div_mod_signed_fail!(i16, div_mod_signed_i16_fail_1, div_mod_signed_i16_fail_2);
-div_mod_signed_fail!(i32, div_mod_signed_i32_fail_1, div_mod_signed_i32_fail_2);
-div_mod_signed_fail!(i64, div_mod_signed_i64_fail_1, div_mod_signed_i64_fail_2);
-div_mod_signed_fail!(i128, div_mod_signed_i128_fail_1, div_mod_signed_i128_fail_2);
-div_mod_signed_fail!(
-    isize,
-    div_mod_signed_isize_fail_1,
-    div_mod_signed_isize_fail_2
-);
 
-macro_rules! div_assign_mod_signed_fail {
-    ($t:ident, $div_assign_mod_signed_fail_1:ident, $div_assign_mod_signed_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_assign_mod_signed_fail_1() {
-            $t::ONE.div_assign_mod(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_assign_mod_signed_fail_2() {
-            $t::MIN.div_assign_mod(-1);
-        }
-    };
+fn div_mod_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::MIN.div_mod(T::NEGATIVE_ONE));
+    assert_panic!(T::MIN.div_assign_mod(T::NEGATIVE_ONE));
 }
-div_assign_mod_signed_fail!(
-    i8,
-    div_assign_mod_signed_i8_fail_1,
-    div_assign_mod_signed_i8_fail_2
-);
-div_assign_mod_signed_fail!(
-    i16,
-    div_assign_mod_signed_i16_fail_1,
-    div_assign_mod_signed_i16_fail_2
-);
-div_assign_mod_signed_fail!(
-    i32,
-    div_assign_mod_signed_i32_fail_1,
-    div_assign_mod_signed_i32_fail_2
-);
-div_assign_mod_signed_fail!(
-    i64,
-    div_assign_mod_signed_i64_fail_1,
-    div_assign_mod_signed_i64_fail_2
-);
-div_assign_mod_signed_fail!(
-    i128,
-    div_assign_mod_signed_i128_fail_1,
-    div_assign_mod_signed_i128_fail_2
-);
-div_assign_mod_signed_fail!(
-    isize,
-    div_assign_mod_signed_isize_fail_1,
-    div_assign_mod_signed_isize_fail_2
-);
+
+#[test]
+pub fn div_mod_fail() {
+    apply_fn_to_primitive_ints!(div_mod_fail_helper);
+    apply_fn_to_signeds!(div_mod_signed_fail_helper);
+}
 
 #[test]
 fn test_div_rem_signed() {
@@ -914,77 +792,21 @@ fn test_div_rem_signed() {
     test::<i128>(-123, -1_000_000_000_000_000_000_000_000, 0, -123);
 }
 
-macro_rules! div_rem_signed_fail {
-    ($t:ident, $div_rem_signed_fail_1:ident, $div_rem_signed_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_rem_signed_fail_1() {
-            $t::ONE.div_rem(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_rem_signed_fail_2() {
-            $t::MIN.div_rem(-1);
-        }
-    };
+fn div_rem_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.div_rem(T::ZERO));
+    assert_panic!(T::ONE.div_assign_rem(T::ZERO));
 }
-div_rem_signed_fail!(i8, div_rem_signed_i8_fail_1, div_rem_signed_i8_fail_2);
-div_rem_signed_fail!(i16, div_rem_signed_i16_fail_1, div_rem_signed_i16_fail_2);
-div_rem_signed_fail!(i32, div_rem_signed_i32_fail_1, div_rem_signed_i32_fail_2);
-div_rem_signed_fail!(i64, div_rem_signed_i64_fail_1, div_rem_signed_i64_fail_2);
-div_rem_signed_fail!(i128, div_rem_signed_i128_fail_1, div_rem_signed_i128_fail_2);
-div_rem_signed_fail!(
-    isize,
-    div_rem_signed_isize_fail_1,
-    div_rem_signed_isize_fail_2
-);
 
-macro_rules! div_assign_rem_signed_fail {
-    ($t:ident, $div_assign_rem_signed_fail_1:ident, $div_assign_rem_signed_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_assign_rem_signed_fail_1() {
-            $t::ONE.div_assign_rem(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_assign_rem_signed_fail_2() {
-            $t::MIN.div_assign_rem(-1);
-        }
-    };
+fn div_rem_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::MIN.div_rem(T::NEGATIVE_ONE));
+    assert_panic!(T::MIN.div_assign_rem(T::NEGATIVE_ONE));
 }
-div_assign_rem_signed_fail!(
-    i8,
-    div_assign_rem_signed_i8_fail_1,
-    div_assign_rem_signed_i8_fail_2
-);
-div_assign_rem_signed_fail!(
-    i16,
-    div_assign_rem_signed_i16_fail_1,
-    div_assign_rem_signed_i16_fail_2
-);
-div_assign_rem_signed_fail!(
-    i32,
-    div_assign_rem_signed_i32_fail_1,
-    div_assign_rem_signed_i32_fail_2
-);
-div_assign_rem_signed_fail!(
-    i64,
-    div_assign_rem_signed_i64_fail_1,
-    div_assign_rem_signed_i64_fail_2
-);
-div_assign_rem_signed_fail!(
-    i128,
-    div_assign_rem_signed_i128_fail_1,
-    div_assign_rem_signed_i128_fail_2
-);
-div_assign_rem_signed_fail!(
-    isize,
-    div_assign_rem_signed_isize_fail_1,
-    div_assign_rem_signed_isize_fail_2
-);
+
+#[test]
+pub fn div_rem_fail() {
+    apply_fn_to_primitive_ints!(div_rem_fail_helper);
+    apply_fn_to_signeds!(div_rem_signed_fail_helper);
+}
 
 #[test]
 fn test_ceiling_div_neg_mod() {
@@ -1083,37 +905,15 @@ fn test_ceiling_div_neg_mod() {
     );
 }
 
-macro_rules! ceiling_div_neg_mod_fail {
-    ($t:ident, $ceiling_div_neg_mod_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_neg_mod_fail() {
-            $t::ONE.ceiling_div_neg_mod(0);
-        }
-    };
+fn ceiling_div_neg_mod_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.ceiling_div_neg_mod(T::ZERO));
+    assert_panic!(T::ONE.ceiling_div_assign_neg_mod(T::ZERO));
 }
-ceiling_div_neg_mod_fail!(u8, ceiling_div_neg_mod_u8_fail);
-ceiling_div_neg_mod_fail!(u16, ceiling_div_neg_mod_u16_fail);
-ceiling_div_neg_mod_fail!(u32, ceiling_div_neg_mod_u32_fail);
-ceiling_div_neg_mod_fail!(u64, ceiling_div_neg_mod_u64_fail);
-ceiling_div_neg_mod_fail!(u128, ceiling_div_neg_mod_u128_fail);
-ceiling_div_neg_mod_fail!(usize, ceiling_div_neg_mod_usize_fail);
 
-macro_rules! ceiling_div_assign_neg_mod_fail {
-    ($t:ident, $ceiling_div_assign_neg_mod_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_assign_neg_mod_fail() {
-            $t::ONE.ceiling_div_assign_neg_mod(0);
-        }
-    };
+#[test]
+pub fn ceiling_div_neg_mod_fail() {
+    apply_fn_to_unsigneds!(ceiling_div_neg_mod_fail_helper);
 }
-ceiling_div_assign_neg_mod_fail!(u8, ceiling_div_assign_neg_mod_u8_fail);
-ceiling_div_assign_neg_mod_fail!(u16, ceiling_div_assign_neg_mod_u16_fail);
-ceiling_div_assign_neg_mod_fail!(u32, ceiling_div_assign_neg_mod_u32_fail);
-ceiling_div_assign_neg_mod_fail!(u64, ceiling_div_assign_neg_mod_u64_fail);
-ceiling_div_assign_neg_mod_fail!(u128, ceiling_div_assign_neg_mod_u128_fail);
-ceiling_div_assign_neg_mod_fail!(usize, ceiling_div_assign_neg_mod_usize_fail);
 
 #[test]
 fn test_ceiling_div_mod() {
@@ -1459,78 +1259,14 @@ fn test_ceiling_div_mod() {
     );
 }
 
-macro_rules! ceiling_div_mod_fail {
-    ($t:ident, $ceiling_div_mod_fail_1:ident, $ceiling_div_mod_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_mod_fail_1() {
-            $t::ONE.ceiling_div_mod(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_mod_fail_2() {
-            $t::MIN.ceiling_div_mod(-1);
-        }
-    };
+fn ceiling_div_mod_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::ONE.ceiling_div_mod(T::ZERO));
+    assert_panic!(T::ONE.ceiling_div_assign_mod(T::ZERO));
+    assert_panic!(T::MIN.ceiling_div_mod(T::NEGATIVE_ONE));
+    assert_panic!(T::MIN.ceiling_div_assign_mod(T::NEGATIVE_ONE));
 }
-ceiling_div_mod_fail!(i8, ceiling_div_mod_i8_fail_1, ceiling_div_mod_i8_fail_2);
-ceiling_div_mod_fail!(i16, ceiling_div_mod_i16_fail_1, ceiling_div_mod_i16_fail_2);
-ceiling_div_mod_fail!(i32, ceiling_div_mod_i32_fail_1, ceiling_div_mod_i32_fail_2);
-ceiling_div_mod_fail!(i64, ceiling_div_mod_i64_fail_1, ceiling_div_mod_i64_fail_2);
-ceiling_div_mod_fail!(
-    i128,
-    ceiling_div_mod_i128_fail_1,
-    ceiling_div_mod_i128_fail_2
-);
-ceiling_div_mod_fail!(
-    isize,
-    ceiling_div_mod_isize_fail_1,
-    ceiling_div_mod_isize_fail_2
-);
 
-macro_rules! ceiling_div_assign_mod_fail {
-    ($t:ident, $ceiling_div_assign_mod_fail_1:ident, $ceiling_div_assign_mod_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_assign_mod_fail_1() {
-            $t::ONE.ceiling_div_assign_mod(0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $ceiling_div_assign_mod_fail_2() {
-            $t::MIN.ceiling_div_assign_mod(-1);
-        }
-    };
+#[test]
+pub fn ceiling_div_mod_fail() {
+    apply_fn_to_signeds!(ceiling_div_mod_fail_helper);
 }
-ceiling_div_assign_mod_fail!(
-    i8,
-    ceiling_div_assign_mod_i8_fail_1,
-    ceiling_div_assign_mod_i8_fail_2
-);
-ceiling_div_assign_mod_fail!(
-    i16,
-    ceiling_div_assign_mod_i16_fail_1,
-    ceiling_div_assign_mod_i16_fail_2
-);
-ceiling_div_assign_mod_fail!(
-    i32,
-    ceiling_div_assign_mod_i32_fail_1,
-    ceiling_div_assign_mod_i32_fail_2
-);
-ceiling_div_assign_mod_fail!(
-    i64,
-    ceiling_div_assign_mod_i64_fail_1,
-    ceiling_div_assign_mod_i64_fail_2
-);
-ceiling_div_assign_mod_fail!(
-    i128,
-    ceiling_div_assign_mod_i128_fail_1,
-    ceiling_div_assign_mod_i128_fail_2
-);
-ceiling_div_assign_mod_fail!(
-    isize,
-    ceiling_div_assign_mod_isize_fail_1,
-    ceiling_div_assign_mod_isize_fail_2
-);

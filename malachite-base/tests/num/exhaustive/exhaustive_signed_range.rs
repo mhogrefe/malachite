@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -139,21 +141,11 @@ fn test_exhaustive_signed_range() {
     );
 }
 
-macro_rules! exhaustive_signed_range_fail {
-    (
-        $t:ident,
-        $exhaustive_signed_range_fail:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $exhaustive_signed_range_fail() {
-            exhaustive_signed_range::<$t>(1, 0);
-        }
-    };
+fn exhaustive_signed_range_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(exhaustive_signed_range::<T>(T::ONE, T::ZERO));
 }
-exhaustive_signed_range_fail!(i8, exhaustive_signed_range_i8_fail);
-exhaustive_signed_range_fail!(i16, exhaustive_signed_range_i16_fail);
-exhaustive_signed_range_fail!(i32, exhaustive_signed_range_i32_fail);
-exhaustive_signed_range_fail!(i64, exhaustive_signed_range_i64_fail);
-exhaustive_signed_range_fail!(i128, exhaustive_signed_range_i128_fail);
-exhaustive_signed_range_fail!(isize, exhaustive_signed_range_isize_fail);
+
+#[test]
+fn exhaustive_signed_range_fail() {
+    apply_fn_to_signeds!(exhaustive_signed_range_fail_helper);
+}

@@ -6,10 +6,10 @@ use malachite_base_test_util::stats::moments::{
 };
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::random::random_signed_range;
+use malachite_base::num::random::random_signed_inclusive_range;
 use malachite_base::random::EXAMPLE_SEED;
 
-fn random_signed_range_helper<T: CheckedToF64 + PrimitiveSigned>(
+fn random_signed_inclusive_range_helper<T: CheckedToF64 + PrimitiveSigned>(
     a: T,
     b: T,
     expected_values: &[T],
@@ -20,9 +20,9 @@ fn random_signed_range_helper<T: CheckedToF64 + PrimitiveSigned>(
     expected_sample_moment_stats: MomentStats,
 ) {
     uniform_primitive_integer_assertions(
-        random_signed_range::<T>(EXAMPLE_SEED, a, b),
+        random_signed_inclusive_range::<T>(EXAMPLE_SEED, a, b),
         a,
-        b - T::ONE,
+        b,
         expected_values,
         expected_common_values,
         expected_pop_median,
@@ -34,8 +34,8 @@ fn random_signed_range_helper<T: CheckedToF64 + PrimitiveSigned>(
 
 #[allow(clippy::decimal_literal_representation)]
 #[test]
-fn test_random_signed_range() {
-    // i8, 5, 6
+fn test_random_signed_inclusive_range() {
+    // i8, 5, 5
     let values = &[5; 20];
     let common_values = &[(5, 1000000)];
     let pop_median = (5, None);
@@ -52,9 +52,9 @@ fn test_random_signed_range() {
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    random_signed_range_helper::<i8>(
+    random_signed_inclusive_range_helper::<i8>(
         5,
-        6,
+        5,
         values,
         common_values,
         pop_median,
@@ -63,7 +63,7 @@ fn test_random_signed_range() {
         sample_moment_stats,
     );
 
-    // i16, 1, 7
+    // i16, 1, 6
     let values = &[2, 6, 4, 2, 3, 5, 6, 2, 3, 6, 5, 1, 6, 1, 3, 6, 3, 1, 5, 1];
     let common_values = &[
         (4, 167408),
@@ -87,9 +87,9 @@ fn test_random_signed_range() {
         skewness: NiceFloat(-0.0024015945144963404),
         excess_kurtosis: NiceFloat(-1.2685533575767198),
     };
-    random_signed_range_helper::<i16>(
+    random_signed_inclusive_range_helper::<i16>(
         1,
-        7,
+        6,
         values,
         common_values,
         pop_median,
@@ -98,7 +98,7 @@ fn test_random_signed_range() {
         sample_moment_stats,
     );
 
-    // i32, 10, 20
+    // i32, 10, 19
     let values = &[
         11, 17, 15, 14, 16, 14, 12, 18, 11, 17, 15, 10, 12, 16, 13, 15, 12, 12, 19, 15,
     ];
@@ -128,9 +128,9 @@ fn test_random_signed_range() {
         skewness: NiceFloat(-0.00016199543215732692),
         excess_kurtosis: NiceFloat(-1.2237431734377722),
     };
-    random_signed_range_helper::<i32>(
+    random_signed_inclusive_range_helper::<i32>(
         10,
-        20,
+        19,
         values,
         common_values,
         pop_median,
@@ -139,7 +139,7 @@ fn test_random_signed_range() {
         sample_moment_stats,
     );
 
-    // i64, -20, -10
+    // i64, -20, -11
     let values = &[
         -19, -13, -15, -16, -14, -16, -18, -12, -19, -13, -15, -20, -18, -14, -17, -15, -18, -18,
         -11, -15,
@@ -170,9 +170,9 @@ fn test_random_signed_range() {
         skewness: NiceFloat(-0.00016199543215732692),
         excess_kurtosis: NiceFloat(-1.2237431734377722),
     };
-    random_signed_range_helper::<i64>(
+    random_signed_inclusive_range_helper::<i64>(
         -20,
-        -10,
+        -11,
         values,
         common_values,
         pop_median,
@@ -181,7 +181,7 @@ fn test_random_signed_range() {
         sample_moment_stats,
     );
 
-    // i8, -100, 100
+    // i8, -100, 99
     let values = &[
         13, -31, 8, 68, 61, -13, -68, 10, -17, 88, -66, -11, -7, 49, 15, 89, 49, 17, 46, -69,
     ];
@@ -211,9 +211,9 @@ fn test_random_signed_range() {
         skewness: NiceFloat(0.00018970091170297907),
         excess_kurtosis: NiceFloat(-1.2011004127418898),
     };
-    random_signed_range_helper::<i8>(
+    random_signed_inclusive_range_helper::<i8>(
         -100,
-        100,
+        99,
         values,
         common_values,
         pop_median,
@@ -228,32 +228,32 @@ fn test_random_signed_range() {
         -13,
     ];
     let common_values = &[
-        (86, 4112),
-        (-42, 4092),
-        (38, 4063),
-        (-2, 4061),
-        (-106, 4061),
-        (-35, 4054),
-        (-73, 4054),
-        (63, 4052),
-        (-92, 4049),
-        (-86, 4047),
+        (86, 4097),
+        (-42, 4078),
+        (38, 4049),
+        (-106, 4048),
+        (-2, 4047),
+        (-73, 4040),
+        (-35, 4037),
+        (63, 4036),
+        (-92, 4035),
+        (-86, 4032),
     ];
-    let pop_median = (-1, None);
+    let pop_median = (-1, Some(0));
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
-        mean: NiceFloat(-1.0),
-        standard_deviation: NiceFloat(73.6115932898254),
+        mean: NiceFloat(-0.5),
+        standard_deviation: NiceFloat(73.90027063549903),
         skewness: NiceFloat(0.0),
-        excess_kurtosis: NiceFloat(-1.2000369094488188),
+        excess_kurtosis: NiceFloat(-1.200036621652552),
     };
     let sample_moment_stats = MomentStats {
-        mean: NiceFloat(-1.0481689999999793),
-        standard_deviation: NiceFloat(73.61930013623301),
-        skewness: NiceFloat(0.0005380412105164722),
-        excess_kurtosis: NiceFloat(-1.2003531635142872),
+        mean: NiceFloat(-0.5411629999999936),
+        standard_deviation: NiceFloat(73.90873539784404),
+        skewness: NiceFloat(0.00044078393804460487),
+        excess_kurtosis: NiceFloat(-1.200418003526936),
     };
-    random_signed_range_helper::<i8>(
+    random_signed_inclusive_range_helper::<i8>(
         i8::MIN,
         i8::MAX,
         values,
@@ -265,11 +265,15 @@ fn test_random_signed_range() {
     );
 }
 
-fn random_signed_range_fail_helper<T: PrimitiveSigned>() {
-    assert_panic!(random_signed_range::<T>(EXAMPLE_SEED, T::TWO, T::TWO));
+fn random_signed_inclusive_range_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(random_signed_inclusive_range::<T>(
+        EXAMPLE_SEED,
+        T::TWO,
+        T::ONE
+    ));
 }
 
 #[test]
-fn random_signed_range_fail() {
-    apply_fn_to_signeds!(random_signed_range_fail_helper);
+fn random_signed_inclusive_range_fail() {
+    apply_fn_to_signeds!(random_signed_inclusive_range_fail_helper);
 }

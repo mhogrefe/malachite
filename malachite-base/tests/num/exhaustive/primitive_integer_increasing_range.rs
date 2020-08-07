@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -192,27 +194,11 @@ fn test_primitive_integer_increasing_range() {
     );
 }
 
-macro_rules! primitive_integer_increasing_range_fail {
-    (
-        $t:ident,
-        $primitive_integer_increasing_range_fail:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $primitive_integer_increasing_range_fail() {
-            primitive_integer_increasing_range::<$t>(1, 0);
-        }
-    };
+fn primitive_integer_increasing_range_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(primitive_integer_increasing_range::<T>(T::ONE, T::ZERO));
 }
-primitive_integer_increasing_range_fail!(u8, primitive_integer_increasing_range_u8_fail);
-primitive_integer_increasing_range_fail!(u16, primitive_integer_increasing_range_u16_fail);
-primitive_integer_increasing_range_fail!(u32, primitive_integer_increasing_range_u32_fail);
-primitive_integer_increasing_range_fail!(u64, primitive_integer_increasing_range_u64_fail);
-primitive_integer_increasing_range_fail!(u128, primitive_integer_increasing_range_u128_fail);
-primitive_integer_increasing_range_fail!(usize, primitive_integer_increasing_range_usize_fail);
-primitive_integer_increasing_range_fail!(i8, primitive_integer_increasing_range_i8_fail);
-primitive_integer_increasing_range_fail!(i16, primitive_integer_increasing_range_i16_fail);
-primitive_integer_increasing_range_fail!(i32, primitive_integer_increasing_range_i32_fail);
-primitive_integer_increasing_range_fail!(i64, primitive_integer_increasing_range_i64_fail);
-primitive_integer_increasing_range_fail!(i128, primitive_integer_increasing_range_i128_fail);
-primitive_integer_increasing_range_fail!(isize, primitive_integer_increasing_range_isize_fail);
+
+#[test]
+fn primitive_integer_increasing_range_fail() {
+    apply_fn_to_primitive_ints!(primitive_integer_increasing_range_fail_helper);
+}

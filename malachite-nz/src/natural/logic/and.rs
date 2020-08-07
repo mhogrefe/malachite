@@ -16,7 +16,7 @@ use platform::Limb;
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Example
 /// ```
@@ -84,8 +84,8 @@ pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    for i in 0..xs.len() {
-        out[i] = xs[i] & ys[i];
+    for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
+        *out = x & y;
     }
 }
 
@@ -158,8 +158,8 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// ```
 pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
-    for i in 0..xs.len() {
-        xs[i] &= ys[i];
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        *x &= y;
     }
 }
 
@@ -444,6 +444,8 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
         }
     }
 }
+
+//TODO
 
 /// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
 /// value.

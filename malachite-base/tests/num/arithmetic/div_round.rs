@@ -1,7 +1,8 @@
-use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
+use std::panic::catch_unwind;
+
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
@@ -1138,130 +1139,20 @@ fn test_div_round_signed() {
     test::<i8>(-128, 1, RoundingMode::Exact, -128);
 }
 
-macro_rules! div_round_fail {
-    ($t:ident, $div_round_fail_1:ident, $div_round_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_round_fail_1() {
-            $t::exact_from(10).div_round(0, RoundingMode::Floor);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_round_fail_2() {
-            $t::exact_from(10).div_round(3, RoundingMode::Exact);
-        }
-    };
+fn div_round_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::exact_from(10).div_round(T::ZERO, RoundingMode::Floor));
+    assert_panic!(T::exact_from(10).div_round(T::exact_from(3), RoundingMode::Exact));
+    assert_panic!(T::exact_from(10).div_round_assign(T::ZERO, RoundingMode::Floor));
+    assert_panic!(T::exact_from(10).div_round_assign(T::exact_from(3), RoundingMode::Exact));
 }
-div_round_fail!(u8, div_round_u8_fail_1, div_round_u8_fail_2);
-div_round_fail!(u16, div_round_u16_fail_1, div_round_u16_fail_2);
-div_round_fail!(u32, div_round_u32_fail_1, div_round_u32_fail_2);
-div_round_fail!(u64, div_round_u64_fail_1, div_round_u64_fail_2);
-div_round_fail!(u128, div_round_u128_fail_1, div_round_u128_fail_2);
-div_round_fail!(usize, div_round_usize_fail_1, div_round_usize_fail_2);
-div_round_fail!(i8, div_round_i8_fail_1, div_round_i8_fail_2);
-div_round_fail!(i16, div_round_i16_fail_1, div_round_i16_fail_2);
-div_round_fail!(i32, div_round_i32_fail_1, div_round_i32_fail_2);
-div_round_fail!(i64, div_round_i64_fail_1, div_round_i64_fail_2);
-div_round_fail!(i128, div_round_i128_fail_1, div_round_i128_fail_2);
-div_round_fail!(isize, div_round_isize_fail_1, div_round_isize_fail_2);
 
-macro_rules! div_round_signed_fail {
-    ($t:ident, $div_round_signed_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_round_signed_fail() {
-            $t::MIN.div_round(-1, RoundingMode::Floor);
-        }
-    };
+fn div_round_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::MIN.div_round(T::NEGATIVE_ONE, RoundingMode::Floor));
+    assert_panic!(T::MIN.div_round_assign(T::NEGATIVE_ONE, RoundingMode::Floor));
 }
-div_round_signed_fail!(i8, div_round_i8_fail_3);
-div_round_signed_fail!(i16, div_round_i16_fail_3);
-div_round_signed_fail!(i32, div_round_i32_fail_3);
-div_round_signed_fail!(i64, div_round_i64_fail_3);
-div_round_signed_fail!(i128, div_round_signed_i128_fail_3);
-div_round_signed_fail!(isize, div_round_isize_fail_3);
 
-macro_rules! div_round_assign_fail {
-    ($t:ident, $div_round_assign_fail_1:ident, $div_round_assign_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_round_assign_fail_1() {
-            $t::exact_from(10).div_round_assign(0, RoundingMode::Floor);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $div_round_assign_fail_2() {
-            $t::exact_from(10).div_round_assign(3, RoundingMode::Exact);
-        }
-    };
+#[test]
+fn div_round_fail() {
+    apply_fn_to_primitive_ints!(div_round_fail_helper);
+    apply_fn_to_signeds!(div_round_signed_fail_helper);
 }
-div_round_assign_fail!(u8, div_round_assign_u8_fail_1, div_round_assign_u8_fail_2);
-div_round_assign_fail!(
-    u16,
-    div_round_assign_u16_fail_1,
-    div_round_assign_u16_fail_2
-);
-div_round_assign_fail!(
-    u32,
-    div_round_assign_u32_fail_1,
-    div_round_assign_u32_fail_2
-);
-div_round_assign_fail!(
-    u64,
-    div_round_assign_u64_fail_1,
-    div_round_assign_u64_fail_2
-);
-div_round_assign_fail!(
-    u128,
-    div_round_assign_u128_fail_1,
-    div_round_assign_u128_fail_2
-);
-div_round_assign_fail!(
-    usize,
-    div_round_assign_usize_fail_1,
-    div_round_assign_usize_fail_2
-);
-div_round_assign_fail!(i8, div_round_assign_i8_fail_1, div_round_assign_i8_fail_2);
-div_round_assign_fail!(
-    i16,
-    div_round_assign_i16_fail_1,
-    div_round_assign_i16_fail_2
-);
-div_round_assign_fail!(
-    i32,
-    div_round_assign_i32_fail_1,
-    div_round_assign_i32_fail_2
-);
-div_round_assign_fail!(
-    i64,
-    div_round_assign_i64_fail_1,
-    div_round_assign_i64_fail_2
-);
-div_round_assign_fail!(
-    i128,
-    div_round_assign_i128_fail_1,
-    div_round_assign_i128_fail_2
-);
-div_round_assign_fail!(
-    isize,
-    div_round_assign_isize_fail_1,
-    div_round_assign_isize_fail_2
-);
-
-macro_rules! div_round_assign_signed_fail {
-    ($t:ident, $div_round_assign_signed_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_round_assign_signed_fail() {
-            $t::MIN.div_round_assign(-1, RoundingMode::Floor);
-        }
-    };
-}
-div_round_assign_signed_fail!(i8, div_round_assign_i8_fail_3);
-div_round_assign_signed_fail!(i16, div_round_assign_i16_fail_3);
-div_round_assign_signed_fail!(i32, div_round_assign_i32_fail_3);
-div_round_assign_signed_fail!(i64, div_round_assign_i64_fail_3);
-div_round_assign_signed_fail!(i128, div_round_signed_assign_i128_fail_3);
-div_round_assign_signed_fail!(isize, div_round_assign_isize_fail_3);

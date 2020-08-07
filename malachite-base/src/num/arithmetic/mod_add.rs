@@ -1,6 +1,5 @@
-use std::ops::{Add, AddAssign, Sub};
-
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
+use std::ops::{Add, AddAssign, Sub};
 
 fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
 where

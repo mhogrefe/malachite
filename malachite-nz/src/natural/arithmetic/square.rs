@@ -1,7 +1,8 @@
 use std::cmp::{max, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Square, SquareAssign, WrappingAddAssign, WrappingSubAssign,
+    ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
+    WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
@@ -39,10 +40,8 @@ use natural::comparison::ord::limbs_cmp_same_length;
 use natural::Natural;
 use platform::{
     DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD,
-    SQR_TOOM6_THRESHOLD,
+    SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
-
-const SQR_TOOM8_THRESHOLD: usize = 454;
 
 /// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
 #[inline]
@@ -771,143 +770,93 @@ fn _limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch:
 pub fn _limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
-    let n = 1 + ((xs_len - 1) >> 3);
+    let n: usize = xs_len.shr_round(3, RoundingMode::Ceiling);
+    let m = n + 1;
+    let k = m + n;
+    let p = k + n;
     assert!(xs_len > 7 * n);
     let s = xs_len - 7 * n;
     assert!(s <= n);
     assert!(s << 1 > 3);
     let (pp_lo, remainder) = out.split_at_mut(3 * n);
-    split_into_chunks_mut!(remainder, 4 * n, [r6, r4], pp_hi);
-    let (v0, v2) = pp_hi.split_at_mut(2 * n + 2);
-    // $\pm1/8$
+    split_into_chunks_mut!(remainder, n << 2, [r6, r4], pp_hi);
+    split_into_chunks_mut!(pp_hi, m, [v0, _unused, v2], _unused);
+    // +/- 1/8
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        &mut v2[..n + 1],
+        v2,
         v0,
         7,
         xs,
         n,
         3,
-        &mut pp_lo[..n + 1],
+        &mut pp_lo[..m],
     );
-    let (r7_r5, remainder) = scratch.split_at_mut(6 * n + 2);
-    let (r3, r1_wse) = remainder.split_at_mut(3 * n + 1);
-    let (r1, wse) = r1_wse.split_at_mut(3 * n + 1);
-    // A(-1/8)*B(-1/8)*8^., A(+1/8)*B(+1/8)*8^.
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    _limbs_square_to_out_toom_8_recursive(r7_r5, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(
-        r7_r5,
-        &mut pp_lo[..2 * n + 1 + if BIT_CORRECTION { 1 } else { 0 }],
-        false,
-        n,
-        3,
-        0,
-    );
-    // $\pm1/4$
+    let (r7_r5, remainder) = scratch.split_at_mut(p << 1);
+    let (r3, r1_wse) = remainder.split_at_mut(p);
+    let (r1, wse) = r1_wse.split_at_mut(p);
+    // A(-1/8) * B(-1/8) * 8 ^, A(1/8) * B(1/8) * 8 ^
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    _limbs_square_to_out_toom_8_recursive(r7_r5, v2, wse);
+    let limit = if BIT_CORRECTION { m << 1 } else { k };
+    _limbs_toom_couple_handling(r7_r5, &mut pp_lo[..limit], false, n, 3, 0);
+    // +/- 1/4
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        &mut v2[..n + 1],
+        v2,
         v0,
         7,
         xs,
         n,
         2,
-        &mut pp_lo[..n + 1],
+        &mut pp_lo[..m],
     );
-    // A(-1/4)*B(-1/4)*4^., A(+1/4)*B(+1/4)*4^.
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    let (r7, r5) = r7_r5.split_at_mut(3 * n + 1);
-    _limbs_square_to_out_toom_8_recursive(r5, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(r5, &mut pp_lo[..2 * n + 1], false, n, 2, 0);
-    // $\pm2$
-    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
-        &mut v2[..n + 1],
-        v0,
-        7,
-        xs,
-        n,
-        &mut pp_lo[..n + 1],
-    );
+    // A(-1/4) * B(-1/4) * 4 ^, A(1/4) * B(1/4) * 4^
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    let (r7, r5) = r7_r5.split_at_mut(p);
+    _limbs_square_to_out_toom_8_recursive(r5, v2, wse);
+    _limbs_toom_couple_handling(r5, &mut pp_lo[..k], false, n, 2, 0);
+    // +/- 2
+    _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(v2, v0, 7, xs, n, &mut pp_lo[..m]);
     // A(-2)*B(-2), A(+2)*B(+2)
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    _limbs_square_to_out_toom_8_recursive(r3, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(r3, &mut pp_lo[..2 * n + 1], false, n, 1, 2);
-    // $\pm8$
-    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-        &mut v2[..n + 1],
-        v0,
-        7,
-        xs,
-        n,
-        3,
-        &mut pp_lo[..n + 1],
-    );
-    // A(-8)*B(-8), A(+8)*B(+8)
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    _limbs_square_to_out_toom_8_recursive(r1, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(
-        r1_wse,
-        &mut pp_lo[..2 * n + 1 + if BIT_CORRECTION { 1 } else { 0 }],
-        false,
-        n,
-        3,
-        6,
-    );
-    // $\pm1/2$
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    _limbs_square_to_out_toom_8_recursive(r3, v2, wse);
+    _limbs_toom_couple_handling(r3, &mut pp_lo[..k], false, n, 1, 2);
+    // +/- 8
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 7, xs, n, 3, &mut pp_lo[..m]);
+    // A(-8) * B(-8), A(8) * B(8)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    _limbs_square_to_out_toom_8_recursive(r1, v2, wse);
+    _limbs_toom_couple_handling(r1_wse, &mut pp_lo[..limit], false, n, 3, 6);
+    // +/- 1/2
     _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        &mut v2[..n + 1],
+        v2,
         v0,
         7,
         xs,
         n,
         1,
-        &mut pp_lo[..n + 1],
+        &mut pp_lo[..m],
     );
-    // A(-1/2)*B(-1/2)*2^., A(+1/2)*B(+1/2)*2^.
-    let (r1, wse) = r1_wse.split_at_mut(3 * n + 1);
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    _limbs_square_to_out_toom_8_recursive(r6, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(r6, &mut pp_lo[..2 * n + 1], false, n, 1, 0);
-    // $\pm1$
-    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
-        &mut v2[..n + 1],
-        v0,
-        7,
-        xs,
-        n,
-        &mut pp_lo[..n + 1],
-    );
-    // A(-1)*B(-1), A(1)*B(1)
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    _limbs_square_to_out_toom_8_recursive(r4, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(r4, &mut pp_lo[..2 * n + 1], false, n, 0, 0);
-    // $\pm4$
-    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
-        &mut v2[..n + 1],
-        v0,
-        7,
-        xs,
-        n,
-        2,
-        &mut pp_lo[..n + 1],
-    );
-    // A(-4)*B(-4), A(+4)*B(+4)
-    _limbs_square_to_out_toom_8_recursive(pp_lo, &v0[..n + 1], wse);
-    let (r2, v2) = pp_hi.split_at_mut(2 * n + 2);
-    _limbs_square_to_out_toom_8_recursive(r2, &v2[..n + 1], wse);
-    _limbs_toom_couple_handling(pp_hi, &mut pp_lo[..2 * n + 1], false, n, 2, 4);
-    // A(0)*B(0)
+    // A(-1/2) * B(-1/2) * 2 ^, A(1/2) * B(1/2) * 2 ^
+    let (r1, wse) = r1_wse.split_at_mut(p);
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    _limbs_square_to_out_toom_8_recursive(r6, v2, wse);
+    _limbs_toom_couple_handling(r6, &mut pp_lo[..k], false, n, 1, 0);
+    // +/- 1
+    _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, 7, xs, n, &mut pp_lo[..m]);
+    // A(-1) * B(-1), A(1) * B(1)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    _limbs_square_to_out_toom_8_recursive(r4, v2, wse);
+    _limbs_toom_couple_handling(r4, &mut pp_lo[..k], false, n, 0, 0);
+    // +/- 4
+    _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(v2, v0, 7, xs, n, 2, &mut pp_lo[..m]);
+    // A(-4) * B(-4), A(4) * B(4)
+    _limbs_square_to_out_toom_8_recursive(pp_lo, v0, wse);
+    let (r2, v2) = pp_hi.split_at_mut(m << 1);
+    _limbs_square_to_out_toom_8_recursive(r2, &v2[..m], wse);
+    _limbs_toom_couple_handling(pp_hi, &mut pp_lo[..k], false, n, 2, 4);
+    // A(0) * B(0)
     _limbs_square_to_out_toom_8_recursive(pp_lo, &xs[..n], wse);
-    _limbs_mul_toom_interpolate_16_points(
-        out,
-        r1,
-        r3,
-        r5,
-        r7,
-        n,
-        s << 1,
-        false,
-        &mut wse[..3 * n + 1],
-    );
+    _limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }
 
 impl Square for Natural {

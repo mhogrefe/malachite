@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use num::arithmetic::traits::Sign;
+use std::cmp::Ordering;
 
 macro_rules! impl_sign {
     ($t:ident) => {

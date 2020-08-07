@@ -206,6 +206,7 @@ pub mod natural {
         pub mod to_limbs;
     }
     pub mod exhaustive {
+        pub mod exhaustive_natural_inclusive_range;
         pub mod exhaustive_natural_range;
         pub mod exhaustive_natural_range_to_infinity;
         pub mod exhaustive_naturals;

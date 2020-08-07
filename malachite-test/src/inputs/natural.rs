@@ -14,7 +14,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::exhaustive::{
     exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
-    exhaustive_unsigneds, primitive_integer_increasing_range,
+    exhaustive_unsigneds, primitive_integer_increasing_inclusive_range,
 };
 use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
@@ -624,7 +624,7 @@ pub fn pairs_of_natural_and_small_u64_var_3<T: PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_naturals(),
-            primitive_integer_increasing_range(1, T::WIDTH + 1),
+            primitive_integer_increasing_inclusive_range(1, T::WIDTH),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -753,7 +753,7 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            primitive_integer_increasing_range(1, T::WIDTH + 1),
+            primitive_integer_increasing_inclusive_range(1, T::WIDTH),
             exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -1828,7 +1828,7 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
             reshape_2_1_to_3(Box::new(dependent_pairs(
                 lex_pairs(
                     exhaustive_naturals(),
-                    primitive_integer_increasing_range(1, T::WIDTH + 1),
+                    primitive_integer_increasing_inclusive_range(1, T::WIDTH),
                 ),
                 f,
             )))

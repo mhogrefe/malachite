@@ -4,10 +4,10 @@ use malachite_base::iterators::comparison::{
 
 fn is_weakly_ascending_helper(xs: &[u8], result: bool) {
     assert_eq!(is_weakly_ascending(xs.iter()), result);
-    assert_eq!(
-        is_weakly_descending(xs.iter().rev().collect::<Vec<_>>().into_iter()),
-        result
-    );
+    assert_eq!(is_weakly_descending(xs.iter().rev()), result);
+    if xs.len() < 2 {
+        assert!(result);
+    }
     if !result {
         assert!(!is_strictly_ascending(xs.iter()));
     }

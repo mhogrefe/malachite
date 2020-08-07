@@ -1,7 +1,3 @@
-use std::cmp::Ordering;
-use std::fmt::Display;
-use std::ops::{Rem, Shr, Sub};
-
 use comparison::traits::Min;
 use num::arithmetic::traits::{
     CheckedAdd, CheckedNeg, OverflowingAdd, Parity, RoundToMultiple, RoundToMultipleAssign,
@@ -11,6 +7,9 @@ use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 use num::logic::traits::TrailingZeros;
 use rounding_modes::RoundingMode;
+use std::cmp::Ordering;
+use std::fmt::Display;
+use std::ops::{Rem, Shr, Sub};
 
 fn _round_to_multiple_unsigned<T: Copy + Display + Eq + Ord + Parity + TrailingZeros + Zero>(
     x: T,

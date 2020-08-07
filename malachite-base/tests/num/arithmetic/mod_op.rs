@@ -1,8 +1,7 @@
-use malachite_base::num::arithmetic::traits::{
-    CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
-};
+use std::panic::catch_unwind;
+
+use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
@@ -73,38 +72,6 @@ fn test_mod_op_unsigned() {
     test::<u128>(0, 1_000_000_000_000_000_000_000_000, 0);
     test::<u128>(123, 1_000_000_000_000_000_000_000_000, 123);
 }
-
-macro_rules! mod_op_unsigned_fail {
-    ($t:ident, $div_mod_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_mod_unsigned_fail() {
-            $t::ONE.mod_op(0);
-        }
-    };
-}
-mod_op_unsigned_fail!(u8, mod_op_unsigned_u8_fail);
-mod_op_unsigned_fail!(u16, mod_op_unsigned_u16_fail);
-mod_op_unsigned_fail!(u32, mod_op_unsigned_u32_fail);
-mod_op_unsigned_fail!(u64, mod_op_unsigned_u64_fail);
-mod_op_unsigned_fail!(u128, mod_op_unsigned_u128_fail);
-mod_op_unsigned_fail!(usize, mod_op_unsigned_usize_fail);
-
-macro_rules! mod_assign_unsigned_fail {
-    ($t:ident, $div_assign_mod_unsigned_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_assign_mod_unsigned_fail() {
-            $t::ONE.mod_assign(0);
-        }
-    };
-}
-mod_assign_unsigned_fail!(u8, mod_assign_unsigned_u8_fail);
-mod_assign_unsigned_fail!(u16, mod_assign_unsigned_u16_fail);
-mod_assign_unsigned_fail!(u32, mod_assign_unsigned_u32_fail);
-mod_assign_unsigned_fail!(u64, mod_assign_unsigned_u64_fail);
-mod_assign_unsigned_fail!(u128, mod_assign_unsigned_u128_fail);
-mod_assign_unsigned_fail!(usize, mod_assign_unsigned_usize_fail);
 
 #[test]
 fn test_div_mod_signed() {
@@ -356,37 +323,15 @@ fn test_div_mod_signed() {
     test::<i8>(-128, -1, 0);
 }
 
-macro_rules! mod_op_signed_fail {
-    ($t:ident, $mod_op_signed_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $mod_op_signed_fail() {
-            $t::ONE.mod_op(0);
-        }
-    };
+fn mod_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.mod_op(T::ZERO));
+    assert_panic!(T::ONE.mod_assign(T::ZERO));
 }
-mod_op_signed_fail!(i8, mod_op_signed_i8_fail);
-mod_op_signed_fail!(i16, mod_op_signed_i16_fail);
-mod_op_signed_fail!(i32, mod_op_signed_i32_fail);
-mod_op_signed_fail!(i64, mod_op_signed_i64_fail);
-mod_op_signed_fail!(i128, mod_op_signed_i128_fail);
-mod_op_signed_fail!(isize, mod_op_signed_isize_fail);
 
-macro_rules! mod_assign_signed_fail {
-    ($t:ident, $mod_assign_signed_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $mod_assign_signed_fail() {
-            $t::ONE.mod_assign(0);
-        }
-    };
+#[test]
+pub fn mod_fail() {
+    apply_fn_to_primitive_ints!(mod_fail_helper);
 }
-mod_assign_signed_fail!(i8, mod_assign_signed_i8_fail);
-mod_assign_signed_fail!(i16, mod_assign_signed_i16_fail);
-mod_assign_signed_fail!(i32, mod_assign_signed_i32_fail);
-mod_assign_signed_fail!(i64, mod_assign_signed_i64_fail);
-mod_assign_signed_fail!(i128, mod_assign_signed_i128_fail);
-mod_assign_signed_fail!(isize, mod_assign_signed_isize_fail);
 
 #[test]
 fn test_neg_mod() {
@@ -461,37 +406,15 @@ fn test_neg_mod() {
     );
 }
 
-macro_rules! neg_mod_fail {
-    ($t:ident, $neg_mod_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $neg_mod_fail() {
-            $t::ONE.neg_mod(0);
-        }
-    };
+fn neg_mod_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.neg_mod(T::ZERO));
+    assert_panic!(T::ONE.neg_mod_assign(T::ZERO));
 }
-neg_mod_fail!(u8, neg_mod_u8_fail);
-neg_mod_fail!(u16, neg_mod_u16_fail);
-neg_mod_fail!(u32, neg_mod_u32_fail);
-neg_mod_fail!(u64, neg_mod_u64_fail);
-neg_mod_fail!(u128, neg_mod_u128_fail);
-neg_mod_fail!(usize, neg_mod_usize_fail);
 
-macro_rules! neg_mod_assign_fail {
-    ($t:ident, $neg_mod_assign_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $neg_mod_assign_fail() {
-            $t::ONE.neg_mod_assign(0);
-        }
-    };
+#[test]
+pub fn neg_mod_fail() {
+    apply_fn_to_unsigneds!(neg_mod_fail_helper);
 }
-neg_mod_assign_fail!(u8, neg_mod_assign_u8_fail);
-neg_mod_assign_fail!(u16, neg_mod_assign_u16_fail);
-neg_mod_assign_fail!(u32, neg_mod_assign_u32_fail);
-neg_mod_assign_fail!(u64, neg_mod_assign_u64_fail);
-neg_mod_assign_fail!(u128, neg_mod_assign_u128_fail);
-neg_mod_assign_fail!(usize, neg_mod_assign_usize_fail);
 
 #[test]
 fn test_ceiling_mod() {
@@ -745,34 +668,12 @@ fn test_ceiling_mod() {
     test::<i8>(-128, -1, 0);
 }
 
-macro_rules! ceiling_mod_fail {
-    ($t:ident, $ceiling_mod_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_fail() {
-            $t::ONE.ceiling_mod(0);
-        }
-    };
+fn ceiling_mod_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::ONE.ceiling_mod(T::ZERO));
+    assert_panic!(T::ONE.ceiling_mod_assign(T::ZERO));
 }
-ceiling_mod_fail!(i8, ceiling_mod_i8_fail);
-ceiling_mod_fail!(i16, ceiling_mod_i16_fail);
-ceiling_mod_fail!(i32, ceiling_mod_i32_fail);
-ceiling_mod_fail!(i64, ceiling_mod_i64_fail);
-ceiling_mod_fail!(i128, ceiling_mod_i128_fail);
-ceiling_mod_fail!(isize, ceiling_mod_isize_fail);
 
-macro_rules! ceiling_mod_assign_fail {
-    ($t:ident, $ceiling_mod_assign_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_assign_fail() {
-            $t::ONE.ceiling_mod_assign(0);
-        }
-    };
+#[test]
+pub fn ceiling_mod_fail() {
+    apply_fn_to_signeds!(ceiling_mod_fail_helper);
 }
-ceiling_mod_assign_fail!(i8, ceiling_mod_assign_i8_fail);
-ceiling_mod_assign_fail!(i16, ceiling_mod_assign_i16_fail);
-ceiling_mod_assign_fail!(i32, ceiling_mod_assign_i32_fail);
-ceiling_mod_assign_fail!(i64, ceiling_mod_assign_i64_fail);
-ceiling_mod_assign_fail!(i128, ceiling_mod_assign_i128_fail);
-ceiling_mod_assign_fail!(isize, ceiling_mod_assign_isize_fail);

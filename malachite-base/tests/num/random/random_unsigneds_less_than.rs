@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
@@ -179,18 +181,11 @@ fn test_random_unsigneds_less_than() {
     );
 }
 
-macro_rules! random_unsigneds_less_than_fail {
-    ($t:ident, $random_unsigneds_less_than_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $random_unsigneds_less_than_fail() {
-            random_unsigneds_less_than::<$t>(EXAMPLE_SEED, 0);
-        }
-    };
+fn random_unsigneds_less_than_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(random_unsigneds_less_than::<T>(EXAMPLE_SEED, T::ZERO));
 }
-random_unsigneds_less_than_fail!(u8, random_unsigneds_less_than_u8_fail);
-random_unsigneds_less_than_fail!(u16, random_unsigneds_less_than_u16_fail);
-random_unsigneds_less_than_fail!(u32, random_unsigneds_less_than_u32_fail);
-random_unsigneds_less_than_fail!(u64, random_unsigneds_less_than_u64_fail);
-random_unsigneds_less_than_fail!(u128, random_unsigneds_less_than_u128_fail);
-random_unsigneds_less_than_fail!(usize, random_unsigneds_less_than_usize_fail);
+
+#[test]
+fn random_unsigneds_less_than_fail() {
+    apply_fn_to_unsigneds!(random_unsigneds_less_than_fail_helper);
+}

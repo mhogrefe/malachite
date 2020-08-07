@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use itertools::{assert_equal, repeat_n, Itertools};
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
@@ -5,7 +7,6 @@ use malachite_base_test_util::stats::moments::{
 };
 
 use malachite_base::bools::random::random_bools;
-use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::random::random_signed_bit_chunks;
@@ -256,18 +257,11 @@ fn test_random_signed_bit_chunks() {
     );
 }
 
-macro_rules! random_signed_bit_chunks_fail {
-    ($t:ident, $random_signed_bit_chunks_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $random_signed_bit_chunks_fail() {
-            random_signed_bit_chunks::<$t>(EXAMPLE_SEED, $t::WIDTH + 1);
-        }
-    };
+fn random_signed_bit_chunks_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(random_signed_bit_chunks::<T>(EXAMPLE_SEED, T::WIDTH + 1));
 }
-random_signed_bit_chunks_fail!(i8, random_signed_bit_chunks_u8_fail);
-random_signed_bit_chunks_fail!(i16, random_signed_bit_chunks_u16_fail);
-random_signed_bit_chunks_fail!(i32, random_signed_bit_chunks_u32_fail);
-random_signed_bit_chunks_fail!(i64, random_signed_bit_chunks_u64_fail);
-random_signed_bit_chunks_fail!(i128, random_signed_bit_chunks_u128_fail);
-random_signed_bit_chunks_fail!(isize, random_signed_bit_chunks_usize_fail);
+
+#[test]
+fn random_signed_bit_chunks_fail() {
+    apply_fn_to_signeds!(random_signed_bit_chunks_fail_helper);
+}

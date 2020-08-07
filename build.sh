@@ -20,6 +20,7 @@ cargo test --release --test lib --features fail_on_untested_path --features serd
 python extra-tests.py &&
 cargo clippy --tests --features serde &&
 cargo doc &&
+RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-nz-test-util &&

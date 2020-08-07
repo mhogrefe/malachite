@@ -58,10 +58,13 @@ pub mod chars {
 }
 pub mod iterators {
     pub mod comparison {
+        pub mod delta_directions;
         pub mod is_strictly_ascending;
         pub mod is_strictly_descending;
+        pub mod is_strictly_zigzagging;
         pub mod is_weakly_ascending;
         pub mod is_weakly_descending;
+        pub mod is_weakly_zigzagging;
     }
     pub mod nonzero_values;
 }
@@ -165,12 +168,12 @@ pub mod num {
         pub mod exhaustive_negative_signeds;
         pub mod exhaustive_nonzero_signeds;
         pub mod exhaustive_positive_primitives;
+        pub mod exhaustive_signed_inclusive_range;
         pub mod exhaustive_signed_range;
-        pub mod exhaustive_signed_range_to_max;
         pub mod exhaustive_signeds;
         pub mod exhaustive_unsigneds;
+        pub mod primitive_integer_increasing_inclusive_range;
         pub mod primitive_integer_increasing_range;
-        pub mod primitive_integer_increasing_range_to_max;
     }
     pub mod float {
         pub mod nice_float;
@@ -209,11 +212,11 @@ pub mod num {
         pub mod random_positive_unsigneds;
         pub mod random_primitive_integers;
         pub mod random_signed_bit_chunks;
+        pub mod random_signed_inclusive_range;
         pub mod random_signed_range;
-        pub mod random_signed_range_to_max;
         pub mod random_unsigned_bit_chunks;
+        pub mod random_unsigned_inclusive_range;
         pub mod random_unsigned_range;
-        pub mod random_unsigned_range_to_max;
         pub mod random_unsigneds_less_than;
         pub mod striped {
             pub mod striped_bit_source;

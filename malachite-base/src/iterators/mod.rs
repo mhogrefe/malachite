@@ -1,6 +1,8 @@
 use num::basic::traits::Zero;
 
-/// Filters out zeros from an iterator.
+/// Generates all the nonzero values of a provided iterator.
+///
+/// This `struct` is created by the `nonzero_values` method. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct NonzeroValues<I: Iterator>(I)
 where
@@ -23,22 +25,22 @@ where
     }
 }
 
-/// Filters out zeros from an iterator.
+/// Returns an iterator that generates all the nonzero values of a provided iterator.
+///
+/// `nonzero_values(xs)` generates the same values as `xs.filter(|x| x != T::ZERO)`, but its type is
+/// easier to work with.
 ///
 /// This iterator will hang if given an iterator that produces an infinite suffix of zeros.
 ///
-/// Length is the number of nonzero values produced by `xs`.
+/// The output length is the number of nonzero values produced by `xs`.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::nonzero_values;
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_primitive_integers;
 ///
 /// assert_eq!(
-///     nonzero_values(random_primitive_integers::<u8>(EXAMPLE_SEED)).take(10)
-///         .collect::<Vec<_>>(),
-///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
+///     nonzero_values([-3i8, -2, -1, 0, 1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     &[-3, -2, -1, 1, 2, 3]
 /// )
 /// ```
 #[inline]
@@ -49,4 +51,5 @@ where
     NonzeroValues(xs)
 }
 
+/// This module contains functions that compare adjacent iterator elements.
 pub mod comparison;

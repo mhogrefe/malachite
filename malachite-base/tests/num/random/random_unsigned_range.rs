@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
@@ -179,18 +181,11 @@ fn test_random_unsigned_range() {
     );
 }
 
-macro_rules! random_unsigned_range_fail {
-    ($t:ident, $random_unsigned_range_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $random_unsigned_range_fail() {
-            random_unsigned_range::<$t>(EXAMPLE_SEED, 2, 2);
-        }
-    };
+fn random_unsigned_range_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(random_unsigned_range::<T>(EXAMPLE_SEED, T::TWO, T::TWO));
 }
-random_unsigned_range_fail!(u8, random_unsigned_range_u8_fail);
-random_unsigned_range_fail!(u16, random_unsigned_range_u16_fail);
-random_unsigned_range_fail!(u32, random_unsigned_range_u32_fail);
-random_unsigned_range_fail!(u64, random_unsigned_range_u64_fail);
-random_unsigned_range_fail!(u128, random_unsigned_range_u128_fail);
-random_unsigned_range_fail!(usize, random_unsigned_range_usize_fail);
+
+#[test]
+fn random_unsigned_range_fail() {
+    apply_fn_to_unsigneds!(random_unsigned_range_fail_helper);
+}

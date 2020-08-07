@@ -5,8 +5,8 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::random_bit_chunks::{RandomSignedBitChunks, RandomUnsignedBitChunks};
 use num::random::random_highest_bit_set_values::RandomHighestBitSetValues;
 use num::random::random_primitive_integers::RandomPrimitiveIntegers;
-use num::random::random_signed_range::RandomSignedRange;
-use num::random::random_unsigned_range::RandomUnsignedRange;
+use num::random::random_signed_range::{RandomSignedInclusiveRange, RandomSignedRange};
+use num::random::random_unsigned_range::{RandomUnsignedInclusiveRange, RandomUnsignedRange};
 use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
 use random::seed::Seed;
 
@@ -402,7 +402,7 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 /// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
 ///
 /// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
-/// use `random_unsigned_range_to_max`.
+/// use `random_unsigned_inclusive_range`.
 ///
 /// $$
 /// P(x) = \\begin{cases}
@@ -448,17 +448,16 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
     }
 }
 
-/// Uniformly generates random unsigned integers greater than or equal to `a`.
+/// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
 ///
-/// `a` cannot be zero.
+/// `a` must be less than or equal to `b`.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{2^W-a} & x \geq a \\\\
+///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
 ///
 /// The output length is infinite.
 ///
@@ -471,35 +470,37 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// # Panics
 ///
-/// Panics if $a = 0$.
+/// Panics if $a > b$.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_unsigned_range_to_max;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
 ///
 /// assert_eq!(
-///     random_unsigned_range_to_max::<u8>(EXAMPLE_SEED, 10).take(10).collect::<Vec<_>>(),
-///     &[123, 249, 79, 118, 238, 220, 178, 171, 97, 42]
+///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 10, 19).take(10).collect::<Vec<_>>(),
+///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
 /// )
 /// ```
-pub fn random_unsigned_range_to_max<T: PrimitiveUnsigned>(
+pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
     seed: Seed,
     a: T,
-) -> RandomUnsignedRange<T> {
-    if a == T::ZERO {
-        panic!("a cannot be 0.");
+    b: T,
+) -> RandomUnsignedInclusiveRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
-    RandomUnsignedRange {
-        xs: random_unsigneds_less_than(seed, a.wrapping_neg()),
-        a,
+    if a == T::ZERO && b == T::MAX {
+        RandomUnsignedInclusiveRange::All(random_primitive_integers(seed))
+    } else {
+        RandomUnsignedInclusiveRange::NotAll(random_unsigneds_less_than(seed, b - a + T::ONE), a)
     }
 }
 
 /// Uniformly generates random signed integers in the half-open interval $[a, b)$.
 ///
 /// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for that,
-/// use `random_signed_range_to_max`.
+/// use `random_signed_inclusive_range`.
 ///
 /// $$
 /// P(x) = \\begin{cases}
@@ -533,22 +534,24 @@ pub fn random_unsigned_range_to_max<T: PrimitiveUnsigned>(
 /// ```
 #[inline]
 pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> RandomSignedRange<T> {
+    if a >= b {
+        panic!("a must be less than b. a: {}, b: {}", a, b);
+    }
     RandomSignedRange {
         xs: T::new_unsigned_range(seed, a, b),
     }
 }
 
-/// Uniformly generates random signed integers greater than or equal to `a`.
+/// Uniformly generates random signed integers in the closed interval $[a, b]$.
 ///
-/// `a` cannot be `T::MIN`.
+/// `a` must be less than or equal to `b`.
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{1}{2^{W-1}-a} & x \geq a \\\\
+///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
-/// where $W$ is `T::WIDTH`.
 ///
 /// The output length is infinite.
 ///
@@ -561,25 +564,29 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 ///
 /// # Panics
 ///
-/// Panics if `a` is `T::MIN`.
+/// Panics if $a > b$.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_signed_range_to_max;
+/// use malachite_base::num::random::random_signed_inclusive_range;
 ///
 /// assert_eq!(
-///     random_signed_range_to_max::<i16>(EXAMPLE_SEED, i16::MIN + 1).take(10).collect::<Vec<_>>(),
-///     &[28530, -5050, 21221, 8617, -24488, -11409, -23875, 28250, 18526, -3178]
+///     random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99).take(10).collect::<Vec<_>>(),
+///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
 /// )
 /// ```
 #[inline]
-pub fn random_signed_range_to_max<T: PrimitiveSigned>(seed: Seed, a: T) -> RandomSignedRange<T> {
-    if a == T::MIN {
-        panic!("a cannot be T::MIN.");
+pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+) -> RandomSignedInclusiveRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
-    RandomSignedRange {
-        xs: T::new_unsigned_range_to_max(seed, a),
+    RandomSignedInclusiveRange {
+        xs: T::new_unsigned_inclusive_range(seed, a, b),
     }
 }
 

@@ -1,12 +1,8 @@
 use std::fmt::Debug;
+use std::panic::catch_unwind;
 
-use malachite_base::num::arithmetic::traits::{
-    CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
-    NegModPowerOfTwo, NegModPowerOfTwoAssign,
-};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
@@ -135,21 +131,14 @@ fn test_mod_power_of_two_signed() {
     test::<i64>(-0x1_0000_0001, 33, 0xffff_ffff);
 }
 
-macro_rules! mod_power_of_two_signed_fail {
-    ($t:ident, $mod_power_of_two_signed_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $mod_power_of_two_signed_fail() {
-            $t::NEGATIVE_ONE.mod_power_of_two(200);
-        }
-    };
+fn mod_power_of_two_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::NEGATIVE_ONE.mod_power_of_two(200));
 }
-mod_power_of_two_signed_fail!(i8, mod_power_of_two_signed_i8_fail);
-mod_power_of_two_signed_fail!(i16, mod_power_of_two_signed_i16_fail);
-mod_power_of_two_signed_fail!(i32, mod_power_of_two_signed_i32_fail);
-mod_power_of_two_signed_fail!(i64, mod_power_of_two_signed_i64_fail);
-mod_power_of_two_signed_fail!(i128, mod_power_of_two_signed_i128_fail);
-mod_power_of_two_signed_fail!(isize, mod_power_of_two_signed_isize_fail);
+
+#[test]
+fn mod_power_of_two_signed_fail() {
+    apply_fn_to_signeds!(mod_power_of_two_signed_fail_helper);
+}
 
 #[test]
 fn test_mod_power_of_two_assign_signed() {
@@ -234,53 +223,21 @@ fn test_mod_power_of_two_assign_signed() {
     test::<i64>(-0x1_0000_0001, 33, 0xffff_ffff);
 }
 
-macro_rules! mod_power_of_two_assign_signed_fail {
-    ($t:ident, $mod_power_of_two_signed_fail_1:ident, $mod_power_of_two_signed_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $mod_power_of_two_signed_fail_1() {
-            let mut x = $t::NEGATIVE_ONE;
-            x.mod_power_of_two_assign(200);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $mod_power_of_two_signed_fail_2() {
-            let mut x = $t::MIN;
-            x.mod_power_of_two_assign($t::WIDTH);
-        }
-    };
+fn mod_power_of_two_assign_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!({
+        let mut x = T::NEGATIVE_ONE;
+        x.mod_power_of_two_assign(200)
+    });
+    assert_panic!({
+        let mut x = T::MIN;
+        x.mod_power_of_two_assign(T::WIDTH)
+    });
 }
-mod_power_of_two_assign_signed_fail!(
-    i8,
-    mod_power_of_two_signed_i8_fail_1,
-    mod_power_of_two_signed_i8_fail_2
-);
-mod_power_of_two_assign_signed_fail!(
-    i16,
-    mod_power_of_two_signed_i16_fail_1,
-    mod_power_of_two_signed_i16_fail_2
-);
-mod_power_of_two_assign_signed_fail!(
-    i32,
-    mod_power_of_two_signed_i32_fail_1,
-    mod_power_of_two_signed_i32_fail_2
-);
-mod_power_of_two_assign_signed_fail!(
-    i64,
-    mod_power_of_two_signed_i64_fail_1,
-    mod_power_of_two_signed_i64_fail_2
-);
-mod_power_of_two_assign_signed_fail!(
-    i128,
-    mod_power_of_two_signed_i128_fail_1,
-    mod_power_of_two_signed_i128_fail_2
-);
-mod_power_of_two_assign_signed_fail!(
-    isize,
-    mod_power_of_two_signed_isize_fail_1,
-    mod_power_of_two_signed_isize_fail_2
-);
+
+#[test]
+fn mod_power_of_two_assign_signed_fail() {
+    apply_fn_to_signeds!(mod_power_of_two_assign_signed_fail_helper);
+}
 
 #[test]
 fn test_rem_power_of_two_signed() {
@@ -404,83 +361,23 @@ fn test_neg_mod_power_of_two_unsigned() {
     test::<u64>(0x1_0000_0001, 33, 0xffff_ffff);
 }
 
-macro_rules! neg_mod_power_of_two_unsigned_fail {
-    (
-        $t:ident,
-        $neg_mod_power_of_two_unsigned_fail_1:ident,
-        $neg_mod_power_of_two_unsigned_fail_2:ident,
-        $neg_mod_power_of_two_assign_unsigned_fail_1:ident,
-        $neg_mod_power_of_two_assign_unsigned_fail_2:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $neg_mod_power_of_two_unsigned_fail_1() {
-            $t::ONE.neg_mod_power_of_two(200);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $neg_mod_power_of_two_unsigned_fail_2() {
-            $t::MAX.neg_mod_power_of_two($t::WIDTH + 1);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $neg_mod_power_of_two_assign_unsigned_fail_1() {
-            let mut x = $t::ONE;
-            x.neg_mod_power_of_two_assign(200);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $neg_mod_power_of_two_assign_unsigned_fail_2() {
-            let mut x = $t::MAX;
-            x.neg_mod_power_of_two_assign($t::WIDTH + 1);
-        }
-    };
+fn neg_mod_power_of_two_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::ONE.neg_mod_power_of_two(200));
+    assert_panic!(T::MAX.neg_mod_power_of_two(T::WIDTH + 1));
+    assert_panic!({
+        let mut x = T::ONE;
+        x.neg_mod_power_of_two_assign(200)
+    });
+    assert_panic!({
+        let mut x = T::MAX;
+        x.neg_mod_power_of_two_assign(T::WIDTH + 1)
+    });
 }
-neg_mod_power_of_two_unsigned_fail!(
-    u8,
-    neg_mod_power_of_two_unsigned_u8_fail_1,
-    neg_mod_power_of_two_unsigned_u8_fail_2,
-    neg_mod_power_of_two_assign_unsigned_u8_fail_1,
-    neg_mod_power_of_two_assign_unsigned_u8_fail_2
-);
-neg_mod_power_of_two_unsigned_fail!(
-    u16,
-    neg_mod_power_of_two_unsigned_u16_fail_1,
-    neg_mod_power_of_two_unsigned_u16_fail_2,
-    neg_mod_power_of_two_assign_unsigned_u16_fail_1,
-    neg_mod_power_of_two_assign_unsigned_u16_fail_2
-);
-neg_mod_power_of_two_unsigned_fail!(
-    u32,
-    neg_mod_power_of_two_unsigned_u32_fail_1,
-    neg_mod_power_of_two_unsigned_u32_fail_2,
-    neg_mod_power_of_two_assign_unsigned_u32_fail_1,
-    neg_mod_power_of_two_assign_unsigned_u32_fail_2
-);
-neg_mod_power_of_two_unsigned_fail!(
-    u64,
-    neg_mod_power_of_two_unsigned_u64_fail_1,
-    neg_mod_power_of_two_unsigned_u64_fail_2,
-    neg_mod_power_of_two_assign_unsigned_u64_fail_1,
-    neg_mod_power_of_two_assign_unsigned_u64_fail_2
-);
-neg_mod_power_of_two_unsigned_fail!(
-    u128,
-    neg_mod_power_of_two_unsigned_u128_fail_1,
-    neg_mod_power_of_two_unsigned_u128_fail_2,
-    neg_mod_power_of_two_assign_unsigned_u128_fail_1,
-    neg_mod_power_of_two_assign_unsigned_u128_fail_2
-);
-neg_mod_power_of_two_unsigned_fail!(
-    usize,
-    neg_mod_power_of_two_unsigned_usize_fail_1,
-    neg_mod_power_of_two_unsigned_usize_fail_2,
-    neg_mod_power_of_two_assign_unsigned_usize_fail_1,
-    neg_mod_power_of_two_assign_unsigned_usize_fail_2
-);
+
+#[test]
+fn neg_mod_power_of_two_fail() {
+    apply_fn_to_unsigneds!(neg_mod_power_of_two_fail_helper);
+}
 
 #[test]
 fn test_ceiling_mod_power_of_two_signed() {
@@ -568,80 +465,20 @@ fn test_ceiling_mod_power_of_two_signed() {
     test::<i64>(-0x1_0000_0001, 33, -0x1_0000_0001);
 }
 
-macro_rules! ceiling_mod_power_of_two_signed_fail {
-    (
-        $t:ident,
-        $ceiling_mod_power_of_two_signed_fail_1:ident,
-        $ceiling_mod_power_of_two_signed_fail_2:ident,
-        $ceiling_mod_power_of_two_assign_signed_fail_1:ident,
-        $ceiling_mod_power_of_two_assign_signed_fail_2:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_power_of_two_signed_fail_1() {
-            $t::ONE.ceiling_mod_power_of_two($t::WIDTH);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_power_of_two_signed_fail_2() {
-            $t::MIN.ceiling_mod_power_of_two($t::WIDTH);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_power_of_two_assign_signed_fail_1() {
-            let mut x = $t::ONE;
-            x.ceiling_mod_power_of_two_assign($t::WIDTH);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $ceiling_mod_power_of_two_assign_signed_fail_2() {
-            let mut x = $t::MIN;
-            x.ceiling_mod_power_of_two_assign($t::WIDTH);
-        }
-    };
+fn ceiling_mod_power_of_two_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::ONE.ceiling_mod_power_of_two(T::WIDTH));
+    assert_panic!(T::MIN.ceiling_mod_power_of_two(T::WIDTH));
+    assert_panic!({
+        let mut x = T::ONE;
+        x.ceiling_mod_power_of_two_assign(T::WIDTH)
+    });
+    assert_panic!({
+        let mut x = T::MIN;
+        x.ceiling_mod_power_of_two_assign(T::WIDTH)
+    });
 }
-ceiling_mod_power_of_two_signed_fail!(
-    i8,
-    ceiling_mod_power_of_two_signed_i8_fail_1,
-    ceiling_mod_power_of_two_signed_i8_fail_2,
-    ceiling_mod_power_of_two_assign_signed_i8_fail_1,
-    ceiling_mod_power_of_two_assign_signed_i8_fail_2
-);
-ceiling_mod_power_of_two_signed_fail!(
-    i16,
-    ceiling_mod_power_of_two_signed_i16_fail_1,
-    ceiling_mod_power_of_two_signed_i16_fail_2,
-    ceiling_mod_power_of_two_assign_signed_i16_fail_1,
-    ceiling_mod_power_of_two_assign_signed_i16_fail_2
-);
-ceiling_mod_power_of_two_signed_fail!(
-    i32,
-    ceiling_mod_power_of_two_signed_i32_fail_1,
-    ceiling_mod_power_of_two_signed_i32_fail_2,
-    ceiling_mod_power_of_two_assign_signed_i32_fail_1,
-    ceiling_mod_power_of_two_assign_signed_i32_fail_2
-);
-ceiling_mod_power_of_two_signed_fail!(
-    i64,
-    ceiling_mod_power_of_two_signed_i64_fail_1,
-    ceiling_mod_power_of_two_signed_i64_fail_2,
-    ceiling_mod_power_of_two_assign_signed_i64_fail_1,
-    ceiling_mod_power_of_two_assign_signed_i64_fail_2
-);
-ceiling_mod_power_of_two_signed_fail!(
-    i128,
-    ceiling_mod_power_of_two_signed_i128_fail_1,
-    ceiling_mod_power_of_two_signed_i128_fail_2,
-    ceiling_mod_power_of_two_assign_signed_i128_fail_1,
-    ceiling_mod_power_of_two_assign_signed_i128_fail_2
-);
-ceiling_mod_power_of_two_signed_fail!(
-    isize,
-    ceiling_mod_power_of_two_signed_isize_fail_1,
-    ceiling_mod_power_of_two_signed_isize_fail_2,
-    ceiling_mod_power_of_two_assign_signed_isize_fail_1,
-    ceiling_mod_power_of_two_assign_signed_isize_fail_2
-);
+
+#[test]
+fn ceiling_mod_power_of_two_fail() {
+    apply_fn_to_signeds!(ceiling_mod_power_of_two_fail_helper);
+}

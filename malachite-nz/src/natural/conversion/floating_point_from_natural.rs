@@ -17,8 +17,6 @@ use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 
-//TODO clean
-
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {
         // Returns whether `n` > `$f::MAX_FINITE`.
@@ -41,40 +39,45 @@ macro_rules! float_impls {
             }
         }
 
-        /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
-        /// `Natural` is taken by value. If the input is larger than the maximum finite value
-        /// representable by the floating-point type, the result depends on the rounding mode. If
-        /// the rounding mode is `Ceiling` or `Up`, the result is positive infinity; if it is
-        /// `Exact`, the function panics; otherwise, the result is the maximum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Panics
-        /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::RoundingFrom;
-        /// use malachite_base::rounding_modes::RoundingMode;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::rounding_from(Natural::from_str("123").unwrap(),
-        ///     RoundingMode::Exact), 123.0);
-        /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
-        ///     RoundingMode::Floor), 1.0e9);
-        /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
-        ///     RoundingMode::Ceiling), 1.00000006e9);
-        /// assert_eq!(f32::rounding_from(
-        ///     Natural::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
-        ///     RoundingMode::Nearest), 3.4028235e38);
-        /// ```
         impl RoundingFrom<Natural> for $f {
+            /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
+            /// `Natural` is taken by value. If the input is larger than the maximum finite value
+            /// representable by the floating-point type, the result depends on the rounding mode.
+            /// If the rounding mode is `Ceiling` or `Up`, the result is positive infinity; if it is
+            /// `Exact`, the function panics; otherwise, the result is the maximum finite float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::RoundingFrom;
+            /// use malachite_base::rounding_modes::RoundingMode;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::rounding_from(Natural::from_str("123").unwrap(),
+            ///     RoundingMode::Exact), 123.0);
+            /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
+            ///     RoundingMode::Floor), 1.0e9);
+            /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
+            ///     RoundingMode::Ceiling), 1.00000006e9);
+            /// assert_eq!(
+            ///     f32::rounding_from(
+            ///         Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap(),
+            ///         RoundingMode::Nearest
+            ///     ),
+            ///     3.4028235e38
+            /// );
+            /// ```
             fn rounding_from(mut value: Natural, rm: RoundingMode) -> $f {
                 if value == 0 {
                     return 0.0;
@@ -104,40 +107,41 @@ macro_rules! float_impls {
             }
         }
 
-        /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
-        /// `Natural` is taken by reference. If the input is larger than the maximum finite value
-        /// representable by the floating-point type, the result depends on the rounding mode. If
-        /// the rounding mode is `Ceiling` or `Up`, the result is positive infinity; if it is
-        /// `Exact`, the function panics; otherwise, the result is the maximum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Panics
-        /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::RoundingFrom;
-        /// use malachite_base::rounding_modes::RoundingMode;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::rounding_from(&Natural::from_str("123").unwrap(),
-        ///     RoundingMode::Exact), 123.0);
-        /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
-        ///     RoundingMode::Floor), 1.0e9);
-        /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
-        ///     RoundingMode::Ceiling), 1.00000006e9);
-        /// assert_eq!(f32::rounding_from(
-        ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap(), RoundingMode::Nearest), 3.4028235e38);
-        /// ```
         impl<'a> RoundingFrom<&'a Natural> for $f {
+            /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
+            /// `Natural` is taken by reference. If the input is larger than the maximum finite
+            /// value representable by the floating-point type, the result depends on the rounding
+            /// mode. If the rounding mode is `Ceiling` or `Up`, the result is positive infinity; if
+            /// it is `Exact`, the function panics; otherwise, the result is the maximum finite
+            /// float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Panics
+            /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::RoundingFrom;
+            /// use malachite_base::rounding_modes::RoundingMode;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::rounding_from(&Natural::from_str("123").unwrap(),
+            ///     RoundingMode::Exact), 123.0);
+            /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
+            ///     RoundingMode::Floor), 1.0e9);
+            /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
+            ///     RoundingMode::Ceiling), 1.00000006e9);
+            /// assert_eq!(f32::rounding_from(
+            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap(), RoundingMode::Nearest), 3.4028235e38);
+            /// ```
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
                 if *value == 0 {
                     return 0.0;
@@ -168,87 +172,89 @@ macro_rules! float_impls {
             }
         }
 
-        /// Converts a `Natural` to the nearest `f32` or an `f64`. The `Natural` is taken by value.
-        /// If there are two nearest floats, the one whose least-significant bit is zero is chosen.
-        /// If the input is larger than the maximum finite value representable by the floating-point
-        /// type, the result is the maximum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::from(Natural::from_str("123").unwrap()), 123.0);
-        /// assert_eq!(f32::from(Natural::from_str("1000000001").unwrap()), 1.0e9);
-        /// assert_eq!(f32::from(
-        ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), 3.4028235e38);
-        /// ```
         impl From<Natural> for $f {
+            /// Converts a `Natural` to the nearest `f32` or an `f64`. The `Natural` is taken by
+            /// value. If there are two nearest floats, the one whose least-significant bit is zero
+            /// is chosen. If the input is larger than the maximum finite value representable by the
+            /// floating-point type, the result is the maximum finite float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::from(Natural::from_str("123").unwrap()), 123.0);
+            /// assert_eq!(f32::from(Natural::from_str("1000000001").unwrap()), 1.0e9);
+            /// assert_eq!(f32::from(
+            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), 3.4028235e38);
+            /// ```
+            #[inline]
             fn from(value: Natural) -> $f {
                 $f::rounding_from(value, RoundingMode::Nearest)
             }
         }
 
-        /// Converts a `Natural` to the nearest `f32` or an `f64`. The `Natural` is taken by
-        /// reference. If there are two nearest floats, the one whose least-significant bit is zero
-        /// is chosen. If the input is larger than the maximum finite value representable by the
-        /// floating-point type, the result is the maximum finite float.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::from(&Natural::from_str("123").unwrap()), 123.0);
-        /// assert_eq!(f32::from(&Natural::from_str("1000000001").unwrap()), 1.0e9);
-        /// assert_eq!(f32::from(
-        ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), 3.4028235e38);
-        /// ```
         impl<'a> From<&'a Natural> for $f {
+            /// Converts a `Natural` to the nearest `f32` or an `f64`. The `Natural` is taken by
+            /// reference. If there are two nearest floats, the one whose least-significant bit is
+            /// zero is chosen. If the input is larger than the maximum finite value representable
+            /// by the floating-point type, the result is the maximum finite float.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::from(&Natural::from_str("123").unwrap()), 123.0);
+            /// assert_eq!(f32::from(&Natural::from_str("1000000001").unwrap()), 1.0e9);
+            /// assert_eq!(f32::from(
+            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), 3.4028235e38);
+            /// ```
+            #[inline]
             fn from(value: &'a Natural) -> $f {
                 $f::rounding_from(value, RoundingMode::Nearest)
             }
         }
 
-        /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If the
-        /// input isn't exactly equal to some float, `None` is returned.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::checked_from(Natural::from_str("123").unwrap()), Some(123.0));
-        /// assert_eq!(f32::checked_from(Natural::from_str("1000000000").unwrap()),
-        ///     Some(1.0e9));
-        /// assert_eq!(f32::checked_from(Natural::from_str("1000000001").unwrap()), None);
-        /// assert_eq!(f32::checked_from(
-        ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), None);
-        /// ```
         impl CheckedFrom<Natural> for $f {
+            /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If
+            /// the input isn't exactly equal to some float, `None` is returned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::checked_from(Natural::from_str("123").unwrap()), Some(123.0));
+            /// assert_eq!(f32::checked_from(Natural::from_str("1000000000").unwrap()),
+            ///     Some(1.0e9));
+            /// assert_eq!(f32::checked_from(Natural::from_str("1000000001").unwrap()), None);
+            /// assert_eq!(f32::checked_from(
+            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), None);
+            /// ```
             fn checked_from(mut value: Natural) -> Option<$f> {
                 if value == 0 {
                     return Some(0.0);
@@ -272,31 +278,31 @@ macro_rules! float_impls {
             }
         }
 
-        /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If the
-        /// input isn't exactly equal to some float, `None` is returned.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::checked_from(&Natural::from_str("123").unwrap()), Some(123.0));
-        /// assert_eq!(f32::checked_from(&Natural::from_str("1000000000").unwrap()),
-        ///     Some(1.0e9));
-        /// assert_eq!(f32::checked_from(&Natural::from_str("1000000001").unwrap()), None);
-        /// assert_eq!(f32::checked_from(
-        ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), None);
-        /// ```
         impl<'a> CheckedFrom<&'a Natural> for $f {
+            /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If
+            /// the input isn't exactly equal to some float, `None` is returned.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::checked_from(&Natural::from_str("123").unwrap()), Some(123.0));
+            /// assert_eq!(f32::checked_from(&Natural::from_str("1000000000").unwrap()),
+            ///     Some(1.0e9));
+            /// assert_eq!(f32::checked_from(&Natural::from_str("1000000001").unwrap()), None);
+            /// assert_eq!(f32::checked_from(
+            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), None);
+            /// ```
             fn checked_from(value: &'a Natural) -> Option<$f> {
                 if *value == 0 {
                     return Some(0.0);
@@ -317,70 +323,67 @@ macro_rules! float_impls {
             }
         }
 
-        /// Determines whether a `Natural` can be exactly converted to an `f32` or `f64`. The
-        /// `Natural` is taken by value.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::convertible_from(Natural::from_str("123").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(Natural::from_str("1000000000").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(Natural::from_str("1000000001").unwrap()), false);
-        /// assert_eq!(f32::convertible_from(
-        ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), false);
-        /// ```
         impl ConvertibleFrom<Natural> for $f {
+            /// Determines whether a `Natural` can be exactly converted to an `f32` or `f64`. The
+            /// `Natural` is taken by value.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::convertible_from(Natural::from_str("123").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(Natural::from_str("1000000000").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(Natural::from_str("1000000001").unwrap()), false);
+            /// assert_eq!(f32::convertible_from(
+            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), false);
+            /// ```
             #[inline]
             fn convertible_from(value: Natural) -> bool {
                 $f::convertible_from(&value)
             }
         }
 
-        /// Determines whether a `Natural` can be exactly converted to an `f32` or `f64`. The
-        /// `Natural` is taken by reference.
-        ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
-        ///
-        /// # Example
-        /// ```
-        /// extern crate malachite_base;
-        /// extern crate malachite_nz;
-        ///
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-        /// use malachite_nz::natural::Natural;
-        /// use std::str::FromStr;
-        ///
-        /// assert_eq!(f32::convertible_from(&Natural::from_str("123").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000000").unwrap()), true);
-        /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000001").unwrap()), false);
-        /// assert_eq!(f32::convertible_from(
-        ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-        ///     .unwrap()), false);
-        /// ```
         impl<'a> ConvertibleFrom<&'a Natural> for $f {
+            /// Determines whether a `Natural` can be exactly converted to an `f32` or `f64`. The
+            /// `Natural` is taken by reference.
+            ///
+            /// Time: worst case O(1)
+            ///
+            /// Additional memory: worst case O(1)
+            ///
+            /// # Example
+            /// ```
+            /// extern crate malachite_base;
+            /// extern crate malachite_nz;
+            ///
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
+            /// use malachite_nz::natural::Natural;
+            /// use std::str::FromStr;
+            ///
+            /// assert_eq!(f32::convertible_from(&Natural::from_str("123").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000000").unwrap()), true);
+            /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000001").unwrap()), false);
+            /// assert_eq!(f32::convertible_from(
+            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///     .unwrap()), false);
+            /// ```
             fn convertible_from(value: &'a Natural) -> bool {
-                if *value == 0 {
-                    return true;
-                }
-                if $gt_max_finite_float(&value) {
-                    return false;
-                }
-                let shift =
-                    i64::exact_from(value.floor_log_two()) - i64::exact_from($f::MANTISSA_WIDTH);
-                shift < 0 || value.divisible_by_power_of_two(u64::wrapping_from(shift))
+                *value == 0
+                    || !$gt_max_finite_float(&value) && {
+                        let shift = i64::exact_from(value.floor_log_two())
+                            - i64::exact_from($f::MANTISSA_WIDTH);
+                        shift < 0 || value.divisible_by_power_of_two(u64::wrapping_from(shift))
+                    }
             }
         }
     };

@@ -1,5 +1,7 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 fn power_of_two_primitive_helper<T: PrimitiveInteger>() {
@@ -25,36 +27,16 @@ fn test_power_of_two() {
     apply_fn_to_unsigneds!(power_of_two_unsigned_helper);
 }
 
-macro_rules! power_of_two_unsigned_fail {
-    ($t:ident, $power_of_two_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $power_of_two_fail() {
-            $t::power_of_two($t::WIDTH);
-        }
-    };
+fn power_of_two_unsigned_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::power_of_two(T::WIDTH));
 }
 
-power_of_two_unsigned_fail!(u8, power_of_two_u8_fail);
-power_of_two_unsigned_fail!(u16, power_of_two_u16_fail);
-power_of_two_unsigned_fail!(u32, power_of_two_u32_fail);
-power_of_two_unsigned_fail!(u64, power_of_two_u64_fail);
-power_of_two_unsigned_fail!(u128, power_of_two_u128_fail);
-power_of_two_unsigned_fail!(usize, power_of_two_usize_fail);
-
-macro_rules! power_of_two_signed_fail {
-    ($t:ident, $power_of_two_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $power_of_two_fail() {
-            $t::power_of_two($t::WIDTH - 1);
-        }
-    };
+fn power_of_two_signed_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(T::power_of_two(T::WIDTH - 1));
 }
 
-power_of_two_signed_fail!(i8, power_of_two_i8_fail);
-power_of_two_signed_fail!(i16, power_of_two_i16_fail);
-power_of_two_signed_fail!(i32, power_of_two_i32_fail);
-power_of_two_signed_fail!(i64, power_of_two_i64_fail);
-power_of_two_signed_fail!(i128, power_of_two_i128_fail);
-power_of_two_signed_fail!(isize, power_of_two_isize_fail);
+#[test]
+fn power_of_two_fail() {
+    apply_fn_to_unsigneds!(power_of_two_unsigned_fail_helper);
+    apply_fn_to_signeds!(power_of_two_signed_fail_helper);
+}

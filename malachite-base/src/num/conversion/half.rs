@@ -1,8 +1,7 @@
-use std::ops::{BitOr, Shl, Shr};
-
 use num::basic::integers::PrimitiveInteger;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
+use std::ops::{BitOr, Shl, Shr};
 
 #[inline]
 fn _join_halves<T, H: PrimitiveInteger>(upper: H, lower: H) -> T

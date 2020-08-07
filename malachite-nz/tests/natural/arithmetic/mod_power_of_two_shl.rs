@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_nz::natural::Natural;
 
 macro_rules! test_mod_power_of_two_shl_unsigned {
-    ($t:ident) => {{
+    ($t:ident) => {
         let test = |u, v: $t, pow, out| {
             let mut n = Natural::from_str(u).unwrap();
             assert!(n.mod_power_of_two_is_reduced(pow));
@@ -34,11 +34,11 @@ macro_rules! test_mod_power_of_two_shl_unsigned {
         test("0", 10, 8, "0");
         test("123", 5, 8, "96");
         test("123", 100, 80, "0");
-    }};
+    };
 }
 
 macro_rules! test_mod_power_of_two_shl_signed {
-    ($t:ident) => {{
+    ($t:ident) => {
         let test = |u, v: $t, pow, out| {
             let mut n = Natural::from_str(u).unwrap();
             assert!(n.mod_power_of_two_is_reduced(pow));
@@ -67,7 +67,7 @@ macro_rules! test_mod_power_of_two_shl_signed {
         test("123", 100, 80, "0");
         test("123", -2, 8, "30");
         test("123", -10, 8, "0");
-    }};
+    };
 }
 
 #[test]

@@ -1,6 +1,6 @@
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 
 #[test]
 fn test_div_exact() {
@@ -76,46 +76,12 @@ fn test_div_exact() {
     test::<i128>(-18_446_744_065_119_617_025, -0xffff_ffff, 0xffff_ffff);
 }
 
-macro_rules! div_exact_fail {
-    ($t:ident, $div_exact_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_exact_fail() {
-            $t::ONE.div_exact(0);
-        }
-    };
+fn div_exact_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.div_exact(T::ZERO));
+    assert_panic!(T::ONE.div_exact_assign(T::ZERO));
 }
-div_exact_fail!(u8, div_exact_u8_fail);
-div_exact_fail!(u16, div_exact_u16_fail);
-div_exact_fail!(u32, div_exact_u32_fail);
-div_exact_fail!(u64, div_exact_u64_fail);
-div_exact_fail!(u128, div_exact_u128_fail);
-div_exact_fail!(usize, div_exact_usize_fail);
-div_exact_fail!(i8, div_exact_i8_fail);
-div_exact_fail!(i16, div_exact_i16_fail);
-div_exact_fail!(i32, div_exact_i32_fail);
-div_exact_fail!(i64, div_exact_i64_fail);
-div_exact_fail!(i128, div_exact_i128_fail);
-div_exact_fail!(isize, div_exact_isize_fail);
 
-macro_rules! div_exact_assign_fail {
-    ($t:ident, $div_exact_assign_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $div_exact_assign_fail() {
-            $t::ONE.div_exact_assign(0);
-        }
-    };
+#[test]
+pub fn div_exact_fail() {
+    apply_fn_to_primitive_ints!(div_exact_fail_helper);
 }
-div_exact_assign_fail!(u8, div_exact_assign_u8_fail);
-div_exact_assign_fail!(u16, div_exact_assign_u16_fail);
-div_exact_assign_fail!(u32, div_exact_assign_u32_fail);
-div_exact_assign_fail!(u64, div_exact_assign_u64_fail);
-div_exact_assign_fail!(u128, div_exact_assign_u128_fail);
-div_exact_assign_fail!(usize, div_exact_assign_usize_fail);
-div_exact_assign_fail!(i8, div_exact_assign_i8_fail);
-div_exact_assign_fail!(i16, div_exact_assign_i16_fail);
-div_exact_assign_fail!(i32, div_exact_assign_i32_fail);
-div_exact_assign_fail!(i64, div_exact_assign_i64_fail);
-div_exact_assign_fail!(i128, div_exact_assign_i128_fail);
-div_exact_assign_fail!(isize, div_exact_assign_isize_fail);
