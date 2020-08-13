@@ -124,7 +124,7 @@ fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
 /// # Panics
 /// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
 ///
-// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
+/// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
 fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     let m = n + 1;
@@ -143,7 +143,7 @@ fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: 
 // First k to use for an FFT mod-F multiply. A mod-F FFT is an order log(2 ^ k) / log(2 ^ (k - 1))
 // algorithm, so k = 3 is merely 1.5 like Karatsuba, whereas k = 4 is 1.33 which is faster than
 // Toom3 at 1.485.
-const FFT_FIRST_K: usize = 4;
+pub(crate) const FFT_FIRST_K: usize = 4;
 
 /// Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 /// multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are

@@ -305,4 +305,12 @@ impl BitConvertible for Integer {
             ),
         }
     }
+
+    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(_xs: I) -> Integer {
+        unimplemented!();
+    }
+
+    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(_xs: I) -> Integer {
+        unimplemented!();
+    }
 }

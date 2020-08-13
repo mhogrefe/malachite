@@ -1,9 +1,11 @@
+use std::iter::Rev;
+use std::iter::{once, Chain, Once};
+
 use itertools::{Interleave, Itertools};
+
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use std::iter::Rev;
-use std::iter::{once, Chain, Once};
 
 /// Generates all primitive integers in an interval.
 ///

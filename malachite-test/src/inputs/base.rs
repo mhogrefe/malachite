@@ -2674,6 +2674,30 @@ pub fn pairs_of_unsigned_vec_var_23<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All pairs of `Vec<T>`, where `T` is unsigned, the second `Vec` is nonempty, and the first `Vec`
+// is at least twice as long as the second.
+pub fn pairs_of_unsigned_vec_var_24<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 2, 1)
+            .filter(|&(ref out, ref xs)| out.len() >= xs.len() << 1),
+    )
+}
+
+// Some pairs of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `xs` would trigger the actual
+// FFT code of `_limbs_mul_greater_to_out_fft`.
+pub fn pairs_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        pairs_of_unsigned_vec_min_sizes(gm, 30, 15).filter(|&(ref out, ref xs)| {
+            out.len() >= xs.len() << 1
+                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs.len(), xs.len())
+        }),
+    )
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {

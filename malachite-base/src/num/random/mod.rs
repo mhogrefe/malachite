@@ -590,6 +590,8 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
     }
 }
 
+/// This module contains iterators that generate primitive integers from geometric-like
+/// distributions.
 pub mod geometric;
 pub mod random_bit_chunks;
 pub mod random_highest_bit_set_values;

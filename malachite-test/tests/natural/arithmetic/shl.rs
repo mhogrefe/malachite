@@ -240,7 +240,7 @@ macro_rules! tests_and_properties_signed {
 }
 tests_and_properties_signed!(i8, shl_i8_properties, i, n, shifted, {});
 tests_and_properties_signed!(i16, shl_i16_properties, i, n, shifted, {});
-tests_and_properties_signed!(i32, shl_signed_limb_properties, i, n, shifted, {
+tests_and_properties_signed!(i32, shl_i32_properties, i, n, shifted, {
     let mut rug_n = natural_to_rug_integer(n);
     rug_n <<= i;
     assert_eq!(rug_integer_to_natural(&rug_n), shifted);

@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 
 use malachite_base::num::basic::integers::PrimitiveInteger;
@@ -27,23 +29,6 @@ pub fn test_get_bits_unsigned() {
     test(0xabcdu64, 100, 200, 0);
 }
 
-macro_rules! get_bits_fail_helper_unsigned {
-    ($t:ident, $fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail() {
-            $t::from(100u8).get_bits(10, 5);
-        }
-    };
-}
-
-get_bits_fail_helper_unsigned!(u8, get_bits_u8_fail);
-get_bits_fail_helper_unsigned!(u16, get_bits_u16_fail);
-get_bits_fail_helper_unsigned!(u32, get_bits_u32_fail);
-get_bits_fail_helper_unsigned!(u64, get_bits_u64_fail);
-get_bits_fail_helper_unsigned!(u128, get_bits_u128_fail);
-get_bits_fail_helper_unsigned!(usize, get_bits_usize_fail);
-
 #[test]
 pub fn test_get_bits_signed() {
     fn test<T: PrimitiveSigned, U: PrimitiveUnsigned>(x: T, start: u64, end: u64, out: U)
@@ -66,28 +51,19 @@ pub fn test_get_bits_signed() {
     test(-1i8, 0, 8, 0xff);
 }
 
-macro_rules! get_bits_fail_helper_signed {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            $t::from(10i8).get_bits(10, 5);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            $t::from(-10i8).get_bits(100, 300);
-        }
-    };
+fn get_bits_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::exact_from(100).get_bits(10, 5));
 }
 
-get_bits_fail_helper_signed!(i8, get_bits_i8_fail_1, get_bits_i8_fail_2);
-get_bits_fail_helper_signed!(i16, get_bits_i16_fail_1, get_bits_i16_fail_2);
-get_bits_fail_helper_signed!(i32, get_bits_i32_fail_1, get_bits_i32_fail_2);
-get_bits_fail_helper_signed!(i64, get_bits_i64_fail_1, get_bits_i64_fail_2);
-get_bits_fail_helper_signed!(i128, get_bits_i128_fail_1, get_bits_i128_fail_2);
-get_bits_fail_helper_signed!(isize, get_bits_isize_fail_1, get_bits_isize_fail_2);
+fn get_bits_fail_helper_signed<T: PrimitiveSigned>() {
+    assert_panic!(T::exact_from(-100).get_bits(100, 300));
+}
+
+#[test]
+fn get_bits_fail() {
+    apply_fn_to_primitive_ints!(get_bits_fail_helper);
+    apply_fn_to_signeds!(get_bits_fail_helper_signed);
+}
 
 #[test]
 pub fn test_assign_bits_unsigned() {
@@ -121,29 +97,6 @@ pub fn test_assign_bits_unsigned() {
     test(0xabcdu64, 100, 200, 0, 0xabcd);
     test(0xabcdu64, 0, 100, 0x1234, 0x1234);
 }
-
-macro_rules! assign_bits_fail_helper_unsigned {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            $t::from(100u8).assign_bits(10, 5, &3);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            $t::from(100u8).assign_bits(3, 3 + $t::WIDTH, &$t::MAX);
-        }
-    };
-}
-
-assign_bits_fail_helper_unsigned!(u8, assign_bits_u8_fail_1, assign_bits_u8_fail_2);
-assign_bits_fail_helper_unsigned!(u16, assign_bits_u16_fail_1, assign_bits_u16_fail_2);
-assign_bits_fail_helper_unsigned!(u32, assign_bits_u32_fail_1, assign_bits_u32_fail_2);
-assign_bits_fail_helper_unsigned!(u64, assign_bits_u64_fail_1, assign_bits_u64_fail_2);
-assign_bits_fail_helper_unsigned!(u128, assign_bits_u128_fail_1, assign_bits_u128_fail_2);
-assign_bits_fail_helper_unsigned!(usize, assign_bits_usize_fail_1, assign_bits_usize_fail_2);
 
 #[test]
 pub fn test_assign_bits_signed() {
@@ -184,100 +137,30 @@ pub fn test_assign_bits_signed() {
     test(-57i64, 0, 64, u64::MAX, -1);
 }
 
-macro_rules! assign_bits_fail_helper_signed {
-    (
-        $u:ident,
-        $s:ident,
-        $fail_1:ident,
-        $fail_2:ident,
-        $fail_3:ident,
-        $fail_4:ident,
-        $fail_5:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            $s::from(100i8).assign_bits(7, 5, &3);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            $s::from(100i8).assign_bits(0, $s::WIDTH, &$u::MAX);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_3() {
-            $s::from(-100i8).assign_bits(0, $s::WIDTH + 1, &0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_4() {
-            $s::from(-100i8).assign_bits($s::WIDTH + 1, $s::WIDTH + 2, &0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_5() {
-            let half_width = $s::WIDTH >> 1;
-            $s::from(-100i8).assign_bits(half_width, 3 * half_width - 4, &0);
-        }
-    };
+fn assign_bits_fail_helper_unsigned<T: PrimitiveUnsigned>()
+where
+    T: BitBlockAccess<Bits = T>,
+{
+    assert_panic!(T::exact_from(100).assign_bits(10, 5, &T::exact_from(3)));
+    assert_panic!(T::exact_from(100).assign_bits(3, T::WIDTH + 3, &T::MAX));
 }
 
-assign_bits_fail_helper_signed!(
-    u8,
-    i8,
-    assign_bits_i8_fail_1,
-    assign_bits_i8_fail_2,
-    assign_bits_i8_fail_3,
-    assign_bits_i8_fail_4,
-    assign_bits_i8_fail_5
-);
-assign_bits_fail_helper_signed!(
-    u16,
-    i16,
-    assign_bits_i16_fail_1,
-    assign_bits_i16_fail_2,
-    assign_bits_i16_fail_3,
-    assign_bits_i16_fail_4,
-    assign_bits_i16_fail_5
-);
-assign_bits_fail_helper_signed!(
-    u32,
-    i32,
-    assign_bits_i32_fail_1,
-    assign_bits_i32_fail_2,
-    assign_bits_i32_fail_3,
-    assign_bits_i32_fail_4,
-    assign_bits_i32_fail_5
-);
-assign_bits_fail_helper_signed!(
-    u64,
-    i64,
-    assign_bits_i64_fail_1,
-    assign_bits_i64_fail_2,
-    assign_bits_i64_fail_3,
-    assign_bits_i64_fail_4,
-    assign_bits_i64_fail_5
-);
-assign_bits_fail_helper_signed!(
-    u128,
-    i128,
-    assign_bits_i128_fail_1,
-    assign_bits_i128_fail_2,
-    assign_bits_i128_fail_3,
-    assign_bits_i128_fail_4,
-    assign_bits_i128_fail_5
-);
-assign_bits_fail_helper_signed!(
-    usize,
-    isize,
-    assign_bits_isize_fail_1,
-    assign_bits_isize_fail_2,
-    assign_bits_isize_fail_3,
-    assign_bits_isize_fail_4,
-    assign_bits_isize_fail_5
-);
+fn assign_bits_fail_helper_signed<U: PrimitiveUnsigned, S: PrimitiveSigned>()
+where
+    S: BitBlockAccess<Bits = U>,
+{
+    assert_panic!(S::exact_from(100).assign_bits(7, 5, &U::exact_from(3)));
+    assert_panic!(S::exact_from(100).assign_bits(0, S::WIDTH, &U::MAX));
+    assert_panic!(S::exact_from(-100).assign_bits(0, S::WIDTH + 1, &U::ZERO));
+    assert_panic!(S::exact_from(-100).assign_bits(S::WIDTH + 1, S::WIDTH + 2, &U::ZERO));
+    assert_panic!({
+        let half_width = S::WIDTH >> 1;
+        S::exact_from(-100).assign_bits(half_width, 3 * half_width - 4, &U::ZERO)
+    });
+}
+
+#[test]
+fn assign_bits_fail() {
+    apply_fn_to_unsigneds!(assign_bits_fail_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(assign_bits_fail_helper_signed);
+}

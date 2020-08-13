@@ -16,6 +16,8 @@ use malachite_test::inputs::base::{
     vecs_of_bool_var_5,
 };
 
+//TODO from_bit_iterator_asc and from_bit_iterator_desc
+
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_to_bits_asc);
     register_demo!(registry, demo_u16_to_bits_asc);

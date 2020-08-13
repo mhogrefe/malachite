@@ -1,6 +1,6 @@
-use malachite_base::num::arithmetic::traits::WrappingDivAssign;
+use std::panic::catch_unwind;
+
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::One;
 
 #[test]
 fn test_wrapping_div() {
@@ -20,24 +20,11 @@ fn test_wrapping_div() {
     test::<i8>(-128, -1, -128);
 }
 
-macro_rules! wrapping_div_assign_fail {
-    ($t:ident, $wrapping_div_assign_fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $wrapping_div_assign_fail() {
-            $t::ONE.wrapping_div_assign(0);
-        }
-    };
+fn wrapping_div_assign_fail_helper<T: PrimitiveInteger>() {
+    assert_panic!(T::ONE.wrapping_div_assign(T::ZERO));
 }
-wrapping_div_assign_fail!(u8, wrapping_div_assign_u8_fail);
-wrapping_div_assign_fail!(u16, wrapping_div_assign_u16_fail);
-wrapping_div_assign_fail!(u32, wrapping_div_assign_u32_fail);
-wrapping_div_assign_fail!(u64, wrapping_div_assign_u64_fail);
-wrapping_div_assign_fail!(u128, wrapping_div_assign_u128_fail);
-wrapping_div_assign_fail!(usize, wrapping_div_assign_usize_fail);
-wrapping_div_assign_fail!(i8, wrapping_div_assign_i8_fail);
-wrapping_div_assign_fail!(i16, wrapping_div_assign_i16_fail);
-wrapping_div_assign_fail!(i32, wrapping_div_assign_i32_fail);
-wrapping_div_assign_fail!(i64, wrapping_div_assign_i64_fail);
-wrapping_div_assign_fail!(i128, wrapping_div_assign_i128_fail);
-wrapping_div_assign_fail!(isize, wrapping_div_assign_isize_fail);
+
+#[test]
+fn wrapping_div_assign_fail() {
+    apply_fn_to_primitive_ints!(wrapping_div_assign_fail_helper);
+}

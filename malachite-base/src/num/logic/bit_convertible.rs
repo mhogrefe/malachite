@@ -1,9 +1,12 @@
-use num::arithmetic::traits::Parity;
+use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
+
+use comparison::traits::Max;
+use named::Named;
+use num::arithmetic::traits::{Parity, WrappingNeg};
 use num::basic::integers::PrimitiveInteger;
-use num::basic::traits::{NegativeOne, Zero};
+use num::basic::traits::{NegativeOne, One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitConvertible, LeadingZeros};
-use std::ops::ShrAssign;
 
 fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
@@ -57,6 +60,43 @@ fn _from_bits_desc_unsigned<T: PrimitiveInteger>(mut bits: &[bool]) -> T {
     }
     let mut n = T::ZERO;
     for &bit in bits {
+        n <<= 1;
+        if bit {
+            n |= T::ONE;
+        }
+    }
+    n
+}
+
+fn _from_bit_iterator_asc_unsigned<T: Copy + Eq + Named + One + Zero, I: Iterator<Item = bool>>(
+    bits: I,
+) -> T
+where
+    T: BitOrAssign<T> + ShlAssign<u64>,
+{
+    let mut n = T::ZERO;
+    let mut mask = T::ONE;
+    for bit in bits {
+        if mask == T::ZERO {
+            assert!(!bit, "Bits cannot fit in integer of type {}", T::NAME);
+        } else {
+            if bit {
+                n |= mask;
+            }
+            mask <<= 1;
+        }
+    }
+    n
+}
+
+#[inline]
+fn _from_bit_iterator_desc_unsigned<T: PrimitiveInteger, I: Iterator<Item = bool>>(bits: I) -> T {
+    let mut n = T::ZERO;
+    let high_mask = T::power_of_two(T::WIDTH - 1);
+    for bit in bits {
+        if n & high_mask != T::ZERO {
+            panic!("Bits cannot fit in integer of type {}", T::NAME);
+        }
         n <<= 1;
         if bit {
             n |= T::ONE;
@@ -162,6 +202,48 @@ macro_rules! impl_bit_convertible_unsigned {
             #[inline]
             fn from_bits_desc(bits: &[bool]) -> $t {
                 _from_bits_desc_unsigned(bits)
+            }
+
+            /// TODO doc
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            /// use std::iter::empty;
+            ///
+            /// assert_eq!(u8::from_bit_iterator_asc(empty()), 0);
+            /// assert_eq!(u16::from_bit_iterator_asc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     u32::from_bit_iterator_asc(
+            ///         [true, true, false, true, true, true, true].iter().cloned()
+            ///     ),
+            ///     123
+            /// );
+            /// ```
+            #[inline]
+            fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
+                _from_bit_iterator_asc_unsigned(bits)
+            }
+
+            /// TODO doc
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            /// use std::iter::empty;
+            ///
+            /// assert_eq!(u8::from_bit_iterator_desc(empty()), 0);
+            /// assert_eq!(u16::from_bit_iterator_desc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     u32::from_bit_iterator_desc(
+            ///         [true, true, true, true, false, true, true].iter().cloned()
+            ///     ),
+            ///     123
+            /// );
+            /// ```
+            #[inline]
+            fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
+                _from_bit_iterator_desc_unsigned(bits)
             }
         }
     };
@@ -270,6 +352,75 @@ where
             }
             S::wrapping_from(u)
         }
+    }
+}
+
+fn _from_bit_iterator_asc_signed<
+    U: Copy + Eq + Max + One + Zero,
+    S: Named,
+    I: Iterator<Item = bool>,
+>(
+    bits: I,
+) -> S
+where
+    U: BitOr<U, Output = U> + BitOrAssign<U> + ShlAssign<u64> + WrappingNeg<Output = U>,
+    S: WrappingFrom<U>,
+{
+    let mut n = U::ZERO;
+    let mut mask = U::ONE;
+    let mut last_bit = false;
+    for bit in bits {
+        if mask == U::ZERO {
+            assert_eq!(
+                bit,
+                last_bit,
+                "Bits cannot fit in integer of type {}",
+                S::NAME
+            );
+        } else {
+            if bit {
+                n |= mask;
+            }
+            mask <<= 1;
+            last_bit = bit;
+        }
+    }
+    if last_bit {
+        S::wrapping_from(n | mask.wrapping_neg())
+    } else {
+        S::wrapping_from(n)
+    }
+}
+
+#[inline]
+fn _from_bit_iterator_desc_signed<U: PrimitiveInteger, S: Named, I: Iterator<Item = bool>>(
+    bits: I,
+) -> S
+where
+    S: WrappingFrom<U>,
+{
+    let mut n = U::ZERO;
+    let high_mask = U::power_of_two(U::WIDTH - 2);
+    let mut first = true;
+    let mut sign_bit = false;
+    for bit in bits {
+        if first {
+            sign_bit = bit;
+            first = false;
+        } else {
+            if n & high_mask != U::ZERO {
+                panic!("Bits cannot fit in integer of type {}", S::NAME);
+            }
+            n <<= 1;
+            if bit != sign_bit {
+                n |= U::ONE;
+            }
+        }
+    }
+    if sign_bit {
+        S::wrapping_from(!n)
+    } else {
+        S::wrapping_from(n)
     }
 }
 
@@ -384,6 +535,48 @@ macro_rules! impl_bit_convertible_signed {
             #[inline]
             fn from_bits_desc(bits: &[bool]) -> $s {
                 _from_bits_desc_signed::<$u, $s>(bits)
+            }
+
+            /// TODO doc
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            /// use std::iter::empty;
+            ///
+            /// assert_eq!(i8::from_bit_iterator_asc(empty()), 0);
+            /// assert_eq!(i16::from_bit_iterator_asc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     i32::from_bit_iterator_asc(
+            ///         [true, false, true, false, false, false, false, true].iter().cloned()
+            ///     ),
+            ///     -123
+            /// );
+            /// ```
+            #[inline]
+            fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
+                _from_bit_iterator_asc_signed::<$u, $s, _>(bits)
+            }
+
+            /// TODO doc
+            ///
+            /// # Examples
+            /// ```
+            /// use malachite_base::num::logic::traits::BitConvertible;
+            /// use std::iter::empty;
+            ///
+            /// assert_eq!(i8::from_bit_iterator_desc(empty()), 0);
+            /// assert_eq!(i16::from_bit_iterator_desc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     i32::from_bit_iterator_desc(
+            ///         [true, false, false, false, false, true, false, true].iter().cloned()
+            ///     ),
+            ///     -123
+            /// );
+            /// ```
+            #[inline]
+            fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
+                _from_bit_iterator_desc_signed::<$u, $s, _>(bits)
             }
         }
     };

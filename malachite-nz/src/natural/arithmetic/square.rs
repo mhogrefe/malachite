@@ -2,7 +2,7 @@ use std::cmp::{max, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
-    WrappingSubAssign,
+    WrappingSubAssign, XMulYIsZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
@@ -16,7 +16,8 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::SQR_FFT_MODF_THRESHOLD;
+use natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
+use natural::arithmetic::mul::fft::{_limbs_mul_greater_to_out_fft, SQR_FFT_MODF_THRESHOLD};
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::poly_eval::{
     _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
@@ -37,10 +38,11 @@ use natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
 };
 use natural::comparison::ord::limbs_cmp_same_length;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{
-    DoubleLimb, Limb, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD,
-    SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
+    DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
+    SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 
 /// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
@@ -859,6 +861,49 @@ pub fn _limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     _limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }
 
+pub const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
+
+/// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.
+#[allow(clippy::absurd_extreme_comparisons)]
+pub fn limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
+    let n = xs.len();
+    assert!(n >= 1);
+    if n < SQR_BASECASE_THRESHOLD {
+        // _limbs_mul_greater_to_out_basecase is faster than _limbs_square_to_out_basecase on small
+        // sizes sometimes
+        _limbs_mul_greater_to_out_basecase(out, xs, xs);
+    } else if n < SQR_TOOM2_THRESHOLD {
+        _limbs_square_to_out_basecase(out, xs);
+    } else if n < SQR_TOOM3_THRESHOLD {
+        // Allocate workspace of fixed size on stack: fast!
+        let mut scratch =
+            [0; _limbs_square_to_out_toom_2_scratch_len(SQR_TOOM3_THRESHOLD_LIMIT - 1)];
+        assert!(SQR_TOOM3_THRESHOLD <= SQR_TOOM3_THRESHOLD_LIMIT);
+        _limbs_square_to_out_toom_2(out, xs, &mut scratch);
+    } else if n < SQR_TOOM4_THRESHOLD {
+        let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(n)];
+        _limbs_square_to_out_toom_3(out, xs, &mut scratch);
+    } else if n < SQR_TOOM6_THRESHOLD {
+        let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(n)];
+        _limbs_square_to_out_toom_4(out, xs, &mut scratch);
+    } else if n < SQR_TOOM8_THRESHOLD {
+        let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(n)];
+        _limbs_square_to_out_toom_6(out, xs, &mut scratch);
+    } else if n < SQR_FFT_THRESHOLD {
+        let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(n)];
+        _limbs_square_to_out_toom_8(out, xs, &mut scratch);
+    } else {
+        // The current FFT code allocates its own space. That should probably change.
+        _limbs_mul_greater_to_out_fft(out, xs, xs);
+    }
+}
+
+pub fn limbs_square(xs: &[Limb]) -> Vec<Limb> {
+    let mut out = vec![0; xs.len() << 1];
+    limbs_square_to_out(&mut out, xs);
+    out
+}
+
 impl Square for Natural {
     type Output = Natural;
 
@@ -914,8 +959,18 @@ impl<'a> Square for &'a Natural {
     /// ```
     #[inline]
     fn square(self) -> Natural {
-        //TODO use better algorithm
-        self * self
+        match self {
+            natural_zero!() | natural_one!() => self.clone(),
+            Natural(Small(x)) => Natural({
+                let (upper, lower) = Limb::x_mul_y_is_zz(*x, *x);
+                if upper == 0 {
+                    Small(lower)
+                } else {
+                    Large(vec![lower, upper])
+                }
+            }),
+            Natural(Large(ref xs)) => Natural::from_owned_limbs_asc(limbs_square(xs)),
+        }
     }
 }
 
@@ -946,7 +1001,20 @@ impl SquareAssign for Natural {
     /// assert_eq!(x, 15_129);
     /// ```
     fn square_assign(&mut self) {
-        //TODO use better algorithm
-        *self *= self.clone();
+        match self {
+            natural_zero!() | natural_one!() => {}
+            Natural(Small(x)) => {
+                let (upper, lower) = Limb::x_mul_y_is_zz(*x, *x);
+                if upper == 0 {
+                    *x = lower;
+                } else {
+                    *self = Natural(Large(vec![lower, upper]));
+                }
+            }
+            Natural(Large(ref mut xs)) => {
+                *xs = limbs_square(xs);
+                self.trim();
+            }
+        }
     }
 }

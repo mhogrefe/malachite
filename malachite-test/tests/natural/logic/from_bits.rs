@@ -71,6 +71,10 @@ fn from_bits_asc_properties() {
         if Limb::convertible_from(&x) {
             assert_eq!(Limb::from_bits_asc(bits), x);
         }
+
+        let x_alt = Natural::from_bit_iterator_asc(bits.iter().cloned());
+        assert!(x_alt.is_valid());
+        assert_eq!(x_alt, x);
     });
 }
 
@@ -100,5 +104,9 @@ fn from_bits_desc_properties() {
         if Limb::convertible_from(&x) {
             assert_eq!(Limb::from_bits_desc(bits), x);
         }
+
+        let x_alt = Natural::from_bit_iterator_desc(bits.iter().cloned());
+        assert!(x_alt.is_valid());
+        assert_eq!(x_alt, x);
     });
 }

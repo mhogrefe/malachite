@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     truncated_geometric_dist_assertions, CheckedToF64, MomentStats,
@@ -223,53 +225,12 @@ fn test_geometric_random_positive_unsigneds() {
     );
 }
 
-macro_rules! geometric_random_positive_unsigneds_fail {
-    (
-        $t:ident,
-        $geometric_random_positive_unsigneds_fail_1:ident,
-        $geometric_random_positive_unsigneds_fail_2:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $geometric_random_positive_unsigneds_fail_1() {
-            geometric_random_positive_unsigneds::<$t>(EXAMPLE_SEED, 1, 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $geometric_random_positive_unsigneds_fail_2() {
-            geometric_random_positive_unsigneds::<$t>(EXAMPLE_SEED, 2, 3);
-        }
-    };
+fn geometric_random_positive_unsigneds_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(geometric_random_positive_unsigneds::<T>(EXAMPLE_SEED, 1, 0));
+    assert_panic!(geometric_random_positive_unsigneds::<T>(EXAMPLE_SEED, 2, 3));
 }
 
-geometric_random_positive_unsigneds_fail!(
-    u8,
-    geometric_random_positive_unsigneds_u8_fail_1,
-    geometric_random_positive_unsigneds_u8_fail_2
-);
-geometric_random_positive_unsigneds_fail!(
-    u16,
-    geometric_random_positive_unsigneds_u16_fail_1,
-    geometric_random_positive_unsigneds_u16_fail_2
-);
-geometric_random_positive_unsigneds_fail!(
-    u32,
-    geometric_random_positive_unsigneds_u32_fail_1,
-    geometric_random_positive_unsigneds_u32_fail_2
-);
-geometric_random_positive_unsigneds_fail!(
-    u64,
-    geometric_random_positive_unsigneds_u64_fail_1,
-    geometric_random_positive_unsigneds_u64_fail_2
-);
-geometric_random_positive_unsigneds_fail!(
-    u128,
-    geometric_random_positive_unsigneds_u128_fail_1,
-    geometric_random_positive_unsigneds_u128_fail_2
-);
-geometric_random_positive_unsigneds_fail!(
-    usize,
-    geometric_random_positive_unsigneds_usize_fail_1,
-    geometric_random_positive_unsigneds_usize_fail_2
-);
+#[test]
+fn geometric_random_positive_unsigneds_fail() {
+    apply_fn_to_unsigneds!(geometric_random_positive_unsigneds_fail_helper);
+}

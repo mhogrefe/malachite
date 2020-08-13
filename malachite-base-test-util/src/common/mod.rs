@@ -2,6 +2,14 @@ use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::str::FromStr;
 
+#[macro_export]
+macro_rules! assert_panic {
+    ($e: expr) => {
+        let result = catch_unwind(|| $e);
+        assert!(result.is_err());
+    };
+}
+
 fn read_strings<T: FromStr>(strings: &[&str]) -> Vec<T>
 where
     T::Err: Debug,

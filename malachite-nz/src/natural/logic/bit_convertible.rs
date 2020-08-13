@@ -1,8 +1,11 @@
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
 
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
 use platform::Limb;
 
@@ -189,5 +192,85 @@ impl BitConvertible for Natural {
     /// ```
     fn from_bits_desc(bits: &[bool]) -> Natural {
         Natural::from_owned_limbs_asc(limbs_asc_from_bits_desc(bits))
+    }
+
+    /// TODO doc
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::logic::traits::BitConvertible;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::empty;
+    ///
+    /// assert_eq!(Natural::from_bit_iterator_asc(empty()), 0);
+    /// // 105 = 1101001b
+    /// assert_eq!(
+    ///     Natural::from_bit_iterator_asc(
+    ///         [true, false, false, true, false, true, true].iter().cloned()
+    ///     ),
+    ///     105
+    /// );
+    /// ```
+    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(xs: I) -> Natural {
+        Natural::from_owned_limbs_asc(
+            xs.chunks(usize::wrapping_from(Limb::WIDTH))
+                .into_iter()
+                .map(Limb::from_bit_iterator_asc)
+                .collect(),
+        )
+    }
+
+    /// TODO doc
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::logic::traits::BitConvertible;
+    /// use malachite_nz::natural::Natural;
+    /// use std::iter::empty;
+    ///
+    /// assert_eq!(Natural::from_bit_iterator_desc(empty()), 0);
+    /// // 105 = 1101001b
+    /// assert_eq!(
+    ///     Natural::from_bit_iterator_desc(
+    ///         [true, true, false, true, false, false, true].iter().cloned()
+    ///     ),
+    ///     105
+    /// );
+    /// ```
+    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
+        const WIDTH: usize = Limb::WIDTH as usize;
+        let mut limbs = Vec::new();
+        let mut buffer = [false; WIDTH];
+        let mut last_width = 0;
+        for chunk in &xs.chunks(WIDTH) {
+            let mut i = 0;
+            for bit in chunk {
+                buffer[i] = bit;
+                i += 1;
+            }
+            last_width = i;
+            limbs.push(Limb::from_bits_desc(&buffer[..last_width]));
+        }
+        match limbs.len() {
+            0 => Natural::ZERO,
+            1 => Natural::from(limbs[0]),
+            _ => {
+                limbs.reverse();
+                let last_width = u64::wrapping_from(last_width);
+                if last_width != Limb::WIDTH {
+                    let smallest_limb = limbs[0];
+                    limbs[0] = 0;
+                    limbs_slice_shr_in_place(&mut limbs, Limb::WIDTH - last_width);
+                    limbs[0] |= smallest_limb;
+                }
+                Natural::from_owned_limbs_asc(limbs)
+            }
+        }
     }
 }

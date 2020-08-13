@@ -1,7 +1,8 @@
+use std::ops::RangeInclusive;
+
 use chars::crement::increment_char;
 use chars::CharType;
 use comparison::traits::{Max, Min};
-use std::ops::RangeInclusive;
 
 /// Generates all ASCII `char`s, in ascending order. For a friendlier order (*e.g.* nonprintable
 /// `char`s coming last), try `exhaustive_ascii_char`s.

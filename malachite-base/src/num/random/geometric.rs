@@ -59,7 +59,7 @@ fn gcd(u: u64, v: u64) -> u64 {
     }
 }
 
-pub fn mean_to_p_with_min<T: PrimitiveInteger>(
+pub(crate) fn mean_to_p_with_min<T: PrimitiveInteger>(
     um_numerator: u64,
     um_denominator: u64,
     min: T,
@@ -273,29 +273,44 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
     }
 }
 
-/// Generates random unsigned integers from a truncated geometric distribution. The maximum value
-/// is `T::MAX`. A geometric distribution is typically parametrized by a value p, such that the
-/// probability P(n) of generating n is (1 - p)<sup>n</sup>p. Instead, this function accepts a value
-/// called the "unadjusted mean"; the numerator and denominator of this value are accepted.
+/// Generates random unsigned integers from a truncated geometric distribution.
 ///
-/// The unadjusted mean is what the mean of the distribution would be if the distribution weren't
-/// truncated. If it is significantly lower than `T::MAX`, then it is very close to the actual mean.
-/// It is related to the parameter p by m = 1 / p - 1, or p = 1 / (m + 1).
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities of $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence;
+/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
+/// is truncated, meaning that values above `T::MAX` are never generated.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on [0, `T::MAX`]
-/// such that P(n) / P(n + 1) = (m + 1) / m, where m = `um_numerator` / `um_denominator`.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
+/// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
+/// more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but note
+/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
 ///
-/// Length is infinite.
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[0, 2^W)$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
 ///
-/// Time per iteration: O(m)
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// The output length is infinite.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_numerator` or `um_denominator` are zero, or if, after being reduced to lowest
-/// terms, their sum is greater than or equal to 2<sup>64</sup>.
+/// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
+/// terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -307,6 +322,24 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p} - 1$, or $p = \frac{1}{m_u + 1}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{1-(1-p)^{2^W}} & 0 \\leq n < 2^W \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(0) = p = \frac{1}{m_u + 1}.
+/// $$
 pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     um_numerator: u64,
@@ -316,24 +349,40 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
     geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ZERO, T::MAX)
 }
 
-/// Generates random positive unsigned integers from a truncated geometric distribution. The maximum
-/// value is `T::MAX`. This function accepts a value called the "unadjusted mean"; the numerator and
-/// denominator of this value are accepted.
+/// Generates random positive unsigned integers from a truncated geometric distribution.
 ///
-/// The unadjusted mean is what the mean of the distribution would be if the distribution weren't
-/// truncated. If it is significantly lower than `T::MAX`, then it is very close to the actual mean.
-/// It is related to the parameter p by m = 1 / p, or p = 1 / m.
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities of $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence;
+/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
+/// is truncated, meaning that values above `T::MAX` are never generated.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on [1, `T::MAX`]
-/// such that P(n) / P(n + 1) = m / (m - 1), where m = `um_numerator` / `um_denominator`.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
+/// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
+/// more quickly they drop. $m_u$ must be greater than one. It may be arbitrarily high, but note
+/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
 ///
-/// Length is infinite.
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[1, 2^W)$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
 ///
-/// Time per iteration: O(m)
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u}{m_u - 1}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// The output length is infinite.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
@@ -349,6 +398,24 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p}$, or $p = \frac{1}{m_u}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^W-1}} & 0 < n < 2^W \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(1) = p = \frac{1}{m_u}.
+/// $$
 pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     um_numerator: u64,
@@ -358,29 +425,53 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
     geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ONE, T::MAX)
 }
 
-/// Generates random signed integers from a modified geometric distribution; the distribution is
-/// mirrored across the y-axis and is truncated at `T::MIN` and `T::MAX`. This function accepts a
-/// value called the "unadjusted mean"; the numerator and denominator of this value are accepted.
+/// Generates random signed integers from a modified geometric distribution.
 ///
-/// The unadjusted mean is what the mean of the distribution would be if the distribution weren't
-/// truncated. If it is significantly lower than `T::MAX`, then it is very close to the actual mean.
-/// It is related to the parameter p by m = 1 / p - 1, or p = 1 / (m + 1).
+/// This distribution can be derived from a truncated geometric distribution by mirroring it,
+/// producing a truncated double geometric distribution. Zero is included.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on
-/// [`T::MIN`, -1] union [1, `T::MAX`] such that P(1) = P(-1) and
-/// P(n) / P(n + sgn(n)) = (m + 1) / m, where m = `um_numerator` / `um_denominator`.
+/// With this distribution, the probability of a value being generated decreases as its absolute
+/// value increases. The probabilities of $P(0), P(\pm 1), P(\pm 2), \ldots$ decrease in a
+/// geometric sequence; that's were the "geometric" comes from. Values below `T::MIN` or above
+/// `T::MAX` are never generated.
 ///
-/// Length is infinite.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// mean is what the mean generated value would be if the distribution were not truncated, and were
+/// restricted to non-negative values. If $m_u$ is significantly lower than `T::MAX`, which is
+/// usually the case, then it is very close to the actual mean of the distribution restricted to
+/// positive values. The higher $m_u$ is, the more gently the probabilities drop; the lower it is,
+/// the more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but
+/// note that the iteration time increases linearly with `abs_um_numerator` + `abs_um_denominator`.
 ///
-/// Time per iteration: O(m)
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[-2^{W-1}, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+/// Whenever $n \geq 0$ and $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u}{m_u - 1},
+/// $$
+/// and whenever $n \leq 0$ and $n, n - 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n-1)} = \frac{m_u}{m_u - 1}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// As a corollary, $P(n) = P(-n)$ whenever $n, -n \in S$.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_numerator` or `um_denominator` are zero, or if, after being reduced to lowest
-/// terms, their sum is greater than or equal to 2<sup>64</sup>.
+/// Panics if `abs_um_numerator` or `abs_um_denominator` are zero, or, if after being reduced to
+/// lowest terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -392,6 +483,23 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///     &[-1, -1, -1, 1, -2, 1, 0, 0, 0, 0]
 /// )
 /// ```
+///
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p} - 1$, or $p = \frac{1}{m_u + 1}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^{|n|}p}{((1-p)^{2^{W-1}}-1)(p-2)} & 0 < n < 2^W \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(0) = \frac{p}{2-p} = \frac{1}{2 m_u + 1}.
+/// $$
 pub fn geometric_random_signeds<T: PrimitiveSigned>(
     seed: Seed,
     abs_um_numerator: u64,
@@ -402,27 +510,43 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 }
 
 /// Generates random natural (non-negative) signed integers from a truncated geometric distribution.
-/// The maximum value is `T::MAX`. This function accepts a value called the "unadjusted mean"; the
-/// numerator and denominator of this value are accepted.
 ///
-/// The unadjusted mean is what the mean of the distribution would be if the distribution weren't
-/// truncated. If it is significantly lower than `T::MAX`, then it is very close to the actual mean.
-/// It is related to the parameter p by m = 1 / p - 1, or p = 1 / (m + 1).
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities of $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence;
+/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
+/// is truncated, meaning that values above `T::MAX` are never generated.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on [0, `T::MAX`]
-/// such that P(n) / P(n + 1) = (m + 1) / m, where m = `um_numerator` / `um_denominator`.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
+/// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
+/// more quickly they drop. $m_u$ must be greater than zero. It may be arbitrarily high, but note
+/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
 ///
-/// Length is infinite.
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[0, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
 ///
-/// Time per iteration: O(m)
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// The output length is infinite.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_numerator` or `um_denominator` are zero, or if, after being reduced to lowest
-/// terms, their sum is greater than or equal to 2<sup>64</sup>.
+/// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
+/// terms, their sum is greater than or equal to $2^{64}$.
 ///
 /// # Examples
 /// ```
@@ -434,6 +558,24 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p} - 1$, or $p = \frac{1}{m_u + 1}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{1-(1-p)^{2^{W-1}}} & 0 \\leq n < 2^{W-1} \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(0) = p = \frac{1}{m_u + 1}.
+/// $$
 pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
     seed: Seed,
     um_numerator: u64,
@@ -443,24 +585,40 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
     geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ZERO, T::MAX)
 }
 
-/// Generates random positive signed integers from a truncated geometric distribution. The maximum
-/// value is `T::MAX`. This function accepts a value called the "unadjusted mean"; the numerator and
-/// denominator of this value are accepted.
+/// Generates random positive signed integers from a truncated geometric distribution.
 ///
-/// The unadjusted mean is what the mean of the distribution would be if the distribution weren't
-/// truncated. If it is significantly lower than `T::MAX`, then it is very close to the actual mean.
-/// It is related to the parameter p by m = 1 / p, or p = 1 / m.
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities of $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence;
+/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
+/// is truncated, meaning that values above `T::MAX` are never generated.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on [1, `T::MAX`]
-/// such that P(n) / P(n + 1) = m / (m - 1), where m = `um_numerator` / `um_denominator`.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `T::MAX`, which is usually the case, then it is very close to the
+/// actual mean. The higher $m_u$ is, the more gently the probabilities drop; the lower it is, the
+/// more quickly they drop. $m_u$ must be greater than one. It may be arbitrarily high, but note
+/// that the iteration time increases linearly with `um_numerator` + `um_denominator`.
 ///
-/// Length is infinite.
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[1, 2^{W-1})$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
 ///
-/// Time per iteration: O(m)
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u}{m_u - 1}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// The output length is infinite.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
@@ -475,6 +633,24 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p}$, or $p = \frac{1}{m_u}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^{n-1}p}{1-(1-p)^{2^{W-1}-1}} & 0 < n < 2^{W-1} \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(1) = p = \frac{1}{m_u}.
+/// $$
 pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     seed: Seed,
     um_numerator: u64,
@@ -483,29 +659,46 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ONE, T::MAX)
 }
 
-/// Generates random negative signed integers from a truncated geometric distribution. The minimum
-/// value is `T::MIN`. This function accepts a value called the "absolute unadjusted mean"; the
-/// numerator and denominator of this value are accepted.
+/// Generates random negative signed integers from a modified geometric distribution.
 ///
-/// The absolute unadjusted mean is the absolute value of what the mean of the distribution would be
-/// if the distribution weren't truncated. If it is significantly lower than `-T::MIN`, then it is
-/// very close to the actual absolute value of the mean. It is related to the parameter p by
-/// m = 1 / p, or p = 1 / m.
+/// This distribution can be derived from a truncated geometric distribution by negating its domain.
+/// The distribution is truncated at `T::MIN`.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on
-/// [`T::MIN`, -1] such that P(n) / P(n - 1) = m / (m - 1), where
-/// m = `abs_um_numerator` / `abs_um_denominator`.
+/// With this distribution, the probability of a value being generated decreases as its absolute
+/// value increases. The probabilities of $P(-1), P(-2), P(-3), \ldots$ decrease in a geometric
+/// sequence; that's were the "geometric" comes from. Values below `T::MIN` are never generated.
 ///
-/// Length is infinite.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// mean is what the absolute value of the mean generated value would be if the distribution were
+/// not truncated. If $m_u$ is significantly lower than `-T::MIN`, which is usually the case, then
+/// it is very close to the actual absolute value of the mean. The higher $m_u$ is, the more gently
+/// the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than
+/// one. It may be arbitrarily high, but note that the iteration time increases linearly with
+/// `abs_um_numerator` + `abs_um_denominator`.
 ///
-/// Time per iteration: O(m)
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[-2^{W-1}, 0)$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// and whenever $n, n - 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n-1)} = \frac{m_u}{m_u - 1}.
+/// $$
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
+/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator` <= `abs_um_denominator`.
 ///
 /// # Examples
 /// ```
@@ -517,6 +710,24 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 ///     &[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p}$, or $p = \frac{1}{m_u}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^{-n-1}p}{1-(1-p)^{2^{W-1}}} & -2^{W-1} \leq n < 0 \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(-1) = p = \frac{1}{m_u}.
+/// $$
 pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
     seed: Seed,
     abs_um_numerator: u64,
@@ -532,29 +743,55 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
     )
 }
 
-/// Generates random nonzero signed integers from a modified geometric distribution; the
-/// distribution excludes zero, is mirrored across the y-axis, and is truncated at `T::MIN` and
-/// `T::MAX`. This function accepts a value called the "unadjusted mean"; the numerator and
-/// denominator of this value are accepted.
+/// Generates random nonzero signed integers from a modified geometric distribution.
 ///
-/// The unadjusted mean is what the mean of the distribution of the absolute values would be if the
-/// distribution weren't truncated. If it is significantly lower than -`T::MIN`, then it is very
-/// close to the actual mean. It is related to the parameter p by m = 1 / p, or p = 1 / m.
+/// This distribution can be derived from a truncated geometric distribution by mirroring it,
+/// producing a truncated double geometric distribution. Zero is excluded.
 ///
-/// One way to characterize this distribution is that it is the unique distribution on
-/// [`T::MIN`, -1] union [1, `T::MAX`] such that P(1) = P(-1) and
-/// P(n) / P(n + sgn(n)) = m / (m - 1), where m = `um_numerator` / `um_denominator`.
+/// With this distribution, the probability of a value being generated decreases as its absolute
+/// value increases. The probabilities of $P(\pm 1), P(\pm 2), P(\pm 3), \ldots$ decrease in a
+/// geometric sequence; that's were the "geometric" comes from. Values below `T::MIN` or above
+/// `T::MAX` are never generated.
 ///
-/// Length is infinite.
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// mean is what the absolute value of the mean generated value would be if the distribution were
+/// not truncated. If $m_u$ is significantly lower than `T::MAX`, which is usually the case, then it
+/// is very close to the actual absolute value of the mean. The higher $m_u$ is, the more gently the
+/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than one.
+/// It may be arbitrarily high, but note that the iteration time increases linearly with
+/// `abs_um_numerator` + `abs_um_denominator`.
 ///
-/// Time per iteration: O(m)
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[-2^{W-1}, 2^{W-1}) \setminus \\{0\\}$, where $W$ is `T::WIDTH`. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+/// $$
+///     P(1) = P(-1)
+/// $$
+/// Whenever $n > 0$ and $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u}{m_u - 1},
+/// $$
+/// and whenever $n < 0$ and $n, n - 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n-1)} = \frac{m_u}{m_u - 1}.
+/// $$
 ///
-/// Additional memory per iteration: O(1)
+/// As a corollary, $P(n) = P(-n)$ whenever $n, -n \in S$.
 ///
-/// where m = `um_numerator` / `um_denominator`.
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// # Panics
-/// Panics if `um_denominator` is zero or if `um_numerator` <= `um_denominator`.
+/// Panics if `abs_um_denominator` is zero or if `abs_um_numerator` <= `abs_um_denominator`.
 ///
 /// # Examples
 /// ```
@@ -566,6 +803,25 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 ///     &[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1]
 /// )
 /// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p}$, or $p = \frac{1}{m_u}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^{|n|}p}{(1-p)^{2^{W-1}}(p-2)-2p+2} &
+///         -2^{W-1} \leq n < 0 \\ \mathrm{or} \\ 0 < n < -2^{W-1} \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{W \to \infty} P(1) = \frac{p}{2} = \frac{1}{2 m_u}.
+/// $$
 pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
     seed: Seed,
     abs_um_numerator: u64,

@@ -187,6 +187,14 @@ pub trait BitConvertible {
     /// Converts a slice of bits into a value. The input bits are in descending order: most- to
     /// least-significant.
     fn from_bits_desc(bits: &[bool]) -> Self;
+
+    /// Converts an iterator of bits into a value. The input bits are in ascending order: least- to
+    /// most-significant.
+    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> Self;
+
+    /// Converts an iterator of bits into a value. The input bits are in descending order: most- to
+    /// least-significant.
+    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> Self;
 }
 
 /// This trait defines an iterator over a value's bits.

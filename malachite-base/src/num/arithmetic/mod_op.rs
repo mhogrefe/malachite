@@ -1,9 +1,10 @@
+use std::ops::{Neg, Rem, RemAssign, Sub};
+
 use num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
 use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
-use std::ops::{Neg, Rem, RemAssign, Sub};
 
 fn _neg_mod_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> T
 where

@@ -1,3 +1,6 @@
+use std::iter::{once, repeat};
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive,
     from_bits_desc_alt, from_bits_desc_signed_naive, from_bits_desc_unsigned_naive,
@@ -7,7 +10,6 @@ use malachite_base_test_util::num::logic::bit_convertible::{
 
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::logic::traits::BitConvertible;
 
 #[test]
 pub fn test_to_bits_asc() {
@@ -90,11 +92,12 @@ pub fn test_to_bits_desc() {
 }
 
 #[test]
-pub fn test_from_bits_asc() {
+pub fn test_from_bits_asc_and_from_bit_iterator_asc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_asc(bits), out);
         assert_eq!(from_bits_asc_unsigned_naive::<T>(bits), out);
         assert_eq!(from_bits_asc_alt::<T>(bits), out);
+        assert_eq!(T::from_bit_iterator_asc(bits.iter().cloned()), out);
     };
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -116,6 +119,7 @@ pub fn test_from_bits_asc() {
         assert_eq!(T::from_bits_asc(bits), out);
         assert_eq!(from_bits_asc_signed_naive::<T>(bits), out);
         assert_eq!(from_bits_asc_alt::<T>(bits), out);
+        assert_eq!(T::from_bit_iterator_asc(bits.iter().cloned()), out);
     };
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
@@ -153,54 +157,36 @@ pub fn test_from_bits_asc() {
     );
 }
 
-macro_rules! from_bits_asc_fail_helper_unsigned {
-    ($t:ident, $fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail() {
-            $t::from_bits_asc(&[true; 200]);
-        }
-    };
+fn from_bits_asc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
+    assert_panic!(T::from_bits_asc(&[true; 200]));
+    assert_panic!(T::from_bit_iterator_asc(repeat(true).take(200)));
 }
 
-from_bits_asc_fail_helper_unsigned!(u8, u8_from_bits_asc_fail);
-from_bits_asc_fail_helper_unsigned!(u16, u16_from_bits_asc_fail);
-from_bits_asc_fail_helper_unsigned!(u32, u32_from_bits_asc_fail);
-from_bits_asc_fail_helper_unsigned!(u64, u64_from_bits_asc_fail);
-from_bits_asc_fail_helper_unsigned!(u128, u128_from_bits_asc_fail);
-from_bits_asc_fail_helper_unsigned!(usize, usize_from_bits_asc_fail);
-
-macro_rules! from_bits_asc_fail_helper_signed {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            let mut bits = vec![false; 200];
-            bits.push(true);
-            bits.push(false);
-            $t::from_bits_asc(&bits);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            let mut bits = vec![false; 200];
-            bits.push(true);
-            $t::from_bits_asc(&bits);
-        }
-    };
+fn from_bits_asc_fail_helper_signed<T: PrimitiveSigned>() {
+    assert_panic!({
+        let mut bits = vec![false; 200];
+        bits.push(true);
+        bits.push(false);
+        T::from_bits_asc(&bits);
+    });
+    assert_panic!({
+        let mut bits = vec![false; 200];
+        bits.push(true);
+        T::from_bits_asc(&bits);
+    });
+    assert_panic!(T::from_bit_iterator_asc(
+        repeat(false).take(200).chain([true, false].iter().cloned())
+    ));
+    assert_panic!(T::from_bit_iterator_asc(
+        repeat(false).take(200).chain(once(true))
+    ));
 }
 
-from_bits_asc_fail_helper_signed!(i8, i8_from_bits_asc_fail_1, i8_from_bits_asc_fail_2);
-from_bits_asc_fail_helper_signed!(i16, i16_from_bits_asc_fail_1, i16_from_bits_asc_fail_2);
-from_bits_asc_fail_helper_signed!(i32, i32_from_bits_asc_fail_1, i32_from_bits_asc_fail_2);
-from_bits_asc_fail_helper_signed!(i64, i64_from_bits_asc_fail_1, i64_from_bits_asc_fail_2);
-from_bits_asc_fail_helper_signed!(i128, i128_from_bits_asc_fail_1, i128_from_bits_asc_fail_2);
-from_bits_asc_fail_helper_signed!(
-    isize,
-    isize_from_bits_asc_fail_1,
-    isize_from_bits_asc_fail_2
-);
+#[test]
+fn from_bits_asc_fail() {
+    apply_fn_to_unsigneds!(from_bits_asc_fail_helper_unsigned);
+    apply_fn_to_signeds!(from_bits_asc_fail_helper_signed);
+}
 
 #[test]
 pub fn test_from_bits_desc() {
@@ -208,6 +194,7 @@ pub fn test_from_bits_desc() {
         assert_eq!(T::from_bits_desc(bits), out);
         assert_eq!(from_bits_desc_unsigned_naive::<T>(bits), out);
         assert_eq!(from_bits_desc_alt::<T>(bits), out);
+        assert_eq!(T::from_bit_iterator_desc(bits.iter().cloned()), out);
     };
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
@@ -229,6 +216,7 @@ pub fn test_from_bits_desc() {
         assert_eq!(T::from_bits_desc(bits), out);
         assert_eq!(from_bits_desc_signed_naive::<T>(bits), out);
         assert_eq!(from_bits_desc_alt::<T>(bits), out);
+        assert_eq!(T::from_bit_iterator_desc(bits.iter().cloned()), out);
     };
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
@@ -266,50 +254,32 @@ pub fn test_from_bits_desc() {
     );
 }
 
-macro_rules! from_bits_desc_fail_helper_unsigned {
-    ($t:ident, $fail:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail() {
-            $t::from_bits_desc(&[true; 200]);
-        }
-    };
+fn from_bits_desc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
+    assert_panic!(T::from_bits_desc(&[true; 200]));
+    assert_panic!(T::from_bit_iterator_desc(repeat(true).take(200)));
 }
 
-from_bits_desc_fail_helper_unsigned!(u8, u8_from_bits_desc_fail);
-from_bits_desc_fail_helper_unsigned!(u16, u16_from_bits_desc_fail);
-from_bits_desc_fail_helper_unsigned!(u32, u32_from_bits_desc_fail);
-from_bits_desc_fail_helper_unsigned!(u64, u64_from_bits_desc_fail);
-from_bits_desc_fail_helper_unsigned!(u128, u128_from_bits_desc_fail);
-from_bits_desc_fail_helper_unsigned!(usize, usize_from_bits_desc_fail);
-
-macro_rules! from_bits_desc_fail_helper_signed {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            let mut bits = vec![false; 202];
-            bits[1] = true;
-            $t::from_bits_desc(&bits);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            let mut bits = vec![false; 201];
-            bits[1] = true;
-            $t::from_bits_desc(&bits);
-        }
-    };
+fn from_bits_desc_fail_helper_signed<T: PrimitiveSigned>() {
+    assert_panic!({
+        let mut bits = vec![false; 202];
+        bits[1] = true;
+        T::from_bits_desc(&bits);
+    });
+    assert_panic!({
+        let mut bits = vec![false; 201];
+        bits[0] = true;
+        T::from_bits_desc(&bits);
+    });
+    assert_panic!(T::from_bit_iterator_desc(
+        [false, true].iter().cloned().chain(repeat(false).take(200))
+    ));
+    assert_panic!(T::from_bit_iterator_desc(
+        once(true).chain(repeat(false).take(200))
+    ));
 }
 
-from_bits_desc_fail_helper_signed!(i8, i8_from_bits_desc_fail_1, i8_from_bits_desc_fail_2);
-from_bits_desc_fail_helper_signed!(i16, i16_from_bits_desc_fail_1, i16_from_bits_desc_fail_2);
-from_bits_desc_fail_helper_signed!(i32, i32_from_bits_desc_fail_1, i32_from_bits_desc_fail_2);
-from_bits_desc_fail_helper_signed!(i64, i64_from_bits_desc_fail_1, i64_from_bits_desc_fail_2);
-from_bits_desc_fail_helper_signed!(i128, i128_from_bits_desc_fail_1, i128_from_bits_desc_fail_2);
-from_bits_desc_fail_helper_signed!(
-    isize,
-    isize_from_bits_desc_fail_1,
-    isize_from_bits_desc_fail_2
-);
+#[test]
+fn from_bits_desc_fail() {
+    apply_fn_to_unsigneds!(from_bits_desc_fail_helper_unsigned);
+    apply_fn_to_signeds!(from_bits_desc_fail_helper_signed);
+}

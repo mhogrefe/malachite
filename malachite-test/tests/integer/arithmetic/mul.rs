@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
@@ -71,7 +71,7 @@ fn mul_properties() {
         assert_eq!(Integer::ONE * x, *x);
         assert_eq!(x * Integer::NEGATIVE_ONE, -x);
         assert_eq!(Integer::NEGATIVE_ONE * x, -x);
-        //TODO assert_eq!(x * x, x.pow(2));
+        assert_eq!(x * x, x.square());
     });
 
     test_properties(triples_of_integers, |&(ref x, ref y, ref z)| {

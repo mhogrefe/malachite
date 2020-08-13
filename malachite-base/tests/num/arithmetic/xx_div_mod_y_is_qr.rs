@@ -1,4 +1,5 @@
-use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
+use std::panic::catch_unwind;
+
 use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -16,49 +17,20 @@ fn test_xx_div_mod_y_is_qr() {
     test::<u64>(0x12, 0x34, 0x33, 0x5a5a_5a5a_5a5a_5a5b, 0x13);
 }
 
-macro_rules! xx_div_mod_y_is_qr_fail {
-    ($t:ident, $xx_div_mod_y_is_qr_fail_1:ident, $xx_div_mod_y_is_qr_fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $xx_div_mod_y_is_qr_fail_1() {
-            $t::xx_div_mod_y_is_qr(3, 5, 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $xx_div_mod_y_is_qr_fail_2() {
-            $t::xx_div_mod_y_is_qr(3, 5, 2);
-        }
-    };
+fn xx_div_mod_y_is_qr_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(T::xx_div_mod_y_is_qr(
+        T::exact_from(3),
+        T::exact_from(5),
+        T::ZERO
+    ));
+    assert_panic!(T::xx_div_mod_y_is_qr(
+        T::exact_from(3),
+        T::exact_from(5),
+        T::TWO
+    ));
 }
 
-xx_div_mod_y_is_qr_fail!(
-    u8,
-    xx_div_mod_y_is_qr_u8_fail_1,
-    xx_div_mod_y_is_qr_u8_fail_2
-);
-xx_div_mod_y_is_qr_fail!(
-    u16,
-    xx_div_mod_y_is_qr_u16_fail_1,
-    xx_div_mod_y_is_qr_u16_fail_2
-);
-xx_div_mod_y_is_qr_fail!(
-    u32,
-    xx_div_mod_y_is_qr_u32_fail_1,
-    xx_div_mod_y_is_qr_u32_fail_2
-);
-xx_div_mod_y_is_qr_fail!(
-    u64,
-    xx_div_mod_y_is_qr_u64_fail_1,
-    xx_div_mod_y_is_qr_u64_fail_2
-);
-xx_div_mod_y_is_qr_fail!(
-    u128,
-    xx_div_mod_y_is_qr_u128_fail_1,
-    xx_div_mod_y_is_qr_u128_fail_2
-);
-xx_div_mod_y_is_qr_fail!(
-    usize,
-    xx_div_mod_y_is_qr_usize_fail_1,
-    xx_div_mod_y_is_qr_usize_fail_2
-);
+#[test]
+fn xx_div_mod_y_is_qr_fail() {
+    apply_fn_to_unsigneds!(xx_div_mod_y_is_qr_fail_helper);
+}

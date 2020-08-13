@@ -20,6 +20,7 @@ use natural::arithmetic::mul::toom::{
     _limbs_mul_same_length_to_out_toom_6h_scratch_len,
     _limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
+use natural::arithmetic::square::limbs_square_to_out;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{
@@ -193,12 +194,11 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
     if xs_len == ys_len {
-        //TODO if xs as *const [Limb] == ys as *const [Limb] {
-        //TODO     mpn_sqr(out, xs, xs_len);
-        //TODO } else {
-        //TODO     mpn_mul_n(out, xs, ys);
-        //TODO }
-        limbs_mul_same_length_to_out(out, xs, ys);
+        if xs as *const [Limb] == ys as *const [Limb] {
+            limbs_square_to_out(out, xs);
+        } else {
+            limbs_mul_same_length_to_out(out, xs, ys);
+        }
     } else if ys_len < MUL_TOOM22_THRESHOLD {
         // Plain schoolbook multiplication. Unless xs_len is very large, or else if
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
@@ -625,4 +625,5 @@ pub mod mul_low;
 pub mod mul_mod;
 pub mod poly_eval;
 pub mod poly_interpolate;
+pub mod square_mod;
 pub mod toom;

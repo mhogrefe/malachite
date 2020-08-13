@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::DivMod;
+use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::mul::limb::{
@@ -609,7 +609,7 @@ fn mul_properties() {
         assert_eq!(Natural::ZERO * x, 0);
         assert_eq!(x * Natural::ONE, *x);
         assert_eq!(Natural::ONE * x, *x);
-        //TODO assert_eq!(x * x, x.pow(2));
+        assert_eq!(x * x, x.square());
     });
 
     test_properties_custom_scale(2_048, triples_of_naturals, |&(ref x, ref y, ref z)| {

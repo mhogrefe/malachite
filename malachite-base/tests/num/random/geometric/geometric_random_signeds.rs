@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     double_truncated_geometric_dist_assertions, CheckedToF64, MomentStats,
@@ -248,66 +250,17 @@ fn test_geometric_random_signeds() {
     );
 }
 
-macro_rules! geometric_random_signeds_fail {
-    (
-        $t:ident,
-        $geometric_random_signeds_fail_1:ident,
-        $geometric_random_signeds_fail_2:ident,
-        $geometric_random_signeds_fail_3:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $geometric_random_signeds_fail_1() {
-            geometric_random_signeds::<$t>(EXAMPLE_SEED, 0, 1);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $geometric_random_signeds_fail_2() {
-            geometric_random_signeds::<$t>(EXAMPLE_SEED, 1, 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $geometric_random_signeds_fail_3() {
-            geometric_random_signeds::<$t>(EXAMPLE_SEED, u64::MAX, u64::MAX - 1);
-        }
-    };
+fn geometric_random_signeds_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(geometric_random_signeds::<T>(EXAMPLE_SEED, 0, 1));
+    assert_panic!(geometric_random_signeds::<T>(EXAMPLE_SEED, 1, 0));
+    assert_panic!(geometric_random_signeds::<T>(
+        EXAMPLE_SEED,
+        u64::MAX,
+        u64::MAX - 1
+    ));
 }
 
-geometric_random_signeds_fail!(
-    i8,
-    geometric_random_signeds_i8_fail_1,
-    geometric_random_signeds_i8_fail_2,
-    geometric_random_signeds_i8_fail_3
-);
-geometric_random_signeds_fail!(
-    i16,
-    geometric_random_signeds_i16_fail_1,
-    geometric_random_signeds_i16_fail_2,
-    geometric_random_signeds_i16_fail_3
-);
-geometric_random_signeds_fail!(
-    i32,
-    geometric_random_signeds_i32_fail_1,
-    geometric_random_signeds_i32_fail_2,
-    geometric_random_signeds_i32_fail_3
-);
-geometric_random_signeds_fail!(
-    i64,
-    geometric_random_signeds_i64_fail_1,
-    geometric_random_signeds_i64_fail_2,
-    geometric_random_signeds_i64_fail_3
-);
-geometric_random_signeds_fail!(
-    i128,
-    geometric_random_signeds_i128_fail_1,
-    geometric_random_signeds_i128_fail_2,
-    geometric_random_signeds_i128_fail_3
-);
-geometric_random_signeds_fail!(
-    isize,
-    geometric_random_signeds_isize_fail_1,
-    geometric_random_signeds_isize_fail_2,
-    geometric_random_signeds_isize_fail_3
-);
+#[test]
+fn geometric_random_signeds_fail() {
+    apply_fn_to_signeds!(geometric_random_signeds_fail_helper);
+}

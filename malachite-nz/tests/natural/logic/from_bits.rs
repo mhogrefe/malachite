@@ -136,9 +136,13 @@ fn test_limbs_asc_from_bits_desc() {
 }
 
 #[test]
-fn test_from_bits_asc() {
+fn test_from_bits_asc_and_from_bit_iterator_asc() {
     let test = |bits: &[bool], out| {
         let x = Natural::from_bits_asc(bits);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+
+        let x = Natural::from_bit_iterator_asc(bits.iter().cloned());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };
@@ -176,9 +180,13 @@ fn test_from_bits_asc() {
 }
 
 #[test]
-fn test_from_bits_desc() {
+fn test_from_bits_desc_and_from_bit_iterator_desc() {
     let test = |bits: &[bool], out| {
         let x = Natural::from_bits_desc(bits);
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
+
+        let x = Natural::from_bit_iterator_desc(bits.iter().cloned());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
     };

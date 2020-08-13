@@ -18,7 +18,12 @@ use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
     _limbs_mul_mod_base_pow_n_minus_1_scratch_len, MULMOD_BNM1_THRESHOLD, MUL_FFT_MODF_THRESHOLD,
 };
+use natural::arithmetic::mul::square_mod::_limbs_square_mod_base_pow_n_minus_1_next_size;
+use natural::arithmetic::mul::square_mod::{
+    _limbs_square_mod_base_pow_n_minus_1, _limbs_square_mod_base_pow_n_minus_1_scratch_len,
+};
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
+use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
@@ -528,11 +533,15 @@ pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
-
-    //TODO special case for squaring
-    let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
-    let mut scratch = vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, xs_len, ys_len)];
-    _limbs_mul_mod_base_pow_n_minus_1(out, n, xs, ys, &mut scratch);
+    if xs as *const [Limb] == ys as *const [Limb] {
+        let n = _limbs_square_mod_base_pow_n_minus_1_next_size(xs_len << 1);
+        let mut scratch = vec![0; _limbs_square_mod_base_pow_n_minus_1_scratch_len(n, xs_len)];
+        _limbs_square_mod_base_pow_n_minus_1(out, n, xs, &mut scratch);
+    } else {
+        let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
+        let mut scratch = vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, xs_len, ys_len)];
+        _limbs_mul_mod_base_pow_n_minus_1(out, n, xs, ys, &mut scratch);
+    }
 }
 
 /// Initialize table[i][j] with bitrev(j).
@@ -1151,8 +1160,7 @@ fn _limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
         let mut scratch = vec![0; n << 1];
         for xs in xss.iter_mut() {
             let (xs_last, xs_init) = xs.split_last_mut().unwrap();
-            //TODO use square
-            limbs_mul_same_length_to_out(&mut scratch, xs_init, xs_init);
+            limbs_square_to_out(&mut scratch, xs_init);
             if *xs_last != 0 {
                 let carry = limbs_slice_add_mul_limb_same_length_in_place_left(
                     &mut scratch[n..],

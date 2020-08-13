@@ -148,6 +148,7 @@ fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         let trailing_falses = bits.iter().rev().take_while(|&&bit| !bit).count();
         let trimmed_bits = bits[..bits.len() - trailing_falses].to_vec();
         assert_eq!(n.to_bits_asc(), trimmed_bits);
+        assert_eq!(T::from_bit_iterator_asc(bits.iter().cloned()), n);
     });
 
     test_properties_no_special(small_unsigneds, |&u| {
@@ -180,6 +181,7 @@ where
             bits[..bits.len() - sign_bits + 1].to_vec()
         };
         assert_eq!(n.to_bits_asc(), trimmed_bits);
+        assert_eq!(T::from_bit_iterator_asc(bits.iter().cloned()), n);
     });
 
     test_properties_no_special(small_unsigneds, |&u| {
@@ -215,6 +217,7 @@ fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
         let leading_falses = bits.iter().take_while(|&&bit| !bit).count();
         let trimmed_bits = bits[leading_falses..].to_vec();
         assert_eq!(n.to_bits_desc(), trimmed_bits);
+        assert_eq!(T::from_bit_iterator_desc(bits.iter().cloned()), n);
     });
 
     test_properties_no_special(small_unsigneds, |&u| {
@@ -247,6 +250,7 @@ where
             bits[sign_bits - 1..].to_vec()
         };
         assert_eq!(n.to_bits_desc(), trimmed_bits);
+        assert_eq!(T::from_bit_iterator_desc(bits.iter().cloned()), n);
     });
 
     test_properties_no_special(small_unsigneds, |&u| {

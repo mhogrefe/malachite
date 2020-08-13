@@ -57,6 +57,6 @@ macro_rules! tests_and_properties_signed {
 }
 tests_and_properties_signed!(i8, shl_round_i8_properties);
 tests_and_properties_signed!(i16, shl_round_i16_properties);
-tests_and_properties_signed!(i32, shl_round_signed_limb_properties);
+tests_and_properties_signed!(i32, shl_round_i32_properties);
 tests_and_properties_signed!(i64, shl_round_i64_properties);
 tests_and_properties_signed!(isize, shl_round_isize_properties);

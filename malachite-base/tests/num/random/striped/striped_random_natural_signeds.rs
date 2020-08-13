@@ -1,3 +1,5 @@
+use std::panic::catch_unwind;
+
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;
@@ -356,53 +358,12 @@ fn test_striped_random_natural_signeds() {
     );
 }
 
-macro_rules! striped_random_natural_signeds_fail {
-    (
-        $t:ident,
-        $striped_random_natural_signeds_fail_1:ident,
-        $striped_random_natural_signeds_fail_2:ident
-    ) => {
-        #[test]
-        #[should_panic]
-        fn $striped_random_natural_signeds_fail_1() {
-            striped_random_natural_signeds::<$t>(EXAMPLE_SEED, 1, 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $striped_random_natural_signeds_fail_2() {
-            striped_random_natural_signeds::<$t>(EXAMPLE_SEED, 2, 3);
-        }
-    };
+fn striped_random_natural_signeds_fail_helper<T: PrimitiveSigned>() {
+    assert_panic!(striped_random_natural_signeds::<T>(EXAMPLE_SEED, 1, 0));
+    assert_panic!(striped_random_natural_signeds::<T>(EXAMPLE_SEED, 2, 3));
 }
 
-striped_random_natural_signeds_fail!(
-    i8,
-    striped_random_natural_signeds_u8_fail_1,
-    striped_random_natural_signeds_u8_fail_2
-);
-striped_random_natural_signeds_fail!(
-    i16,
-    striped_random_natural_signeds_u16_fail_1,
-    striped_random_natural_signeds_u16_fail_2
-);
-striped_random_natural_signeds_fail!(
-    i32,
-    striped_random_natural_signeds_u32_fail_1,
-    striped_random_natural_signeds_u32_fail_2
-);
-striped_random_natural_signeds_fail!(
-    i64,
-    striped_random_natural_signeds_u64_fail_1,
-    striped_random_natural_signeds_u64_fail_2
-);
-striped_random_natural_signeds_fail!(
-    i128,
-    striped_random_natural_signeds_u128_fail_1,
-    striped_random_natural_signeds_u128_fail_2
-);
-striped_random_natural_signeds_fail!(
-    isize,
-    striped_random_natural_signeds_usize_fail_1,
-    striped_random_natural_signeds_usize_fail_2
-);
+#[test]
+fn striped_random_natural_signeds_fail() {
+    apply_fn_to_signeds!(striped_random_natural_signeds_fail_helper);
+}

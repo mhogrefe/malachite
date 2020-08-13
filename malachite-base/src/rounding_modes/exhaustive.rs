@@ -1,6 +1,7 @@
-use rounding_modes::{RoundingMode, ROUNDING_MODES};
 use std::iter::Cloned;
 use std::slice::Iter;
+
+use rounding_modes::{RoundingMode, ROUNDING_MODES};
 
 /// Generates all `RoundingMode`s.
 ///

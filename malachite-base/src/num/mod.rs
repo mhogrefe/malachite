@@ -1,3 +1,6 @@
+#[macro_use]
+pub mod macros;
+
 pub mod arithmetic {
     pub mod abs;
     pub mod add_mul;
@@ -124,4 +127,5 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod traits;
 }
+/// This module contains iterators that generate primitive integers randomly.
 pub mod random;

@@ -565,7 +565,7 @@ pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
-/// This is mpn_sub_nc from gmp-impl.h, GMP 6.1.2, where rp and up are disjoint.
+/// This is mpn_sub_nc from gmp-impl.h, GMP 6.1.2, where rp, up, and vp are disjoint.
 pub fn _limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],

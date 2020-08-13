@@ -48,7 +48,7 @@ where
 
 #[test]
 fn test_unsigned_abs() {
-    apply_fn_to_unsigned_signed_pair!(unsigned_abs_helper);
+    apply_fn_to_unsigned_signed_pairs!(unsigned_abs_helper);
 }
 
 fn abs_assign_properties_helper<T: PrimitiveSigned>()

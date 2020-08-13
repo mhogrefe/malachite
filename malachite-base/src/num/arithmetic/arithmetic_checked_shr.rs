@@ -1,8 +1,11 @@
+use std::ops::{Neg, Shr};
+
 use num::arithmetic::traits::{ArithmeticCheckedShl, ArithmeticCheckedShr, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
-use std::ops::{Neg, Shr};
+
+//TODO clean wheres
 
 fn _arithmetic_checked_shr_unsigned_signed<
     T: PrimitiveInteger,
