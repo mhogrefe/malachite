@@ -3,8 +3,7 @@ use iterators::{nonzero_values, NonzeroValues};
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::geometric::mean_to_p_with_min;
-use num::random::random_unsigneds_less_than;
-use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
+use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::seed::Seed;
 use std::marker::PhantomData;
 
@@ -58,7 +57,7 @@ impl StripedBitSource {
     pub fn new(seed: Seed, m_numerator: u64, m_denominator: u64) -> StripedBitSource {
         assert_ne!(m_denominator, 0);
         assert!(m_numerator >= m_denominator);
-        let (numerator, denominator) = mean_to_p_with_min(m_numerator, m_denominator, 1u64);
+        let (numerator, denominator) = mean_to_p_with_min(1u64, m_numerator, m_denominator);
         StripedBitSource {
             first_bit_of_block: true,
             previous_bit: false,

@@ -5,8 +5,10 @@ pub trait Named {
     const NAME: &'static str;
 }
 
-/// The name of a type, as given by the `stringify` macro. It doesn't work very well for types whose
-/// names contain several tokens, like `(u8, u8)`, `&str`, or `Vec<bool>`.
+/// The name of a type, as given by the `stringify` macro.
+///
+/// It doesn't work very well for types whose names contain several tokens, like `(u8, u8)`, `&str`,
+/// or `Vec<bool>`.
 ///
 /// # Example
 /// ```

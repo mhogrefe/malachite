@@ -8,12 +8,19 @@ fn test_from_bits_asc() {
         let x = Integer::from_bits_asc(bits);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
+
+        let x = Integer::from_bit_iterator_asc(bits.iter().cloned());
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
     };
     test(&[], "0");
     test(&[false], "0");
     test(&[false, false, false], "0");
     test(&[true, false], "1");
+    test(&[true], "-1");
+    test(&[true, true, true], "-1");
     test(&[false, true, true, false], "6");
+    test(&[false, true, false, true], "-6");
     test(&[true, false, false, true, false, true, true, false], "105");
     test(
         &[true, false, false, true, false, true, true, false, false],
@@ -25,6 +32,7 @@ fn test_from_bits_asc() {
         ],
         "105",
     );
+    test(&[true, true, true, false, true, false, false, true], "-105");
     test(
         &[
             false, false, false, false, false, false, false, false, false, false, false, false,
@@ -43,6 +51,15 @@ fn test_from_bits_asc() {
         ],
         "1000000000000",
     );
+    test(
+        &[
+            false, false, false, false, false, false, false, false, false, false, false, false,
+            true, true, true, true, false, true, false, true, true, false, true, false, true, true,
+            false, true, false, true, false, false, true, true, true, false, true, false, false,
+            false, true,
+        ],
+        "-1000000000000",
+    );
 }
 
 #[test]
@@ -51,12 +68,19 @@ fn test_from_bits_desc() {
         let x = Integer::from_bits_desc(bits);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
+
+        let x = Integer::from_bit_iterator_desc(bits.iter().cloned());
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), out);
     };
     test(&[], "0");
     test(&[false], "0");
     test(&[false, false, false], "0");
     test(&[false, true], "1");
+    test(&[true], "-1");
+    test(&[true, true, true], "-1");
     test(&[false, true, true, false], "6");
+    test(&[true, false, true, false], "-6");
     test(&[false, true, true, false, true, false, false, true], "105");
     test(
         &[false, false, true, true, false, true, false, false, true],
@@ -67,6 +91,13 @@ fn test_from_bits_desc() {
             false, false, false, true, true, false, true, false, false, true,
         ],
         "105",
+    );
+    test(&[true, false, false, true, false, true, true, true], "-105");
+    test(
+        &[
+            true, true, true, false, false, true, false, true, true, true,
+        ],
+        "-105",
     );
     test(
         &[
@@ -85,5 +116,14 @@ fn test_from_bits_desc() {
             false, false, false, false,
         ],
         "1000000000000",
+    );
+    test(
+        &[
+            true, false, false, false, true, false, true, true, true, false, false, true, false,
+            true, false, true, true, false, true, false, true, true, false, true, false, true,
+            true, true, true, false, false, false, false, false, false, false, false, false, false,
+            false, false,
+        ],
+        "-1000000000000",
     );
 }

@@ -22,10 +22,10 @@ fn geometric_random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 ) {
     double_nonzero_truncated_geometric_dist_assertions(
         geometric_random_nonzero_signeds::<T>(EXAMPLE_SEED, um_numerator, um_denominator),
-        um_numerator,
-        um_denominator,
         T::MIN,
         T::MAX,
+        um_numerator,
+        um_denominator,
         expected_values,
         expected_common_values,
         expected_abs_mean,

@@ -27,10 +27,10 @@ fn geometric_random_negative_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 {
     negative_truncated_geometric_dist_assertions(
         geometric_random_negative_signeds::<T>(EXAMPLE_SEED, abs_um_numerator, abs_um_denominator),
-        abs_um_numerator,
-        abs_um_denominator,
         T::NEGATIVE_ONE,
         T::MIN,
+        abs_um_numerator,
+        abs_um_denominator,
         expected_values,
         expected_common_values,
         expected_pop_median,

@@ -100,6 +100,7 @@ pub mod integer {
         pub mod to_twos_complement_limbs;
     }
     pub mod exhaustive {
+        pub mod exhaustive_integer_inclusive_range;
         pub mod exhaustive_integer_range;
         pub mod exhaustive_integer_range_to_infinity;
         pub mod exhaustive_integer_range_to_negative_infinity;
@@ -109,6 +110,7 @@ pub mod integer {
         pub mod exhaustive_nonzero_integers;
         pub mod exhaustive_positive_integers;
         pub mod integer_decreasing_range_to_negative_infinity;
+        pub mod integer_increasing_inclusive_range;
         pub mod integer_increasing_range;
         pub mod integer_increasing_range_to_infinity;
     }

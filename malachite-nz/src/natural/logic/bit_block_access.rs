@@ -24,7 +24,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// Panics if `start` > `end`.
@@ -45,24 +45,24 @@ use platform::Limb;
 /// ```
 pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
     let len = xs.len();
-    if limb_start >= len {
+    if small_start >= len {
         return Vec::new();
     }
-    let limb_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
-    let mut result_limbs = (if limb_end >= len {
-        &xs[limb_start..]
+    let small_end = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
+    let mut out = (if small_end >= len {
+        &xs[small_start..]
     } else {
-        &xs[limb_start..limb_end]
+        &xs[small_start..small_end]
     })
     .to_vec();
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
-        limbs_slice_shr_in_place(&mut result_limbs, offset);
+        limbs_slice_shr_in_place(&mut out, offset);
     }
-    limbs_vec_mod_power_of_two_in_place(&mut result_limbs, end - start);
-    result_limbs
+    limbs_vec_mod_power_of_two_in_place(&mut out, end - start);
+    out
 }
 
 /// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -75,7 +75,7 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
 /// Panics if `start` > `end`.
@@ -95,12 +95,12 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 /// ```
 pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
-    let limb_start = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if limb_start >= xs.len() {
+    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+    if small_start >= xs.len() {
         return Vec::new();
     }
     limbs_vec_mod_power_of_two_in_place(&mut xs, end);
-    vec_delete_left(&mut xs, limb_start);
+    vec_delete_left(&mut xs, small_start);
     let offset = start & Limb::WIDTH_MASK;
     if offset != 0 {
         limbs_slice_shr_in_place(&mut xs, offset);
@@ -139,46 +139,44 @@ pub(crate) fn limbs_assign_bits_helper(
     mut bits: &[Limb],
     invert: bool,
 ) {
-    let start_limb = usize::exact_from(start >> Limb::LOG_WIDTH);
-    let end_limb = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
-    let bits_limb_width =
-        usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
-    if bits_limb_width < bits.len() {
-        bits = &bits[..bits_limb_width];
+    let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
+    let small_end = usize::exact_from((end - 1) >> Limb::LOG_WIDTH) + 1;
+    let width = usize::exact_from((end - start).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
+    if width < bits.len() {
+        bits = &bits[..width];
     }
     let start_remainder = start & Limb::WIDTH_MASK;
     let end_remainder = end & Limb::WIDTH_MASK;
-    if end_limb > xs.len() {
+    if small_end > xs.len() {
         // Possible inefficiency here: we might write many zeros only to delete them later.
-        xs.resize(end_limb, 0);
+        xs.resize(small_end, 0);
     }
-    let limbs = &mut xs[start_limb..end_limb];
-    assert!(!limbs.is_empty());
-    let original_first_limb = limbs[0];
-    let original_last_limb = *limbs.last().unwrap();
-    copy_from_diff_len_slice(limbs, bits);
+    let out = &mut xs[small_start..small_end];
+    assert!(!out.is_empty());
+    let original_first = out[0];
+    let original_last = *out.last().unwrap();
+    copy_from_diff_len_slice(out, bits);
     if invert {
-        limbs_not_in_place(limbs);
+        limbs_not_in_place(out);
     }
     if start_remainder != 0 {
-        limbs_slice_shl_in_place(limbs, start_remainder);
-        limbs[0] |= original_first_limb.mod_power_of_two(start_remainder);
+        limbs_slice_shl_in_place(out, start_remainder);
+        out[0] |= original_first.mod_power_of_two(start_remainder);
     }
     if end_remainder != 0 {
-        limbs.last_mut().unwrap().assign_bits(
+        out.last_mut().unwrap().assign_bits(
             end_remainder,
             Limb::WIDTH,
-            &(original_last_limb >> end_remainder),
+            &(original_last >> end_remainder),
         );
     }
 }
 
-/// Writes the limbs of `bits` into the limbs of `limbs`, starting at bit `start` of `limbs`
-/// (inclusive) and ending at bit `end` of `limbs` (exclusive). The bit indices do not need to be
-/// aligned with any limb boundaries. If `bits` has more than `end` - `start` bits, only the first
-/// `end` - `start` bits are written. If `bits` has fewer than `end` - `start` bits, the remaining
-/// written bits are zero. `limbs` may be extended to accommodate the new bits. `start` must be
-/// smaller than `end`.
+/// Writes the limbs of `bits` into the limbs of `xs`, starting at bit `start` of `xs` (inclusive)
+/// and ending at bit `end` of `xs` (exclusive). The bit indices do not need to be aligned with any
+/// limb boundaries. If `bits` has more than `end` - `start` bits, only the first `end` - `start`
+/// bits are written. If `bits` has fewer than `end` - `start` bits, the remaining written bits are
+/// zero. `xs` may be extended to accommodate the new bits. `start` must be smaller than `end`.
 ///
 /// Time: worst case O(n)
 ///
@@ -194,18 +192,19 @@ pub(crate) fn limbs_assign_bits_helper(
 /// use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// let mut limbs = vec![123];
-/// limbs_assign_bits(&mut limbs, 64, 128, &[456]);
-/// assert_eq!(limbs, &[123, 0, 456, 0]);
+/// let mut xs = vec![123];
+/// limbs_assign_bits(&mut xs, 64, 128, &[456]);
+/// assert_eq!(xs, &[123, 0, 456, 0]);
 ///
-/// let mut limbs = vec![123];
-/// limbs_assign_bits(&mut limbs, 80, 100, &[456]);
-/// assert_eq!(limbs, &[123, 0, 29884416, 0]);
+/// let mut xs = vec![123];
+/// limbs_assign_bits(&mut xs, 80, 100, &[456]);
+/// assert_eq!(xs, &[123, 0, 29884416, 0]);
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_assign_bits(&mut limbs, 80, 100, &[789, 321]);
-/// assert_eq!(limbs, &[123, 456, 51707904, 0]);
+/// let mut xs = vec![123, 456];
+/// limbs_assign_bits(&mut xs, 80, 100, &[789, 321]);
+/// assert_eq!(xs, &[123, 456, 51707904, 0]);
 /// ```
+#[inline]
 pub fn limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     limbs_assign_bits_helper(xs, start, end, bits, false);
@@ -302,6 +301,8 @@ impl BitBlockAccess for Natural {
             }
         }
     }
+
+    //TODO clean
 
     /// Writes the bits of `bits` to `self`. The first index that the bits are written to in `self`
     /// is `start` and last index is `end - 1`. The bit indices do not need to be aligned with any

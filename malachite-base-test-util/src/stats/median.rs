@@ -91,7 +91,7 @@ where
     }
 }
 
-fn truncated_geometric_pmf(unadjusted_mean: f64, m: f64, n: f64) -> f64 {
+fn truncated_geometric_pmf(m: f64, unadjusted_mean: f64, n: f64) -> f64 {
     if n >= 0.0 && m >= n {
         let p = 1.0 / (unadjusted_mean + 1.0);
         let q = 1.0 - p;
@@ -101,7 +101,7 @@ fn truncated_geometric_pmf(unadjusted_mean: f64, m: f64, n: f64) -> f64 {
     }
 }
 
-fn truncated_geometric_cdf(unadjusted_mean: f64, m: f64, n: f64) -> f64 {
+fn truncated_geometric_cdf(m: f64, unadjusted_mean: f64, n: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     if n < 0.0 {
         0.0
@@ -114,25 +114,25 @@ fn truncated_geometric_cdf(unadjusted_mean: f64, m: f64, n: f64) -> f64 {
 }
 
 pub fn truncated_geometric_median<T: CheckedToF64 + PrimitiveInteger>(
-    unadjusted_mean: f64,
     min: T,
     max: T,
+    unadjusted_mean: f64,
 ) -> (T, Option<T>) {
     assert!(min >= T::ZERO);
-    assert!(min < max);
+    assert!(min <= max);
     let min_64 = min.checked_to_f64();
     let max_64 = max.checked_to_f64() - min_64;
     let unadjusted_mean = unadjusted_mean - min_64;
     let (x, y) = binary_search_median(
         min,
         max,
-        |n| truncated_geometric_pmf(unadjusted_mean, max_64, n.checked_to_f64() - min_64),
-        |n| truncated_geometric_cdf(unadjusted_mean, max_64, n.checked_to_f64() - min_64),
+        |n| truncated_geometric_pmf(max_64, unadjusted_mean, n.checked_to_f64() - min_64),
+        |n| truncated_geometric_cdf(max_64, unadjusted_mean, n.checked_to_f64() - min_64),
     );
     (x, y)
 }
 
-fn double_nonzero_geometric_pmf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
+fn double_nonzero_geometric_pmf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
     if n == 0.0 || n > a || n < -b {
         0.0
     } else {
@@ -142,7 +142,7 @@ fn double_nonzero_geometric_pmf(unadjusted_mean: f64, a: f64, b: f64, n: f64) ->
     }
 }
 
-fn double_nonzero_geometric_cdf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
+fn double_nonzero_geometric_cdf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
     if n < -b {
         return 0.0;
     } else if n >= a {
@@ -161,9 +161,9 @@ fn double_nonzero_geometric_cdf(unadjusted_mean: f64, a: f64, b: f64, n: f64) ->
 }
 
 pub fn double_nonzero_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
-    unadjusted_mean: f64,
     min: T,
     max: T,
+    unadjusted_mean: f64,
 ) -> (T, Option<T>) {
     assert!(min < T::ZERO);
     assert!(max > T::ZERO);
@@ -172,13 +172,13 @@ pub fn double_nonzero_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
     let (x, y) = binary_search_median(
         min,
         max,
-        |n| double_nonzero_geometric_pmf(unadjusted_mean, max_64, min_64, n.checked_to_f64()),
-        |n| double_nonzero_geometric_cdf(unadjusted_mean, max_64, min_64, n.checked_to_f64()),
+        |n| double_nonzero_geometric_pmf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
+        |n| double_nonzero_geometric_cdf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
     );
     (x, y)
 }
 
-fn double_geometric_pmf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
+fn double_geometric_pmf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
     if n > a || n < -b {
         0.0
     } else {
@@ -189,7 +189,7 @@ fn double_geometric_pmf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
     }
 }
 
-fn double_geometric_cdf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
+fn double_geometric_cdf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
     if n < -b {
         return 0.0;
     } else if n >= a {
@@ -210,9 +210,9 @@ fn double_geometric_cdf(unadjusted_mean: f64, a: f64, b: f64, n: f64) -> f64 {
 }
 
 pub fn double_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
-    unadjusted_mean: f64,
     min: T,
     max: T,
+    unadjusted_mean: f64,
 ) -> (T, Option<T>) {
     assert!(min < T::ZERO);
     assert!(max > T::ZERO);
@@ -221,8 +221,8 @@ pub fn double_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
     let (x, y) = binary_search_median(
         min,
         max,
-        |n| double_geometric_pmf(unadjusted_mean, max_64, min_64, n.checked_to_f64()),
-        |n| double_geometric_cdf(unadjusted_mean, max_64, min_64, n.checked_to_f64()),
+        |n| double_geometric_pmf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
+        |n| double_geometric_cdf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
     );
     (x, y)
 }

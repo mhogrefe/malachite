@@ -1,24 +1,28 @@
-use malachite_base::num::arithmetic::traits::{RoundToMultipleOfPowerOfTwo, WrappingAddAssign};
+use std::cmp::min;
+
+use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::num::basic::traits::Iverson;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_test_zero;
 
 use fail_on_untested_path;
 use natural::arithmetic::add::{
-    limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
-    limbs_slice_add_same_length_in_place_left,
+    limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::mul::fft::{
     _limbs_mul_fft, _limbs_mul_fft_best_k, SQR_FFT_MODF_THRESHOLD,
 };
-use natural::arithmetic::mul::mul_mod::{FFT_FIRST_K, MUL_FFT_MODF_THRESHOLD};
+use natural::arithmetic::mul::mul_mod::{
+    _limbs_mul_mod_base_pow_n_minus_1_next_size_helper,
+    _limbs_mul_mod_base_pow_n_plus_1_basecase_helper, FFT_FIRST_K, MUL_FFT_MODF_THRESHOLD,
+};
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_in_place_left,
-    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_to_out,
+    limbs_sub_limb_in_place, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use platform::Limb;
 
@@ -26,29 +30,23 @@ use platform::Limb;
 const SQRMOD_BNM1_THRESHOLD: usize = 16;
 
 /// This is mpn_sqrmod_bnm1_next_size from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
+#[inline]
 pub(crate) fn _limbs_square_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
-    if n < SQRMOD_BNM1_THRESHOLD {
-        n
-    } else if n < 4 * (SQRMOD_BNM1_THRESHOLD - 1) + 1 {
-        (n + (2 - 1)) & 2usize.wrapping_neg()
-    } else if n < 8 * (SQRMOD_BNM1_THRESHOLD - 1) + 1 {
-        (n + (4 - 1)) & 4usize.wrapping_neg()
-    } else {
-        let nh = (n + 1) >> 1;
-        if nh < SQR_FFT_MODF_THRESHOLD {
-            (n + (8 - 1)) & 8usize.wrapping_neg()
-        } else {
-            nh.round_to_multiple_of_power_of_two(
-                u64::exact_from(_limbs_mul_fft_best_k(nh, true)),
-                RoundingMode::Ceiling,
-            ) << 1
-        }
-    }
+    _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
+        n,
+        SQRMOD_BNM1_THRESHOLD,
+        SQR_FFT_MODF_THRESHOLD,
+        true,
+    )
 }
 
 /// This is mpn_sqrmod_bnm1_itch from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn _limbs_square_mod_base_pow_n_minus_1_scratch_len(rn: usize, an: usize) -> usize {
-    rn + 3 + (if an > rn >> 1 { an } else { 0 })
+pub(crate) fn _limbs_square_mod_base_pow_n_minus_1_scratch_len(n: usize, xs_len: usize) -> usize {
+    if xs_len > n >> 1 {
+        n + xs_len + 3
+    } else {
+        n + 3
+    }
 }
 
 /// Input is {ap,rn}; output is {rp,rn}, computation is
@@ -73,230 +71,167 @@ fn _limbs_square_mod_base_pow_n_minus_1_basecase(
     }
 }
 
-/// Input is {ap,rn+1}; output is {rp,rn+1}, in
-/// semi-normalised representation, computation is mod B^rn + 1. Needs
-/// a scratch area of 2rn + 2 limbs at tp; tp == rp is allowed.
+/// Input is {xs, n+1}; output is {xs, n + 1}, in
+/// semi-normalised representation, computation is mod B ^ n + 1.
 /// Output is normalised.
 ///
 /// This is mpn_bc_sqrmod_bnp1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2, where rp == tp.
-fn _limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], rn: usize) {
-    assert_ne!(rn, 0);
-    limbs_square_to_out(out, &xs[..rn + 1]);
-    split_into_chunks_mut!(out, rn, [out_0, out_1], out_2);
-    assert_eq!(out_2[1], 0);
-    assert!(out_2[0] < Limb::MAX);
-    let cy = out_2[0]
-        + if limbs_sub_same_length_in_place_left(out_0, out_1) {
-            1
-        } else {
-            0
-        };
-    out_1[0] = 0;
-    assert!(!limbs_slice_add_limb_in_place(&mut out[..rn + 1], cy));
+fn _limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n: usize) {
+    assert_ne!(n, 0);
+    limbs_square_to_out(out, &xs[..n + 1]);
+    split_into_chunks_mut!(out, n, [out_0, out_1], out_2);
+    _limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
 }
 
-/// Computes {rp,MIN(rn,2an)} <- {ap,an}^2 Mod(B^rn-1)
+/// Computes {out, min(n, 2 * xs.len())} <- xs ^ 2 mod (B ^ n - 1)
 ///
-/// The result is expected to be ZERO if and only if the operand
-/// already is. Otherwise the class [0] Mod(B^rn-1) is represented by
-/// B^rn-1.
-/// It should not be a problem if sqrmod_bnm1 is used to
-/// compute the full square with an <= 2*rn, because this condition
-/// implies (B^an-1)^2 < (B^rn-1) .
+/// The result is expected to be zero if and only if the operand already is. Otherwise the class [0]
+/// mod (B ^ n - 1) is represented by B ^ n - 1.
 ///
-/// Requires rn/4 < an <= rn
-/// Scratch need: rn/2 + (need for recursive call OR rn + 3). This gives
+/// It should not be a problem if `_limbs_square_mod_base_pow_n_minus_1` is used to compute the full
+/// square with xs.len() <= 2 * n, because this condition implies (B ^ xs.len() - 1) ^ 2 <
+/// (B ^ n - 1) .
 ///
-/// S(n) <= rn/2 + MAX (rn + 4, S(n/2)) <= 3/2 rn + 4
+/// Requires n / 4 < xs.len() <= n
+/// Scratch need: n / 2 + (need for recursive call OR n + 3). This gives
+///
+/// S(n) <= n / 2 + MAX (n + 4, S(half_n / 2)) <= 3 / 2 * n + 4
 ///
 /// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.  
 pub fn _limbs_square_mod_base_pow_n_minus_1(
     out: &mut [Limb],
-    rn: usize,
+    n: usize,
     xs: &[Limb],
     scratch: &mut [Limb],
 ) {
-    let an = xs.len();
-    assert_ne!(an, 0);
-    assert!(an <= rn);
-    if (rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD {
-        if an < rn {
-            if 2 * an <= rn {
+    let xs_len = xs.len();
+    assert_ne!(xs_len, 0);
+    assert!(xs_len <= n);
+    let two_xs_len = xs_len << 1;
+    if n < SQRMOD_BNM1_THRESHOLD || n.odd() {
+        if xs_len < n {
+            if two_xs_len <= n {
                 limbs_square_to_out(out, xs);
             } else {
-                fail_on_untested_path(
-                    "((rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD) && an < rn < 2 * an",
-                );
+                fail_on_untested_path("(n < SQRMOD_BNM1_THRESHOLD || n.odd()) && two_xs_len > n");
                 limbs_square_to_out(scratch, xs);
-                let cy = if limbs_add_greater_to_out(out, &scratch[..rn], &scratch[rn..2 * an]) {
-                    1
-                } else {
-                    0
-                };
-                assert!(!limbs_slice_add_limb_in_place(&mut out[..rn], cy));
+                let (scratch_lo, scratch_hi) = scratch.split_at(n);
+                if limbs_add_to_out(out, scratch_lo, &scratch_hi[..two_xs_len - n]) {
+                    assert!(!limbs_slice_add_limb_in_place(&mut out[..n], 1));
+                }
             }
         } else {
-            _limbs_square_mod_base_pow_n_minus_1_basecase(out, &xs[..rn], scratch);
+            _limbs_square_mod_base_pow_n_minus_1_basecase(out, &xs[..n], scratch);
         }
     } else {
-        let n = rn >> 1;
-        assert!(2 * an > n);
-        // Compute xm = a^2 mod (B^n - 1), xp = a^2 mod (B^n + 1)
-        // and crt together as
-        // x = -xp * B^n + (B^n + 1) * [ (xp + xm)/2 mod (B^n-1)]
-        let a0 = &xs[..];
-        if an > n {
-            let a1 = &xs[n..];
-            let (xp_lo, xp_hi) = scratch.split_at_mut(n);
-            let cy = if limbs_add_greater_to_out(xp_lo, &a0[..n], &a1[..an - n]) {
-                1
-            } else {
-                0
-            };
-            limbs_slice_add_limb_in_place(xp_lo, cy);
-            _limbs_square_mod_base_pow_n_minus_1(out, n, xp_lo, xp_hi);
+        let half_n = n >> 1;
+        assert!(two_xs_len > half_n);
+        // Compute xm = a ^ 2 mod (B ^ half_n - 1), scratch = a ^ 2 mod (B ^ half_n + 1)
+        // and CRT together as
+        // x = -scratch * B ^ half_n + (B ^ half_n + 1) * [(scratch + xm) / 2 mod (B ^ half_n - 1)]
+        let k = if half_n < MUL_FFT_MODF_THRESHOLD {
+            0
         } else {
-            _limbs_square_mod_base_pow_n_minus_1(out, n, &a0[..an], scratch);
-        }
-        let (xp, sp1) = scratch.split_at_mut(2 * n + 2);
-        if an > n {
-            let a1 = &xs[n..];
-            let cy = if limbs_sub_to_out(sp1, &a0[..n], &a1[..an - n]) {
-                1
-            } else {
-                0
-            };
-            sp1[n] = 0;
-            assert!(!limbs_slice_add_limb_in_place(&mut sp1[..n + 1], cy));
-            let anp = n + usize::exact_from(sp1[n]);
-            let k = if n < MUL_FFT_MODF_THRESHOLD {
-                0
-            } else {
-                let mut k = _limbs_mul_fft_best_k(n, true);
-                let mut mask = (1 << k) - 1;
-                while n & mask != 0 {
-                    k -= 1;
-                    mask >>= 1;
-                }
-                k
-            };
+            min(
+                _limbs_mul_fft_best_k(half_n, true),
+                usize::wrapping_from(half_n.trailing_zeros()),
+            )
+        };
+        let m = half_n + 1;
+        if xs_len > half_n {
+            let (xs_lo, xs_hi) = xs.split_at(half_n);
+            let (xp_lo, xp_hi) = scratch.split_at_mut(half_n);
+            if limbs_add_greater_to_out(xp_lo, xs_lo, xs_hi) {
+                limbs_slice_add_limb_in_place(xp_lo, 1);
+            }
+            _limbs_square_mod_base_pow_n_minus_1(out, half_n, xp_lo, xp_hi);
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
+            scratch_hi[half_n] = 0;
+            if limbs_sub_to_out(scratch_hi, xs_lo, xs_hi) {
+                assert!(!limbs_slice_add_limb_in_place(&mut scratch_hi[..m], 1));
+            }
             if k >= FFT_FIRST_K {
-                let xs = &sp1[..anp];
-                xp[n] = if _limbs_mul_fft(xp, n, xs, xs, k) {
-                    1
-                } else {
-                    0
-                };
+                let xs = &scratch_hi[..half_n + usize::exact_from(scratch_hi[half_n])];
+                scratch_lo[half_n] = Limb::iverson(_limbs_mul_fft(scratch_lo, half_n, xs, xs, k));
             } else {
-                _limbs_square_mod_base_pow_n_plus_1_basecase(xp, sp1, n);
+                _limbs_square_mod_base_pow_n_plus_1_basecase(scratch_lo, scratch_hi, half_n);
             }
         } else {
-            let ap1 = a0;
-            let anp = an;
-            let k = if n < MUL_FFT_MODF_THRESHOLD {
-                0
-            } else {
-                let mut k = _limbs_mul_fft_best_k(n, true);
-                let mut mask = (1 << k) - 1;
-                while n & mask != 0 {
-                    k -= 1;
-                    mask >>= 1;
-                }
-                k
-            };
+            _limbs_square_mod_base_pow_n_minus_1(out, half_n, xs, scratch);
             if k >= FFT_FIRST_K {
-                let xs = &ap1[..anp];
-                xp[n] = if _limbs_mul_fft(xp, n, xs, xs, k) {
-                    1
-                } else {
-                    0
-                };
+                scratch[half_n] = Limb::iverson(_limbs_mul_fft(scratch, half_n, xs, xs, k));
             } else {
-                assert!(anp <= n);
-                assert!(anp << 1 > n);
-                limbs_square_to_out(xp, &a0[..an]);
-                let anp = 2 * an - n;
-                let (xp_lo, xp_hi) = xp.split_at_mut(n);
-                let cy = if limbs_sub_in_place_left(xp_lo, &xp_hi[..anp]) {
-                    1
-                } else {
-                    0
-                };
-                xp_hi[0] = 0;
-                assert!(!limbs_slice_add_limb_in_place(&mut xp[..n + 1], cy));
+                assert!(xs_len <= half_n);
+                limbs_square_to_out(scratch, xs);
+                let (scratch_lo, scratch_hi) = scratch[..two_xs_len].split_at_mut(half_n);
+                let carry = limbs_sub_in_place_left(scratch_lo, scratch_hi);
+                scratch_hi[0] = 0;
+                if carry {
+                    assert!(!limbs_slice_add_limb_in_place(&mut scratch[..m], 1));
+                }
             }
         }
         // Here the CRT recomposition begins.
         //
-        // xm <- (xp + xm)/2 = (xp + xm)B^n/2 mod (B^n-1)
+        // xm <- (scratch + xm) / 2 = (scratch + xm) B ^ half_n / 2 mod (B ^ half_n - 1)
         // Division by 2 is a bitwise rotation.
         //
-        // Assumes xp normalised mod (B^n+1).
+        // Assumes scratch normalised mod (B ^ half_n + 1).
         //
-        // The residue class [0] is represented by [B^n-1]; except when
-        // both input are ZERO.
-        // xp[n] == 1 implies {xp,n} == ZERO
-        let mut cy = xp[n].wrapping_add(
-            if limbs_slice_add_same_length_in_place_left(&mut out[..n], &xp[..n]) {
-                1
-            } else {
-                0
-            },
-        );
-        cy.wrapping_add_assign(out[0] & 1);
-        limbs_slice_shr_in_place(&mut out[..n], 1);
-        assert!(cy <= 2);
-        let hi = cy << (Limb::WIDTH - 1); // (cy&1) << ...
-        cy >>= 1;
-        // We can have cy != 0 only if hi = 0...
-        assert!(!out[n - 1].get_highest_bit());
-        out[n - 1] |= hi;
-        // ... rp[n-1] + cy can not overflow, the following INCR is correct.
-        assert!(cy <= 1);
-        // Next increment can not overflow, read the previous comments about cy.
-        assert!(cy == 0 || !out[n - 1].get_highest_bit());
-        assert!(!limbs_slice_add_limb_in_place(&mut out[..n], cy));
-        //  Compute the highest half:
-        // ([(xp + xm)/2 mod (B^n-1)] - xp ) * B^n
-        if 2 * an < rn {
-            // Note that in this case, the only way the result can equal
-            // zero mod B^{rn} - 1 is if the input is zero, and
-            // then the output of both the recursive calls and this CRT
-            // reconstruction is zero, not B^{rn} - 1.
-            let (rp_lo, rp_hi) = out.split_at_mut(n);
-            cy = if limbs_sub_same_length_to_out(rp_hi, &rp_lo[..2 * an - n], &xp[..2 * an - n]) {
-                1
-            } else {
-                0
-            };
-            cy = xp[n].wrapping_add(
-                if _limbs_sub_same_length_with_borrow_in_in_place_right(
-                    &out[2 * an - n..rn - n],
-                    &mut xp[2 * an - n..rn - n],
-                    cy != 0,
-                ) {
-                    1
-                } else {
-                    0
-                },
-            );
-            assert!(slice_test_zero(&xp[2 * an - n + 1..rn - n]));
-            cy = if limbs_sub_limb_in_place(&mut out[..2 * an], cy) {
-                1
-            } else {
-                0
-            };
-            assert_eq!(cy, xp[2 * an - n]);
+        // The residue class [0] is represented by [B ^ half_n - 1], except when both inputs are
+        // zero. scratch[half_n] == 1 implies {scratch, half_n} == 0
+        let mut carry = scratch[half_n];
+        let (out_lo, out_hi) = out.split_at_mut(half_n);
+        if limbs_slice_add_same_length_in_place_left(out_lo, &scratch[..half_n]) {
+            carry.wrapping_add_assign(1);
+        }
+        if out_lo[0].odd() {
+            carry.wrapping_add_assign(1);
+        }
+        limbs_slice_shr_in_place(out_lo, 1);
+        assert!(carry <= 2);
+        let hi = carry << (Limb::WIDTH - 1); // (carry & 1) << ...
+        carry >>= 1;
+        // We can have carry != 0 only if hi = 0...
+        let out_last = out_lo.last_mut().unwrap();
+        assert!(!out_last.get_highest_bit());
+        *out_last |= hi;
+        // out[half_n - 1] + carry can't overflow, so the following increment is correct.
+        assert!(carry <= 1);
+        // Next increment can not overflow: read the previous comments about carry.
+        assert!(carry == 0 || !out_last.get_highest_bit());
+        assert!(!limbs_slice_add_limb_in_place(out_lo, carry));
+        // Compute the highest half: ([(scratch + xm) / 2 mod (B ^ half_n - 1)] - scratch ) *
+        // B ^ half_n
+        if two_xs_len < n {
+            // Note that in this case, the only way the result can equal zero mod B ^ n - 1 is if
+            // the input is zero, and then the output of both the recursive calls and this CRT
+            // reconstruction is zero, not B ^ n - 1.
+            let k = two_xs_len - half_n;
+            let (scratch_lo, scratch_hi) = scratch.split_at_mut(k);
+            let borrow = limbs_sub_same_length_to_out(out_hi, &out_lo[..k], scratch_lo);
+            let mut carry = scratch_hi[(half_n - xs_len) << 1];
+            if _limbs_sub_same_length_with_borrow_in_in_place_right(
+                &out[k..n - half_n],
+                &mut scratch_hi[..n - two_xs_len],
+                borrow,
+            ) {
+                carry.wrapping_add_assign(1);
+            }
+            assert!(slice_test_zero(&scratch_hi[1..n - two_xs_len]));
+            if carry != 0 {
+                carry = Limb::iverson(limbs_sub_limb_in_place(&mut out[..two_xs_len], 1));
+            }
+            assert_eq!(carry, scratch_hi[0]);
         } else {
-            let (rp_lo, rp_hi) = out.split_at_mut(n);
-            cy = xp[n].wrapping_add(if limbs_sub_same_length_to_out(rp_hi, rp_lo, &xp[..n]) {
-                1
-            } else {
-                0
-            });
-            // cy = 1 only if {xp,n+1} is not ZERO, i.e. {rp,n} is not ZERO.
-            // DECR will affect _at most_ the lowest n limbs.
-            assert!(!limbs_sub_limb_in_place(&mut out[..2 * n], cy));
+            let (scratch_last, scratch_init) = scratch[..m].split_last().unwrap();
+            let mut carry = *scratch_last;
+            if limbs_sub_same_length_to_out(out_hi, out_lo, scratch_init) {
+                carry.wrapping_add_assign(1);
+            }
+            // carry = 1 only if {scratch, half_n + 1} is not zero, i.e. {out, half_n} is not zero.
+            // The decrement will affect _at most_ the lowest half_n limbs.
+            assert!(!limbs_sub_limb_in_place(&mut out[..half_n << 1], carry));
         }
     }
 }

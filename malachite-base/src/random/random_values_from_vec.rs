@@ -1,4 +1,4 @@
-use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
+use num::random::RandomUnsignedsLessThan;
 
 /// Uniformly generates a random value from a nonempty `Vec`.
 #[derive(Clone, Debug)]

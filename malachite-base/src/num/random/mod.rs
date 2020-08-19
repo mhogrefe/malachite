@@ -2,142 +2,357 @@ use iterators::{nonzero_values, NonzeroValues};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::random::random_bit_chunks::{RandomSignedBitChunks, RandomUnsignedBitChunks};
-use num::random::random_highest_bit_set_values::RandomHighestBitSetValues;
-use num::random::random_primitive_integers::RandomPrimitiveIntegers;
-use num::random::random_signed_range::{RandomSignedInclusiveRange, RandomSignedRange};
-use num::random::random_unsigned_range::{RandomUnsignedInclusiveRange, RandomUnsignedRange};
-use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
+use num::conversion::traits::WrappingFrom;
+use num::logic::traits::BitAccess;
+use rand::Rng;
+use rand_chacha::ChaCha20Rng;
 use random::seed::Seed;
+use std::fmt::Debug;
+
+/// Uniformly generates random primitive integers.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct ThriftyRandomState {
+    x: u32,
+    bits_left: u64,
+}
+
+#[doc(hidden)]
+pub trait HasRandomPrimitiveIntegers {
+    type State: Clone + Debug;
+
+    fn new_state() -> Self::State;
+
+    fn get_random(rng: &mut ChaCha20Rng, state: &mut Self::State) -> Self;
+}
+
+macro_rules! impl_trivial_random_primitive_integers {
+    ($t: ident) => {
+        impl HasRandomPrimitiveIntegers for $t {
+            type State = ();
+
+            #[inline]
+            fn new_state() -> () {
+                ()
+            }
+
+            #[inline]
+            fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> $t {
+                rng.gen()
+            }
+        }
+    };
+}
+impl_trivial_random_primitive_integers!(u32);
+impl_trivial_random_primitive_integers!(u64);
+impl_trivial_random_primitive_integers!(u128);
+impl_trivial_random_primitive_integers!(usize);
+impl_trivial_random_primitive_integers!(i32);
+impl_trivial_random_primitive_integers!(i64);
+impl_trivial_random_primitive_integers!(i128);
+impl_trivial_random_primitive_integers!(isize);
+
+fn _get_random<T: PrimitiveInteger>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
+    if state.bits_left == 0 {
+        state.x = rng.gen();
+        state.bits_left = 32 - T::WIDTH;
+    } else {
+        state.x >>= T::WIDTH;
+        state.bits_left -= T::WIDTH;
+    }
+    T::wrapping_from(state.x)
+}
+
+macro_rules! impl_thrifty_random_primitive_integers {
+    ($t: ident) => {
+        impl HasRandomPrimitiveIntegers for $t {
+            type State = ThriftyRandomState;
+
+            #[inline]
+            fn new_state() -> ThriftyRandomState {
+                ThriftyRandomState { x: 0, bits_left: 0 }
+            }
+
+            #[inline]
+            fn get_random(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> $t {
+                _get_random(rng, state)
+            }
+        }
+    };
+}
+impl_thrifty_random_primitive_integers!(u8);
+impl_thrifty_random_primitive_integers!(u16);
+impl_thrifty_random_primitive_integers!(i8);
+impl_thrifty_random_primitive_integers!(i16);
+
+/// Uniformly generates random primitive integers.
+///
+/// This `struct` is created by the `random_primitive_integers` method. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomPrimitiveIntegers<T: HasRandomPrimitiveIntegers> {
+    pub(crate) rng: ChaCha20Rng,
+    pub(crate) state: T::State,
+}
+
+impl<T: HasRandomPrimitiveIntegers> Iterator for RandomPrimitiveIntegers<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        Some(T::get_random(&mut self.rng, &mut self.state))
+    }
+}
+
+/// Uniformly generates random unsigned integers less than a positive limit.
+#[derive(Clone, Debug)]
+pub struct RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
+    pub(crate) xs: RandomUnsignedBitChunks<T>,
+    pub(crate) limit: T,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        loop {
+            let x = self.xs.next();
+            if self.limit == T::ZERO || x.unwrap() < self.limit {
+                return x;
+            }
+        }
+    }
+}
+
+/// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
+///
+/// This `struct` is created by the `random_unsigned_range` method. See its documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomUnsignedRange<T: PrimitiveUnsigned> {
+    pub(crate) xs: RandomUnsignedsLessThan<T>,
+    pub(crate) a: T,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedRange<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(|x| x + self.a)
+    }
+}
+
+/// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
+///
+/// This `struct` is created by the `random_unsigned_inclusive_range` method. See its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub enum RandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
+    NotAll(RandomUnsignedsLessThan<T>, T),
+    All(RandomPrimitiveIntegers<T>),
+}
+
+impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedInclusiveRange<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        match self {
+            RandomUnsignedInclusiveRange::NotAll(xs, a) => xs.next().map(|x| x + *a),
+            RandomUnsignedInclusiveRange::All(xs) => xs.next(),
+        }
+    }
+}
+
+#[doc(hidden)]
+pub trait HasRandomSignedRange: Sized {
+    type UnsignedValue: PrimitiveUnsigned;
+
+    fn new_unsigned_range(seed: Seed, a: Self, b: Self)
+        -> RandomUnsignedRange<Self::UnsignedValue>;
+
+    fn new_unsigned_inclusive_range(
+        seed: Seed,
+        a: Self,
+        b: Self,
+    ) -> RandomUnsignedInclusiveRange<Self::UnsignedValue>;
+
+    fn from_unsigned_value(x: Self::UnsignedValue) -> Self;
+}
+
+macro_rules! impl_has_random_signed_range {
+    ($u: ident, $s: ident) => {
+        impl HasRandomSignedRange for $s {
+            type UnsignedValue = $u;
+
+            fn new_unsigned_range(seed: Seed, mut a: $s, mut b: $s) -> RandomUnsignedRange<$u> {
+                a.flip_bit($u::WIDTH - 1);
+                b.flip_bit($u::WIDTH - 1);
+                random_unsigned_range(seed, $u::wrapping_from(a), $u::wrapping_from(b))
+            }
+
+            fn new_unsigned_inclusive_range(
+                seed: Seed,
+                mut a: $s,
+                mut b: $s,
+            ) -> RandomUnsignedInclusiveRange<$u> {
+                a.flip_bit($u::WIDTH - 1);
+                b.flip_bit($u::WIDTH - 1);
+                random_unsigned_inclusive_range(seed, $u::wrapping_from(a), $u::wrapping_from(b))
+            }
+
+            fn from_unsigned_value(mut u: $u) -> $s {
+                u.flip_bit($u::WIDTH - 1);
+                $s::wrapping_from(u)
+            }
+        }
+    };
+}
+apply_to_unsigned_signed_pair!(impl_has_random_signed_range);
+
+/// Uniformly generates random signed integers in the half-open interval $[a, b)$.
+///
+/// This `struct` is created by the `random_signed_range` method. See its documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomSignedRange<T: HasRandomSignedRange> {
+    pub(crate) xs: RandomUnsignedRange<T::UnsignedValue>,
+}
+
+impl<T: HasRandomSignedRange> Iterator for RandomSignedRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(T::from_unsigned_value)
+    }
+}
+
+/// Uniformly generates random signed integers in the closed interval $[a, b]$.
+///
+/// This `struct` is created by the `random_signed_inclusive_range` method. See its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct RandomSignedInclusiveRange<T: HasRandomSignedRange> {
+    pub(crate) xs: RandomUnsignedInclusiveRange<T::UnsignedValue>,
+}
+
+impl<T: HasRandomSignedRange> Iterator for RandomSignedInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(T::from_unsigned_value)
+    }
+}
 
 /// Uniformly generates unsigned integers of up to `chunk_size` bits.
 ///
-/// $$
-/// P(x) = \\begin{cases}
-///     2^{-c} & 0 \\leq x < 2^c \\\\
-///     0 & \\text{otherwise}
-/// \\end{cases}
-/// $$
-/// where $c$ is `chunk_size`.
-///
-/// The output length is infinite.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `chunk_size` is greater than `T::WIDTH`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_unsigned_bit_chunks;
-///
-/// assert_eq!(
-///     random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3).take(10).collect::<Vec<_>>(),
-///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
-/// )
-/// ```
-pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
-    seed: Seed,
-    chunk_size: u64,
-) -> RandomUnsignedBitChunks<T> {
-    assert!(chunk_size <= T::WIDTH);
-    RandomUnsignedBitChunks {
-        xs: random_primitive_integers(seed),
-        x: T::ZERO,
-        bits_left: 0,
-        chunk_size,
-        mask: T::low_mask(chunk_size),
-        high_bits: None,
+/// This `struct` is created by the `random_unsigned_bit_chunks` method. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
+    pub(crate) xs: RandomPrimitiveIntegers<T>,
+    pub(crate) x: T,
+    pub(crate) bits_left: u64,
+    pub(crate) chunk_size: u64,
+    pub(crate) mask: T,
+    pub(crate) high_bits: Option<T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedBitChunks<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        if self.chunk_size == 0 {
+            return Some(T::ZERO);
+        }
+        let width_minus_chunk_size = T::WIDTH - self.chunk_size;
+        Some(if self.bits_left == 0 {
+            self.x = self.xs.next().unwrap();
+            self.bits_left = width_minus_chunk_size;
+            self.x & self.mask
+        } else if self.bits_left >= self.chunk_size {
+            self.x >>= self.chunk_size;
+            if let Some(bits) = self.high_bits {
+                self.x |= bits << width_minus_chunk_size;
+                self.high_bits = None;
+            }
+            self.bits_left -= self.chunk_size;
+            self.x & self.mask
+        } else {
+            let mut old_x = self.x >> self.chunk_size;
+            if let Some(bits) = self.high_bits {
+                old_x |= bits << width_minus_chunk_size;
+            }
+            self.x = self.xs.next().unwrap();
+            self.high_bits = Some(self.x >> (T::WIDTH - self.bits_left));
+            self.x <<= self.bits_left;
+            self.bits_left += width_minus_chunk_size;
+            (self.x | old_x) & self.mask
+        })
     }
 }
+
+#[doc(hidden)]
+pub trait RandomSignedChunkable: Sized {
+    type AbsoluteChunks: Clone + Debug;
+
+    fn new_absolute_chunks(seed: Seed, chunk_size: u64) -> Self::AbsoluteChunks;
+
+    fn next_chunk(xs: &mut Self::AbsoluteChunks) -> Option<Self>;
+}
+
+macro_rules! impl_random_signed_chunkable {
+    ($u: ident, $s: ident) => {
+        impl RandomSignedChunkable for $s {
+            type AbsoluteChunks = RandomUnsignedBitChunks<$u>;
+
+            fn new_absolute_chunks(seed: Seed, chunk_size: u64) -> RandomUnsignedBitChunks<$u> {
+                random_unsigned_bit_chunks(seed, chunk_size)
+            }
+
+            fn next_chunk(xs: &mut Self::AbsoluteChunks) -> Option<$s> {
+                xs.next().map(WrappingFrom::wrapping_from)
+            }
+        }
+    };
+}
+apply_to_unsigned_signed_pair!(impl_random_signed_chunkable);
 
 /// Uniformly generates signed integers of up to `chunk_size` bits.
 ///
-/// The generated values will all be
-/// non-negative unless `chunk_size` is equal to `T::WIDTH`.
-///
-/// $$
-/// P(x) = \\begin{cases}
-///     2^{-c} & c = W \\ \\text{or} \\ (c < W \\ \\text{and} \\ 0 \\leq x < 2^c) \\\\
-///     0 & \\text{otherwise}
-/// \\end{cases}
-/// $$
-/// where $c$ is `chunk_size` and $W$ is `T::WIDTH`.
-///
-/// The output length is infinite.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `chunk_size` is greater than `T::WIDTH`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_signed_bit_chunks;
-///
-/// assert_eq!(
-///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3).take(10).collect::<Vec<_>>(),
-///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
-/// )
-/// ```
-pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
-    seed: Seed,
-    chunk_size: u64,
-) -> RandomSignedBitChunks<T> {
-    assert!(chunk_size <= T::WIDTH);
-    RandomSignedBitChunks {
-        xs: T::new_absolute_chunks(seed, chunk_size),
+/// This `struct` is created by the `random_signed_bit_chunks` method. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomSignedBitChunks<T: RandomSignedChunkable> {
+    pub(crate) xs: T::AbsoluteChunks,
+}
+
+impl<T: RandomSignedChunkable> Iterator for RandomSignedBitChunks<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        T::next_chunk(&mut self.xs)
     }
 }
 
-/// Uniformly generates unsigned integers whose highest bit is set.
-///
-/// $$
-/// P(x) = \\begin{cases}
-///     2^{1-W} & 2^{W-1} \\leq x < 2^W \\\\
-///     0 & \\text{otherwise}
-/// \\end{cases}
-/// $$
-/// where $W$ is `T::WIDTH`.
-///
-/// The output length is infinite.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Examples
-/// ```
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::random::random_highest_bit_set_unsigneds;
-///
-/// assert_eq!(
-///     random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
-///     &[241, 222, 151, 226, 198, 220, 180, 212, 161, 175],
-/// )
-/// ```
-#[inline]
-pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
-    seed: Seed,
-) -> RandomHighestBitSetValues<RandomUnsignedBitChunks<T>> {
-    RandomHighestBitSetValues {
-        xs: random_unsigned_bit_chunks(seed, T::WIDTH - 1),
-        mask: T::power_of_two(T::WIDTH - 1),
+/// Generates an iterator's values, but with the highest bit set.
+#[derive(Clone, Debug)]
+pub struct RandomHighestBitSetValues<I: Iterator>
+where
+    I::Item: PrimitiveInteger,
+{
+    pub(crate) xs: I,
+    pub(crate) mask: I::Item,
+}
+
+impl<I: Iterator> Iterator for RandomHighestBitSetValues<I>
+where
+    I::Item: PrimitiveInteger,
+{
+    type Item = I::Item;
+
+    #[inline]
+    fn next(&mut self) -> Option<I::Item> {
+        self.xs.next().map(|x| x | self.mask)
     }
 }
 
@@ -590,13 +805,138 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
     }
 }
 
+/// Uniformly generates unsigned integers of up to `chunk_size` bits.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{-c} & 0 \\leq x < 2^c \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $c$ is `chunk_size`.
+///
+/// The output length is infinite.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `chunk_size` is greater than `T::WIDTH`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_unsigned_bit_chunks;
+///
+/// assert_eq!(
+///     random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3).take(10).collect::<Vec<_>>(),
+///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
+/// )
+/// ```
+pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
+    seed: Seed,
+    chunk_size: u64,
+) -> RandomUnsignedBitChunks<T> {
+    assert!(chunk_size <= T::WIDTH);
+    RandomUnsignedBitChunks {
+        xs: random_primitive_integers(seed),
+        x: T::ZERO,
+        bits_left: 0,
+        chunk_size,
+        mask: T::low_mask(chunk_size),
+        high_bits: None,
+    }
+}
+
+/// Uniformly generates signed integers of up to `chunk_size` bits.
+///
+/// The generated values will all be
+/// non-negative unless `chunk_size` is equal to `T::WIDTH`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{-c} & c = W \\ \\text{or} \\ (c < W \\ \\text{and} \\ 0 \\leq x < 2^c) \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $c$ is `chunk_size` and $W$ is `T::WIDTH`.
+///
+/// The output length is infinite.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `chunk_size` is greater than `T::WIDTH`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_signed_bit_chunks;
+///
+/// assert_eq!(
+///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3).take(10).collect::<Vec<_>>(),
+///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
+/// )
+/// ```
+pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
+    seed: Seed,
+    chunk_size: u64,
+) -> RandomSignedBitChunks<T> {
+    assert!(chunk_size <= T::WIDTH);
+    RandomSignedBitChunks {
+        xs: T::new_absolute_chunks(seed, chunk_size),
+    }
+}
+
+/// Uniformly generates unsigned integers whose highest bit is set.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     2^{1-W} & 2^{W-1} \\leq x < 2^W \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+/// where $W$ is `T::WIDTH`.
+///
+/// The output length is infinite.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_highest_bit_set_unsigneds;
+///
+/// assert_eq!(
+///     random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
+///     &[241, 222, 151, 226, 198, 220, 180, 212, 161, 175],
+/// )
+/// ```
+#[inline]
+pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
+    seed: Seed,
+) -> RandomHighestBitSetValues<RandomUnsignedBitChunks<T>> {
+    RandomHighestBitSetValues {
+        xs: random_unsigned_bit_chunks(seed, T::WIDTH - 1),
+        mask: T::power_of_two(T::WIDTH - 1),
+    }
+}
+
 /// This module contains iterators that generate primitive integers from geometric-like
 /// distributions.
 pub mod geometric;
-pub mod random_bit_chunks;
-pub mod random_highest_bit_set_values;
-pub mod random_primitive_integers;
-pub mod random_signed_range;
-pub mod random_unsigned_range;
-pub mod random_unsigneds_less_than;
 pub mod striped;

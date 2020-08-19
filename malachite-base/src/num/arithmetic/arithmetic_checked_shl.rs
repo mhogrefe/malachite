@@ -1,10 +1,9 @@
-use std::ops::{Neg, Shl, Shr};
-
 use comparison::traits::Min;
 use num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
+use std::ops::{Neg, Shl, Shr};
 
 fn _arithmetic_checked_shl_unsigned_unsigned<
     T: PrimitiveInteger + Shl<U, Output = T> + Shr<U, Output = T>,

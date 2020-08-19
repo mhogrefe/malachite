@@ -28,11 +28,15 @@ fn from_bits_asc_properties() {
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_asc(bits), x);
         }
+
+        let x_alt = Integer::from_bit_iterator_asc(bits.iter().cloned());
+        assert!(x_alt.is_valid());
+        assert_eq!(x_alt, x);
     });
 }
 
 #[test]
-fn from_limbs_desc_properties() {
+fn from_bits_desc_properties() {
     test_properties(vecs_of_bool, |bits| {
         let x = Integer::from_bits_desc(bits);
         assert!(x.is_valid());
@@ -47,5 +51,9 @@ fn from_limbs_desc_properties() {
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_desc(bits), x);
         }
+
+        let x_alt = Integer::from_bit_iterator_desc(bits.iter().cloned());
+        assert!(x_alt.is_valid());
+        assert_eq!(x_alt, x);
     });
 }

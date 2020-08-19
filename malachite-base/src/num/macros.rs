@@ -1,3 +1,4 @@
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_to_unsigneds {
     ($m: tt) => {
@@ -10,6 +11,7 @@ macro_rules! apply_to_unsigneds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_to_signeds {
     ($m: tt) => {
@@ -22,6 +24,7 @@ macro_rules! apply_to_signeds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_to_primitive_ints {
     ($m: tt) => {
@@ -30,6 +33,7 @@ macro_rules! apply_to_primitive_ints {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_to_unsigned_signed_pair {
     ($m: tt) => {
@@ -42,6 +46,7 @@ macro_rules! apply_to_unsigned_signed_pair {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_unsigneds {
     ($f: ident) => {
@@ -54,6 +59,7 @@ macro_rules! apply_fn_to_unsigneds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_signeds {
     ($f: ident) => {
@@ -66,6 +72,7 @@ macro_rules! apply_fn_to_signeds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_primitive_ints {
     ($f: ident) => {
@@ -74,6 +81,7 @@ macro_rules! apply_fn_to_primitive_ints {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_unsigned_signed_pairs {
     ($f: ident) => {
@@ -86,6 +94,7 @@ macro_rules! apply_fn_to_unsigned_signed_pairs {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_unsigneds_and_unsigneds {
     ($f: ident) => {
@@ -128,6 +137,7 @@ macro_rules! apply_fn_to_unsigneds_and_unsigneds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_unsigneds_and_signeds {
     ($f: ident) => {
@@ -170,6 +180,7 @@ macro_rules! apply_fn_to_unsigneds_and_signeds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_signeds_and_unsigneds {
     ($f: ident) => {
@@ -212,6 +223,7 @@ macro_rules! apply_fn_to_signeds_and_unsigneds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_signeds_and_signeds {
     ($f: ident) => {
@@ -254,6 +266,7 @@ macro_rules! apply_fn_to_signeds_and_signeds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_primitive_ints_and_unsigneds {
     ($f: ident) => {
@@ -262,6 +275,7 @@ macro_rules! apply_fn_to_primitive_ints_and_unsigneds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_primitive_ints_and_signeds {
     ($f: ident) => {
@@ -270,6 +284,7 @@ macro_rules! apply_fn_to_primitive_ints_and_signeds {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! apply_fn_to_primitive_ints_and_primitive_ints {
     ($f: ident) => {

@@ -67,6 +67,10 @@ pub mod iterators {
         pub mod is_weakly_descending;
         pub mod is_weakly_zigzagging;
     }
+    pub mod count_is_at_least;
+    pub mod count_is_at_most;
+    pub mod is_constant;
+    pub mod is_unique;
     pub mod nonzero_values;
 }
 pub mod named;
@@ -201,7 +205,11 @@ pub mod num {
             pub mod geometric_random_nonzero_signeds;
             pub mod geometric_random_positive_signeds;
             pub mod geometric_random_positive_unsigneds;
+            pub mod geometric_random_signed_inclusive_range;
+            pub mod geometric_random_signed_range;
             pub mod geometric_random_signeds;
+            pub mod geometric_random_unsigned_inclusive_range;
+            pub mod geometric_random_unsigned_range;
             pub mod geometric_random_unsigneds;
             pub mod mean;
         }

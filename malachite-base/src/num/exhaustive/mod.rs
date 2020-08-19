@@ -46,92 +46,7 @@ impl<T: PrimitiveInteger> DoubleEndedIterator for PrimitiveIntegerIncreasingRang
     }
 }
 
-/// Generates all primitive integers in the half-open interval $[a, b)$, in ascending order.
-///
-/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. This
-/// function cannot create a range that includes `T::MAX`; for that, use
-/// `primitive_integer_increasing_inclusive_range`.
-///
-/// The output is $(k)_{k=a}^{b-1}$.
-///
-/// The output length is $b - a$.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::exhaustive::primitive_integer_increasing_range;
-///
-/// assert_eq!(
-///     primitive_integer_increasing_range::<i8>(-5, 5).collect::<Vec<_>>(),
-///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
-/// )
-/// ```
-#[inline]
-pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
-    a: T,
-    b: T,
-) -> PrimitiveIntegerIncreasingRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    PrimitiveIntegerIncreasingRange {
-        a: Some(a),
-        b: Some(b),
-    }
-}
-
-/// Generates all primitive integers in the closed interval $[a, b]$, in ascending order.
-///
-/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range contains a single
-/// element.
-///
-/// The output is $(k)_{k=a}^{b}$.
-///
-/// The output length is $b - a + 1$.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::exhaustive::primitive_integer_increasing_inclusive_range;
-///
-/// assert_eq!(
-///     primitive_integer_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
-///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
-/// )
-/// ```
-#[inline]
-pub fn primitive_integer_increasing_inclusive_range<T: PrimitiveInteger>(
-    a: T,
-    b: T,
-) -> PrimitiveIntegerIncreasingRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    PrimitiveIntegerIncreasingRange {
-        a: Some(a),
-        b: b.checked_add(T::ONE),
-    }
-}
-
-/// Generates all values of a signed integer type in an interval, in order of ascending absolute
+/// Generates all values of a signed integer type in an interval, in order of increasing absolute
 /// value.
 ///
 /// This `struct` is created by the `exhaustive_signed_range` and
@@ -155,108 +70,9 @@ impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
     }
 }
 
-/// Generates all signed integers in the half-open interval $[a, b)$, in order of ascending absolute
-/// value.
-///
-/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
-/// than or equal to `b`. If `a` and `b` are equal, the range is empty. This function cannot create
-/// a range that includes `T::MAX`; for that, use `exhaustive_signed_inclusive_range`.
-///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a)$ and $i < j$.
-///
-/// The output length is $b - a$.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::exhaustive::exhaustive_signed_range;
-///
-/// assert_eq!(
-///     exhaustive_signed_range::<i8>(-5, 5).collect::<Vec<_>>(),
-///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, -5]
-/// )
-/// ```
-pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSignedRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    if a >= T::ZERO {
-        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_range(a, b))
-    } else if b <= T::ZERO {
-        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_range(a, b).rev())
-    } else {
-        ExhaustiveSignedRange::BothSigns(
-            once(T::ZERO).chain(
-                primitive_integer_increasing_range(T::ONE, b)
-                    .interleave(primitive_integer_increasing_range(a, T::ZERO).rev()),
-            ),
-        )
-    }
-}
-
-/// Generates all signed integers in the closed interval $[a, b]$, in order of ascending absolute
-/// value.
-///
-/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
-/// than or equal to `b`. If `a` and `b` are equal, the range contains a single element.
-///
-/// The output satisfies
-/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
-/// $i, j \\in [0, b - a]$ and $i < j$.
-///
-/// The output length is $b - a + 1$.
-///
-/// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
-///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::exhaustive::exhaustive_signed_inclusive_range;
-///
-/// assert_eq!(
-///     exhaustive_signed_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
-///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
-/// )
-/// ```
-pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
-    a: T,
-    b: T,
-) -> ExhaustiveSignedRange<T> {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    if a >= T::ZERO {
-        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_inclusive_range(a, b))
-    } else if b <= T::ZERO {
-        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_inclusive_range(a, b).rev())
-    } else {
-        ExhaustiveSignedRange::BothSigns(
-            once(T::ZERO).chain(
-                primitive_integer_increasing_inclusive_range(T::ONE, b).interleave(
-                    primitive_integer_increasing_inclusive_range(a, T::NEGATIVE_ONE).rev(),
-                ),
-            ),
-        )
-    }
-}
+#[doc(hidden)]
+pub type PrimitiveIntegerUpDown<T> =
+    Interleave<PrimitiveIntegerIncreasingRange<T>, Rev<PrimitiveIntegerIncreasingRange<T>>>;
 
 /// Generates all unsigned integers in ascending order.
 ///
@@ -314,11 +130,7 @@ pub fn exhaustive_positive_primitives<T: PrimitiveInteger>() -> PrimitiveInteger
     primitive_integer_increasing_inclusive_range(T::ONE, T::MAX)
 }
 
-#[doc(hidden)]
-pub type PrimitiveIntegerUpDown<T> =
-    Interleave<PrimitiveIntegerIncreasingRange<T>, Rev<PrimitiveIntegerIncreasingRange<T>>>;
-
-/// Generates all signed integers in order of ascending absolute value.
+/// Generates all signed integers in order of increasing absolute value.
 ///
 /// When two numbers have the same absolute value, the positive one comes first.
 ///
@@ -404,7 +216,7 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveInteger
     primitive_integer_increasing_range(T::MIN, T::ZERO).rev()
 }
 
-/// Generates all nonzero signed integers in order of ascending absolute value.
+/// Generates all nonzero signed integers in order of increasing absolute value.
 ///
 /// When two numbers have the same absolute value, the positive one comes first.
 ///
@@ -433,4 +245,192 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveInteger
 #[inline]
 pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerUpDown<T> {
     exhaustive_positive_primitives().interleave(exhaustive_negative_signeds())
+}
+
+/// Generates all primitive integers in the half-open interval $[a, b)$, in ascending order.
+///
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. This
+/// function cannot create a range that includes `T::MAX`; for that, use
+/// `primitive_integer_increasing_inclusive_range`.
+///
+/// The output is $(k)_{k=a}^{b-1}$.
+///
+/// The output length is $b - a$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::primitive_integer_increasing_range;
+///
+/// assert_eq!(
+///     primitive_integer_increasing_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
+/// )
+/// ```
+#[inline]
+pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
+    a: T,
+    b: T,
+) -> PrimitiveIntegerIncreasingRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    PrimitiveIntegerIncreasingRange {
+        a: Some(a),
+        b: Some(b),
+    }
+}
+
+/// Generates all primitive integers in the closed interval $[a, b]$, in ascending order.
+///
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range contains a single
+/// element.
+///
+/// The output is $(k)_{k=a}^{b}$.
+///
+/// The output length is $b - a + 1$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::primitive_integer_increasing_inclusive_range;
+///
+/// assert_eq!(
+///     primitive_integer_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+/// )
+/// ```
+#[inline]
+pub fn primitive_integer_increasing_inclusive_range<T: PrimitiveInteger>(
+    a: T,
+    b: T,
+) -> PrimitiveIntegerIncreasingRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    PrimitiveIntegerIncreasingRange {
+        a: Some(a),
+        b: b.checked_add(T::ONE),
+    }
+}
+
+/// Generates all signed integers in the half-open interval $[a, b)$, in order of increasing
+/// absolute value.
+///
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range is empty. This function cannot create
+/// a range that includes `T::MAX`; for that, use `exhaustive_signed_inclusive_range`.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a)$ and $i < j$.
+///
+/// The output length is $b - a$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_signed_range;
+///
+/// assert_eq!(
+///     exhaustive_signed_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, -5]
+/// )
+/// ```
+pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSignedRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    if a >= T::ZERO {
+        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_range(a, b))
+    } else if b <= T::ZERO {
+        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_range(a, b).rev())
+    } else {
+        ExhaustiveSignedRange::BothSigns(
+            once(T::ZERO).chain(
+                primitive_integer_increasing_range(T::ONE, b)
+                    .interleave(primitive_integer_increasing_range(a, T::ZERO).rev()),
+            ),
+        )
+    }
+}
+
+/// Generates all signed integers in the closed interval $[a, b]$, in order of increasing absolute
+/// value.
+///
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range contains a single element.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a]$ and $i < j$.
+///
+/// The output length is $b - a + 1$.
+///
+/// # Complexity per iteration
+/// $T(i) = \mathcal{O}(1)$
+///
+/// $M(i) = \mathcal{O}(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_signed_inclusive_range;
+///
+/// assert_eq!(
+///     exhaustive_signed_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
+/// )
+/// ```
+pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
+    a: T,
+    b: T,
+) -> ExhaustiveSignedRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    if a >= T::ZERO {
+        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_inclusive_range(a, b))
+    } else if b <= T::ZERO {
+        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_inclusive_range(a, b).rev())
+    } else {
+        ExhaustiveSignedRange::BothSigns(
+            once(T::ZERO).chain(
+                primitive_integer_increasing_inclusive_range(T::ONE, b).interleave(
+                    primitive_integer_increasing_inclusive_range(a, T::NEGATIVE_ONE).rev(),
+                ),
+            ),
+        )
+    }
 }

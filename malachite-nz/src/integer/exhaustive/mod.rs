@@ -5,7 +5,10 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 
 use integer::Integer;
 
-/// Generates all `Integer`s in a finite interval, in ascending order.
+/// Generates all `Natural`s in a finite interval, in ascending order.
+///
+/// This `struct` is created by the `integer_increasing_range` and
+/// `integer_increasing_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerIncreasingRange {
     a: Integer,
@@ -37,43 +40,10 @@ impl DoubleEndedIterator for IntegerIncreasingRange {
     }
 }
 
-/// Generates all `Integer`s in the half-open interval [`a`, `b`), in ascending order. `a` must be
-/// less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate all
-/// `Integer`s in an infinite interval in ascending or descending order, use
-/// `integer_increasing_range_to_infinity` or `integer_decreasing_range_to_negative_infinity`.
-///
-/// Length is `b` - `a`.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::integer_increasing_range;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     integer_increasing_range(Integer::from(-4), Integer::from(4))
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[-4, -3, -2, -1, 0, 1, 2, 3]"
-/// )
-/// ```
-#[inline]
-pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRange {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    IntegerIncreasingRange { a, b }
-}
-
 /// Generates all `Integer`s greater than or equal to some `Integer`, in ascending order.
+///
+/// This `struct` is created by the `integer_increasing_range_to_infinity` method. See its
+/// documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerIncreasingRangeToInfinity {
     a: Integer,
@@ -89,34 +59,10 @@ impl Iterator for IntegerIncreasingRangeToInfinity {
     }
 }
 
-/// Generates all `Integer`s greater than or equal to `a`, in ascending order.
+/// Generates all `Integer`s less than or equal to some `Integer`, in ascending order.
 ///
-/// Length is infinite.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::integer_increasing_range_to_infinity;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     integer_increasing_range_to_infinity(Integer::from(-4)).take(10)
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[-4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
-/// )
-/// ```
-#[inline]
-pub const fn integer_increasing_range_to_infinity(a: Integer) -> IntegerIncreasingRangeToInfinity {
-    IntegerIncreasingRangeToInfinity { a }
-}
-
-/// Generates all `Integer`s less than or equal to some `Integer`, in descending order.
+/// This `struct` is created by the `integer_decreasing_range_to_negative_infinity` method. See its
+/// documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerDecreasingRangeToNegativeInfinity {
     a: Integer,
@@ -132,37 +78,10 @@ impl Iterator for IntegerDecreasingRangeToNegativeInfinity {
     }
 }
 
-/// Generates all `Integer`s less than or equal to `a`, in descending order.
+/// Generates all `Integer`s in a finite interval, in order of increasing absolute value.
 ///
-/// Length is infinite.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::integer_decreasing_range_to_negative_infinity;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     integer_decreasing_range_to_negative_infinity(Integer::from(4)).take(10)
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[4, 3, 2, 1, 0, -1, -2, -3, -4, -5]"
-/// )
-/// ```
-#[inline]
-pub const fn integer_decreasing_range_to_negative_infinity(
-    a: Integer,
-) -> IntegerDecreasingRangeToNegativeInfinity {
-    IntegerDecreasingRangeToNegativeInfinity { a }
-}
-
-/// Generates all `Integer`s in a half-open interval, in order of ascending absolute value. When two
-/// numbers have the same absolute value, the positive one comes first.
+/// This `struct` is created by the `exhaustive_integer_range` and
+/// `exhaustive_integer_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRange {
     NonNegative(IntegerIncreasingRange),
@@ -184,55 +103,11 @@ impl Iterator for ExhaustiveIntegerRange {
     }
 }
 
-/// Generates all `Integer`s in the half-open interval [`a`, `b`), in order of ascending absolute
-/// value. When two numbers have the same absolute value, the positive one comes first. `a` must be
-/// less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate all
-/// `Integer`s in an infinite interval, use `exhaustive_integer_range_to_infinity`,
-/// `exhaustive_integer_range_to_negative_infinity`, or `exhaustive_integers`.
+/// Generates all `Integer`s greater than or equal to some `Integer`, in order of increasing
+/// absolute value.
 ///
-/// Length is `b` - `a`.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Panics
-/// Panics if `a` > `b`.
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::exhaustive_integer_range;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     exhaustive_integer_range(Integer::from(-4), Integer::from(4))
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[0, 1, -1, 2, -2, 3, -3, -4]"
-/// )
-/// ```
-pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
-    if a > b {
-        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
-    }
-    if a >= 0 {
-        ExhaustiveIntegerRange::NonNegative(integer_increasing_range(a, b))
-    } else if b <= 0 {
-        ExhaustiveIntegerRange::NonPositive(integer_increasing_range(a, b).rev())
-    } else {
-        ExhaustiveIntegerRange::BothSigns(
-            once(Integer::ZERO).chain(
-                integer_increasing_range(Integer::ONE, b)
-                    .interleave(integer_increasing_range(a, Integer::ZERO).rev()),
-            ),
-        )
-    }
-}
-
-/// Generates all `Integer`s greater than or equal to some `Integer`, in order of ascending absolute
-/// value. When two numbers have the same absolute value, the positive one comes first.
+/// This `struct` is created by the `exhaustive_integer_range_to_infinity` method. See its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRangeToInfinity {
     NonNegative(IntegerIncreasingRangeToInfinity),
@@ -255,45 +130,11 @@ impl Iterator for ExhaustiveIntegerRangeToInfinity {
     }
 }
 
-/// Generates all `Integer`s greater than or equal to `a`, in order of ascending absolute value.
-/// When two numbers have the same absolute value, the positive one comes first.
+/// Generates all `Integer`s less than or equal to some `Integer`, in order of increasing absolute
+/// value.
 ///
-/// Length is infinite.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_infinity;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     exhaustive_integer_range_to_infinity(Integer::from(-2)).take(10)
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[0, 1, -1, 2, -2, 3, 4, 5, 6, 7]"
-/// )
-/// ```
-#[inline]
-pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRangeToInfinity {
-    if a >= 0 {
-        ExhaustiveIntegerRangeToInfinity::NonNegative(integer_increasing_range_to_infinity(a))
-    } else {
-        ExhaustiveIntegerRangeToInfinity::BothSigns(
-            once(Integer::ZERO).chain(
-                integer_increasing_range_to_infinity(Integer::ONE)
-                    .interleave(integer_increasing_range(a, Integer::ZERO).rev()),
-            ),
-        )
-    }
-}
-
-/// Generates all `Integer`s less than or equal to some `Integer`, in order of ascending absolute
-/// value. When two numbers have the same absolute value, the positive one comes first.
+/// This `struct` is created by the `exhaustive_integer_range_to_negative_infinity` method. See its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRangeToNegativeInfinity {
     NonPositive(IntegerDecreasingRangeToNegativeInfinity),
@@ -316,50 +157,11 @@ impl Iterator for ExhaustiveIntegerRangeToNegativeInfinity {
     }
 }
 
-/// Generates all `Integer`s less than or equal to `a`, in order of ascending absolute value. When
-/// two numbers have the same absolute value, the positive one comes first.
-///
-/// Length is infinite.
-///
-/// Time for the ith iteration: worst case O(i)
-///
-/// Additional memory for the ith iteration: amortized O(1)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_negative_infinity;
-/// use malachite_nz::integer::Integer;
-///
-/// assert_eq!(
-///     exhaustive_integer_range_to_negative_infinity(Integer::from(2)).take(10)
-///         .collect::<Vec<_>>().to_debug_string(),
-///     "[0, 1, -1, 2, -2, -3, -4, -5, -6, -7]"
-/// )
-/// ```
-#[inline]
-pub fn exhaustive_integer_range_to_negative_infinity(
-    a: Integer,
-) -> ExhaustiveIntegerRangeToNegativeInfinity {
-    if a <= 0 {
-        ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(
-            integer_decreasing_range_to_negative_infinity(a),
-        )
-    } else {
-        ExhaustiveIntegerRangeToNegativeInfinity::BothSigns(once(Integer::ZERO).chain(
-            integer_increasing_range(Integer::ONE, a + Integer::ONE).interleave(
-                integer_decreasing_range_to_negative_infinity(Integer::NEGATIVE_ONE),
-            ),
-        ))
-    }
-}
-
+#[doc(hidden)]
 pub type IntegerUpDown =
     Interleave<IntegerIncreasingRangeToInfinity, IntegerDecreasingRangeToNegativeInfinity>;
 
-/// Generates all `Integer`s, in order of ascending absolute value. When two numbers have the same
+/// Generates all `Integer`s, in order of increasing absolute value. When two numbers have the same
 /// absolute value, the positive one comes first.
 ///
 /// Length is infinite.
@@ -460,7 +262,7 @@ pub const fn exhaustive_negative_integers() -> IntegerDecreasingRangeToNegativeI
     integer_decreasing_range_to_negative_infinity(Integer::NEGATIVE_ONE)
 }
 
-/// Generates all nonzero `Integer`s, in order of ascending absolute value. When two numbers have
+/// Generates all nonzero `Integer`s, in order of increasing absolute value. When two numbers have
 /// the same absolute value, the positive one comes first.
 ///
 /// Length is infinite.
@@ -484,4 +286,392 @@ pub const fn exhaustive_negative_integers() -> IntegerDecreasingRangeToNegativeI
 #[inline]
 pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
     exhaustive_positive_integers().interleave(exhaustive_negative_integers())
+}
+
+/// Generates all `Integer`s in the half-open interval $[a, b)$, in ascending order.
+///
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. To generate
+/// all `Integer`s in an infinite interval in ascending or descending order, use
+/// `integer_increasing_range_to_infinity` or `integer_decreasing_range_to_negative_infinity`.
+///
+/// The output is $(k)_{k=a}^{b-1}$.
+///
+/// The output length is $b - a$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is positive and its least-
+/// significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::integer_increasing_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     integer_increasing_range(Integer::from(-4), Integer::from(4))
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[-4, -3, -2, -1, 0, 1, 2, 3]"
+/// )
+/// ```
+#[inline]
+pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRange {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    IntegerIncreasingRange { a, b }
+}
+
+/// Generates all `Integer`s in the closed interval $[a, b]$, in ascending order.
+///
+/// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range contains a single
+/// element. To generate all `Integer`s in an infinite interval in ascending or descending order,
+/// use `integer_increasing_range_to_infinity` or `integer_decreasing_range_to_negative_infinity`.
+///
+/// The output is $(k)_{k=a}^{b}$.
+///
+/// The output length is $b - a + 1$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is positive and its least-
+/// significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::integer_increasing_inclusive_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     integer_increasing_inclusive_range(Integer::from(-4), Integer::from(4))
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[-4, -3, -2, -1, 0, 1, 2, 3, 4]"
+/// )
+/// ```
+#[inline]
+pub fn integer_increasing_inclusive_range(a: Integer, b: Integer) -> IntegerIncreasingRange {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    IntegerIncreasingRange {
+        a,
+        b: b + Integer::ONE,
+    }
+}
+
+/// Generates all `Integer`s greater than or equal to `a`, in ascending order.
+///
+/// The output is $(k)_{k=a}^{\infty}$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is positive and its least-
+/// significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::integer_increasing_range_to_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     integer_increasing_range_to_infinity(Integer::from(-4)).take(10)
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[-4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+/// )
+/// ```
+#[inline]
+pub const fn integer_increasing_range_to_infinity(a: Integer) -> IntegerIncreasingRangeToInfinity {
+    IntegerIncreasingRangeToInfinity { a }
+}
+
+/// Generates all `Integer`s less than or equal to `a`, in descending order.
+///
+/// The output is $(-k)_{k=-a}^{\infty}$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is negative and the least-
+/// significant limb of its absolute value is `Limb::MAX`, the worst case space and time
+/// complexities are constant.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::integer_decreasing_range_to_negative_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     integer_decreasing_range_to_negative_infinity(Integer::from(4)).take(10)
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[4, 3, 2, 1, 0, -1, -2, -3, -4, -5]"
+/// )
+/// ```
+#[inline]
+pub const fn integer_decreasing_range_to_negative_infinity(
+    a: Integer,
+) -> IntegerDecreasingRangeToNegativeInfinity {
+    IntegerDecreasingRangeToNegativeInfinity { a }
+}
+
+/// Generates all `Integer`s in the half-open interval $[a, b)$, in order of increasing absolute
+/// value.
+///
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range is empty.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a)$ and $i < j$.
+///
+/// The output length is $b - a$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the least-significant limb of the absolute value of the
+/// previously-generated value is `Limb::MAX`, the worst case space and time complexities are
+/// constant.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::exhaustive_integer_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     exhaustive_integer_range(Integer::from(-4), Integer::from(4))
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[0, 1, -1, 2, -2, 3, -3, -4]"
+/// )
+/// ```
+pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    if a >= 0 {
+        ExhaustiveIntegerRange::NonNegative(integer_increasing_range(a, b))
+    } else if b <= 0 {
+        ExhaustiveIntegerRange::NonPositive(integer_increasing_range(a, b).rev())
+    } else {
+        ExhaustiveIntegerRange::BothSigns(
+            once(Integer::ZERO).chain(
+                integer_increasing_range(Integer::ONE, b)
+                    .interleave(integer_increasing_range(a, Integer::ZERO).rev()),
+            ),
+        )
+    }
+}
+
+/// Generates all `Integer`s in the closed interval $[a, b]$, in order of increasing absolute value.
+///
+/// When two numbers have the same absolute value, the positive one comes first. `a` must be less
+/// than or equal to `b`. If `a` and `b` are equal, the range contains a single element.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a]$ and $i < j$.
+///
+/// The output length is $b - a + 1$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the least-significant limb of the absolute value of the
+/// previously-generated value is `Limb::MAX`, the worst case space and time complexities are
+/// constant.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::exhaustive_integer_inclusive_range;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     exhaustive_integer_inclusive_range(Integer::from(-4), Integer::from(4))
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[0, 1, -1, 2, -2, 3, -3, 4, -4]"
+/// )
+/// ```
+pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    if a >= 0 {
+        ExhaustiveIntegerRange::NonNegative(integer_increasing_inclusive_range(a, b))
+    } else if b <= 0 {
+        ExhaustiveIntegerRange::NonPositive(integer_increasing_inclusive_range(a, b).rev())
+    } else {
+        ExhaustiveIntegerRange::BothSigns(
+            once(Integer::ZERO).chain(
+                integer_increasing_inclusive_range(Integer::ONE, b)
+                    .interleave(integer_increasing_inclusive_range(a, Integer::NEGATIVE_ONE).rev()),
+            ),
+        )
+    }
+}
+
+/// Generates all `Integer`s greater than or equal to `a`, in order of increasing absolute value.
+///
+/// When two numbers have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a]$ and $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is positive and its least-
+/// significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     exhaustive_integer_range_to_infinity(Integer::from(-2)).take(10)
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[0, 1, -1, 2, -2, 3, 4, 5, 6, 7]"
+/// )
+/// ```
+#[inline]
+pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRangeToInfinity {
+    if a >= 0 {
+        ExhaustiveIntegerRangeToInfinity::NonNegative(integer_increasing_range_to_infinity(a))
+    } else {
+        ExhaustiveIntegerRangeToInfinity::BothSigns(
+            once(Integer::ZERO).chain(
+                integer_increasing_range_to_infinity(Integer::ONE)
+                    .interleave(integer_increasing_range(a, Integer::ZERO).rev()),
+            ),
+        )
+    }
+}
+
+/// Generates all `Integer`s less than or equal to `a`, in order of increasing absolute value.
+///
+/// When two numbers have the same absolute value, the positive one comes first.
+///
+/// The output satisfies
+/// $(|x_i|, \operatorname{sgn}(-x_i)) <_\mathrm{lex} (|x_j|, \operatorname{sgn}(-x_j))$ whenever
+/// $i, j \\in [0, b - a]$ and $i < j$.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = \mathcal{O}(i)$
+///
+/// $M(i) = \mathcal{O}(i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
+/// we exclude the cases where the the previously-generated value is positive and its least-
+/// significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::strings::ToDebugString;
+/// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_negative_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     exhaustive_integer_range_to_negative_infinity(Integer::from(2)).take(10)
+///         .collect::<Vec<_>>().to_debug_string(),
+///     "[0, 1, -1, 2, -2, -3, -4, -5, -6, -7]"
+/// )
+/// ```
+#[inline]
+pub fn exhaustive_integer_range_to_negative_infinity(
+    a: Integer,
+) -> ExhaustiveIntegerRangeToNegativeInfinity {
+    if a <= 0 {
+        ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(
+            integer_decreasing_range_to_negative_infinity(a),
+        )
+    } else {
+        ExhaustiveIntegerRangeToNegativeInfinity::BothSigns(once(Integer::ZERO).chain(
+            integer_increasing_range(Integer::ONE, a + Integer::ONE).interleave(
+                integer_decreasing_range_to_negative_infinity(Integer::NEGATIVE_ONE),
+            ),
+        ))
+    }
 }

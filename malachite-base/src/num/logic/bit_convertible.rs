@@ -1,5 +1,3 @@
-use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
-
 use comparison::traits::Max;
 use named::Named;
 use num::arithmetic::traits::{Parity, WrappingNeg};
@@ -7,6 +5,7 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::{NegativeOne, One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::{BitConvertible, LeadingZeros};
+use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
 
 fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();

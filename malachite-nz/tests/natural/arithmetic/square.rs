@@ -12735,24 +12735,23 @@ fn test_limbs_mul_greater_to_out_fft_square() {
         _limbs_mul_greater_to_out_fft(&mut out, xs, xs);
         assert_eq!(out, out_after);
     };
-    // (rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD in _limbs_square_mod_base_pow_n_minus_1
-    // ((rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD) && an < rn
-    //      in _limbs_square_mod_base_pow_n_minus_1
-    // ((rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD) && 2 * an <= rn
+    // n < SQRMOD_BNM1_THRESHOLD || n.odd() in _limbs_square_mod_base_pow_n_minus_1
+    // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && xs_len < n in _limbs_square_mod_base_pow_n_minus_1
+    // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && two_xs_len <= n
     //      in _limbs_square_mod_base_pow_n_minus_1
     test(&[2], &[10; 2], &[4, 0]);
     test(&[2, 3, 4], &[10; 8], &[4, 12, 25, 24, 16, 0, 10, 10]);
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an <= n
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() in _limbs_square_mod_base_pow_n_minus_1
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // ((rn & 1) != 0 || rn < SQRMOD_BNM1_THRESHOLD) && an >= rn
+    // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && xs_len >= n
     // !limbs_add_same_length_to_out(out, scratch_lo, scratch_hi)
     //      in _limbs_square_mod_base_pow_n_minus_1_basecase
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an <= n && n < MUL_FFT_MODF_THRESHOLD
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && half_n < MUL_FFT_MODF_THRESHOLD
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an <= n && k < FFT_FIRST_K && ap1 == a0
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && k < FFT_FIRST_K
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && 2 * an >= rn
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && 2 * xs_len >= n
     //      in _limbs_square_mod_base_pow_n_minus_1
     test(
         &[
@@ -12766,11 +12765,11 @@ fn test_limbs_mul_greater_to_out_fft_square() {
             4185745608, 107053422, 10, 10, 10, 10,
         ],
     );
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an > n
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an > n && n < MUL_FFT_MODF_THRESHOLD
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && half_n < MUL_FFT_MODF_THRESHOLD
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an > n && k < FFT_FIRST_K
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && k < FFT_FIRST_K
     //      in _limbs_square_mod_base_pow_n_minus_1
     test(
         &[
@@ -12804,11 +12803,11 @@ fn test_limbs_mul_greater_to_out_fft_square() {
             1668857024, 4085640472, 4147728831, 2331128955, 1110679516, 777748997, 10, 10, 10, 10,
         ],
     );
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an <= n && n >= MUL_FFT_MODF_THRESHOLD
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n &&
+    //      half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_square_mod_base_pow_n_minus_1
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && k >= FFT_FIRST_K
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an <= n && k >= FFT_FIRST_K
-    //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && 2 * an < rn
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && two_xs_len <= n
     //      in _limbs_square_mod_base_pow_n_minus_1
     test(
         &[
@@ -13143,9 +13142,9 @@ fn test_limbs_mul_greater_to_out_fft_square() {
             4113530023, 3254687986, 2787398011, 2821429669, 3239612180, 613091669, 10, 10, 10, 10,
         ],
     );
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an > n && n >= MUL_FFT_MODF_THRESHOLD
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && half_n >= MUL_FFT_MODF_THRESHOLD
     //      in _limbs_square_mod_base_pow_n_minus_1
-    // (rn & 1) == 0 && rn >= SQRMOD_BNM1_THRESHOLD && an > n && k >= FFT_FIRST_K
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && k >= FFT_FIRST_K
     //      in _limbs_square_mod_base_pow_n_minus_1
     test(
         &[

@@ -4,10 +4,10 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::CheckedInto;
-use num::random::random_unsigneds_less_than;
-use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
+use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::seed::Seed;
 
+/// Generates random unsigned integers from a truncated geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNaturalValues<T: PrimitiveInteger> {
     xs: RandomUnsignedsLessThan<u64>,
@@ -59,36 +59,68 @@ fn gcd(u: u64, v: u64) -> u64 {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct SimpleRational {
+    n: u64,
+    d: u64,
+}
+
+impl SimpleRational {
+    fn new(n: u64, d: u64) -> SimpleRational {
+        assert_ne!(d, 0);
+        let gcd = gcd(n, d);
+        SimpleRational {
+            n: n / gcd,
+            d: d / gcd,
+        }
+    }
+
+    fn inverse(self) -> SimpleRational {
+        assert_ne!(self.n, 0);
+        SimpleRational {
+            n: self.d,
+            d: self.n,
+        }
+    }
+
+    fn add_u64(self, x: u64) -> SimpleRational {
+        SimpleRational {
+            n: self.n.checked_add(x.checked_mul(self.d).unwrap()).unwrap(),
+            d: self.d,
+        }
+    }
+
+    fn sub_u64(self, x: u64) -> SimpleRational {
+        SimpleRational {
+            n: self.n.checked_sub(x.checked_mul(self.d).unwrap()).unwrap(),
+            d: self.d,
+        }
+    }
+}
+
 pub(crate) fn mean_to_p_with_min<T: PrimitiveInteger>(
+    min: T,
     um_numerator: u64,
     um_denominator: u64,
-    min: T,
 ) -> (u64, u64) {
-    let gcd = gcd(um_numerator, um_denominator);
-    let (um_numerator, um_denominator) = (um_numerator / gcd, um_denominator / gcd);
-    let um_numerator = um_numerator
-        .checked_sub(
-            um_denominator
-                .checked_mul(CheckedInto::<u64>::checked_into(min).unwrap())
-                .unwrap(),
-        )
-        .unwrap();
-    (
-        um_denominator,
-        um_numerator.checked_add(um_denominator).unwrap(),
-    )
+    let um = SimpleRational::new(um_numerator, um_denominator);
+    let p = um
+        .sub_u64(CheckedInto::<u64>::checked_into(min).unwrap())
+        .add_u64(1)
+        .inverse();
+    (p.n, p.d)
 }
 
 fn geometric_random_natural_values_range<T: PrimitiveInteger>(
     seed: Seed,
-    um_numerator: u64,
-    um_denominator: u64,
     min: T,
     max: T,
+    um_numerator: u64,
+    um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
-    assert!(min < max);
+    assert!(min <= max);
     assert_ne!(um_denominator, 0);
-    let (numerator, denominator) = mean_to_p_with_min(um_numerator, um_denominator, min);
+    let (numerator, denominator) = mean_to_p_with_min(min, um_numerator, um_denominator);
     GeometricRandomNaturalValues {
         xs: random_unsigneds_less_than(seed, denominator),
         numerator,
@@ -97,6 +129,7 @@ fn geometric_random_natural_values_range<T: PrimitiveInteger>(
     }
 }
 
+/// Generates random negative signed integers from a modified geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNegativeSigneds<T: PrimitiveSigned> {
     xs: RandomUnsignedsLessThan<u64>,
@@ -127,17 +160,17 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNegativeSigneds<T> {
 
 fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
     seed: Seed,
-    abs_um_numerator: u64,
-    abs_um_denominator: u64,
     abs_min: T,
     abs_max: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
 ) -> GeometricRandomNegativeSigneds<T> {
     assert!(abs_min > abs_max);
     assert_ne!(abs_um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(
+        abs_min.checked_neg().unwrap(),
         abs_um_numerator,
         abs_um_denominator,
-        abs_min.checked_neg().unwrap(),
     );
     GeometricRandomNegativeSigneds {
         xs: random_unsigneds_less_than(seed, denominator),
@@ -147,6 +180,7 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random nonzero signed integers from a modified geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNonzeroSigneds<T: PrimitiveSigned> {
     bs: RandomBools,
@@ -190,13 +224,13 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
 
 fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
     seed: Seed,
-    abs_um_numerator: u64,
-    abs_um_denominator: u64,
     min: T,
     max: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
 ) -> GeometricRandomNonzeroSigneds<T> {
     assert_ne!(abs_um_denominator, 0);
-    let (numerator, denominator) = mean_to_p_with_min(abs_um_numerator, abs_um_denominator, T::ONE);
+    let (numerator, denominator) = mean_to_p_with_min(T::ONE, abs_um_numerator, abs_um_denominator);
     GeometricRandomNonzeroSigneds {
         bs: random_bools(seed.fork("bs")),
         xs: random_unsigneds_less_than(seed.fork("xs"), denominator),
@@ -206,6 +240,7 @@ fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random signed integers from a modified geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomSigneds<T: PrimitiveSigned> {
     bs: RandomBools,
@@ -256,14 +291,14 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSigneds<T> {
 
 fn geometric_random_signeds_range<T: PrimitiveSigned>(
     seed: Seed,
-    abs_um_numerator: u64,
-    abs_um_denominator: u64,
     min: T,
     max: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
 ) -> GeometricRandomSigneds<T> {
     assert_ne!(abs_um_denominator, 0);
     let (numerator, denominator) =
-        mean_to_p_with_min(abs_um_numerator, abs_um_denominator, T::ZERO);
+        mean_to_p_with_min(T::ZERO, abs_um_numerator, abs_um_denominator);
     GeometricRandomSigneds {
         bs: random_bools(seed.fork("bs")),
         xs: random_unsigneds_less_than(seed.fork("xs"), denominator),
@@ -273,12 +308,32 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
     }
 }
 
+/// Generates random negative signed integers in a range from a modified geometric distribution.
+#[derive(Clone, Debug)]
+pub enum GeometricRandomSignedRange<T: PrimitiveSigned> {
+    NonNegative(GeometricRandomNaturalValues<T>),
+    NonPositive(GeometricRandomNegativeSigneds<T>),
+    BothSigns(GeometricRandomSigneds<T>),
+}
+
+impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        match self {
+            GeometricRandomSignedRange::NonNegative(ref mut xs) => xs.next(),
+            GeometricRandomSignedRange::NonPositive(ref mut xs) => xs.next(),
+            GeometricRandomSignedRange::BothSigns(ref mut xs) => xs.next(),
+        }
+    }
+}
+
 /// Generates random unsigned integers from a truncated geometric distribution.
 ///
 /// With this distribution, the probability of a value being generated decreases as the value
-/// increases. The probabilities of $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence;
-/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
-/// is truncated, meaning that values above `T::MAX` are never generated.
+/// increases. The probabilities $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence; that's
+/// where the "geometric" comes from. Unlike a true geometric distribution, this distribution is
+/// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
@@ -346,15 +401,15 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert_ne!(um_numerator, 0);
-    geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ZERO, T::MAX)
+    geometric_random_natural_values_range(seed, T::ZERO, T::MAX, um_numerator, um_denominator)
 }
 
 /// Generates random positive unsigned integers from a truncated geometric distribution.
 ///
 /// With this distribution, the probability of a value being generated decreases as the value
-/// increases. The probabilities of $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence;
-/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
-/// is truncated, meaning that values above `T::MAX` are never generated.
+/// increases. The probabilities $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence; that's
+/// where the "geometric" comes from. Unlike a true geometric distribution, this distribution is
+/// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
@@ -422,7 +477,7 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert!(um_numerator > um_denominator);
-    geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ONE, T::MAX)
+    geometric_random_natural_values_range(seed, T::ONE, T::MAX, um_numerator, um_denominator)
 }
 
 /// Generates random signed integers from a modified geometric distribution.
@@ -431,9 +486,9 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// producing a truncated double geometric distribution. Zero is included.
 ///
 /// With this distribution, the probability of a value being generated decreases as its absolute
-/// value increases. The probabilities of $P(0), P(\pm 1), P(\pm 2), \ldots$ decrease in a
-/// geometric sequence; that's were the "geometric" comes from. Values below `T::MIN` or above
-/// `T::MAX` are never generated.
+/// value increases. The probabilities $P(0), P(\pm 1), P(\pm 2), \ldots$ decrease in a geometric
+/// sequence; that's where the "geometric" comes from. Values below `T::MIN` or above `T::MAX` are
+/// never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
@@ -506,15 +561,15 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
     abs_um_denominator: u64,
 ) -> GeometricRandomSigneds<T> {
     assert_ne!(abs_um_numerator, 0);
-    geometric_random_signeds_range(seed, abs_um_numerator, abs_um_denominator, T::MIN, T::MAX)
+    geometric_random_signeds_range(seed, T::MIN, T::MAX, abs_um_numerator, abs_um_denominator)
 }
 
 /// Generates random natural (non-negative) signed integers from a truncated geometric distribution.
 ///
 /// With this distribution, the probability of a value being generated decreases as the value
-/// increases. The probabilities of $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence;
-/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
-/// is truncated, meaning that values above `T::MAX` are never generated.
+/// increases. The probabilities $P(0), P(1), P(2), \ldots$ decrease in a geometric sequence; that's
+/// where the "geometric" comes from. Unlike a true geometric distribution, this distribution is
+/// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
@@ -582,15 +637,15 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
     assert_ne!(um_numerator, 0);
-    geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ZERO, T::MAX)
+    geometric_random_natural_values_range(seed, T::ZERO, T::MAX, um_numerator, um_denominator)
 }
 
 /// Generates random positive signed integers from a truncated geometric distribution.
 ///
 /// With this distribution, the probability of a value being generated decreases as the value
-/// increases. The probabilities of $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence;
-/// that's were the "geometric" comes from. Unlike a true geometric distribution, this distribution
-/// is truncated, meaning that values above `T::MAX` are never generated.
+/// increases. The probabilities $P(1), P(2), P(3), \ldots$ decrease in a geometric sequence; that's
+/// where the "geometric" comes from. Unlike a true geometric distribution, this distribution is
+/// truncated, meaning that values above `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
@@ -656,7 +711,7 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     um_numerator: u64,
     um_denominator: u64,
 ) -> GeometricRandomNaturalValues<T> {
-    geometric_random_natural_values_range(seed, um_numerator, um_denominator, T::ONE, T::MAX)
+    geometric_random_natural_values_range(seed, T::ONE, T::MAX, um_numerator, um_denominator)
 }
 
 /// Generates random negative signed integers from a modified geometric distribution.
@@ -665,8 +720,8 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// The distribution is truncated at `T::MIN`.
 ///
 /// With this distribution, the probability of a value being generated decreases as its absolute
-/// value increases. The probabilities of $P(-1), P(-2), P(-3), \ldots$ decrease in a geometric
-/// sequence; that's were the "geometric" comes from. Values below `T::MIN` are never generated.
+/// value increases. The probabilities $P(-1), P(-2), P(-3), \ldots$ decrease in a geometric
+/// sequence; that's where the "geometric" comes from. Values below `T::MIN` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
@@ -736,10 +791,10 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
     assert!(abs_um_numerator > abs_um_denominator);
     geometric_random_negative_signeds_range(
         seed,
-        abs_um_numerator,
-        abs_um_denominator,
         T::NEGATIVE_ONE,
         T::MIN,
+        abs_um_numerator,
+        abs_um_denominator,
     )
 }
 
@@ -749,8 +804,8 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// producing a truncated double geometric distribution. Zero is excluded.
 ///
 /// With this distribution, the probability of a value being generated decreases as its absolute
-/// value increases. The probabilities of $P(\pm 1), P(\pm 2), P(\pm 3), \ldots$ decrease in a
-/// geometric sequence; that's were the "geometric" comes from. Values below `T::MIN` or above
+/// value increases. The probabilities $P(\pm 1), P(\pm 2), P(\pm 3), \ldots$ decrease in a
+/// geometric sequence; that's where the "geometric" comes from. Values below `T::MIN` or above
 /// `T::MAX` are never generated.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
@@ -830,9 +885,414 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
     assert!(abs_um_numerator > abs_um_denominator);
     geometric_random_nonzero_signeds_range(
         seed,
-        abs_um_numerator,
-        abs_um_denominator,
         T::MIN,
         T::MAX,
+        abs_um_numerator,
+        abs_um_denominator,
     )
+}
+
+/// Generates random unsigned integers from a truncated geometric distribution over the half-open
+/// interval $[a, b)$.
+///
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities $P(a), P(a + 1), P(a + 2), \ldots$ decrease in a geometric
+/// sequence; that's where the "geometric" comes from. Unlike a true geometric distribution, this
+/// distribution is truncated, meaning that values above `b` are never generated.
+///
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
+/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator` + `um_denominator`.
+///
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[a, b)$. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+///
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
+/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::geometric::geometric_random_unsigned_range;
+///
+/// assert_eq!(
+///     geometric_random_unsigned_range::<u16>(EXAMPLE_SEED, 1, 7, 3, 1)
+///         .take(10).collect::<Vec<_>>(),
+///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
+/// )
+/// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p} + a - 1$, or $p = \frac{1}{m_u - a + 1}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & a \\leq n < b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{b \to \infty} P(a) = p = \frac{1}{m_u - a + 1}.
+/// $$
+#[inline]
+pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    um_numerator: u64,
+    um_denominator: u64,
+) -> GeometricRandomNaturalValues<T> {
+    if a >= b {
+        panic!("a must be less than b. a: {}, b: {}", a, b);
+    }
+    geometric_random_natural_values_range(seed, a, b - T::ONE, um_numerator, um_denominator)
+}
+
+/// Generates random unsigned integers from a truncated geometric distribution over the closed
+/// interval $[a, b]$.
+///
+/// With this distribution, the probability of a value being generated decreases as the value
+/// increases. The probabilities $P(a), P(a + 1), P(a + 2), \ldots$ decrease in a geometric
+/// sequence; that's where the "geometric" comes from. Unlike a true geometric distribution, this
+/// distribution is truncated, meaning that values above `b` are never generated.
+///
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
+/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator` + `um_denominator`.
+///
+/// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
+/// equal $[a, b]$. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+///
+/// and whenever $n, n + 1 \in S$,
+/// $$
+/// \frac{P(n)}{P(n+1)} = \frac{m_u + 1}{m_u}.
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
+/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::geometric::geometric_random_unsigned_inclusive_range;
+///
+/// assert_eq!(
+///     geometric_random_unsigned_inclusive_range::<u16>(EXAMPLE_SEED, 1, 6, 3, 1)
+///         .take(10).collect::<Vec<_>>(),
+///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
+/// )
+/// ```
+///
+/// # Further details
+/// Geometric distributions are more typically parametrized by a parameter $p$. The relationship
+/// between $p$ and $m_u$ is $m_u = \frac{1}{p} + a - 1$, or $p = \frac{1}{m_u - a + 1}$.
+///
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & a \\leq n \\leq b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// It's also useful to note that
+/// $$
+///     \lim_{b \to \infty} P(a) = p = \frac{1}{m_u - a + 1}.
+/// $$
+#[inline]
+pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    um_numerator: u64,
+    um_denominator: u64,
+) -> GeometricRandomNaturalValues<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    geometric_random_natural_values_range(seed, a, b, um_numerator, um_denominator)
+}
+
+/// Generates random signed integers from a modified geometric distribution over the half-open
+/// interval $[a, b)$.
+///
+/// With this distribution, the probability of a value being generated decreases as its absolute
+/// value increases. The probabilities $P(n), P(n + \operatorname{sgn}(n)),
+/// P(n + 2\operatorname{sgn}(n)), \ldots$, where $n, n + \operatorname{sgn}(n),
+/// n + 2\operatorname{sgn}(n), \ldots \in [a, b) \\setminus \\{0\\}$, decrease in a geometric
+/// sequence; that's where the "geometric" comes from.
+///
+/// The form of the distribution depends on the range. If $a \geq 0$, the distribution is highest at
+/// $a$ and is truncated at $b$. If $b \leq 1$, the distribution is reflected: it is highest at
+/// $b - 1$ and is truncated at $a$. Otherwise, the interval includes both positive and negative
+/// values. In that case the distribution is doubled: it is highest at zero and is truncated at $a$
+/// and $b$.
+///
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
+/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator` + `um_denominator`.
+///
+/// Here is a more precise characterization of this distribution. Let its support
+/// $S \subset \Z$ equal $[a, b)$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically
+/// parametrized by a parameter $p$. The relationship between $p$ and $m_u$ is
+/// $m_u = \frac{1}{p} + c - 1$, or $p = \frac{1}{m_u - c + 1}$. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+/// If $0, 1 \in S$, then
+/// $$
+/// \frac{P(0)}{P(1)} = \frac{m_u + 1}{m_u}.
+/// $$
+/// If $-1, 0 \in S$, then
+/// $$
+/// \frac{P(0)}{P(-1)} = \frac{m_u + 1}{m_u}.
+/// $$
+/// and whenever $n, n + \operatorname{sgn}(n) \in S \setminus \\{0\\}$,
+/// $$
+/// \frac{P(n)}{P(n+\operatorname{sgn}(n))} = \frac{m_u + 1}{m_u}.
+/// $$
+///
+/// As a corollary, $P(n) = P(-n)$ whenever $n, -n \in S$.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
+/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::geometric::geometric_random_signed_range;
+///
+/// assert_eq!(
+///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 100, 30, 1)
+///         .take(10).collect::<Vec<_>>(),
+///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
+/// )
+/// ```
+///
+/// # Further details
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^b} & 0 \\leq a \\leq n < b \\\\
+///     \frac{(1-p)^{-n}p}{(1-p)^{1-b}-(1-p)^{1-a}} & a \\leq n < b \\leq 1 \\\\
+///     \frac{(1-p)^{|n|}p}{2-p-(1-p)^{1-a}-(1-p)^b} &
+///         a < 0 < 1 < b \\ \mathrm{and} \\ a \\leq n < b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+#[inline]
+pub fn geometric_random_signed_range<T: PrimitiveSigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
+) -> GeometricRandomSignedRange<T> {
+    if a >= b {
+        panic!("a must be less than b. a: {}, b: {}", a, b);
+    }
+    if a >= T::ZERO {
+        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
+            seed,
+            a,
+            b - T::ONE,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    } else if b <= T::ONE {
+        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_range(
+            seed,
+            b - T::ONE,
+            a,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    } else {
+        GeometricRandomSignedRange::BothSigns(geometric_random_signeds_range(
+            seed,
+            a,
+            b - T::ONE,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    }
+}
+
+/// Generates random signed integers from a modified geometric distribution over the closed interval
+/// $[a, b]$.
+///
+/// With this distribution, the probability of a value being generated decreases as its absolute
+/// value increases. The probabilities $P(n), P(n + \operatorname{sgn}(n)),
+/// P(n + 2\operatorname{sgn}(n)), \ldots$, where $n, n + \operatorname{sgn}(n),
+/// n + 2\operatorname{sgn}(n), \ldots \in [a, b] \\setminus \\{0\\}$, decrease in a geometric
+/// sequence; that's where the "geometric" comes from.
+///
+/// The form of the distribution depends on the range. If $a \geq 0$, the distribution is highest at
+/// $a$ and is truncated at $b$. If $b \leq 0$, the distribution is reflected: it is highest at $b$
+/// and is truncated at $a$. Otherwise, the interval includes both positive and negative values. In
+/// that case the distribution is doubled: it is highest at zero and is truncated at $a$ and $b$.
+///
+/// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
+/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
+/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
+/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
+/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
+/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `um_numerator` + `um_denominator`.
+///
+/// Here is a more precise characterization of this distribution. Let its support
+/// $S \subset \Z$ equal $[a, b]$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically
+/// parametrized by a parameter $p$. The relationship between $p$ and $m_u$ is
+/// $m_u = \frac{1}{p} + c - 1$, or $p = \frac{1}{m_u - c + 1}$. Then we have
+/// $$
+///     P(n) \neq 0 \leftrightarrow n \in S
+/// $$
+/// If $0, 1 \in S$, then
+/// $$
+/// \frac{P(0)}{P(1)} = \frac{m_u + 1}{m_u}.
+/// $$
+/// If $-1, 0 \in S$, then
+/// $$
+/// \frac{P(0)}{P(-1)} = \frac{m_u + 1}{m_u}.
+/// $$
+/// and whenever $n, n + \operatorname{sgn}(n) \in S \setminus \\{0\\}$,
+/// $$
+/// \frac{P(n)}{P(n+\operatorname{sgn}(n))} = \frac{m_u + 1}{m_u}.
+/// $$
+///
+/// As a corollary, $P(n) = P(-n)$ whenever $n, -n \in S$.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E[T(i)] = \mathcal{O}(n)$
+///
+/// $E[M(i)] = \mathcal{O}(1)$
+///
+/// where $n$ = `um_numerator` + `um_denominator`.
+///
+/// # Panics
+/// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
+/// than or equal to `a`, or, if they are too large and manipulating them leads to arithmetic
+/// overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::geometric::geometric_random_signed_range;
+///
+/// assert_eq!(
+///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1)
+///         .take(10).collect::<Vec<_>>(),
+///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
+/// )
+/// ```
+///
+/// # Further details
+/// The probability mass function of this distribution is
+/// $$
+/// P(n) = \\begin{cases}
+///     \frac{(1-p)^np}{(1-p)^a-(1-p)^{b+1}} & 0 \\leq a \\leq n \\leq b \\\\
+///     \frac{(1-p)^{-n}p}{(1-p)^{-b}-(1-p)^{1-a}} & a \\leq n \\leq b \\leq 0 \\\\
+///     \frac{(1-p)^{|n|}p}{2-p-(1-p)^{1-a}-(1-p)^{b+1}} &
+///         a < 0 < b \\ \mathrm{and} \\ a \\leq n \\leq b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+#[inline]
+pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
+) -> GeometricRandomSignedRange<T> {
+    if a > b {
+        panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
+    }
+    if a >= T::ZERO {
+        GeometricRandomSignedRange::NonNegative(geometric_random_natural_values_range(
+            seed,
+            a,
+            b,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    } else if b <= T::ZERO {
+        GeometricRandomSignedRange::NonPositive(geometric_random_negative_signeds_range(
+            seed,
+            b,
+            a,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    } else {
+        GeometricRandomSignedRange::BothSigns(geometric_random_signeds_range(
+            seed,
+            a,
+            b,
+            abs_um_numerator,
+            abs_um_denominator,
+        ))
+    }
 }

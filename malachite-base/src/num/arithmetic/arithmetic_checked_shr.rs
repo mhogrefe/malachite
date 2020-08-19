@@ -5,20 +5,14 @@ use num::basic::integers::PrimitiveInteger;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-//TODO clean wheres
-
 fn _arithmetic_checked_shr_unsigned_signed<
-    T: PrimitiveInteger,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInteger + Shr<U, Output = T>,
     U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: T,
     bits: S,
-) -> Option<T>
-where
-    S: UnsignedAbs<Output = U>,
-    T: ArithmeticCheckedShl<U, Output = T> + Shr<U, Output = T>,
-{
+) -> Option<T> {
     if bits < S::ZERO {
         x.arithmetic_checked_shl(bits.unsigned_abs())
     } else {
@@ -71,16 +65,15 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
 apply_to_unsigneds!(impl_arithmetic_checked_shr_unsigned_signed);
 
 fn _arithmetic_checked_shr_signed_signed<
-    T: PrimitiveInteger,
+    T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: T,
     bits: S,
 ) -> Option<T>
 where
-    S: UnsignedAbs<Output = U>,
-    T: Neg<Output = T> + ArithmeticCheckedShl<U, Output = T> + Shr<U, Output = T>,
+    T: PrimitiveInteger,
 {
     if bits < S::ZERO {
         x.arithmetic_checked_shl(bits.unsigned_abs())

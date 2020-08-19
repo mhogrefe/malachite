@@ -21,10 +21,10 @@ fn geometric_random_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
 ) {
     truncated_geometric_dist_assertions(
         geometric_random_unsigneds::<T>(EXAMPLE_SEED, um_numerator, um_denominator),
-        um_numerator,
-        um_denominator,
         T::ZERO,
         T::MAX,
+        um_numerator,
+        um_denominator,
         expected_values,
         expected_common_values,
         expected_pop_median,

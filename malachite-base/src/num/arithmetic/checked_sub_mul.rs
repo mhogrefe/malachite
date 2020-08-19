@@ -2,10 +2,11 @@ use num::arithmetic::traits::{CheckedMul, CheckedSub, CheckedSubMul, UnsignedAbs
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-fn _checked_sub_mul_unsigned<T>(x: T, y: T, z: T) -> Option<T>
-where
-    T: CheckedMul<T, Output = T> + CheckedSub<T, Output = T>,
-{
+fn _checked_sub_mul_unsigned<T: CheckedMul<T, Output = T> + CheckedSub<T, Output = T>>(
+    x: T,
+    y: T,
+    z: T,
+) -> Option<T> {
     y.checked_mul(z).and_then(|yz| x.checked_sub(yz))
 }
 
@@ -36,13 +37,23 @@ macro_rules! impl_checked_sub_mul_unsigned {
 }
 apply_to_unsigneds!(impl_checked_sub_mul_unsigned);
 
-fn _checked_sub_mul_signed<U: Copy + Ord, T: Copy + Eq + Ord + Zero>(x: T, y: T, z: T) -> Option<T>
-where
+fn _checked_sub_mul_signed<
+    U: CheckedMul<U, Output = U> + CheckedSub<U, Output = U> + Copy + WrappingSub<U, Output = U>,
     T: CheckedMul<T, Output = T>
         + CheckedSub<T, Output = T>
+        + Copy
+        + Eq
+        + Ord
         + UnsignedAbs<Output = U>
-        + WrappingFrom<U>,
-    U: CheckedMul<U, Output = U> + CheckedSub<U, Output = U> + WrappingSub<U, Output = U>,
+        + WrappingFrom<U>
+        + Zero,
+>(
+    x: T,
+    y: T,
+    z: T,
+) -> Option<T>
+where
+    U: Ord,
 {
     if y == T::ZERO || z == T::ZERO {
         return Some(x);

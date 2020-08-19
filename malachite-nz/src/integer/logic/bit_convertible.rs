@@ -1,12 +1,15 @@
+use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitConvertible, LeadingZeros, LowMask, NotAssign};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::logic::bit_convertible::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
 use natural::Natural;
-use platform::Limb;
+use platform::{Limb, SignedLimb};
 
 /// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
 /// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
@@ -119,6 +122,18 @@ fn limbs_asc_from_negative_twos_complement_bits_asc(bits: &[bool]) -> Vec<Limb> 
 
 fn limbs_asc_from_negative_twos_complement_bits_desc(bits: &[bool]) -> Vec<Limb> {
     limbs_asc_from_negative_twos_complement_limbs_asc(limbs_asc_from_bits_desc(bits))
+}
+
+fn from_bit_iterator_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: usize) -> Integer {
+    if sign_bit {
+        if last_width != usize::exact_from(Limb::WIDTH) {
+            *limbs.last_mut().unwrap() |= !Limb::low_mask(u64::exact_from(last_width));
+        }
+        assert!(!limbs_twos_complement_in_place(&mut limbs));
+        -Natural::from_owned_limbs_asc(limbs)
+    } else {
+        Integer::from(Natural::from_owned_limbs_asc(limbs))
+    }
 }
 
 impl BitConvertible for Integer {
@@ -306,11 +321,124 @@ impl BitConvertible for Integer {
         }
     }
 
-    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(_xs: I) -> Integer {
-        unimplemented!();
+    /// TODO doc
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::logic::traits::BitConvertible;
+    /// use malachite_nz::integer::Integer;
+    /// use std::iter::empty;
+    ///
+    /// assert_eq!(Integer::from_bit_iterator_asc(empty()), 0);
+    /// // 105 = 1101001b
+    /// assert_eq!(
+    ///     Integer::from_bit_iterator_asc(
+    ///         [true, false, false, true, false, true, true, false].iter().cloned()
+    ///     ),
+    ///     105
+    /// );
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(
+    ///     Integer::from_bit_iterator_asc(
+    ///         [true, true, true, false, true, false, false, true].iter().cloned()
+    ///     ),
+    ///     -105
+    /// );
+    /// ```
+    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+        const WIDTH: usize = Limb::WIDTH as usize;
+        let mut limbs = Vec::new();
+        let mut buffer = [false; WIDTH];
+        let mut last_width = 0;
+        let mut last_bit = false;
+        for chunk in &xs.chunks(WIDTH) {
+            let mut i = 0;
+            for bit in chunk {
+                buffer[i] = bit;
+                i += 1;
+            }
+            last_width = i;
+            last_bit = buffer[last_width - 1];
+            limbs.push(Limb::from_bits_asc(&buffer[..last_width]));
+        }
+        from_bit_iterator_helper(limbs, last_bit, last_width)
     }
 
-    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(_xs: I) -> Integer {
-        unimplemented!();
+    /// TODO doc
+    ///
+    /// # Example
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::logic::traits::BitConvertible;
+    /// use malachite_nz::integer::Integer;
+    /// use std::iter::empty;
+    ///
+    /// assert_eq!(Integer::from_bit_iterator_desc(empty()), 0);
+    /// // 105 = 1101001b
+    /// assert_eq!(
+    ///     Integer::from_bit_iterator_desc(
+    ///         [false, true, true, false, true, false, false, true].iter().cloned()
+    ///     ),
+    ///     105
+    /// );
+    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+    /// assert_eq!(
+    ///     Integer::from_bit_iterator_desc(
+    ///         [true, false, false, true, false, true, true, true].iter().cloned()
+    ///     ),
+    ///     -105
+    /// );
+    /// ```
+    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+        const WIDTH: usize = Limb::WIDTH as usize;
+        let mut limbs = Vec::new();
+        let mut buffer = [false; WIDTH];
+        let mut last_width = 0;
+        let mut first_bit = false;
+        let mut first = true;
+        for chunk in &xs.chunks(WIDTH) {
+            let mut i = 0;
+            for bit in chunk {
+                if first {
+                    first_bit = bit;
+                    first = false;
+                }
+                buffer[i] = bit;
+                i += 1;
+            }
+            last_width = i;
+            limbs.push(Limb::from_bits_desc(&buffer[..last_width]));
+        }
+        match limbs.len() {
+            0 => Integer::ZERO,
+            1 => {
+                if first_bit {
+                    if last_width != WIDTH {
+                        limbs[0] |= !Limb::low_mask(u64::exact_from(last_width));
+                    }
+                    Integer::from(SignedLimb::wrapping_from(limbs[0]))
+                } else {
+                    Integer::from(limbs[0])
+                }
+            }
+            _ => {
+                limbs.reverse();
+                if last_width != WIDTH {
+                    let smallest_limb = limbs[0];
+                    limbs[0] = 0;
+                    limbs_slice_shr_in_place(
+                        &mut limbs,
+                        Limb::WIDTH - u64::wrapping_from(last_width),
+                    );
+                    limbs[0] |= smallest_limb;
+                }
+                from_bit_iterator_helper(limbs, first_bit, last_width)
+            }
+        }
     }
 }

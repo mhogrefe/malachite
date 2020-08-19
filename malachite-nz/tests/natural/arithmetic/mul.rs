@@ -8520,7 +8520,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     // n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1_next_size
     // n.odd() || n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
     // ys_len < n in _limbs_mul_mod_base_pow_n_minus_1
-    // xs_len + ys_len <= n in _limbs_mul_mod_base_pow_n_minus_1
+    // sum <= n in _limbs_mul_mod_base_pow_n_minus_1
     test(vec![2], vec![3], vec![10; 2]);
     test(series(2, 3), series(3, 3), vec![10; 6]);
     let xs = vec![
@@ -8966,15 +8966,15 @@ fn test_limbs_mul_greater_to_out_fft() {
     // ys_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
     // ys_len >= n in _limbs_mul_mod_base_pow_n_minus_1
     // half_n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and !bp1_is_ys_0 in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and !ap1_is_xs_0 in _limbs_mul_mod_base_pow_n_minus_1
-    // xs_len + ys_len >= n in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_base_pow_n_minus_1
-    // xs_len + ys_len < n in _limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and ys_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and xs_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // sum >= n in _limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // sum < n in _limbs_mul_mod_base_pow_n_minus_1
     test(xs, ys, vec![10; out_len]);
     // n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 in _limbs_mul_mod_base_pow_n_minus_1_next_size
-    // xs_len + ys_len > n in _limbs_mul_mod_base_pow_n_minus_1
+    // sum > n in _limbs_mul_mod_base_pow_n_minus_1
     test(
         vec![
             823_938_137,
@@ -9989,8 +9989,8 @@ fn test_limbs_mul_greater_to_out_fft() {
     // ceiling_half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1_next_size
     // half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
     // k >= FFT_FIRST_K in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and bp1_is_ys_0 in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and !ap1_is_xs_0 in _limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and xs_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
     // len <= k_times_n in _limbs_mul_fft_decompose
     // len != 0 in _limbs_mul_fft_decompose
     // shift_limbs < n in _limbs_mul_fft_shl_mod_f_to_out
@@ -11804,7 +11804,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         1_543_197_978,
     ];
     let out_len = xs.len() + ys.len();
-    // k >= FFT_FIRST_K and ap1_is_xs_0 in _limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and xs_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         0,

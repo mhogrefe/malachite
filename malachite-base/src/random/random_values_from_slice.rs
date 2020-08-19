@@ -1,4 +1,4 @@
-use num::random::random_unsigneds_less_than::RandomUnsignedsLessThan;
+use num::random::RandomUnsignedsLessThan;
 
 /// Uniformly generates a random reference to a value from a nonempty slice.
 #[derive(Clone, Debug)]

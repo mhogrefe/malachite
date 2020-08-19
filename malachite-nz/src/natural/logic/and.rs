@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::mem::swap;
 use std::ops::{BitAnd, BitAndAssign};
 
 use malachite_base::num::conversion::traits::WrappingFrom;
@@ -445,8 +446,6 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     }
 }
 
-//TODO
-
 /// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
 /// value.
 ///
@@ -468,18 +467,16 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 /// assert_eq!(x, 0xf0f0_f0f0u32);
 /// ```
 impl BitAndAssign<Natural> for Natural {
-    fn bitand_assign(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.and_assign_limb(y);
-        } else if let Natural(Small(ref mut x)) = *self {
-            *x = other.and_limb(*x);
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_and_in_place_either(xs, &mut ys) {
-                    *xs = ys;
+    fn bitand_assign(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.and_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *x = other.and_limb(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_and_in_place_either(xs, ys) {
+                    swap(xs, ys);
                 }
+                self.trim();
             }
-            self.trim();
         }
     }
 }
@@ -506,15 +503,13 @@ impl BitAndAssign<Natural> for Natural {
 /// ```
 impl<'a> BitAndAssign<&'a Natural> for Natural {
     fn bitand_assign(&mut self, other: &'a Natural) {
-        if let Natural(Small(y)) = *other {
-            self.and_assign_limb(y);
-        } else if let Natural(Small(ref mut x)) = *self {
-            *x = other.and_limb_ref(*x);
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.and_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *x = other.and_limb_ref(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_vec_and_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 }

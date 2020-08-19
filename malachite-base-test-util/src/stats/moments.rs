@@ -369,14 +369,14 @@ pub fn deleted_uniform_primitive_integer_assertions<I: Clone + Iterator>(
 }
 
 // unadjusted_mean is what the mean would be if the distribution were not truncated.
-fn pop_truncated_geometric_dist_mean(unadjusted_mean: f64, max: f64) -> f64 {
+fn pop_truncated_geometric_dist_mean(max: f64, unadjusted_mean: f64) -> f64 {
     let m = max;
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     (q - q.powf(m) * q * (1.0 + m * p)) / (p - q.powf(1.0 + m) * p)
 }
 
-fn pop_truncated_geometric_dist_2_mean(unadjusted_mean: f64, max: f64) -> f64 {
+fn pop_truncated_geometric_dist_2_mean(max: f64, unadjusted_mean: f64) -> f64 {
     let m = max;
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
@@ -385,7 +385,7 @@ fn pop_truncated_geometric_dist_2_mean(unadjusted_mean: f64, max: f64) -> f64 {
         / ((1.0 - q.powf(1.0 + m)) * p_2)
 }
 
-fn pop_truncated_geometric_dist_3_mean(unadjusted_mean: f64, max: f64) -> f64 {
+fn pop_truncated_geometric_dist_3_mean(max: f64, unadjusted_mean: f64) -> f64 {
     let m = max;
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
@@ -397,7 +397,7 @@ fn pop_truncated_geometric_dist_3_mean(unadjusted_mean: f64, max: f64) -> f64 {
         / ((1.0 - q.powf(1.0 + m)) * p_3)
 }
 
-fn pop_truncated_geometric_dist_4_mean(unadjusted_mean: f64, max: f64) -> f64 {
+fn pop_truncated_geometric_dist_4_mean(max: f64, unadjusted_mean: f64) -> f64 {
     let m = max;
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
@@ -419,19 +419,19 @@ fn pop_truncated_geometric_dist_4_mean(unadjusted_mean: f64, max: f64) -> f64 {
 }
 
 fn pop_truncated_geometric_dist_moment_stats(
-    unadjusted_mean: f64,
     min: f64,
     max: f64,
+    unadjusted_mean: f64,
 ) -> MomentStats {
     assert!(min <= max);
     assert!(min <= unadjusted_mean); // unadjusted_mean may be arbitrarily large
     let unadjusted_mean = unadjusted_mean - min;
     let max = max - min;
     let mut stats = moment_stats_from_raw_moments(
-        pop_truncated_geometric_dist_mean(unadjusted_mean, max),
-        pop_truncated_geometric_dist_2_mean(unadjusted_mean, max),
-        pop_truncated_geometric_dist_3_mean(unadjusted_mean, max),
-        pop_truncated_geometric_dist_4_mean(unadjusted_mean, max),
+        pop_truncated_geometric_dist_mean(max, unadjusted_mean),
+        pop_truncated_geometric_dist_2_mean(max, unadjusted_mean),
+        pop_truncated_geometric_dist_3_mean(max, unadjusted_mean),
+        pop_truncated_geometric_dist_4_mean(max, unadjusted_mean),
     );
     stats.mean = NiceFloat(stats.mean.0 + min);
     stats
@@ -439,10 +439,10 @@ fn pop_truncated_geometric_dist_moment_stats(
 
 pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
     xs: I,
-    um_numerator: u64,
-    um_denominator: u64,
     min: I::Item,
     max: I::Item,
+    um_numerator: u64,
+    um_denominator: u64,
     expected_values: &[I::Item],
     expected_common_values: &[(I::Item, usize)],
     expected_pop_median: (I::Item, Option<I::Item>),
@@ -463,9 +463,9 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            truncated_geometric_median(unadjusted_mean, min, max),
+            truncated_geometric_median(min, max, unadjusted_mean),
             actual_sample_median,
-            pop_truncated_geometric_dist_moment_stats(unadjusted_mean, min_64, max_64),
+            pop_truncated_geometric_dist_moment_stats(min_64, max_64, unadjusted_mean),
             actual_sample_moment_stats
         ),
         (
@@ -485,10 +485,10 @@ pub fn negative_truncated_geometric_dist_assertions<
     U: CheckedToF64 + PrimitiveUnsigned,
 >(
     xs: I,
-    abs_um_numerator: u64,
-    abs_um_denominator: u64,
     abs_min: S,
     abs_max: S,
+    abs_um_numerator: u64,
+    abs_um_denominator: u64,
     expected_values: &[S],
     expected_common_values: &[(S, usize)],
     expected_pop_median: (S, Option<S>),
@@ -507,13 +507,13 @@ pub fn negative_truncated_geometric_dist_assertions<
     let actual_sample_median = median(xs.clone().take(1_000_000));
     let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
     let mut pop_sample_moment_stats =
-        pop_truncated_geometric_dist_moment_stats(abs_unadjusted_mean, abs_min_64, abs_max_64);
+        pop_truncated_geometric_dist_moment_stats(abs_min_64, abs_max_64, abs_unadjusted_mean);
     pop_sample_moment_stats.mean = NiceFloat(-pop_sample_moment_stats.mean.0);
     pop_sample_moment_stats.skewness = NiceFloat(-pop_sample_moment_stats.skewness.0);
     let (x, y) = truncated_geometric_median(
-        abs_unadjusted_mean,
         abs_min.unsigned_abs(),
         abs_max.unsigned_abs(),
+        abs_unadjusted_mean,
     );
     let (x, y) = if let Some(y) = y {
         (
@@ -543,7 +543,7 @@ pub fn negative_truncated_geometric_dist_assertions<
     );
 }
 
-fn pop_double_nonzero_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_nonzero_truncated_geometric_dist_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -551,7 +551,7 @@ fn pop_double_nonzero_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64
     (qpa * (1.0 + a * p) - qpb * (1.0 + b * p)) / ((-2.0 + qpa + qpb) * p)
 }
 
-fn pop_double_nonzero_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_nonzero_truncated_geometric_dist_2_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -561,7 +561,7 @@ fn pop_double_nonzero_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f
         / (p * p)
 }
 
-fn pop_double_nonzero_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_nonzero_truncated_geometric_dist_3_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -571,7 +571,7 @@ fn pop_double_nonzero_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f
         / ((-2.0 + qpa + qpb) * p * p * p)
 }
 
-fn pop_double_nonzero_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_nonzero_truncated_geometric_dist_4_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let a_2 = a * a;
@@ -600,27 +600,27 @@ fn pop_double_nonzero_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f
 }
 
 fn pop_double_nonzero_truncated_geometric_dist_moment_stats(
-    unadjusted_mean: f64,
     min: f64,
     max: f64,
+    unadjusted_mean: f64,
 ) -> MomentStats {
     assert!(min < 0.0);
     assert!(max > 0.0);
     assert!(unadjusted_mean > 1.0); // unadjusted_mean may be arbitrarily large
     moment_stats_from_raw_moments(
-        pop_double_nonzero_truncated_geometric_dist_mean(unadjusted_mean - 1.0, -min, max),
-        pop_double_nonzero_truncated_geometric_dist_2_mean(unadjusted_mean - 1.0, -min, max),
-        pop_double_nonzero_truncated_geometric_dist_3_mean(unadjusted_mean - 1.0, -min, max),
-        pop_double_nonzero_truncated_geometric_dist_4_mean(unadjusted_mean - 1.0, -min, max),
+        pop_double_nonzero_truncated_geometric_dist_mean(-min, max, unadjusted_mean - 1.0),
+        pop_double_nonzero_truncated_geometric_dist_2_mean(-min, max, unadjusted_mean - 1.0),
+        pop_double_nonzero_truncated_geometric_dist_3_mean(-min, max, unadjusted_mean - 1.0),
+        pop_double_nonzero_truncated_geometric_dist_4_mean(-min, max, unadjusted_mean - 1.0),
     )
 }
 
 pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     xs: I,
-    um_numerator: u64,
-    um_denominator: u64,
     min: I::Item,
     max: I::Item,
+    um_numerator: u64,
+    um_denominator: u64,
     expected_values: &[I::Item],
     expected_common_values: &[(I::Item, usize)],
     expected_abs_mean: NiceFloat<f64>,
@@ -644,12 +644,12 @@ pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
             actual_values.as_slice(),
             actual_common_values.as_slice(),
             actual_abs_mean,
-            double_nonzero_geometric_median(unadjusted_mean, min, max),
+            double_nonzero_geometric_median(min, max, unadjusted_mean),
             actual_sample_median,
             pop_double_nonzero_truncated_geometric_dist_moment_stats(
-                unadjusted_mean,
                 min_64,
-                max_64
+                max_64,
+                unadjusted_mean,
             ),
             actual_sample_moment_stats
         ),
@@ -665,7 +665,7 @@ pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     );
 }
 
-fn pop_double_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_truncated_geometric_dist_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -673,7 +673,7 @@ fn pop_double_truncated_geometric_dist_mean(unadjusted_mean: f64, b: f64, a: f64
         / (p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
 }
 
-fn pop_double_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_truncated_geometric_dist_2_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -683,7 +683,7 @@ fn pop_double_truncated_geometric_dist_2_mean(unadjusted_mean: f64, b: f64, a: f
         / (p * p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
 }
 
-fn pop_double_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_truncated_geometric_dist_3_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -693,7 +693,7 @@ fn pop_double_truncated_geometric_dist_3_mean(unadjusted_mean: f64, b: f64, a: f
         / (p * p * p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
 }
 
-fn pop_double_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f64, a: f64) -> f64 {
+fn pop_double_truncated_geometric_dist_4_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;
     let qpa = q.powf(a);
@@ -720,27 +720,27 @@ fn pop_double_truncated_geometric_dist_4_mean(unadjusted_mean: f64, b: f64, a: f
 }
 
 fn pop_double_truncated_geometric_dist_moment_stats(
-    unadjusted_mean: f64,
     min: f64,
     max: f64,
+    unadjusted_mean: f64,
 ) -> MomentStats {
     assert!(min < 0.0);
     assert!(max > 0.0);
     assert!(unadjusted_mean > 0.0); // unadjusted_mean may be arbitrarily large
     moment_stats_from_raw_moments(
-        pop_double_truncated_geometric_dist_mean(unadjusted_mean, -min, max),
-        pop_double_truncated_geometric_dist_2_mean(unadjusted_mean, -min, max),
-        pop_double_truncated_geometric_dist_3_mean(unadjusted_mean, -min, max),
-        pop_double_truncated_geometric_dist_4_mean(unadjusted_mean, -min, max),
+        pop_double_truncated_geometric_dist_mean(-min, max, unadjusted_mean),
+        pop_double_truncated_geometric_dist_2_mean(-min, max, unadjusted_mean),
+        pop_double_truncated_geometric_dist_3_mean(-min, max, unadjusted_mean),
+        pop_double_truncated_geometric_dist_4_mean(-min, max, unadjusted_mean),
     )
 }
 
 pub fn double_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     xs: I,
-    um_numerator: u64,
-    um_denominator: u64,
     min: I::Item,
     max: I::Item,
+    um_numerator: u64,
+    um_denominator: u64,
     expected_values: &[I::Item],
     expected_common_values: &[(I::Item, usize)],
     expected_natural_mean: NiceFloat<f64>,
@@ -764,9 +764,9 @@ pub fn double_truncated_geometric_dist_assertions<I: Clone + Iterator>(
             actual_values.as_slice(),
             actual_common_values.as_slice(),
             actual_natural_mean,
-            double_geometric_median(unadjusted_mean, min, max),
+            double_geometric_median(min, max, unadjusted_mean),
             actual_sample_median,
-            pop_double_truncated_geometric_dist_moment_stats(unadjusted_mean, min_64, max_64),
+            pop_double_truncated_geometric_dist_moment_stats(min_64, max_64, unadjusted_mean),
             actual_sample_moment_stats
         ),
         (

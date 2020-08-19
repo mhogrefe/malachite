@@ -7,22 +7,24 @@ use num::arithmetic::traits::{
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 
-fn _div_mod_unsigned<T: Copy>(x: T, other: T) -> (T, T)
-where
-    T: Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
-{
+fn _div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>>(
+    x: T,
+    other: T,
+) -> (T, T) {
     let q = x / other;
     (q, x - q * other)
 }
 
-fn _div_assign_mod_unsigned<T: Copy>(x: &mut T, other: T) -> T
-where
-    T: DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>,
-{
+fn _div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>>(
+    x: &mut T,
+    other: T,
+) -> T {
     let original = *x;
     *x /= other;
     original - *x * other
 }
+
+//TODO wheres
 
 fn _ceiling_div_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: T, other: T) -> (T, T)
 where

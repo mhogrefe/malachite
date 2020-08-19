@@ -47,19 +47,19 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 /// enough that no additional memory needs to be given to d.
 ///
 /// # Panics
-/// Panics if `index` >= `limbs.len()` * 32.
+/// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
 ///
 /// # Example
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_slice_set_bit;
 ///
-/// let mut limbs = &mut [0, 1];
-/// limbs_slice_set_bit(limbs, 0);
-/// assert_eq!(limbs, &[1, 1]);
-/// limbs_slice_set_bit(limbs, 1);
-/// assert_eq!(limbs, &[3, 1]);
-/// limbs_slice_set_bit(limbs, 33);
-/// assert_eq!(limbs, &[3, 3]);
+/// let mut xs = &mut [0, 1];
+/// limbs_slice_set_bit(xs, 0);
+/// assert_eq!(xs, &[1, 1]);
+/// limbs_slice_set_bit(xs, 1);
+/// assert_eq!(xs, &[3, 1]);
+/// limbs_slice_set_bit(xs, 33);
+/// assert_eq!(xs, &[3, 3]);
 /// ```
 pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
     limbs_set_bit_helper(xs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
@@ -79,22 +79,22 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_vec_set_bit;
 ///
-/// let mut limbs = vec![0, 1];
-/// limbs_vec_set_bit(&mut limbs, 0);
-/// assert_eq!(limbs, &[1, 1]);
-/// limbs_vec_set_bit(&mut limbs, 1);
-/// assert_eq!(limbs, &[3, 1]);
-/// limbs_vec_set_bit(&mut limbs, 33);
-/// assert_eq!(limbs, &[3, 3]);
-/// limbs_vec_set_bit(&mut limbs, 128);
-/// assert_eq!(limbs, &[3, 3, 0, 0, 1]);
+/// let mut xs = vec![0, 1];
+/// limbs_vec_set_bit(&mut xs, 0);
+/// assert_eq!(xs, &[1, 1]);
+/// limbs_vec_set_bit(&mut xs, 1);
+/// assert_eq!(xs, &[3, 1]);
+/// limbs_vec_set_bit(&mut xs, 33);
+/// assert_eq!(xs, &[3, 3]);
+/// limbs_vec_set_bit(&mut xs, 128);
+/// assert_eq!(xs, &[3, 3, 0, 0, 1]);
 /// ```
 pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index >= xs.len() {
-        xs.resize(limb_index + 1, 0);
+    let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
+    if small_index >= xs.len() {
+        xs.resize(small_index + 1, 0);
     }
-    limbs_set_bit_helper(xs, index, limb_index);
+    limbs_set_bit_helper(xs, index, small_index);
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
@@ -111,16 +111,16 @@ pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 ///
-/// let mut limbs = &mut [3, 3];
-/// limbs_clear_bit(limbs, 33);
-/// assert_eq!(limbs, &[3, 1]);
-/// limbs_clear_bit(limbs, 1);
-/// assert_eq!(limbs, &[1, 1]);
+/// let mut xs = &mut [3, 3];
+/// limbs_clear_bit(xs, 33);
+/// assert_eq!(xs, &[3, 1]);
+/// limbs_clear_bit(xs, 1);
+/// assert_eq!(xs, &[1, 1]);
 /// ```
 pub fn limbs_clear_bit(xs: &mut [Limb], index: u64) {
-    let limb_index = usize::exact_from(index >> Limb::LOG_WIDTH);
-    if limb_index < xs.len() {
-        xs[limb_index].clear_bit(index & Limb::WIDTH_MASK);
+    let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
+    if small_index < xs.len() {
+        xs[small_index].clear_bit(index & Limb::WIDTH_MASK);
     }
 }
 
@@ -204,21 +204,22 @@ impl BitAccess for Natural {
     /// assert_eq!(x.to_string(), "100");
     /// ```
     fn set_bit(&mut self, index: u64) {
-        mutate_with_possible_promotion!(
-            self,
-            small,
-            limbs,
-            {
+        match self {
+            Natural(Small(ref mut small)) => {
                 if index < Limb::WIDTH {
                     let mut modified = *small;
                     modified.set_bit(index);
-                    Some(modified)
+                    *small = modified;
                 } else {
-                    None
+                    let mut limbs = vec![*small];
+                    limbs_vec_set_bit(&mut limbs, index);
+                    *self = Natural(Large(limbs));
                 }
-            },
-            limbs_vec_set_bit(limbs, index)
-        );
+            }
+            Natural(Large(ref mut limbs)) => {
+                limbs_vec_set_bit(limbs, index);
+            }
+        }
     }
 
     /// Sets the `index`th bit of a `Natural`, or the coefficient of 2<sup>`index`</sup> in its
@@ -246,13 +247,12 @@ impl BitAccess for Natural {
     /// assert_eq!(x.to_string(), "100");
     /// ```
     fn clear_bit(&mut self, index: u64) {
-        match *self {
-            Natural(Small(ref mut small)) => {
-                small.clear_bit(index);
-                return;
+        match self {
+            Natural(Small(ref mut small)) => small.clear_bit(index),
+            Natural(Large(ref mut limbs)) => {
+                limbs_clear_bit(limbs, index);
+                self.trim();
             }
-            Natural(Large(ref mut limbs)) => limbs_clear_bit(limbs, index),
         }
-        self.trim();
     }
 }

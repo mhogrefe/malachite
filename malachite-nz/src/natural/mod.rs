@@ -135,25 +135,6 @@ impl Min for Natural {
 // Implement `Named` for `Natural`.
 impl_named!(Natural);
 
-macro_rules! mutate_with_possible_promotion {
-    ($n:ident, $small:ident, $large:ident, $process_small:expr, $process_large:expr) => {
-        if let Natural(Small(ref mut $small)) = *$n {
-            if let Some(small_result) = $process_small {
-                *$small = small_result;
-                return;
-            }
-        }
-        if let Natural(Small(x)) = *$n {
-            *$n = Natural(Large(vec![x]));
-        }
-        if let Natural(Large(ref mut $large)) = *$n {
-            $process_large
-        } else {
-            unreachable!();
-        }
-    };
-}
-
 pub mod arithmetic {
     pub mod add;
     pub mod add_mul;
