@@ -1,6 +1,5 @@
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
-
 use integer::Integer;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 
 macro_rules! impl_unsigned {
     ($t: ident) => {

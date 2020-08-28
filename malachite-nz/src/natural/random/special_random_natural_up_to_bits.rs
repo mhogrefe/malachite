@@ -1,5 +1,3 @@
-use std::cmp::max;
-
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, SaturatingSubAssign, ShrRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -7,11 +5,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::rounding_modes::RoundingMode;
-use rand::distributions::{IndependentSample, Range};
-use rand::Rng;
-
 use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::Natural;
+use rand::distributions::{IndependentSample, Range};
+use rand::Rng;
+use std::cmp::max;
 
 /// Returns a slice of `T`s representing a random `Natural` with up to `bits` bits; equivalently,
 /// returns the limbs of a random `Natural` sampled from [0, 2<sup>`bits`</sup>). The `Natural` will

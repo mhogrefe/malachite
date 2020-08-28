@@ -235,6 +235,7 @@ pub mod num {
             pub mod striped_random_positive_signeds;
             pub mod striped_random_positive_unsigneds;
             pub mod striped_random_signeds;
+            pub mod striped_random_unsigned_bit_chunks;
             pub mod striped_random_unsigneds;
         }
     }

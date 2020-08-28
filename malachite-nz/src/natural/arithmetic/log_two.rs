@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
-
 use natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};

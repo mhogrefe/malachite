@@ -69,19 +69,19 @@ fn from_power_of_two_digits_asc_properties_helper<
 #[test]
 fn from_power_of_two_digits_asc_properties() {
     from_power_of_two_digits_asc_properties_helper::<u8, _>(
-        Natural::_from_power_of_two_digits_asc_u8_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
     );
     from_power_of_two_digits_asc_properties_helper::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_u16_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
     );
     from_power_of_two_digits_asc_properties_helper::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_u32_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
     );
     from_power_of_two_digits_asc_properties_helper::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_u64_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
     );
     from_power_of_two_digits_asc_properties_helper::<usize, _>(
-        Natural::_from_power_of_two_digits_asc_usize_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
     );
 
     test_properties(vecs_of_unsigned, |limbs| {

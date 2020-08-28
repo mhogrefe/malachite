@@ -6,11 +6,11 @@ use orderings::ORDERINGS;
 
 /// Generates all `Ordering`s, in increasing order.
 ///
-/// Length is 3.
+/// The output length is 3.
 ///
-/// Time: worst case O(1) per iteration
+/// # Worst-case complexity
 ///
-/// Additional memory: worst case O(1) per iteration
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -29,13 +29,13 @@ pub fn orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
         .cloned()
 }
 
-/// Generates all `Ordering`s. `Equal` comes first.
+/// Generates all `Ordering`s, with `Equal` coming first.
 ///
-/// Length is 3.
+/// The output length is 3.
 ///
-/// Time: worst case O(1) per iteration
+/// # Worst-case complexity
 ///
-/// Additional memory: worst case O(1) per iteration
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

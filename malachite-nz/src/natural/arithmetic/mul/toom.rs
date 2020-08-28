@@ -1,5 +1,4 @@
-use std::cmp::{max, Ordering};
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOfTwo, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
@@ -9,8 +8,6 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
@@ -50,6 +47,7 @@ use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use std::cmp::{max, Ordering};
 
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
@@ -188,7 +186,10 @@ fn _limbs_mul_greater_to_out_toom_22_recursive(
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+pub const fn _limbs_mul_greater_to_out_toom_22_input_sizes_valid(
+    xs_len: usize,
+    ys_len: usize,
+) -> bool {
     xs_len >= ys_len && xs_len + 1 < ys_len << 1
 }
 
@@ -344,7 +345,7 @@ pub fn _limbs_mul_greater_to_out_toom_22(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom32_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = if xs_len << 1 >= 3 * ys_len {
         (xs_len - 1) / 3
     } else {
@@ -370,7 +371,10 @@ pub fn _limbs_mul_same_length_to_out_toom_32_recursive(p: &mut [Limb], a: &[Limb
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+pub const fn _limbs_mul_greater_to_out_toom_32_input_sizes_valid(
+    xs_len: usize,
+    ys_len: usize,
+) -> bool {
     xs_len > ys_len + 1 && (xs_len == 6 || ys_len > 4) && xs_len << 1 < 3 * (ys_len + 1)
 }
 
@@ -1112,7 +1116,7 @@ pub fn _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom43_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= ys_len << 2 {
         (xs_len - 1) >> 2
     } else {
@@ -1503,7 +1507,7 @@ pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom52_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len << 1 >= 5 * ys_len {
         (xs_len - 1) / 5
     } else {
@@ -1705,7 +1709,7 @@ pub fn _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom53_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= 5 * ys_len {
         (xs_len - 1) / 5
     } else {
@@ -1977,7 +1981,10 @@ pub fn _limbs_mul_greater_to_out_toom_53(
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-pub fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+pub const fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(
+    xs_len: usize,
+    ys_len: usize,
+) -> bool {
     xs_len != 0 && xs_len >= ys_len && {
         let sum = xs_len + ys_len;
         let n = 1 + if xs_len << 2 >= 5 * ys_len {
@@ -2003,7 +2010,7 @@ pub fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom54_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_54_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_54_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1
         + (if xs_len << 2 >= 5 * ys_len {
             (xs_len - 1) / 5
@@ -2144,7 +2151,10 @@ pub fn _limbs_mul_greater_to_out_toom_54(
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-pub fn _limbs_mul_greater_to_out_toom_62_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+pub const fn _limbs_mul_greater_to_out_toom_62_input_sizes_valid(
+    xs_len: usize,
+    ys_len: usize,
+) -> bool {
     xs_len != 0 && xs_len >= ys_len && {
         let n = 1 + if xs_len >= 3 * ys_len {
             (xs_len - 1) / 6
@@ -2163,7 +2173,7 @@ pub fn _limbs_mul_greater_to_out_toom_62_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom62_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_62_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_62_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= 3 * ys_len {
         (xs_len - 1) / 6
     } else {
@@ -2451,7 +2461,10 @@ fn limbs_abs_sub_add_same_length(out_diff: &mut [Limb], xs: &mut [Limb], ys: &[L
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-pub fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
+pub const fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(
+    xs_len: usize,
+    ys_len: usize,
+) -> bool {
     xs_len != 0 && xs_len >= ys_len && {
         let sum = xs_len + ys_len;
         let n = 1 + if xs_len >= ys_len << 1 {
@@ -2477,7 +2490,7 @@ pub fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs_len: usize, ys_len
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom63_mul_itch from gmp-impl.h, GMP 6.1.2.
-pub fn _limbs_mul_greater_to_out_toom_63_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn _limbs_mul_greater_to_out_toom_63_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= ys_len << 1 {
         (xs_len - 1) / 6
     } else {

@@ -1,3 +1,6 @@
+use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use random::Seed;
+
 /// Inserts several copies of a value to the left (beginning) of a `Vec`. Using this function is
 /// more efficient than inserting the values one by one.
 ///
@@ -47,6 +50,55 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
     let old_len = xs.len();
     xs.copy_within(delete_size..old_len, 0);
     xs.truncate(old_len - delete_size);
+}
+
+/// Uniformly generates a random value from a nonempty `Vec`.
+#[derive(Clone, Debug)]
+pub struct RandomValuesFromVec<T: Clone> {
+    pub(crate) xs: Vec<T>,
+    pub(crate) indices: RandomUnsignedsLessThan<usize>,
+}
+
+impl<T: Clone> Iterator for RandomValuesFromVec<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        Some(self.xs[self.indices.next().unwrap()].clone())
+    }
+}
+
+/// Uniformly generates a random value from a nonempty `Vec`. The iterator owns the data. It may be
+/// more convenient for the iterator to return references to a pre-existing slice, in which case you
+/// may  use `random_values_from_slice` instead.
+///
+/// Length is infinite.
+///
+/// Time per iteration: worst case O(1)
+///
+/// Additional memory per iteration: worst case O(1)
+///
+/// # Panics
+/// Panics if `xs` is empty.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random_values_from_vec;
+///
+/// let xs = vec![2, 3, 5, 7, 11];
+/// assert_eq!(
+///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect::<Vec<_>>(),
+///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
+/// );
+/// ```
+#[inline]
+pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesFromVec<T> {
+    if xs.is_empty() {
+        panic!("empty Vec");
+    }
+    let indices = random_unsigneds_less_than(seed, xs.len());
+    RandomValuesFromVec { xs, indices }
 }
 
 pub mod from_str;

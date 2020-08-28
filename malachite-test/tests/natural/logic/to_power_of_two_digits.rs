@@ -91,22 +91,22 @@ fn to_power_of_two_digits_asc_properties_helper<
 #[test]
 fn to_power_of_two_digits_asc_properties() {
     to_power_of_two_digits_asc_properties_helper::<u8, _>(
-        Natural::_to_power_of_two_digits_asc_u8_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
     to_power_of_two_digits_asc_properties_helper::<u16, _>(
-        Natural::_to_power_of_two_digits_asc_u16_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
     to_power_of_two_digits_asc_properties_helper::<u32, _>(
-        Natural::_to_power_of_two_digits_asc_u32_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
     to_power_of_two_digits_asc_properties_helper::<u64, _>(
-        Natural::_to_power_of_two_digits_asc_u64_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
     to_power_of_two_digits_asc_properties_helper::<u128, _>(
-        Natural::_to_power_of_two_digits_asc_u128_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
     to_power_of_two_digits_asc_properties_helper::<usize, _>(
-        Natural::_to_power_of_two_digits_asc_usize_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
     );
 
     test_properties(naturals, |n| {

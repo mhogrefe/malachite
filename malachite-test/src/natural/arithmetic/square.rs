@@ -3,6 +3,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
+use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
     _limbs_square_to_out_toom_2_scratch_len, _limbs_square_to_out_toom_3,
@@ -18,7 +19,7 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_var_17, pairs_of_unsigned_vec_var_18, pairs_of_unsigned_vec_var_19,
     pairs_of_unsigned_vec_var_21, pairs_of_unsigned_vec_var_22, pairs_of_unsigned_vec_var_23,
 };
-use malachite_test::inputs::natural::naturals;
+use malachite_test::inputs::natural::{naturals, pairs_of_naturals_var_3};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_square_to_out_basecase);
@@ -54,6 +55,11 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         registry,
         Large,
         benchmark_limbs_square_to_out_toom_8_algorithms
+    );
+    register_bench!(
+        registry,
+        Large,
+        benchmark_limbs_square_to_out_fft_algorithms
     );
     register_bench!(registry, Large, benchmark_natural_square_assign);
     register_bench!(registry, Large, benchmark_natural_square_algorithms);
@@ -284,6 +290,32 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
     );
 }
 
+fn benchmark_limbs_square_to_out_fft_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark(
+        "_limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
+        BenchmarkType::Algorithms,
+        pairs_of_unsigned_vec_var_23(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs)| xs.len()),
+        "xs.len()",
+        &mut [
+            (
+                "Toom8",
+                &mut (|(mut out, xs)| {
+                    let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(xs.len())];
+                    _limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
+                }),
+            ),
+            (
+                "FFT",
+                &mut (|(mut out, xs)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &xs)),
+            ),
+        ],
+    );
+}
+
 fn benchmark_natural_square_assign(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.square_assign()",
@@ -302,15 +334,15 @@ fn benchmark_natural_square_algorithms(gm: GenerationMode, limit: usize, file_na
     run_benchmark(
         "Natural.square()",
         BenchmarkType::Algorithms,
-        naturals(gm),
+        pairs_of_naturals_var_3(gm),
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::exact_from(n.significant_bits())),
+        &(|(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("standard", &mut (|ref n| no_out!(n.square()))),
-            ("using *", &mut (|ref n| no_out!(n * n))),
+            ("standard", &mut (|(ref n, _)| no_out!(n.square()))),
+            ("using *", &mut (|(n_1, n_2)| no_out!(n_1 * n_2))),
         ],
     );
 }

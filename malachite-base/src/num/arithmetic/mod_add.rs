@@ -2,6 +2,8 @@ use std::ops::{Add, AddAssign, Sub};
 
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
 
+//TODO wheres
+
 fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
 where
     T: Add<T, Output = T> + Sub<T, Output = T>,

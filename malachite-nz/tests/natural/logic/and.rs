@@ -27,7 +27,7 @@ fn test_limbs_and_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_and_limb_fail() {
+const fn limbs_and_limb_fail() {
     limbs_and_limb(&[], 10);
 }
 

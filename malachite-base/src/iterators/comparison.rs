@@ -47,11 +47,8 @@ where
 /// `xs.count()`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -81,9 +78,9 @@ where
 /// where $N$ may be $\infty$.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
@@ -112,9 +109,9 @@ where
 /// where $N$ may be $\infty$.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
@@ -143,9 +140,9 @@ where
 /// where $N$ may be $\infty$.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
@@ -175,9 +172,9 @@ where
 /// where $N$ may be $\infty$.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
@@ -218,9 +215,9 @@ where
 /// informal definition.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
@@ -273,9 +270,9 @@ where
 /// informal definition.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///

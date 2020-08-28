@@ -4,21 +4,12 @@ use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::geometric::mean_to_p_with_min;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
-use random::seed::Seed;
+use random::Seed;
 use std::marker::PhantomData;
 
-/// A `StripedBitSource` generates bits in a way that lets you control the mean length of a run (a
-/// consecutive series of 0s or 1s). If the mean is set to 2, the bits are generated as if by fair
-/// coin flips. If the mean is greater than 2, each bit is more likely to be the same as the
-/// previous bit, resulting in long runs of bits (or stripes). If the mean is less than 2, each bit
-/// is more likely to be different from the previous bit, resulting in a sequence that prefers to
-/// alternate between 0 and 1. The mean must be at least 1; if it is exactly 1, then the sequence is
-/// 010101... or 101010... with equal probability.
+/// Generates bits from a striped random sequence.
 ///
-/// The first bit is 0 or 1 with equal probability.
-///
-/// This class is useful for generating numbers for testing arithmetic functions; they are likely to
-/// trigger carries.
+/// See the module-level documentation.
 #[derive(Clone, Debug)]
 pub struct StripedBitSource {
     first_bit_of_block: bool,
@@ -29,11 +20,12 @@ pub struct StripedBitSource {
 }
 
 impl StripedBitSource {
-    /// Creates a new `StripedBitSource` with mean run length `m_numerator` / `m_denominator`.
+    /// Creates a new `StripedBitSource` with mean run length $m$, where $m$ is
+    /// `m_numerator` / `m_denominator`.
     ///
-    /// Time: O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: O(1)
+    /// Constant time and additional memory.
     ///
     /// # Panics
     /// Panics if `m_denominator` is zero or if `m_numerator` < `m_denominator`.
@@ -69,14 +61,14 @@ impl StripedBitSource {
 
     /// Gets a bit from this `StripedBitSource`. If this function is being called for the first
     /// time, the probabilities of a `true` or a `false` are equal. On subsequent calls, the
-    /// probability of getting a bit different from the previous one is 1 / m.
+    /// probability of getting a bit different from the previous one is $1 / m$.
     ///
     /// To reset the bit source, so that the next call to `get` has equal probabilities of `true` or
     /// `false`, call `end_block`.
     ///
-    /// Time: O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: O(1)
+    /// Constant time and additional memory.
     pub fn get(&mut self) -> bool {
         self.previous_bit = if self.first_bit_of_block {
             self.first_bit_of_block = false;
@@ -90,9 +82,9 @@ impl StripedBitSource {
     /// Resets this `StripedBitSource`, so that the next time `get` is called, the probabilities of
     /// `true` or `false` will be equal.
     ///
-    /// Time: O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -133,19 +125,21 @@ impl StripedBitSource {
     }
 }
 
+/// Generates random unsigned integers from a random striped distribution.
 #[derive(Clone, Debug)]
-pub struct StripedRandomUnsigneds<T: PrimitiveUnsigned> {
+pub struct StripedRandomUnsignedBitChunks<T: PrimitiveUnsigned> {
     phantom_data: PhantomData<*const T>,
     bits: StripedBitSource,
+    chunk_size: u64,
 }
 
-impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsigneds<T> {
+impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedBitChunks<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         self.bits.end_block();
         let mut x = T::ZERO;
-        for _ in 0..T::WIDTH {
+        for _ in 0..self.chunk_size {
             x <<= 1;
             if self.bits.get() {
                 x |= T::ONE;
@@ -155,6 +149,9 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsigneds<T> {
     }
 }
 
+/// Generates random signed integers from a random striped distribution.
+///
+/// This `struct` is created by the `striped_random_signeds` method. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomSigneds<T: PrimitiveSigned> {
     phantom_data: PhantomData<*const T>,
@@ -181,6 +178,10 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomSigneds<T> {
     }
 }
 
+/// Generates random natural (non-negative) signed integers from a random striped distribution.
+///
+/// This `struct` is created by the `striped_random_natural_signeds` method. See its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalSigneds<T: PrimitiveSigned> {
     phantom_data: PhantomData<*const T>,
@@ -203,6 +204,10 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
     }
 }
 
+/// Generates random negative signed integers from a random striped distribution.
+///
+/// This `struct` is created by the `striped_random_negative_signeds` method. See its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
     phantom_data: PhantomData<*const T>,
@@ -226,26 +231,44 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
     }
 }
 
-/// Generates random unsigned integers from a striped distribution. The way this distribution works
-/// is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is generated
-/// whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first `T::WIDTH`
-/// bits are selected to create a `T` value.
+/// Generates random unsigned integers less than a positive limit, from a random striped
+/// distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely values are 0 (000...) and `T::MAX` (111...). The least
-/// likely values are floor(T::MAX / 3) (01010...) and floor(2 * T::MAX / 3) (10101...).
+/// This `struct` is created by the `striped_random_unsigneds_less_than` method. See its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct StripedRandomUnsignedsLessThan<T: PrimitiveUnsigned> {
+    pub(crate) xs: StripedRandomUnsignedBitChunks<T>,
+    pub(crate) limit: T,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedsLessThan<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        loop {
+            let x = self.xs.next();
+            if x.unwrap() < self.limit {
+                return x;
+            }
+        }
+    }
+}
+
+/// Generates random unsigned integers from a random striped distribution.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// Length is infinite.
+/// The output length is infinite.
 ///
-/// Time per iteration: O(1)
+/// # Worst-case complexity
 ///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -260,37 +283,28 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 ///     "11111000"]
 /// )
 /// ```
+#[inline]
 pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     m_numerator: u64,
     m_denominator: u64,
-) -> StripedRandomUnsigneds<T> {
-    StripedRandomUnsigneds {
-        phantom_data: PhantomData,
-        bits: StripedBitSource::new(seed, m_numerator, m_denominator),
-    }
+) -> StripedRandomUnsignedBitChunks<T> {
+    striped_random_unsigned_bit_chunks(seed, T::WIDTH, m_numerator, m_denominator)
 }
 
-/// Generates random positive unsigned integers from a striped distribution. The way this
-/// distribution works is that given m = `m_numerator` / `m_denominator`, an random infinite bit
-/// sequence is generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then
-/// the first `T::WIDTH` bits are selected to create a `T` value.
+/// Generates random positive unsigned integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely value is 0 `T::MAX` (111...). The least likely values
-/// are floor(T::MAX / 3) (01010...) and floor(2 * T::MAX / 3) (10101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -309,33 +323,23 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     m_numerator: u64,
     m_denominator: u64,
-) -> NonzeroValues<StripedRandomUnsigneds<T>> {
+) -> NonzeroValues<StripedRandomUnsignedBitChunks<T>> {
     nonzero_values(striped_random_unsigneds(seed, m_numerator, m_denominator))
 }
 
-/// Generates random signed integers from a striped distribution. The way this distribution works is
-/// that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is generated
-/// whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
-/// `T::WIDTH - 1` bits are selected to create a `T` value; the sign bit is selected separately, and
-/// is equally likely to be 0 or 1.
+/// Generates random signed integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely values are 0 (0000...), `T::MAX` (0111...), `T::MIN`
-/// (1000...), and -1 (1111...). The least likely values are floor(`T::MAX` / 3) (001010...),
-/// floor(2 * `T::MAX` / 3) (010101...), floor(-2 * `T::MAX` / 3) (101010...), and
-/// floor(-`T::MAX` / 3) (110101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -362,26 +366,19 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
     }
 }
 
-/// Generates random natural (non-negative) signed integers from a striped distribution. The way
-/// this distribution works is that given m = `m_numerator` / `m_denominator`, an random infinite
-/// bit sequence is generated whose mean length of bit runs (blocks of equal adjacent bits) is m.
-/// Then the first `T::WIDTH - 1` bits are selected to create a `T` value.
+/// Generates random natural (non-negative) signed integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely values are 0 (0000...), and `T::MAX` (0111...). The
-/// least likely values are floor(`T::MAX` / 3) (001010...) and floor(2 * `T::MAX` / 3) (010101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -406,26 +403,19 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
     }
 }
 
-/// Generates random positive signed integers from a striped distribution. The way this distribution
-/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
-/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
-/// `T::WIDTH - 1` bits are selected to create a `T` value.
+/// Generates random positive signed integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely value is 0 (0000...). The least likely values are
-/// floor(`T::MAX` / 3) (001010...) and floor(2 * `T::MAX` / 3) (010101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -452,27 +442,19 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
     ))
 }
 
-/// Generates random negative signed integers from a striped distribution. The way this distribution
-/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
-/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
-/// `T::WIDTH - 1` bits are selected to create a `T` value.
+/// Generates random negative signed integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely values are `T::MIN` (1000...), and -1 (1111...). The
-/// least likely values are floor(-2 * `T::MAX` / 3) (101010...) and floor(-`T::MAX` / 3)
-/// (110101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -498,29 +480,19 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
     }
 }
 
-/// Generates random nonzero signed integers from a striped distribution. The way this distribution
-/// works is that given m = `m_numerator` / `m_denominator`, an random infinite bit sequence is
-/// generated whose mean length of bit runs (blocks of equal adjacent bits) is m. Then the first
-/// `T::WIDTH - 1` bits are selected to create a `T` value; the sign bit is selected separately, and
-/// is equally likely to be 0 or 1.
+/// Generates random nonzero signed integers from a random striped distribution.
 ///
-/// If m == 2, every value is equally likely. If it is greater than 2, then long runs of identical
-/// bits are preferred, and the most likely values are `T::MAX` (0111...), `T::MIN` (1000...), and
-/// -1 (1111...). The least likely values are floor(`T::MAX` / 3) (001010...),
-/// floor(2 * `T::MAX` / 3) (010101...), floor(-2 * `T::MAX` / 3) (101010...), and
-/// floor(-`T::MAX` / 3) (110101...).
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
 ///
-/// If m is less than 2 (but it must always be at least 1), then alternating bits are preferred, and
-/// the most likely and least likely values are swapped.
+/// The output length is infinite.
 ///
-/// Length is infinite.
+/// # Worst-case complexity
 ///
-/// Time per iteration: O(1)
-///
-/// Additional memory per iteration: O(1)
+/// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `m_denominator` is zero or if `m_numerator` <= `um_denominator`.
+/// Panics if `m_denominator` is zero or if `m_numerator` <= `m_denominator`.
 ///
 /// # Examples
 /// ```
@@ -541,4 +513,47 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
     m_denominator: u64,
 ) -> NonzeroValues<StripedRandomSigneds<T>> {
     nonzero_values(striped_random_signeds(seed, m_numerator, m_denominator))
+}
+
+///
+/// Generates random unsigned integers of up to `chunk_size` bits from a random striped
+/// distribution.
+///
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `m_numerator` / `m_denominator`. See the module-level documentation.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity
+///
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `m_denominator` is zero, if `m_numerator` <= `m_denominator`, or if `chunk_size` is
+/// greater than `T::WIDTH`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::striped::striped_random_unsigned_bit_chunks;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// assert_eq!(
+///     striped_random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3, 4, 1).take(10)
+///         .map(|x| x.to_binary_string()).collect::<Vec<_>>(),
+///     &["0", "0", "0", "101", "11", "100", "11", "11", "0", "111"]
+/// )
+/// ```
+pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
+    seed: Seed,
+    chunk_size: u64,
+    m_numerator: u64,
+    m_denominator: u64,
+) -> StripedRandomUnsignedBitChunks<T> {
+    assert!(chunk_size <= T::WIDTH);
+    StripedRandomUnsignedBitChunks {
+        phantom_data: PhantomData,
+        bits: StripedBitSource::new(seed, m_numerator, m_denominator),
+        chunk_size,
+    }
 }

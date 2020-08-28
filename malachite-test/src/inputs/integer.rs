@@ -144,6 +144,11 @@ pub fn nrm_pairs_of_integers(
     }))
 }
 
+// All pairs of `Integer`s where the first equals the second.
+pub fn pairs_of_integers_var_2(gm: GenerationMode) -> It<(Integer, Integer)> {
+    Box::new(integers(gm).map(|x| (x.clone(), x)))
+}
+
 pub fn triples_of_integers(gm: GenerationMode) -> It<(Integer, Integer, Integer)> {
     match gm {
         GenerationMode::Exhaustive => {

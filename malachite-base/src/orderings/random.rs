@@ -2,18 +2,19 @@ use std::cmp::Ordering;
 use std::iter::Cloned;
 
 use orderings::ORDERINGS;
-use random::random_values_from_slice;
-use random::random_values_from_slice::RandomValuesFromSlice;
-use random::seed::Seed;
+use random::Seed;
+use slices::{random_values_from_slice, RandomValuesFromSlice};
 
 /// Generates a random `Ordering` that has an equal probability of being `Less`, `Greater`, or
 /// `Equal`.
 ///
-/// Length is infinite.
+/// $P(<) = P(=) = P(>) = \frac{1}{3}$.
 ///
-/// Time per iteration: worst case O(1)
+/// The output length is infinite.
 ///
-/// Additional memory per iteration: worst case O(1)
+/// # Complexity per iteration
+///
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

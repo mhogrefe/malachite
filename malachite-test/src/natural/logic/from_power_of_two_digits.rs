@@ -275,7 +275,6 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
 macro_rules! demo_and_bench {
     (
         $t:ident,
-        $from_power_of_two_digits_asc_naive:ident,
         $from_power_of_two_digits_asc_demo_name:ident,
         $from_power_of_two_digits_desc_demo_name:ident,
         $from_power_of_two_digits_asc_bench_name:ident,
@@ -295,7 +294,7 @@ macro_rules! demo_and_bench {
             file_name: &str,
         ) {
             benchmark_from_power_of_two_digits_asc_algorithms::<$t, _>(
-                Natural::$from_power_of_two_digits_asc_naive,
+                Natural::_from_power_of_two_digits_asc_naive,
                 gm,
                 limit,
                 file_name,
@@ -314,7 +313,6 @@ macro_rules! demo_and_bench {
 
 demo_and_bench!(
     u8,
-    _from_power_of_two_digits_asc_u8_naive,
     demo_natural_from_power_of_two_digits_asc_u8,
     demo_natural_from_power_of_two_digits_desc_u8,
     benchmark_natural_from_power_of_two_digits_asc_u8_algorithms,
@@ -322,7 +320,6 @@ demo_and_bench!(
 );
 demo_and_bench!(
     u16,
-    _from_power_of_two_digits_asc_u16_naive,
     demo_natural_from_power_of_two_digits_asc_u16,
     demo_natural_from_power_of_two_digits_desc_u16,
     benchmark_natural_from_power_of_two_digits_asc_u16_algorithms,
@@ -330,7 +327,6 @@ demo_and_bench!(
 );
 demo_and_bench!(
     u32,
-    _from_power_of_two_digits_asc_u32_naive,
     demo_natural_from_power_of_two_digits_asc_u32,
     demo_natural_from_power_of_two_digits_desc_u32,
     benchmark_natural_from_power_of_two_digits_asc_u32_algorithms,
@@ -338,7 +334,6 @@ demo_and_bench!(
 );
 demo_and_bench!(
     u64,
-    _from_power_of_two_digits_asc_u64_naive,
     demo_natural_from_power_of_two_digits_asc_u64,
     demo_natural_from_power_of_two_digits_desc_u64,
     benchmark_natural_from_power_of_two_digits_asc_u64_algorithms,
@@ -346,7 +341,6 @@ demo_and_bench!(
 );
 demo_and_bench!(
     usize,
-    _from_power_of_two_digits_asc_usize_naive,
     demo_natural_from_power_of_two_digits_asc_usize,
     demo_natural_from_power_of_two_digits_desc_usize,
     benchmark_natural_from_power_of_two_digits_asc_usize_algorithms,

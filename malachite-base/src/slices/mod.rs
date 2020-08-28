@@ -1,4 +1,6 @@
 use num::basic::traits::Zero;
+use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use random::Seed;
 
 /// Sets all values in a slice to 0.
 ///
@@ -110,6 +112,57 @@ pub fn slice_trailing_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
 #[inline]
 pub fn slice_move_left<T: Copy>(xs: &mut [T], starting_index: usize) {
     xs.copy_within(starting_index..xs.len(), 0);
+}
+
+/// Uniformly generates a random reference to a value from a nonempty slice.
+#[derive(Clone, Debug)]
+pub struct RandomValuesFromSlice<'a, T> {
+    pub(crate) xs: &'a [T],
+    pub(crate) indices: RandomUnsignedsLessThan<usize>,
+}
+
+impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
+    type Item = &'a T;
+
+    #[inline]
+    fn next(&mut self) -> Option<&'a T> {
+        Some(&self.xs[self.indices.next().unwrap()])
+    }
+}
+
+/// Uniformly generates a random reference to a value from a nonempty slice. The iterator cannot
+/// outlive the slice. It may be more convenient for the iterator to own the data, in which case you
+/// may use `random_values_from_vec` instead.
+///
+/// Length is infinite.
+///
+/// Time per iteration: worst case O(1)
+///
+/// Additional memory per iteration: worst case O(1)
+///
+/// # Panics
+/// Panics if `xs` is empty.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::slices::random_values_from_slice;
+///
+/// let xs = &[2, 3, 5, 7, 11];
+/// assert_eq!(
+///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect::<Vec<_>>(),
+///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
+/// );
+/// ```
+#[inline]
+pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlice<T> {
+    if xs.is_empty() {
+        panic!("empty slice");
+    }
+    RandomValuesFromSlice {
+        xs,
+        indices: random_unsigneds_less_than(seed, xs.len()),
+    }
 }
 
 /// This macro splits an immutable slice into adjacent immutable chunks. There are |`$xs_i`| + 1

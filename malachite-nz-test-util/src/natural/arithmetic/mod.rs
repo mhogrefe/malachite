@@ -8,5 +8,6 @@ pub mod mod_mul;
 pub mod mod_op;
 pub mod mul;
 pub mod neg;
+pub mod pow;
 pub mod square;
 pub mod sub;

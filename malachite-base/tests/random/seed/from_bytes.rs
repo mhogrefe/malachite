@@ -1,4 +1,4 @@
-use malachite_base::random::seed::Seed;
+use malachite_base::random::Seed;
 use malachite_base::random::EXAMPLE_SEED;
 
 #[test]

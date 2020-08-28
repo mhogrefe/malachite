@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
-
 use natural::Natural;
 
 impl SaturatingSub<Natural> for Natural {

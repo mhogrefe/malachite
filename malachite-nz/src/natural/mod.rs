@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
-
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
+use std::str::FromStr;
 
 /// A natural (non-negative) integer.
 ///
@@ -168,6 +166,7 @@ pub mod arithmetic {
     pub mod neg;
     pub mod next_power_of_two;
     pub mod parity;
+    pub mod pow;
     pub mod power_of_two;
     pub mod round_to_multiple;
     pub mod round_to_multiple_of_power_of_two;

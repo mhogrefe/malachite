@@ -46,7 +46,9 @@ pub mod chars;
 pub mod comparison;
 /// This module contains functions and adaptors for iterators.
 pub mod iterators;
+/// This module contains functions for working with primitive integers and floats.
 pub mod num;
+/// This module contains functions for working with `Ordering`s.
 pub mod orderings;
 pub mod random;
 pub mod rounding_modes;

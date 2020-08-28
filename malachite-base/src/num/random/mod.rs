@@ -6,7 +6,7 @@ use num::conversion::traits::WrappingFrom;
 use num::logic::traits::BitAccess;
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
-use random::seed::Seed;
+use random::Seed;
 use std::fmt::Debug;
 
 /// Uniformly generates random primitive integers.
@@ -104,6 +104,9 @@ impl<T: HasRandomPrimitiveIntegers> Iterator for RandomPrimitiveIntegers<T> {
 }
 
 /// Uniformly generates random unsigned integers less than a positive limit.
+///
+/// This `struct` is created by the `random_unsigneds_less_than` method. See its documentation
+/// for more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
     pub(crate) xs: RandomUnsignedBitChunks<T>,
@@ -117,7 +120,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
     fn next(&mut self) -> Option<T> {
         loop {
             let x = self.xs.next();
-            if self.limit == T::ZERO || x.unwrap() < self.limit {
+            if x.unwrap() < self.limit {
                 return x;
             }
         }
@@ -363,11 +366,8 @@ where
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -400,11 +400,8 @@ pub fn random_primitive_integers<T: PrimitiveInteger>(seed: Seed) -> RandomPrimi
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -436,11 +433,8 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -472,11 +466,8 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -511,11 +502,8 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -545,11 +533,8 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -581,11 +566,8 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 ///
@@ -629,11 +611,8 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 ///
@@ -677,11 +656,8 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 ///
@@ -727,11 +703,8 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 ///
@@ -771,11 +744,8 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(i)] = \mathcal{O}(1)$
 ///
-/// $E[M(i)] = \mathcal{O}(1)$
-///
-/// where $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 ///
@@ -818,11 +788,8 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `chunk_size` is greater than `T::WIDTH`.
@@ -868,11 +835,8 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `chunk_size` is greater than `T::WIDTH`.
@@ -910,11 +874,8 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -939,4 +900,62 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
 /// This module contains iterators that generate primitive integers from geometric-like
 /// distributions.
 pub mod geometric;
+
+/// This module contains iterators that generate primitive integers that tend to have long runs of
+/// binary 0s and 1s.
+///
+/// Integers with long runs of 0s and 1s are good for testing; they're more likely to result in
+/// carries and borrows than uniformly random integers. This idea was inspired by GMP's
+/// `mpz_rrandomb` function, although striped integers are more general: they can also have runs
+/// that are shorter than average, so that they tend to contain alternating blocks like $1010101$.
+///
+/// Let the average length of a run of 0s and 1s be $m$. The functions in this module allow the user
+/// to specify a rational $m$ through the parameters `m_numerator` and `m_denominator`. Since any
+/// binary sequence has an average run length of at least 1, $m$ must be at least 1. if $m$ is
+/// between 1 and 2, the sequence is less likely to have two equal adjacent bits than a uniformly
+/// random sequence. If $m$ is 2, the sequence is uniformly random. If $m$ is greater than 2 (the
+/// most useful case), the sequence tends to have long runs of 0s and 1s.
+///
+/// # Details
+///
+/// A random striped sequence with parameter $m \geq 1$ is an infinite sequence of bits, defined as
+/// follows. The first bit is 0 or 1 with equal probability. Every subsequent bit has a $1/m$
+/// probability of being different than the preceding bit. Notice that every sequence has an equal
+/// probability as its negation. Also, if $m > 1$, any sequence has a nonzero probability of
+/// occurring.
+///
+/// * If $m=1$, the sequence must be either $01010101010101010101\ldots$ or
+///   $10101010101010101010\ldots$.
+/// * If $1<m<2$, the sequence tends to alternate between 0 and 1 more often than a uniformly random
+///   sequence. A sample sequence with $m=33/32$ is
+///   $1010101010101010101010110101010101010101\ldots$.
+/// * If $m=2$, the sequence is uniformly random. A sample sequence with $m=2$ is
+///   $1100110001101010100101101001000001100001\ldots$.
+/// * If $m>2$, the sequence tends to have longer runs of 0s and 1s than a uniformly random
+///   sequence. A sample sequence with $m=32$ is
+///   $1111111111111111110000000011111111111111\ldots$.
+///
+/// An alternative way to generate a striped sequence is to start with 0 or 1 with equal probability
+/// and then determine the length of each block of equal bits using a geometric distribution with
+/// mean $m$. In practice, this isn't any more efficient than the naive algorithm.
+///
+/// We can generate a random striped unsigned integer of type `T` by taking the first `T::WIDTH`
+/// bits of a striped sequence. Fixing the parameter $m$ defines a distribution over `T`s. A few
+/// things can be said about the probability $P_m(n)$ of an unsigned integer $n$ of width $W$ being
+/// generated :
+/// * $P_m(n) = P_m(\lnot n)$
+/// * $P_m(0) = P_m(2^W-1) = \frac{1}{2} \left ( 1-\frac{1}{m} \right )^{W-1}$. If $m>2$, this is
+///   the maximum probability achieved; if $m<2$, the minimum.
+/// * $P_m(\lfloor 2^W/3 \rfloor) = P_m(\lfloor 2^{W+1}/3 \rfloor) = 1/(2m^{W-1})$. If $m>2$,
+///   this is the minimum probability achieved; if $m<2$, the maximum.
+/// * Because of these distributions' symmetry, their mean is $(2^W-1)/2$ and their skewness is 0.
+///   It's hard to say anything about their standard deviations or excess kurtoses, although these
+///   can be computed quickly for specific values of $m$ when $W$ is 8 or 16.
+///
+/// We can similarly generate random striped signed integers of width `T`. The sign bit is chosen
+/// uniformly, and the remaining `T::WIDTH - 1` are taken from a striped sequence.
+///
+/// Generating striped random values from an interval seems difficult. We can't shift the interval
+/// by adding, since addition destroys the the values' stripiness. For this reason, iterators that
+/// generate striped random values from an interval are not provided.
 pub mod striped;

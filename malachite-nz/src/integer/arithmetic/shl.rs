@@ -1,8 +1,28 @@
-use std::ops::{Shl, ShlAssign};
-
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
-
 use integer::Integer;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::traits::Zero;
+use natural::Natural;
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+
+fn _shl_unsigned<T>(x: Integer, bits: T) -> Integer
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Integer {
+        sign: x.sign,
+        abs: x.abs << bits,
+    }
+}
+
+fn _shl_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
+where
+    &'a Natural: Shl<T, Output = Natural>,
+{
+    Integer {
+        sign: x.sign,
+        abs: &x.abs << bits,
+    }
+}
 
 macro_rules! impl_shl_unsigned {
     ($t:ident) => {
@@ -32,11 +52,9 @@ macro_rules! impl_shl_unsigned {
             /// assert_eq!((Integer::from(-123) << 100u8).to_string(),
             ///     "-155921023828072216384094494261248");
             /// ```
+            #[inline]
             fn shl(self, bits: $t) -> Integer {
-                Integer {
-                    sign: self.sign,
-                    abs: self.abs << bits,
-                }
+                _shl_unsigned(self, bits)
             }
         }
 
@@ -66,11 +84,9 @@ macro_rules! impl_shl_unsigned {
             /// assert_eq!((&Integer::from(-123) << 100u8).to_string(),
             ///     "-155921023828072216384094494261248");
             /// ```
+            #[inline]
             fn shl(self, bits: $t) -> Integer {
-                Integer {
-                    sign: self.sign,
-                    abs: &self.abs << bits,
-                }
+                _shl_unsigned_ref(self, bits)
             }
         }
 
@@ -102,6 +118,7 @@ macro_rules! impl_shl_unsigned {
             /// x <<= 4u64;
             /// assert_eq!(x.to_string(), "-1024");
             /// ```
+            #[inline]
             fn shl_assign(&mut self, bits: $t) {
                 self.abs <<= bits;
             }
@@ -109,6 +126,31 @@ macro_rules! impl_shl_unsigned {
     };
 }
 apply_to_unsigneds!(impl_shl_unsigned);
+
+fn _shl_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Integer,
+    bits: S,
+) -> Integer
+where
+    &'a Integer: Shl<U, Output = Integer> + Shr<U, Output = Integer>,
+{
+    if bits >= S::ZERO {
+        x << bits.unsigned_abs()
+    } else {
+        x >> bits.unsigned_abs()
+    }
+}
+
+fn _shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
+where
+    Integer: ShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x <<= bits.unsigned_abs();
+    } else {
+        *x >>= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_shl_signed {
     ($t:ident) => {
@@ -177,12 +219,9 @@ macro_rules! impl_shl_signed {
             /// assert_eq!((&Integer::from(492) << -2i32).to_string(), "123");
             /// assert_eq!((&(-Integer::trillion()) << -10i64).to_string(), "-976562500");
             /// ```
+            #[inline]
             fn shl(self, bits: $t) -> Integer {
-                if bits >= 0 {
-                    self << bits.unsigned_abs()
-                } else {
-                    self >> bits.unsigned_abs()
-                }
+                _shl_signed_ref(self, bits)
             }
         }
 

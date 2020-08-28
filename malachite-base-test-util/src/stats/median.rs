@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 
 use stats::moments::CheckedToF64;
 
-pub fn uniform_bool_median(min: bool, max: bool) -> (bool, Option<bool>) {
+pub const fn uniform_bool_median(min: bool, max: bool) -> (bool, Option<bool>) {
     if min == max {
         (min, None)
     } else {

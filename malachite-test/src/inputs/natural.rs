@@ -192,6 +192,11 @@ pub fn pairs_of_naturals_var_2(gm: GenerationMode) -> It<(Natural, Natural)> {
     Box::new(pairs_of_naturals(gm).filter(|&(ref x, ref y)| x < y))
 }
 
+// All pairs of `Natural`s where the first equals the second.
+pub fn pairs_of_naturals_var_3(gm: GenerationMode) -> It<(Natural, Natural)> {
+    Box::new(naturals(gm).map(|x| (x.clone(), x)))
+}
+
 pub fn triples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
     match gm {
         GenerationMode::Exhaustive => {

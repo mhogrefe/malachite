@@ -1,8 +1,7 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-
-use integer::Integer;
 
 macro_rules! impl_shr_round_unsigned {
     ($t:ident) => {

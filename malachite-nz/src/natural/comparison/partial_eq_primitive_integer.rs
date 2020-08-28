@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::WrappingFrom;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

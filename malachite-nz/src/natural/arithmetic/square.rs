@@ -1,5 +1,4 @@
-use std::cmp::{max, Ordering};
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
     WrappingSubAssign, XMulYIsZZ,
@@ -8,8 +7,6 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -44,6 +41,7 @@ use platform::{
     DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD,
     SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
+use std::cmp::{max, Ordering};
 
 /// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
 #[inline]
@@ -219,7 +217,7 @@ pub fn _limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut 
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
+pub const fn _limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
     xs_len == 3 || xs_len > 4
 }
 
@@ -382,7 +380,7 @@ pub fn _limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut 
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
+pub const fn _limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
 }
 
@@ -515,7 +513,7 @@ pub fn _limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut 
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
+pub const fn _limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
 }
 
@@ -667,7 +665,7 @@ pub const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 ///
 /// Additional memory: worst case O(1)
 #[inline]
-pub fn _limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
+pub const fn _limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
 }
 
@@ -682,67 +680,60 @@ pub fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
 }
 
 /// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn sqr_toom8_max() -> usize {
-    if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
-        (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
-    } else {
-        usize::MAX
-    }
-}
+pub const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
+    (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
+} else {
+    usize::MAX
+};
 
 /// This is MAYBE_sqr_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
 
 /// This is MAYBE_sqr_above_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn toom8_maybe_sqr_above_basecase() -> bool {
-    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM2_THRESHOLD
-}
+pub const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM2_THRESHOLD;
 
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
 
 /// This is MAYBE_sqr_above_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn toom8_maybe_sqr_above_toom2() -> bool {
-    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM3_THRESHOLD
-}
+pub const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM3_THRESHOLD;
 
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
 
 /// This is MAYBE_sqr_above_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn toom8_maybe_sqr_above_toom3() -> bool {
-    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM4_THRESHOLD
-}
+pub const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM4_THRESHOLD;
 
 /// This is MAYBE_sqr_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
 
 /// This is MAYBE_sqr_above_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn toom8_maybe_sqr_above_toom4() -> bool {
-    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM6_THRESHOLD
-}
+pub const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM6_THRESHOLD;
 
 /// This is MAYBE_sqr_above_toom6 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub fn toom8_maybe_sqr_above_toom6() -> bool {
-    TUNE_PROGRAM_BUILD || sqr_toom8_max() >= SQR_TOOM8_THRESHOLD
-}
+pub const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
 
 // This is TOOM8_SQR_REC from mpn/generic/toom8_sqr.c, GMP 6.1.2, when f is false.
 fn _limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
-    if TOOM8_MAYBE_SQR_BASECASE && (!toom8_maybe_sqr_above_basecase() || n < SQR_TOOM2_THRESHOLD) {
+    if TOOM8_MAYBE_SQR_BASECASE && (!TOOM8_MAYBE_SQR_ABOVE_BASECASE || n < SQR_TOOM2_THRESHOLD) {
         _limbs_square_to_out_basecase(out, xs);
-    } else if TOOM8_MAYBE_SQR_TOOM2 && (!toom8_maybe_sqr_above_toom2() || n < SQR_TOOM3_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM2 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM2 || n < SQR_TOOM3_THRESHOLD) {
         _limbs_square_to_out_toom_2(out, xs, scratch);
-    } else if TOOM8_MAYBE_SQR_TOOM3 && (!toom8_maybe_sqr_above_toom3() || n < SQR_TOOM4_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM3 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM3 || n < SQR_TOOM4_THRESHOLD) {
         _limbs_square_to_out_toom_3(out, xs, scratch);
-    } else if TOOM8_MAYBE_SQR_TOOM4 && (!toom8_maybe_sqr_above_toom4() || n < SQR_TOOM6_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM4 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM4 || n < SQR_TOOM6_THRESHOLD) {
         _limbs_square_to_out_toom_4(out, xs, scratch);
-    } else if !toom8_maybe_sqr_above_toom6() || n < SQR_TOOM8_THRESHOLD {
+    } else if !TOOM8_MAYBE_SQR_ABOVE_TOOM6 || n < SQR_TOOM8_THRESHOLD {
         _limbs_square_to_out_toom_6(out, xs, scratch);
     } else {
         _limbs_square_to_out_toom_8(out, xs, scratch);

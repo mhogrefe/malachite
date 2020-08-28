@@ -21,7 +21,7 @@ use comparison::traits::Min;
 /// assert_eq!(char_to_contiguous_range('a'), 97);
 /// assert_eq!(char_to_contiguous_range(char::MAX), 1_112_063);
 /// ```
-pub fn char_to_contiguous_range(c: char) -> u32 {
+pub const fn char_to_contiguous_range(c: char) -> u32 {
     match c {
         '\u{0}'..=CHAR_JUST_BELOW_SURROGATES => c as u32,
         _ => c as u32 - SURROGATE_RANGE_SIZE,
@@ -35,11 +35,8 @@ pub fn char_to_contiguous_range(c: char) -> u32 {
 /// return `None`.
 ///
 /// # Worst-case complexity
-/// $T(u) = \mathcal{O}(1)$
 ///
-/// $M(u) = \mathcal{O}(1)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -88,11 +85,8 @@ pub fn increment_char(c: &mut char) {
 /// Decrements this `char`, skipping over the surrogate range.
 ///
 /// # Worst-case complexity
-/// $T(u) = \mathcal{O}(1)$
 ///
-/// $M(u) = \mathcal{O}(1)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `self` is `'\u{0}'`.

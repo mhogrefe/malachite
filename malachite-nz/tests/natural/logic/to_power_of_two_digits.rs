@@ -3,6 +3,7 @@ use std::str::FromStr;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
+use malachite_base::strings::ToDebugString;
 
 use malachite_nz::natural::Natural;
 
@@ -23,15 +24,15 @@ fn test_to_power_of_two_digits_asc() {
         );
         assert_eq!(to_power_of_two_digits_asc_naive(&n, log_base), out);
     };
-    test::<u8, _>(Natural::_to_power_of_two_digits_asc_u8_naive, "0", 1, &[]);
+    test::<u8, _>(Natural::_to_power_of_two_digits_asc_naive, "0", 1, &[]);
     test::<u16, _>(
-        Natural::_to_power_of_two_digits_asc_u16_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "123",
         10,
         &[123],
     );
     test::<u16, _>(
-        Natural::_to_power_of_two_digits_asc_u16_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000",
         1,
         &[
@@ -40,31 +41,31 @@ fn test_to_power_of_two_digits_asc() {
         ],
     );
     test::<u32, _>(
-        Natural::_to_power_of_two_digits_asc_u32_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000",
         3,
         &[0, 0, 0, 0, 1, 2, 1, 5, 4, 2, 3, 4, 6, 1],
     );
     test::<u64, _>(
-        Natural::_to_power_of_two_digits_asc_u64_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000",
         4,
         &[0, 0, 0, 1, 5, 10, 4, 13, 8, 14],
     );
     test::<u32, _>(
-        Natural::_to_power_of_two_digits_asc_u32_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000",
         32,
         &[3_567_587_328, 232],
     );
     test::<u64, _>(
-        Natural::_to_power_of_two_digits_asc_u64_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000",
         64,
         &[1_000_000_000_000],
     );
     test::<u64, _>(
-        Natural::_to_power_of_two_digits_asc_u64_naive,
+        Natural::_to_power_of_two_digits_asc_naive,
         "1000000000000000000000000",
         64,
         &[2_003_764_205_206_896_640, 54_210],
@@ -210,17 +211,12 @@ fn test_to_power_of_two_digits_asc_natural() {
     let test = |n, log_base, out| {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
-            format!(
-                "{:?}",
-                PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, log_base)
-            ),
+            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, log_base).to_debug_string(),
             out
         );
         assert_eq!(
-            format!(
-                "{:?}",
-                n._to_power_of_two_digits_asc_natural_naive(log_base)
-            ),
+            n._to_power_of_two_digits_asc_natural_naive(log_base)
+                .to_debug_string(),
             out
         );
     };
@@ -263,10 +259,8 @@ fn test_to_power_of_two_digits_desc_natural() {
     let test = |n, log_base, out| {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
-            format!(
-                "{:?}",
-                PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(&n, log_base)
-            ),
+            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(&n, log_base)
+                .to_debug_string(),
             out
         );
     };

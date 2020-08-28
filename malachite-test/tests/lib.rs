@@ -283,6 +283,7 @@ pub mod natural {
         pub mod neg;
         pub mod next_power_of_two;
         pub mod parity;
+        pub mod pow;
         pub mod power_of_two;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_two;

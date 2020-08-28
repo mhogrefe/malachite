@@ -3,7 +3,7 @@ use malachite_base::num::logic::traits::BitConvertible;
 use malachite_nz::integer::Integer;
 
 #[test]
-fn test_from_bits_asc() {
+fn test_from_bits_asc_and_from_bit_iterator_asc() {
     let test = |bits: &[bool], out| {
         let x = Integer::from_bits_asc(bits);
         assert!(x.is_valid());
@@ -63,7 +63,7 @@ fn test_from_bits_asc() {
 }
 
 #[test]
-fn test_from_bits_desc() {
+fn test_from_bits_desc_and_from_bit_iterator_desc() {
     let test = |bits: &[bool], out| {
         let x = Integer::from_bits_desc(bits);
         assert!(x.is_valid());

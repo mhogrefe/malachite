@@ -94,7 +94,7 @@ fn test_limbs_pos_or_neg_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_pos_or_neg_limb_fail() {
+const fn limbs_pos_or_neg_limb_fail() {
     limbs_pos_or_neg_limb(&[], 10);
 }
 
@@ -112,7 +112,7 @@ fn test_limbs_neg_or_neg_limb() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_neg_or_neg_limb_fail() {
+const fn limbs_neg_or_neg_limb_fail() {
     limbs_neg_or_neg_limb(&[], 10);
 }
 

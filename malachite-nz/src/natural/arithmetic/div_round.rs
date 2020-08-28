@@ -1,14 +1,12 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::{
     DivAssignMod, DivMod, DivRound, DivRoundAssign, Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::{Iverson, One};
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::Natural;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// quotient limbs of a `Limb` divided by the `Natural` and rounded according to a specified

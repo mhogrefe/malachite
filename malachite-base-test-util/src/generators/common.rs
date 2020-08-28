@@ -12,7 +12,7 @@ pub enum GenMode {
 }
 
 impl GenMode {
-    pub fn name(self) -> &'static str {
+    pub const fn name(self) -> &'static str {
         match self {
             GenMode::Exhaustive => "exhaustive",
             GenMode::Random => "random",

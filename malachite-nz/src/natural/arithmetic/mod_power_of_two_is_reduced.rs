@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::ModPowerOfTwoIsReduced;
 use malachite_base::num::logic::traits::SignificantBits;
-
 use natural::Natural;
 
 impl ModPowerOfTwoIsReduced for Natural {

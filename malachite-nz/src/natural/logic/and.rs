@@ -1,13 +1,11 @@
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::ops::{BitAnd, BitAndAssign};
-
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::slices::slice_set_zero;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::Ordering;
+use std::mem::swap;
+use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.

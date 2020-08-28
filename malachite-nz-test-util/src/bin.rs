@@ -2,9 +2,10 @@
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
 
-use demo_and_bench::register;
 use malachite_base_test_util::runner::cmd::read_command_line_arguments;
 use malachite_base_test_util::runner::Runner;
+
+use demo_and_bench::register;
 
 fn main() {
     let args = read_command_line_arguments();

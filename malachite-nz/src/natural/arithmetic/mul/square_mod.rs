@@ -1,12 +1,9 @@
-use std::cmp::min;
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_test_zero;
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -25,6 +22,7 @@ use natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use platform::Limb;
+use std::cmp::min;
 
 //TODO tune
 const SQRMOD_BNM1_THRESHOLD: usize = 16;
@@ -41,7 +39,10 @@ pub(crate) fn _limbs_square_mod_base_pow_n_minus_1_next_size(n: usize) -> usize 
 }
 
 /// This is mpn_sqrmod_bnm1_itch from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn _limbs_square_mod_base_pow_n_minus_1_scratch_len(n: usize, xs_len: usize) -> usize {
+pub(crate) const fn _limbs_square_mod_base_pow_n_minus_1_scratch_len(
+    n: usize,
+    xs_len: usize,
+) -> usize {
     if xs_len > n >> 1 {
         n + xs_len + 3
     } else {

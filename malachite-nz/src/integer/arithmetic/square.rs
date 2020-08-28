@@ -1,6 +1,5 @@
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-
 use integer::Integer;
+use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 
 impl Square for Integer {
     type Output = Integer;

@@ -1,5 +1,4 @@
-use malachite_base::random::seed::Seed;
-use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::random::{Seed, EXAMPLE_SEED};
 
 #[test]
 fn test_fork() {

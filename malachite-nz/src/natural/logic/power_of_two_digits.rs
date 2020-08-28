@@ -1,22 +1,22 @@
-use std::cmp::{min, Ordering};
-
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, DivRound, ModPowerOfTwo, Parity, PowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, FromOtherTypeSlice, WrappingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ExactFrom, FromOtherTypeSlice, WrappingFrom,
+};
 use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, LowMask, PowerOfTwoDigits, SignificantBits,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{min, Ordering};
 
 fn reformat_slice<'a, T: PrimitiveUnsigned, U: PrimitiveUnsigned, I>(
     ys: &mut Vec<U>,
@@ -56,11 +56,61 @@ fn reformat_slice<'a, T: PrimitiveUnsigned, U: PrimitiveUnsigned, I>(
     }
 }
 
+impl Natural {
+    pub fn _to_power_of_two_digits_asc_naive<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+        &self,
+        log_base: u64,
+    ) -> Vec<T> {
+        assert_ne!(log_base, 0);
+        if log_base > T::WIDTH {
+            panic!(
+                "type {:?} is too small for a digit of width {}",
+                T::NAME,
+                log_base
+            );
+        }
+        let digit_len = self
+            .significant_bits()
+            .div_round(log_base, RoundingMode::Ceiling);
+        let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
+        let mut previous_index = 0;
+        for _ in 0..digit_len {
+            let index = previous_index + log_base;
+            digits.push(T::exact_from(self.get_bits(previous_index, index)));
+            previous_index = index;
+        }
+        digits
+    }
+
+    pub fn _from_power_of_two_digits_asc_naive<T: PrimitiveUnsigned>(
+        log_base: u64,
+        digits: &[T],
+    ) -> Natural
+    where
+        Natural: From<T>,
+    {
+        assert_ne!(log_base, 0);
+        if log_base > T::WIDTH {
+            panic!(
+                "type {:?} is too small for a digit of width {}",
+                T::NAME,
+                log_base
+            );
+        }
+        let mut n = Natural::ZERO;
+        let mut previous_index = 0;
+        for &digit in digits {
+            let index = previous_index + log_base;
+            n.assign_bits(previous_index, index, &Natural::from(digit));
+            previous_index = index;
+        }
+        n
+    }
+}
+
 macro_rules! power_of_two_digits_primitive {
     (
-        $t: ident,
-        $to_power_of_two_digits_asc_naive: ident,
-        $from_power_of_two_digits_asc_naive: ident
+        $t: ident
     ) => {
         impl PowerOfTwoDigits<$t> for Natural {
             /// Returns a `Vec` containing the digits of `self` in ascending order: least- to most-
@@ -124,12 +174,12 @@ macro_rules! power_of_two_digits_primitive {
                     let (last, init) = limbs.split_last().unwrap();
                     for limb in init {
                         for i in 0..Limb::WIDTH {
-                            digits.push(if limb.get_bit(i) { 1 } else { 0 });
+                            digits.push($t::iverson(limb.get_bit(i)));
                         }
                     }
                     let mut last = *last;
                     while last != 0 {
-                        digits.push(if last.odd() { 1 } else { 0 });
+                        digits.push($t::iverson(last.odd()));
                         last >>= 1;
                     }
                 } else if let Some(log_log_base) = log_base.checked_log_two() {
@@ -352,83 +402,28 @@ macro_rules! power_of_two_digits_primitive {
                 }
                 Natural::from_owned_limbs_asc(limbs)
             }
-        }
 
-        impl Natural {
-            pub fn $to_power_of_two_digits_asc_naive(&self, log_base: u64) -> Vec<$t> {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                let digit_len = self
-                    .significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling);
-                let mut digits = Vec::with_capacity(usize::exact_from(digit_len));
-                let mut previous_index = 0;
-                for _ in 0..digit_len {
-                    let index = previous_index + log_base;
-                    digits.push($t::exact_from(self.get_bits(previous_index, index)));
-                    previous_index = index;
-                }
-                digits
+            /// TODO doc
+            #[inline]
+            fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = $t>>(
+                _log_base: u64,
+                _digits: I,
+            ) -> Natural {
+                unimplemented!();
             }
 
-            pub fn $from_power_of_two_digits_asc_naive(log_base: u64, digits: &[$t]) -> Natural {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                let mut n = Natural::ZERO;
-                let mut previous_index = 0;
-                for &digit in digits {
-                    let index = previous_index + log_base;
-                    n.assign_bits(previous_index, index, &Natural::from(digit));
-                    previous_index = index;
-                }
-                n
+            /// TODO doc
+            #[inline]
+            fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = $t>>(
+                _log_base: u64,
+                _digits: I,
+            ) -> Natural {
+                unimplemented!();
             }
         }
     };
 }
-
-power_of_two_digits_primitive!(
-    u8,
-    _to_power_of_two_digits_asc_u8_naive,
-    _from_power_of_two_digits_asc_u8_naive
-);
-power_of_two_digits_primitive!(
-    u16,
-    _to_power_of_two_digits_asc_u16_naive,
-    _from_power_of_two_digits_asc_u16_naive
-);
-power_of_two_digits_primitive!(
-    u32,
-    _to_power_of_two_digits_asc_u32_naive,
-    _from_power_of_two_digits_asc_u32_naive
-);
-power_of_two_digits_primitive!(
-    u64,
-    _to_power_of_two_digits_asc_u64_naive,
-    _from_power_of_two_digits_asc_u64_naive
-);
-power_of_two_digits_primitive!(
-    u128,
-    _to_power_of_two_digits_asc_u128_naive,
-    _from_power_of_two_digits_asc_u128_naive
-);
-power_of_two_digits_primitive!(
-    usize,
-    _to_power_of_two_digits_asc_usize_naive,
-    _from_power_of_two_digits_asc_usize_naive
-);
+apply_to_unsigneds!(power_of_two_digits_primitive);
 
 impl PowerOfTwoDigits<Natural> for Natural {
     /// Returns a `Vec` containing the digits of `self` in ascending order: least- to most-
@@ -746,6 +741,24 @@ impl PowerOfTwoDigits<Natural> for Natural {
             }
             n
         }
+    }
+
+    /// TODO doc
+    #[inline]
+    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = Natural>>(
+        _log_base: u64,
+        _digits: I,
+    ) -> Natural {
+        unimplemented!();
+    }
+
+    /// TODO doc
+    #[inline]
+    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = Natural>>(
+        _log_base: u64,
+        _digits: I,
+    ) -> Natural {
+        unimplemented!();
     }
 }
 

@@ -72,6 +72,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::pow::{
+    _limb_pow_alt_estimated_out_len, _limbs_pow_alt_estimated_out_len,
+};
 use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_3_input_size_valid, _limbs_square_to_out_toom_4_input_size_valid,
     _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
@@ -1123,6 +1126,11 @@ pub fn pairs_of_unsigned_and_small_unsigned_var_1<
         pairs_of_unsigned_and_small_unsigned::<T, U>(gm)
             .filter(|&(n, u)| !n.divisible_by_power_of_two(u.exact_into())),
     )
+}
+
+// All pairs of `Limb` and `u64`, where both are at least 2.
+pub fn pairs_of_unsigned_and_small_unsigned_var_2(gm: GenerationMode) -> It<(Limb, u64)> {
+    Box::new(pairs_of_unsigned_and_small_unsigned(gm).filter(|&(x, exp)| exp > 1 && x > 1))
 }
 
 pub fn pairs_of_unsigned_and_small_signed<T: PrimitiveUnsigned + Rand, U: PrimitiveSigned>(
@@ -5126,6 +5134,28 @@ pub fn pairs_of_unsigned_vec_and_positive_unsigned_var_2<T: PrimitiveUnsigned + 
     )
 }
 
+// All pairs of `Vec<Limb>`, and `u64`, where the length of the vec `Vec` is at least 2 and the
+// `u64` is least 2.
+pub fn pairs_of_unsigned_vec_and_small_unsigned_var_3(gm: GenerationMode) -> It<(Vec<Limb>, u64)> {
+    let ps: It<(Vec<Limb>, u64)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(u64::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(u64::checked_from)),
+        )),
+    };
+    Box::new(ps.filter(|&(ref xs, exp)| exp > 1 && *xs.last().unwrap() != 0))
+}
+
 fn triples_of_unsigned_vec_small_unsigned_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -5834,6 +5864,38 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1<
     )
 }
 
+// All triples of `Vec<Limb>`, `Vec<Limb>`, and `u64`, where the length of the second `Vec` is at
+// least 2, the length of the first `Vec` is at least `_limbs_pow_alt_estimated_out_len` applied to
+// the second `Vec` and `u64`, and the `u64` is least 2.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_2(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    let ts: It<(Vec<Limb>, Vec<Limb>, u64)> = match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_vecs_min_length(4, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_vecs_min_length(seed, scale, 4, &(|seed_2| random(seed_2)))),
+            &(|seed| random_vecs_min_length(seed, scale, 2, &(|seed_2| random(seed_2)))),
+            &(|seed| u32s_geometric(seed, scale).flat_map(u64::checked_from)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 4)),
+            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(u64::checked_from)),
+        )),
+    };
+    Box::new(ts.filter(|&(ref out, ref xs, exp)| {
+        exp > 1
+            && *xs.last().unwrap() != 0
+            && out.len() >= _limbs_pow_alt_estimated_out_len(xs, exp)
+    }))
+}
+
 fn triples_of_unsigned_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, RoundingMode)> {
@@ -6192,6 +6254,19 @@ pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2<
             &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
         )),
     }
+}
+
+// All triples of `Vec<Limb>`, `Limb`, and `u64`, where the length of the `Vec` is at least
+// `_limb_pow_alt_estimated_out_len` applied to the `Limb` and `u64`, and the `Limb` and the `u64`
+// are at least 2.
+pub fn triples_of_unsigned_vec_unsigned_and_small_unsigned_var_3(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Limb, u64)> {
+    Box::new(
+        triples_of_unsigned_vec_unsigned_and_small_unsigned(gm).filter(|&(ref out, x, exp)| {
+            exp > 1 && x > 1 && out.len() >= _limb_pow_alt_estimated_out_len(x, exp)
+        }),
+    )
 }
 
 fn triples_of_unsigned_vec_usize_and_unsigned_vec<T: PrimitiveUnsigned + Rand>(

@@ -1,7 +1,8 @@
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
-use malachite_base::random::{random_values_from_slice, EXAMPLE_SEED};
+use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::slices::random_values_from_slice;
 use malachite_base::voids::Void;
 
 #[allow(clippy::decimal_literal_representation)]

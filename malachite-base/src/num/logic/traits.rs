@@ -225,6 +225,20 @@ pub trait PowerOfTwoDigits<T> {
     /// Converts a slice of digits into a value. The input digits are in descending order: most- to
     /// least-significant. The base is 2<sup>`log_base`</sup>.
     fn from_power_of_two_digits_desc(log_base: u64, digits: &[T]) -> Self;
+
+    /// Converts an iterator of digits into a value. The input digits are in ascending order: least-
+    /// to most-significant.
+    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = T>>(
+        log_base: u64,
+        digits: I,
+    ) -> Self;
+
+    /// Converts an iterator of digits into a value. The input bits are in descending order: most-
+    /// to least-significant.
+    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = T>>(
+        log_base: u64,
+        digits: I,
+    ) -> Self;
 }
 
 /// An iterator over a value's base-power-of-two digits.

@@ -1,8 +1,4 @@
-use std::cmp::Ordering;
-use std::iter::once;
-use std::mem::swap;
-use std::ops::{Div, DivAssign};
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     DivRem, WrappingAddAssign, WrappingSubAssign, XXAddYYIsZZ,
 };
@@ -11,8 +7,6 @@ use malachite_base::num::basic::traits::{Iverson, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -43,6 +37,10 @@ use natural::Natural;
 use platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, FUDGE, MU_DIVAPPR_Q_THRESHOLD,
 };
+use std::cmp::Ordering;
+use std::iter::once;
+use std::mem::swap;
+use std::ops::{Div, DivAssign};
 
 /// Divide an number by a divisor of B - 1, where B is the limb base.
 ///
@@ -1365,6 +1363,7 @@ fn _limbs_div_barrett_approx_preinverted(
 /// Result is O(`q_len`)
 ///
 /// This is mpn_mu_divappr_q_choose_in from mpn/generic/mu_divappr_q.c, GMP 6.1.2, where k == 0.
+#[allow(clippy::missing_const_for_fn)]
 fn _limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
     if q_len > d_len {
         // Compute an inverse size that is a nice partition of the quotient.

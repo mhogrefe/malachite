@@ -1,9 +1,6 @@
-use std::mem::swap;
-
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
-
 use natural::arithmetic::add::{
     limbs_add_greater, limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
 };
@@ -12,6 +9,7 @@ use natural::arithmetic::mul::limbs_mul_to_out;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
+use std::mem::swap;
 
 /// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
 /// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result

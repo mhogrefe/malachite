@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOfTwo, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Iverson;
@@ -7,7 +5,6 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
-
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -21,6 +18,7 @@ use natural::arithmetic::sub::{
     limbs_sub_to_out,
 };
 use platform::Limb;
+use std::cmp::min;
 
 //TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
@@ -75,7 +73,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
 /// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.1.2.
-pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
+pub(crate) const fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
     ys_len: usize,

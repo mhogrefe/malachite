@@ -2,7 +2,7 @@ use rand::Rng;
 use rand_chacha::ChaCha20Rng;
 
 use num::arithmetic::traits::Parity;
-use random::seed::Seed;
+use random::Seed;
 
 /// Uniformly generates random `bool`s, as if by flips of a fair coin.
 ///
@@ -37,11 +37,8 @@ impl Iterator for RandomBools {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

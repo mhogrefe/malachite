@@ -1,5 +1,5 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::{Pow, PowerOfTwo};
+use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -14,6 +14,7 @@ fn power_of_two_properties() {
         assert!(n.is_valid());
 
         assert_eq!(n, Natural::ONE << pow);
+        assert_eq!(n, Natural::TWO.pow(pow));
         assert_eq!(n, Natural::low_mask(pow) + Natural::ONE);
         //TODO checked log two
         let mut n = n.clone();

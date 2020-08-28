@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::WrappingAddAssign;
-
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -64,7 +63,7 @@ const MAYBE_RANGE_TOOM22: bool = TUNE_PROGRAM_BUILD
 
 /// We need fractional approximation of the value 0 < a <= 1/2
 /// giving the minimum in the function k = (1 - a) ^ e / (1 - 2 * a ^ e).
-fn get_n_lo(n: usize) -> usize {
+const fn get_n_lo(n: usize) -> usize {
     if MAYBE_RANGE_BASECASE && n < SCALED_MUL_TOOM22_THRESHOLD {
         n >> 1
     } else if MAYBE_RANGE_TOOM22 && n < SCALED_MUL_TOOM33_THRESHOLD {

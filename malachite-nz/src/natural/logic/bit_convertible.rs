@@ -4,7 +4,6 @@ use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
-
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
 use platform::Limb;
@@ -244,25 +243,26 @@ impl BitConvertible for Natural {
     /// );
     /// ```
     fn from_bit_iterator_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
-        const WIDTH: usize = Limb::WIDTH as usize;
         let mut limbs = Vec::new();
-        let mut buffer = [false; WIDTH];
         let mut last_width = 0;
-        for chunk in &xs.chunks(WIDTH) {
+        for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
+            let mut limb = 0;
             let mut i = 0;
             for bit in chunk {
-                buffer[i] = bit;
+                limb <<= 1;
+                if bit {
+                    limb |= 1;
+                }
                 i += 1;
             }
             last_width = i;
-            limbs.push(Limb::from_bits_desc(&buffer[..last_width]));
+            limbs.push(limb);
         }
         match limbs.len() {
             0 => Natural::ZERO,
             1 => Natural::from(limbs[0]),
             _ => {
                 limbs.reverse();
-                let last_width = u64::wrapping_from(last_width);
                 if last_width != Limb::WIDTH {
                     let smallest_limb = limbs[0];
                     limbs[0] = 0;

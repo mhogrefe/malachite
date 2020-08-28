@@ -1,8 +1,3 @@
-use std::cmp::{min, Ordering};
-use std::marker::PhantomData;
-use std::slice::Chunks;
-
-use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, DivRound, FloorLogTwo, ModPowerOfTwo, PowerOfTwo, SaturatingSubAssign, ShrRound,
 };
@@ -15,12 +10,14 @@ use malachite_base::num::logic::traits::{
     LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator,
 };
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::logic::bit_block_access::limbs_slice_get_bits;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{min, Ordering};
+use std::marker::PhantomData;
+use std::slice::Chunks;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct FitsInLimbIterator<'a, T>(FILIterator<'a, T>);
@@ -492,71 +489,118 @@ impl<'a, T: PrimitiveUnsigned> PowerOfTwoDigitIterator<T>
     }
 }
 
+fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
+    xs: &[Limb],
+    log_base: u64,
+) -> FitsInLimbIterator<'_, T> {
+    let significant_bits = limbs_significant_bits(xs);
+    let log_log_base = log_base.floor_log_two();
+    let significant_digits = significant_bits.shr_round(log_log_base, RoundingMode::Ceiling);
+    FitsInLimbIterator(FILIterator {
+        significant_digits: usize::exact_from(significant_digits),
+        limbs: xs,
+        log_base,
+        some_remaining: true,
+        limb_i: 0,
+        limb_j: xs.len() - 1,
+        i: 0,
+        j: (significant_digits - 1).mod_power_of_two(Limb::LOG_WIDTH - log_log_base)
+            << log_log_base,
+        mask: Limb::low_mask(log_base),
+        boo: PhantomData,
+    })
+}
+
+fn size_of_limb_iterator<T: PrimitiveUnsigned>(xs: &[Limb]) -> SizeOfLimbIterator<'_, T> {
+    SizeOfLimbIterator(SOLIterator {
+        limbs: xs,
+        some_remaining: true,
+        i: 0,
+        j: xs.len() - 1,
+        boo: PhantomData,
+    })
+}
+
+fn multiple_of_limb_iterator<T: PrimitiveUnsigned>(
+    xs: &[Limb],
+    log_base: u64,
+) -> MultipleOfLimbIterator<'_, T> {
+    let log_log_base = log_base.floor_log_two();
+    let log_ratio = log_log_base - Limb::LOG_WIDTH;
+    let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
+    MultipleOfLimbIterator(MOLIterator {
+        significant_digits,
+        log_ratio,
+        limbs: xs,
+        chunks: xs.chunks(usize::power_of_two(log_ratio)),
+        boo: PhantomData,
+    })
+}
+
+fn irregular_iterator<T: PrimitiveUnsigned>(
+    xs: &[Limb],
+    log_base: u64,
+) -> IrregularIterator<'_, T> {
+    let significant_digits = limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
+    IrregularIterator(IIterator {
+        significant_digits: usize::exact_from(significant_digits),
+        limbs: xs,
+        log_base,
+        some_remaining: true,
+        i: 0,
+        j: significant_digits - 1,
+        boo: PhantomData,
+    })
+}
+
+fn _power_of_two_digits<T: PrimitiveUnsigned>(
+    x: &Natural,
+    log_base: u64,
+) -> NaturalPowerOfTwoDigitPrimitiveIterator<T>
+where
+    Limb: PowerOfTwoDigitIterable<
+        T,
+        PowerOfTwoDigitIterator = PrimitivePowerOfTwoDigitIterator<Limb, T>,
+    >,
+{
+    assert_ne!(log_base, 0);
+    if log_base > T::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            T::NAME,
+            log_base
+        );
+    }
+    match x {
+        Natural(Small(small)) => NaturalPowerOfTwoDigitPrimitiveIterator::Small(
+            PowerOfTwoDigitIterable::<T>::power_of_two_digits(*small, log_base),
+        ),
+        Natural(Large(ref limbs)) => {
+            if let Some(log_log_base) = log_base.checked_log_two() {
+                match log_log_base.cmp(&Limb::LOG_WIDTH) {
+                    Ordering::Equal => NaturalPowerOfTwoDigitPrimitiveIterator::SizeOfLimb(
+                        size_of_limb_iterator(limbs),
+                    ),
+                    Ordering::Less => NaturalPowerOfTwoDigitPrimitiveIterator::FitsInLimb(
+                        fits_in_limb_iterator(limbs, log_base),
+                    ),
+                    Ordering::Greater => NaturalPowerOfTwoDigitPrimitiveIterator::MultipleOfLimb(
+                        multiple_of_limb_iterator(limbs, log_base),
+                    ),
+                }
+            } else {
+                NaturalPowerOfTwoDigitPrimitiveIterator::Irregular(irregular_iterator(
+                    limbs, log_base,
+                ))
+            }
+        }
+    }
+}
+
 macro_rules! iterables {
     (
-        $t: ident,
-        $fits_in_limb_fn: ident,
-        $size_of_limb_fn: ident,
-        $multiple_of_limb_fn: ident,
-        $irregular_fn: ident
+        $t: ident
     ) => {
-        fn $fits_in_limb_fn(xs: &[Limb], log_base: u64) -> FitsInLimbIterator<'_, $t> {
-            let significant_bits = limbs_significant_bits(xs);
-            let log_log_base = log_base.floor_log_two();
-            let significant_digits =
-                significant_bits.shr_round(log_log_base, RoundingMode::Ceiling);
-            FitsInLimbIterator(FILIterator {
-                significant_digits: usize::exact_from(significant_digits),
-                limbs: xs,
-                log_base,
-                some_remaining: true,
-                limb_i: 0,
-                limb_j: xs.len() - 1,
-                i: 0,
-                j: (significant_digits - 1).mod_power_of_two(Limb::LOG_WIDTH - log_log_base)
-                    << log_log_base,
-                mask: Limb::low_mask(log_base),
-                boo: PhantomData,
-            })
-        }
-
-        const fn $size_of_limb_fn(xs: &[Limb]) -> SizeOfLimbIterator<'_, $t> {
-            SizeOfLimbIterator(SOLIterator {
-                limbs: xs,
-                some_remaining: true,
-                i: 0,
-                j: xs.len() - 1,
-                boo: PhantomData,
-            })
-        }
-
-        fn $multiple_of_limb_fn(xs: &[Limb], log_base: u64) -> MultipleOfLimbIterator<'_, $t> {
-            let log_log_base = log_base.floor_log_two();
-            let log_ratio = log_log_base - Limb::LOG_WIDTH;
-            let significant_digits = xs.len().shr_round(log_ratio, RoundingMode::Ceiling);
-            MultipleOfLimbIterator(MOLIterator {
-                significant_digits,
-                log_ratio,
-                limbs: xs,
-                chunks: xs.chunks(usize::power_of_two(log_ratio)),
-                boo: PhantomData,
-            })
-        }
-
-        fn $irregular_fn(xs: &[Limb], log_base: u64) -> IrregularIterator<'_, $t> {
-            let significant_digits =
-                limbs_significant_bits(xs).div_round(log_base, RoundingMode::Ceiling);
-            IrregularIterator(IIterator {
-                significant_digits: usize::exact_from(significant_digits),
-                limbs: xs,
-                log_base,
-                some_remaining: true,
-                i: 0,
-                j: significant_digits - 1,
-                boo: PhantomData,
-            })
-        }
-
         impl<'a> PowerOfTwoDigitIterable<$t> for &'a Natural {
             type PowerOfTwoDigitIterator = NaturalPowerOfTwoDigitPrimitiveIterator<'a, $t>;
 
@@ -610,91 +654,12 @@ macro_rules! iterables {
                 self,
                 log_base: u64,
             ) -> NaturalPowerOfTwoDigitPrimitiveIterator<'a, $t> {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                match self {
-                    Natural(Small(small)) => NaturalPowerOfTwoDigitPrimitiveIterator::Small(
-                        PowerOfTwoDigitIterable::<$t>::power_of_two_digits(*small, log_base),
-                    ),
-                    Natural(Large(ref limbs)) => {
-                        if let Some(log_log_base) = log_base.checked_log_two() {
-                            match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                                Ordering::Equal => {
-                                    NaturalPowerOfTwoDigitPrimitiveIterator::SizeOfLimb(
-                                        $size_of_limb_fn(limbs),
-                                    )
-                                }
-                                Ordering::Less => {
-                                    NaturalPowerOfTwoDigitPrimitiveIterator::FitsInLimb(
-                                        $fits_in_limb_fn(limbs, log_base),
-                                    )
-                                }
-                                Ordering::Greater => {
-                                    NaturalPowerOfTwoDigitPrimitiveIterator::MultipleOfLimb(
-                                        $multiple_of_limb_fn(limbs, log_base),
-                                    )
-                                }
-                            }
-                        } else {
-                            NaturalPowerOfTwoDigitPrimitiveIterator::Irregular($irregular_fn(
-                                limbs, log_base,
-                            ))
-                        }
-                    }
-                }
+                _power_of_two_digits(self, log_base)
             }
         }
     };
 }
-
-iterables!(
-    u8,
-    fits_in_limb_iterator_u8,
-    size_of_limb_iterator_u8,
-    multiple_of_limb_iterator_u8,
-    irregular_iterator_u8
-);
-iterables!(
-    u16,
-    fits_in_limb_iterator_u16,
-    size_of_limb_iterator_u16,
-    multiple_of_limb_iterator_u16,
-    irregular_iterator_u16
-);
-iterables!(
-    u32,
-    fits_in_limb_iterator_u32,
-    size_of_limb_iterator_u32,
-    multiple_of_limb_iterator_u32,
-    irregular_iterator_u32
-);
-iterables!(
-    u64,
-    fits_in_limb_iterator_u64,
-    size_of_limb_iterator_u64,
-    multiple_of_limb_iterator_u64,
-    irregular_iterator_u64
-);
-iterables!(
-    u128,
-    fits_in_limb_iterator_u128,
-    size_of_limb_iterator_u128,
-    multiple_of_limb_iterator_u128,
-    irregular_iterator_u128
-);
-iterables!(
-    usize,
-    fits_in_limb_iterator_usize,
-    size_of_limb_iterator_usize,
-    multiple_of_limb_iterator_usize,
-    irregular_iterator_usize
-);
+apply_to_unsigneds!(iterables);
 
 #[derive(Clone, Debug)]
 pub struct NaturalMultipleOfLimbIterator<'a>(NMOLIterator<'a>);

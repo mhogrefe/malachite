@@ -251,6 +251,24 @@ macro_rules! impl_power_of_two_digits {
                     fn from_power_of_two_digits_desc(log_base: u64, digits: &[$u]) -> $t {
                         _from_power_of_two_digits_desc(log_base, digits)
                     }
+
+                    /// TODO doc
+                    #[inline]
+                    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = $u>>(
+                        _log_base: u64,
+                        _digits: I,
+                    ) -> $t {
+                        unimplemented!();
+                    }
+
+                    /// TODO doc
+                    #[inline]
+                    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = $u>>(
+                        _log_base: u64,
+                        _digits: I,
+                    ) -> $t {
+                        unimplemented!();
+                    }
                 }
             };
         }

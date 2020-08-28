@@ -24,12 +24,18 @@ fn _div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T,
     original - *x * other
 }
 
-//TODO wheres
-
-fn _ceiling_div_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: T, other: T) -> (T, T)
-where
-    T: Add<T, Output = T> + DivMod<T, DivOutput = T, ModOutput = T> + Sub<T, Output = T>,
-{
+fn _ceiling_div_neg_mod_unsigned<
+    T: Add<T, Output = T>
+        + Copy
+        + DivMod<T, DivOutput = T, ModOutput = T>
+        + Eq
+        + One
+        + Sub<T, Output = T>
+        + Zero,
+>(
+    x: T,
+    other: T,
+) -> (T, T) {
     let (quotient, remainder) = x.div_mod(other);
     if remainder == T::ZERO {
         (quotient, T::ZERO)
@@ -39,10 +45,12 @@ where
     }
 }
 
-fn _ceiling_div_assign_neg_mod_unsigned<T: Copy + Eq + One + Zero>(x: &mut T, other: T) -> T
-where
-    T: AddAssign<T> + DivAssignMod<T, ModOutput = T> + Sub<T, Output = T>,
-{
+fn _ceiling_div_assign_neg_mod_unsigned<
+    T: AddAssign<T> + Copy + DivAssignMod<T, ModOutput = T> + Eq + One + Sub<T, Output = T> + Zero,
+>(
+    x: &mut T,
+    other: T,
+) -> T {
     let remainder = x.div_assign_mod(other);
     if remainder == T::ZERO {
         T::ZERO
@@ -254,58 +262,72 @@ macro_rules! impl_div_mod_unsigned {
 }
 apply_to_unsigneds!(impl_div_mod_unsigned);
 
-fn _div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
-where
-    T: ExactFrom<U>
-        + Neg<Output = T>
+fn _div_mod_signed<
+    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
+    S: Copy
+        + ExactFrom<U>
+        + Neg<Output = S>
+        + Ord
         + UnsignedAbs<Output = U>
         + WrappingFrom<U>
-        + WrappingNeg<Output = T>,
-    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
-{
-    let (quotient, remainder) = if (x >= T::ZERO) == (other >= T::ZERO) {
+        + WrappingNeg<Output = S>
+        + Zero,
+>(
+    x: S,
+    other: S,
+) -> (S, S) {
+    let (quotient, remainder) = if (x >= S::ZERO) == (other >= S::ZERO) {
         let (quotient, remainder) = x.unsigned_abs().div_mod(other.unsigned_abs());
-        (T::exact_from(quotient), remainder)
+        (S::exact_from(quotient), remainder)
     } else {
         let (quotient, remainder) = x.unsigned_abs().ceiling_div_neg_mod(other.unsigned_abs());
-        (T::wrapping_from(quotient).wrapping_neg(), remainder)
+        (S::wrapping_from(quotient).wrapping_neg(), remainder)
     };
     (
         quotient,
-        if other >= T::ZERO {
-            T::exact_from(remainder)
+        if other >= S::ZERO {
+            S::exact_from(remainder)
         } else {
-            -T::exact_from(remainder)
+            -S::exact_from(remainder)
         },
     )
 }
 
-fn _div_rem_signed<T: Copy>(x: T, other: T) -> (T, T)
-where
-    T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
-{
+fn _div_rem_signed<
+    T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>,
+>(
+    x: T,
+    other: T,
+) -> (T, T) {
     let q = x.checked_div(other).unwrap();
     (q, x - q * other)
 }
 
-fn _div_assign_rem_signed<T: Copy>(x: &mut T, other: T) -> T
-where
-    T: CheckedDiv<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>,
-{
+fn _div_assign_rem_signed<
+    T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>,
+>(
+    x: &mut T,
+    other: T,
+) -> T {
     let original = *x;
     *x = x.checked_div(other).unwrap();
     original - *x * other
 }
 
-fn _ceiling_div_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> (T, T)
-where
-    T: ExactFrom<U>
+fn _ceiling_div_mod_signed<
+    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
+    T: Copy
+        + ExactFrom<U>
         + Neg<Output = T>
+        + Ord
         + UnsignedAbs<Output = U>
         + WrappingFrom<U>
-        + WrappingNeg<Output = T>,
-    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
-{
+        + WrappingNeg<Output = T>
+        + Zero,
+>(
+    x: T,
+    other: T,
+) -> (T, T) {
     let (quotient, remainder) = if (x >= T::ZERO) == (other >= T::ZERO) {
         let (quotient, remainder) = x.unsigned_abs().ceiling_div_neg_mod(other.unsigned_abs());
         (T::exact_from(quotient), remainder)

@@ -6,11 +6,8 @@ use std::slice::Iter;
 /// The output length is 2.
 ///
 /// # Worst-case complexity
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

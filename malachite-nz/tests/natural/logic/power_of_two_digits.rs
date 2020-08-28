@@ -1,7 +1,9 @@
+use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
 };
+use malachite_base::strings::ToDebugString;
 
 use malachite_nz::natural::Natural;
 
@@ -115,8 +117,7 @@ pub fn test_power_of_two_digits_primitive() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    //TODO use square
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 32),
         &[2_701_131_776, 466_537_709, 54_210]
@@ -134,7 +135,7 @@ pub fn test_power_of_two_digits_primitive() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 64),
         &[2_003_764_205_206_896_640, 54_210]
@@ -150,7 +151,7 @@ pub fn test_power_of_two_digits_primitive() {
     assert_eq!(digits.get(2), 0);
     assert_eq!(digits.get(3), 0);
 
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 37),
         &[58_535_706_624, 129_132_033_639, 52]
@@ -215,10 +216,7 @@ power_of_two_digits_primitive_fail_helper!(
 pub fn test_power_of_two_digits() {
     let n = Natural::from(107u32);
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 2)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 2).to_debug_string(),
         "[3, 2, 2, 1]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 2);
@@ -252,10 +250,7 @@ pub fn test_power_of_two_digits() {
 
     let n = Natural::from(105u32);
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 1)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 1).to_debug_string(),
         "[1, 0, 0, 1, 0, 1, 1]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 1);
@@ -293,10 +288,7 @@ pub fn test_power_of_two_digits() {
 
     let n = Natural::trillion();
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 16)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 16).to_debug_string(),
         "[4096, 54437, 232]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 16);
@@ -314,10 +306,7 @@ pub fn test_power_of_two_digits() {
 
     let n = Natural::trillion();
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 17)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 17).to_debug_string(),
         "[69632, 27218, 58]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 17);
@@ -333,13 +322,9 @@ pub fn test_power_of_two_digits() {
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
-    //TODO use square
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 32)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 32).to_debug_string(),
         "[2701131776, 466537709, 54210]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 32);
@@ -355,12 +340,9 @@ pub fn test_power_of_two_digits() {
     assert_eq!(digits.get(3), 0u32);
     assert_eq!(digits.get(4), 0u32);
 
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 64)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 64).to_debug_string(),
         "[2003764205206896640, 54210]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 64);
@@ -374,12 +356,9 @@ pub fn test_power_of_two_digits() {
     assert_eq!(digits.get(2), 0u64);
     assert_eq!(digits.get(3), 0u64);
 
-    let n = Natural::trillion() * Natural::trillion();
+    let n = Natural::trillion().square();
     assert_eq!(
-        format!(
-            "{:?}",
-            PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 37)
-        ),
+        PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 37).to_debug_string(),
         "[58535706624, 129132033639, 52]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 37);

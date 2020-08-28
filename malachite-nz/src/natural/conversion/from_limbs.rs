@@ -1,5 +1,4 @@
 use malachite_base::num::basic::traits::Zero;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

@@ -63,9 +63,9 @@ where
 /// This function will hang if given an infinite constant iterator.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $n$ is the number of values produced by `xs`.
 ///
@@ -99,9 +99,9 @@ where
 /// hang if provided an infinite iterator.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $n$ is `min(n, xs.count())`.
 ///
@@ -124,9 +124,9 @@ pub fn count_is_at_least<I: Iterator>(xs: I, n: usize) -> bool {
 /// hang if provided an infinite iterator.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(1)$
+/// $M(n) = O(1)$
 ///
 /// where $n$ is `min(n, xs.count())`.
 ///
@@ -151,9 +151,9 @@ pub fn count_is_at_most<I: Iterator>(xs: I, n: usize) -> bool {
 /// This iterator will hang if given an infinite unique iterator.
 ///
 /// # Worst-case complexity
-/// $T(n) = \mathcal{O}(n)$
+/// $T(n) = O(n)$
 ///
-/// $M(n) = \mathcal{O}(n)$
+/// $M(n) = O(n)$
 ///
 /// where $n$ is `xs.count()`.
 ///

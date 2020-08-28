@@ -1,15 +1,13 @@
-use std::cmp::Ordering;
-
+use integer::Integer;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, LowMask, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
-
-use integer::Integer;
 use natural::logic::bit_scan::{limbs_index_of_next_false_bit, limbs_index_of_next_true_bit};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the

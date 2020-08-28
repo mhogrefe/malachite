@@ -1,11 +1,10 @@
+use fail_on_untested_path;
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, EqMod, EqModPowerOfTwo, NegMod, PowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::logic::traits::TrailingZeros;
-
-use fail_on_untested_path;
-use integer::Integer;
 use natural::arithmetic::add::{limbs_add, limbs_add_limb};
 use natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
@@ -47,7 +46,7 @@ pub fn limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
 /// Set r to -n mod d. n >= d is allowed. Can give r > d. d cannot equal 0.
 ///
 /// This is NEG_MOD from gmp-impl.h, GMP 6.1.2, where r is returned.
-fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
+const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
     if n <= d {
         d - n
     } else {
@@ -76,7 +75,7 @@ fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.1.2, where a and d are positive, c is negative, a
 /// and d are one limb long, and c is longer than one limb.
-pub fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
+pub const fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
     // We are checking whether x === -y mod m; that is, whether x + y = k * m for some k in Z. But
     // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
     // while the highest possible value of x + y is 2<sup>Limb::WIDTH + 1</sup> - 2, so we have

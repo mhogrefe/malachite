@@ -1,6 +1,5 @@
-use malachite_base::num::logic::traits::SignificantBits;
-
 use integer::Integer;
+use malachite_base::num::logic::traits::SignificantBits;
 
 impl<'a> SignificantBits for &'a Integer {
     /// Returns the smallest number of bits necessary to represent the absolute value of an

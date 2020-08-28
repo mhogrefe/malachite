@@ -23,21 +23,21 @@ fn test_from_power_of_two_digits_asc() {
             out
         );
     };
-    test::<u8, _>(Natural::_from_power_of_two_digits_asc_u8_naive, 1, &[], "0");
+    test::<u8, _>(Natural::_from_power_of_two_digits_asc_naive, 1, &[], "0");
     test::<u8, _>(
-        Natural::_from_power_of_two_digits_asc_u8_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         1,
         &[0, 0, 0],
         "0",
     );
     test::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_u16_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         10,
         &[123],
         "123",
     );
     test::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_u16_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         1,
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1,
@@ -46,31 +46,31 @@ fn test_from_power_of_two_digits_asc() {
         "1000000000000",
     );
     test::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_u32_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         3,
         &[0, 0, 0, 0, 1, 2, 1, 5, 4, 2, 3, 4, 6, 1, 0],
         "1000000000000",
     );
     test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_u64_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         4,
         &[0, 0, 0, 1, 5, 10, 4, 13, 8, 14],
         "1000000000000",
     );
     test::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_u32_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         32,
         &[3_567_587_328, 232],
         "1000000000000",
     );
     test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_u64_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         64,
         &[1_000_000_000_000],
         "1000000000000",
     );
     test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_u64_naive,
+        Natural::_from_power_of_two_digits_asc_naive,
         64,
         &[2_003_764_205_206_896_640, 54_210],
         "1000000000000000000000000",

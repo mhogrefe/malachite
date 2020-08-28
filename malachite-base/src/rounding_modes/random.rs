@@ -1,9 +1,8 @@
 use std::iter::Cloned;
 
-use random::random_values_from_slice;
-use random::random_values_from_slice::RandomValuesFromSlice;
-use random::seed::Seed;
+use random::Seed;
 use rounding_modes::{RoundingMode, ROUNDING_MODES};
+use slices::{random_values_from_slice, RandomValuesFromSlice};
 
 /// Generates a random `RoundingMode` that has an equal probability of being any of the 6
 /// `RoundingMode`s.

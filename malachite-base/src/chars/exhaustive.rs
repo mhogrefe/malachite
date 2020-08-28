@@ -10,11 +10,8 @@ use comparison::traits::{Max, Min};
 /// The output length is 128.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -37,11 +34,8 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
 /// The output length is 1,112,064.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -177,11 +171,8 @@ impl Iterator for ExhaustiveChars {
 /// The output length is 128.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -220,11 +211,8 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
 /// The output length is 1,112,064.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

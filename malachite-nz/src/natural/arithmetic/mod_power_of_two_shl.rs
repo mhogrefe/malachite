@@ -3,7 +3,6 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-
 use natural::Natural;
 
 macro_rules! impl_mod_power_of_two_shl_unsigned {

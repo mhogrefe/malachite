@@ -81,11 +81,8 @@ pub type PrimitiveIntegerUpDown<T> =
 /// The output length is $2^W$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -110,11 +107,8 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntegerIncreasin
 /// The output length is $L$.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -141,11 +135,8 @@ pub fn exhaustive_positive_primitives<T: PrimitiveInteger>() -> PrimitiveInteger
 /// The output length is $2^W$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -168,11 +159,8 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveInteg
 /// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -195,11 +183,8 @@ pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerIncre
 /// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -227,11 +212,8 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveInteger
 /// The output length is $2^W-1$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```
@@ -258,11 +240,8 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerUpDow
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -300,11 +279,8 @@ pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -346,11 +322,8 @@ pub fn primitive_integer_increasing_inclusive_range<T: PrimitiveInteger>(
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `a` > `b`.
@@ -395,11 +368,8 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
-/// $T(i) = \mathcal{O}(1)$
 ///
-/// $M(i) = \mathcal{O}(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `a` > `b`.

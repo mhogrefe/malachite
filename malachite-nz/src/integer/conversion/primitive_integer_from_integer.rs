@@ -1,11 +1,10 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-
-use integer::Integer;
 
 macro_rules! impl_from {
     ($u: ident, $s: ident) => {

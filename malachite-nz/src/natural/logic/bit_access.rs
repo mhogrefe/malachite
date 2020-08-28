@@ -1,7 +1,6 @@
 use malachite_base::num::basic::integers::PrimitiveInteger;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
@@ -43,9 +42,6 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
-/// enough that no additional memory needs to be given to d.
-///
 /// # Panics
 /// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
 ///
@@ -61,6 +57,9 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 /// limbs_slice_set_bit(xs, 33);
 /// assert_eq!(xs, &[3, 3]);
 /// ```
+///
+/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
+/// enough that no additional memory needs to be given to d.
 pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
     limbs_set_bit_helper(xs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
 }
@@ -72,8 +71,6 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 /// Time: worst case O(`index`)
 ///
 /// Additional memory: worst case O(`index`)
-///
-/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
 ///
 /// # Example
 /// ```
@@ -89,6 +86,8 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 /// limbs_vec_set_bit(&mut xs, 128);
 /// assert_eq!(xs, &[3, 3, 0, 0, 1]);
 /// ```
+///
+/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
 pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if small_index >= xs.len() {

@@ -6,18 +6,24 @@ use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use rounding_modes::RoundingMode;
 
-fn _div_round_unsigned<T: Copy + Display + Eq + One + Ord + Parity + Zero>(
+fn _div_round_unsigned<
+    T: Add<T, Output = T>
+        + Copy
+        + Display
+        + Div<T, Output = T>
+        + Eq
+        + Mul<T, Output = T>
+        + One
+        + Ord
+        + Parity
+        + Shr<u64, Output = T>
+        + Sub<T, Output = T>
+        + Zero,
+>(
     x: T,
     other: T,
     rm: RoundingMode,
-) -> T
-where
-    T: Add<T, Output = T>
-        + Div<T, Output = T>
-        + Mul<T, Output = T>
-        + Shr<u64, Output = T>
-        + Sub<T, Output = T>,
-{
+) -> T {
     let quotient = x / other;
     if rm == RoundingMode::Down || rm == RoundingMode::Floor {
         quotient
@@ -133,16 +139,25 @@ macro_rules! impl_div_round_unsigned {
 }
 apply_to_unsigneds!(impl_div_round_unsigned);
 
-fn _div_round_signed<U, T: Copy + Ord + Zero>(x: T, other: T, rm: RoundingMode) -> T
-where
-    T: ExactFrom<U> + UnsignedAbs<Output = U> + WrappingFrom<U> + WrappingNeg<Output = T>,
+fn _div_round_signed<
     U: DivRound<U, Output = U>,
-{
-    if (x >= T::ZERO) == (other >= T::ZERO) {
-        T::exact_from(x.unsigned_abs().div_round(other.unsigned_abs(), rm))
+    S: Copy
+        + ExactFrom<U>
+        + Ord
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>
+        + WrappingNeg<Output = S>
+        + Zero,
+>(
+    x: S,
+    other: S,
+    rm: RoundingMode,
+) -> S {
+    if (x >= S::ZERO) == (other >= S::ZERO) {
+        S::exact_from(x.unsigned_abs().div_round(other.unsigned_abs(), rm))
     } else {
         // Has to be wrapping so that (self, other) == (T::MIN, 1) works
-        T::wrapping_from(x.unsigned_abs().div_round(other.unsigned_abs(), -rm)).wrapping_neg()
+        S::wrapping_from(x.unsigned_abs().div_round(other.unsigned_abs(), -rm)).wrapping_neg()
     }
 }
 

@@ -1,10 +1,8 @@
-use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
-use std::str::FromStr;
-
-use malachite_base::num::basic::traits::Zero;
-
 use error::ParseIntegerError;
 use integer::Integer;
+use malachite_base::num::basic::traits::Zero;
+use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
+use std::str::FromStr;
 
 impl Integer {
     //TODO test

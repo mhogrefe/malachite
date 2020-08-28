@@ -32,6 +32,7 @@ pub mod mul;
 pub mod neg;
 pub mod next_power_of_two;
 pub mod parity;
+pub mod pow;
 pub mod power_of_two;
 pub mod round_to_multiple;
 pub mod round_to_multiple_of_power_of_two;
@@ -79,6 +80,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     neg::register(registry);
     next_power_of_two::register(registry);
     parity::register(registry);
+    pow::register(registry);
     power_of_two::register(registry);
     round_to_multiple::register(registry);
     round_to_multiple_of_power_of_two::register(registry);
