@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;

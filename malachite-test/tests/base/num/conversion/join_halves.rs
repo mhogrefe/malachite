@@ -1,6 +1,6 @@
 use std::{u16, u8};
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 
 use malachite_test::common::test_properties;

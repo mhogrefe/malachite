@@ -1,6 +1,6 @@
 use bools::random::{random_bools, RandomBools};
 use num::arithmetic::traits::Parity;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::CheckedInto;
@@ -9,14 +9,14 @@ use random::Seed;
 
 /// Generates random unsigned integers from a truncated geometric distribution.
 #[derive(Clone, Debug)]
-pub struct GeometricRandomNaturalValues<T: PrimitiveInteger> {
+pub struct GeometricRandomNaturalValues<T: PrimitiveInt> {
     xs: RandomUnsignedsLessThan<u64>,
     numerator: u64,
     min: T,
     max: T,
 }
 
-impl<T: PrimitiveInteger> Iterator for GeometricRandomNaturalValues<T> {
+impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -98,7 +98,7 @@ impl SimpleRational {
     }
 }
 
-pub(crate) fn mean_to_p_with_min<T: PrimitiveInteger>(
+pub(crate) fn mean_to_p_with_min<T: PrimitiveInt>(
     min: T,
     um_numerator: u64,
     um_denominator: u64,
@@ -111,7 +111,7 @@ pub(crate) fn mean_to_p_with_min<T: PrimitiveInteger>(
     (p.n, p.d)
 }
 
-fn geometric_random_natural_values_range<T: PrimitiveInteger>(
+fn geometric_random_natural_values_range<T: PrimitiveInt>(
     seed: Seed,
     min: T,
     max: T,

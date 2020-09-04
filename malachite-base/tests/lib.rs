@@ -56,6 +56,12 @@ pub mod chars {
         pub mod exhaustive_ascii_chars;
         pub mod exhaustive_chars;
     }
+    pub mod random {
+        pub mod random_ascii_chars;
+        pub mod random_char_inclusive_range;
+        pub mod random_char_range;
+        pub mod random_chars;
+    }
 }
 pub mod iterators {
     pub mod comparison {
@@ -164,6 +170,7 @@ pub mod num {
         pub mod ord_abs;
     }
     pub mod conversion {
+        pub mod checked_from_and_exact_from;
         pub mod from;
         pub mod half;
         pub mod slice;
@@ -172,13 +179,13 @@ pub mod num {
         pub mod exhaustive_natural_signeds;
         pub mod exhaustive_negative_signeds;
         pub mod exhaustive_nonzero_signeds;
-        pub mod exhaustive_positive_primitives;
+        pub mod exhaustive_positive_primitive_ints;
         pub mod exhaustive_signed_inclusive_range;
         pub mod exhaustive_signed_range;
         pub mod exhaustive_signeds;
         pub mod exhaustive_unsigneds;
-        pub mod primitive_integer_increasing_inclusive_range;
-        pub mod primitive_integer_increasing_range;
+        pub mod primitive_int_increasing_inclusive_range;
+        pub mod primitive_int_increasing_range;
     }
     pub mod float {
         pub mod nice_float;
@@ -219,7 +226,7 @@ pub mod num {
         pub mod random_nonzero_signeds;
         pub mod random_positive_signeds;
         pub mod random_positive_unsigneds;
-        pub mod random_primitive_integers;
+        pub mod random_primitive_ints;
         pub mod random_signed_bit_chunks;
         pub mod random_signed_inclusive_range;
         pub mod random_signed_range;
@@ -245,12 +252,10 @@ pub mod orderings {
     pub mod random;
 }
 pub mod random {
-    pub mod random_values_from_slice;
-    pub mod random_values_from_vec;
-    pub mod seed {
-        pub mod fork;
-        pub mod from_bytes;
-    }
+    pub mod fork;
+    pub mod from_bytes;
+    pub mod get_rng;
+    pub mod next;
 }
 pub mod rounding_modes {
     pub mod clone;

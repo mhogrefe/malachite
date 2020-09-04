@@ -3,13 +3,13 @@ use num::arithmetic::traits::{
     ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign, WrappingNeg,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
+fn _mod_power_of_two_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
     if x == T::ZERO || pow >= T::WIDTH {
         x
     } else {
@@ -17,17 +17,17 @@ fn _mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T {
     }
 }
 
-fn _mod_power_of_two_assign_unsigned<T: PrimitiveInteger>(x: &mut T, pow: u64) {
+fn _mod_power_of_two_assign_unsigned<T: PrimitiveInt>(x: &mut T, pow: u64) {
     if *x != T::ZERO && pow < T::WIDTH {
         *x &= T::low_mask(pow)
     }
 }
 
 #[inline]
-fn _neg_mod_power_of_two_unsigned<T: PrimitiveInteger>(x: T, pow: u64) -> T
-where
-    T: ModPowerOfTwo<Output = T>,
-{
+fn _neg_mod_power_of_two_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+    x: T,
+    pow: u64,
+) -> T {
     if x != T::ZERO && pow > T::WIDTH {
         panic!(ERROR_MESSAGE);
     }
@@ -205,28 +205,30 @@ macro_rules! impl_mod_power_of_two_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_two_unsigned);
 
-fn _mod_power_of_two_signed<U, S: PrimitiveInteger>(x: S, pow: u64) -> U
-where
-    U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
-{
+fn _mod_power_of_two_signed<U: ModPowerOfTwo<Output = U> + WrappingFrom<S>, S: PrimitiveInt>(
+    x: S,
+    pow: u64,
+) -> U {
     if x < S::ZERO && pow > S::WIDTH {
         panic!(ERROR_MESSAGE);
     }
     U::wrapping_from(x).mod_power_of_two(pow)
 }
 
-fn _mod_power_of_two_assign_signed<U, S: Copy>(x: &mut S, pow: u64)
-where
-    S: CheckedFrom<U> + ModPowerOfTwo<Output = U>,
-{
+fn _mod_power_of_two_assign_signed<U, S: CheckedFrom<U> + Copy + ModPowerOfTwo<Output = U>>(
+    x: &mut S,
+    pow: u64,
+) {
     *x = S::checked_from(x.mod_power_of_two(pow)).expect(ERROR_MESSAGE);
 }
 
-fn _rem_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
-where
+fn _rem_power_of_two_signed<
     U: ModPowerOfTwo<Output = U> + WrappingFrom<S>,
-    S: WrappingFrom<U> + WrappingNeg<Output = S>,
-{
+    S: Copy + Ord + WrappingFrom<U> + WrappingNeg<Output = S> + Zero,
+>(
+    x: S,
+    pow: u64,
+) -> S {
     if x >= S::ZERO {
         S::wrapping_from(U::wrapping_from(x).mod_power_of_two(pow))
     } else {
@@ -234,11 +236,13 @@ where
     }
 }
 
-fn _ceiling_mod_power_of_two_signed<U, S: Copy + Ord + Zero>(x: S, pow: u64) -> S
-where
+fn _ceiling_mod_power_of_two_signed<
     U: ModPowerOfTwo<Output = U> + NegModPowerOfTwo<Output = U> + WrappingFrom<S>,
-    S: CheckedFrom<U> + CheckedNeg<Output = S> + WrappingNeg<Output = S>,
-{
+    S: CheckedFrom<U> + CheckedNeg<Output = S> + Copy + Ord + WrappingNeg<Output = S> + Zero,
+>(
+    x: S,
+    pow: u64,
+) -> S {
     let abs_result = if x >= S::ZERO {
         U::wrapping_from(x).neg_mod_power_of_two(pow)
     } else {

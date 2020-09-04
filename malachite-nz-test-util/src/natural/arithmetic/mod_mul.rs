@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};

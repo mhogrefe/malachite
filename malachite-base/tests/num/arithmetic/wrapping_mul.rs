@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_wrapping_mul() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: T) {
         assert_eq!(x.wrapping_mul(y), out);
 
         let mut x = x;

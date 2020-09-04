@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_saturating_sub_mul() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: T, z: T, out: T) {
         assert_eq!(x.saturating_sub_mul(y, z), out);
 
         let mut x = x;

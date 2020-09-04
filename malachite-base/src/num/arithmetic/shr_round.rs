@@ -3,13 +3,13 @@ use std::ops::{Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
 use comparison::traits::Min;
 use num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
 fn _shr_round_unsigned_unsigned<
-    T: PrimitiveInteger,
+    T: PrimitiveInt,
     U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
 >(
     x: T,
@@ -70,7 +70,7 @@ where
 }
 
 fn _shr_round_assign_unsigned_unsigned<
-    T: PrimitiveInteger,
+    T: PrimitiveInt,
     U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
 >(
     x: &mut T,
@@ -368,11 +368,7 @@ macro_rules! impl_shr_round_signed_unsigned {
 }
 apply_to_signeds!(impl_shr_round_signed_unsigned);
 
-fn _shr_round_primitive_signed<
-    T: PrimitiveInteger,
-    U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + Zero,
->(
+fn _shr_round_primitive_signed<T: PrimitiveInt, U: Ord + WrappingFrom<u64>, S: Copy + Ord + Zero>(
     x: T,
     bits: S,
     rm: RoundingMode,
@@ -394,7 +390,7 @@ where
 }
 
 fn _shr_round_assign_primitive_signed<
-    T: PrimitiveInteger,
+    T: PrimitiveInt,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + Zero,
 >(

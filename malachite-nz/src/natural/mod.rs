@@ -1,10 +1,12 @@
+use std::str::FromStr;
+
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
+
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
-use std::str::FromStr;
 
 /// A natural (non-negative) integer.
 ///
@@ -186,9 +188,9 @@ pub mod conversion;
 
 pub mod comparison {
     pub mod ord;
-    pub mod partial_eq_primitive_integer;
-    pub mod partial_ord_abs_primitive_integer;
-    pub mod partial_ord_primitive_integer;
+    pub mod partial_eq_primitive_int;
+    pub mod partial_ord_abs_primitive_int;
+    pub mod partial_ord_primitive_int;
 }
 
 pub mod exhaustive;

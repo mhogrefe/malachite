@@ -1,11 +1,11 @@
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::logic::traits::BitAccess;
 
-fn _get_bit_unsigned<T: PrimitiveInteger>(x: &T, index: u64) -> bool {
+fn _get_bit_unsigned<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     index < T::WIDTH && *x & T::power_of_two(index) != T::ZERO
 }
 
-fn _set_bit_unsigned<T: PrimitiveInteger>(x: &mut T, index: u64) {
+fn _set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::power_of_two(index);
     } else {
@@ -17,7 +17,7 @@ fn _set_bit_unsigned<T: PrimitiveInteger>(x: &mut T, index: u64) {
     }
 }
 
-fn _clear_bit_unsigned<T: PrimitiveInteger>(x: &mut T, index: u64) {
+fn _clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !T::power_of_two(index);
     }
@@ -131,7 +131,7 @@ macro_rules! impl_bit_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_access_unsigned);
 
-fn _get_bit_signed<T: PrimitiveInteger>(x: &T, index: u64) -> bool {
+fn _get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     if index < T::WIDTH {
         *x & (T::ONE << index) != T::ZERO
     } else {
@@ -139,7 +139,7 @@ fn _get_bit_signed<T: PrimitiveInteger>(x: &T, index: u64) -> bool {
     }
 }
 
-fn _set_bit_signed<T: PrimitiveInteger>(x: &mut T, index: u64) {
+fn _set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::ONE << index;
     } else if *x >= T::ZERO {
@@ -151,7 +151,7 @@ fn _set_bit_signed<T: PrimitiveInteger>(x: &mut T, index: u64) {
     }
 }
 
-fn _clear_bit_signed<T: PrimitiveInteger>(x: &mut T, index: u64) {
+fn _clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !(T::ONE << index);
     } else if *x < T::ZERO {

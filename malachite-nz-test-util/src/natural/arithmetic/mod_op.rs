@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
 use malachite_nz::natural::arithmetic::mod_op::_mod_by_preinversion;

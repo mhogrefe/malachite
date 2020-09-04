@@ -1,14 +1,14 @@
 use std::ops::{BitOr, ShrAssign};
 
 use num::arithmetic::traits::ArithmeticCheckedShl;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{PowerOfTwoDigits, SignificantBits};
 
 fn _to_power_of_two_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInteger,
+    U: PrimitiveInt,
 >(
     x: &T,
     log_base: u64,
@@ -41,7 +41,7 @@ where
 
 fn _to_power_of_two_digits_desc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInteger,
+    U: PrimitiveInt,
 >(
     x: &T,
     log_base: u64,
@@ -54,7 +54,7 @@ where
     digits
 }
 
-fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
+fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInt>(log_base: u64, digits: &[U]) -> T
 where
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
 {
@@ -77,7 +77,7 @@ where
     n
 }
 
-fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInteger>(log_base: u64, digits: &[U]) -> T
+fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInt>(log_base: u64, digits: &[U]) -> T
 where
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
 {

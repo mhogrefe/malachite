@@ -1,9 +1,12 @@
-use fail_on_untested_path;
+use std::cmp::min;
+
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::slices::slice_test_zero;
+
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_greater_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -22,7 +25,6 @@ use natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
 use platform::Limb;
-use std::cmp::min;
 
 //TODO tune
 const SQRMOD_BNM1_THRESHOLD: usize = 16;

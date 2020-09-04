@@ -6,7 +6,7 @@ use num::arithmetic::traits::{
     OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
     UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::CheckedHammingDistance;
@@ -31,7 +31,7 @@ pub trait PrimitiveSigned:
     + NegativeOne
     + OverflowingAbs<Output = Self>
     + OverflowingAbsAssign
-    + PrimitiveInteger
+    + PrimitiveInt
     + RandomSignedChunkable
     + SaturatingAbs<Output = Self>
     + SaturatingAbsAssign

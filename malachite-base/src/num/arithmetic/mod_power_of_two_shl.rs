@@ -3,18 +3,18 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoShl, ModPowerOfTwoShlAssign, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 
-fn _mod_power_of_two_shl_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
+fn _mod_power_of_two_shl_unsigned<
+    T: ModPowerOfTwo<Output = T> + PrimitiveInt + Shl<U, Output = T>,
+    U: ExactFrom<u64> + Ord,
+>(
     x: T,
     other: U,
     pow: u64,
-) -> T
-where
-    T: ModPowerOfTwo<Output = T> + Shl<U, Output = T>,
-{
+) -> T {
     assert!(pow <= T::WIDTH);
     if other >= U::exact_from(T::WIDTH) {
         T::ZERO
@@ -23,13 +23,14 @@ where
     }
 }
 
-fn _mod_power_of_two_shl_assign_unsigned<T: PrimitiveInteger, U: ExactFrom<u64> + Ord>(
+fn _mod_power_of_two_shl_assign_unsigned<
+    T: PrimitiveInt + ShlAssign<U>,
+    U: ExactFrom<u64> + Ord,
+>(
     x: &mut T,
     other: U,
     pow: u64,
-) where
-    T: ShlAssign<U>,
-{
+) {
     assert!(pow <= T::WIDTH);
     if other >= U::exact_from(T::WIDTH) {
         *x = T::ZERO;
@@ -99,18 +100,14 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
 apply_to_unsigneds!(impl_mod_power_of_two_shl_unsigned);
 
 fn _mod_power_of_two_shl_signed<
-    T: PrimitiveInteger,
+    T: ModPowerOfTwoShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: T,
     other: S,
     pow: u64,
-) -> T
-where
-    S: UnsignedAbs<Output = U>,
-    T: ModPowerOfTwoShl<U, Output = T> + Shr<U, Output = T>,
-{
+) -> T {
     assert!(pow <= T::WIDTH);
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
@@ -126,17 +123,14 @@ where
 }
 
 fn _mod_power_of_two_shl_assign_signed<
-    T: PrimitiveInteger,
+    T: ModPowerOfTwoShlAssign<U> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: &mut T,
     other: S,
     pow: u64,
-) where
-    T: ModPowerOfTwoShlAssign<U> + ShrAssign<U>,
-    S: UnsignedAbs<Output = U>,
-{
+) {
     assert!(pow <= T::WIDTH);
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {

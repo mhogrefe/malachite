@@ -1,6 +1,6 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
-fn not_assign_helper<T: PrimitiveInteger>() {
+fn not_assign_helper<T: PrimitiveInt>() {
     let test = |n: T| {
         let mut x = n;
         x.not_assign();

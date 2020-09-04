@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 pub fn test_rotate_left() {
-    fn test<T: PrimitiveInteger>(n: T, bits: u64, out: T) {
+    fn test<T: PrimitiveInt>(n: T, bits: u64, out: T) {
         assert_eq!(n.rotate_left(bits), out);
     };
 
@@ -29,7 +29,7 @@ pub fn test_rotate_left() {
 
 #[test]
 pub fn test_rotate_right() {
-    fn test<T: PrimitiveInteger>(n: T, bits: u64, out: T) {
+    fn test<T: PrimitiveInt>(n: T, bits: u64, out: T) {
         assert_eq!(n.rotate_right(bits), out);
     };
 

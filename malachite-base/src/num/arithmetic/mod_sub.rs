@@ -1,9 +1,10 @@
 use num::arithmetic::traits::{ModSub, ModSubAssign, WrappingAdd, WrappingSub};
 
-fn _mod_sub<T: Copy + Ord>(x: T, other: T, m: T) -> T
-where
-    T: WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>,
-{
+fn _mod_sub<T: Copy + Ord + WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>>(
+    x: T,
+    other: T,
+    m: T,
+) -> T {
     let diff = x.wrapping_sub(other);
     if x < other {
         m.wrapping_add(diff)

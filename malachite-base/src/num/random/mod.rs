@@ -1,13 +1,17 @@
+use std::convert::identity;
+use std::fmt::Debug;
+
+use rand::Rng;
+use rand_chacha::ChaCha20Rng;
+
 use iterators::{nonzero_values, NonzeroValues};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
+use num::iterator::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
 use random::Seed;
-use std::fmt::Debug;
 
 /// Uniformly generates random primitive integers.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -17,7 +21,7 @@ pub struct ThriftyRandomState {
 }
 
 #[doc(hidden)]
-pub trait HasRandomPrimitiveIntegers {
+pub trait HasRandomPrimitiveInts {
     type State: Clone + Debug;
 
     fn new_state() -> Self::State;
@@ -25,9 +29,9 @@ pub trait HasRandomPrimitiveIntegers {
     fn get_random(rng: &mut ChaCha20Rng, state: &mut Self::State) -> Self;
 }
 
-macro_rules! impl_trivial_random_primitive_integers {
+macro_rules! impl_trivial_random_primitive_ints {
     ($t: ident) => {
-        impl HasRandomPrimitiveIntegers for $t {
+        impl HasRandomPrimitiveInts for $t {
             type State = ();
 
             #[inline]
@@ -42,16 +46,16 @@ macro_rules! impl_trivial_random_primitive_integers {
         }
     };
 }
-impl_trivial_random_primitive_integers!(u32);
-impl_trivial_random_primitive_integers!(u64);
-impl_trivial_random_primitive_integers!(u128);
-impl_trivial_random_primitive_integers!(usize);
-impl_trivial_random_primitive_integers!(i32);
-impl_trivial_random_primitive_integers!(i64);
-impl_trivial_random_primitive_integers!(i128);
-impl_trivial_random_primitive_integers!(isize);
+impl_trivial_random_primitive_ints!(u32);
+impl_trivial_random_primitive_ints!(u64);
+impl_trivial_random_primitive_ints!(u128);
+impl_trivial_random_primitive_ints!(usize);
+impl_trivial_random_primitive_ints!(i32);
+impl_trivial_random_primitive_ints!(i64);
+impl_trivial_random_primitive_ints!(i128);
+impl_trivial_random_primitive_ints!(isize);
 
-fn _get_random<T: PrimitiveInteger>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
+fn _get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
         state.x = rng.gen();
         state.bits_left = 32 - T::WIDTH;
@@ -62,9 +66,9 @@ fn _get_random<T: PrimitiveInteger>(rng: &mut ChaCha20Rng, state: &mut ThriftyRa
     T::wrapping_from(state.x)
 }
 
-macro_rules! impl_thrifty_random_primitive_integers {
+macro_rules! impl_thrifty_random_primitive_ints {
     ($t: ident) => {
-        impl HasRandomPrimitiveIntegers for $t {
+        impl HasRandomPrimitiveInts for $t {
             type State = ThriftyRandomState;
 
             #[inline]
@@ -79,22 +83,22 @@ macro_rules! impl_thrifty_random_primitive_integers {
         }
     };
 }
-impl_thrifty_random_primitive_integers!(u8);
-impl_thrifty_random_primitive_integers!(u16);
-impl_thrifty_random_primitive_integers!(i8);
-impl_thrifty_random_primitive_integers!(i16);
+impl_thrifty_random_primitive_ints!(u8);
+impl_thrifty_random_primitive_ints!(u16);
+impl_thrifty_random_primitive_ints!(i8);
+impl_thrifty_random_primitive_ints!(i16);
 
 /// Uniformly generates random primitive integers.
 ///
-/// This `struct` is created by the `random_primitive_integers` method. See its documentation for
+/// This `struct` is created by the `random_primitive_ints` method. See its documentation for
 /// more.
 #[derive(Clone, Debug)]
-pub struct RandomPrimitiveIntegers<T: HasRandomPrimitiveIntegers> {
+pub struct RandomPrimitiveInts<T: HasRandomPrimitiveInts> {
     pub(crate) rng: ChaCha20Rng,
     pub(crate) state: T::State,
 }
 
-impl<T: HasRandomPrimitiveIntegers> Iterator for RandomPrimitiveIntegers<T> {
+impl<T: HasRandomPrimitiveInts> Iterator for RandomPrimitiveInts<T> {
     type Item = T;
 
     #[inline]
@@ -152,7 +156,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedRange<T> {
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
     NotAll(RandomUnsignedsLessThan<T>, T),
-    All(RandomPrimitiveIntegers<T>),
+    All(RandomPrimitiveInts<T>),
 }
 
 impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedInclusiveRange<T> {
@@ -252,45 +256,14 @@ impl<T: HasRandomSignedRange> Iterator for RandomSignedInclusiveRange<T> {
 /// more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
-    pub(crate) xs: RandomPrimitiveIntegers<T>,
-    pub(crate) x: T,
-    pub(crate) bits_left: u64,
-    pub(crate) chunk_size: u64,
-    pub(crate) mask: T,
-    pub(crate) high_bits: Option<T>,
+    xs: IteratorToBitChunks<RandomPrimitiveInts<T>, T, T>,
 }
 
 impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedBitChunks<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        if self.chunk_size == 0 {
-            return Some(T::ZERO);
-        }
-        let width_minus_chunk_size = T::WIDTH - self.chunk_size;
-        Some(if self.bits_left == 0 {
-            self.x = self.xs.next().unwrap();
-            self.bits_left = width_minus_chunk_size;
-            self.x & self.mask
-        } else if self.bits_left >= self.chunk_size {
-            self.x >>= self.chunk_size;
-            if let Some(bits) = self.high_bits {
-                self.x |= bits << width_minus_chunk_size;
-                self.high_bits = None;
-            }
-            self.bits_left -= self.chunk_size;
-            self.x & self.mask
-        } else {
-            let mut old_x = self.x >> self.chunk_size;
-            if let Some(bits) = self.high_bits {
-                old_x |= bits << width_minus_chunk_size;
-            }
-            self.x = self.xs.next().unwrap();
-            self.high_bits = Some(self.x >> (T::WIDTH - self.bits_left));
-            self.x <<= self.bits_left;
-            self.bits_left += width_minus_chunk_size;
-            (self.x | old_x) & self.mask
-        })
+        self.xs.next_with_wrapping(identity)
     }
 }
 
@@ -341,7 +314,7 @@ impl<T: RandomSignedChunkable> Iterator for RandomSignedBitChunks<T> {
 #[derive(Clone, Debug)]
 pub struct RandomHighestBitSetValues<I: Iterator>
 where
-    I::Item: PrimitiveInteger,
+    I::Item: PrimitiveInt,
 {
     pub(crate) xs: I,
     pub(crate) mask: I::Item,
@@ -349,7 +322,7 @@ where
 
 impl<I: Iterator> Iterator for RandomHighestBitSetValues<I>
 where
-    I::Item: PrimitiveInteger,
+    I::Item: PrimitiveInt,
 {
     type Item = I::Item;
 
@@ -371,17 +344,17 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::random::random_primitive_integers;
+/// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_integers::<u8>(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
+///     random_primitive_ints::<u8>(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
 ///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
 /// )
 /// ```
 #[inline]
-pub fn random_primitive_integers<T: PrimitiveInteger>(seed: Seed) -> RandomPrimitiveIntegers<T> {
-    RandomPrimitiveIntegers {
+pub fn random_primitive_ints<T: PrimitiveInt>(seed: Seed) -> RandomPrimitiveInts<T> {
+    RandomPrimitiveInts {
         rng: seed.get_rng(),
         state: T::new_state(),
     }
@@ -416,8 +389,8 @@ pub fn random_primitive_integers<T: PrimitiveInteger>(seed: Seed) -> RandomPrimi
 #[inline]
 pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
-) -> NonzeroValues<RandomPrimitiveIntegers<T>> {
-    nonzero_values(random_primitive_integers(seed))
+) -> NonzeroValues<RandomPrimitiveInts<T>> {
+    nonzero_values(random_primitive_ints(seed))
 }
 
 /// Uniformly generates random positive signed integers.
@@ -549,8 +522,8 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 #[inline]
 pub fn random_nonzero_signeds<T: PrimitiveSigned>(
     seed: Seed,
-) -> NonzeroValues<RandomPrimitiveIntegers<T>> {
-    nonzero_values(random_primitive_integers(seed))
+) -> NonzeroValues<RandomPrimitiveInts<T>> {
+    nonzero_values(random_primitive_ints(seed))
 }
 
 /// Uniformly generates random unsigned integers less than a positive `limit`.
@@ -682,7 +655,7 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
     if a == T::ZERO && b == T::MAX {
-        RandomUnsignedInclusiveRange::All(random_primitive_integers(seed))
+        RandomUnsignedInclusiveRange::All(random_primitive_ints(seed))
     } else {
         RandomUnsignedInclusiveRange::NotAll(random_unsigneds_less_than(seed, b - a + T::ONE), a)
     }
@@ -808,14 +781,8 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
     seed: Seed,
     chunk_size: u64,
 ) -> RandomUnsignedBitChunks<T> {
-    assert!(chunk_size <= T::WIDTH);
     RandomUnsignedBitChunks {
-        xs: random_primitive_integers(seed),
-        x: T::ZERO,
-        bits_left: 0,
-        chunk_size,
-        mask: T::low_mask(chunk_size),
-        high_bits: None,
+        xs: iterator_to_bit_chunks(random_primitive_ints(seed), T::WIDTH, chunk_size),
     }
 }
 

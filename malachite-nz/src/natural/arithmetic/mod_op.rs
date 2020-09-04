@@ -1,12 +1,17 @@
+use std::cmp::Ordering;
+use std::mem::swap;
+use std::ops::{Rem, RemAssign};
+
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, PowerOfTwo, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
+
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -39,9 +44,6 @@ use platform::{
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
     MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::ops::{Rem, RemAssign};
 
 /// Time: O(1)
 ///

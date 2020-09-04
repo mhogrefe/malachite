@@ -5,7 +5,7 @@ use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -265,9 +265,7 @@ pub fn triples_of_integer_integer_and_natural_var_2(
     )
 }
 
-fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger + Rand>(
-    scale: u32,
-) -> It<(Integer, T)> {
+fn random_pairs_of_integer_and_primitive<T: PrimitiveInt + Rand>(scale: u32) -> It<(Integer, T)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_integers(seed, scale)),
@@ -275,9 +273,7 @@ fn random_pairs_of_integer_and_primitive<T: PrimitiveInteger + Rand>(
     ))
 }
 
-fn random_pairs_of_primitive_and_integer<T: PrimitiveInteger + Rand>(
-    scale: u32,
-) -> It<(T, Integer)> {
+fn random_pairs_of_primitive_and_integer<T: PrimitiveInt + Rand>(scale: u32) -> It<(T, Integer)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
@@ -516,6 +512,18 @@ pub fn rm_pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+pub fn nrm_pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+    Box::new(pairs_of_integer_and_small_unsigned(gm).map(|(x, y)| {
+        (
+            (integer_to_bigint(&x), y),
+            (integer_to_rug_integer(&x), y),
+            (x, y),
+        )
+    }))
+}
+
 // All pairs of `Integer` and `T` where `T` is unsigned and the `Integer` is divisible by 2 to the
 // power of the `T`.
 pub fn pairs_of_integer_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
@@ -606,7 +614,7 @@ pub fn rm_pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
     )
 }
 
-fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInteger + Rand>(
+fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInt + Rand>(
     scale: u32,
 ) -> It<(Integer, T, Integer)> {
     Box::new(random_triples(
@@ -617,7 +625,7 @@ fn random_triples_of_integer_primitive_and_integer<T: PrimitiveInteger + Rand>(
     ))
 }
 
-fn random_triples_of_primitive_integer_and_primitive<T: PrimitiveInteger + Rand>(
+fn random_triples_of_primitive_int_and_primitive<T: PrimitiveInt + Rand>(
     scale: u32,
 ) -> It<(T, Integer, T)> {
     Box::new(random_triples(
@@ -656,7 +664,7 @@ pub fn triples_of_unsigned_integer_and_unsigned<T: PrimitiveUnsigned + Rand>(
             exhaustive_integers(),
             exhaustive_unsigneds(),
         )),
-        GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
+        GenerationMode::Random(scale) => random_triples_of_primitive_int_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
@@ -702,7 +710,7 @@ where
             exhaustive_integers(),
             exhaustive_signeds(),
         )),
-        GenerationMode::Random(scale) => random_triples_of_primitive_integer_and_primitive(scale),
+        GenerationMode::Random(scale) => random_triples_of_primitive_int_and_primitive(scale),
         GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| special_random_signed(seed)),

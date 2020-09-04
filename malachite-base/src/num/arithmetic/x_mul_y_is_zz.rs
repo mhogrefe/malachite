@@ -1,5 +1,5 @@
 use num::arithmetic::traits::XMulYIsZZ;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};

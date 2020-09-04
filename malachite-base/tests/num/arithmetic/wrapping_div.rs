@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_wrapping_div() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: T) {
         assert_eq!(x.wrapping_div(y), out);
 
         let mut x = x;
@@ -20,7 +20,7 @@ fn test_wrapping_div() {
     test::<i8>(-128, -1, -128);
 }
 
-fn wrapping_div_assign_fail_helper<T: PrimitiveInteger>() {
+fn wrapping_div_assign_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.wrapping_div_assign(T::ZERO));
 }
 

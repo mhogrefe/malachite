@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_overflowing_div() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: T, overflow: bool) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: T, overflow: bool) {
         assert_eq!(x.overflowing_div(y), (out, overflow));
 
         let mut x = x;
@@ -20,7 +20,7 @@ fn test_overflowing_div() {
     test::<i8>(-128, -1, -128, true);
 }
 
-fn overflowing_div_assign_fail_helper<T: PrimitiveInteger>() {
+fn overflowing_div_assign_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.overflowing_div_assign(T::ZERO));
 }
 

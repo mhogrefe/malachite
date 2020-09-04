@@ -2,12 +2,7 @@ use std::ops::{Add, AddAssign, Sub};
 
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
 
-//TODO wheres
-
-fn _mod_add<T: Copy + Ord>(x: T, other: T, m: T) -> T
-where
-    T: Add<T, Output = T> + Sub<T, Output = T>,
-{
+fn _mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other: T, m: T) -> T {
     let neg = m - x;
     if neg > other {
         x + other
@@ -16,10 +11,7 @@ where
     }
 }
 
-fn _mod_add_assign<T: Copy + Ord>(x: &mut T, other: T, m: T)
-where
-    T: AddAssign<T> + Sub<T, Output = T>,
-{
+fn _mod_add_assign<T: AddAssign<T> + Copy + Ord + Sub<T, Output = T>>(x: &mut T, other: T, m: T) {
     let neg = m - *x;
     if neg > other {
         *x += other;

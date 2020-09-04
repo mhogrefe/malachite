@@ -40,10 +40,10 @@ use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
     LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
-use num::random::HasRandomPrimitiveIntegers;
+use num::random::HasRandomPrimitiveInts;
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
-pub trait PrimitiveInteger:
+pub trait PrimitiveInt:
     'static
     + Add<Self, Output = Self>
     + AddAssign<Self>
@@ -368,7 +368,7 @@ pub trait PrimitiveInteger:
     + SubMul<Self, Self, Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
-    + HasRandomPrimitiveIntegers
+    + HasRandomPrimitiveInts
     + TrailingZeros
     + Two
     + UpperHex
@@ -442,7 +442,7 @@ pub trait PrimitiveInteger:
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::integers::PrimitiveInteger;
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     ///
     /// assert_eq!(123u32.get_highest_bit(), false);
     /// assert_eq!(4_000_000_000u32.get_highest_bit(), true);
@@ -460,13 +460,13 @@ macro_rules! impl_basic_traits {
     ($t:ident, $width:expr) => {
         /// # Examples
         /// ```
-        /// use malachite_base::num::basic::integers::PrimitiveInteger;
+        /// use malachite_base::num::basic::integers::PrimitiveInt;
         ///
         /// assert_eq!(u32::WIDTH, 32);
         /// assert_eq!(u32::LOG_WIDTH, 5);
         /// assert_eq!(u32::WIDTH_MASK, 0x1f);
         /// ```
-        impl PrimitiveInteger for $t {
+        impl PrimitiveInt for $t {
             const WIDTH: u64 = $width;
         }
 

@@ -2,7 +2,7 @@ use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
+    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_signeds,
     exhaustive_unsigneds,
 };
 
@@ -14,10 +14,10 @@ pub fn exhaustive_bool_gen() -> It<bool> {
     Box::new(exhaustive_bools())
 }
 
-// -- PrimitiveInteger --
+// -- PrimitiveInt --
 
-pub fn exhaustive_primitive_integer_gen_var_1<T: PrimitiveUnsigned>() -> It<T> {
-    Box::new(exhaustive_positive_primitives())
+pub fn exhaustive_primitive_int_gen_var_1<T: PrimitiveUnsigned>() -> It<T> {
+    Box::new(exhaustive_positive_primitive_ints())
 }
 
 // -- PrimitiveSigned --

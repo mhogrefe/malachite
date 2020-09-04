@@ -1,9 +1,11 @@
-use integer::Integer;
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
+
+use integer::Integer;
 use natural::Natural;
-use std::ops::{Shr, ShrAssign};
 
 fn _shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where
@@ -143,7 +145,30 @@ macro_rules! impl_shr_unsigned {
 }
 apply_to_unsigneds!(impl_shr_unsigned);
 
-//TODO clean
+fn _shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Integer,
+    bits: S,
+) -> Integer
+where
+    &'a Integer: Shl<U, Output = Integer> + Shr<U, Output = Integer>,
+{
+    if bits >= S::ZERO {
+        x >> bits.unsigned_abs()
+    } else {
+        x << bits.unsigned_abs()
+    }
+}
+
+fn _shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
+where
+    Integer: ShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x >>= bits.unsigned_abs();
+    } else {
+        *x <<= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_shr_signed {
     ($t:ident) => {
@@ -220,12 +245,9 @@ macro_rules! impl_shr_signed {
             ///     "-155921023828072216384094494261248"
             /// );
             /// ```
+            #[inline]
             fn shr(self, bits: $t) -> Integer {
-                if bits >= 0 {
-                    self >> bits.unsigned_abs()
-                } else {
-                    self << bits.unsigned_abs()
-                }
+                _shr_signed_ref(self, bits)
             }
         }
 
@@ -265,12 +287,9 @@ macro_rules! impl_shr_signed {
             ///     x >>= -4i64;
             ///     assert_eq!(x.to_string(), "-1024");
             /// ```
+            #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                if bits >= 0 {
-                    *self >>= bits.unsigned_abs();
-                } else {
-                    *self <<= bits.unsigned_abs();
-                }
+                _shr_assign_signed(self, bits)
             }
         }
     };

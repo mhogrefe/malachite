@@ -60,6 +60,7 @@ pub mod integer {
         pub mod mul;
         pub mod neg;
         pub mod parity;
+        pub mod pow;
         pub mod power_of_two;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_two;
@@ -81,21 +82,21 @@ pub mod integer {
         pub mod ord;
         pub mod ord_abs;
         pub mod partial_eq_natural;
-        pub mod partial_eq_primitive_integer;
+        pub mod partial_eq_primitive_int;
         pub mod partial_ord_abs_natural_and_comparators;
-        pub mod partial_ord_abs_primitive_integer_and_comparators;
+        pub mod partial_ord_abs_primitive_int_and_comparators;
         pub mod partial_ord_natural;
-        pub mod partial_ord_primitive_integer;
+        pub mod partial_ord_primitive_int;
     }
     pub mod conversion {
         pub mod clone;
         pub mod floating_point_from_integer;
         pub mod from_floating_point;
         pub mod from_natural;
-        pub mod from_primitive_integer;
+        pub mod from_primitive_int;
         pub mod from_twos_complement_limbs;
         pub mod natural_from_integer;
-        pub mod primitive_integer_from_integer;
+        pub mod primitive_int_from_integer;
         pub mod serde;
         pub mod to_twos_complement_limbs;
     }
@@ -195,17 +196,17 @@ pub mod natural {
     pub mod comparison {
         pub mod eq;
         pub mod ord;
-        pub mod partial_eq_primitive_integer;
-        pub mod partial_ord_abs_primitive_integer_and_comparators;
-        pub mod partial_ord_primitive_integer;
+        pub mod partial_eq_primitive_int;
+        pub mod partial_ord_abs_primitive_int_and_comparators;
+        pub mod partial_ord_primitive_int;
     }
     pub mod conversion {
         pub mod clone;
         pub mod floating_point_from_natural;
         pub mod from_floating_point;
         pub mod from_limbs;
-        pub mod from_primitive_integer;
-        pub mod primitive_integer_from_natural;
+        pub mod from_primitive_int;
+        pub mod primitive_int_from_natural;
         pub mod serde;
         pub mod to_limbs;
     }

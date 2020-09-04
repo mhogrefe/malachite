@@ -10,151 +10,34 @@ use num::BigUint;
 use rug::ops::Pow as RugPow;
 
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::pow::{
-    _limb_pow_alt_estimated_out_len, _limb_pow_alt_estimated_scratch_len,
-    _limbs_pow_alt_estimated_out_len, _limbs_pow_alt_estimated_scratch_len, limb_pow_alt,
-    limb_pow_to_out_alt, limbs_pow_alt, limbs_pow_to_out_alt,
-};
+use malachite_nz::natural::arithmetic::pow::limbs_pow;
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limb_pow() {
-    let test = |x: Limb, exp: u64, out: &[Limb]| {
-        assert_eq!(limb_pow_alt(x, exp), out);
+fn test_limbs_pow() {
+    let test = |xs: &[Limb], exp: u64, out: &[Limb]| {
+        assert_eq!(limbs_pow(xs, exp), out);
     };
-    test(2, 2, &[4]);
-    test(2, 10, &[1024]);
-    test(2, 100, &[0, 0, 0, 16]);
+    test(&[2], 2, &[4]);
+    test(&[2], 10, &[1024]);
+    test(&[2], 100, &[0, 0, 0, 16]);
     test(
-        3,
+        &[3],
         100,
         &[3476558801, 3600055637, 1531049845, 1731684438, 1514558410],
     );
-    test(10, 9, &[1000000000]);
+    test(&[10], 9, &[1000000000]);
     test(
-        10,
+        &[10],
         100,
         &[
             0, 0, 0, 2821623568, 2863809288, 2384534140, 4085960256, 2227490315, 2095778599,
             2904921283, 4681,
         ],
     );
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_fail_1() {
-    limb_pow_alt(0, 2);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_fail_2() {
-    limb_pow_alt(1, 2);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_fail_3() {
-    limb_pow_alt(2, 0);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_fail_4() {
-    limb_pow_alt(2, 1);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limb_pow_to_out() {
-    let test = |out_before: &[Limb], x: Limb, exp: u64, out_after: &[Limb], out_len: usize| {
-        let mut out = out_before.to_vec();
-        assert_eq!(out.len(), _limb_pow_alt_estimated_out_len(x, exp));
-        let mut scratch = vec![0; _limb_pow_alt_estimated_scratch_len(x, exp)];
-        assert_eq!(limb_pow_to_out_alt(&mut out, x, exp, &mut scratch), out_len);
-        assert_eq!(out, out_after);
-    };
-    test(&[10, 10], 2, 2, &[4, 0], 1);
-    test(&[10, 10], 2, 10, &[1024, 0], 1);
-    test(&[10; 8], 2, 100, &[0, 0, 0, 16, 10, 10, 10, 10], 4);
-    test(
-        &[10; 8],
-        3,
-        100,
-        &[
-            3476558801, 3600055637, 1531049845, 1731684438, 1514558410, 0, 10, 10,
-        ],
-        5,
-    );
-    test(&[10, 10], 10, 9, &[1000000000, 0], 1);
-    test(
-        &[10; 14],
-        10,
-        100,
-        &[
-            0, 0, 0, 2821623568, 2863809288, 2384534140, 4085960256, 2227490315, 2095778599,
-            2904921283, 4681, 0, 10, 10,
-        ],
-        11,
-    );
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_1() {
-    limb_pow_to_out_alt(&mut [10, 10], 0, 2, &mut [10, 10]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_2() {
-    limb_pow_to_out_alt(&mut [10, 10], 1, 2, &mut [10, 10]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_3() {
-    limb_pow_to_out_alt(&mut [10, 10], 2, 0, &mut [10, 10]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_4() {
-    limb_pow_to_out_alt(&mut [10, 10], 2, 1, &mut [10, 10]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_5() {
-    limb_pow_to_out_alt(&mut [10], 2, 2, &mut [10, 10]);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-#[should_panic]
-fn limb_pow_to_out_fail_6() {
-    limb_pow_to_out_alt(&mut [10; 8], 2, 100, &mut []);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_pow() {
-    let test = |xs: &[Limb], exp: u64, out: &[Limb]| {
-        assert_eq!(limbs_pow_alt(xs, exp), out);
-    };
     test(&[1, 1], 2, &[1, 2, 1]);
     test(
         &[1, 1],
@@ -216,148 +99,28 @@ fn test_limbs_pow() {
 #[test]
 #[should_panic]
 fn limbs_pow_fail_1() {
-    limbs_pow_alt(&[], 2);
+    limbs_pow(&[], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pow_fail_2() {
-    limbs_pow_alt(&[1], 2);
+    limbs_pow(&[], 1);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pow_fail_3() {
-    limbs_pow_alt(&[1, 1], 0);
+    limbs_pow(&[1, 1], 0);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_pow_fail_4() {
-    limbs_pow_alt(&[1, 1], 1);
-}
-
-#[cfg(feature = "32_bit_limbs")]
-#[test]
-fn test_limbs_pow_to_out() {
-    let test = |out_before: &[Limb], xs: &[Limb], exp: u64, out_after: &[Limb], out_len: usize| {
-        let mut out = out_before.to_vec();
-        assert_eq!(out.len(), _limbs_pow_alt_estimated_out_len(xs, exp));
-        let mut scratch = vec![0; _limbs_pow_alt_estimated_scratch_len(xs, exp)];
-        assert_eq!(
-            limbs_pow_to_out_alt(&mut out, xs, exp, &mut scratch),
-            out_len
-        );
-        assert_eq!(out, out_after);
-    };
-    test(&[10; 4], &[1, 1], 2, &[1, 2, 1, 0], 3);
-    test(
-        &[10; 12],
-        &[1, 1],
-        10,
-        &[1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1, 0],
-        11,
-    );
-    test(
-        &[10; 104],
-        &[1, 1],
-        100,
-        &[
-            1, 100, 4950, 161700, 3921225, 75287520, 1192052400, 3122658912, 1404300575,
-            3856263611, 1591254002, 3258062030, 899556955, 803216378, 1310151248, 1499375850,
-            2332619193, 3968431524, 4085749530, 1136679331, 273489285, 3338642246, 3544105701,
-            844866219, 1175366874, 758834048, 646998201, 3049457170, 733614013, 1400647268,
-            3979434005, 2770685599, 4038926785, 264011298, 2126789533, 3205011234, 3674235589,
-            3864120130, 1717547830, 3817918906, 2976806973, 2930427077, 3798905017, 2672346699,
-            2426398649, 1834316445, 4131270269, 887459147, 1698650569, 3123194158, 2868271121,
-            3706731654, 2073725215, 570568395, 729640870, 1868322716, 3338774936, 3779458204,
-            3890882669, 1414262575, 1200805502, 3641833126, 342345696, 1286652406, 3703949518,
-            47177294, 1562872441, 3379562707, 2490682825, 640606377, 1577764504, 3545174992,
-            2808433500, 3939117033, 343741199, 2292546107, 1377056316, 1693477863, 368237605,
-            832210433, 2481934560, 2826277781, 3285796914, 2204777130, 3821989418, 1802445372,
-            1367480655, 813259882, 901179532, 3258302570, 1591286535, 3856267598, 1404301014,
-            3122658955, 1192052403, 75287520, 3921225, 161700, 4950, 100, 1, 0, 10, 10,
-        ],
-        101,
-    );
-    test(
-        &[10; 22],
-        &[1, 2, 3],
-        10,
-        &[
-            1, 20, 210, 1500, 8085, 34704, 122520, 363120, 915570, 1980440, 3692140, 5941320,
-            8240130, 9804240, 9924120, 8433072, 5893965, 3280500, 1377810, 393660, 59049, 0,
-        ],
-        21,
-    );
-    test(
-        &[10; 15],
-        &[u32::MAX; 3],
-        5,
-        &[
-            u32::MAX,
-            u32::MAX,
-            u32::MAX,
-            4,
-            0,
-            0,
-            0xffff_fff6,
-            u32::MAX,
-            u32::MAX,
-            9,
-            0,
-            0,
-            0xffff_fffb,
-            u32::MAX,
-            u32::MAX,
-        ],
-        15,
-    );
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_1() {
-    limbs_pow_to_out_alt(&mut [10; 4], &[], 2, &mut [10; 4]);
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_2() {
-    limbs_pow_to_out_alt(&mut [10; 4], &[1], 2, &mut [10; 4]);
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_3() {
-    limbs_pow_to_out_alt(&mut [10; 4], &[1, 1], 0, &mut [10; 4]);
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_4() {
-    limbs_pow_to_out_alt(&mut [10; 4], &[1, 1], 1, &mut [10; 4]);
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_5() {
-    limbs_pow_to_out_alt(&mut [10; 103], &[1, 1], 100, &mut [10; 103]);
-}
-
-#[cfg(feature = "32_bit_limbss")]
-#[test]
-#[should_panic]
-fn limbs_pow_to_out_fail_6() {
-    limbs_pow_to_out_alt(&mut [10; 104], &[1, 1], 100, &mut [10; 4]);
+    limbs_pow(&[1, 1], 1);
 }
 
 #[test]
@@ -390,6 +153,10 @@ fn test_pow() {
             natural_pow_simple_binary(&Natural::from_str(u).unwrap(), exp).to_string(),
             out
         );
+        assert_eq!(
+            Natural::from_str(u).unwrap().pow_ref_alt(exp).to_string(),
+            out
+        );
     };
     test("0", 0, "1");
     test("1", 0, "1");
@@ -407,6 +174,20 @@ fn test_pow() {
     test("3", 2, "9");
     test("1000", 2, "1000000");
     test("1000000000000", 2, "1000000000000000000000000");
+    // xs.len() == 1 first time
+    // *x <= HALF_MASK in bsize_1_helper
+    // exp.even() in bsize_1_helper
+    // *exp != 0 in bsize_1_helper
+    // *trailing_zero_bits_out == 0 || *out_0 == 1 ||
+    //      *out_0 >> (Limb::WIDTH - *trailing_zero_bits_out) != 0 in bsize_1_helper
+    // exp != 0
+    // len == 1 || exp.even()
+    // len == 1
+    // bits.odd()
+    // len == 1 && bit
+    // len == 1 && !bit
+    // out_0 == 1
+    // trailing_zero_bits_out == 0
     test(
         "123",
         456,
@@ -422,6 +203,8 @@ fn test_pow() {
         6282833554705299329560514844771293338811599302127586876027950885792304316616960102321873904\
         36601614145603241902386663442520160735566561"
     );
+    // exp.odd() in bsize_1_helper
+    // out_0 != 1
     test(
         "123",
         457,
@@ -437,6 +220,9 @@ fn test_pow() {
         0422788527228751817535943325906869080673826714161693185751437958952453430943886092585590490\
         23701998539909198753993559603429979770474687003"
     );
+    // *trailing_zero_bits_out != 0 && *out_0 != 1 &&
+    //      *out_0 >> (Limb::WIDTH - *trailing_zero_bits_out) == 0 in bsize_1_helper
+    // bits.even()
     test(
         "10",
         100,
@@ -449,7 +235,18 @@ fn test_pow() {
         "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
         000000000000"
     );
+    // *exp == 0 in bsize_1_helper
+    // exp == 0
+    // trailing_zero_bits_out != 0
     test("2", 100, "1267650600228229401496703205376");
+    // xs.len() == 2
+    // xs.len() == 2 && trailing_zero_bits_in == 0
+    // xs.len() == 2 && x_1 != 0
+    // len >> 1 && exp.odd()
+    // len != 1
+    // !CountOnes::count_ones(exp).eq_mod_power_of_two(bits, 1)
+    // len != 1 && !bit
+    // len != 1 && bit
     test(
         "12345678987654321",
         5,
@@ -460,5 +257,51 @@ fn test_pow() {
         6,
         "354070611898367606555445954656918550154832595750628623501854823341167403514406003590115726\
         6821921"
+    );
+    // xs.len() == 2 && trailing_zero_bits_in != 0
+    // CountOnes::count_ones(exp).eq_mod_power_of_two(bits, 1)
+    test(
+        "26872817533106",
+        12,
+        "141826844138959364185940647071896554485587687634106997683499856265150283163630969349636867\
+        234174443605205673555107919666790176734540047683138771242870390213185536"
+    );
+    // xs.len() == 2 && x_1 == 0
+    test(
+        "14823718968",
+        5,
+        "715790392004360489610590536764569459261039357165568",
+    );
+    // xs.len() > 2
+    // xs.len() > 2 && trailing_zero_bits_in != 0
+    test(
+        "24424421844081699326",
+        55,
+        "213961716190310170274088594850318375142996259342375501592273155327928007898048540877403565\
+        3947261530991648842767731271386297041920019953715121571673691873897348960187317337771890905\
+        1572382143119842882294517424053653145781261386562757014940642327399405478861990592953674053\
+        5435746102693851943687705326429729387827027180615610631114411764811616316442929883964904298\
+        3315499400867326194538467726927965720256457038271587840064522521610550522662098778092390775\
+        1204011661884808984320689270774425563736748276177153496839435580581401399443258277883965208\
+        0795662477157903348885713252035517047912637599810655108674777287567258783790305252352655254\
+        9161655860569081456083564805569388857136788414537348033500867479587662770873397446881847014\
+        6730827427892395144171556599844946073138166223624637280926661575895662911794190561258748348\
+        7934048838204018355648003975520634897314818368802033588189644263971368238570985509229153518\
+        4180400851608974878145053640167246336219940448713158030020593993974770074718137925127520351\
+        9045385528768578776802376700963217886663279210963568902459805925376"
+    );
+    // xs.len() > 2 && trailing_zero_bits_in == 0
+    test(
+        "762845729280891732629",
+        6,
+        "197069908665560609451994985160700801551868029168403239983377351218306354370509861303202043\
+        757725875289425891538656609168767721"
+    );
+    // x == 0
+    test(
+        "576460717943685120",
+        9,
+        "702954903302866311524348366058883550484761300374963994159100861262489870076604686210427395\
+        8248045324225063677698694075567381512070601339698619038564352000000000"
     );
 }

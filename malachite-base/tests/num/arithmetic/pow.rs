@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_pow() {
-    fn test<T: PrimitiveInteger>(x: T, y: u64, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: u64, out: T) {
         assert_eq!(x.pow(y), out);
 
         let mut x = x;

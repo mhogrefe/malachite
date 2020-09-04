@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::{Rem, RemAssign};
+
 use malachite_base::num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign,
 };
-use std::ops::{Rem, RemAssign};
+
+use integer::Integer;
 
 impl Mod<Integer> for Integer {
     type Output = Integer;

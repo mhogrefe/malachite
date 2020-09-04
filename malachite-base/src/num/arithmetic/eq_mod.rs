@@ -1,11 +1,8 @@
 use num::arithmetic::traits::{EqMod, Mod};
 use num::basic::traits::Zero;
 
-fn _eq_mod<T: Copy + Eq + Mod<T> + Zero>(x: T, other: T, m: T) -> bool
-where
-    <T as Mod>::Output: Eq,
-{
-    x == other || m != T::ZERO && x.mod_op(m) == other.mod_op(m)
+fn _eq_mod<U: Eq, S: Copy + Eq + Mod<S, Output = U> + Zero>(x: S, other: S, m: S) -> bool {
+    x == other || m != S::ZERO && x.mod_op(m) == other.mod_op(m)
 }
 
 macro_rules! impl_eq_mod {

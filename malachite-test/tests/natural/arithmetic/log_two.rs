@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo, PowerOfTwo};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;

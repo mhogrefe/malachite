@@ -1,13 +1,13 @@
 use std::panic::catch_unwind;
 
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_shl_round() {
-    fn test<T: PrimitiveInteger, U: PrimitiveInteger>(t: T, u: U, rm: RoundingMode, out: T)
+    fn test<T: PrimitiveInt, U: PrimitiveInt>(t: T, u: U, rm: RoundingMode, out: T)
     where
         T: ShlRound<U, Output = T> + ShlRoundAssign<U>,
     {
@@ -772,7 +772,7 @@ fn test_shl_round() {
     );
 }
 
-fn shl_round_fail_helper<T: PrimitiveInteger, U: PrimitiveSigned>()
+fn shl_round_fail_helper<T: PrimitiveInt, U: PrimitiveSigned>()
 where
     T: ShlRound<U, Output = T> + ShlRoundAssign<U>,
 {

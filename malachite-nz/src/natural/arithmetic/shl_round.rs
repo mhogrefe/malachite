@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
 use malachite_base::rounding_modes::RoundingMode;
+
 use natural::Natural;
 
 macro_rules! impl_natural_shl_round_signed {

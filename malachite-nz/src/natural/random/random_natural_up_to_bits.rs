@@ -5,8 +5,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::Natural;
 use rand::{Rand, Rng};
+
+use natural::Natural;
 
 /// Returns a slice of `Limb`s representing a random `Natural` with up to `bits` bits; equivalently,
 /// returns the limbs of a random `Natural` uniformly sampled from [0, 2<sup>`bits`</sup>). There

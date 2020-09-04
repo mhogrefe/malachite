@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
+
 use integer::Integer;
 use natural::Natural;
-use std::cmp::Ordering;
 
 impl PartialOrd<Natural> for Integer {
     /// Compares an `Integer` to a `Natural`.

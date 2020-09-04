@@ -1,16 +1,17 @@
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoMulAssign};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 
-fn _mod_power_of_two_mul<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
-where
-    T: ModPowerOfTwo<Output = T>,
-{
+fn _mod_power_of_two_mul<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+    x: T,
+    other: T,
+    pow: u64,
+) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul(other).mod_power_of_two(pow)
 }
 
 #[inline]
-fn _mod_power_of_two_mul_assign<T: PrimitiveInteger>(x: &mut T, other: T, pow: u64) {
+fn _mod_power_of_two_mul_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul_assign(other);
     x.mod_power_of_two_assign(pow);

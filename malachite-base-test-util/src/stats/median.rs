@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
 use stats::moments::CheckedToF64;
@@ -11,7 +11,7 @@ pub const fn uniform_bool_median(min: bool, max: bool) -> (bool, Option<bool>) {
     }
 }
 
-pub fn uniform_primitive_integer_median<T: PrimitiveInteger>(min: T, max: T) -> (T, Option<T>) {
+pub fn uniform_primitive_int_median<T: PrimitiveInt>(min: T, max: T) -> (T, Option<T>) {
     let mut mean = min.wrapping_add(max);
     mean >>= 1;
     if mean < min || mean > max {
@@ -24,12 +24,12 @@ pub fn uniform_primitive_integer_median<T: PrimitiveInteger>(min: T, max: T) -> 
     }
 }
 
-pub fn deleted_uniform_primitive_integer_median<T: PrimitiveInteger>(
+pub fn deleted_uniform_primitive_int_median<T: PrimitiveInt>(
     min: T,
     max: T,
     deleted: T,
 ) -> (T, Option<T>) {
-    let (mut lo, mut hi) = uniform_primitive_integer_median(min, max - T::ONE);
+    let (mut lo, mut hi) = uniform_primitive_int_median(min, max - T::ONE);
     if lo >= deleted {
         lo += T::ONE;
     }
@@ -41,7 +41,7 @@ pub fn deleted_uniform_primitive_integer_median<T: PrimitiveInteger>(
     (lo, hi)
 }
 
-pub(crate) fn binary_search_median<T: PrimitiveInteger, P, C>(
+pub(crate) fn binary_search_median<T: PrimitiveInt, P, C>(
     mut min: T,
     mut max: T,
     pmf: P,
@@ -113,7 +113,7 @@ fn truncated_geometric_cdf(m: f64, unadjusted_mean: f64, n: f64) -> f64 {
     }
 }
 
-pub fn truncated_geometric_median<T: CheckedToF64 + PrimitiveInteger>(
+pub fn truncated_geometric_median<T: CheckedToF64 + PrimitiveInt>(
     min: T,
     max: T,
     unadjusted_mean: f64,

@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_divisible_by() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: bool) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: bool) {
         assert_eq!(x.divisible_by(y), out);
     };
     test::<u8>(0, 0, true);

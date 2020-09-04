@@ -1,9 +1,11 @@
+use std::cmp::Ordering;
+
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
+
 use natural::InnerNatural::Small;
 use natural::Natural;
-use std::cmp::Ordering;
 
 impl RoundToMultiple<Natural> for Natural {
     type Output = Natural;

@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
@@ -1139,7 +1139,7 @@ fn test_div_round_signed() {
     test::<i8>(-128, 1, RoundingMode::Exact, -128);
 }
 
-fn div_round_fail_helper<T: PrimitiveInteger>() {
+fn div_round_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(10).div_round(T::ZERO, RoundingMode::Floor));
     assert_panic!(T::exact_from(10).div_round(T::exact_from(3), RoundingMode::Exact));
     assert_panic!(T::exact_from(10).div_round_assign(T::ZERO, RoundingMode::Floor));

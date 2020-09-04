@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_add_mul() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: T, z: T, out: T) {
         assert_eq!(x.add_mul(y, z), out);
 
         let mut x = x;

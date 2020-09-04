@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
     PowerOfTwo, RoundToMultiple, RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign,
     ShrRound,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};

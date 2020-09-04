@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -57,7 +57,7 @@ where
     }
 }
 
-fn bucketing_function<T: PrimitiveInteger>(t: &(T, T, T)) -> usize {
+fn bucketing_function<T: PrimitiveInt>(t: &(T, T, T)) -> usize {
     usize::exact_from(max!(
         t.0.significant_bits(),
         t.1.significant_bits(),

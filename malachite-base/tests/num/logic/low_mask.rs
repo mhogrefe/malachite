@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn low_mask_primitive_helper<T: PrimitiveInteger>() {
+fn low_mask_primitive_helper<T: PrimitiveInt>() {
     let test = |bits, out| {
         assert_eq!(T::low_mask(bits), out);
     };
@@ -37,7 +37,7 @@ fn test_low_mask() {
     apply_fn_to_signeds!(low_mask_signed_helper);
 }
 
-fn low_mask_fail_helper<T: PrimitiveInteger>() {
+fn low_mask_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::low_mask(T::WIDTH + 1));
 }
 

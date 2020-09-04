@@ -3,10 +3,7 @@ use std::ops::Sub;
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
 use num::basic::traits::Zero;
 
-fn _mod_neg<T: Copy + Eq + Zero>(x: T, m: T) -> T
-where
-    T: Sub<T, Output = T>,
-{
+fn _mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
     if x == T::ZERO {
         T::ZERO
     } else {
@@ -14,10 +11,7 @@ where
     }
 }
 
-fn _mod_neg_assign<T: Copy + Eq + Zero>(x: &mut T, m: T)
-where
-    T: Sub<T, Output = T>,
-{
+fn _mod_neg_assign<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: &mut T, m: T) {
     if *x != T::ZERO {
         *x = m - *x;
     }

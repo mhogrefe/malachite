@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
@@ -1268,7 +1268,7 @@ fn test_round_to_multiple_signed() {
     test::<isize>(-2, 0, RoundingMode::Nearest, 0);
 }
 
-fn round_to_multiple_fail_helper<T: PrimitiveInteger>() {
+fn round_to_multiple_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(10).round_to_multiple(T::ZERO, RoundingMode::Up));
     assert_panic!(T::exact_from(10).round_to_multiple(T::exact_from(3), RoundingMode::Exact));
     assert_panic!(T::MAX.round_to_multiple(T::TWO, RoundingMode::Ceiling));

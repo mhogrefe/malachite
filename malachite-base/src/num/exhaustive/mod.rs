@@ -3,21 +3,21 @@ use std::iter::{once, Chain, Once};
 
 use itertools::{Interleave, Itertools};
 
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 
 /// Generates all primitive integers in an interval.
 ///
-/// This `struct` is created by the `primitive_integer_increasing_range` and
-/// `primitive_integer_increasing_inclusive_range` methods. See their documentation for more.
+/// This `struct` is created by the `primitive_int_increasing_range` and
+/// `primitive_int_increasing_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub struct PrimitiveIntegerIncreasingRange<T: PrimitiveInteger> {
+pub struct PrimitiveIntIncreasingRange<T: PrimitiveInt> {
     a: Option<T>,
     b: Option<T>,
 }
 
-impl<T: PrimitiveInteger> Iterator for PrimitiveIntegerIncreasingRange<T> {
+impl<T: PrimitiveInt> Iterator for PrimitiveIntIncreasingRange<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
@@ -31,7 +31,7 @@ impl<T: PrimitiveInteger> Iterator for PrimitiveIntegerIncreasingRange<T> {
     }
 }
 
-impl<T: PrimitiveInteger> DoubleEndedIterator for PrimitiveIntegerIncreasingRange<T> {
+impl<T: PrimitiveInt> DoubleEndedIterator for PrimitiveIntIncreasingRange<T> {
     fn next_back(&mut self) -> Option<T> {
         if self.a == self.b {
             None
@@ -53,9 +53,9 @@ impl<T: PrimitiveInteger> DoubleEndedIterator for PrimitiveIntegerIncreasingRang
 /// `exhaustive_signed_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveSignedRange<T: PrimitiveSigned> {
-    NonNegative(PrimitiveIntegerIncreasingRange<T>),
-    NonPositive(Rev<PrimitiveIntegerIncreasingRange<T>>),
-    BothSigns(Chain<Once<T>, PrimitiveIntegerUpDown<T>>),
+    NonNegative(PrimitiveIntIncreasingRange<T>),
+    NonPositive(Rev<PrimitiveIntIncreasingRange<T>>),
+    BothSigns(Chain<Once<T>, PrimitiveIntUpDown<T>>),
 }
 
 impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
@@ -71,8 +71,8 @@ impl<T: PrimitiveSigned> Iterator for ExhaustiveSignedRange<T> {
 }
 
 #[doc(hidden)]
-pub type PrimitiveIntegerUpDown<T> =
-    Interleave<PrimitiveIntegerIncreasingRange<T>, Rev<PrimitiveIntegerIncreasingRange<T>>>;
+pub type PrimitiveIntUpDown<T> =
+    Interleave<PrimitiveIntIncreasingRange<T>, Rev<PrimitiveIntIncreasingRange<T>>>;
 
 /// Generates all unsigned integers in ascending order.
 ///
@@ -94,8 +94,8 @@ pub type PrimitiveIntegerUpDown<T> =
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_inclusive_range(T::ZERO, T::MAX)
+pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntIncreasingRange<T> {
+    primitive_int_increasing_inclusive_range(T::ZERO, T::MAX)
 }
 
 /// Generates all positive primitive integers in ascending order.
@@ -112,16 +112,16 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntegerIncreasin
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::exhaustive::exhaustive_positive_primitives;
+/// use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 ///
 /// assert_eq!(
-///     exhaustive_positive_primitives::<u8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_positive_primitive_ints::<u8>().take(10).collect::<Vec<_>>(),
 ///     &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_positive_primitives<T: PrimitiveInteger>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_inclusive_range(T::ONE, T::MAX)
+pub fn exhaustive_positive_primitive_ints<T: PrimitiveInt>() -> PrimitiveIntIncreasingRange<T> {
+    primitive_int_increasing_inclusive_range(T::ONE, T::MAX)
 }
 
 /// Generates all signed integers in order of increasing absolute value.
@@ -148,7 +148,7 @@ pub fn exhaustive_positive_primitives<T: PrimitiveInteger>() -> PrimitiveInteger
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveIntegerUpDown<T>> {
+pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveIntUpDown<T>> {
     once(T::ZERO).chain(exhaustive_nonzero_signeds())
 }
 
@@ -172,8 +172,8 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveInteg
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerIncreasingRange<T> {
-    primitive_integer_increasing_inclusive_range(T::ZERO, T::MAX)
+pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntIncreasingRange<T> {
+    primitive_int_increasing_inclusive_range(T::ZERO, T::MAX)
 }
 
 /// Generates all negative signed integers in descending order.
@@ -196,9 +196,8 @@ pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerIncre
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntegerIncreasingRange<T>>
-{
-    primitive_integer_increasing_range(T::MIN, T::ZERO).rev()
+pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntIncreasingRange<T>> {
+    primitive_int_increasing_range(T::MIN, T::ZERO).rev()
 }
 
 /// Generates all nonzero signed integers in order of increasing absolute value.
@@ -225,15 +224,15 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveInteger
 /// )
 /// ```
 #[inline]
-pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerUpDown<T> {
-    exhaustive_positive_primitives().interleave(exhaustive_negative_signeds())
+pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntUpDown<T> {
+    exhaustive_positive_primitive_ints().interleave(exhaustive_negative_signeds())
 }
 
 /// Generates all primitive integers in the half-open interval $[a, b)$, in ascending order.
 ///
 /// `a` must be less than or equal to `b`. If `a` and `b` are equal, the range is empty. This
 /// function cannot create a range that includes `T::MAX`; for that, use
-/// `primitive_integer_increasing_inclusive_range`.
+/// `primitive_int_increasing_inclusive_range`.
 ///
 /// The output is $(k)_{k=a}^{b-1}$.
 ///
@@ -248,22 +247,22 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntegerUpDow
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::exhaustive::primitive_integer_increasing_range;
+/// use malachite_base::num::exhaustive::primitive_int_increasing_range;
 ///
 /// assert_eq!(
-///     primitive_integer_increasing_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     primitive_int_increasing_range::<i8>(-5, 5).collect::<Vec<_>>(),
 ///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
 /// )
 /// ```
 #[inline]
-pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
+pub fn primitive_int_increasing_range<T: PrimitiveInt>(
     a: T,
     b: T,
-) -> PrimitiveIntegerIncreasingRange<T> {
+) -> PrimitiveIntIncreasingRange<T> {
     if a > b {
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
-    PrimitiveIntegerIncreasingRange {
+    PrimitiveIntIncreasingRange {
         a: Some(a),
         b: Some(b),
     }
@@ -287,22 +286,22 @@ pub fn primitive_integer_increasing_range<T: PrimitiveInteger>(
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::exhaustive::primitive_integer_increasing_inclusive_range;
+/// use malachite_base::num::exhaustive::primitive_int_increasing_inclusive_range;
 ///
 /// assert_eq!(
-///     primitive_integer_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     primitive_int_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
 ///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 /// )
 /// ```
 #[inline]
-pub fn primitive_integer_increasing_inclusive_range<T: PrimitiveInteger>(
+pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
     a: T,
     b: T,
-) -> PrimitiveIntegerIncreasingRange<T> {
+) -> PrimitiveIntIncreasingRange<T> {
     if a > b {
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
-    PrimitiveIntegerIncreasingRange {
+    PrimitiveIntIncreasingRange {
         a: Some(a),
         b: b.checked_add(T::ONE),
     }
@@ -342,14 +341,14 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
     if a >= T::ZERO {
-        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_range(a, b))
+        ExhaustiveSignedRange::NonNegative(primitive_int_increasing_range(a, b))
     } else if b <= T::ZERO {
-        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_range(a, b).rev())
+        ExhaustiveSignedRange::NonPositive(primitive_int_increasing_range(a, b).rev())
     } else {
         ExhaustiveSignedRange::BothSigns(
             once(T::ZERO).chain(
-                primitive_integer_increasing_range(T::ONE, b)
-                    .interleave(primitive_integer_increasing_range(a, T::ZERO).rev()),
+                primitive_int_increasing_range(T::ONE, b)
+                    .interleave(primitive_int_increasing_range(a, T::ZERO).rev()),
             ),
         )
     }
@@ -391,15 +390,14 @@ pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
     if a >= T::ZERO {
-        ExhaustiveSignedRange::NonNegative(primitive_integer_increasing_inclusive_range(a, b))
+        ExhaustiveSignedRange::NonNegative(primitive_int_increasing_inclusive_range(a, b))
     } else if b <= T::ZERO {
-        ExhaustiveSignedRange::NonPositive(primitive_integer_increasing_inclusive_range(a, b).rev())
+        ExhaustiveSignedRange::NonPositive(primitive_int_increasing_inclusive_range(a, b).rev())
     } else {
         ExhaustiveSignedRange::BothSigns(
             once(T::ZERO).chain(
-                primitive_integer_increasing_inclusive_range(T::ONE, b).interleave(
-                    primitive_integer_increasing_inclusive_range(a, T::NEGATIVE_ONE).rev(),
-                ),
+                primitive_int_increasing_inclusive_range(T::ONE, b)
+                    .interleave(primitive_int_increasing_inclusive_range(a, T::NEGATIVE_ONE).rev()),
             ),
         )
     }

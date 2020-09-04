@@ -6,10 +6,10 @@ use num::arithmetic::traits::{
 use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 
-fn _neg_mod_unsigned<T: Copy + Eq + Zero>(x: T, other: T) -> T
-where
-    T: Rem<T, Output = T> + Sub<T, Output = T>,
-{
+fn _neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Zero>(
+    x: T,
+    other: T,
+) -> T {
     let remainder = x % other;
     if remainder == T::ZERO {
         T::ZERO
@@ -18,10 +18,10 @@ where
     }
 }
 
-fn _neg_mod_assign_unsigned<T: Copy + Eq + Zero>(x: &mut T, other: T)
-where
-    T: RemAssign<T> + Sub<T, Output = T>,
-{
+fn _neg_mod_assign_unsigned<T: Copy + Eq + RemAssign<T> + Sub<T, Output = T> + Zero>(
+    x: &mut T,
+    other: T,
+) {
     *x %= other;
     if *x != T::ZERO {
         *x = other - *x;
@@ -156,37 +156,41 @@ macro_rules! impl_mod_unsigned {
 }
 apply_to_unsigneds!(impl_mod_unsigned);
 
-fn _mod_op_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
-where
-    T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
+fn _mod_op_signed<
     U: NegMod<U, Output = U> + Rem<U, Output = U>,
-{
-    let remainder = if (x >= T::ZERO) == (other >= T::ZERO) {
+    S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
+>(
+    x: S,
+    other: S,
+) -> S {
+    let remainder = if (x >= S::ZERO) == (other >= S::ZERO) {
         x.unsigned_abs() % other.unsigned_abs()
     } else {
         x.unsigned_abs().neg_mod(other.unsigned_abs())
     };
-    if other >= T::ZERO {
-        T::exact_from(remainder)
+    if other >= S::ZERO {
+        S::exact_from(remainder)
     } else {
-        -T::exact_from(remainder)
+        -S::exact_from(remainder)
     }
 }
 
-fn _ceiling_mod_signed<U, T: Copy + Ord + Zero>(x: T, other: T) -> T
-where
-    T: ExactFrom<U> + Neg<Output = T> + UnsignedAbs<Output = U>,
+fn _ceiling_mod_signed<
     U: NegMod<U, Output = U> + Rem<U, Output = U>,
-{
-    let remainder = if (x >= T::ZERO) == (other >= T::ZERO) {
+    S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
+>(
+    x: S,
+    other: S,
+) -> S {
+    let remainder = if (x >= S::ZERO) == (other >= S::ZERO) {
         x.unsigned_abs().neg_mod(other.unsigned_abs())
     } else {
         x.unsigned_abs() % other.unsigned_abs()
     };
-    if other >= T::ZERO {
-        -T::exact_from(remainder)
+    if other >= S::ZERO {
+        -S::exact_from(remainder)
     } else {
-        T::exact_from(remainder)
+        S::exact_from(remainder)
     }
 }
 

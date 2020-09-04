@@ -5,7 +5,7 @@ use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, DivRound, EqModPowerOfTwo, ModPowerOfTwo,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;

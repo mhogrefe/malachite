@@ -1,11 +1,13 @@
+use std::cmp::Ordering;
+
 use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::cmp::Ordering;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether

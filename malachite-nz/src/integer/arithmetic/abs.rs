@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
+
+use integer::Integer;
 use natural::Natural;
 
 impl AbsAssign for Integer {

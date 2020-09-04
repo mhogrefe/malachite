@@ -1,5 +1,5 @@
 use num::arithmetic::traits::XXXAddYYYIsZZZ;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 

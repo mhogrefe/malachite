@@ -3,10 +3,11 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoMulAssign, PowerOfTwo, XMulYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ,
     XXXXAddYYYYIsZZZZ,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
+
 use natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

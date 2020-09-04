@@ -1,5 +1,5 @@
 use num::arithmetic::traits::ShrRound;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::{
     FromOtherTypeSlice, SplitInHalf, VecFromOtherType, VecFromOtherTypeSlice, WrappingFrom,
@@ -94,7 +94,7 @@ where
     }
 }
 
-fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
+fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt>(
     slice: &[A],
 ) -> Vec<B>
 where
@@ -112,9 +112,7 @@ where
     xs
 }
 
-fn _vec_from_other_type_large_to_small<A: PrimitiveInteger, B: PrimitiveInteger>(
-    mut value: A,
-) -> Vec<B>
+fn _vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt>(mut value: A) -> Vec<B>
 where
     B: WrappingFrom<A>,
 {
@@ -197,9 +195,7 @@ macro_rules! impl_slice_traits_large_to_small {
     };
 }
 
-pub fn _from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
-    slice: &[A],
-) -> B
+pub fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt>(slice: &[A]) -> B
 where
     B: WrappingFrom<A>,
 {
@@ -212,7 +208,7 @@ where
     result
 }
 
-fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInteger, B: PrimitiveInteger>(
+fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt>(
     slice: &[A],
 ) -> Vec<B>
 where

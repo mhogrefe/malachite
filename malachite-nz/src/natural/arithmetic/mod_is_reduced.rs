@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::basic::traits::Zero;
+
 use natural::Natural;
 
 impl ModIsReduced for Natural {

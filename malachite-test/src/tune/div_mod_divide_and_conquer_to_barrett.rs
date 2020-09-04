@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_bench::tune::{compare_two, ComparisonResult};
 use malachite_nz::natural::arithmetic::div_mod::{

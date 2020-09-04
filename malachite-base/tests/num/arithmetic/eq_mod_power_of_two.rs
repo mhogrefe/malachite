@@ -1,7 +1,7 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn eq_mod_power_of_two_primitive_helper<T: PrimitiveInteger>() {
+fn eq_mod_power_of_two_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, other, pow, out| {
         assert_eq!(n.eq_mod_power_of_two(other, pow), out);
     };

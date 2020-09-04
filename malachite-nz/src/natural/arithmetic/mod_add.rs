@@ -1,4 +1,5 @@
 use malachite_base::num::arithmetic::traits::{ModAdd, ModAddAssign};
+
 use natural::Natural;
 
 impl ModAdd<Natural, Natural> for Natural {

@@ -1,7 +1,9 @@
-use integer::Integer;
+use std::iter::{once, Chain, Once, Rev};
+
 use itertools::{Interleave, Itertools};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use std::iter::{once, Chain, Once, Rev};
+
+use integer::Integer;
 
 /// Generates all `Natural`s in a finite interval, in ascending order.
 ///

@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_arithmetic_checked_shl() {
-    fn test<T: PrimitiveInteger, U: PrimitiveInteger>(t: T, u: U, out: Option<T>)
+    fn test<T: PrimitiveInt, U: PrimitiveInt>(t: T, u: U, out: Option<T>)
     where
         T: ArithmeticCheckedShl<U, Output = T>,
     {

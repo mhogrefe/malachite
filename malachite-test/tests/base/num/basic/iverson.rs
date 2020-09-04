@@ -1,9 +1,9 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::bools;
 
-fn iverson_properties_helper<T: PrimitiveInteger>() {
+fn iverson_properties_helper<T: PrimitiveInt>() {
     test_properties_no_special(bools, |&b| {
         let n = T::iverson(b);
         assert!(n == T::ZERO || n == T::ONE);

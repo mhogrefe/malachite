@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::logic::traits::CountOnes;
+
+use integer::Integer;
 
 impl Integer {
     /// Counts the number of ones in the binary expansion of an `Integer`. If the `Integer` is

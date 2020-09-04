@@ -2,7 +2,7 @@ use std::panic::catch_unwind;
 
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -18,7 +18,7 @@ fn random_unsigneds_less_than_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) {
-    uniform_primitive_integer_assertions(
+    uniform_primitive_int_assertions(
         random_unsigneds_less_than(EXAMPLE_SEED, limit),
         T::ZERO,
         limit.wrapping_sub(T::ONE),

@@ -1,10 +1,10 @@
 use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn significant_bits_helper<T: PrimitiveInteger>() {
+fn significant_bits_helper<T: PrimitiveInt>() {
     let test = |n, out| {
         assert_eq!(T::exact_from(n).significant_bits(), out);
     };

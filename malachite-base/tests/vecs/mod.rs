@@ -38,3 +38,5 @@ fn vec_delete_left_fail_2() {
     let mut xs: Vec<u32> = vec![1, 2, 3];
     vec_delete_left(&mut xs, 4);
 }
+
+pub mod random_values_from_vec;

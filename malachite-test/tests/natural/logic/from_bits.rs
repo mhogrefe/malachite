@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base_test_util::num::logic::bit_convertible::{

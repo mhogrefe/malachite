@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_nz::natural::arithmetic::div_exact::MAX_OVER_3;
 use malachite_nz::platform::Limb;

@@ -1,10 +1,13 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use std::mem::swap;
+
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ShrRound,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
+
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::arithmetic::mod_power_of_two::{
     limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
     limbs_slice_mod_power_of_two_in_place,
@@ -19,7 +22,6 @@ use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::mem::swap;
 
 fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     xs.resize(

@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
@@ -8,12 +10,12 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
+
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {

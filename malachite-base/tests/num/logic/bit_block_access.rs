@@ -2,7 +2,7 @@ use std::panic::catch_unwind;
 
 use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::BitBlockAccess;
@@ -51,7 +51,7 @@ pub fn test_get_bits_signed() {
     test(-1i8, 0, 8, 0xff);
 }
 
-fn get_bits_fail_helper<T: PrimitiveInteger>() {
+fn get_bits_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(100).get_bits(10, 5));
 }
 

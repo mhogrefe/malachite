@@ -1,5 +1,5 @@
 use malachite_base::named::Named;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 
 macro_rules! test_unsigned_constants {

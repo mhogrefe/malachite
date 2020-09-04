@@ -1,7 +1,8 @@
+use std::cmp::Ordering;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::cmp::Ordering;
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, compares the two `Natural`s.

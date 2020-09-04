@@ -1,12 +1,12 @@
 use std::ops::{Shl, ShlAssign};
 
 use num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
-fn _shl_round<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round<T: PrimitiveInt, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
     x: T,
     bits: S,
     rm: RoundingMode,
@@ -27,7 +27,7 @@ where
     }
 }
 
-fn _shl_round_assign<T: PrimitiveInteger, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round_assign<T: PrimitiveInt, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
     x: &mut T,
     bits: S,
     rm: RoundingMode,

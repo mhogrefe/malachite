@@ -1,6 +1,7 @@
+use std::ops::Neg;
+
 use integer::Integer;
 use natural::Natural;
-use std::ops::Neg;
 
 impl Neg for Natural {
     type Output = Integer;

@@ -1,12 +1,14 @@
+use std::ops::{Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::vecs::vec_delete_left;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Shr, ShrAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `Limb`, rounding down.

@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn get_bit_helper_unsigned<T: PrimitiveInteger>() {
+fn get_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, out| {
         assert_eq!(T::exact_from(n).get_bit(index), out);
     };
@@ -51,7 +51,7 @@ fn test_get_bit() {
     apply_fn_to_signeds!(get_bit_helper_signed);
 }
 
-fn set_bit_helper_unsigned<T: PrimitiveInteger>() {
+fn set_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, out: u64| {
         let mut n = T::exact_from(n);
         n.set_bit(index);
@@ -93,7 +93,7 @@ fn test_set_bit() {
     apply_fn_to_signeds!(set_bit_helper_signed);
 }
 
-fn set_bit_fail_helper<T: PrimitiveInteger>() {
+fn set_bit_fail_helper<T: PrimitiveInt>() {
     assert_panic!({
         let mut n = T::exact_from(5);
         n.set_bit(200);
@@ -105,7 +105,7 @@ fn set_bit_fail() {
     apply_fn_to_primitive_ints!(set_bit_fail_helper);
 }
 
-fn clear_bit_helper_unsigned<T: PrimitiveInteger>() {
+fn clear_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, out: u64| {
         let mut n = T::exact_from(n);
         n.clear_bit(index);
@@ -159,7 +159,7 @@ fn clear_bit_fail() {
     apply_fn_to_signeds!(clear_bit_fail_helper);
 }
 
-fn assign_bit_helper_unsigned<T: PrimitiveInteger>() {
+fn assign_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, bit, out: u64| {
         let mut n = T::exact_from(n);
         n.assign_bit(index, bit);
@@ -210,7 +210,7 @@ fn test_assign_bit() {
     apply_fn_to_signeds!(assign_bit_helper_signed);
 }
 
-fn assign_bit_fail_helper<T: PrimitiveInteger>() {
+fn assign_bit_fail_helper<T: PrimitiveInt>() {
     assert_panic!({
         let mut n = T::exact_from(5);
         n.assign_bit(200, true);
@@ -230,7 +230,7 @@ fn assign_bit_fail() {
     apply_fn_to_signeds!(assign_bit_fail_helper_signed);
 }
 
-fn flip_bit_helper_unsigned<T: PrimitiveInteger>() {
+fn flip_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, out: u64| {
         let mut n = T::exact_from(n);
         n.flip_bit(index);

@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{ModNeg, ModNegAssign};
 use malachite_base::num::basic::traits::Zero;
+
 use natural::Natural;
 
 impl ModNeg<Natural> for Natural {

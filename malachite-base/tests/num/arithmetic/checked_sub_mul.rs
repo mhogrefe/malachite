@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_checked_sub_mul() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, z: T, out: Option<T>) {
+    fn test<T: PrimitiveInt>(x: T, y: T, z: T, out: Option<T>) {
         assert_eq!(x.checked_sub_mul(y, z), out);
     };
     test::<u8>(100, 3, 7, Some(79));

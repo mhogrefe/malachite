@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::vecs::vec_delete_left;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;

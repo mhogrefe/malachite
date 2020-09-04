@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_overflowing_mul() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: T, overflow: bool) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: T, overflow: bool) {
         assert_eq!(x.overflowing_mul(y), (out, overflow));
 
         let mut x = x;

@@ -1,12 +1,12 @@
 use std::ops::{Neg, Shr};
 
 use num::arithmetic::traits::{ArithmeticCheckedShl, ArithmeticCheckedShr, UnsignedAbs};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
 fn _arithmetic_checked_shr_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInteger + Shr<U, Output = T>,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
@@ -73,7 +73,7 @@ fn _arithmetic_checked_shr_signed_signed<
     bits: S,
 ) -> Option<T>
 where
-    T: PrimitiveInteger,
+    T: PrimitiveInt,
 {
     if bits < S::ZERO {
         x.arithmetic_checked_shl(bits.unsigned_abs())

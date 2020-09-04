@@ -1,11 +1,14 @@
+use std::cmp::Ordering;
+
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, PowerOfTwo,
     WrappingAddAssign,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::slice_trailing_zeros;
+
 use natural::arithmetic::div_exact::limbs_modular_invert_limb;
 use natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,
@@ -20,7 +23,6 @@ use natural::comparison::ord::limbs_cmp;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
-use std::cmp::Ordering;
 
 /// See the description for `_limbs_mod_exact_odd_limb`. divisor must be odd.
 ///

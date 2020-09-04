@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn power_of_two_primitive_helper<T: PrimitiveInteger>() {
+fn power_of_two_primitive_helper<T: PrimitiveInt>() {
     let test = |pow, out| {
         assert_eq!(T::power_of_two(pow), out);
     };

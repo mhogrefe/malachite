@@ -1,10 +1,10 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_div_exact() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, out: T) {
+    fn test<T: PrimitiveInt>(x: T, y: T, out: T) {
         assert_eq!(x.div_exact(y), out);
 
         let mut x = x;
@@ -76,7 +76,7 @@ fn test_div_exact() {
     test::<i128>(-18_446_744_065_119_617_025, -0xffff_ffff, 0xffff_ffff);
 }
 
-fn div_exact_fail_helper<T: PrimitiveInteger>() {
+fn div_exact_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.div_exact(T::ZERO));
     assert_panic!(T::ONE.div_exact_assign(T::ZERO));
 }

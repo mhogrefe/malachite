@@ -1,60 +1,25 @@
+use std::cmp::{min, Ordering};
+
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, DivRound, ModPowerOfTwo, Parity, PowerOfTwo,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ExactFrom, FromOtherTypeSlice, WrappingFrom,
 };
+use malachite_base::num::iterator::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{
     BitAccess, BitBlockAccess, LowMask, PowerOfTwoDigits, SignificantBits,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::cmp::{min, Ordering};
-
-fn reformat_slice<'a, T: PrimitiveUnsigned, U: PrimitiveUnsigned, I>(
-    ys: &mut Vec<U>,
-    xs: I,
-    y_width: u64,
-    x_width: u64,
-) where
-    U: WrappingFrom<T>,
-    I: Iterator<Item = &'a T>,
-{
-    let mut y = U::ZERO;
-    let mut remaining_y_bits = y_width;
-    for &x in xs {
-        let mut x = x;
-        let mut remaining_x_bits = x_width;
-        while remaining_x_bits != 0 {
-            let y_index = y_width - remaining_y_bits;
-            if remaining_x_bits <= remaining_y_bits {
-                y |= U::wrapping_from(x) << y_index;
-                remaining_y_bits -= remaining_x_bits;
-                remaining_x_bits = 0;
-            } else {
-                y |= U::wrapping_from(x).mod_power_of_two(remaining_y_bits) << y_index;
-                x >>= remaining_y_bits;
-                remaining_x_bits -= remaining_y_bits;
-                remaining_y_bits = 0;
-            }
-            if remaining_y_bits == 0 {
-                ys.push(y);
-                y = U::ZERO;
-                remaining_y_bits = y_width;
-            }
-        }
-    }
-    if y != U::ZERO {
-        ys.push(y);
-    }
-}
 
 impl Natural {
     pub fn _to_power_of_two_digits_asc_naive<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
@@ -169,8 +134,9 @@ macro_rules! power_of_two_digits_primitive {
                     }
                     Natural(Large(ref limbs)) => limbs,
                 };
-                let mut digits = Vec::new();
+                let mut digits;
                 if log_base == 1 {
+                    digits = Vec::new();
                     let (last, init) = limbs.split_last().unwrap();
                     for limb in init {
                         for i in 0..Limb::WIDTH {
@@ -183,6 +149,7 @@ macro_rules! power_of_two_digits_primitive {
                         last >>= 1;
                     }
                 } else if let Some(log_log_base) = log_base.checked_log_two() {
+                    digits = Vec::new();
                     match log_log_base.cmp(&Limb::LOG_WIDTH) {
                         Ordering::Equal => {
                             digits.extend(limbs.iter().cloned().map($t::wrapping_from))
@@ -203,7 +170,8 @@ macro_rules! power_of_two_digits_primitive {
                         ),
                     }
                 } else {
-                    reformat_slice(&mut digits, limbs.iter(), log_base, Limb::WIDTH);
+                    digits = iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base)
+                        .collect();
                 }
                 digits.truncate(digits.len() - slice_trailing_zeros(&digits));
                 digits
@@ -298,9 +266,11 @@ macro_rules! power_of_two_digits_primitive {
                 assert!(digits
                     .iter()
                     .all(|digit| digit.significant_bits() <= log_base));
-                let mut limbs = Vec::new();
+                let mut limbs;
                 if digits.is_empty() {
+                    limbs = Vec::new();
                 } else if let Some(log_log_base) = log_base.checked_log_two() {
+                    limbs = Vec::new();
                     match log_log_base.cmp(&Limb::LOG_WIDTH) {
                         Ordering::Equal => {
                             limbs.extend(digits.iter().cloned().map(Limb::wrapping_from))
@@ -323,7 +293,8 @@ macro_rules! power_of_two_digits_primitive {
                         }
                     }
                 } else {
-                    reformat_slice(&mut limbs, digits.iter(), Limb::WIDTH, log_base);
+                    limbs = iterator_to_bit_chunks(digits.iter().cloned(), log_base, Limb::WIDTH)
+                        .collect();
                 }
                 Natural::from_owned_limbs_asc(limbs)
             }
@@ -373,9 +344,11 @@ macro_rules! power_of_two_digits_primitive {
                 assert!(digits
                     .iter()
                     .all(|digit| digit.significant_bits() <= log_base));
-                let mut limbs = Vec::new();
+                let mut limbs;
                 if digits.is_empty() {
+                    limbs = Vec::new();
                 } else if let Some(log_log_base) = log_base.checked_log_two() {
+                    limbs = Vec::new();
                     match log_log_base.cmp(&Limb::LOG_WIDTH) {
                         Ordering::Equal => {
                             limbs.extend(digits.iter().rev().cloned().map(Limb::wrapping_from))
@@ -398,7 +371,9 @@ macro_rules! power_of_two_digits_primitive {
                         }
                     }
                 } else {
-                    reformat_slice(&mut limbs, digits.iter().rev(), Limb::WIDTH, log_base);
+                    limbs =
+                        iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
+                            .collect();
                 }
                 Natural::from_owned_limbs_asc(limbs)
             }

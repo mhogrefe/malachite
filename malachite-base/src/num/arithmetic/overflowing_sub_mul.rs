@@ -2,7 +2,7 @@ use num::arithmetic::traits::{
     OverflowingMul, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
     OverflowingSubMulAssign, UnsignedAbs, WrappingMul, WrappingSub,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 
 fn _overflowing_sub_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
@@ -71,7 +71,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_sub_mul_unsigned);
 
-fn _overflowing_sub_mul<U: PrimitiveInteger, S: Copy + Ord + Zero>(x: S, y: S, z: S) -> (S, bool)
+fn _overflowing_sub_mul<U: PrimitiveInt, S: Copy + Ord + Zero>(x: S, y: S, z: S) -> (S, bool)
 where
     S: OverflowingMul<S, Output = S>
         + OverflowingSub<S, Output = S>

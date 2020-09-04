@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, DivMod, DivRound, EqModPowerOfTwo, ModPowerOfTwo,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;

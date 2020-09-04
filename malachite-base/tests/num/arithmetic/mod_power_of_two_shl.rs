@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwoShl, ModPowerOfTwoShlAssign};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
 fn test_mod_power_of_two_shl() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveInteger>(t: T, u: U, pow: u64, out: T)
+    fn test<T: PrimitiveUnsigned, U: PrimitiveInt>(t: T, u: U, pow: u64, out: T)
     where
         T: ModPowerOfTwoShl<U, Output = T> + ModPowerOfTwoShlAssign<U>,
     {

@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, UnsignedAbs,
 };
+
 use natural::Natural;
 
 macro_rules! impl_mod_power_of_two_shr_signed {

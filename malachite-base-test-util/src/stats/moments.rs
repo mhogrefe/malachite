@@ -1,7 +1,7 @@
 use std::fmt::{self, Debug, Formatter};
 
 use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -11,9 +11,8 @@ use num::float::nice_float::NiceFloat;
 use stats::common_values_map::common_values_map;
 use stats::median;
 use stats::median::{
-    deleted_uniform_primitive_integer_median, double_geometric_median,
-    double_nonzero_geometric_median, truncated_geometric_median, uniform_bool_median,
-    uniform_primitive_integer_median,
+    deleted_uniform_primitive_int_median, double_geometric_median, double_nonzero_geometric_median,
+    truncated_geometric_median, uniform_bool_median, uniform_primitive_int_median,
 };
 
 // Panics if the input exceeds the finite range of f64.
@@ -21,7 +20,7 @@ pub trait CheckedToF64 {
     fn checked_to_f64(&self) -> f64;
 }
 
-macro_rules! impl_checked_to_f64_for_primitive_integers {
+macro_rules! impl_checked_to_f64_for_primitive_ints {
     ($t: ident) => {
         impl CheckedToF64 for $t {
             #[inline]
@@ -33,7 +32,7 @@ macro_rules! impl_checked_to_f64_for_primitive_integers {
         }
     };
 }
-apply_to_primitive_ints!(impl_checked_to_f64_for_primitive_integers);
+apply_to_primitive_ints!(impl_checked_to_f64_for_primitive_ints);
 
 impl CheckedToF64 for bool {
     #[inline]
@@ -233,7 +232,7 @@ pub fn uniform_bool_assertions<I: Clone + Iterator<Item = bool>>(
     );
 }
 
-pub fn uniform_primitive_integer_assertions<I: Clone + Iterator>(
+pub fn uniform_primitive_int_assertions<I: Clone + Iterator>(
     xs: I,
     a: I::Item,
     b: I::Item,
@@ -244,7 +243,7 @@ pub fn uniform_primitive_integer_assertions<I: Clone + Iterator>(
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item: CheckedToF64 + PrimitiveInteger,
+    I::Item: CheckedToF64 + PrimitiveInt,
 {
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
@@ -254,7 +253,7 @@ pub fn uniform_primitive_integer_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            uniform_primitive_integer_median(a, b),
+            uniform_primitive_int_median(a, b),
             actual_sample_median,
             pop_disc_uniform_dist_moment_stats(&a, &b),
             actual_sample_moment_stats
@@ -315,7 +314,7 @@ fn pop_deleted_disc_uniform_dist_4_mean<T: CheckedToF64>(a: &T, b: &T, c: &T) ->
         / (30.0 * (a - b))
 }
 
-fn deleted_uniform_primitive_integer_moment_stats<T: CheckedToF64 + Ord>(
+fn deleted_uniform_primitive_int_moment_stats<T: CheckedToF64 + Ord>(
     a: &T,
     b: &T,
     c: &T,
@@ -330,7 +329,7 @@ fn deleted_uniform_primitive_integer_moment_stats<T: CheckedToF64 + Ord>(
     )
 }
 
-pub fn deleted_uniform_primitive_integer_assertions<I: Clone + Iterator>(
+pub fn deleted_uniform_primitive_int_assertions<I: Clone + Iterator>(
     xs: I,
     a: I::Item,
     b: I::Item,
@@ -342,7 +341,7 @@ pub fn deleted_uniform_primitive_integer_assertions<I: Clone + Iterator>(
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item: CheckedToF64 + PrimitiveInteger,
+    I::Item: CheckedToF64 + PrimitiveInt,
 {
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
     let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
@@ -352,9 +351,9 @@ pub fn deleted_uniform_primitive_integer_assertions<I: Clone + Iterator>(
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            deleted_uniform_primitive_integer_median(a, b, c),
+            deleted_uniform_primitive_int_median(a, b, c),
             actual_sample_median,
-            deleted_uniform_primitive_integer_moment_stats(&a, &b, &c),
+            deleted_uniform_primitive_int_moment_stats(&a, &b, &c),
             actual_sample_moment_stats
         ),
         (
@@ -450,7 +449,7 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
 ) where
-    I::Item: CheckedToF64 + PrimitiveInteger,
+    I::Item: CheckedToF64 + PrimitiveInt,
 {
     let min_64 = min.checked_to_f64();
     let max_64 = max.checked_to_f64();

@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bools::random::{random_bools, RandomBools};
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::signeds::PrimitiveSigned;
@@ -5,7 +7,6 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::geometric::mean_to_p_with_min;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
-use std::marker::PhantomData;
 
 /// Generates bits from a striped random sequence.
 ///

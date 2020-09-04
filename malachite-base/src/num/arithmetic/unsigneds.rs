@@ -1,5 +1,5 @@
 use num::arithmetic::traits::{CeilingLogTwo, CheckedLogTwo, FloorLogTwo};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 
 macro_rules! impl_arithmetic_traits {

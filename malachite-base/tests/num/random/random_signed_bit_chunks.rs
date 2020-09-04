@@ -3,7 +3,7 @@ use std::panic::catch_unwind;
 use itertools::{assert_equal, repeat_n, Itertools};
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
-    uniform_primitive_integer_assertions, CheckedToF64, MomentStats,
+    uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };
 
 use malachite_base::bools::random::random_bools;
@@ -27,7 +27,7 @@ fn random_signed_bit_chunks_helper<T: CheckedToF64 + PrimitiveSigned>(
         (T::MIN, T::MAX)
     };
     let xs = random_signed_bit_chunks(EXAMPLE_SEED, chunk_size);
-    uniform_primitive_integer_assertions(
+    uniform_primitive_int_assertions(
         xs.clone(),
         min,
         max,

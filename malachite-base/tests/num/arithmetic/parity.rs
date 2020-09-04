@@ -1,7 +1,7 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn even_primitive_helper<T: PrimitiveInteger>() {
+fn even_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, out| {
         assert_eq!(n.even(), out);
     };
@@ -29,7 +29,7 @@ fn test_even() {
     apply_fn_to_signeds!(even_signed_helper);
 }
 
-fn odd_primitive_helper<T: PrimitiveInteger>() {
+fn odd_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, out| {
         assert_eq!(n.odd(), out);
     };

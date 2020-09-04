@@ -1,8 +1,10 @@
-use error::ParseIntegerError;
-use integer::Integer;
-use malachite_base::num::basic::traits::Zero;
 use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
 use std::str::FromStr;
+
+use malachite_base::num::basic::traits::Zero;
+
+use error::ParseIntegerError;
+use integer::Integer;
 
 impl Integer {
     //TODO test
@@ -75,8 +77,8 @@ impl FromStr for Integer {
 pub mod floating_point_from_integer;
 pub mod from_floating_point;
 pub mod from_natural;
-pub mod from_primitive_integer;
+pub mod from_primitive_int;
 pub mod from_twos_complement_limbs;
 pub mod natural_from_integer;
-pub mod primitive_integer_from_integer;
+pub mod primitive_int_from_integer;
 pub mod to_twos_complement_limbs;

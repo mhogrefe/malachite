@@ -109,6 +109,7 @@ pub mod conversion {
 }
 pub mod exhaustive;
 pub mod floats;
+pub mod iterator;
 pub mod logic {
     pub mod bit_access;
     pub mod bit_block_access;

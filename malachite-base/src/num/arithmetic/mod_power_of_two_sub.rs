@@ -1,15 +1,16 @@
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoSub, ModPowerOfTwoSubAssign};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 
-fn _mod_power_of_two_sub<T: PrimitiveInteger>(x: T, other: T, pow: u64) -> T
-where
-    T: ModPowerOfTwo<Output = T>,
-{
+fn _mod_power_of_two_sub<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+    x: T,
+    other: T,
+    pow: u64,
+) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_sub(other).mod_power_of_two(pow)
 }
 
-fn _mod_power_of_two_sub_assign<T: PrimitiveInteger>(x: &mut T, other: T, pow: u64) {
+fn _mod_power_of_two_sub_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_sub_assign(other);
     x.mod_power_of_two_assign(pow);

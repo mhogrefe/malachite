@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+
 use natural::InnerNatural::Small;
 use natural::Natural;
-use std::str::FromStr;
 
 /// An integer.
 ///
@@ -122,6 +124,7 @@ pub mod arithmetic {
     pub mod mul;
     pub mod neg;
     pub mod parity;
+    pub mod pow;
     pub mod power_of_two;
     pub mod round_to_multiple;
     pub mod round_to_multiple_of_power_of_two;
@@ -139,11 +142,11 @@ pub mod comparison {
     pub mod ord;
     pub mod ord_abs;
     pub mod partial_eq_natural;
-    pub mod partial_eq_primitive_integer;
+    pub mod partial_eq_primitive_int;
     pub mod partial_ord_abs_natural;
-    pub mod partial_ord_abs_primitive_integer;
+    pub mod partial_ord_abs_primitive_int;
     pub mod partial_ord_natural;
-    pub mod partial_ord_primitive_integer;
+    pub mod partial_ord_primitive_int;
 }
 
 pub mod conversion;

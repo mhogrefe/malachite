@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod};
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;

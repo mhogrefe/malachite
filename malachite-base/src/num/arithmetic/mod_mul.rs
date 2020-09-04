@@ -2,7 +2,7 @@ use num::arithmetic::traits::{
     ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOfTwo,
     WrappingSubAssign,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::LeadingZeros;
@@ -173,16 +173,13 @@ pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
 /// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT Dev 1.
 pub fn _limbs_mod_preinverted<
     T: PrimitiveUnsigned,
-    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     mut x_1: T,
     x_0: T,
     d: T,
     d_inv: T,
-) -> T
-where
-    DT: From<T> + HasHalf<Half = T>,
-{
+) -> T {
     assert_ne!(d, T::ZERO);
     let d_inv = DT::from(d_inv);
     let shift = LeadingZeros::leading_zeros(d);
@@ -240,15 +237,15 @@ where
 }
 
 // This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
-pub fn _fast_mod_mul<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+pub fn _fast_mod_mul<
+    T: PrimitiveUnsigned,
+    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
     x: T,
     y: T,
     m: T,
     inv: T,
-) -> T
-where
-    DT: From<T> + HasHalf<Half = T>,
-{
+) -> T {
     assert_ne!(m, T::ZERO);
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
     _limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)

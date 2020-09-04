@@ -1,12 +1,12 @@
 use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
 fn test_checked_square() {
-    fn test<T: PrimitiveInteger>(x: T, out: Option<T>) {
+    fn test<T: PrimitiveInt>(x: T, out: Option<T>) {
         assert_eq!(x.checked_square(), out);
     };
     test::<u8>(0, Some(0));

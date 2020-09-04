@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, NextPowerOfTwo, NextPowerOfTwoAssign,
 };
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

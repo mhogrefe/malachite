@@ -1,10 +1,11 @@
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-use integer::Integer;
 use itertools::Itertools;
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitConvertible, LeadingZeros, LowMask, NotAssign};
+
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
+use integer::Integer;
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::logic::bit_convertible::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
 use natural::Natural;

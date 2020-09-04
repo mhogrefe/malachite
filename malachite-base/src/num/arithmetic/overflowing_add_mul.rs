@@ -2,8 +2,10 @@ use num::arithmetic::traits::{
     OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
     OverflowingMul, UnsignedAbs, WrappingAdd, WrappingMul,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
+
+//TODO wheres
 
 fn _overflowing_add_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
 where
@@ -71,7 +73,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-fn _overflowing_add_mul_signed<U: PrimitiveInteger, S: Copy + Eq + Ord + Zero>(
+fn _overflowing_add_mul_signed<U: PrimitiveInt, S: Copy + Eq + Ord + Zero>(
     x: S,
     y: S,
     z: S,

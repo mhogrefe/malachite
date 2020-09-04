@@ -9,7 +9,7 @@ use std::str::FromStr;
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, NegAssign, PowerOfTwo};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;

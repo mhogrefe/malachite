@@ -1,8 +1,8 @@
 use num::arithmetic::traits::UnsignedAbs;
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{LeadingZeros, SignificantBits};
 
-fn _significant_bits_unsigned<T: PrimitiveInteger>(x: T) -> u64 {
+fn _significant_bits_unsigned<T: PrimitiveInt>(x: T) -> u64 {
     T::WIDTH - LeadingZeros::leading_zeros(x)
 }
 

@@ -40,3 +40,5 @@ pub mod constants;
 pub mod crement;
 /// This module contains iterators that generate `char`s without repetition.
 pub mod exhaustive;
+/// This module contains iterators that generate `char`s randomly.
+pub mod random;

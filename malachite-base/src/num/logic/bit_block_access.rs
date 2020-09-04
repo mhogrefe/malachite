@@ -2,13 +2,13 @@ use std::cmp::min;
 use std::ops::Neg;
 
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _get_bits_unsigned<T: PrimitiveInteger>(x: &T, start: u64, end: u64) -> T
+fn _get_bits_unsigned<T: PrimitiveInt>(x: &T, start: u64, end: u64) -> T
 where
     T: ModPowerOfTwo<Output = T>,
 {
@@ -20,7 +20,7 @@ where
     }
 }
 
-fn _assign_bits_unsigned<T: PrimitiveInteger>(x: &mut T, start: u64, end: u64, bits: &T)
+fn _assign_bits_unsigned<T: PrimitiveInt>(x: &mut T, start: u64, end: u64, bits: &T)
 where
     T: ModPowerOfTwo<Output = T>,
 {
@@ -106,7 +106,7 @@ macro_rules! impl_bit_block_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-fn _get_bits_signed<T: PrimitiveInteger, U>(x: &T, start: u64, end: u64) -> U
+fn _get_bits_signed<T: PrimitiveInt, U>(x: &T, start: u64, end: u64) -> U
 where
     T: ModPowerOfTwo<Output = U> + Neg<Output = T>,
 {
@@ -119,12 +119,8 @@ where
     .mod_power_of_two(end - start)
 }
 
-fn _assign_bits_signed<T: PrimitiveInteger, U: PrimitiveInteger>(
-    x: &mut T,
-    start: u64,
-    end: u64,
-    bits: &U,
-) where
+fn _assign_bits_signed<T: PrimitiveInt, U: PrimitiveInt>(x: &mut T, start: u64, end: u64, bits: &U)
+where
     T: UnsignedAbs<Output = U> + WrappingFrom<U>,
     U: BitBlockAccess<Bits = U> + ModPowerOfTwo<Output = U>,
 {

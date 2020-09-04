@@ -1,9 +1,11 @@
-use error::ParseIntegerError;
-use malachite_base::num::basic::traits::Zero;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
+
+use malachite_base::num::basic::traits::Zero;
+
+use error::ParseIntegerError;
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 
 impl Natural {
     //TODO test
@@ -114,7 +116,7 @@ impl fmt::Binary for Natural {
 pub mod floating_point_from_natural;
 pub mod from_floating_point;
 pub mod from_limbs;
-pub mod from_primitive_integer;
+pub mod from_primitive_int;
 pub mod limb_count;
-pub mod primitive_integer_from_natural;
+pub mod primitive_int_from_natural;
 pub mod to_limbs;

@@ -1,8 +1,8 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_eq_mod() {
-    fn test<T: PrimitiveInteger>(x: T, y: T, m: T, out: bool) {
+    fn test<T: PrimitiveInt>(x: T, y: T, m: T, out: bool) {
         assert_eq!(x.eq_mod(y, m), out);
     };
     test::<u8>(0, 0, 0, true);

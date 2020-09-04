@@ -9,7 +9,7 @@ use num::arithmetic::traits::{
     NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ,
     XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice};
 use num::logic::traits::{HammingDistance, PowerOfTwoDigitIterable, PowerOfTwoDigits};
@@ -103,7 +103,7 @@ pub trait PrimitiveUnsigned:
     + PowerOfTwoDigitIterable<u64>
     + PowerOfTwoDigitIterable<u128>
     + PowerOfTwoDigitIterable<usize>
-    + PrimitiveInteger
+    + PrimitiveInt
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>
     + VecFromOtherType<u32>

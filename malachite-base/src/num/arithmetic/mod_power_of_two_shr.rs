@@ -3,23 +3,19 @@ use std::ops::{Shr, ShrAssign};
 use num::arithmetic::traits::{
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, UnsignedAbs,
 };
-use num::basic::integers::PrimitiveInteger;
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
 fn _mod_power_of_two_shr_signed<
-    T: PrimitiveInteger,
+    T: ModPowerOfTwoShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: T,
     other: S,
     pow: u64,
-) -> T
-where
-    T: ModPowerOfTwoShl<U, Output = T> + Shr<U, Output = T>,
-    S: UnsignedAbs<Output = U>,
-{
+) -> T {
     assert!(pow <= T::WIDTH);
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {
@@ -35,17 +31,14 @@ where
 }
 
 fn _mod_power_of_two_shr_assign_signed<
-    T: PrimitiveInteger,
+    T: ModPowerOfTwoShlAssign<U> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: &mut T,
     other: S,
     pow: u64,
-) where
-    T: ModPowerOfTwoShlAssign<U> + ShrAssign<U>,
-    S: UnsignedAbs<Output = U>,
-{
+) {
     assert!(pow <= T::WIDTH);
     let other_abs = other.unsigned_abs();
     if other >= S::ZERO {

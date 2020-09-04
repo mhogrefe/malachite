@@ -1,7 +1,7 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn divisible_by_power_of_two_primitive_helper<T: PrimitiveInteger>() {
+fn divisible_by_power_of_two_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, pow, out| {
         assert_eq!(n.divisible_by_power_of_two(pow), out);
     };

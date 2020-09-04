@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -323,7 +323,7 @@ fn test_div_mod_signed() {
     test::<i8>(-128, -1, 0);
 }
 
-fn mod_fail_helper<T: PrimitiveInteger>() {
+fn mod_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.mod_op(T::ZERO));
     assert_panic!(T::ONE.mod_assign(T::ZERO));
 }

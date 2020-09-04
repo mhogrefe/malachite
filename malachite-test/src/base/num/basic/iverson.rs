@@ -1,4 +1,4 @@
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
 use malachite_test::inputs::base::bools;
@@ -18,7 +18,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_ns_demo!(registry, demo_isize_iverson);
 }
 
-fn demo_iverson<T: PrimitiveInteger>(gm: NoSpecialGenerationMode, limit: usize) {
+fn demo_iverson<T: PrimitiveInt>(gm: NoSpecialGenerationMode, limit: usize) {
     for b in bools(gm).take(limit) {
         println!("iverson({}) = {}", b, T::iverson(b));
     }

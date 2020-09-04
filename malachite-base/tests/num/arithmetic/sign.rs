@@ -1,9 +1,9 @@
 use std::cmp::Ordering;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 
-fn primitive_sign_helper<T: PrimitiveInteger>() {
+fn primitive_sign_helper<T: PrimitiveInt>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };

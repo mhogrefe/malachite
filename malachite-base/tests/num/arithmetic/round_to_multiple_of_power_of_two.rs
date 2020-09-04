@@ -1,12 +1,12 @@
 use std::panic::catch_unwind;
 
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_round_to_multiple_of_power_of_two() {
-    fn test<T: PrimitiveInteger>(n: T, pow: u64, rm: RoundingMode, out: T) {
+    fn test<T: PrimitiveInt>(n: T, pow: u64, rm: RoundingMode, out: T) {
         assert_eq!(n.round_to_multiple_of_power_of_two(pow, rm), out);
 
         let mut n = n;
@@ -50,7 +50,7 @@ fn test_round_to_multiple_of_power_of_two() {
     test::<i8>(-0x78, 4, RoundingMode::Nearest, -0x80);
 }
 
-fn round_to_multiple_of_power_of_two_fail_helper<T: PrimitiveInteger>() {
+fn round_to_multiple_of_power_of_two_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(10).round_to_multiple_of_power_of_two(4, RoundingMode::Exact));
     assert_panic!(T::MAX.round_to_multiple_of_power_of_two(4, RoundingMode::Up));
     assert_panic!(T::MAX.round_to_multiple_of_power_of_two(4, RoundingMode::Ceiling));

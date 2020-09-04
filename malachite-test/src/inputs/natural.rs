@@ -5,7 +5,7 @@ use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
     DivRound, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PowerOfTwo,
 };
-use malachite_base::num::basic::integers::PrimitiveInteger;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -13,8 +13,8 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_positive_primitives, exhaustive_signeds,
-    exhaustive_unsigneds, primitive_integer_increasing_inclusive_range,
+    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_signeds,
+    exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
 use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
@@ -275,9 +275,7 @@ pub fn triples_of_natural_natural_and_positive_natural(
     }
 }
 
-fn random_pairs_of_natural_and_primitive<T: PrimitiveInteger + Rand>(
-    scale: u32,
-) -> It<(Natural, T)> {
+fn random_pairs_of_natural_and_primitive<T: PrimitiveInt + Rand>(scale: u32) -> It<(Natural, T)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random_naturals(seed, scale)),
@@ -285,9 +283,7 @@ fn random_pairs_of_natural_and_primitive<T: PrimitiveInteger + Rand>(
     ))
 }
 
-fn random_pairs_of_primitive_and_natural<T: PrimitiveInteger + Rand>(
-    scale: u32,
-) -> It<(T, Natural)> {
+fn random_pairs_of_primitive_and_natural<T: PrimitiveInt + Rand>(scale: u32) -> It<(T, Natural)> {
     Box::new(random_pairs(
         &EXAMPLE_SEED,
         &(|seed| random(seed)),
@@ -629,7 +625,7 @@ pub fn pairs_of_natural_and_small_u64_var_3<T: PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(lex_pairs(
             exhaustive_naturals(),
-            primitive_integer_increasing_inclusive_range(1, T::WIDTH),
+            primitive_int_increasing_inclusive_range(1, T::WIDTH),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -758,7 +754,7 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            primitive_integer_increasing_inclusive_range(1, T::WIDTH),
+            primitive_int_increasing_inclusive_range(1, T::WIDTH),
             exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -783,7 +779,7 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_3(
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
             exhaustive_naturals(),
-            exhaustive_positive_primitives(),
+            exhaustive_positive_primitive_ints(),
             exhaustive_unsigneds(),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -801,7 +797,7 @@ pub fn triples_of_natural_small_u64_and_small_u64_var_3(
     }
 }
 
-fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInteger + Rand>(
+fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInt + Rand>(
     scale: u32,
 ) -> It<(Natural, T, Natural)> {
     Box::new(random_triples(
@@ -812,7 +808,7 @@ fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInteger + Rand>(
     ))
 }
 
-fn random_triples_of_primitive_natural_and_primitive<T: PrimitiveInteger + Rand>(
+fn random_triples_of_primitive_natural_and_primitive<T: PrimitiveInt + Rand>(
     scale: u32,
 ) -> It<(T, Natural, T)> {
     Box::new(random_triples(
@@ -1749,7 +1745,7 @@ pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Na
             };
             Box::new(exhaustive_dependent_pairs_infinite_sqrt(
                 (),
-                exhaustive_positive_primitives(),
+                exhaustive_positive_primitive_ints(),
                 f,
             ))
         }
@@ -1833,7 +1829,7 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
             reshape_2_1_to_3(Box::new(dependent_pairs(
                 lex_pairs(
                     exhaustive_naturals(),
-                    primitive_integer_increasing_inclusive_range(1, T::WIDTH),
+                    primitive_int_increasing_inclusive_range(1, T::WIDTH),
                 ),
                 f,
             )))
@@ -1893,7 +1889,7 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
                 )
             };
             reshape_2_1_to_3(Box::new(dependent_pairs(
-                log_pairs(exhaustive_naturals(), exhaustive_positive_primitives()),
+                log_pairs(exhaustive_naturals(), exhaustive_positive_primitive_ints()),
                 f,
             )))
         }
