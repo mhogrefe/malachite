@@ -4,14 +4,16 @@ use random::Seed;
 use rounding_modes::{RoundingMode, ROUNDING_MODES};
 use slices::{random_values_from_slice, RandomValuesFromSlice};
 
-/// Generates a random `RoundingMode` that has an equal probability of being any of the 6
-/// `RoundingMode`s.
+/// Uniformly generates a random `RoundingMode`.
 ///
-/// Length is infinite.
+/// The output length is infinite.
 ///
-/// Time per iteration: worst case O(1)
+/// # Expected complexity per iteration
+/// $E[T(i)] = O(1)$
 ///
-/// Additional memory per iteration: wost case O(1)
+/// $E[M(i)] = O(1)$
+///
+/// where $T$ is time and $M$ is additional memory.
 ///
 /// # Examples
 /// ```

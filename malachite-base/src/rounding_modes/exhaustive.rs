@@ -5,11 +5,11 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 
 /// Generates all `RoundingMode`s.
 ///
-/// Length is 6.
+/// The output length is 6.
 ///
-/// Time: worst case O(1) per iteration
+/// # Complexity per iteration
 ///
-/// Additional memory: worst case O(1) per iteration
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

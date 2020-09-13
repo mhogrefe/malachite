@@ -46,17 +46,26 @@ pub mod comparison {
     pub mod macros;
 }
 pub mod chars {
-    pub mod char_to_contiguous_range;
     pub mod char_type;
     pub mod constants;
-    pub mod contiguous_range_to_char;
+    pub mod crement {
+        pub mod char_to_contiguous_range;
+        pub mod contiguous_range_to_char;
+        #[allow(clippy::module_inception)]
+        pub mod crement;
+    }
     pub mod exhaustive {
         pub mod ascii_chars_increasing;
         pub mod chars_increasing;
         pub mod exhaustive_ascii_chars;
         pub mod exhaustive_chars;
     }
+    pub mod is_graphic;
     pub mod random {
+        pub mod graphic_weighted_random_ascii_chars;
+        pub mod graphic_weighted_random_char_inclusive_range;
+        pub mod graphic_weighted_random_char_range;
+        pub mod graphic_weighted_random_chars;
         pub mod random_ascii_chars;
         pub mod random_char_inclusive_range;
         pub mod random_char_range;
@@ -75,8 +84,10 @@ pub mod iterators {
     }
     pub mod count_is_at_least;
     pub mod count_is_at_most;
+    pub mod first_and_last;
     pub mod is_constant;
     pub mod is_unique;
+    pub mod matching_intervals_in_iterator;
     pub mod nonzero_values;
 }
 pub mod named;
@@ -104,6 +115,7 @@ pub mod num {
         pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
+        pub mod mod_pow;
         pub mod mod_power_of_two;
         pub mod mod_power_of_two_add;
         pub mod mod_power_of_two_is_reduced;
@@ -171,9 +183,13 @@ pub mod num {
     }
     pub mod conversion {
         pub mod checked_from_and_exact_from;
+        pub mod convertible_from;
         pub mod from;
         pub mod half;
+        pub mod overflowing_from;
+        pub mod saturating_from;
         pub mod slice;
+        pub mod wrapping_from;
     }
     pub mod exhaustive {
         pub mod exhaustive_natural_signeds;

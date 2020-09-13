@@ -46,15 +46,50 @@ pub mod chars;
 pub mod comparison;
 /// This module contains functions and adaptors for iterators.
 pub mod iterators;
+/// This module contains `Never`, a type that cannot be instantiated.
+pub mod nevers;
 /// This module contains functions for working with primitive integers and floats.
 #[macro_use]
 pub mod num;
 /// This module contains functions for working with `Ordering`s.
 pub mod orderings;
+/// This module contains functions for generating random values with `ChaCha20Rng`.
 pub mod random;
+/// This module contains the `RoundingMode` enum.
+///
+/// A `RoundingMode` can often be specified when a function conceptually returns a value of one
+/// type, but must be rounded to another type. The most common case is a conceptually real-valued
+/// function whose result must be rounded to an integer, like `div_round`.
+///
+/// When converting a real value to an integer, the different `RoundingMode`s act as follows:
+/// - `Floor` applies the floor function: $x \mapsto \lfloor x \rfloor$. In other words, the value
+///   is rounded towards $-\infty$.
+/// - `Ceiling` applies the ceiling function: $x \mapsto \lceil x \rceil$. In other words, the value
+///   is rounded towards $\infty$.
+/// - `Down` applies the function $x \mapsto \operatorname{sgn}(x) \lfloor |x| \rfloor$. In other
+///   words, the value is rounded towards $0$.
+/// - `Up` applies the function $x \mapsto \operatorname{sgn}(x) \lceil |x| \rceil$. In other words,
+///   the value is rounded away from $0$.
+/// - `Nearest` applies the function
+///   $$
+///     x \mapsto \\begin{cases}
+///         \lfloor x \rfloor & x - \lfloor x \rfloor < \frac{1}{2} \\\\
+///         \lceil x \rceil & x - \lfloor x \rfloor > \frac{1}{2} \\\\
+///         \lfloor x \rfloor &
+///    x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor x \rfloor \\ \text{is even} \\\\
+///         \lceil x \rceil &
+///    x - \lfloor x \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor x \rfloor \\ \text{is odd.}
+///     \\end{cases}
+///   $$
+///   In other words, it rounds to the nearest integer, and when there's a tie, it rounds to the
+///   nearest even integer. This is also called _bankers' rounding_ and is often used as a default.
+/// - `Exact` panics if the value is not already rounded.
+///
+/// Sometimes a `RoundingMode` is used in an unusual context, such as rounding an integer to a
+/// floating-point number, in which case further explanation of its behavior is provided at the
+/// usage site.
 pub mod rounding_modes;
 #[macro_use]
 pub mod slices;
-pub mod nevers;
 pub mod strings;
 pub mod vecs;

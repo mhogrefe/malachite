@@ -60,13 +60,13 @@ fn gcd(u: u64, v: u64) -> u64 {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-struct SimpleRational {
-    n: u64,
-    d: u64,
+pub(crate) struct SimpleRational {
+    pub(crate) n: u64,
+    pub(crate) d: u64,
 }
 
 impl SimpleRational {
-    fn new(n: u64, d: u64) -> SimpleRational {
+    pub(crate) fn new(n: u64, d: u64) -> SimpleRational {
         assert_ne!(d, 0);
         let gcd = gcd(n, d);
         SimpleRational {
@@ -75,7 +75,7 @@ impl SimpleRational {
         }
     }
 
-    fn inverse(self) -> SimpleRational {
+    pub(crate) fn inverse(self) -> SimpleRational {
         assert_ne!(self.n, 0);
         SimpleRational {
             n: self.d,
@@ -83,7 +83,7 @@ impl SimpleRational {
         }
     }
 
-    fn add_u64(self, x: u64) -> SimpleRational {
+    pub(crate) fn add_u64(self, x: u64) -> SimpleRational {
         SimpleRational {
             n: self.n.checked_add(x.checked_mul(self.d).unwrap()).unwrap(),
             d: self.d,

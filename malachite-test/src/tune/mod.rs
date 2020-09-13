@@ -48,7 +48,7 @@ fn display_lines(lines: &[String]) {
     }
 }
 
-pub fn tune(param_group: &str) {
+pub(crate) fn tune(param_group: &str) {
     match param_group {
         "AORSMUL" => display_lines(&aorsmul::tune()),
         "Toom22" => display_lines(&toom_22::tune()),

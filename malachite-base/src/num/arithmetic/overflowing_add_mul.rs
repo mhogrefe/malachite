@@ -5,12 +5,13 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 
-//TODO wheres
-
-fn _overflowing_add_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
-where
+fn _overflowing_add_mul_unsigned<
     T: OverflowingAdd<T, Output = T> + OverflowingMul<T, Output = T>,
-{
+>(
+    x: T,
+    y: T,
+    z: T,
+) -> (T, bool) {
     let (product, overflow_1) = y.overflowing_mul(z);
     let (result, overflow_2) = x.overflowing_add(product);
     (result, overflow_1 | overflow_2)
@@ -73,18 +74,22 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-fn _overflowing_add_mul_signed<U: PrimitiveInt, S: Copy + Eq + Ord + Zero>(
-    x: S,
-    y: S,
-    z: S,
-) -> (S, bool)
-where
-    S: OverflowingAdd<S, Output = S>
+fn _overflowing_add_mul_signed<
+    U: PrimitiveInt,
+    S: Copy
+        + Eq
+        + Ord
+        + OverflowingAdd<S, Output = S>
         + OverflowingMul<S, Output = S>
         + UnsignedAbs<Output = U>
         + WrappingAdd<S, Output = S>
-        + WrappingMul<S, Output = S>,
-{
+        + WrappingMul<S, Output = S>
+        + Zero,
+>(
+    x: S,
+    y: S,
+    z: S,
+) -> (S, bool) {
     if y == S::ZERO || z == S::ZERO {
         return (x, false);
     }

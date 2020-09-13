@@ -47,6 +47,7 @@ pub mod generators;
 pub mod num {
     pub mod arithmetic {
         pub mod mod_mul;
+        pub mod mod_pow;
     }
     pub mod float {
         pub mod nice_float;
@@ -59,6 +60,7 @@ pub mod num {
         pub mod geometric;
     }
 }
+pub mod rounding_modes;
 pub mod runner;
 pub mod slices;
 pub mod stats;

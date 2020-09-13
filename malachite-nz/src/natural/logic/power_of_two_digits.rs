@@ -1,19 +1,13 @@
 use std::cmp::{min, Ordering};
 
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{
-    CheckedLogTwo, DivRound, ModPowerOfTwo, Parity, PowerOfTwo,
-};
+use malachite_base::num::arithmetic::traits::{CheckedLogTwo, DivRound, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ExactFrom, FromOtherTypeSlice, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::iterator::iterator_to_bit_chunks;
-use malachite_base::num::logic::traits::{
-    BitAccess, BitBlockAccess, LowMask, PowerOfTwoDigits, SignificantBits,
-};
+use malachite_base::num::logic::traits::{BitBlockAccess, PowerOfTwoDigits, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
 
@@ -134,45 +128,9 @@ macro_rules! power_of_two_digits_primitive {
                     }
                     Natural(Large(ref limbs)) => limbs,
                 };
-                let mut digits;
-                if log_base == 1 {
-                    digits = Vec::new();
-                    let (last, init) = limbs.split_last().unwrap();
-                    for limb in init {
-                        for i in 0..Limb::WIDTH {
-                            digits.push($t::iverson(limb.get_bit(i)));
-                        }
-                    }
-                    let mut last = *last;
-                    while last != 0 {
-                        digits.push($t::iverson(last.odd()));
-                        last >>= 1;
-                    }
-                } else if let Some(log_log_base) = log_base.checked_log_two() {
-                    digits = Vec::new();
-                    match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                        Ordering::Equal => {
-                            digits.extend(limbs.iter().cloned().map($t::wrapping_from))
-                        }
-                        Ordering::Less => {
-                            for mut limb in limbs.iter().cloned() {
-                                let mask = Limb::low_mask(log_base);
-                                for _ in 0..u64::power_of_two(Limb::LOG_WIDTH - log_log_base) {
-                                    digits.push($t::wrapping_from(limb & mask));
-                                    limb >>= log_base;
-                                }
-                            }
-                        }
-                        Ordering::Greater => digits.extend(
-                            limbs
-                                .chunks(usize::power_of_two(log_log_base - Limb::LOG_WIDTH))
-                                .map($t::from_other_type_slice),
-                        ),
-                    }
-                } else {
-                    digits = iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base)
-                        .collect();
-                }
+                let mut digits =
+                    iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base)
+                        .collect::<Vec<_>>();
                 digits.truncate(digits.len() - slice_trailing_zeros(&digits));
                 digits
             }
@@ -266,37 +224,9 @@ macro_rules! power_of_two_digits_primitive {
                 assert!(digits
                     .iter()
                     .all(|digit| digit.significant_bits() <= log_base));
-                let mut limbs;
-                if digits.is_empty() {
-                    limbs = Vec::new();
-                } else if let Some(log_log_base) = log_base.checked_log_two() {
-                    limbs = Vec::new();
-                    match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                        Ordering::Equal => {
-                            limbs.extend(digits.iter().cloned().map(Limb::wrapping_from))
-                        }
-                        Ordering::Less => limbs.extend(
-                            digits
-                                .chunks(usize::wrapping_from(Limb::WIDTH >> log_log_base))
-                                .map(|limb_digits| {
-                                    Limb::from_power_of_two_digits_asc(log_base, limb_digits)
-                                }),
-                        ),
-                        Ordering::Greater => {
-                            for mut digit in digits.iter().cloned() {
-                                let mask = $t::MAX.mod_power_of_two(Limb::WIDTH);
-                                for _ in 0..u64::power_of_two(log_log_base - Limb::LOG_WIDTH) {
-                                    limbs.push(Limb::wrapping_from(digit & mask));
-                                    digit >>= Limb::WIDTH;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    limbs = iterator_to_bit_chunks(digits.iter().cloned(), log_base, Limb::WIDTH)
-                        .collect();
-                }
-                Natural::from_owned_limbs_asc(limbs)
+                Natural::from_owned_limbs_asc(
+                    iterator_to_bit_chunks(digits.iter().cloned(), log_base, Limb::WIDTH).collect(),
+                )
             }
 
             /// Converts a slice of digits into a `Natural`, where the base is a power of two. The
@@ -344,38 +274,10 @@ macro_rules! power_of_two_digits_primitive {
                 assert!(digits
                     .iter()
                     .all(|digit| digit.significant_bits() <= log_base));
-                let mut limbs;
-                if digits.is_empty() {
-                    limbs = Vec::new();
-                } else if let Some(log_log_base) = log_base.checked_log_two() {
-                    limbs = Vec::new();
-                    match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                        Ordering::Equal => {
-                            limbs.extend(digits.iter().rev().cloned().map(Limb::wrapping_from))
-                        }
-                        Ordering::Less => limbs.extend(
-                            digits
-                                .rchunks(usize::wrapping_from(Limb::WIDTH >> log_log_base))
-                                .map(|limb_digits| {
-                                    Limb::from_power_of_two_digits_desc(log_base, limb_digits)
-                                }),
-                        ),
-                        Ordering::Greater => {
-                            for mut digit in digits.iter().rev().cloned() {
-                                let mask = $t::MAX.mod_power_of_two(Limb::WIDTH);
-                                for _ in 0..u64::power_of_two(log_log_base - Limb::LOG_WIDTH) {
-                                    limbs.push(Limb::wrapping_from(digit & mask));
-                                    digit >>= Limb::WIDTH;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    limbs =
-                        iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
-                            .collect();
-                }
-                Natural::from_owned_limbs_asc(limbs)
+                Natural::from_owned_limbs_asc(
+                    iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
+                        .collect::<Vec<_>>(),
+                )
             }
 
             /// TODO doc

@@ -4,6 +4,8 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 
 use integer::Integer;
 
+//TODO clean
+
 macro_rules! impl_unsigned {
     ($t: ident) => {
         impl PartialOrd<$t> for Integer {

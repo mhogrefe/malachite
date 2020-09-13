@@ -1583,7 +1583,7 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Natural
     }
 }
 
-pub fn quadruples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural, Natural)> {
+fn quadruples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural, Natural)> {
     match gm {
         GenerationMode::Exhaustive => {
             Box::new(exhaustive_quadruples_from_single(exhaustive_naturals()))

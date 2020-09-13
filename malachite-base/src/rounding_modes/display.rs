@@ -5,9 +5,9 @@ use rounding_modes::RoundingMode;
 impl Display for RoundingMode {
     /// Converts a `RoundingMode` to a `String`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```

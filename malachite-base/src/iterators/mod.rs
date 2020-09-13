@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::hash::Hash;
 
+use itertools::Itertools;
+
 use num::basic::traits::Zero;
 
 /// Generates all the nonzero values of a provided iterator.
@@ -67,7 +69,7 @@ where
 ///
 /// $M(n) = O(1)$
 ///
-/// where $n$ is the number of values produced by `xs`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the number of values produced by `xs`.
 ///
 /// # Examples
 /// ```
@@ -103,7 +105,7 @@ where
 ///
 /// $M(n) = O(1)$
 ///
-/// where $n$ is `min(n, xs.count())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `min(n, xs.count())`.
 ///
 /// # Examples
 /// ```
@@ -128,7 +130,7 @@ pub fn count_is_at_least<I: Iterator>(xs: I, n: usize) -> bool {
 ///
 /// $M(n) = O(1)$
 ///
-/// where $n$ is `min(n, xs.count())`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `min(n, xs.count())`.
 ///
 /// # Examples
 /// ```
@@ -155,7 +157,7 @@ pub fn count_is_at_most<I: Iterator>(xs: I, n: usize) -> bool {
 ///
 /// $M(n) = O(n)$
 ///
-/// where $n$ is `xs.count()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
 ///
 /// # Examples
 /// ```
@@ -178,6 +180,84 @@ where
         }
     }
     true
+}
+
+/// Returns the first and last elements of an iterator, or `None` if it is empty.
+///
+/// The iterator's elements must be cloneable, since if the iterator consists of a single element
+/// `x`, the result will be `(x, x)`.
+///
+/// This iterator will hang if given an infinite iterator.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::first_and_last;
+///
+/// let empty: [u32; 0] = [];
+/// assert_eq!(first_and_last(&mut empty.iter()), None);
+/// assert_eq!(first_and_last(&mut [1].iter().cloned()), Some((1, 1)));
+/// assert_eq!(first_and_last(&mut [1, 2, 3].iter().cloned()), Some((1, 3)));
+/// ```
+pub fn first_and_last<I: Iterator>(xs: &mut I) -> Option<(I::Item, I::Item)>
+where
+    I::Item: Clone,
+{
+    if let Some(first) = xs.next() {
+        if let Some(last) = xs.last() {
+            Some((first, last))
+        } else {
+            Some((first.clone(), first))
+        }
+    } else {
+        None
+    }
+}
+
+/// Groups elements of an iterator into intervals of adjacent elements that match a predicate.
+///
+/// The intervals are inclusive.
+///
+/// This iterator will hang if given an infinite iterator.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::matching_intervals_in_iterator;
+///
+/// let xs = &[1, 2, 10, 11, 12, 7, 8, 16, 5];
+/// assert_eq!(
+///     matching_intervals_in_iterator(xs.iter().cloned(), |&x| x >= 10).as_slice(),
+///     &[(10, 12), (16, 16)]
+/// );
+/// assert_eq!(
+///     matching_intervals_in_iterator(xs.iter().cloned(), |&x| x < 10).as_slice(),
+///     &[(1, 2), (7, 8), (5, 5)]
+/// );
+/// ```
+pub fn matching_intervals_in_iterator<I: Iterator, F: Fn(&I::Item) -> bool>(
+    xs: I,
+    predicate: F,
+) -> Vec<(I::Item, I::Item)>
+where
+    I::Item: Clone,
+{
+    xs.group_by(predicate)
+        .into_iter()
+        .filter_map(|(b, mut group)| if b { first_and_last(&mut group) } else { None })
+        .collect()
 }
 
 /// This module contains functions that compare adjacent iterator elements.

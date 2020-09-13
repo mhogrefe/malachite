@@ -12,18 +12,24 @@ use num::conversion::traits::ExactFrom;
 use num::logic::traits::TrailingZeros;
 use rounding_modes::RoundingMode;
 
-fn _round_to_multiple_unsigned<T: Copy + Display + Eq + Ord + Parity + TrailingZeros + Zero>(
+fn _round_to_multiple_unsigned<
+    T: CheckedAdd<T, Output = T>
+        + Copy
+        + Display
+        + Eq
+        + Ord
+        + OverflowingAdd<T, Output = T>
+        + Parity
+        + Rem<T, Output = T>
+        + Shr<u64, Output = T>
+        + Sub<T, Output = T>
+        + TrailingZeros
+        + Zero,
+>(
     x: T,
     other: T,
     rm: RoundingMode,
-) -> T
-where
-    T: CheckedAdd<T, Output = T>
-        + OverflowingAdd<T, Output = T>
-        + Rem<T, Output = T>
-        + Shr<u64, Output = T>
-        + Sub<T, Output = T>,
-{
+) -> T {
     match (x, other) {
         (x, y) if x == y => x,
         (x, y) if y == T::ZERO => match rm {
@@ -185,15 +191,14 @@ macro_rules! impl_round_to_multiple_unsigned {
 }
 apply_to_unsigneds!(impl_round_to_multiple_unsigned);
 
-fn _round_to_multiple_signed<U: Eq, S: Copy + Min + Ord + Zero>(
+fn _round_to_multiple_signed<
+    U: Eq + RoundToMultiple<U, Output = U>,
+    S: CheckedNeg<Output = S> + Copy + ExactFrom<U> + Min + Ord + UnsignedAbs<Output = U> + Zero,
+>(
     x: S,
     other: S,
     rm: RoundingMode,
-) -> S
-where
-    U: RoundToMultiple<U, Output = U>,
-    S: CheckedNeg<Output = S> + ExactFrom<U> + UnsignedAbs<Output = U>,
-{
+) -> S {
     if x >= S::ZERO {
         S::exact_from(x.unsigned_abs().round_to_multiple(other.unsigned_abs(), rm))
     } else {

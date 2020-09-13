@@ -5,10 +5,13 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 
-fn _overflowing_sub_mul_unsigned<T>(x: T, y: T, z: T) -> (T, bool)
-where
+fn _overflowing_sub_mul_unsigned<
     T: OverflowingMul<T, Output = T> + OverflowingSub<T, Output = T>,
-{
+>(
+    x: T,
+    y: T,
+    z: T,
+) -> (T, bool) {
     let (product, overflow_1) = y.overflowing_mul(z);
     let (result, overflow_2) = x.overflowing_sub(product);
     (result, overflow_1 | overflow_2)
@@ -71,14 +74,21 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_sub_mul_unsigned);
 
-fn _overflowing_sub_mul<U: PrimitiveInt, S: Copy + Ord + Zero>(x: S, y: S, z: S) -> (S, bool)
-where
-    S: OverflowingMul<S, Output = S>
+fn _overflowing_sub_mul<
+    U: PrimitiveInt,
+    S: Copy
+        + Ord
+        + OverflowingMul<S, Output = S>
         + OverflowingSub<S, Output = S>
         + UnsignedAbs<Output = U>
         + WrappingMul<S, Output = S>
-        + WrappingSub<S, Output = S>,
-{
+        + WrappingSub<S, Output = S>
+        + Zero,
+>(
+    x: S,
+    y: S,
+    z: S,
+) -> (S, bool) {
     if y == S::ZERO || z == S::ZERO {
         return (x, false);
     }

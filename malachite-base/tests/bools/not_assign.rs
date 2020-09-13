@@ -3,7 +3,7 @@ use malachite_base_test_util::generators::bool_gen;
 use malachite_base::num::logic::traits::NotAssign;
 
 #[test]
-fn test_bool_not_assign() {
+fn test_not_assign() {
     let test = |mut b: bool, out| {
         b.not_assign();
         assert_eq!(b, out);
@@ -13,7 +13,7 @@ fn test_bool_not_assign() {
 }
 
 #[test]
-fn bool_not_assign_properties() {
+fn not_assign_properties() {
     bool_gen().test_properties(|b| {
         let mut mut_b = b;
         mut_b.not_assign();

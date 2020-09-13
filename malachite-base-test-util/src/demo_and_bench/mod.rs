@@ -68,8 +68,12 @@ macro_rules! signed_single_arg_bench {
 
 pub(crate) fn register(runner: &mut Runner) {
     bools::register(runner);
+    chars::register(runner);
     num::register(runner);
+    rounding_modes::register(runner);
 }
 
 pub mod bools;
+pub mod chars;
 pub mod num;
+pub mod rounding_modes;

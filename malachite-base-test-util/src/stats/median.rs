@@ -41,7 +41,7 @@ pub fn deleted_uniform_primitive_int_median<T: PrimitiveInt>(
     (lo, hi)
 }
 
-pub(crate) fn binary_search_median<T: PrimitiveInt, P, C>(
+fn binary_search_median<T: PrimitiveInt, P, C>(
     mut min: T,
     mut max: T,
     pmf: P,

@@ -1093,6 +1093,40 @@ pub trait OverflowingPowAssign<RHS = Self> {
     fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
 }
 
+/// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModPow<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_pow(self, exp: RHS, m: M) -> Self::Output;
+}
+
+/// Replaces `self` with `self.pow(other)` mod `m`. Assumes the inputs are already reduced mod `m`.
+pub trait ModPowAssign<RHS = Self, M = Self> {
+    fn mod_pow_assign(&mut self, exp: RHS, m: M);
+}
+
+/// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
+/// modular exponentiations with the same modulus are necessary, it can be quicker to precompute
+/// some piece of data and reuse it in the exponentiation calls. This trait provides a method for
+/// precomputing the data and a method for using it during exponentiation.
+pub trait ModPowPrecomputed<RHS = Self, M = Self> {
+    type Output;
+    type Data;
+
+    fn precompute_mod_pow_data(m: &M) -> Self::Data;
+
+    fn mod_pow_precomputed(self, exp: RHS, m: M, data: &Self::Data) -> Self::Output;
+}
+
+/// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If
+/// multiple modular exponentiations with the same modulus are necessary, it can be quicker to
+/// precompute some piece of data and reuse it in the exponentiation calls. This trait provides a
+/// method for using precomputed data during exponentiation. For precomputing the data, use the
+/// `precompute_mod_pow_data` function in `ModPowPrecomputed`.
+pub trait ModPowPrecomputedAssign<RHS = Self, M = Self>: ModPowPrecomputed<RHS, M> {
+    fn mod_pow_precomputed_assign(&mut self, exp: RHS, m: M, data: &Self::Data);
+}
+
 /// Squares `self`.
 pub trait Square {
     type Output;

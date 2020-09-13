@@ -12,6 +12,10 @@ use comparison::traits::Min;
 ///
 /// The inverse of this function is `contiguous_range_to_char`.
 ///
+/// # Worst-case complexity
+///
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::chars::crement::char_to_contiguous_range;

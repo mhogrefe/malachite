@@ -396,6 +396,7 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// ```
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
+    #[inline]
     fn mod_mul_precomputed(self, other: u128, m: u128, _data: &()) -> u128 {
         _naive_mod_mul(self, other, m)
     }
@@ -462,7 +463,9 @@ macro_rules! impl_mod_mul {
             ///
             /// # Example
             /// ```
-            /// use malachite_base::num::arithmetic::traits::*;
+            /// use malachite_base::num::arithmetic::traits::{
+            ///     ModMulPrecomputed, ModMulPrecomputedAssign,
+            /// };
             ///
             /// let data = u8::precompute_mod_mul_data(&7);
             ///
@@ -496,8 +499,8 @@ macro_rules! impl_mod_mul {
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
             /// assigned to a.
             #[inline]
-            fn mod_mul_precomputed_assign(&mut self, other: $t, m: $t, _data: &Self::Data) {
-                *self = _naive_mod_mul(*self, other, m);
+            fn mod_mul_precomputed_assign(&mut self, other: $t, m: $t, data: &Self::Data) {
+                *self = self.mod_mul_precomputed(other, m, data);
             }
         }
 

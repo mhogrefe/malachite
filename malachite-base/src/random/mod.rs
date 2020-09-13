@@ -80,9 +80,7 @@ impl Seed {
     /// probability, generate a different seed. Determining the initial seed from the resulting seed
     /// will be (cryptographically) difficult, even if the key is known.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```

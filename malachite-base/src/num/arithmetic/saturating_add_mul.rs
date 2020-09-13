@@ -6,17 +6,19 @@ use num::arithmetic::traits::{
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-fn _saturating_add_mul_unsigned<T>(x: T, y: T, z: T) -> T
-where
-    T: SaturatingAdd<T, Output = T> + SaturatingMul<T, Output = T>,
-{
+fn _saturating_add_mul_unsigned<T: SaturatingAdd<T, Output = T> + SaturatingMul<T, Output = T>>(
+    x: T,
+    y: T,
+    z: T,
+) -> T {
     x.saturating_add(y.saturating_mul(z))
 }
 
-fn _saturating_add_mul_assign_unsigned<T>(x: &mut T, y: T, z: T)
-where
-    T: SaturatingAddAssign<T> + SaturatingMul<T, Output = T>,
-{
+fn _saturating_add_mul_assign_unsigned<T: SaturatingAddAssign<T> + SaturatingMul<T, Output = T>>(
+    x: &mut T,
+    y: T,
+    z: T,
+) {
     x.saturating_add_assign(y.saturating_mul(z));
 }
 
@@ -73,18 +75,22 @@ macro_rules! impl_saturating_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_saturating_add_mul_unsigned);
 
-fn _saturating_add_mul_signed<U: Copy + Ord, S: Copy + Max + Min + Ord + Zero>(
+fn _saturating_add_mul_signed<
+    U: CheckedMul<U, Output = U> + Copy + Ord + WrappingSub<U, Output = U>,
+    S: Copy
+        + Max
+        + Min
+        + Ord
+        + SaturatingAdd<S, Output = S>
+        + SaturatingMul<S, Output = S>
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<U>
+        + Zero,
+>(
     x: S,
     y: S,
     z: S,
-) -> S
-where
-    U: CheckedMul<U, Output = U> + WrappingSub<U, Output = U>,
-    S: SaturatingAdd<S, Output = S>
-        + SaturatingMul<S, Output = S>
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>,
-{
+) -> S {
     if y == S::ZERO || z == S::ZERO {
         return x;
     }

@@ -232,7 +232,7 @@ fn benchmark_mod_mul_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.mod_mul({}, u64)", T::NAME, T::NAME),
+        &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),
         gm.name(),
@@ -259,7 +259,7 @@ fn benchmark_mod_mul_algorithms_with_fast<
     DT: From<T> + HasHalf<Half = T>,
 {
     run_benchmark(
-        &format!("{}.mod_mul({}, u64)", T::NAME, T::NAME),
+        &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),
         gm.name(),
@@ -291,7 +291,7 @@ fn benchmark_mod_mul_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.mod_mul_assign({}, u64)", T::NAME, T::NAME),
+        &format!("{}.mod_mul_assign({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds_var_1::<T>(gm),
         gm.name(),
@@ -309,7 +309,7 @@ fn benchmark_mod_mul_precomputed_algorithms<T: PrimitiveUnsigned + Rand + Sample
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.mod_mul({}, u64)", T::NAME, T::NAME),
+        &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),
         gm.name(),

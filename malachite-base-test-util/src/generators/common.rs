@@ -79,9 +79,20 @@ impl<T> Generator<T> {
         }
     }
 
-    pub fn test_properties_with_config<F: FnMut(T)>(&self, config: &GenConfig, mut test: F) {
-        for x in (self.exhaustive)().take(LARGE_LIMIT) {
-            test(x);
+    fn test_properties_with_config_optional_exhaustive_limit<F: FnMut(T)>(
+        &self,
+        config: &GenConfig,
+        mut test: F,
+        exhaustive_limit: bool,
+    ) {
+        if exhaustive_limit {
+            for x in (self.exhaustive)().take(LARGE_LIMIT) {
+                test(x);
+            }
+        } else {
+            for x in (self.exhaustive)() {
+                test(x);
+            }
         }
         for x in (self.random)(config).take(LARGE_LIMIT) {
             test(x);
@@ -93,9 +104,18 @@ impl<T> Generator<T> {
         }
     }
 
+    pub fn test_properties_with_config<F: FnMut(T)>(&self, config: &GenConfig, test: F) {
+        self.test_properties_with_config_optional_exhaustive_limit(config, test, true);
+    }
+
     #[inline]
     pub fn test_properties<F: FnMut(T)>(&self, test: F) {
-        self.test_properties_with_config(&GenConfig::new(), test)
+        self.test_properties_with_config(&GenConfig::new(), test);
+    }
+
+    #[inline]
+    pub fn test_properties_no_exhaustive_limit<F: FnMut(T)>(&self, test: F) {
+        self.test_properties_with_config_optional_exhaustive_limit(&GenConfig::new(), test, false);
     }
 
     pub fn get(&self, gm: GenMode, config: &GenConfig) -> It<T> {

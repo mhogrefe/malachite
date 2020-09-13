@@ -7,11 +7,14 @@ impl FromStr for RoundingMode {
 
     /// Converts a `String` to a `RoundingMode`.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(n)
+    /// $M(n) = O(n)$
     ///
-    /// where n = `src.len()`
+    /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
+    ///
+    /// The worst case occurs when the input `&str` is invalid and must be copied into an `Err`.
     ///
     /// # Examples
     /// ```

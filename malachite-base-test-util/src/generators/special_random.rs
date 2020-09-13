@@ -1,3 +1,8 @@
+use malachite_base::chars::random::{
+    graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
+    graphic_weighted_random_char_range, graphic_weighted_random_chars,
+};
+use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::random::striped::{
@@ -7,6 +12,46 @@ use malachite_base::num::random::striped::{
 use malachite_base::random::EXAMPLE_SEED;
 
 use generators::common::{GenConfig, It};
+
+// -- char --
+
+pub fn special_random_char_gen(config: &GenConfig) -> It<char> {
+    Box::new(graphic_weighted_random_chars(
+        EXAMPLE_SEED,
+        config.get_or("graphic_char_weight_n", 50),
+        config.get_or("graphic_char_weight_d", 1),
+    ))
+}
+
+pub fn special_random_char_gen_var_1(config: &GenConfig) -> It<char> {
+    Box::new(graphic_weighted_random_ascii_chars(
+        EXAMPLE_SEED,
+        config.get_or("graphic_char_weight_n", 50),
+        config.get_or("graphic_char_weight_d", 1),
+    ))
+}
+
+#[allow(unstable_name_collisions)]
+pub fn special_random_char_gen_var_2(config: &GenConfig) -> It<char> {
+    Box::new(graphic_weighted_random_char_range(
+        EXAMPLE_SEED,
+        char::MIN,
+        char::MAX,
+        config.get_or("graphic_char_weight_n", 50),
+        config.get_or("graphic_char_weight_d", 1),
+    ))
+}
+
+#[allow(unstable_name_collisions)]
+pub fn special_random_char_gen_var_3(config: &GenConfig) -> It<char> {
+    Box::new(graphic_weighted_random_char_inclusive_range(
+        EXAMPLE_SEED,
+        '\u{1}',
+        char::MAX,
+        config.get_or("graphic_char_weight_n", 50),
+        config.get_or("graphic_char_weight_d", 1),
+    ))
+}
 
 // -- PrimitiveSigned --
 

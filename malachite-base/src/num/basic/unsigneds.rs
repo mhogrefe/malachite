@@ -1,13 +1,14 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
     FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModMul, ModMulAssign,
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPowerOfTwo,
-    ModPowerOfTwoAdd, ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul,
-    ModPowerOfTwoMulAssign, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoShl,
-    ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, ModPowerOfTwoSub,
-    ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ,
-    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
+    ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOfTwo, ModPowerOfTwoAdd,
+    ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
+    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoShl, ModPowerOfTwoShlAssign,
+    ModPowerOfTwoShr, ModPowerOfTwoShrAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub,
+    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
+    NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
+    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -40,6 +41,8 @@ pub trait PrimitiveUnsigned:
     + ModMulPrecomputedAssign<Self, Self>
     + ModNeg<Self, Output = Self>
     + ModNegAssign<Self>
+    + ModPow<u64, Self, Output = Self>
+    + ModPowAssign<u64, Self>
     + ModPowerOfTwo<Output = Self>
     + ModPowerOfTwoAdd<Self, Output = Self>
     + ModPowerOfTwoAddAssign<Self>
@@ -83,6 +86,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoShrAssign<isize>
     + ModPowerOfTwoSub<Self, Output = Self>
     + ModPowerOfTwoSubAssign<Self>
+    + ModPowPrecomputed<u64, Self, Output = Self>
+    + ModPowPrecomputedAssign<u64, Self>
     + ModSub<Self, Self, Output = Self>
     + ModSubAssign<Self, Self>
     + NegMod<Self, Output = Self>

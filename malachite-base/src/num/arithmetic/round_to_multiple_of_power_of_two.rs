@@ -3,10 +3,13 @@ use num::arithmetic::traits::{
 };
 use rounding_modes::RoundingMode;
 
-fn _round_to_multiple_of_power_of_two<T>(x: T, pow: u64, rm: RoundingMode) -> T
-where
+fn _round_to_multiple_of_power_of_two<
     T: ArithmeticCheckedShl<u64, Output = T> + ShrRound<u64, Output = T>,
-{
+>(
+    x: T,
+    pow: u64,
+    rm: RoundingMode,
+) -> T {
     x.shr_round(pow, rm).arithmetic_checked_shl(pow).unwrap()
 }
 

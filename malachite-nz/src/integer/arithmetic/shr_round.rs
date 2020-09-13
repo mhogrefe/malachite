@@ -1,10 +1,63 @@
+use std::ops::{Shl, ShlAssign};
+
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
 
 use integer::Integer;
+use natural::Natural;
 
-//TODO clean
+fn _shr_round_unsigned_ref<'a, T>(x: &'a Integer, bits: T, rm: RoundingMode) -> Integer
+where
+    &'a Natural: ShrRound<T, Output = Natural>,
+{
+    match *x {
+        Integer {
+            sign: true,
+            ref abs,
+        } => Integer {
+            sign: true,
+            abs: abs.shr_round(bits, rm),
+        },
+        Integer {
+            sign: false,
+            ref abs,
+        } => {
+            let abs_shifted = abs.shr_round(bits, -rm);
+            if abs_shifted == 0 {
+                Integer::ZERO
+            } else {
+                Integer {
+                    sign: false,
+                    abs: abs_shifted,
+                }
+            }
+        }
+    }
+}
+
+fn _shr_round_assign_unsigned<T>(x: &mut Integer, bits: T, rm: RoundingMode)
+where
+    Natural: ShrRoundAssign<T>,
+{
+    match *x {
+        Integer {
+            sign: true,
+            ref mut abs,
+        } => {
+            abs.shr_round_assign(bits, rm);
+        }
+        Integer {
+            sign: false,
+            ref mut abs,
+        } => {
+            abs.shr_round_assign(bits, -rm);
+            if *abs == 0 {
+                x.sign = true;
+            }
+        }
+    }
+}
 
 macro_rules! impl_shr_round_unsigned {
     ($t:ident) => {
@@ -134,30 +187,9 @@ macro_rules! impl_shr_round_unsigned {
             ///     "1"
             /// );
             /// ```
+            #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Integer {
-                match *self {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => Integer {
-                        sign: true,
-                        abs: abs.shr_round(bits, rm),
-                    },
-                    Integer {
-                        sign: false,
-                        ref abs,
-                    } => {
-                        let abs_shifted = abs.shr_round(bits, -rm);
-                        if abs_shifted == 0 {
-                            Integer::ZERO
-                        } else {
-                            Integer {
-                                sign: false,
-                                abs: abs_shifted,
-                            }
-                        }
-                    }
-                }
+                _shr_round_unsigned_ref(self, bits, rm)
             }
         }
 
@@ -217,28 +249,41 @@ macro_rules! impl_shr_round_unsigned {
             /// assert_eq!(n.to_string(), "1");
             /// ```
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                match *self {
-                    Integer {
-                        sign: true,
-                        ref mut abs,
-                    } => {
-                        abs.shr_round_assign(bits, rm);
-                    }
-                    Integer {
-                        sign: false,
-                        ref mut abs,
-                    } => {
-                        abs.shr_round_assign(bits, -rm);
-                        if *abs == 0 {
-                            self.sign = true;
-                        }
-                    }
-                }
+                _shr_round_assign_unsigned(self, bits, rm);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_shr_round_unsigned);
+
+fn _shr_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Integer,
+    bits: S,
+    rm: RoundingMode,
+) -> Integer
+where
+    &'a Integer: Shl<U, Output = Integer> + ShrRound<U, Output = Integer>,
+{
+    if bits >= S::ZERO {
+        x.shr_round(bits.unsigned_abs(), rm)
+    } else {
+        x << bits.unsigned_abs()
+    }
+}
+
+fn _shr_round_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &mut Integer,
+    bits: S,
+    rm: RoundingMode,
+) where
+    Integer: ShlAssign<U> + ShrRoundAssign<U>,
+{
+    if bits >= S::ZERO {
+        x.shr_round_assign(bits.unsigned_abs(), rm);
+    } else {
+        *x <<= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_shr_round_signed {
     ($t:ident) => {
@@ -397,12 +442,9 @@ macro_rules! impl_shr_round_signed {
             ///     "155921023828072216384094494261248"
             /// );
             /// ```
+            #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Integer {
-                if bits >= 0 {
-                    self.shr_round(bits.unsigned_abs(), rm)
-                } else {
-                    self << bits.unsigned_abs()
-                }
+                _shr_round_signed_ref(self, bits, rm)
             }
         }
 
@@ -470,12 +512,9 @@ macro_rules! impl_shr_round_signed {
             /// x.shr_round_assign(-4i64, RoundingMode::Exact);
             /// assert_eq!(x.to_string(), "1024");
             /// ```
+            #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                if bits >= 0 {
-                    self.shr_round_assign(bits.unsigned_abs(), rm);
-                } else {
-                    *self <<= bits.unsigned_abs();
-                }
+                _shr_round_assign_signed(self, bits, rm);
             }
         }
     };

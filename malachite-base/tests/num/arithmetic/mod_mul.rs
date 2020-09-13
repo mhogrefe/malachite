@@ -1,8 +1,8 @@
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 
 use malachite_base::num::arithmetic::mod_mul::{
-    _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted, test_invert_u32_table,
-    test_invert_u64_table,
+    _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted, _naive_mod_mul,
+    test_invert_u32_table, test_invert_u64_table,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
@@ -93,6 +93,8 @@ fn mod_mul_helper<T: PrimitiveUnsigned>() {
         let mut mut_x = x;
         mut_x.mod_mul_precomputed_assign(y, m, &data);
         assert_eq!(mut_x, out);
+
+        assert_eq!(_naive_mod_mul(x, y, m), out);
     };
     test(T::ZERO, T::ZERO, T::ONE, T::ZERO);
     test(T::TWO, T::exact_from(3), T::exact_from(7), T::exact_from(6));

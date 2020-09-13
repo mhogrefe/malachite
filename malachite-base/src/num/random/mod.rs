@@ -109,12 +109,12 @@ impl<T: HasRandomPrimitiveInts> Iterator for RandomPrimitiveInts<T> {
 
 /// Uniformly generates random unsigned integers less than a positive limit.
 ///
-/// This `struct` is created by the `random_unsigneds_less_than` method. See its documentation
-/// for more.
+/// This `enum` is created by the `random_unsigneds_less_than` method. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
-pub struct RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
-    pub(crate) xs: RandomUnsignedBitChunks<T>,
-    pub(crate) limit: T,
+pub enum RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
+    One,
+    AtLeastTwo(RandomUnsignedBitChunks<T>, T),
 }
 
 impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
@@ -122,11 +122,14 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
 
     #[inline]
     fn next(&mut self) -> Option<T> {
-        loop {
-            let x = self.xs.next();
-            if x.unwrap() < self.limit {
-                return x;
-            }
+        match *self {
+            RandomUnsignedsLessThan::One => Some(T::ZERO),
+            RandomUnsignedsLessThan::AtLeastTwo(ref mut xs, limit) => loop {
+                let x = xs.next();
+                if x.unwrap() < limit {
+                    return x;
+                }
+            },
         }
     }
 }
@@ -562,10 +565,13 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 ) -> RandomUnsignedsLessThan<T> {
     if limit == T::ZERO {
         panic!("limit cannot be 0.");
-    }
-    RandomUnsignedsLessThan {
-        xs: random_unsigned_bit_chunks(seed, limit.ceiling_log_two()),
-        limit,
+    } else if limit == T::ONE {
+        RandomUnsignedsLessThan::One
+    } else {
+        RandomUnsignedsLessThan::AtLeastTwo(
+            random_unsigned_bit_chunks(seed, limit.ceiling_log_two()),
+            limit,
+        )
     }
 }
 
@@ -765,7 +771,7 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `chunk_size` is greater than `T::WIDTH`.
+/// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
 ///
 /// # Examples
 /// ```
@@ -806,7 +812,7 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `chunk_size` is greater than `T::WIDTH`.
+/// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
 ///
 /// # Examples
 /// ```

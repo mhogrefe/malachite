@@ -48,33 +48,6 @@ fn random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned>(
 #[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_unsigned_bit_chunks() {
-    // u8, chunk_size = 0
-    let values = &[0; 20];
-    let common_values = &[(0, 1_000_000)];
-    let pop_median = (0, None);
-    let sample_median = (0, None);
-    let pop_moment_stats = MomentStats {
-        mean: NiceFloat(0.0),
-        standard_deviation: NiceFloat(0.0),
-        skewness: NiceFloat(f64::NAN),
-        excess_kurtosis: NiceFloat(f64::NAN),
-    };
-    let sample_moment_stats = MomentStats {
-        mean: NiceFloat(0.0),
-        standard_deviation: NiceFloat(0.0),
-        skewness: NiceFloat(f64::NAN),
-        excess_kurtosis: NiceFloat(f64::NAN),
-    };
-    random_unsigned_bit_chunks_helper::<u8>(
-        0,
-        values,
-        common_values,
-        pop_median,
-        sample_median,
-        pop_moment_stats,
-        sample_moment_stats,
-    );
-
     // u16, chunk_size = 1
     let values = &[1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0];
     let common_values = &[(1, 500473), (0, 499527)];
@@ -247,6 +220,7 @@ fn test_random_unsigned_bit_chunks() {
 }
 
 fn random_unsigned_bit_chunks_fail_helper<T: PrimitiveUnsigned>() {
+    assert_panic!(random_unsigned_bit_chunks::<T>(EXAMPLE_SEED, 0));
     assert_panic!(random_unsigned_bit_chunks::<T>(EXAMPLE_SEED, T::WIDTH + 1));
 }
 

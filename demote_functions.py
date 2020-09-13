@@ -3,6 +3,30 @@ import subprocess
 
 def try_building(include_rust_wheels):
     try:
+        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-base-test-util')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-nz-test-util')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all', '--features', '32_bit_limbs'], cwd = 'malachite-nz-test-util')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-base')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-nz')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all', '--features', '32_bit_limbs'], cwd = 'malachite-nz')
+    except subprocess.CalledProcessError:
+        return False
+    try:
         subprocess.check_call(['cargo', 'check', '--tests'], cwd = 'malachite-test')
     except subprocess.CalledProcessError:
         return False
@@ -62,6 +86,7 @@ def try_replacing(filename, substring, replacement, exceptions, include_rust_whe
             return
 
 
+assert try_building(True)
 filename_list = []
 for root, directories, filenames in os.walk('.'):
     for filename in filenames: 

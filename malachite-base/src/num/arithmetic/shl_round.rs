@@ -6,6 +6,8 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
+//TODO wheres
+
 fn _shl_round<T: PrimitiveInt, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
     x: T,
     bits: S,

@@ -14,7 +14,6 @@ pub mod base {
     pub mod chars {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;
-        pub mod crement;
     }
 
     pub mod comparison {
@@ -40,6 +39,7 @@ pub mod base {
             pub mod mod_mul;
             pub mod mod_neg;
             pub mod mod_op;
+            pub mod mod_pow;
             pub mod mod_power_of_two;
             pub mod mod_power_of_two_add;
             pub mod mod_power_of_two_is_reduced;
@@ -104,17 +104,13 @@ pub mod base {
         }
 
         pub mod conversion {
-            pub mod convertible_from;
             pub mod from_other_type_slice;
             pub mod join_halves;
             pub mod lower_half;
-            pub mod overflowing_from;
-            pub mod saturating_from;
             pub mod split_in_half;
             pub mod upper_half;
             pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
-            pub mod wrapping_from;
         }
 
         pub mod comparison {
@@ -138,7 +134,6 @@ pub mod base {
 
     pub mod rounding_modes {
         pub mod clone;
-        pub mod display;
         pub mod eq;
         pub mod from_str;
         pub mod hash;
