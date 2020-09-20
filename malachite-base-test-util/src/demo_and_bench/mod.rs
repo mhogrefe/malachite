@@ -73,7 +73,7 @@ pub(crate) fn register(runner: &mut Runner) {
     rounding_modes::register(runner);
 }
 
-pub mod bools;
-pub mod chars;
-pub mod num;
-pub mod rounding_modes;
+mod bools;
+mod chars;
+mod num;
+mod rounding_modes;

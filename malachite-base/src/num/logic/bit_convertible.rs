@@ -68,12 +68,12 @@ fn _from_bits_desc_unsigned<T: PrimitiveInt>(mut bits: &[bool]) -> T {
     n
 }
 
-fn _from_bit_iterator_asc_unsigned<T: Copy + Eq + Named + One + Zero, I: Iterator<Item = bool>>(
+fn _from_bit_iterator_asc_unsigned<
+    T: BitOrAssign<T> + Copy + Eq + Named + One + ShlAssign<u64> + Zero,
+    I: Iterator<Item = bool>,
+>(
     bits: I,
-) -> T
-where
-    T: BitOrAssign<T> + ShlAssign<u64>,
-{
+) -> T {
     let mut n = T::ZERO;
     let mut mask = T::ONE;
     for bit in bits {
@@ -307,10 +307,9 @@ fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
     bits
 }
 
-fn _from_bits_asc_signed<U: PrimitiveInt, S: PrimitiveInt>(bits: &[bool]) -> S
-where
-    S: ExactFrom<U> + WrappingFrom<U>,
-{
+fn _from_bits_asc_signed<U: PrimitiveInt, S: ExactFrom<U> + PrimitiveInt + WrappingFrom<U>>(
+    bits: &[bool],
+) -> S {
     match bits {
         &[] => S::ZERO,
         &[.., false] => S::exact_from(_from_bits_asc_unsigned::<U>(bits)),
@@ -331,10 +330,9 @@ where
     }
 }
 
-fn _from_bits_desc_signed<U: PrimitiveInt, S: PrimitiveInt>(bits: &[bool]) -> S
-where
-    S: ExactFrom<U> + WrappingFrom<U>,
-{
+fn _from_bits_desc_signed<U: PrimitiveInt, S: ExactFrom<U> + PrimitiveInt + WrappingFrom<U>>(
+    bits: &[bool],
+) -> S {
     match bits {
         &[] => S::ZERO,
         &[false, ..] => S::exact_from(_from_bits_desc_unsigned::<U>(bits)),
@@ -356,16 +354,20 @@ where
 }
 
 fn _from_bit_iterator_asc_signed<
-    U: Copy + Eq + Max + One + Zero,
-    S: Named,
+    U: BitOr<U, Output = U>
+        + BitOrAssign<U>
+        + Copy
+        + Eq
+        + Max
+        + One
+        + ShlAssign<u64>
+        + WrappingNeg<Output = U>
+        + Zero,
+    S: Named + WrappingFrom<U>,
     I: Iterator<Item = bool>,
 >(
     bits: I,
-) -> S
-where
-    U: BitOr<U, Output = U> + BitOrAssign<U> + ShlAssign<u64> + WrappingNeg<Output = U>,
-    S: WrappingFrom<U>,
-{
+) -> S {
     let mut n = U::ZERO;
     let mut mask = U::ONE;
     let mut last_bit = false;
@@ -393,10 +395,13 @@ where
 }
 
 #[inline]
-fn _from_bit_iterator_desc_signed<U: PrimitiveInt, S: Named, I: Iterator<Item = bool>>(bits: I) -> S
-where
-    S: WrappingFrom<U>,
-{
+fn _from_bit_iterator_desc_signed<
+    U: PrimitiveInt,
+    S: Named + WrappingFrom<U>,
+    I: Iterator<Item = bool>,
+>(
+    bits: I,
+) -> S {
     let mut n = U::ZERO;
     let high_mask = U::power_of_two(U::WIDTH - 2);
     let mut first = true;

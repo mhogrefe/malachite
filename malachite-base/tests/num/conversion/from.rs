@@ -76,10 +76,7 @@ pub fn test_join_halves() {
 
 #[test]
 pub fn test_from_other_type_slice() {
-    fn test<T: Debug + Eq, U: Copy + Debug + Eq>(slice: &[T], n: U)
-    where
-        U: FromOtherTypeSlice<T>,
-    {
+    fn test<T: Debug + Eq, U: Copy + Debug + Eq + FromOtherTypeSlice<T>>(slice: &[T], n: U) {
         assert_eq!(U::from_other_type_slice(slice), n);
     };
     test::<u32, u32>(&[], 0);
@@ -105,10 +102,7 @@ pub fn test_from_other_type_slice() {
 
 #[test]
 pub fn test_vec_from_other_type_slice() {
-    fn test<T: Debug + Eq, U: Debug + Eq>(slice: &[T], vec: &[U])
-    where
-        U: VecFromOtherTypeSlice<T>,
-    {
+    fn test<T: Debug + Eq, U: Debug + Eq + VecFromOtherTypeSlice<T>>(slice: &[T], vec: &[U]) {
         assert_eq!(U::vec_from_other_type_slice(slice), vec);
     };
     test::<u32, u32>(&[123, 456], &[123, 456]);
@@ -125,10 +119,7 @@ pub fn test_vec_from_other_type_slice() {
 
 #[test]
 pub fn test_vec_from_other_type() {
-    fn test<T: Debug + Eq, U: Debug + Eq>(value: T, vec: &[U])
-    where
-        U: VecFromOtherType<T>,
-    {
+    fn test<T: Debug + Eq, U: Debug + Eq + VecFromOtherType<T>>(value: T, vec: &[U]) {
         assert_eq!(U::vec_from_other_type(value), vec);
     };
     test::<u32, u32>(123, &[123]);

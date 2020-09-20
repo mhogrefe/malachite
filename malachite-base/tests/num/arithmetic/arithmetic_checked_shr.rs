@@ -3,10 +3,11 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 
 #[test]
 fn test_arithmetic_checked_shr() {
-    fn test<T: PrimitiveInt, U: PrimitiveInt>(t: T, u: U, out: Option<T>)
-    where
-        T: ArithmeticCheckedShr<U, Output = T>,
-    {
+    fn test<T: ArithmeticCheckedShr<U, Output = T> + PrimitiveInt, U: PrimitiveInt>(
+        t: T,
+        u: U,
+        out: Option<T>,
+    ) {
         assert_eq!(t.arithmetic_checked_shr(u), out);
     };
     test::<u32, i8>(100, 3, Some(12));

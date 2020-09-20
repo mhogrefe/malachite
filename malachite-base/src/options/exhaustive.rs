@@ -1,0 +1,64 @@
+use itertools::__std_iter::{once, Chain, Once};
+
+/// Generates all `Options`, except `None`, with values from a given iterator.
+///
+/// This `struct` is created by the `exhaustive_somes` method. See its documentation for more.
+pub struct ExhaustiveSomes<I: Iterator> {
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
+    type Item = Option<I::Item>;
+
+    fn next(&mut self) -> Option<Option<I::Item>> {
+        self.xs.next().map(Some)
+    }
+}
+
+/// Generates all `Options`, except `None`, with values from a given iterator.
+///
+/// The elements of the given iterator are wrapped in `Some` and generated in the original order.
+///
+/// The output length is `xs.count()`.
+///
+/// # Complexity per iteration
+///
+/// Same as the time and additional memory complexity of iterating `xs`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::options::exhaustive::exhaustive_somes;
+///
+/// assert_eq!(
+///     exhaustive_somes([1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     &[Some(1), Some(2), Some(3)]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
+    ExhaustiveSomes { xs }
+}
+
+/// Generates all `Options` with values from a given iterator.
+///
+/// `None` comes first, followed by the elements of the given iterator wrapped in `Some`.
+///
+/// The output length is `xs.count()`.
+///
+/// # Complexity per iteration
+///
+/// Same as the time and additional memory complexity of iterating `xs`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::options::exhaustive::exhaustive_options;
+///
+/// assert_eq!(
+///     exhaustive_options([1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     &[None, Some(1), Some(2), Some(3)]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_options<I: Iterator>(xs: I) -> Chain<Once<Option<I::Item>>, ExhaustiveSomes<I>> {
+    once(None).chain(exhaustive_somes(xs))
+}

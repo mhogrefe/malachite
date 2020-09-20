@@ -9,17 +9,13 @@ use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
 fn _shr_round_unsigned_unsigned<
-    T: PrimitiveInt,
-    U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
+    T: PrimitiveInt + Shl<U, Output = T> + Shr<U, Output = T>,
+    U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
 >(
     x: T,
     bits: U,
     rm: RoundingMode,
-) -> T
-where
-    T: Shl<U, Output = T> + Shr<U, Output = T>,
-    U: Sub<U, Output = U>,
-{
+) -> T {
     if bits == U::ZERO || x == T::ZERO {
         return x;
     }
@@ -70,16 +66,13 @@ where
 }
 
 fn _shr_round_assign_unsigned_unsigned<
-    T: PrimitiveInt,
-    U: Copy + Display + Eq + One + Ord + WrappingFrom<u64> + Zero,
+    T: PrimitiveInt + Shl<U, Output = T> + ShrAssign<U>,
+    U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
 >(
     x: &mut T,
     bits: U,
     rm: RoundingMode,
-) where
-    T: Shl<U, Output = T> + ShrAssign<U>,
-    U: Sub<U, Output = U>,
-{
+) {
     if bits == U::ZERO || *x == T::ZERO {
         return;
     }
@@ -237,15 +230,15 @@ macro_rules! impl_shr_round_unsigned_unsigned {
 }
 apply_to_unsigneds!(impl_shr_round_unsigned_unsigned);
 
-fn _shr_round_signed_unsigned<U: Copy + Eq + Zero, S: Copy + Eq + Min + Ord + Zero, B>(
+fn _shr_round_signed_unsigned<
+    U: Copy + Eq + ShrRound<B, Output = U> + Zero,
+    S: Copy + Eq + Min + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + WrappingFrom<U> + Zero,
+    B,
+>(
     x: S,
     bits: B,
     rm: RoundingMode,
-) -> S
-where
-    U: ShrRound<B, Output = U>,
-    S: Neg<Output = S> + UnsignedAbs<Output = U> + WrappingFrom<U>,
-{
+) -> S {
     let abs = x.unsigned_abs();
     if x >= S::ZERO {
         S::wrapping_from(abs.shr_round(bits, rm))
@@ -368,15 +361,15 @@ macro_rules! impl_shr_round_signed_unsigned {
 }
 apply_to_signeds!(impl_shr_round_signed_unsigned);
 
-fn _shr_round_primitive_signed<T: PrimitiveInt, U: Ord + WrappingFrom<u64>, S: Copy + Ord + Zero>(
+fn _shr_round_primitive_signed<
+    T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
+    U: Ord + WrappingFrom<u64>,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+>(
     x: T,
     bits: S,
     rm: RoundingMode,
-) -> T
-where
-    T: Shl<U, Output = T> + ShrRound<U, Output = T>,
-    S: UnsignedAbs<Output = U>,
-{
+) -> T {
     if bits >= S::ZERO {
         x.shr_round(bits.unsigned_abs(), rm)
     } else {
@@ -390,17 +383,14 @@ where
 }
 
 fn _shr_round_assign_primitive_signed<
-    T: PrimitiveInt,
+    T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
     U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + Zero,
+    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: &mut T,
     bits: S,
     rm: RoundingMode,
-) where
-    T: ShlAssign<U> + ShrRoundAssign<U>,
-    S: UnsignedAbs<Output = U>,
-{
+) {
     if bits >= S::ZERO {
         x.shr_round_assign(bits.unsigned_abs(), rm);
     } else {

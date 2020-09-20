@@ -19,6 +19,7 @@ macro_rules! impl_from_unsigned {
             ///
             /// assert_eq!(Integer::from(123u32).to_string(), "123");
             /// ```
+            #[inline]
             fn from(u: $t) -> Integer {
                 Integer {
                     sign: true,
@@ -46,6 +47,7 @@ macro_rules! impl_from_signed {
             ///
             /// assert_eq!(Integer::from(-123i32).to_string(), "-123");
             /// ```
+            #[inline]
             fn from(i: $t) -> Integer {
                 Integer {
                     sign: i >= 0,

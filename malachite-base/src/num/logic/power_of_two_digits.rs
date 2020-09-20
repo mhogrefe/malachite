@@ -8,14 +8,11 @@ use num::logic::traits::{PowerOfTwoDigits, SignificantBits};
 
 fn _to_power_of_two_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInt,
+    U: PrimitiveInt + WrappingFrom<T>,
 >(
     x: &T,
     log_base: u64,
-) -> Vec<U>
-where
-    U: WrappingFrom<T>,
-{
+) -> Vec<U> {
     assert_ne!(log_base, 0);
     if log_base > U::WIDTH {
         panic!(
@@ -41,23 +38,23 @@ where
 
 fn _to_power_of_two_digits_desc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
-    U: PrimitiveInt,
+    U: PrimitiveInt + WrappingFrom<T>,
 >(
     x: &T,
     log_base: u64,
-) -> Vec<U>
-where
-    U: WrappingFrom<T>,
-{
+) -> Vec<U> {
     let mut digits = _to_power_of_two_digits_asc(x, log_base);
     digits.reverse();
     digits
 }
 
-fn _from_power_of_two_digits_asc<T: Zero, U: PrimitiveInt>(log_base: u64, digits: &[U]) -> T
-where
-    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
-{
+fn _from_power_of_two_digits_asc<
+    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
+    U: PrimitiveInt,
+>(
+    log_base: u64,
+    digits: &[U],
+) -> T {
     assert_ne!(log_base, 0);
     if log_base > U::WIDTH {
         panic!(
@@ -77,10 +74,13 @@ where
     n
 }
 
-fn _from_power_of_two_digits_desc<T: Zero, U: PrimitiveInt>(log_base: u64, digits: &[U]) -> T
-where
-    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U>,
-{
+fn _from_power_of_two_digits_desc<
+    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
+    U: PrimitiveInt,
+>(
+    log_base: u64,
+    digits: &[U],
+) -> T {
     assert_ne!(log_base, 0);
     if log_base > U::WIDTH {
         panic!(

@@ -5,10 +5,11 @@ use malachite_base::num::logic::traits::PowerOfTwoDigits;
 
 #[test]
 pub fn test_to_power_of_two_digits_asc() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, log_base: u64, out: &[U])
-    where
-        T: PowerOfTwoDigits<U>,
-    {
+    fn test<T: PowerOfTwoDigits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        x: T,
+        log_base: u64,
+        out: &[U],
+    ) {
         assert_eq!(
             PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(&x, log_base),
             out
@@ -44,10 +45,11 @@ fn to_power_of_two_digits_asc_fail() {
 
 #[test]
 pub fn test_to_power_of_two_digits_desc() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, log_base: u64, out: &[U])
-    where
-        T: PowerOfTwoDigits<U>,
-    {
+    fn test<T: PowerOfTwoDigits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        x: T,
+        log_base: u64,
+        out: &[U],
+    ) {
         assert_eq!(
             PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(&x, log_base),
             out
@@ -83,10 +85,11 @@ fn to_power_of_two_digits_desc_fail() {
 
 #[test]
 pub fn test_from_power_of_two_digits_asc() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(log_base: u64, digits: &[U], out: T)
-    where
-        T: PowerOfTwoDigits<U>,
-    {
+    fn test<T: PowerOfTwoDigits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        log_base: u64,
+        digits: &[U],
+        out: T,
+    ) {
         assert_eq!(T::from_power_of_two_digits_asc(log_base, digits), out);
     };
 
@@ -127,10 +130,11 @@ fn from_power_of_two_digits_asc_fail() {
 
 #[test]
 pub fn test_from_power_of_two_digits_desc() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(log_base: u64, digits: &[U], out: T)
-    where
-        T: PowerOfTwoDigits<U>,
-    {
+    fn test<T: PowerOfTwoDigits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+        log_base: u64,
+        digits: &[U],
+        out: T,
+    ) {
         assert_eq!(T::from_power_of_two_digits_desc(log_base, digits), out);
     };
 

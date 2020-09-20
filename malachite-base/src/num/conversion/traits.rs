@@ -15,10 +15,7 @@ pub trait CheckedInto<T> {
     fn checked_into(self) -> Option<T>;
 }
 
-impl<T, U> CheckedInto<U> for T
-where
-    U: CheckedFrom<T>,
-{
+impl<T, U: CheckedFrom<T>> CheckedInto<U> for T {
     #[inline]
     fn checked_into(self) -> Option<U> {
         U::checked_from(self)
@@ -39,20 +36,14 @@ pub trait ExactInto<T> {
     fn exact_into(self) -> T;
 }
 
-impl<T, U> ExactFrom<T> for U
-where
-    U: CheckedFrom<T>,
-{
+impl<T, U: CheckedFrom<T>> ExactFrom<T> for U {
     #[inline]
     fn exact_from(value: T) -> U {
         U::checked_from(value).unwrap()
     }
 }
 
-impl<T, U> ExactInto<U> for T
-where
-    U: ExactFrom<T>,
-{
+impl<T, U: ExactFrom<T>> ExactInto<U> for T {
     #[inline]
     fn exact_into(self) -> U {
         U::exact_from(self)
@@ -73,10 +64,7 @@ pub trait WrappingInto<T>: Sized {
     fn wrapping_into(self) -> T;
 }
 
-impl<T, U> WrappingInto<U> for T
-where
-    U: WrappingFrom<T>,
-{
+impl<T, U: WrappingFrom<T>> WrappingInto<U> for T {
     #[inline]
     fn wrapping_into(self) -> U {
         U::wrapping_from(self)
@@ -97,10 +85,7 @@ pub trait SaturatingInto<T>: Sized {
     fn saturating_into(self) -> T;
 }
 
-impl<T, U> SaturatingInto<U> for T
-where
-    U: SaturatingFrom<T>,
-{
+impl<T, U: SaturatingFrom<T>> SaturatingInto<U> for T {
     #[inline]
     fn saturating_into(self) -> U {
         U::saturating_from(self)
@@ -123,10 +108,7 @@ pub trait OverflowingInto<T>: Sized {
     fn overflowing_into(self) -> (T, bool);
 }
 
-impl<T, U> OverflowingInto<U> for T
-where
-    U: OverflowingFrom<T>,
-{
+impl<T, U: OverflowingFrom<T>> OverflowingInto<U> for T {
     #[inline]
     fn overflowing_into(self) -> (U, bool) {
         U::overflowing_from(self)
@@ -146,10 +128,7 @@ pub trait RoundingInto<T>: Sized {
     fn rounding_into(self, rm: RoundingMode) -> T;
 }
 
-impl<T, U> RoundingInto<U> for T
-where
-    U: RoundingFrom<T>,
-{
+impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
     #[inline]
     fn rounding_into(self, rm: RoundingMode) -> U {
         U::rounding_from(self, rm)

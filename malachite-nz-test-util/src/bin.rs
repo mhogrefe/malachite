@@ -24,4 +24,4 @@ fn main() {
     }
 }
 
-pub mod demo_and_bench;
+mod demo_and_bench;

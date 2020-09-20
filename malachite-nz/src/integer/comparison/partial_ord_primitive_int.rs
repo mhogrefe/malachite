@@ -1,10 +1,21 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
+use natural::Natural;
 
-//TODO clean
+fn _partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>
+where
+    Natural: PartialOrd<T>,
+{
+    if x.sign {
+        x.abs.partial_cmp(other)
+    } else {
+        Some(Ordering::Less)
+    }
+}
 
 macro_rules! impl_unsigned {
     ($t: ident) => {
@@ -28,12 +39,9 @@ macro_rules! impl_unsigned {
             /// assert!(-Integer::trillion() < 123u64);
             /// assert!(-Integer::trillion() <= 123u64);
             /// ```
+            #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
-                if self.sign {
-                    self.abs.partial_cmp(other)
-                } else {
-                    Some(Ordering::Less)
-                }
+                _partial_cmp_unsigned(self, other)
             }
         }
 
@@ -66,6 +74,26 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
+fn _partial_cmp_signed<U: PartialOrd<Natural>, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &Integer,
+    other: &S,
+) -> Option<Ordering>
+where
+    Natural: PartialOrd<U>,
+{
+    if x.sign {
+        if *other >= S::ZERO {
+            x.abs.partial_cmp(&other.unsigned_abs())
+        } else {
+            Some(Ordering::Greater)
+        }
+    } else if *other >= S::ZERO {
+        Some(Ordering::Less)
+    } else {
+        other.unsigned_abs().partial_cmp(&x.abs)
+    }
+}
+
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialOrd<$t> for Integer {
@@ -88,18 +116,9 @@ macro_rules! impl_signed {
             /// assert!(-Integer::trillion() < 123i64);
             /// assert!(-Integer::trillion() <= 123i64);
             /// ```
+            #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
-                if self.sign {
-                    if *other >= 0 {
-                        self.abs.partial_cmp(&other.unsigned_abs())
-                    } else {
-                        Some(Ordering::Greater)
-                    }
-                } else if *other >= 0 {
-                    Some(Ordering::Less)
-                } else {
-                    other.unsigned_abs().partial_cmp(&self.abs)
-                }
+                _partial_cmp_signed(self, other)
             }
         }
 

@@ -2,17 +2,19 @@ use num::arithmetic::traits::{
     WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingMul,
 };
 
-fn _wrapping_add_mul<T>(x: T, y: T, z: T) -> T
-where
-    T: WrappingAdd<T, Output = T> + WrappingMul<T, Output = T>,
-{
+fn _wrapping_add_mul<T: WrappingAdd<T, Output = T> + WrappingMul<T, Output = T>>(
+    x: T,
+    y: T,
+    z: T,
+) -> T {
     x.wrapping_add(y.wrapping_mul(z))
 }
 
-fn _wrapping_add_mul_assign<T>(x: &mut T, y: T, z: T)
-where
-    T: WrappingAddAssign<T> + WrappingMul<T, Output = T>,
-{
+fn _wrapping_add_mul_assign<T: WrappingAddAssign<T> + WrappingMul<T, Output = T>>(
+    x: &mut T,
+    y: T,
+    z: T,
+) {
     x.wrapping_add_assign(y.wrapping_mul(z));
 }
 

@@ -32,6 +32,7 @@ use malachite_base::num::logic::traits::{
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
@@ -126,16 +127,6 @@ use inputs::common::{
     permute_1_2_4_3, permute_1_3_2, permute_1_3_4_2, permute_2_1, permute_2_1_3, reshape_1_2_to_3,
     reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, reshape_3_3_3_to_9, reshape_4_4_4_to_12,
 };
-
-//TODO replace with bool_gen in Malachite
-pub fn bools(gm: NoSpecialGenerationMode) -> It<bool> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_bools()),
-        NoSpecialGenerationMode::Random(_) => Box::new(random(&EXAMPLE_SEED)),
-    }
-}
-
-pub(crate) type It<T> = Box<dyn Iterator<Item = T>>;
 
 //TODO replace with unsigned_gen in Malachite
 pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
@@ -4337,6 +4328,85 @@ where
     )
 }
 
+// All triples of `T`, `T`, `u64`, and `u64`, where the `T`s are unsigned and the second `u64` is
+// between n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the two
+// `T`s.
+pub fn quadruples_of_unsigneds_var_5<T: PrimitiveUnsigned + Rand + SampleRange>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, T, u64, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_3_1_to_4(Box::new(dependent_pairs(
+            exhaustive_triples(
+                exhaustive_unsigneds(),
+                exhaustive_unsigneds(),
+                exhaustive_unsigneds(),
+            ),
+            |&(x, y, _): &(T, T, u64)| {
+                Box::new(primitive_int_increasing_inclusive_range(
+                    max(x.significant_bits(), y.significant_bits()),
+                    T::WIDTH,
+                ))
+            },
+        ))),
+        NoSpecialGenerationMode::Random(_) => {
+            reshape_3_1_to_4(permute_2_1(Box::new(random_dependent_pairs(
+                (),
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |_, &pow| {
+                    random_triples(
+                        &scramble(&EXAMPLE_SEED, "ts"),
+                        &(|seed| {
+                            random_range::<T>(&scramble(&seed, "x"), T::ZERO, T::low_mask(pow))
+                        }),
+                        &(|seed| {
+                            random_range::<T>(&scramble(&seed, "y"), T::ZERO, T::low_mask(pow))
+                        }),
+                        &(|seed| random(&scramble(&seed, "exp"))),
+                    )
+                },
+            ))))
+        }
+    }
+}
+
+// All triples of `T`, `u64`, `u64`, and `u64`, where the `T`s is unsigned and the third `u64` is
+// between n and `T::WIDTH`, inclusive, where n is the number of significant bits of the `T`.
+pub fn quadruples_of_unsigneds_var_6<T: PrimitiveUnsigned + Rand + SampleRange>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, u64, u64, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_3_1_to_4(Box::new(dependent_pairs(
+            exhaustive_triples(
+                exhaustive_unsigneds(),
+                exhaustive_unsigneds(),
+                exhaustive_unsigneds(),
+            ),
+            |&(x, _, _): &(T, u64, u64)| {
+                Box::new(primitive_int_increasing_inclusive_range(
+                    x.significant_bits(),
+                    T::WIDTH,
+                ))
+            },
+        ))),
+        NoSpecialGenerationMode::Random(_) => {
+            reshape_3_1_to_4(permute_2_1(Box::new(random_dependent_pairs(
+                (),
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |_, &pow| {
+                    random_triples(
+                        &scramble(&EXAMPLE_SEED, "ts"),
+                        &(|seed| {
+                            random_range::<T>(&scramble(&seed, "u"), T::ZERO, T::low_mask(pow))
+                        }),
+                        &(|seed| random(&scramble(&seed, "e"))),
+                        &(|seed| random(&scramble(&seed, "f"))),
+                    )
+                },
+            ))))
+        }
+    }
+}
+
 fn quadruples_of_unsigned_small_unsigned_small_unsigned_and_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -5870,6 +5940,41 @@ pub fn triples_of_unsigned_unsigned_and_small_u64_var_1<
                         T::ZERO,
                         T::low_mask(pow),
                     ))
+                },
+            ))))
+        }
+    }
+}
+
+// All triples of `T`, `u64` and `u64`, where `T` is unsigned and the second `u64` is between n and
+// `T::WIDTH`, inclusive, where n is the number of significant bits of the `T`.
+pub fn triples_of_unsigned_unsigned_and_small_u64_var_2<
+    T: PrimitiveUnsigned + Rand + SampleRange,
+>(
+    gm: NoSpecialGenerationMode,
+) -> It<(T, u64, u64)> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(dependent_pairs(
+            exhaustive_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()),
+            |&(u, _): &(T, u64)| {
+                Box::new(primitive_int_increasing_inclusive_range(
+                    u.significant_bits(),
+                    T::WIDTH,
+                ))
+            },
+        ))),
+        NoSpecialGenerationMode::Random(_) => {
+            reshape_2_1_to_3(permute_2_1(Box::new(random_dependent_pairs(
+                (),
+                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
+                |_, &pow| {
+                    random_pairs(
+                        &scramble(&EXAMPLE_SEED, "ps"),
+                        &(|seed| {
+                            random_range::<T>(&scramble(&seed, "u"), T::ZERO, T::low_mask(pow))
+                        }),
+                        &(|seed| random(seed)),
+                    )
                 },
             ))))
         }

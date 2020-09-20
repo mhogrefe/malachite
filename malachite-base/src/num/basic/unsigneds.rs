@@ -4,11 +4,11 @@ use num::arithmetic::traits::{
     ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
     ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOfTwo, ModPowerOfTwoAdd,
     ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
-    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoShl, ModPowerOfTwoShlAssign,
-    ModPowerOfTwoShr, ModPowerOfTwoShrAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub,
-    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
-    NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
-    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoPow, ModPowerOfTwoPowAssign,
+    ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
+    ModPowerOfTwoSub, ModPowerOfTwoSubAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
+    NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ,
+    XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -51,6 +51,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoMulAssign<Self>
     + ModPowerOfTwoNeg<Output = Self>
     + ModPowerOfTwoNegAssign
+    + ModPowerOfTwoPow<u64, Output = Self>
+    + ModPowerOfTwoPowAssign<u64>
     + ModPowerOfTwoShl<i8, Output = Self>
     + ModPowerOfTwoShl<i16, Output = Self>
     + ModPowerOfTwoShl<i32, Output = Self>

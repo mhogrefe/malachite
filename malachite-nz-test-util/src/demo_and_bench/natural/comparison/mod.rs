@@ -4,4 +4,4 @@ pub(crate) fn register(runner: &mut Runner) {
     from_primitive_int::register(runner);
 }
 
-pub mod from_primitive_int;
+mod from_primitive_int;

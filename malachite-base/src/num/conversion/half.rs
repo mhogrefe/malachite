@@ -5,19 +5,15 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 
 #[inline]
-fn _join_halves<T, H: PrimitiveInt>(upper: H, lower: H) -> T
-where
-    T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>,
-{
+fn _join_halves<T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>, H: PrimitiveInt>(
+    upper: H,
+    lower: H,
+) -> T {
     T::from(upper) << H::WIDTH | T::from(lower)
 }
 
 #[inline]
-fn _upper_half<T: Copy, H: PrimitiveInt>(x: &T) -> H
-where
-    T: Shr<u64, Output = T>,
-    H: WrappingFrom<T>,
-{
+fn _upper_half<T: Copy + Shr<u64, Output = T>, H: PrimitiveInt + WrappingFrom<T>>(x: &T) -> H {
     H::wrapping_from(*x >> H::WIDTH)
 }
 

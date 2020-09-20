@@ -184,16 +184,13 @@ macro_rules! impl_arithmetic_checked_shl_signed_unsigned {
 apply_to_signeds!(impl_arithmetic_checked_shl_signed_unsigned);
 
 fn _arithmetic_checked_shl_signed_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + Shr<U, Output = T>,
+    T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: T,
     bits: S,
-) -> Option<T>
-where
-    T: PrimitiveInt,
-{
+) -> Option<T> {
     if bits >= S::ZERO {
         x.arithmetic_checked_shl(bits.unsigned_abs())
     } else {

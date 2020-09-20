@@ -479,8 +479,8 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
 }
 
 pub fn negative_truncated_geometric_dist_assertions<
-    I: Clone,
-    S: CheckedToF64 + PrimitiveSigned,
+    I: Clone + Iterator<Item = S>,
+    S: CheckedToF64 + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
     U: CheckedToF64 + PrimitiveUnsigned,
 >(
     xs: I,
@@ -494,10 +494,7 @@ pub fn negative_truncated_geometric_dist_assertions<
     expected_sample_median: (S, Option<S>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
-) where
-    I: Iterator<Item = S>,
-    S: UnsignedAbs<Output = U> + WrappingFrom<U>,
-{
+) {
     let abs_min_64 = -abs_min.checked_to_f64();
     let abs_max_64 = -abs_max.checked_to_f64();
     let abs_unadjusted_mean = abs_um_numerator as f64 / abs_um_denominator as f64;

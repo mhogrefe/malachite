@@ -54,11 +54,6 @@ pub fn test_striped_bit_source() {
         10,
         "01010101010101101000111001010101010101111010101010101010110101011010101010101010",
     );
-    striped_bit_source_helper(
-        1,
-        1,
-        "01010101010101010101010101010101010101010101010101010101010101010101010101010101",
-    );
 }
 
 #[test]
@@ -70,6 +65,12 @@ fn new_fail_1() {
 #[test]
 #[should_panic]
 fn new_fail_2() {
+    StripedBitSource::new(EXAMPLE_SEED, 1, 1);
+}
+
+#[test]
+#[should_panic]
+fn new_fail_3() {
     StripedBitSource::new(EXAMPLE_SEED, 2, 3);
 }
 

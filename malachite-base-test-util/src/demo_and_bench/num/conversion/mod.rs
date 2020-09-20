@@ -8,8 +8,8 @@ pub(crate) fn register(runner: &mut Runner) {
     wrapping_from::register(runner);
 }
 
-pub mod checked_from_and_exact_from;
-pub mod convertible_from;
-pub mod overflowing_from;
-pub mod saturating_from;
-pub mod wrapping_from;
+mod checked_from_and_exact_from;
+mod convertible_from;
+mod overflowing_from;
+mod saturating_from;
+mod wrapping_from;

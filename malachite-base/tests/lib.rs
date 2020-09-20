@@ -40,7 +40,10 @@ pub mod bools {
     pub mod constants;
     pub mod exhaustive;
     pub mod not_assign;
-    pub mod random;
+    pub mod random {
+        pub mod random_bools;
+        pub mod weighted_random_bools;
+    }
 }
 pub mod comparison {
     pub mod macros;
@@ -87,6 +90,7 @@ pub mod iterators {
     pub mod first_and_last;
     pub mod is_constant;
     pub mod is_unique;
+    pub mod iterator_cache;
     pub mod matching_intervals_in_iterator;
     pub mod nonzero_values;
 }
@@ -121,6 +125,7 @@ pub mod num {
         pub mod mod_power_of_two_is_reduced;
         pub mod mod_power_of_two_mul;
         pub mod mod_power_of_two_neg;
+        pub mod mod_power_of_two_pow;
         pub mod mod_power_of_two_shl;
         pub mod mod_power_of_two_shr;
         pub mod mod_power_of_two_sub;
@@ -263,6 +268,16 @@ pub mod num {
         }
     }
 }
+pub mod options {
+    pub mod exhaustive {
+        pub mod exhaustive_options;
+        pub mod exhaustive_somes;
+    }
+    pub mod random {
+        pub mod random_options;
+        pub mod random_somes;
+    }
+}
 pub mod orderings {
     pub mod exhaustive;
     pub mod random;
@@ -290,11 +305,15 @@ pub mod slices {
     pub mod slice_test_zero;
     pub mod slice_trailing_zeros;
     pub mod split_into_chunks;
+    pub mod split_into_chunks_mut;
 }
 pub mod strings {
     pub mod string_is_subset;
     pub mod string_nub;
     pub mod string_sort;
     pub mod to_debug_string;
+}
+pub mod tuples {
+    pub mod singletons;
 }
 pub mod vecs;

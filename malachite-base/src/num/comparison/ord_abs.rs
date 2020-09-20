@@ -63,10 +63,7 @@ macro_rules! impl_ord_abs_unsigned {
 }
 apply_to_unsigneds!(impl_ord_abs_unsigned);
 
-fn _cmp_abs_signed<T: Copy + UnsignedAbs>(x: &T, y: &T) -> Ordering
-where
-    <T as UnsignedAbs>::Output: Ord,
-{
+fn _cmp_abs_signed<U: Ord, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> Ordering {
     x.unsigned_abs().cmp(&y.unsigned_abs())
 }
 

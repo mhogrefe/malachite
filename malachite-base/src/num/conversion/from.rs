@@ -117,10 +117,7 @@ macro_rules! identity_conversion {
     };
 }
 
-fn _checked_from_lossless<A, B>(value: A) -> Option<B>
-where
-    B: From<A>,
-{
+fn _checked_from_lossless<A, B: From<A>>(value: A) -> Option<B> {
     Some(B::from(value))
 }
 
@@ -235,11 +232,12 @@ macro_rules! lossless_conversion {
     };
 }
 
-fn _checked_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> Option<B>
-where
-    A: WrappingFrom<B>,
-    B: WrappingFrom<A>,
-{
+fn _checked_from_lossy<
+    A: Copy + Ord + WrappingFrom<B> + Zero,
+    B: Copy + Ord + WrappingFrom<A> + Zero,
+>(
+    value: A,
+) -> Option<B> {
     let result = B::wrapping_from(value);
     if (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value {
         Some(result)
@@ -248,11 +246,7 @@ where
     }
 }
 
-fn _saturating_from_lossy<A: Ord, B: Max + Min>(value: A) -> B
-where
-    A: CheckedFrom<B>,
-    B: WrappingFrom<A>,
-{
+fn _saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A>>(value: A) -> B {
     if let Some(b_max) = A::checked_from(B::MAX) {
         if value >= b_max {
             return B::MAX;
@@ -266,11 +260,12 @@ where
     B::wrapping_from(value)
 }
 
-fn _overflowing_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> (B, bool)
-where
-    A: WrappingFrom<B>,
-    B: WrappingFrom<A>,
-{
+fn _overflowing_from_lossy<
+    A: Copy + Ord + WrappingFrom<B> + Zero,
+    B: Copy + Ord + WrappingFrom<A> + Zero,
+>(
+    value: A,
+) -> (B, bool) {
     let result = B::wrapping_from(value);
     (
         result,
@@ -278,11 +273,12 @@ where
     )
 }
 
-fn _convertible_from_lossy<A: Copy + Ord + Zero, B: Copy + Ord + Zero>(value: A) -> bool
-where
-    A: WrappingFrom<B>,
-    B: WrappingFrom<A>,
-{
+fn _convertible_from_lossy<
+    A: Copy + Ord + WrappingFrom<B> + Zero,
+    B: Copy + Ord + WrappingFrom<A> + Zero,
+>(
+    value: A,
+) -> bool {
     let result = B::wrapping_from(value);
     (result >= B::ZERO) == (value >= A::ZERO) && A::wrapping_from(result) == value
 }

@@ -1,11 +1,124 @@
-use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
+use std::ops::Neg;
+
+use malachite_base::comparison::traits::Min;
+use malachite_base::num::arithmetic::traits::{DivisibleByPowerOfTwo, WrappingNeg};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
 
 use integer::Integer;
+use natural::Natural;
+
+fn _checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -> Option<T> {
+    match *value {
+        Integer { sign: false, .. } => None,
+        Integer {
+            sign: true,
+            ref abs,
+        } => T::checked_from(abs),
+    }
+}
+
+fn _wrapping_from_unsigned<'a, T: WrappingFrom<&'a Natural> + WrappingNeg<Output = T>>(
+    value: &'a Integer,
+) -> T {
+    match *value {
+        Integer {
+            sign: true,
+            ref abs,
+        } => T::wrapping_from(abs),
+        Integer {
+            sign: false,
+            ref abs,
+        } => T::wrapping_from(abs).wrapping_neg(),
+    }
+}
+
+fn _saturating_from_unsigned<'a, T: Copy + SaturatingFrom<&'a Natural> + Zero>(
+    value: &'a Integer,
+) -> T {
+    match *value {
+        Integer {
+            sign: true,
+            ref abs,
+        } => T::saturating_from(abs),
+        _ => T::ZERO,
+    }
+}
+
+fn _overflowing_from_unsigned<
+    'a,
+    T: OverflowingFrom<&'a Natural> + WrappingFrom<&'a Natural> + WrappingNeg<Output = T>,
+>(
+    value: &'a Integer,
+) -> (T, bool) {
+    match *value {
+        Integer {
+            sign: true,
+            ref abs,
+        } => T::overflowing_from(abs),
+        Integer {
+            sign: false,
+            ref abs,
+        } => (T::wrapping_from(abs).wrapping_neg(), true),
+    }
+}
+
+fn _checked_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a Integer>>(
+    value: &'a Integer,
+) -> Option<T> {
+    if T::convertible_from(value) {
+        Some(T::wrapping_from(value))
+    } else {
+        None
+    }
+}
+
+fn _saturating_from_signed<
+    'a,
+    U: PrimitiveInt + SaturatingFrom<&'a Natural>,
+    S: Min + Neg<Output = S> + SaturatingFrom<U> + WrappingFrom<U>,
+>(
+    value: &'a Integer,
+) -> S {
+    match *value {
+        Integer {
+            sign: true,
+            ref abs,
+        } => S::saturating_from(U::saturating_from(abs)),
+        Integer {
+            sign: false,
+            ref abs,
+        } => {
+            let abs = U::saturating_from(abs);
+            if abs.get_highest_bit() {
+                S::MIN
+            } else {
+                -S::wrapping_from(abs)
+            }
+        }
+    }
+}
+
+fn _convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
+    match *value {
+        Integer {
+            sign: true,
+            ref abs,
+        } => abs.significant_bits() < T::WIDTH,
+        Integer {
+            sign: false,
+            ref abs,
+        } => {
+            let significant_bits = abs.significant_bits();
+            significant_bits < T::WIDTH
+                || significant_bits == T::WIDTH && abs.divisible_by_power_of_two(T::WIDTH - 1)
+        }
+    }
+}
 
 macro_rules! impl_from {
     ($u: ident, $s: ident) => {
@@ -58,14 +171,9 @@ macro_rules! impl_from {
             /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::trillion())), "None");
             /// assert_eq!(format!("{:?}", u32::checked_from(&-Integer::trillion())), "None");
             /// ```
+            #[inline]
             fn checked_from(value: &Integer) -> Option<$u> {
-                match *value {
-                    Integer { sign: false, .. } => None,
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => $u::checked_from(abs),
-                }
+                _checked_from_unsigned(value)
             }
         }
 
@@ -117,17 +225,9 @@ macro_rules! impl_from {
             /// assert_eq!(u32::wrapping_from(&Integer::trillion()), 3567587328);
             /// assert_eq!(u32::wrapping_from(&-Integer::trillion()), 727379968);
             /// ```
+            #[inline]
             fn wrapping_from(value: &Integer) -> $u {
-                match *value {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => $u::wrapping_from(abs),
-                    Integer {
-                        sign: false,
-                        ref abs,
-                    } => $u::wrapping_from(abs).wrapping_neg(),
-                }
+                _wrapping_from_unsigned(value)
             }
         }
 
@@ -153,6 +253,7 @@ macro_rules! impl_from {
             /// assert_eq!(u32::saturating_from(Integer::trillion()), u32::MAX);
             /// assert_eq!(u32::saturating_from(-Integer::trillion()), 0);
             /// ```
+            #[inline]
             fn saturating_from(value: Integer) -> $u {
                 $u::saturating_from(&value)
             }
@@ -180,14 +281,9 @@ macro_rules! impl_from {
             /// assert_eq!(u32::saturating_from(&Integer::trillion()), u32::MAX);
             /// assert_eq!(u32::saturating_from(&-Integer::trillion()), 0);
             /// ```
+            #[inline]
             fn saturating_from(value: &Integer) -> $u {
-                match *value {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => $u::saturating_from(abs),
-                    _ => 0,
-                }
+                _saturating_from_unsigned(value)
             }
         }
 
@@ -213,6 +309,7 @@ macro_rules! impl_from {
             /// assert_eq!(u32::overflowing_from(Integer::trillion()), (3567587328, true));
             /// assert_eq!(u32::overflowing_from(-Integer::trillion()), (727379968, true));
             /// ```
+            #[inline]
             fn overflowing_from(value: Integer) -> ($u, bool) {
                 $u::overflowing_from(&value)
             }
@@ -240,17 +337,9 @@ macro_rules! impl_from {
             /// assert_eq!(u32::overflowing_from(&Integer::trillion()), (3567587328, true));
             /// assert_eq!(u32::overflowing_from(&-Integer::trillion()), (727379968, true));
             /// ```
+            #[inline]
             fn overflowing_from(value: &Integer) -> ($u, bool) {
-                match *value {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => $u::overflowing_from(abs),
-                    Integer {
-                        sign: false,
-                        ref abs,
-                    } => ($u::wrapping_from(abs).wrapping_neg(), true),
-                }
+                _overflowing_from_unsigned(value)
             }
         }
 
@@ -302,6 +391,7 @@ macro_rules! impl_from {
             /// assert_eq!(u32::convertible_from(&Integer::trillion()), false);
             /// assert_eq!(u32::convertible_from(&-Integer::trillion()), false);
             /// ```
+            #[inline]
             fn convertible_from(value: &Integer) -> bool {
                 value.sign && $u::convertible_from(&value.abs)
             }
@@ -357,12 +447,9 @@ macro_rules! impl_from {
             /// assert_eq!(i32::checked_from(&Integer::trillion()), None);
             /// assert_eq!(i32::checked_from(&-Integer::trillion()), None);
             /// ```
+            #[inline]
             fn checked_from(value: &Integer) -> Option<$s> {
-                if $s::convertible_from(value) {
-                    Some($s::wrapping_from(value))
-                } else {
-                    None
-                }
+                _checked_from_signed(value)
             }
         }
 
@@ -414,6 +501,7 @@ macro_rules! impl_from {
             /// assert_eq!(i32::wrapping_from(&Integer::trillion()), -727379968);
             /// assert_eq!(i32::wrapping_from(&-Integer::trillion()), 727379968);
             /// ```
+            #[inline]
             fn wrapping_from(value: &Integer) -> $s {
                 $s::wrapping_from($u::wrapping_from(value))
             }
@@ -441,6 +529,7 @@ macro_rules! impl_from {
             /// assert_eq!(i32::saturating_from(Integer::trillion()), 2147483647);
             /// assert_eq!(i32::saturating_from(-Integer::trillion()), -2147483648);
             /// ```
+            #[inline]
             fn saturating_from(value: Integer) -> $s {
                 $s::saturating_from(&value)
             }
@@ -468,24 +557,9 @@ macro_rules! impl_from {
             /// assert_eq!(i32::saturating_from(&Integer::trillion()), 2147483647);
             /// assert_eq!(i32::saturating_from(&-Integer::trillion()), -2147483648);
             /// ```
+            #[inline]
             fn saturating_from(value: &Integer) -> $s {
-                match *value {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => $s::saturating_from($u::saturating_from(abs)),
-                    Integer {
-                        sign: false,
-                        ref abs,
-                    } => {
-                        let abs = $u::saturating_from(abs);
-                        if abs.get_highest_bit() {
-                            $s::MIN
-                        } else {
-                            -$s::wrapping_from(abs)
-                        }
-                    }
-                }
+                _saturating_from_signed::<$u, $s>(value)
             }
         }
 
@@ -511,6 +585,7 @@ macro_rules! impl_from {
             /// assert_eq!(i32::overflowing_from(Integer::trillion()), (-727379968, true));
             /// assert_eq!(i32::overflowing_from(-Integer::trillion()), (727379968, true));
             /// ```
+            #[inline]
             fn overflowing_from(value: Integer) -> ($s, bool) {
                 $s::overflowing_from(&value)
             }
@@ -538,6 +613,7 @@ macro_rules! impl_from {
             /// assert_eq!(i32::overflowing_from(&Integer::trillion()), (-727379968, true));
             /// assert_eq!(i32::overflowing_from(&-Integer::trillion()), (727379968, true));
             /// ```
+            #[inline]
             fn overflowing_from(value: &Integer) -> ($s, bool) {
                 ($s::wrapping_from(value), !$s::convertible_from(value))
             }
@@ -591,22 +667,9 @@ macro_rules! impl_from {
             /// assert_eq!(i32::convertible_from(&Integer::trillion()), false);
             /// assert_eq!(i32::convertible_from(&-Integer::trillion()), false);
             /// ```
+            #[inline]
             fn convertible_from(value: &Integer) -> bool {
-                match *value {
-                    Integer {
-                        sign: true,
-                        ref abs,
-                    } => abs.significant_bits() < $u::WIDTH,
-                    Integer {
-                        sign: false,
-                        ref abs,
-                    } => {
-                        let significant_bits = abs.significant_bits();
-                        significant_bits < $u::WIDTH
-                            || significant_bits == $u::WIDTH
-                                && abs.divisible_by_power_of_two($u::WIDTH - 1)
-                    }
-                }
+                _convertible_from_signed::<$u>(value)
             }
         }
     };

@@ -4,4 +4,4 @@ pub(crate) fn register(runner: &mut Runner) {
     comparison::register(runner);
 }
 
-pub mod comparison;
+mod comparison;

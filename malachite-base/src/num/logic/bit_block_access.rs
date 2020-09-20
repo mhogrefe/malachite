@@ -8,10 +8,11 @@ use num::logic::traits::{BitBlockAccess, LeadingZeros};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _get_bits_unsigned<T: PrimitiveInt>(x: &T, start: u64, end: u64) -> T
-where
-    T: ModPowerOfTwo<Output = T>,
-{
+fn _get_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+    x: &T,
+    start: u64,
+    end: u64,
+) -> T {
     assert!(start <= end);
     if start >= T::WIDTH {
         T::ZERO
@@ -20,10 +21,12 @@ where
     }
 }
 
-fn _assign_bits_unsigned<T: PrimitiveInt>(x: &mut T, start: u64, end: u64, bits: &T)
-where
-    T: ModPowerOfTwo<Output = T>,
-{
+fn _assign_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+    x: &mut T,
+    start: u64,
+    end: u64,
+    bits: &T,
+) {
     assert!(start <= end);
     let width = T::WIDTH;
     let bits_width = end - start;
@@ -106,10 +109,11 @@ macro_rules! impl_bit_block_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-fn _get_bits_signed<T: PrimitiveInt, U>(x: &T, start: u64, end: u64) -> U
-where
-    T: ModPowerOfTwo<Output = U> + Neg<Output = T>,
-{
+fn _get_bits_signed<T: ModPowerOfTwo<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
+    x: &T,
+    start: u64,
+    end: u64,
+) -> U {
     assert!(start <= end);
     (if start >= T::WIDTH {
         -T::iverson(*x < T::ZERO)
@@ -119,11 +123,15 @@ where
     .mod_power_of_two(end - start)
 }
 
-fn _assign_bits_signed<T: PrimitiveInt, U: PrimitiveInt>(x: &mut T, start: u64, end: u64, bits: &U)
-where
-    T: UnsignedAbs<Output = U> + WrappingFrom<U>,
-    U: BitBlockAccess<Bits = U> + ModPowerOfTwo<Output = U>,
-{
+fn _assign_bits_signed<
+    T: PrimitiveInt + UnsignedAbs<Output = U> + WrappingFrom<U>,
+    U: BitBlockAccess<Bits = U> + ModPowerOfTwo<Output = U> + PrimitiveInt,
+>(
+    x: &mut T,
+    start: u64,
+    end: u64,
+    bits: &U,
+) {
     assert!(start <= end);
     if *x >= T::ZERO {
         let mut abs_x = x.unsigned_abs();

@@ -6,6 +6,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 use natural::Natural;
 
+//TODO clean
+
 macro_rules! impl_mod_power_of_two_shl_unsigned {
     ($t:ident) => {
         /// Shifts a `Natural` left (multiplies it by a power of 2) mod 2<sup>`pow`</sup>, taking

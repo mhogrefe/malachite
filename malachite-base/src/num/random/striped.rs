@@ -1,11 +1,10 @@
 use std::marker::PhantomData;
 
-use bools::random::{random_bools, RandomBools};
+use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::random::geometric::mean_to_p_with_min;
-use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
 
 /// Generates bits from a striped random sequence.
@@ -16,8 +15,7 @@ pub struct StripedBitSource {
     first_bit_of_block: bool,
     previous_bit: bool,
     bs: RandomBools,
-    xs: RandomUnsignedsLessThan<u64>,
-    numerator: u64,
+    xs: WeightedRandomBools,
 }
 
 impl StripedBitSource {
@@ -49,14 +47,13 @@ impl StripedBitSource {
     /// ```
     pub fn new(seed: Seed, m_numerator: u64, m_denominator: u64) -> StripedBitSource {
         assert_ne!(m_denominator, 0);
-        assert!(m_numerator >= m_denominator);
+        assert!(m_numerator > m_denominator);
         let (numerator, denominator) = mean_to_p_with_min(1u64, m_numerator, m_denominator);
         StripedBitSource {
             first_bit_of_block: true,
             previous_bit: false,
             bs: random_bools(seed.fork("bs")),
-            xs: random_unsigneds_less_than(seed.fork("xs"), denominator),
-            numerator,
+            xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
         }
     }
 
@@ -75,7 +72,7 @@ impl StripedBitSource {
             self.first_bit_of_block = false;
             self.bs.next().unwrap()
         } else {
-            self.previous_bit ^ (self.xs.next().unwrap() < self.numerator)
+            self.previous_bit ^ self.xs.next().unwrap()
         };
         self.previous_bit
     }

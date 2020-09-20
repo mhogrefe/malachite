@@ -92,6 +92,20 @@ fn _fast_pow_mod<
 
 macro_rules! impl_mod_pow_precomputed_fast {
     ($t:ident, $dt:ident, $invert_limb:ident) => {
+        /// Provides functions for computing `self.pow(exp)` and `self.square()` mod `m`. Some
+        /// precomputed data is provided; this speeds up computations involving several modular
+        /// exponentiations with the same modulus. The precomputed data should be obtained using
+        /// `precompute_mod_pow_data`.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+        ///
+        /// let data = u32::precompute_mod_pow_data(&497);
+        /// assert_eq!(100u32.mod_square_precomputed(497, &data), 60);
+        /// assert_eq!(200u32.mod_square_precomputed(497, &data), 240);
+        /// assert_eq!(300u32.mod_square_precomputed(497, &data), 43);
+        /// ```
         impl ModPowPrecomputed<u64, $t> for $t {
             type Output = $t;
             type Data = ($t, u64);
@@ -107,10 +121,10 @@ macro_rules! impl_mod_pow_precomputed_fast {
                 ($invert_limb(m << leading_zeros), leading_zeros)
             }
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`.
-            /// Some precomputed data is provided; this speeds up computations involving several
-            /// modular exponentiations with the same modulus. The precomputed data should be
-            /// obtained using `precompute_mod_pow_data`.
+            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`. Some
+            /// precomputed data is provided; this speeds up computations involving several modular
+            /// exponentiations with the same modulus. The precomputed data should be obtained using
+            /// `precompute_mod_pow_data`.
             ///
             /// TODO complexity
             ///
@@ -140,6 +154,20 @@ impl_mod_pow_precomputed_fast!(u64, u128, _limbs_invert_limb_u64);
 
 macro_rules! impl_mod_pow_precomputed_promoted {
     ($t:ident) => {
+        /// Provides functions for computing `self.pow(exp)` and `self.square()` mod `m`. Some
+        /// precomputed data is provided; this speeds up computations involving several modular
+        /// exponentiations with the same modulus. The precomputed data should be obtained using
+        /// `precompute_mod_pow_data`.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+        ///
+        /// let data = u16::precompute_mod_pow_data(&497);
+        /// assert_eq!(100u16.mod_square_precomputed(497, &data), 60);
+        /// assert_eq!(200u16.mod_square_precomputed(497, &data), 240);
+        /// assert_eq!(300u16.mod_square_precomputed(497, &data), 43);
+        /// ```
         impl ModPowPrecomputed<u64, $t> for $t {
             type Output = $t;
             type Data = (u32, u64);
@@ -154,10 +182,10 @@ macro_rules! impl_mod_pow_precomputed_promoted {
                 u32::precompute_mod_pow_data(&u32::from(m))
             }
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`.
-            /// Some precomputed data is provided; this speeds up computations involving several
-            /// modular exponentiations with the same modulus. The precomputed data should be
-            /// obtained using `precompute_mod_pow_data`.
+            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`. Some
+            /// precomputed data is provided; this speeds up computations involving several modular
+            /// exponentiations with the same modulus. The precomputed data should be obtained using
+            /// `precompute_mod_pow_data`.
             ///
             /// TODO complexity
             ///
@@ -184,6 +212,19 @@ macro_rules! impl_mod_pow_precomputed_promoted {
 impl_mod_pow_precomputed_promoted!(u8);
 impl_mod_pow_precomputed_promoted!(u16);
 
+/// Provides functions for computing `self.pow(exp)` and `self.square()` mod `m`. Some precomputed
+/// data is provided; this speeds up computations involving several modular exponentiations with the
+/// same modulus. The precomputed data should be obtained using `precompute_mod_pow_data`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+///
+/// let data = u128::precompute_mod_pow_data(&497);
+/// assert_eq!(100u128.mod_square_precomputed(497, &data), 60);
+/// assert_eq!(200u128.mod_square_precomputed(497, &data), 240);
+/// assert_eq!(300u128.mod_square_precomputed(497, &data), 43);
+/// ```
 impl ModPowPrecomputed<u64, u128> for u128 {
     type Output = u128;
     type Data = ();
@@ -196,7 +237,7 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     /// Additional memory: worst case O(1)
     fn precompute_mod_pow_data(_m: &u128) {}
 
-    /// Computes `self.pow(exp) mod `m`. Assumes the inputs are already reduced mod `m`. Some
+    /// Computes `self.pow(exp) mod `m`. Assumes the input is already reduced mod `m`. Some
     /// precomputed data is provided; this speeds up computations involving several modular
     /// exponentiations with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_pow_data`.
@@ -243,7 +284,7 @@ impl ModPowPrecomputed<u64, usize> for usize {
         }
     }
 
-    /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. Some
+    /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`. Some
     /// precomputed data is provided; this speeds up computations involving several modular
     /// exponentiations with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_pow_data`.
@@ -272,8 +313,33 @@ impl ModPowPrecomputed<u64, usize> for usize {
 
 macro_rules! impl_mod_pow {
     ($t:ident) => {
+        /// Provides functions for replacing `self` with `self.pow(exp)` pr `self.square()` mod `m`.
+        /// Some precomputed data is provided; this speeds up computations involving several modular
+        /// exponentiations with the same modulus. The precomputed data should be obtained using
+        /// `precompute_mod_pow_data`.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::{
+        ///     ModPowPrecomputed, ModPowPrecomputedAssign
+        /// };
+        ///
+        /// let data = u32::precompute_mod_pow_data(&497);
+        ///
+        /// let mut x = 100u32;
+        /// x.mod_square_precomputed_assign(497, &data);
+        /// assert_eq!(x, 60);
+        ///
+        /// let mut x = 200u32;
+        /// x.mod_square_precomputed_assign(497, &data);
+        /// assert_eq!(x, 240);
+        ///
+        /// let mut x = 300u32;
+        /// x.mod_square_precomputed_assign(497, &data);
+        /// assert_eq!(x, 43);
+        /// ```
         impl ModPowPrecomputedAssign<u64, $t> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced
+            /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the input is already reduced
             /// mod `m`. Some precomputed data is provided; this speeds up computations involving
             /// several modular exponentiations with the same modulus. The precomputed data should
             /// be obtained using `precompute_mod_pow_data`.
@@ -322,10 +388,20 @@ macro_rules! impl_mod_pow {
             }
         }
 
+        /// Provides functions for computing `self.pow(exp)` and `self.square()` mod `m`.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::ModPow;
+        ///
+        /// assert_eq!(100u32.mod_square(497), 60);
+        /// assert_eq!(200u32.mod_square(497), 240);
+        /// assert_eq!(300u32.mod_square(497), 43);
+        /// ```
         impl ModPow<u64> for $t {
             type Output = $t;
 
-            /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`.
+            /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
             ///
             /// TODO complexity
             ///
@@ -342,8 +418,26 @@ macro_rules! impl_mod_pow {
             }
         }
 
+        /// Provides functions for replacing `self` with `self.pow(exp)` or `self.square()` mod `m`.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::ModPowAssign;
+        ///
+        /// let mut n = 100u32;
+        /// n.mod_square_assign(497);
+        /// assert_eq!(n, 60);
+        ///
+        /// let mut n = 200u32;
+        /// n.mod_square_assign(497);
+        /// assert_eq!(n, 240);
+        ///
+        /// let mut n = 300u32;
+        /// n.mod_square_assign(497);
+        /// assert_eq!(n, 43);
+        /// ```
         impl ModPowAssign<u64> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced
+            /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the input is already reduced
             /// mod `m`.
             ///
             /// TODO complexity

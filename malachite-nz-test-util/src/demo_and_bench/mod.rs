@@ -42,4 +42,4 @@ pub(crate) fn register(runner: &mut Runner) {
     natural::register(runner);
 }
 
-pub mod natural;
+mod natural;

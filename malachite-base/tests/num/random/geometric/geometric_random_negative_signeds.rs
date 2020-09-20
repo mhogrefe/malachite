@@ -12,23 +12,23 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::random::geometric::geometric_random_negative_signeds;
 use malachite_base::random::EXAMPLE_SEED;
 
-fn geometric_random_negative_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
+fn geometric_random_negative_signeds_helper<
+    U: CheckedToF64 + PrimitiveUnsigned,
+    S: CheckedToF64 + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>(
     abs_um_numerator: u64,
     abs_um_denominator: u64,
-    expected_values: &[T],
-    expected_common_values: &[(T, usize)],
-    expected_pop_median: (T, Option<T>),
-    expected_sample_median: (T, Option<T>),
+    expected_values: &[S],
+    expected_common_values: &[(S, usize)],
+    expected_pop_median: (S, Option<S>),
+    expected_sample_median: (S, Option<S>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
-) where
-    T: WrappingFrom<<T as UnsignedAbs>::Output>,
-    <T as UnsignedAbs>::Output: CheckedToF64 + PrimitiveUnsigned,
-{
+) {
     negative_truncated_geometric_dist_assertions(
-        geometric_random_negative_signeds::<T>(EXAMPLE_SEED, abs_um_numerator, abs_um_denominator),
-        T::NEGATIVE_ONE,
-        T::MIN,
+        geometric_random_negative_signeds::<S>(EXAMPLE_SEED, abs_um_numerator, abs_um_denominator),
+        S::NEGATIVE_ONE,
+        S::MIN,
         abs_um_numerator,
         abs_um_denominator,
         expected_values,
@@ -62,7 +62,7 @@ fn test_geometric_random_negative_signeds() {
         skewness: NiceFloat(-8.160460378454992),
         excess_kurtosis: NiceFloat(68.31033619043166),
     };
-    geometric_random_negative_signeds_helper::<i64>(
+    geometric_random_negative_signeds_helper::<_, i64>(
         65,
         64,
         values,
@@ -102,7 +102,7 @@ fn test_geometric_random_negative_signeds() {
         skewness: NiceFloat(-2.716807176148366),
         excess_kurtosis: NiceFloat(9.308727522629948),
     };
-    geometric_random_negative_signeds_helper::<i64>(
+    geometric_random_negative_signeds_helper::<_, i64>(
         12_345,
         10_000,
         values,
@@ -143,7 +143,7 @@ fn test_geometric_random_negative_signeds() {
         skewness: NiceFloat(-2.114056944012543),
         excess_kurtosis: NiceFloat(6.4341815215340645),
     };
-    geometric_random_negative_signeds_helper::<i64>(
+    geometric_random_negative_signeds_helper::<_, i64>(
         2,
         1,
         values,
@@ -185,7 +185,7 @@ fn test_geometric_random_negative_signeds() {
         skewness: NiceFloat(-0.6830069791725721),
         excess_kurtosis: NiceFloat(-0.5435066974705061),
     };
-    geometric_random_negative_signeds_helper::<i8>(
+    geometric_random_negative_signeds_helper::<_, i8>(
         64,
         1,
         values,
@@ -227,7 +227,7 @@ fn test_geometric_random_negative_signeds() {
         skewness: NiceFloat(-0.04254845146202895),
         excess_kurtosis: NiceFloat(-1.1968222027376492),
     };
-    geometric_random_negative_signeds_helper::<i8>(
+    geometric_random_negative_signeds_helper::<_, i8>(
         1000,
         1,
         values,

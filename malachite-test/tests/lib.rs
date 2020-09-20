@@ -45,6 +45,7 @@ pub mod base {
             pub mod mod_power_of_two_is_reduced;
             pub mod mod_power_of_two_mul;
             pub mod mod_power_of_two_neg;
+            pub mod mod_power_of_two_pow;
             pub mod mod_power_of_two_shl;
             pub mod mod_power_of_two_shr;
             pub mod mod_power_of_two_sub;
@@ -97,10 +98,6 @@ pub mod base {
             pub mod xxx_add_yyy_is_zzz;
             pub mod xxx_sub_yyy_is_zzz;
             pub mod xxxx_add_yyyy_is_zzzz;
-        }
-
-        pub mod basic {
-            pub mod iverson;
         }
 
         pub mod conversion {

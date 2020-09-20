@@ -6,17 +6,15 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 
-//TODO wheres
-
-fn _shl_round<T: PrimitiveInt, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round<
+    T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
+    U,
+    S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
+>(
     x: T,
     bits: S,
     rm: RoundingMode,
-) -> T
-where
-    T: Shl<U, Output = T> + ShrRound<U, Output = T>,
-    S: UnsignedAbs<Output = U>,
-{
+) -> T {
     if bits >= S::ZERO {
         let width = S::wrapping_from(T::WIDTH);
         if width >= S::ZERO && bits >= width {
@@ -29,14 +27,15 @@ where
     }
 }
 
-fn _shl_round_assign<T: PrimitiveInt, U, S: Copy + Ord + WrappingFrom<u64> + Zero>(
+fn _shl_round_assign<
+    T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
+    U,
+    S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
+>(
     x: &mut T,
     bits: S,
     rm: RoundingMode,
-) where
-    T: ShlAssign<U> + ShrRoundAssign<U>,
-    S: UnsignedAbs<Output = U>,
-{
+) {
     if bits >= S::ZERO {
         let width = S::wrapping_from(T::WIDTH);
         if width >= S::ZERO && bits >= width {

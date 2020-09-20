@@ -6,10 +6,12 @@ use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_shr_round() {
-    fn test<T: PrimitiveInt, U: PrimitiveInt>(t: T, u: U, rm: RoundingMode, out: T)
-    where
-        T: ShrRound<U, Output = T> + ShrRoundAssign<U>,
-    {
+    fn test<T: PrimitiveInt + ShrRound<U, Output = T> + ShrRoundAssign<U>, U: PrimitiveInt>(
+        t: T,
+        u: U,
+        rm: RoundingMode,
+        out: T,
+    ) {
         assert_eq!(t.shr_round(u, rm), out);
 
         let mut t = t;
@@ -761,10 +763,10 @@ fn test_shr_round() {
     );
 }
 
-fn shr_round_fail_helper<T: PrimitiveInt, U: PrimitiveInt>()
-where
-    T: ShrRound<U, Output = T> + ShrRoundAssign<U>,
-{
+fn shr_round_fail_helper<
+    T: PrimitiveInt + ShrRound<U, Output = T> + ShrRoundAssign<U>,
+    U: PrimitiveInt,
+>() {
     assert_panic!(T::exact_from(123).shr_round(U::ONE, RoundingMode::Exact));
     assert_panic!(T::exact_from(123).shr_round(U::exact_from(100), RoundingMode::Exact));
     assert_panic!(T::exact_from(123).shr_round_assign(U::ONE, RoundingMode::Exact));

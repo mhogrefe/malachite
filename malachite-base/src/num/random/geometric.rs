@@ -1,17 +1,15 @@
-use bools::random::{random_bools, RandomBools};
+use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
 use num::arithmetic::traits::Parity;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::CheckedInto;
-use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
 
 /// Generates random unsigned integers from a truncated geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNaturalValues<T: PrimitiveInt> {
-    xs: RandomUnsignedsLessThan<u64>,
-    numerator: u64,
+    xs: WeightedRandomBools,
     min: T,
     max: T,
 }
@@ -22,7 +20,7 @@ impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
     fn next(&mut self) -> Option<T> {
         let mut failures = self.min;
         loop {
-            if self.xs.next().unwrap() < self.numerator {
+            if self.xs.next().unwrap() {
                 return Some(failures);
             } else {
                 // Wrapping to min is equivalent to restarting this function.
@@ -106,7 +104,6 @@ pub(crate) fn mean_to_p_with_min<T: PrimitiveInt>(
     let um = SimpleRational::new(um_numerator, um_denominator);
     let p = um
         .sub_u64(CheckedInto::<u64>::checked_into(min).unwrap())
-        .add_u64(1)
         .inverse();
     (p.n, p.d)
 }
@@ -122,8 +119,7 @@ fn geometric_random_natural_values_range<T: PrimitiveInt>(
     assert_ne!(um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(min, um_numerator, um_denominator);
     GeometricRandomNaturalValues {
-        xs: random_unsigneds_less_than(seed, denominator),
-        numerator,
+        xs: weighted_random_bools(seed, numerator, denominator),
         min,
         max,
     }
@@ -132,8 +128,7 @@ fn geometric_random_natural_values_range<T: PrimitiveInt>(
 /// Generates random negative signed integers from a modified geometric distribution.
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNegativeSigneds<T: PrimitiveSigned> {
-    xs: RandomUnsignedsLessThan<u64>,
-    abs_numerator: u64,
+    xs: WeightedRandomBools,
     abs_min: T,
     abs_max: T,
 }
@@ -144,7 +139,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNegativeSigneds<T> {
     fn next(&mut self) -> Option<T> {
         let mut result = self.abs_min;
         loop {
-            if self.xs.next().unwrap() < self.abs_numerator {
+            if self.xs.next().unwrap() {
                 return Some(result);
             } else {
                 // Wrapping to min is equivalent to restarting this function.
@@ -173,8 +168,7 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
         abs_um_denominator,
     );
     GeometricRandomNegativeSigneds {
-        xs: random_unsigneds_less_than(seed, denominator),
-        abs_numerator: numerator,
+        xs: weighted_random_bools(seed, numerator, denominator),
         abs_min,
         abs_max,
     }
@@ -184,8 +178,7 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
 #[derive(Clone, Debug)]
 pub struct GeometricRandomNonzeroSigneds<T: PrimitiveSigned> {
     bs: RandomBools,
-    xs: RandomUnsignedsLessThan<u64>,
-    abs_numerator: u64,
+    xs: WeightedRandomBools,
     min: T,
     max: T,
 }
@@ -198,7 +191,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
             if self.bs.next().unwrap() {
                 let mut result = T::ONE;
                 loop {
-                    if self.xs.next().unwrap() < self.abs_numerator {
+                    if self.xs.next().unwrap() {
                         return Some(result);
                     } else if result == self.max {
                         break;
@@ -209,7 +202,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomNonzeroSigneds<T> {
             } else {
                 let mut result = T::NEGATIVE_ONE;
                 loop {
-                    if self.xs.next().unwrap() < self.abs_numerator {
+                    if self.xs.next().unwrap() {
                         return Some(result);
                     } else if result == self.min {
                         break;
@@ -233,8 +226,7 @@ fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
     let (numerator, denominator) = mean_to_p_with_min(T::ONE, abs_um_numerator, abs_um_denominator);
     GeometricRandomNonzeroSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: random_unsigneds_less_than(seed.fork("xs"), denominator),
-        abs_numerator: numerator,
+        xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
         min,
         max,
     }
@@ -244,8 +236,7 @@ fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
 #[derive(Clone, Debug)]
 pub struct GeometricRandomSigneds<T: PrimitiveSigned> {
     bs: RandomBools,
-    xs: RandomUnsignedsLessThan<u64>,
-    abs_numerator: u64,
+    xs: WeightedRandomBools,
     min: T,
     max: T,
 }
@@ -258,7 +249,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSigneds<T> {
             let mut result = T::ZERO;
             if self.bs.next().unwrap() {
                 loop {
-                    if self.xs.next().unwrap() < self.abs_numerator {
+                    if self.xs.next().unwrap() {
                         if result == T::ZERO && self.bs.next().unwrap() {
                             break;
                         } else {
@@ -272,7 +263,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSigneds<T> {
                 }
             } else {
                 loop {
-                    if self.xs.next().unwrap() < self.abs_numerator {
+                    if self.xs.next().unwrap() {
                         if result == T::ZERO && self.bs.next().unwrap() {
                             break;
                         } else {
@@ -301,8 +292,7 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
         mean_to_p_with_min(T::ZERO, abs_um_numerator, abs_um_denominator);
     GeometricRandomSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: random_unsigneds_less_than(seed.fork("xs"), denominator),
-        abs_numerator: numerator,
+        xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
         min,
         max,
     }

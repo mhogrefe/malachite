@@ -82,10 +82,7 @@ pub trait ToDebugString: Debug {
     fn to_debug_string(&self) -> String;
 }
 
-impl<T> ToDebugString for T
-where
-    T: Debug,
-{
+impl<T: Debug> ToDebugString for T {
     /// Returns the `String` produced by `T`s `Debug` implementation.
     ///
     /// Time: depends on `Debug` implementation
@@ -112,10 +109,7 @@ pub trait ToBinaryString: Binary {
     fn to_binary_string(&self) -> String;
 }
 
-impl<T> ToBinaryString for T
-where
-    T: Binary,
-{
+impl<T: Binary> ToBinaryString for T {
     /// Returns the `String` produced by `T`s `Binary` implementation.
     ///
     /// Time: depends on `Debug` implementation

@@ -16,6 +16,7 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::common::It;
 use malachite_nz::integer::exhaustive::{
     exhaustive_integer_range_to_infinity, exhaustive_integer_range_to_negative_infinity,
     exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
@@ -53,7 +54,7 @@ use rust_wheels::iterators::tuples::{
 use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::GenerationMode;
-use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, It, RandomValueAndVecOfBool};
+use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, RandomValueAndVecOfBool};
 use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {

@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::traits::Zero;
 
 use integer::Integer;
+use natural::Natural;
 
 macro_rules! impl_unsigned {
     ($t: ident) => {
@@ -19,6 +21,7 @@ macro_rules! impl_unsigned {
             /// assert!(Integer::from(123) == 123u64);
             /// assert!(Integer::from(-123) != 123u64);
             /// ```
+            #[inline]
             fn eq(&self, other: &$t) -> bool {
                 self.sign && self.abs == *other
             }
@@ -48,6 +51,13 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
+fn _eq_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &Integer, other: &S) -> bool
+where
+    Natural: PartialEq<U>,
+{
+    x.sign == (*other >= S::ZERO) && x.abs == other.unsigned_abs()
+}
+
 macro_rules! impl_signed {
     ($t: ident) => {
         impl PartialEq<$t> for Integer {
@@ -66,7 +76,7 @@ macro_rules! impl_signed {
             /// assert!(Integer::from(-123) == -123i64);
             /// ```
             fn eq(&self, other: &$t) -> bool {
-                self.sign == (*other >= 0) && self.abs == other.unsigned_abs()
+                _eq_signed(self, other)
             }
         }
 

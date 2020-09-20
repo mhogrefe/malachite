@@ -83,10 +83,7 @@ macro_rules! impl_slice_traits_ident {
     };
 }
 
-fn _from_other_type_slice_large_to_small<A: Copy, B: Zero>(slice: &[A]) -> B
-where
-    B: WrappingFrom<A>,
-{
+fn _from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(slice: &[A]) -> B {
     if slice.is_empty() {
         B::ZERO
     } else {
@@ -94,12 +91,9 @@ where
     }
 }
 
-fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt>(
+fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     slice: &[A],
-) -> Vec<B>
-where
-    B: WrappingFrom<A>,
-{
+) -> Vec<B> {
     let log_size_ratio = A::LOG_WIDTH - B::LOG_WIDTH;
     let mut xs = vec![B::ZERO; slice.len() << log_size_ratio];
     for (chunk, &u) in xs.chunks_exact_mut(1 << log_size_ratio).zip(slice.iter()) {
@@ -112,10 +106,9 @@ where
     xs
 }
 
-fn _vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt>(mut value: A) -> Vec<B>
-where
-    B: WrappingFrom<A>,
-{
+fn _vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+    mut value: A,
+) -> Vec<B> {
     let mut xs = vec![B::ZERO; 1 << (A::LOG_WIDTH - B::LOG_WIDTH)];
     for out in &mut xs {
         *out = B::wrapping_from(value);
@@ -195,10 +188,9 @@ macro_rules! impl_slice_traits_large_to_small {
     };
 }
 
-pub fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt>(slice: &[A]) -> B
-where
-    B: WrappingFrom<A>,
-{
+pub fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+    slice: &[A],
+) -> B {
     let mut result = B::ZERO;
     let mut offset = 0;
     for &u in slice.iter().take(1 << (B::LOG_WIDTH - A::LOG_WIDTH)) {
@@ -208,12 +200,9 @@ where
     result
 }
 
-fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt>(
+fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     slice: &[A],
-) -> Vec<B>
-where
-    B: WrappingFrom<A>,
-{
+) -> Vec<B> {
     let log_size_ratio = B::LOG_WIDTH - A::LOG_WIDTH;
     let mut xs = vec![B::ZERO; slice.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
     for (out, chunk) in xs.iter_mut().zip(slice.chunks(1 << log_size_ratio)) {
@@ -222,10 +211,7 @@ where
     xs
 }
 
-fn _vec_from_other_type_small_to_large<A, B>(value: A) -> Vec<B>
-where
-    B: WrappingFrom<A>,
-{
+fn _vec_from_other_type_small_to_large<A, B: WrappingFrom<A>>(value: A) -> Vec<B> {
     vec![B::wrapping_from(value)]
 }
 

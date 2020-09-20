@@ -52,6 +52,8 @@ pub mod nevers;
 #[macro_use]
 pub mod num;
 /// This module contains functions for working with `Ordering`s.
+pub mod options;
+/// This module contains functions for working with `Option`s.
 pub mod orderings;
 /// This module contains functions for generating random values with `ChaCha20Rng`.
 pub mod random;
@@ -85,11 +87,31 @@ pub mod random;
 ///   nearest even integer. This is also called _bankers' rounding_ and is often used as a default.
 /// - `Exact` panics if the value is not already rounded.
 ///
+/// # Examples
+///
+/// Here are some examples of how floating-point values would be rounded to integer values using the
+/// different `RoundingMode`s.
+///
+/// | x    | `Floor` | `Ceiling` | `Down` | `Up` | `Nearest` | `Exact`    |
+/// |------|---------|-----------|--------|------|-----------|------------|
+/// |  3.0 |       3 |         3 |      3 |    3 |         3 |          3 |
+/// |  3.2 |       3 |         4 |      3 |    4 |         3 | `panic!()` |
+/// |  3.8 |       3 |         4 |      3 |    4 |         4 | `panic!()` |
+/// |  3.5 |       3 |         4 |      3 |    4 |         4 | `panic!()` |
+/// |  4.5 |       4 |         5 |      4 |    5 |         4 | `panic!()` |
+/// | -3.2 |      -4 |        -3 |     -3 |   -4 |        -3 | `panic!()` |
+/// | -3.8 |      -4 |        -3 |     -3 |   -4 |        -4 | `panic!()` |
+/// | -3.5 |      -4 |        -3 |     -3 |   -4 |        -4 | `panic!()` |
+/// | -4.5 |      -5 |        -4 |     -4 |   -5 |        -4 | `panic!()` |
+///
 /// Sometimes a `RoundingMode` is used in an unusual context, such as rounding an integer to a
 /// floating-point number, in which case further explanation of its behavior is provided at the
 /// usage site.
 pub mod rounding_modes;
+/// This module contains functions for working with slices.
 #[macro_use]
 pub mod slices;
 pub mod strings;
+/// This module contains functions for working with tuples.
+pub mod tuples;
 pub mod vecs;

@@ -1,11 +1,8 @@
+use bools::random::{weighted_random_bools, WeightedRandomBools};
 use chars::char_is_graphic;
 use chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
 use comparison::traits::{Max, Min};
-use num::random::geometric::SimpleRational;
-use num::random::{
-    random_unsigned_inclusive_range, random_unsigneds_less_than, RandomUnsignedInclusiveRange,
-    RandomUnsignedsLessThan,
-};
+use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
 use random::Seed;
 use vecs::{random_values_from_vec, RandomValuesFromVec};
 
@@ -34,8 +31,7 @@ impl Iterator for RandomCharRange {
 /// `graphic_weighted_random_char_inclusive_range` methods. See their documentation for more.
 #[derive(Clone, Debug)]
 pub struct WeightedGraphicRandomCharRange {
-    numerator: u64,
-    xs: RandomUnsignedsLessThan<u64>,
+    xs: WeightedRandomBools,
     graphic: RandomValuesFromVec<char>,
     non_graphic: RandomValuesFromVec<char>,
 }
@@ -45,7 +41,7 @@ impl Iterator for WeightedGraphicRandomCharRange {
 
     #[inline]
     fn next(&mut self) -> Option<char> {
-        if self.xs.next().unwrap() < self.numerator {
+        if self.xs.next().unwrap() {
             self.graphic.next()
         } else {
             self.non_graphic.next()
@@ -423,7 +419,6 @@ pub fn graphic_weighted_random_char_inclusive_range(
     if a > b {
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
     }
-    assert_ne!(w_numerator, 0);
     let (graphic_chars, non_graphic_chars): (Vec<_>, Vec<_>) =
         (a..=b).partition(|&c| char_is_graphic(c));
     if graphic_chars.is_empty() {
@@ -432,13 +427,8 @@ pub fn graphic_weighted_random_char_inclusive_range(
     if non_graphic_chars.is_empty() {
         panic!("The range {:?}..={:?} only contains graphic chars", a, b);
     }
-    let w = SimpleRational::new(w_numerator, w_denominator)
-        .inverse()
-        .add_u64(1)
-        .inverse();
     WeightedGraphicRandomCharRange {
-        numerator: w.n,
-        xs: random_unsigneds_less_than(seed.fork("xs"), w.d),
+        xs: weighted_random_bools(seed.fork("xs"), w_numerator, w_denominator),
         graphic: random_values_from_vec(seed.fork("graphic"), graphic_chars),
         non_graphic: random_values_from_vec(seed.fork("non_graphic"), non_graphic_chars),
     }

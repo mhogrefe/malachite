@@ -9,10 +9,7 @@ use malachite_base::num::logic::traits::BitBlockAccess;
 
 #[test]
 pub fn test_get_bits_unsigned() {
-    fn test<T: PrimitiveUnsigned>(x: T, start: u64, end: u64, out: T)
-    where
-        T: BitBlockAccess<Bits = T>,
-    {
+    fn test<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>(x: T, start: u64, end: u64, out: T) {
         assert_eq!(x.get_bits(start, end), out);
         assert_eq!(get_bits_naive::<T, T>(&x, start, end), out)
     };
@@ -31,10 +28,12 @@ pub fn test_get_bits_unsigned() {
 
 #[test]
 pub fn test_get_bits_signed() {
-    fn test<T: PrimitiveSigned, U: PrimitiveUnsigned>(x: T, start: u64, end: u64, out: U)
-    where
-        T: BitBlockAccess<Bits = U>,
-    {
+    fn test<T: BitBlockAccess<Bits = U> + PrimitiveSigned, U: PrimitiveUnsigned>(
+        x: T,
+        start: u64,
+        end: u64,
+        out: U,
+    ) {
         assert_eq!(x.get_bits(start, end), out);
         assert_eq!(get_bits_naive::<T, U>(&x, start, end), out)
     };
@@ -67,10 +66,13 @@ fn get_bits_fail() {
 
 #[test]
 pub fn test_assign_bits_unsigned() {
-    fn test<T: PrimitiveUnsigned>(x_in: T, start: u64, end: u64, bits: T, x_out: T)
-    where
-        T: BitBlockAccess<Bits = T>,
-    {
+    fn test<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>(
+        x_in: T,
+        start: u64,
+        end: u64,
+        bits: T,
+        x_out: T,
+    ) {
         let mut x = x_in;
         x.assign_bits(start, end, &bits);
         assert_eq!(x, x_out);
@@ -100,15 +102,13 @@ pub fn test_assign_bits_unsigned() {
 
 #[test]
 pub fn test_assign_bits_signed() {
-    fn test<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    fn test<T: BitBlockAccess<Bits = U> + PrimitiveSigned, U: PrimitiveUnsigned>(
         x_in: T,
         start: u64,
         end: u64,
         bits: U,
         x_out: T,
-    ) where
-        T: BitBlockAccess<Bits = U>,
-    {
+    ) {
         let mut x = x_in;
         x.assign_bits(start, end, &bits);
         assert_eq!(x, x_out);
@@ -137,18 +137,15 @@ pub fn test_assign_bits_signed() {
     test(-57i64, 0, 64, u64::MAX, -1);
 }
 
-fn assign_bits_fail_helper_unsigned<T: PrimitiveUnsigned>()
-where
-    T: BitBlockAccess<Bits = T>,
-{
+fn assign_bits_fail_helper_unsigned<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>() {
     assert_panic!(T::exact_from(100).assign_bits(10, 5, &T::exact_from(3)));
     assert_panic!(T::exact_from(100).assign_bits(3, T::WIDTH + 3, &T::MAX));
 }
 
-fn assign_bits_fail_helper_signed<U: PrimitiveUnsigned, S: PrimitiveSigned>()
-where
-    S: BitBlockAccess<Bits = U>,
-{
+fn assign_bits_fail_helper_signed<
+    U: PrimitiveUnsigned,
+    S: BitBlockAccess<Bits = U> + PrimitiveSigned,
+>() {
     assert_panic!(S::exact_from(100).assign_bits(7, 5, &U::exact_from(3)));
     assert_panic!(S::exact_from(100).assign_bits(0, S::WIDTH, &U::MAX));
     assert_panic!(S::exact_from(-100).assign_bits(0, S::WIDTH + 1, &U::ZERO));

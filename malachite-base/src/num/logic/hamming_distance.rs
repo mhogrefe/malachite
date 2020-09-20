@@ -3,10 +3,7 @@ use std::ops::BitXor;
 use num::basic::traits::Zero;
 use num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
 
-fn _hamming_distance_unsigned<T: CountOnes>(x: T, y: T) -> u64
-where
-    T: BitXor<Output = T>,
-{
+fn _hamming_distance_unsigned<T: BitXor<Output = T> + CountOnes>(x: T, y: T) -> u64 {
     CountOnes::count_ones(x ^ y)
 }
 
@@ -36,10 +33,10 @@ macro_rules! impl_hamming_distance_unsigned {
 }
 apply_to_unsigneds!(impl_hamming_distance_unsigned);
 
-fn _checked_hamming_distance_signed<T: Copy + CountOnes + Ord + Zero>(x: T, y: T) -> Option<u64>
-where
-    T: BitXor<Output = T>,
-{
+fn _checked_hamming_distance_signed<T: BitXor<Output = T> + Copy + CountOnes + Ord + Zero>(
+    x: T,
+    y: T,
+) -> Option<u64> {
     if (x >= T::ZERO) == (y >= T::ZERO) {
         Some(CountOnes::count_ones(x ^ y))
     } else {

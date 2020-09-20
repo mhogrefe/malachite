@@ -14,35 +14,37 @@ use malachite_base::num::random::geometric::geometric_random_signed_range;
 use malachite_base::random::EXAMPLE_SEED;
 
 fn geometric_random_signed_range_helper<
-    T: CheckedToF64 + PrimitiveSigned + WrappingFrom<<T as UnsignedAbs>::Output>,
+    U: CheckedToF64 + PrimitiveUnsigned,
+    S: CheckedToF64
+        + PrimitiveSigned
+        + UnsignedAbs<Output = U>
+        + WrappingFrom<<S as UnsignedAbs>::Output>,
 >(
-    a: T,
-    b: T,
+    a: S,
+    b: S,
     abs_um_numerator: u64,
     abs_um_denominator: u64,
-    expected_values: &[T],
-    expected_common_values: &[(T, usize)],
+    expected_values: &[S],
+    expected_common_values: &[(S, usize)],
     expected_natural_mean: Option<NiceFloat<f64>>,
-    expected_pop_median: (T, Option<T>),
-    expected_sample_median: (T, Option<T>),
+    expected_pop_median: (S, Option<S>),
+    expected_sample_median: (S, Option<S>),
     expected_pop_moment_stats: MomentStats,
     expected_sample_moment_stats: MomentStats,
-) where
-    <T as UnsignedAbs>::Output: CheckedToF64 + PrimitiveUnsigned,
-{
-    let xs = geometric_random_signed_range::<T>(
+) {
+    let xs = geometric_random_signed_range::<S>(
         EXAMPLE_SEED,
         a,
         b,
         abs_um_numerator,
         abs_um_denominator,
     );
-    if a >= T::ZERO {
+    if a >= S::ZERO {
         assert!(expected_natural_mean.is_none());
         truncated_geometric_dist_assertions(
             xs,
             a,
-            b - T::ONE,
+            b - S::ONE,
             abs_um_numerator,
             abs_um_denominator,
             expected_values,
@@ -52,11 +54,11 @@ fn geometric_random_signed_range_helper<
             expected_pop_moment_stats,
             expected_sample_moment_stats,
         );
-    } else if b <= T::ONE {
+    } else if b <= S::ONE {
         assert!(expected_natural_mean.is_none());
         negative_truncated_geometric_dist_assertions(
             xs,
-            b - T::ONE,
+            b - S::ONE,
             a,
             abs_um_numerator,
             abs_um_denominator,
@@ -71,7 +73,7 @@ fn geometric_random_signed_range_helper<
         double_truncated_geometric_dist_assertions(
             xs,
             a,
-            b - T::ONE,
+            b - S::ONE,
             abs_um_numerator,
             abs_um_denominator,
             expected_values,
@@ -105,7 +107,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(f64::NAN),
         excess_kurtosis: NiceFloat(f64::NAN),
     };
-    geometric_random_signed_range_helper::<i8>(
+    geometric_random_signed_range_helper::<_, i8>(
         5,
         6,
         10,
@@ -143,7 +145,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(0.8627980859656847),
         excess_kurtosis: NiceFloat(-0.27185507049284263),
     };
-    geometric_random_signed_range_helper::<i16>(
+    geometric_random_signed_range_helper::<_, i16>(
         1,
         7,
         3,
@@ -187,7 +189,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(0.17230969046968866),
         excess_kurtosis: NiceFloat(-1.183362703825652),
     };
-    geometric_random_signed_range_helper::<i32>(
+    geometric_random_signed_range_helper::<_, i32>(
         10,
         20,
         30,
@@ -232,7 +234,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(-0.18245914264956217),
         excess_kurtosis: NiceFloat(-1.1796684829530097),
     };
-    geometric_random_signed_range_helper::<i64>(
+    geometric_random_signed_range_helper::<_, i64>(
         -20,
         -10,
         30,
@@ -276,7 +278,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(-0.009330685977635587),
         excess_kurtosis: NiceFloat(0.33242667080464994),
     };
-    geometric_random_signed_range_helper::<i8>(
+    geometric_random_signed_range_helper::<_, i8>(
         -100,
         100,
         30,
@@ -320,7 +322,7 @@ fn test_geometric_random_signed_range() {
         skewness: NiceFloat(-0.009040591966747374),
         excess_kurtosis: NiceFloat(0.8847001181957856),
     };
-    geometric_random_signed_range_helper::<i8>(
+    geometric_random_signed_range_helper::<_, i8>(
         i8::MIN,
         i8::MAX,
         30,

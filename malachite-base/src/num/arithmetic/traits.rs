@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use num::basic::traits::Two;
 use rounding_modes::RoundingMode;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
@@ -1093,29 +1094,66 @@ pub trait OverflowingPowAssign<RHS = Self> {
     fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
 }
 
-/// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`.
-pub trait ModPow<RHS = Self, M = Self> {
+/// Computes `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
+/// 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoPow<RHS = Self> {
+    type Output;
+
+    fn mod_power_of_two_pow(self, exp: RHS, pow: u64) -> Self::Output;
+}
+
+/// Replaces `self` with `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
+/// mod 2<sup>`pow`</sup>.
+pub trait ModPowerOfTwoPowAssign<RHS = Self> {
+    fn mod_power_of_two_pow_assign(&mut self, exp: RHS, pow: u64);
+}
+
+/// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
+pub trait ModPow<RHS: Two = Self, M = Self>
+where
+    Self: Sized,
+{
     type Output;
 
     fn mod_pow(self, exp: RHS, m: M) -> Self::Output;
+
+    /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+    fn mod_square(self, m: M) -> Self::Output {
+        self.mod_pow(RHS::TWO, m)
+    }
 }
 
 /// Replaces `self` with `self.pow(other)` mod `m`. Assumes the inputs are already reduced mod `m`.
-pub trait ModPowAssign<RHS = Self, M = Self> {
+pub trait ModPowAssign<RHS: Two = Self, M = Self> {
     fn mod_pow_assign(&mut self, exp: RHS, m: M);
+
+    /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced  mod `m`.
+    fn mod_square_assign(&mut self, m: M) {
+        self.mod_pow_assign(RHS::TWO, m);
+    }
 }
 
 /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
 /// modular exponentiations with the same modulus are necessary, it can be quicker to precompute
 /// some piece of data and reuse it in the exponentiation calls. This trait provides a method for
 /// precomputing the data and a method for using it during exponentiation.
-pub trait ModPowPrecomputed<RHS = Self, M = Self> {
+pub trait ModPowPrecomputed<RHS: Two = Self, M = Self>
+where
+    Self: Sized,
+{
     type Output;
     type Data;
 
     fn precompute_mod_pow_data(m: &M) -> Self::Data;
 
     fn mod_pow_precomputed(self, exp: RHS, m: M, data: &Self::Data) -> Self::Output;
+
+    /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`. Some
+    /// precomputed data is provided. The precomputed data should be obtained using
+    /// `precompute_mod_pow_data`.
+    fn mod_square_precomputed(self, m: M, data: &Self::Data) -> Self::Output {
+        self.mod_pow_precomputed(RHS::TWO, m, data)
+    }
 }
 
 /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If
@@ -1123,8 +1161,15 @@ pub trait ModPowPrecomputed<RHS = Self, M = Self> {
 /// precompute some piece of data and reuse it in the exponentiation calls. This trait provides a
 /// method for using precomputed data during exponentiation. For precomputing the data, use the
 /// `precompute_mod_pow_data` function in `ModPowPrecomputed`.
-pub trait ModPowPrecomputedAssign<RHS = Self, M = Self>: ModPowPrecomputed<RHS, M> {
+pub trait ModPowPrecomputedAssign<RHS: Two = Self, M = Self>: ModPowPrecomputed<RHS, M> {
     fn mod_pow_precomputed_assign(&mut self, exp: RHS, m: M, data: &Self::Data);
+
+    /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+    /// Some precomputed data is provided. The precomputed data should be obtained using
+    /// `precompute_mod_pow_data`.
+    fn mod_square_precomputed_assign(&mut self, m: M, data: &Self::Data) {
+        self.mod_pow_precomputed_assign(RHS::TWO, m, data);
+    }
 }
 
 /// Squares `self`.

@@ -8,15 +8,12 @@ use num::logic::traits::LeadingZeros;
 
 fn _implicit_xx_div_mod_y_is_qr<
     T: PrimitiveUnsigned,
-    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
+    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
     x_1: T,
     x_0: T,
     y: T,
-) -> (T, T)
-where
-    DT: From<T> + HasHalf<Half = T>,
-{
+) -> (T, T) {
     assert!(x_1 < y);
     let (q, r) = DT::join_halves(x_1, x_0).div_mod(DT::from(y));
     (q.lower_half(), r.lower_half())

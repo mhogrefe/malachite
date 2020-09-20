@@ -262,3 +262,5 @@ where
 
 /// This module contains functions that compare adjacent iterator elements.
 pub mod comparison;
+/// This module defines `IteratorCache`, which remembers values produced by an iterator.
+pub mod iterator_cache;

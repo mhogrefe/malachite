@@ -41,16 +41,12 @@ pub fn deleted_uniform_primitive_int_median<T: PrimitiveInt>(
     (lo, hi)
 }
 
-fn binary_search_median<T: PrimitiveInt, P, C>(
+fn binary_search_median<T: PrimitiveInt, P: Fn(T) -> f64, C: Fn(T) -> f64>(
     mut min: T,
     mut max: T,
     pmf: P,
     cdf: C,
-) -> (T, Option<T>)
-where
-    P: Fn(T) -> f64,
-    C: Fn(T) -> f64,
-{
+) -> (T, Option<T>) {
     let initial_median;
     loop {
         if min == max {

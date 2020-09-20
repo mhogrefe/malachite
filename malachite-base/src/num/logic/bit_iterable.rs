@@ -323,10 +323,9 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     }
 }
 
-fn _bits_signed<U: PrimitiveUnsigned, S: PrimitiveSigned>(x: S) -> PrimitiveSignedBitIterator<U, S>
-where
-    U: WrappingFrom<S>,
-{
+fn _bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
+    x: S,
+) -> PrimitiveSignedBitIterator<U, S> {
     let unsigned = U::wrapping_from(x);
     let significant_bits = match x.sign() {
         Ordering::Equal => 0,

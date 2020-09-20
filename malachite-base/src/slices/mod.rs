@@ -4,11 +4,12 @@ use random::Seed;
 
 /// Sets all values in a slice to 0.
 ///
-/// Time: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// Additional memory: worst case O(1)
+/// $M(n) = O(1)$
 ///
-/// where n = `xs.len()`
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
@@ -19,7 +20,7 @@ use random::Seed;
 /// assert_eq!(xs, [1, 0, 0, 0, 5]);
 /// ```
 ///
-/// This is mpn_zero from mpn/generic/zero.c, GMP 6.1.2. Note that this is needed less often in
+/// This is `mpn_zero` from `mpn/generic/zero.c`, GMP 6.1.2. Note that this is needed less often in
 /// Malachite than in GMP, since Malachite generally initializes new memory with zeros.
 pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
     for x in xs.iter_mut() {
@@ -29,11 +30,12 @@ pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
 
 /// Tests whether all values in a slice are equal to 0.
 ///
-/// Time: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// Additional memory: worst case O(1)
+/// $M(n) = O(1)$
 ///
-/// where n = `xs.len()`
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
@@ -51,11 +53,12 @@ pub fn slice_test_zero<T: Eq + Zero>(xs: &[T]) -> bool {
 
 /// Counts the number of zeros that a slice starts with.
 ///
-/// Time: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// Additional memory: worst case O(1)
+/// $M(n) = O(1)$
 ///
-/// where n = `xs.len()`
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
@@ -71,11 +74,12 @@ pub fn slice_leading_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
 
 /// Counts the number of zeros that a slice ends with.
 ///
-/// Time: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// Additional memory: worst case O(1)
+/// $M(n) = O(1)$
 ///
-/// where n = `xs.len()`
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Examples
 /// ```
@@ -89,17 +93,26 @@ pub fn slice_trailing_zeros<T: Eq + Zero>(xs: &[T]) -> usize {
     xs.iter().rev().take_while(|&x| x == &zero).count()
 }
 
-/// Given a slice `xs` and an starting index, copies the contents of `&xs[starting_index..]` to
+/// Given a slice `xs` and an starting index, copies the subslice starting from that index to the
+/// beginning of the slice.
+///
+/// In other words, this function copies the contents of `&xs[starting_index..]` to
 /// `&xs[..xs.len() - starting_index]`.
 ///
-/// Time: worst case O(n)
+/// In other other words, if $k$ is `starting_index`, the sequence $[x_0, x_1, \ldots, x_{n-1}]$
+/// becomes $[x_k, x_{k+1}, \ldots, x_{n-1}, x_{n-k}, x_{n-k+1}, \ldots, x_{n-1}]$.
 ///
-/// Additional memory: worst case O(1)
+/// If `starting_index` is zero or `xs.len()`, nothing happens.
 ///
-/// where n = `xs.len()`
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Panics
-/// Panics if `amount` is greater than the length of `xs`.
+/// Panics if `starting_index` is greater than the length of `xs`.
 ///
 /// # Examples
 /// ```
@@ -114,11 +127,106 @@ pub fn slice_move_left<T: Copy>(xs: &mut [T], starting_index: usize) {
     xs.copy_within(starting_index..xs.len(), 0);
 }
 
+/// This macro splits an immutable slice into adjacent immutable chunks.
+///
+/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
+/// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
+/// $\mathbf{x}_k$, is specified via a separate argument called `xs_last`.
+///
+/// The first $k$ output slice names are assigned adjacent length-$n$ chunks from $\mathbf{x}$. If
+/// $|\mathbf{x}| < kn$, the generated code panics.
+///
+/// The last slice, $\mathbf{x}_k$, which is assigned to `xs_last`, has length $|\mathbf{x}| - kn$.
+/// This length may be greater than $n$.
+///
+/// # Worst-case complexity
+/// $T(k) = O(k)$
+///
+/// $M(k) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $k$ is the number of output slice names `xs_i`.
+///
+/// # Examples
+/// ```
+/// #[macro_use]
+/// extern crate malachite_base;
+///
+/// fn main() {
+///     let xs = &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+///     split_into_chunks!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
+///     assert_eq!(xs_1, &[0, 1, 2]);
+///     assert_eq!(xs_2, &[3, 4, 5]);
+///     assert_eq!(xs_3, &[6, 7, 8]);
+///     assert_eq!(xs_4, &[9, 10, 11, 12]);
+/// }
+/// ```
+#[macro_export]
+macro_rules! split_into_chunks {
+    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &$xs[..];
+        let n = $n;
+        $(
+            let ($xs_i, remainder) = remainder.split_at(n);
+        )*
+        let $xs_last = remainder;
+    }
+}
+
+/// This macro splits a mutable slice into adjacent mutable chunks.
+///
+/// An input slice $\mathbf{x}$, a chunk length $n$, and $k + 1$ output slice names
+/// $\\mathbf{x}_0, \\mathbf{x}_1, \\ldots, \\mathbf{x}_k$ are given. The last output slice name,
+/// $\mathbf{x}_k$, is specified via a separate argument called `xs_last`.
+///
+/// The first $k$ output slice names are assigned adjacent length-$n$ chunks from $\mathbf{x}$. If
+/// $|\mathbf{x}| < kn$, the generated code panics.
+///
+/// The last slice, $\mathbf{x}_k$, which is assigned to `xs_last`, has length $|\mathbf{x}| - kn$.
+/// This length may be greater than $n$.
+///
+/// # Worst-case complexity
+/// $T(k) = O(k)$
+///
+/// $M(k) = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $k$ is the number of output slice names `xs_i`.
+///
+/// # Examples
+/// ```
+/// #[macro_use]
+/// extern crate malachite_base;
+///
+/// use malachite_base::slices::slice_set_zero;
+///
+/// fn main() {
+///     let xs = &mut [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+///     split_into_chunks_mut!(xs, 3, [xs_1, xs_2, xs_3], xs_4);
+///     assert_eq!(xs_1, &[0, 1, 2]);
+///     assert_eq!(xs_2, &[3, 4, 5]);
+///     assert_eq!(xs_3, &[6, 7, 8]);
+///     assert_eq!(xs_4, &[9, 10, 11, 12]);
+///
+///     slice_set_zero(xs_2);
+///     assert_eq!(xs, &[0, 1, 2, 0, 0, 0, 6, 7, 8, 9, 10, 11, 12]);
+/// }
+/// ```
+#[macro_export]
+macro_rules! split_into_chunks_mut {
+    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
+        let remainder = &mut $xs[..];
+        let n = $n;
+        $(
+            let ($xs_i, remainder) = remainder.split_at_mut(n);
+        )*
+        let $xs_last = remainder;
+    }
+}
+
 /// Uniformly generates a random reference to a value from a nonempty slice.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromSlice<'a, T> {
-    pub(crate) xs: &'a [T],
-    pub(crate) indices: RandomUnsignedsLessThan<usize>,
+    xs: &'a [T],
+    indices: RandomUnsignedsLessThan<usize>,
 }
 
 impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
@@ -134,11 +242,14 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// outlive the slice. It may be more convenient for the iterator to own the data, in which case you
 /// may use `random_values_from_vec` instead.
 ///
-/// Length is infinite.
+/// The output length is infinite.
 ///
-/// Time per iteration: worst case O(1)
+/// # Expected complexity per iteration
+/// $E[T(n)] = O(n)$
 ///
-/// Additional memory per iteration: worst case O(1)
+/// $E[M(n)] = O(1)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///
 /// # Panics
 /// Panics if `xs` is empty.
@@ -162,37 +273,5 @@ pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlic
     RandomValuesFromSlice {
         xs,
         indices: random_unsigneds_less_than(seed, xs.len()),
-    }
-}
-
-/// This macro splits an immutable slice into adjacent immutable chunks. There are |`$xs_i`| + 1
-/// chunks; the first |`$xs_i`| have length `$n`, and the remainder, which is assigned to
-/// `$xs_last`, has length `$xs.len()` - `$n` * |`$xs_i`| (which may be longer than `$n`). If
-/// `$xs.len()` < `$n` * |`$xs_i`|, the generated code panics at runtime.
-#[macro_export]
-macro_rules! split_into_chunks {
-    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
-        let remainder = &$xs[..];
-        let n = $n;
-        $(
-            let ($xs_i, remainder) = remainder.split_at(n);
-        )*
-        let $xs_last = remainder;
-    }
-}
-
-/// This macro splits a mutable slice into adjacent mutable chunks. There are |`$xs_i`| + 1 chunks;
-/// the first |`$xs_i`| have length `$n`, and the remainder, which is assigned to `$xs_last`, has
-/// length `$xs.len()` - `$n` * |`$xs_i`| (which may be longer than `$n`). If
-/// `$xs.len()` < `$n` * |`$xs_i`|, the generated code panics at runtime.
-#[macro_export]
-macro_rules! split_into_chunks_mut {
-    ($xs: expr, $n: expr, [$($xs_i: ident),*], $xs_last: ident) => {
-        let remainder = &mut $xs[..];
-        let n = $n;
-        $(
-            let ($xs_i, remainder) = remainder.split_at_mut(n);
-        )*
-        let $xs_last = remainder;
     }
 }

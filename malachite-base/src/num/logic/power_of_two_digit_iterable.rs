@@ -20,9 +20,8 @@ pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUn
     boo: PhantomData<U>,
 }
 
-impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator for PrimitivePowerOfTwoDigitIterator<T, U>
-where
-    U: WrappingFrom<<T as BitBlockAccess>::Bits>,
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
+    Iterator for PrimitivePowerOfTwoDigitIterator<T, U>
 {
     type Item = U;
 
@@ -91,10 +90,8 @@ where
     }
 }
 
-impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> DoubleEndedIterator
-    for PrimitivePowerOfTwoDigitIterator<T, U>
-where
-    U: WrappingFrom<<T as BitBlockAccess>::Bits>,
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
+    DoubleEndedIterator for PrimitivePowerOfTwoDigitIterator<T, U>
 {
     /// A function to iterate through the digits of a primitive unsigned integer in descending order
     /// (most-significant first). The base is 2<sup>`log_base`</sup> and the output type is `U`.
@@ -134,17 +131,13 @@ where
 }
 
 /// This allows for some optimizations, e.g. when collecting into a `Vec`.
-impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> ExactSizeIterator
-    for PrimitivePowerOfTwoDigitIterator<T, U>
-where
-    U: WrappingFrom<<T as BitBlockAccess>::Bits>,
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
+    ExactSizeIterator for PrimitivePowerOfTwoDigitIterator<T, U>
 {
 }
 
-impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> PowerOfTwoDigitIterator<U>
-    for PrimitivePowerOfTwoDigitIterator<T, U>
-where
-    U: WrappingFrom<<T as BitBlockAccess>::Bits>,
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
+    PowerOfTwoDigitIterator<U> for PrimitivePowerOfTwoDigitIterator<T, U>
 {
     /// A function to retrieve base-2<sup>`log_base`</sup> digits by index. Indexing at or above the
     /// significant digit count returns zero. The output type is `U`.

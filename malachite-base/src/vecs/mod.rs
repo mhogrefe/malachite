@@ -55,8 +55,8 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 /// Uniformly generates a random value from a nonempty `Vec`.
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromVec<T: Clone> {
-    pub(crate) xs: Vec<T>,
-    pub(crate) indices: RandomUnsignedsLessThan<usize>,
+    xs: Vec<T>,
+    indices: RandomUnsignedsLessThan<usize>,
 }
 
 impl<T: Clone> Iterator for RandomValuesFromVec<T> {

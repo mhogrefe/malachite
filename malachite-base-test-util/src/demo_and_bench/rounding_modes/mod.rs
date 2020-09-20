@@ -4,4 +4,4 @@ pub(crate) fn register(runner: &mut Runner) {
     display::register(runner);
 }
 
-pub mod display;
+mod display;

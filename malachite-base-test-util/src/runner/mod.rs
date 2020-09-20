@@ -99,6 +99,14 @@ macro_rules! register_signed_demos {
 }
 
 #[macro_export]
+macro_rules! register_primitive_int_demos {
+    ($runner: ident, $f: ident) => {
+        register_unsigned_demos!($runner, $f);
+        register_signed_demos!($runner, $f);
+    };
+}
+
+#[macro_export]
 macro_rules! register_unsigned_unsigned_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos_2!(

@@ -884,10 +884,11 @@ pub mod geometric;
 ///
 /// Let the average length of a run of 0s and 1s be $m$. The functions in this module allow the user
 /// to specify a rational $m$ through the parameters `m_numerator` and `m_denominator`. Since any
-/// binary sequence has an average run length of at least 1, $m$ must be at least 1. if $m$ is
-/// between 1 and 2, the sequence is less likely to have two equal adjacent bits than a uniformly
-/// random sequence. If $m$ is 2, the sequence is uniformly random. If $m$ is greater than 2 (the
-/// most useful case), the sequence tends to have long runs of 0s and 1s.
+/// binary sequence has an average run length of at least 1, $m$ must be at least 1; but if it is
+/// exactly 1 then the sequence is strictly alternating and no longer random, so 1 is excluded. if
+/// $m$ is between 1 and 2, the sequence is less likely to have two equal adjacent bits than a
+/// uniformly random sequence. If $m$ is 2, the sequence is uniformly random. If $m$ is greater than
+/// 2 (the most useful case), the sequence tends to have long runs of 0s and 1s.
 ///
 /// # Details
 ///
@@ -897,8 +898,8 @@ pub mod geometric;
 /// probability as its negation. Also, if $m > 1$, any sequence has a nonzero probability of
 /// occurring.
 ///
-/// * If $m=1$, the sequence must be either $01010101010101010101\ldots$ or
-///   $10101010101010101010\ldots$.
+/// * $m=1$ is disallowed. If it were allowed, the sequence would be either
+///   $01010101010101010101\ldots$ or $10101010101010101010\ldots$.
 /// * If $1<m<2$, the sequence tends to alternate between 0 and 1 more often than a uniformly random
 ///   sequence. A sample sequence with $m=33/32$ is
 ///   $1010101010101010101010110101010101010101\ldots$.

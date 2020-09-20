@@ -4,10 +4,15 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 #[test]
 fn test_mod_power_of_two_shl() {
-    fn test<T: PrimitiveUnsigned, U: PrimitiveInt>(t: T, u: U, pow: u64, out: T)
-    where
-        T: ModPowerOfTwoShl<U, Output = T> + ModPowerOfTwoShlAssign<U>,
-    {
+    fn test<
+        T: ModPowerOfTwoShl<U, Output = T> + ModPowerOfTwoShlAssign<U> + PrimitiveUnsigned,
+        U: PrimitiveInt,
+    >(
+        t: T,
+        u: U,
+        pow: u64,
+        out: T,
+    ) {
         assert_eq!(t.mod_power_of_two_shl(u, pow), out);
 
         let mut t = t;

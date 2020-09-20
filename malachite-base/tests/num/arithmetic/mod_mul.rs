@@ -58,15 +58,15 @@ fn limbs_invert_limb_u64_fail() {
 
 #[test]
 fn test_limbs_mod_preinverted() {
-    fn test<T: PrimitiveUnsigned, DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+    fn test<
+        T: CheckedFrom<DT> + PrimitiveUnsigned,
+        DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
+    >(
         x_1: T,
         x_0: T,
         d: T,
         out: T,
-    ) where
-        DT: From<T> + HasHalf<Half = T>,
-        T: CheckedFrom<DT>,
-    {
+    ) {
         let d_inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
         assert_eq!(_limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
         assert_eq!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)), out);

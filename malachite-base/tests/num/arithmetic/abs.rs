@@ -26,18 +26,14 @@ fn test_abs() {
     apply_fn_to_signeds!(abs_helper);
 }
 
-fn test<U: PrimitiveUnsigned, S: PrimitiveSigned>(n: S, out: U)
-where
-    S: UnsignedAbs<Output = U>,
-{
+fn test<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U>>(n: S, out: U) {
     assert_eq!(n.unsigned_abs(), out);
 }
 
-fn unsigned_abs_helper<U: PrimitiveUnsigned, S: PrimitiveSigned>()
-where
-    S: UnsignedAbs<Output = U>,
-    U: CheckedFrom<S>,
-{
+fn unsigned_abs_helper<
+    U: CheckedFrom<S> + PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
+>() {
     test(S::ZERO, U::ZERO);
     test(S::ONE, U::ONE);
     test(S::exact_from(100), U::exact_from(100));
@@ -51,23 +47,20 @@ fn test_unsigned_abs() {
     apply_fn_to_unsigned_signed_pairs!(unsigned_abs_helper);
 }
 
-fn abs_assign_properties_helper<T: PrimitiveSigned>()
-where
-    T: ExactFrom<<T as UnsignedAbs>::Output>,
-{
-    signed_gen_var_1::<T>().test_properties(|n| {
+fn abs_assign_properties_helper<U, S: ExactFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>>() {
+    signed_gen_var_1::<S>().test_properties(|n| {
         let mut abs = n;
         abs.abs_assign();
         assert_eq!(abs, n.abs());
         assert_eq!(abs.abs(), abs);
-        assert_eq!(abs == n, n >= T::ZERO);
-        assert_eq!(T::exact_from(n.unsigned_abs()), abs)
+        assert_eq!(abs == n, n >= S::ZERO);
+        assert_eq!(S::exact_from(n.unsigned_abs()), abs)
     });
 }
 
 #[test]
 fn abs_assign_properties() {
-    apply_fn_to_signeds!(abs_assign_properties_helper);
+    apply_fn_to_unsigned_signed_pairs!(abs_assign_properties_helper);
 }
 
 fn unsigned_abs_properties_helper<T: PrimitiveSigned>() {

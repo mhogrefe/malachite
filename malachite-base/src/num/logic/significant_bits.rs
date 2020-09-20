@@ -32,10 +32,7 @@ macro_rules! impl_significant_bits_unsigned {
 }
 apply_to_unsigneds!(impl_significant_bits_unsigned);
 
-fn _significant_bits_signed<U: SignificantBits, S>(x: S) -> u64
-where
-    S: UnsignedAbs<Output = U>,
-{
+fn _significant_bits_signed<U: SignificantBits, S: UnsignedAbs<Output = U>>(x: S) -> u64 {
     x.unsigned_abs().significant_bits()
 }
 
