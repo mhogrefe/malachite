@@ -84,7 +84,7 @@ pub fn test_assign_bits_unsigned() {
     // assign partially
     test(0xab5du16, 4, 8, 0xc, 0xabcd);
     test(0x5bcdu16, 12, 100, 0xa, 0xabcd);
-    test(0xabcdu16, 5, 9, 10, 43_853);
+    test(0xabcdu16, 5, 9, 10, 43853);
     test(0xabcdu16, 5, 5, 123, 0xabcd);
     // assign zeros above width
     test(0xabcdu16, 100, 200, 0, 0xabcd);
@@ -94,7 +94,7 @@ pub fn test_assign_bits_unsigned() {
 
     test(0xab5du64, 4, 8, 0xc, 0xabcd);
     test(0x5bcdu64, 12, 100, 0xa, 0xabcd);
-    test(0xabcdu64, 5, 9, 10, 43_853);
+    test(0xabcdu64, 5, 9, 10, 43853);
     test(0xabcdu64, 5, 5, 123, 0xabcd);
     test(0xabcdu64, 100, 200, 0, 0xabcd);
     test(0xabcdu64, 0, 100, 0x1234, 0x1234);
@@ -122,7 +122,7 @@ pub fn test_assign_bits_signed() {
     // *self < 0
     // assign within width
     test(-0x5413i16, 4, 8, 0xc, -0x5433);
-    test(-0x54a3i16, 5, 9, 14, -21_539);
+    test(-0x54a3i16, 5, 9, 14, -21539);
     test(-0x5433i16, 5, 5, 0, -0x5433);
     // assign ones above width
     test(-0x5433i16, 100, 104, 0xf, -0x5433);
@@ -131,7 +131,7 @@ pub fn test_assign_bits_signed() {
 
     test(0x2b5di64, 4, 8, 0xc, 0x2bcd);
     test(-0x5413i64, 4, 8, 0xc, -0x5433);
-    test(-0x54a3i64, 5, 9, 14, -21_539);
+    test(-0x54a3i64, 5, 9, 14, -21539);
     test(-0x5433i64, 5, 5, 0, -0x5433);
     test(-0x5433i64, 100, 104, 0xf, -0x5433);
     test(-57i64, 0, 64, u64::MAX, -1);

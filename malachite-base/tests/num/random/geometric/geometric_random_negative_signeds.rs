@@ -103,8 +103,8 @@ fn test_geometric_random_negative_signeds() {
         excess_kurtosis: NiceFloat(9.308727522629948),
     };
     geometric_random_negative_signeds_helper::<_, i64>(
-        12_345,
-        10_000,
+        12345,
+        10000,
         values,
         common_values,
         pop_median,

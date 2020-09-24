@@ -20,7 +20,7 @@ pub fn test_split_in_half() {
     split_in_half_helper(u16::from(u8::MAX) + 1, (1, 0));
     split_in_half_helper(u16::MAX, (u8::MAX, u8::MAX));
     split_in_half_helper(258u16, (1u8, 2u8));
-    split_in_half_helper(0xabcd_1234u32, (0xabcd, 0x1234));
+    split_in_half_helper(0xabcd1234u32, (0xabcd, 0x1234));
 }
 
 fn lower_half_helper<T: PrimitiveUnsigned + SplitInHalf>(n: T, out: T::Half)
@@ -38,7 +38,7 @@ pub fn test_lower_half() {
     lower_half_helper(u16::from(u8::MAX) + 1, 0);
     lower_half_helper(u16::MAX, u8::MAX);
     lower_half_helper(258u16, 2u8);
-    lower_half_helper(0xabcd_1234u32, 0x1234);
+    lower_half_helper(0xabcd1234u32, 0x1234);
 }
 
 fn upper_half_helper<T: PrimitiveUnsigned + SplitInHalf>(n: T, out: T::Half)
@@ -56,7 +56,7 @@ pub fn test_upper_half() {
     upper_half_helper(u16::from(u8::MAX) + 1, 1);
     upper_half_helper(u16::MAX, u8::MAX);
     upper_half_helper(258u16, 1u8);
-    upper_half_helper(0xabcd_1234u32, 0xabcd);
+    upper_half_helper(0xabcd1234u32, 0xabcd);
 }
 
 fn join_halves_helper<T: JoinHalves + PrimitiveUnsigned>(upper: T::Half, lower: T::Half, out: T) {
@@ -88,16 +88,16 @@ pub fn test_from_other_type_slice() {
     test::<u8, u16>(&[0xab, 0xcd, 0xef], 0xcdab);
     test::<u8, u64>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67],
-        0x67_4523_01ef_cdab,
+        0x67452301efcdab,
     );
     test::<u8, u64>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xff],
-        0x8967_4523_01ef_cdab,
+        0x8967452301efcdab,
     );
 
     test::<u64, u32>(&[], 0);
     test::<u16, u8>(&[0xabcd, 0xef01], 0xcd);
-    test::<u128, u8>(&[0x1234_5678_90ab_cdef_0123_4567_890a_bcde], 0xde);
+    test::<u128, u8>(&[0x1234567890a9cdef012345678909bcde], 0xde);
 }
 
 #[test]

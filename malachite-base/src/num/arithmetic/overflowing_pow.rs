@@ -32,11 +32,11 @@ macro_rules! impl_overflowing_pow {
             ///
             /// let mut x = -10i32;
             /// assert_eq!(x.overflowing_pow_assign(9), false);
-            /// assert_eq!(x, -1_000_000_000);
+            /// assert_eq!(x, -1000000000);
             ///
             /// let mut x = -10i16;
             /// assert_eq!(x.overflowing_pow_assign(9), true);
-            /// assert_eq!(x, 13_824);
+            /// assert_eq!(x, 13824);
             /// ```
             #[inline]
             fn overflowing_pow_assign(&mut self, exp: u64) -> bool {

@@ -39,9 +39,9 @@ fn mod_pow_helper<T: PrimitiveUnsigned>() {
     if T::WIDTH > u16::WIDTH {
         test(
             T::TWO,
-            1_000_000,
-            T::exact_from(1_000_000_000),
-            T::exact_from(747_109_376),
+            1000000,
+            T::exact_from(1000000000),
+            T::exact_from(747109376),
         );
     }
 }

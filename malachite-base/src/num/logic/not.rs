@@ -15,7 +15,7 @@ macro_rules! impl_not {
             ///
             /// let mut x = 123u16;
             /// x.not_assign();
-            /// assert_eq!(x, 65_412);
+            /// assert_eq!(x, 65412);
             /// ```
             #[inline]
             fn not_assign(&mut self) {

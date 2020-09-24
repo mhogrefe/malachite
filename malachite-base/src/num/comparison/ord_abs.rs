@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use std::cmp::Ordering;
 
 fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
     Some(x.cmp_abs(y))

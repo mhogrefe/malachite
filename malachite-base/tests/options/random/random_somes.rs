@@ -18,8 +18,8 @@ fn random_somes_helper<I: Clone + Iterator>(
 {
     let xs = random_somes(xs);
     let values = xs.clone().take(20).collect::<Vec<_>>();
-    let common_values = common_values_map_debug(1_000_000, 10, xs.clone());
-    let median = median(xs.take(1_000_000));
+    let common_values = common_values_map_debug(1000000, 10, xs.clone());
+    let median = median(xs.take(1000000));
     assert_eq!(
         (values.as_slice(), common_values.as_slice(), median),
         (expected_values, expected_common_values, expected_median)

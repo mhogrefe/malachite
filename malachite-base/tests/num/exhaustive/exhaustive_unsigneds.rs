@@ -32,10 +32,10 @@ fn test_exhaustive_unsigneds() {
         254, 255,
     ]);
     exhaustive_unsigneds_long_helper::<u16>(&[
-        65_516,
-        65_517,
-        65_518,
-        65_519,
+        65516,
+        65517,
+        65518,
+        65519,
         0xfff0,
         0xfff1,
         0xfff2,

@@ -17,7 +17,7 @@ macro_rules! impl_rotate {
             ///
             /// assert_eq!(Rotate::rotate_left(123u8, 0), 123);
             /// assert_eq!(Rotate::rotate_left(123u8, 5), 111);
-            /// assert_eq!(Rotate::rotate_left(123u8, 1_005), 111);
+            /// assert_eq!(Rotate::rotate_left(123u8, 1005), 111);
             /// ```
             #[inline]
             fn rotate_left(self, n: u64) -> $t {
@@ -37,7 +37,7 @@ macro_rules! impl_rotate {
             ///
             /// assert_eq!(Rotate::rotate_right(123u8, 0), 123);
             /// assert_eq!(Rotate::rotate_right(123u8, 3), 111);
-            /// assert_eq!(Rotate::rotate_right(123u8, 1_003), 111);
+            /// assert_eq!(Rotate::rotate_right(123u8, 1003), 111);
             /// ```
             #[inline]
             fn rotate_right(self, n: u64) -> $t {

@@ -33,7 +33,7 @@ pub fn test_striped_bit_source() {
         "00011111111111000000011111111111111000000000001111111111000000000000000000011111",
     );
     striped_bit_source_helper(
-        1_000_000,
+        1000000,
         1,
         "00000000000000000000000000000000000000000000000000000000000000000000000000000000",
     );
@@ -76,7 +76,7 @@ fn new_fail_3() {
 
 #[test]
 pub fn test_end_block() {
-    let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 1_000_000, 1);
+    let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 1000000, 1);
     let mut strings = Vec::with_capacity(5);
     for _ in 0..5 {
         strings.push(generate_string(&mut bit_source));

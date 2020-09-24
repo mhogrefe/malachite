@@ -15,8 +15,8 @@ fn graphic_weighted_random_char_range_helper(
 ) {
     let xs = graphic_weighted_random_char_range(EXAMPLE_SEED, a, b, w_numerator, w_denominator);
     let values = xs.clone().take(200).collect::<String>();
-    let common_values = common_values_map_debug(1_000_000, 10, xs.clone());
-    let median = median(xs.take(1_000_000));
+    let common_values = common_values_map_debug(1000000, 10, xs.clone());
+    let median = median(xs.take(1000000));
     assert_eq!(
         (values.as_str(), common_values.as_slice(), median),
         (expected_values, expected_common_values, expected_median)

@@ -66,8 +66,8 @@ macro_rules! impl_bit_access_unsigned {
             /// assert_eq!(123u8.get_bit(2), false);
             /// assert_eq!(123u16.get_bit(3), true);
             /// assert_eq!(123u32.get_bit(100), false);
-            /// assert_eq!(1_000_000_000_000u64.get_bit(12), true);
-            /// assert_eq!(1_000_000_000_000u64.get_bit(100), false);
+            /// assert_eq!(1000000000000u64.get_bit(12), true);
+            /// assert_eq!(1000000000000u64.get_bit(100), false);
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
@@ -230,10 +230,10 @@ macro_rules! impl_bit_access_signed {
             /// assert_eq!((-123i8).get_bit(0), true);
             /// assert_eq!((-123i16).get_bit(1), false);
             /// assert_eq!((-123i32).get_bit(100), true);
-            /// assert_eq!(1_000_000_000_000i64.get_bit(12), true);
-            /// assert_eq!(1_000_000_000_000i64.get_bit(100), false);
-            /// assert_eq!((-1_000_000_000_000i64).get_bit(12), true);
-            /// assert_eq!((-1_000_000_000_000i64).get_bit(100), true);
+            /// assert_eq!(1000000000000i64.get_bit(12), true);
+            /// assert_eq!(1000000000000i64.get_bit(100), false);
+            /// assert_eq!((-1000000000000i64).get_bit(12), true);
+            /// assert_eq!((-1000000000000i64).get_bit(100), true);
             /// ```
             #[inline]
             fn get_bit(&self, index: u64) -> bool {

@@ -101,4 +101,5 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
     RandomValuesFromVec { xs, indices }
 }
 
+pub mod exhaustive;
 pub mod from_str;

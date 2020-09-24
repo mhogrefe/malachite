@@ -1,12 +1,3 @@
-use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
-use std::hash::Hash;
-use std::iter::{Product, Sum};
-use std::ops::{
-    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
-    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-};
-use std::str::FromStr;
-
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{
@@ -41,6 +32,14 @@ use num::logic::traits::{
     LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
 };
 use num::random::HasRandomPrimitiveInts;
+use std::fmt::{Binary, Debug, Display, LowerHex, Octal, UpperHex};
+use std::hash::Hash;
+use std::iter::{Product, Sum};
+use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Mul, MulAssign, Not, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+};
+use std::str::FromStr;
 
 /// This trait defines functions on primitive integral types: uxx, ixx, usize, and isize.
 pub trait PrimitiveInt:
@@ -445,9 +444,9 @@ pub trait PrimitiveInt:
     /// use malachite_base::num::basic::integers::PrimitiveInt;
     ///
     /// assert_eq!(123u32.get_highest_bit(), false);
-    /// assert_eq!(4_000_000_000u32.get_highest_bit(), true);
-    /// assert_eq!(2_000_000_000i32.get_highest_bit(), false);
-    /// assert_eq!((-2_000_000_000i32).get_highest_bit(), true);
+    /// assert_eq!(4000000000u32.get_highest_bit(), true);
+    /// assert_eq!(2000000000i32.get_highest_bit(), false);
+    /// assert_eq!((-2000000000i32).get_highest_bit(), true);
     /// ```
     #[inline]
     fn get_highest_bit(&self) -> bool {

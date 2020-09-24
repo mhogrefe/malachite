@@ -23,7 +23,7 @@ use comparison::traits::Min;
 ///
 /// assert_eq!(char_to_contiguous_range('\u{0}'), 0);
 /// assert_eq!(char_to_contiguous_range('a'), 97);
-/// assert_eq!(char_to_contiguous_range(char::MAX), 1_112_063);
+/// assert_eq!(char_to_contiguous_range(char::MAX), 1112063);
 /// ```
 pub const fn char_to_contiguous_range(c: char) -> u32 {
     match c {
@@ -49,7 +49,7 @@ pub const fn char_to_contiguous_range(c: char) -> u32 {
 ///
 /// assert_eq!(contiguous_range_to_char(0), Some('\u{0}'));
 /// assert_eq!(contiguous_range_to_char(97), Some('a'));
-/// assert_eq!(contiguous_range_to_char(1_112_063), Some(char::MAX));
+/// assert_eq!(contiguous_range_to_char(1112063), Some(char::MAX));
 /// ```
 pub fn contiguous_range_to_char(u: u32) -> Option<char> {
     const ONE_BELOW_FIRST_SURROGATE_CODE_POINT: u32 = FIRST_SURROGATE_CODE_POINT - 1;

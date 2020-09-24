@@ -1,8 +1,7 @@
-use std::ops::Rem;
-
 use comparison::traits::Min;
 use num::arithmetic::traits::DivisibleBy;
 use num::basic::traits::{NegativeOne, Zero};
+use std::ops::Rem;
 
 fn _divisible_by_unsigned<T: Copy + Eq + Rem<T, Output = T> + Zero>(x: T, other: T) -> bool {
     x == T::ZERO || other != T::ZERO && x % other == T::ZERO

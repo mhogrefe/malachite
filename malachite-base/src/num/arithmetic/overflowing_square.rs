@@ -16,8 +16,8 @@ macro_rules! impl_overflowing_square {
             /// use malachite_base::num::arithmetic::traits::OverflowingSquare;
             ///
             /// assert_eq!(3u8.overflowing_square(), (9, false));
-            /// assert_eq!((-1_000i32).overflowing_square(), (1_000_000, false));
-            /// assert_eq!(1_000u16.overflowing_square(), (16_960, true));
+            /// assert_eq!((-1000i32).overflowing_square(), (1000000, false));
+            /// assert_eq!(1000u16.overflowing_square(), (16960, true));
             /// ```
             #[inline]
             fn overflowing_square(self) -> ($t, bool) {
@@ -40,13 +40,13 @@ macro_rules! impl_overflowing_square {
             /// assert_eq!(x.overflowing_square_assign(), false);
             /// assert_eq!(x, 9);
             ///
-            /// let mut x = -1_000i32;
+            /// let mut x = -1000i32;
             /// assert_eq!(x.overflowing_square_assign(), false);
-            /// assert_eq!(x, 1_000_000);
+            /// assert_eq!(x, 1000000);
             ///
-            /// let mut x = 1_000u16;
+            /// let mut x = 1000u16;
             /// assert_eq!(x.overflowing_square_assign(), true);
-            /// assert_eq!(x, 16_960);
+            /// assert_eq!(x, 16960);
             /// ```
             #[inline]
             fn overflowing_square_assign(&mut self) -> bool {

@@ -29,7 +29,7 @@ macro_rules! impl_pow {
             ///
             /// let mut x = -10i32;
             /// x.pow_assign(9);
-            /// assert_eq!(x, -1_000_000_000);
+            /// assert_eq!(x, -1000000000);
             /// ```
             #[inline]
             fn pow_assign(&mut self, exp: u64) {

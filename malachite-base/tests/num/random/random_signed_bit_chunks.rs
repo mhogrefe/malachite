@@ -43,14 +43,14 @@ fn random_signed_bit_chunks_helper<T: CheckedToF64 + PrimitiveSigned>(
             random_bools(EXAMPLE_SEED)
                 .chunks(usize::exact_from(chunk_size))
                 .into_iter()
-                .take(1_000_000)
+                .take(1000000)
                 .map(|bs| {
                     T::from_bits_asc(
                         &bs.chain(repeat_n(false, usize::exact_from(T::WIDTH - chunk_size)))
                             .collect::<Vec<_>>(),
                     )
                 }),
-            xs.take(1_000_000),
+            xs.take(1000000),
         );
     }
 }

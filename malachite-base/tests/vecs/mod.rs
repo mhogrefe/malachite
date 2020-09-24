@@ -39,4 +39,8 @@ fn vec_delete_left_fail_2() {
     vec_delete_left(&mut xs, 4);
 }
 
+pub mod exhaustive {
+    pub mod exhaustive_fixed_length_vecs_from_single;
+    pub mod exhaustive_length_n_vecs;
+}
 pub mod random_values_from_vec;

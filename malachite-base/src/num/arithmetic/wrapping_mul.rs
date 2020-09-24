@@ -24,7 +24,7 @@ macro_rules! impl_wrapping_mul {
             ///
             /// let mut x = 123u16;
             /// x.wrapping_mul_assign(456);
-            /// assert_eq!(x, 56_088);
+            /// assert_eq!(x, 56088);
             ///
             /// let mut x = 123u8;
             /// x.wrapping_mul_assign(200);

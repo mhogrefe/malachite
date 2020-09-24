@@ -15,8 +15,8 @@ fn get_bit_helper_unsigned<T: PrimitiveInt>() {
     test(123, 3, true);
     test(123, 100, false);
     if T::WIDTH >= u64::WIDTH {
-        test(1_000_000_000_000, 12, true);
-        test(1_000_000_000_000, 100, false);
+        test(1000000000000, 12, true);
+        test(1000000000000, 100, false);
     }
 }
 
@@ -31,8 +31,8 @@ fn get_bit_helper_signed<T: PrimitiveSigned>() {
     test(-123, 1, false);
     test(-123, 100, true);
     if T::WIDTH >= u64::WIDTH {
-        test(-1_000_000_000_000, 12, true);
-        test(-1_000_000_000_000, 100, true);
+        test(-1000000000000, 12, true);
+        test(-1000000000000, 100, true);
         test(-i64::from(u32::MAX), 0, true);
         test(-i64::from(u32::MAX), 1, false);
         test(-i64::from(u32::MAX), 31, false);
@@ -63,7 +63,7 @@ fn set_bit_helper_unsigned<T: PrimitiveInt>() {
         test(0, 10, 1024);
     }
     if T::WIDTH >= u64::WIDTH {
-        test(1_000_000_000_000, 10, 1_000_000_001_024);
+        test(1000000000000, 10, 1000000001024);
     }
 }
 
@@ -82,8 +82,8 @@ fn set_bit_helper_signed<T: PrimitiveSigned>() {
     test(-32, 0, -31);
 
     if T::WIDTH >= u64::WIDTH {
-        test(-1_000_000_000_000, 10, -999_999_998_976);
-        test(-1_000_000_000_000, 100, -1_000_000_000_000);
+        test(-1000000000000, 10, -999999998976);
+        test(-1000000000000, 100, -1000000000000);
     }
 }
 
@@ -119,8 +119,8 @@ fn clear_bit_helper_unsigned<T: PrimitiveInt>() {
         test(1024, 10, 0);
     }
     if T::WIDTH >= u64::WIDTH {
-        test(1_000_000_001_024, 10, 1_000_000_000_000);
-        test(1_000_000_001_024, 100, 1_000_000_001_024);
+        test(1000000001024, 10, 1000000000000);
+        test(1000000001024, 100, 1000000001024);
     }
 }
 
@@ -137,7 +137,7 @@ fn clear_bit_helper_signed<T: PrimitiveSigned>() {
     test(-31, 0, -32);
 
     if T::WIDTH >= u64::WIDTH {
-        test(-999_999_998_976, 10, -1_000_000_000_000);
+        test(-999999998976, 10, -1000000000000);
     }
 }
 
@@ -175,9 +175,9 @@ fn assign_bit_helper_unsigned<T: PrimitiveInt>() {
         test(1024, 10, false, 0);
     }
     if T::WIDTH >= u64::WIDTH {
-        test(1_000_000_000_000, 10, true, 1_000_000_001_024);
-        test(1_000_000_001_024, 10, false, 1_000_000_000_000);
-        test(1_000_000_001_024, 100, false, 1_000_000_001_024);
+        test(1000000000000, 10, true, 1000000001024);
+        test(1000000001024, 10, false, 1000000000000);
+        test(1000000001024, 100, false, 1000000001024);
     }
 }
 
@@ -198,9 +198,9 @@ fn assign_bit_helper_signed<T: PrimitiveSigned>() {
     test(-31, 0, false, -32);
 
     if T::WIDTH >= u64::WIDTH {
-        test(-1_000_000_000_000, 10, true, -999_999_998_976);
-        test(-1_000_000_000_000, 100, true, -1_000_000_000_000);
-        test(-999_999_998_976, 10, false, -1_000_000_000_000);
+        test(-1000000000000, 10, true, -999999998976);
+        test(-1000000000000, 100, true, -1000000000000);
+        test(-999999998976, 10, false, -1000000000000);
     }
 }
 
@@ -244,8 +244,8 @@ fn flip_bit_helper_unsigned<T: PrimitiveInt>() {
         test(1024, 10, 0);
     }
     if T::WIDTH >= u64::WIDTH {
-        test(1_000_000_000_000, 10, 1_000_000_001_024);
-        test(1_000_000_001_024, 10, 1_000_000_000_000);
+        test(1000000000000, 10, 1000000001024);
+        test(1000000001024, 10, 1000000000000);
     }
 }
 
@@ -264,8 +264,8 @@ fn flip_bit_helper_signed<T: PrimitiveSigned>() {
     test(-31, 0, -32);
 
     if T::WIDTH >= u64::WIDTH {
-        test(-1_000_000_000_000, 10, -999_999_998_976);
-        test(-999_999_998_976, 10, -1_000_000_000_000);
+        test(-1000000000000, 10, -999999998976);
+        test(-999999998976, 10, -1000000000000);
     }
 }
 

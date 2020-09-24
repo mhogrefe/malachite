@@ -28,7 +28,7 @@ macro_rules! impl_wrapping_sub {
             ///
             /// let mut x = 123u16;
             /// x.wrapping_sub_assign(456);
-            /// assert_eq!(x, 65_203);
+            /// assert_eq!(x, 65203);
             /// ```
             #[inline]
             fn wrapping_sub_assign(&mut self, other: $t) {

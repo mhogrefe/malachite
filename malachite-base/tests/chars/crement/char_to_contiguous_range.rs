@@ -10,7 +10,7 @@ fn test_char_to_contiguous_range() {
     test('\u{0}', 0);
     test('a', 97);
     test('A', 65);
-    test(CHAR_JUST_BELOW_SURROGATES, 55_295);
-    test(CHAR_JUST_ABOVE_SURROGATES, 55_296);
-    test(char::MAX, 1_112_063);
+    test(CHAR_JUST_BELOW_SURROGATES, 55295);
+    test(CHAR_JUST_ABOVE_SURROGATES, 55296);
+    test(char::MAX, 1112063);
 }

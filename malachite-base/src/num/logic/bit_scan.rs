@@ -39,14 +39,14 @@ macro_rules! impl_bit_scan_unsigned {
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(0), Some(0));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(20), Some(20));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(31), Some(31));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(32), Some(34));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(33), Some(34));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(34), Some(34));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(35), Some(36));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_false_bit(100), Some(100));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(0), Some(0));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(20), Some(20));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(31), Some(31));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(32), Some(34));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(33), Some(34));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(34), Some(34));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(35), Some(36));
+            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(100), Some(100));
             /// ```
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
@@ -67,15 +67,15 @@ macro_rules! impl_bit_scan_unsigned {
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(0), Some(32));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(20), Some(32));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(31), Some(32));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(32), Some(32));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(33), Some(33));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(34), Some(35));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(35), Some(35));
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(36), None);
-            /// assert_eq!(0xb_0000_0000u64.index_of_next_true_bit(100), None);
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(0), Some(32));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(20), Some(32));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(31), Some(32));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(32), Some(32));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(33), Some(33));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(34), Some(35));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(35), Some(35));
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(36), None);
+            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(100), None);
             /// ```
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
@@ -138,14 +138,14 @@ macro_rules! impl_bit_scan_signed {
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(0), Some(0));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(20), Some(20));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(31), Some(31));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(32), Some(34));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(33), Some(34));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(34), Some(34));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(35), None);
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_false_bit(100), None);
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(0), Some(0));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(20), Some(20));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(31), Some(31));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(32), Some(34));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(33), Some(34));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(34), Some(34));
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(35), None);
+            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(100), None);
             /// ```
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
@@ -167,15 +167,15 @@ macro_rules! impl_bit_scan_signed {
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(0), Some(32));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(20), Some(32));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(31), Some(32));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(32), Some(32));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(33), Some(33));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(34), Some(35));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(35), Some(35));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(36), Some(36));
-            /// assert_eq!((-0x5_0000_0000i64).index_of_next_true_bit(100), Some(100));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(0), Some(32));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(20), Some(32));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(31), Some(32));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(32), Some(32));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(33), Some(33));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(34), Some(35));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(35), Some(35));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(36), Some(36));
+            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
             /// ```
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {

@@ -1,11 +1,10 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
-
 use num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, CheckedDiv,
     DivAssignMod, DivAssignRem, DivMod, DivRem, UnsignedAbs, WrappingNeg,
 };
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
 
 fn _div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>>(
     x: T,

@@ -24,6 +24,7 @@
 #![allow(
     clippy::cognitive_complexity,
     clippy::many_single_char_names,
+    clippy::too_many_arguments,
     unstable_name_collisions
 )]
 

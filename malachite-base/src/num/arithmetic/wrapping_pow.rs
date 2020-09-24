@@ -29,11 +29,11 @@ macro_rules! impl_wrapping_pow {
             ///
             /// let mut x = -10i32;
             /// x.wrapping_pow_assign(9);
-            /// assert_eq!(x, -1_000_000_000);
+            /// assert_eq!(x, -1000000000);
             ///
             /// let mut x = -10i16;
             /// x.wrapping_pow_assign(9);
-            /// assert_eq!(x, 13_824);
+            /// assert_eq!(x, 13824);
             /// ```
             #[inline]
             fn wrapping_pow_assign(&mut self, exp: u64) {

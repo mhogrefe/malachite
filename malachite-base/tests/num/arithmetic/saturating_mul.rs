@@ -9,9 +9,9 @@ fn test_saturating_mul() {
         x.saturating_mul_assign(y);
         assert_eq!(x, out);
     };
-    test::<u16>(123, 456, 56_088);
+    test::<u16>(123, 456, 56088);
     test::<u8>(123, 200, 255);
-    test::<i16>(123, -45, -5_535);
+    test::<i16>(123, -45, -5535);
     test::<i8>(123, 45, 127);
     test::<i8>(-123, 45, -128);
 }

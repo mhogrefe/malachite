@@ -30,8 +30,8 @@ fn test_char_type() {
             (CharType::AsciiUpper, 26),
             (CharType::AsciiNumeric, 10),
             (CharType::AsciiNonAlphanumericGraphic, 33),
-            (CharType::NonAsciiGraphic, 141_703),
-            (CharType::NonGraphic, 970_266)
+            (CharType::NonAsciiGraphic, 141703),
+            (CharType::NonGraphic, 970266)
         ]
     );
 

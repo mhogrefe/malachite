@@ -15,7 +15,7 @@ fn mod_power_of_two_pow_helper<T: PrimitiveUnsigned>() {
     test(T::TWO, 2, 3, T::exact_from(4));
     test(T::exact_from(5), 13, 3, T::exact_from(5));
     test(T::exact_from(7), 1000, 6, T::ONE);
-    test(T::exact_from(101), 1_000_000, 8, T::ONE);
+    test(T::exact_from(101), 1000000, 8, T::ONE);
 }
 
 #[test]

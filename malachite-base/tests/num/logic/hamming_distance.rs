@@ -8,9 +8,9 @@ pub fn test_hamming_distance() {
     };
 
     test(123u16, 456u16, 6);
-    test(0xffffu32, 0xffff_0000u32, 32);
+    test(0xffffu32, 0xffff0000u32, 32);
     test(0xffffu32, u32::MAX, 16);
-    test(0xffff_0000u32, u32::MAX, 16);
+    test(0xffff0000u32, u32::MAX, 16);
 }
 
 #[test]
@@ -27,7 +27,7 @@ pub fn test_checked_hamming_distance() {
     test(0i128, i128::MAX, Some(127));
     test(0i128, -1i128, None);
     test(-1i128, i128::MIN, Some(127));
-    test(0xffffi32, 0x7fff_0000i32, Some(31));
+    test(0xffffi32, 0x7fff0000i32, Some(31));
     test(0xffffi32, i32::MAX, Some(15));
-    test(0x7fff_0000i32, i32::MAX, Some(16));
+    test(0x7fff0000i32, i32::MAX, Some(16));
 }

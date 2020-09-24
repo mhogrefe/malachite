@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
-pub const SMALL_LIMIT: usize = 1_000;
-pub const LARGE_LIMIT: usize = 10_000;
+pub const SMALL_LIMIT: usize = 1000;
+pub const LARGE_LIMIT: usize = 10000;
 
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum GenMode {

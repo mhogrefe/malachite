@@ -10,9 +10,9 @@ fn test_contiguous_range_to_char() {
     test(0, Some('\u{0}'));
     test(97, Some('a'));
     test(65, Some('A'));
-    test(55_295, Some(CHAR_JUST_BELOW_SURROGATES));
-    test(55_296, Some(CHAR_JUST_ABOVE_SURROGATES));
-    test(1_112_063, Some(char::MAX));
-    test(1_112_064, None);
+    test(55295, Some(CHAR_JUST_BELOW_SURROGATES));
+    test(55296, Some(CHAR_JUST_ABOVE_SURROGATES));
+    test(1112063, Some(char::MAX));
+    test(1112064, None);
     test(u32::MAX, None);
 }

@@ -31,7 +31,7 @@ macro_rules! impl_overflowing_sub {
             ///
             /// let mut x = 123u16;
             /// assert_eq!(x.overflowing_sub_assign(456), true);
-            /// assert_eq!(x, 65_203);
+            /// assert_eq!(x, 65203);
             /// ```
             #[inline]
             fn overflowing_sub_assign(&mut self, other: $t) -> bool {

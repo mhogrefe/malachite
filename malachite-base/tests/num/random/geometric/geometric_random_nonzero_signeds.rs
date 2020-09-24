@@ -112,8 +112,8 @@ fn test_geometric_random_nonzero_signeds() {
         excess_kurtosis: NiceFloat(-0.5314899892072216),
     };
     geometric_random_nonzero_signeds_helper::<i64>(
-        12_345,
-        10_000,
+        12345,
+        10000,
         values,
         common_values,
         abs_mean,

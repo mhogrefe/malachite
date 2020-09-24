@@ -1,9 +1,8 @@
-use std::cmp::Ordering;
-use std::marker::PhantomData;
-
 use num::arithmetic::traits::DivisibleBy;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
+use std::cmp::Ordering;
+use std::marker::PhantomData;
 
 #[derive(Clone, Debug)]
 pub struct SameWidthIteratorToBitChunks<

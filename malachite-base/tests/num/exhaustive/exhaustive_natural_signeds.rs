@@ -39,10 +39,10 @@ fn test_exhaustive_natural_signeds() {
         126, 127,
     ]);
     exhaustive_natural_signeds_long_helper::<i16>(&[
-        32_748,
-        32_749,
-        32_750,
-        32_751,
+        32748,
+        32749,
+        32750,
+        32751,
         0x7ff0,
         0x7ff1,
         0x7ff2,

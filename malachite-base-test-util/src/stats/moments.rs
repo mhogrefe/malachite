@@ -209,9 +209,9 @@ pub fn uniform_bool_assertions<I: Clone + Iterator<Item = bool>>(
     expected_sample_moment_stats: MomentStats,
 ) {
     let actual_values = xs.clone().take(20).collect::<Vec<bool>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -246,9 +246,9 @@ pub fn uniform_primitive_int_assertions<I: Clone + Iterator>(
     I::Item: CheckedToF64 + PrimitiveInt,
 {
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -344,9 +344,9 @@ pub fn deleted_uniform_primitive_int_assertions<I: Clone + Iterator>(
     I::Item: CheckedToF64 + PrimitiveInt,
 {
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -455,9 +455,9 @@ pub fn truncated_geometric_dist_assertions<I: Clone + Iterator>(
     let max_64 = max.checked_to_f64();
     let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -499,9 +499,9 @@ pub fn negative_truncated_geometric_dist_assertions<
     let abs_max_64 = -abs_max.checked_to_f64();
     let abs_unadjusted_mean = abs_um_numerator as f64 / abs_um_denominator as f64;
     let actual_values = xs.clone().take(20).collect::<Vec<S>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     let mut pop_sample_moment_stats =
         pop_truncated_geometric_dist_moment_stats(abs_min_64, abs_max_64, abs_unadjusted_mean);
     pop_sample_moment_stats.mean = NiceFloat(-pop_sample_moment_stats.mean.0);
@@ -631,10 +631,10 @@ pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     let max_64 = max.checked_to_f64();
     let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_abs_mean = mean(xs.clone().map(Abs::abs).take(1_000_000));
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_abs_mean = mean(xs.clone().map(Abs::abs).take(1000000));
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),
@@ -751,10 +751,10 @@ pub fn double_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     let max_64 = max.checked_to_f64();
     let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
     let actual_values = xs.clone().take(20).collect::<Vec<I::Item>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone());
-    let actual_natural_mean = mean(xs.clone().filter(|&x| x >= I::Item::ZERO).take(1_000_000));
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_common_values = common_values_map(1000000, 10, xs.clone());
+    let actual_natural_mean = mean(xs.clone().filter(|&x| x >= I::Item::ZERO).take(1000000));
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values.as_slice(),

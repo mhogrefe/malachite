@@ -34,3 +34,6 @@ impl<I: Iterator> Iterator for Singletons<I> {
 pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
     Singletons { xs }
 }
+
+pub mod exhaustive;
+pub mod random;

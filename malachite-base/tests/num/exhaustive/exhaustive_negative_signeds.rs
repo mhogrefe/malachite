@@ -42,9 +42,9 @@ fn test_exhaustive_negative_signeds() {
         -124, -125, -126, -127, -128,
     ]);
     exhaustive_negative_signeds_long_helper::<i16>(&[
-        -32_749,
-        -32_750,
-        -32_751,
+        -32749,
+        -32750,
+        -32751,
         -0x7ff0,
         -0x7ff1,
         -0x7ff2,

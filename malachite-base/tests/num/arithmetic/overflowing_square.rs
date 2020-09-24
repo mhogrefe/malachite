@@ -14,16 +14,16 @@ fn test_overflowing_square() {
     test::<u32>(2, 4, false);
     test::<i64>(3, 9, false);
     test::<u128>(10, 100, false);
-    test::<isize>(123, 15_129, false);
-    test::<u32>(1_000, 1_000_000, false);
+    test::<isize>(123, 15129, false);
+    test::<u32>(1000, 1000000, false);
 
     test::<i16>(-1, 1, false);
     test::<i32>(-2, 4, false);
     test::<i64>(-3, 9, false);
     test::<i128>(-10, 100, false);
-    test::<isize>(-123, 15_129, false);
-    test::<i32>(-1_000, 1_000_000, false);
+    test::<isize>(-123, 15129, false);
+    test::<i32>(-1000, 1000000, false);
 
-    test::<u16>(1_000, 16_960, true);
-    test::<i16>(-1_000, 16_960, true);
+    test::<u16>(1000, 16960, true);
+    test::<i16>(-1000, 16960, true);
 }

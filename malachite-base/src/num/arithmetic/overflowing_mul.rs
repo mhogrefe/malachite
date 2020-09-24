@@ -27,7 +27,7 @@ macro_rules! impl_overflowing_mul {
             ///
             /// let mut x = 123u16;
             /// assert_eq!(x.overflowing_mul_assign(456), false);
-            /// assert_eq!(x, 56_088);
+            /// assert_eq!(x, 56088);
             ///
             /// let mut x = 123u8;
             /// assert_eq!(x.overflowing_mul_assign(200), true);

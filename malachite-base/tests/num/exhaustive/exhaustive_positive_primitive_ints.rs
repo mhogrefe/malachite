@@ -40,10 +40,10 @@ fn test_exhaustive_positive_primitive_ints() {
         126, 127,
     ]);
     exhaustive_positive_primitive_ints_long_helper::<u16>(&[
-        65_516,
-        65_517,
-        65_518,
-        65_519,
+        65516,
+        65517,
+        65518,
+        65519,
         0xfff0,
         0xfff1,
         0xfff2,
@@ -62,10 +62,10 @@ fn test_exhaustive_positive_primitive_ints() {
         u16::MAX,
     ]);
     exhaustive_positive_primitive_ints_long_helper::<i16>(&[
-        32_748,
-        32_749,
-        32_750,
-        32_751,
+        32748,
+        32749,
+        32750,
+        32751,
         0x7ff0,
         0x7ff1,
         0x7ff2,

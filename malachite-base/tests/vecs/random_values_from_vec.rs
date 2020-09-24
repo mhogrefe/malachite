@@ -14,8 +14,8 @@ fn test_random_values_from_vec() {
                 actual_median: (u32, Option<u32>)| {
         let xs = random_values_from_vec(EXAMPLE_SEED, vec);
         let expected_values = xs.clone().take(20).collect::<Vec<_>>();
-        let expected_common_values = common_values_map_debug(1_000_000, 10, xs.clone());
-        let expected_median = median(xs.take(1_000_000));
+        let expected_common_values = common_values_map_debug(1000000, 10, xs.clone());
+        let expected_median = median(xs.take(1000000));
         assert_eq!(
             (
                 expected_values.as_slice(),

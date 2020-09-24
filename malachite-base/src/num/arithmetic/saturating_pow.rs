@@ -30,11 +30,11 @@ macro_rules! impl_saturating_pow {
             ///
             /// let mut x = -10i32;
             /// x.saturating_pow_assign(9);
-            /// assert_eq!(x, -1_000_000_000);
+            /// assert_eq!(x, -1000000000);
             ///
             /// let mut x = -10i16;
             /// x.saturating_pow_assign(9);
-            /// assert_eq!(x, -32_768);
+            /// assert_eq!(x, -32768);
             /// ```
             #[inline]
             fn saturating_pow_assign(&mut self, exp: u64) {

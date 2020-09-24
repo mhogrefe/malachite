@@ -9,9 +9,9 @@ fn test_overflowing_mul() {
         assert_eq!(x.overflowing_mul_assign(y), overflow);
         assert_eq!(x, out);
     };
-    test::<u16>(123, 456, 56_088, false);
+    test::<u16>(123, 456, 56088, false);
     test::<u8>(123, 200, 24, true);
-    test::<i16>(123, -45, -5_535, false);
+    test::<i16>(123, -45, -5535, false);
     test::<i8>(123, 45, -97, true);
     test::<i8>(-123, 45, 97, true);
 }

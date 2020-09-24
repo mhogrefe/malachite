@@ -16,6 +16,7 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_nz::integer::exhaustive::{
     exhaustive_integer_range_to_infinity, exhaustive_integer_range_to_negative_infinity,
@@ -51,7 +52,6 @@ use rust_wheels::iterators::tuples::{
     exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
     random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
 };
-use rust_wheels::iterators::vecs::exhaustive_fixed_size_vecs_from_single;
 
 use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, RandomValueAndVecOfBool};
@@ -1285,8 +1285,8 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |i: &Integer| {
-                exhaustive_fixed_size_vecs_from_single(
-                    u64::wrapping_from(i.to_twos_complement_limbs_asc().len()),
+                exhaustive_fixed_length_vecs_from_single(
+                    i.to_twos_complement_limbs_asc().len(),
                     exhaustive_bools(),
                 )
             };
@@ -1328,10 +1328,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Integer
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Integer| {
-                exhaustive_fixed_size_vecs_from_single(
-                    u64::wrapping_from(n.to_bits_asc().len()),
-                    exhaustive_bools(),
-                )
+                exhaustive_fixed_length_vecs_from_single(n.to_bits_asc().len(), exhaustive_bools())
             };
             Box::new(dependent_pairs(exhaustive_integers(), f))
         }

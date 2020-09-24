@@ -24,12 +24,12 @@ fn striped_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>
         .map(|x| x.to_binary_string())
         .take(20)
         .collect::<Vec<_>>();
-    let actual_common_values = common_values_map(1_000_000, 10, xs.clone())
+    let actual_common_values = common_values_map(1000000, 10, xs.clone())
         .iter()
         .map(|(x, frequency)| (x.to_binary_string(), *frequency))
         .collect::<Vec<_>>();
-    let actual_sample_median = median(xs.clone().take(1_000_000));
-    let actual_sample_moment_stats = moment_stats(xs.take(1_000_000));
+    let actual_sample_median = median(xs.clone().take(1000000));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
         (
             actual_values,

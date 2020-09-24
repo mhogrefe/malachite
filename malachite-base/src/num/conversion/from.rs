@@ -1,11 +1,10 @@
-use std::num::ParseIntError;
-
 use comparison::traits::{Max, Min};
 use num::basic::traits::Zero;
 use num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
     WrappingFrom,
 };
+use std::num::ParseIntError;
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
@@ -299,10 +298,10 @@ macro_rules! lossy_conversion {
         /// use malachite_base::num::conversion::traits::CheckedFrom;
         ///
         /// assert_eq!(u32::checked_from(5u64), Some(5));
-        /// assert_eq!(u8::checked_from(1_000u16), None);
+        /// assert_eq!(u8::checked_from(1000u16), None);
         /// assert_eq!(u32::checked_from(-5i32), None);
-        /// assert_eq!(i32::checked_from(3_000_000_000u32), None);
-        /// assert_eq!(i8::checked_from(-1_000i16), None);
+        /// assert_eq!(i32::checked_from(3000000000u32), None);
+        /// assert_eq!(i8::checked_from(-1000i16), None);
         /// ```
         impl CheckedFrom<$a> for $b {
             #[inline]
@@ -323,10 +322,10 @@ macro_rules! lossy_conversion {
         /// use malachite_base::num::conversion::traits::WrappingFrom;
         ///
         /// assert_eq!(u32::wrapping_from(5u64), 5);
-        /// assert_eq!(u8::wrapping_from(1_000u16), 232);
-        /// assert_eq!(u32::wrapping_from(-5i32), 4_294_967_291);
-        /// assert_eq!(i32::wrapping_from(3_000_000_000u32), -1_294_967_296);
-        /// assert_eq!(i8::wrapping_from(-1_000i16), 24);
+        /// assert_eq!(u8::wrapping_from(1000u16), 232);
+        /// assert_eq!(u32::wrapping_from(-5i32), 4294967291);
+        /// assert_eq!(i32::wrapping_from(3000000000u32), -1294967296);
+        /// assert_eq!(i8::wrapping_from(-1000i16), 24);
         /// ```
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
@@ -348,10 +347,10 @@ macro_rules! lossy_conversion {
         /// use malachite_base::num::conversion::traits::SaturatingFrom;
         ///
         /// assert_eq!(u32::saturating_from(5u64), 5);
-        /// assert_eq!(u8::saturating_from(1_000u16), 255);
+        /// assert_eq!(u8::saturating_from(1000u16), 255);
         /// assert_eq!(u32::saturating_from(-5i32), 0);
-        /// assert_eq!(i32::saturating_from(3_000_000_000u32), 2_147_483_647);
-        /// assert_eq!(i8::saturating_from(-1_000i16), -128);
+        /// assert_eq!(i32::saturating_from(3000000000u32), 2147483647);
+        /// assert_eq!(i8::saturating_from(-1000i16), -128);
         /// ```
         impl SaturatingFrom<$a> for $b {
             #[inline]
@@ -372,10 +371,10 @@ macro_rules! lossy_conversion {
         /// use malachite_base::num::conversion::traits::OverflowingFrom;
         ///
         /// assert_eq!(u32::overflowing_from(5u64), (5, false));
-        /// assert_eq!(u8::overflowing_from(1_000u16), (232, true));
-        /// assert_eq!(u32::overflowing_from(-5i32), (4_294_967_291, true));
-        /// assert_eq!(i32::overflowing_from(3_000_000_000u32), (-1_294_967_296, true));
-        /// assert_eq!(i8::overflowing_from(-1_000i16), (24, true));
+        /// assert_eq!(u8::overflowing_from(1000u16), (232, true));
+        /// assert_eq!(u32::overflowing_from(-5i32), (4294967291, true));
+        /// assert_eq!(i32::overflowing_from(3000000000u32), (-1294967296, true));
+        /// assert_eq!(i8::overflowing_from(-1000i16), (24, true));
         /// ```
         impl OverflowingFrom<$a> for $b {
             #[inline]
@@ -395,10 +394,10 @@ macro_rules! lossy_conversion {
         /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         ///
         /// assert_eq!(u32::convertible_from(5u64), true);
-        /// assert_eq!(u8::convertible_from(1_000u16), false);
+        /// assert_eq!(u8::convertible_from(1000u16), false);
         /// assert_eq!(u32::convertible_from(-5i32), false);
-        /// assert_eq!(i32::convertible_from(3_000_000_000u32), false);
-        /// assert_eq!(i8::convertible_from(-1_000i16), false);
+        /// assert_eq!(i32::convertible_from(3000000000u32), false);
+        /// assert_eq!(i8::convertible_from(-1000i16), false);
         /// ```
         impl ConvertibleFrom<$a> for $b {
             #[inline]

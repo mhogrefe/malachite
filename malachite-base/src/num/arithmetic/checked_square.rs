@@ -16,8 +16,8 @@ macro_rules! impl_checked_square {
             /// use malachite_base::num::arithmetic::traits::CheckedSquare;
             ///
             /// assert_eq!(3u8.checked_square(), Some(9));
-            /// assert_eq!((-1_000i32).checked_square(), Some(1_000_000));
-            /// assert_eq!((1_000u16).checked_square(), None);
+            /// assert_eq!((-1000i32).checked_square(), Some(1000000));
+            /// assert_eq!((1000u16).checked_square(), None);
             /// ```
             #[inline]
             fn checked_square(self) -> Option<$t> {

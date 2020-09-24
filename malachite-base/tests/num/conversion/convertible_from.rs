@@ -14,7 +14,7 @@ pub fn test_convertible_from() {
     };
     test_single(0u8);
     test_single(5u64);
-    test_single(1_000u32);
+    test_single(1000u32);
     test_single(123u8);
     test_single(-123i16);
     test_single(i64::MIN);
@@ -24,7 +24,7 @@ pub fn test_convertible_from() {
         assert_eq!(U::convertible_from(n_in), convertible);
     };
     test_double::<_, u16>(0u8, true);
-    test_double::<_, i32>(1_000u16, true);
+    test_double::<_, i32>(1000u16, true);
     test_double::<_, i8>(-5i16, true);
     test_double::<_, u64>(255u8, true);
 
@@ -34,7 +34,7 @@ pub fn test_convertible_from() {
     test_double::<_, u16>(i32::MIN, false);
     test_double::<_, i16>(i32::MIN, false);
     test_double::<_, u32>(-5i32, false);
-    test_double::<_, i32>(3_000_000_000u32, false);
+    test_double::<_, i32>(3000000000u32, false);
     test_double::<_, i8>(-1000i16, false);
 }
 

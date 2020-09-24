@@ -53,7 +53,7 @@ fn test_exhaustive_chars() {
     );
 
     assert_eq!(
-        exhaustive_chars().skip(141_698).take(200).collect::<String>(),
+        exhaustive_chars().skip(141698).take(200).collect::<String>(),
         "𱋧𱋨𱋩𱋪𱋫𱋬𱋭𱋮𱋯𱋰𱋱𱋲𱋳𱋴𱋵𱋶𱋷𱋸𱋹𱋺𱋻𱋼𱋽𱋾𱋿𱌀𱌁𱌂𱌃𱌄𱌅𱌆𱌇𱌈𱌉𱌊𱌋𱌌𱌍𱌎𱌏𱌐𱌑𱌒𱌓𱌔𱌕𱌖𱌗𱌘𱌙𱌚𱌛𱌜𱌝𱌞𱌟𱌠𱌡𱌢𱌣𱌤𱌥𱌦𱌧𱌨𱌩𱌪𱌫𱌬\
         𱌭𱌮𱌯𱌰𱌱𱌲𱌳𱌴𱌵𱌶𱌷𱌸𱌹𱌺𱌻𱌼𱌽𱌾𱌿𱍀𱍁𱍂𱍃𱍄𱍅𱍆𱍇𱍈𱍉𱍊\u{0}\u{1}\u{2}\u{3}\u{4}\u{5}\u{6}\u{7}\u{8}\t\n\
         \u{b}\u{c}\r\u{e}\u{f}\u{10}\u{11}\u{12}\u{13}\u{14}\u{15}\u{16}\u{17}\u{18}\u{19}\u{1a}\

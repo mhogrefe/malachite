@@ -1,10 +1,9 @@
-use std::ops::{Shl, ShlAssign};
-
 use num::arithmetic::traits::{ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
+use std::ops::{Shl, ShlAssign};
 
 fn _shl_round<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,

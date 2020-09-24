@@ -1,12 +1,11 @@
-use std::fmt::Display;
-use std::ops::{Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
-
 use comparison::traits::Min;
 use num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
+use std::fmt::Display;
+use std::ops::{Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
 fn _shr_round_unsigned_unsigned<
     T: PrimitiveInt + Shl<U, Output = T> + Shr<U, Output = T>,

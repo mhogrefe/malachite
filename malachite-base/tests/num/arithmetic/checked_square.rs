@@ -14,18 +14,18 @@ fn test_checked_square() {
     test::<u32>(2, Some(4));
     test::<i64>(3, Some(9));
     test::<u128>(10, Some(100));
-    test::<isize>(123, Some(15_129));
-    test::<u32>(1_000, Some(1_000_000));
+    test::<isize>(123, Some(15129));
+    test::<u32>(1000, Some(1000000));
 
     test::<i16>(-1, Some(1));
     test::<i32>(-2, Some(4));
     test::<i64>(-3, Some(9));
     test::<i128>(-10, Some(100));
-    test::<isize>(-123, Some(15_129));
-    test::<i32>(-1_000, Some(1_000_000));
+    test::<isize>(-123, Some(15129));
+    test::<i32>(-1000, Some(1000000));
 
-    test::<u16>(1_000, None);
-    test::<i16>(-1_000, None);
+    test::<u16>(1000, None);
+    test::<i16>(-1000, None);
 }
 
 fn unsigned_checked_square_properties_helper<T: PrimitiveUnsigned>() {

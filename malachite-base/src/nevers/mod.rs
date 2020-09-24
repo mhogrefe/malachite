@@ -1,3 +1,5 @@
+use std::iter::{empty, Empty};
+
 /// `Never` is a type that cannot be instantiated.
 ///
 /// In other languages this type may be called `Nothing`, `Empty`, or `Void`.
@@ -10,3 +12,8 @@
 /// ```
 #[derive(Clone, Copy, Debug, Hash, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Never {}
+
+//TODO doc
+pub const fn nevers() -> Empty<Never> {
+    empty()
+}

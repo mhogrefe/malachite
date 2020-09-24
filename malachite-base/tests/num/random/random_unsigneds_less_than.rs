@@ -36,7 +36,7 @@ fn random_unsigneds_less_than_helper<T: CheckedToF64 + PrimitiveUnsigned>(
 fn test_random_unsigneds_less_than() {
     // u8, limit = 1
     let values = &[0; 20];
-    let common_values = &[(0, 1_000_000)];
+    let common_values = &[(0, 1000000)];
     let pop_median = (0, None);
     let sample_median = (0, None);
     let pop_moment_stats = MomentStats {

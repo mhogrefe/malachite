@@ -260,6 +260,7 @@ where
         .collect()
 }
 
+pub mod bit_distributor;
 /// This module contains functions that compare adjacent iterator elements.
 pub mod comparison;
 /// This module defines `IteratorCache`, which remembers values produced by an iterator.

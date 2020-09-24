@@ -1,11 +1,3 @@
-use std::fmt::{Debug, Display, LowerExp, UpperExp};
-use std::iter::{Product, Sum};
-use std::num::FpCategory;
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
-};
-use std::str::FromStr;
-
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{ModPowerOfTwo, ModPowerOfTwoNeg, NegAssign, PowerOfTwo};
@@ -14,6 +6,13 @@ use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, ExactInto};
+use std::fmt::{Debug, Display, LowerExp, UpperExp};
+use std::iter::{Product, Sum};
+use std::num::FpCategory;
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign,
+};
+use std::str::FromStr;
 
 //TODO docs
 pub trait PrimitiveFloat:
@@ -253,13 +252,13 @@ macro_rules! float_traits {
     };
 }
 
-float_traits!(f32, u32, 1.0e-45, 1.175_494_2e-38, 1.175_494_4e-38);
+float_traits!(f32, u32, 1.0e-45, 1.1754942e-38, 1.1754944e-38);
 float_traits!(
     f64,
     u64,
     5.0e-324,
-    2.225_073_858_507_201e-308,
-    2.225_073_858_507_201_4e-308
+    2.225073858507201e-308,
+    2.2250738585072014e-308
 );
 
 pub fn increment_float<T: PrimitiveFloat>(f: &mut T) {
@@ -283,7 +282,7 @@ pub fn decrement_float<T: PrimitiveFloat>(f: &mut T) {
 }
 
 /// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
-macro_rules! impl01_float {
+macro_rules! impl01float {
     ($t:ty) => {
         /// The constant 0.0 for primitive floating-point types.
         ///
@@ -323,5 +322,5 @@ macro_rules! impl01_float {
     };
 }
 
-impl01_float!(f32);
-impl01_float!(f64);
+impl01float!(f32);
+impl01float!(f64);

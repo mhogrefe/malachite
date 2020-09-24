@@ -32,6 +32,7 @@ use malachite_base::num::logic::traits::{
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
@@ -117,9 +118,9 @@ use rust_wheels::iterators::tuples::{
     random_sextuples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
-    exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
-    exhaustive_vecs_shortlex, random_vecs, random_vecs_min_length, special_random_bool_vecs,
-    special_random_unsigned_vecs, special_random_unsigned_vecs_min_length,
+    exhaustive_vecs, exhaustive_vecs_min_length, exhaustive_vecs_shortlex, random_vecs,
+    random_vecs_min_length, special_random_bool_vecs, special_random_unsigned_vecs,
+    special_random_unsigned_vecs_min_length,
 };
 
 use common::{GenerationMode, NoSpecialGenerationMode};
@@ -7418,7 +7419,10 @@ pub fn pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => {
             let f = |n: &T| {
-                exhaustive_fixed_size_vecs_from_single(n.significant_bits(), exhaustive_bools())
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::wrapping_from(n.significant_bits()),
+                    exhaustive_bools(),
+                )
             };
             Box::new(dependent_pairs(exhaustive_unsigneds(), f))
         }
@@ -7456,10 +7460,7 @@ where
     match gm {
         GenerationMode::Exhaustive => {
             let f = |n: &T| {
-                exhaustive_fixed_size_vecs_from_single(
-                    u64::wrapping_from(n.to_bits_asc().len()),
-                    exhaustive_bools(),
-                )
+                exhaustive_fixed_length_vecs_from_single(n.to_bits_asc().len(), exhaustive_bools())
             };
             Box::new(dependent_pairs(exhaustive_signeds(), f))
         }
@@ -7537,9 +7538,9 @@ pub fn triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
     match gm {
         GenerationMode::Exhaustive => {
             let f = |&(u, log_base): &(T, u64)| {
-                exhaustive_fixed_size_vecs_from_single(
-                    u.significant_bits()
-                        .div_round(log_base, RoundingMode::Ceiling),
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::wrapping_from(u.significant_bits())
+                        .div_round(usize::wrapping_from(log_base), RoundingMode::Ceiling),
                     exhaustive_bools(),
                 )
             };

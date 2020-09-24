@@ -9,7 +9,7 @@ use malachite_base::rounding_modes::RoundingMode::{Ceiling, Down, Exact, Floor, 
 fn test_random_rounding_modes() {
     let xs = random_rounding_modes(EXAMPLE_SEED);
     let values = xs.clone().take(20).collect::<Vec<_>>();
-    let common_values = common_values_map(1_000_000, 10, xs.clone());
+    let common_values = common_values_map(1000000, 10, xs.clone());
     assert_eq!(
         (values.as_slice(), common_values.as_slice()),
         (

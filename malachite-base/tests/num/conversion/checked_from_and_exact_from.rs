@@ -14,7 +14,7 @@ pub fn test_checked_from() {
     };
     test_single(0u8);
     test_single(5u64);
-    test_single(1_000u32);
+    test_single(1000u32);
     test_single(123u8);
     test_single(-123i16);
     test_single(i64::MIN);
@@ -24,7 +24,7 @@ pub fn test_checked_from() {
         assert_eq!(U::checked_from(n_in), n_out);
     };
     test_double(0u8, Some(0u16));
-    test_double(1_000u16, Some(1_000i32));
+    test_double(1000u16, Some(1000i32));
     test_double(-5i16, Some(-5i8));
     test_double(255u8, Some(255u64));
 
@@ -34,7 +34,7 @@ pub fn test_checked_from() {
     test_double::<_, u16>(i32::MIN, None);
     test_double::<_, i16>(i32::MIN, None);
     test_double::<_, u32>(-5i32, None);
-    test_double::<_, i32>(3_000_000_000u32, None);
+    test_double::<_, i32>(3000000000u32, None);
     test_double::<_, i8>(-1000i16, None);
 }
 
@@ -45,7 +45,7 @@ pub fn test_exact_from() {
     };
     test_single(0u8);
     test_single(5u64);
-    test_single(1_000u32);
+    test_single(1000u32);
     test_single(123u8);
     test_single(-123i16);
     test_single(i64::MIN);
@@ -55,7 +55,7 @@ pub fn test_exact_from() {
         assert_eq!(U::exact_from(n_in), n_out);
     };
     test_double(0u8, 0u16);
-    test_double(1_000u16, 1_000i32);
+    test_double(1000u16, 1000i32);
     test_double(-5i16, -5i8);
     test_double(255u8, 255u64);
 }
@@ -99,7 +99,7 @@ fn exact_from_fail_6() {
 #[test]
 #[should_panic]
 fn exact_from_fail_7() {
-    i32::exact_from(3_000_000_000u32);
+    i32::exact_from(3000000000u32);
 }
 
 #[test]

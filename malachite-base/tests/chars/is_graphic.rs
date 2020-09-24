@@ -26,7 +26,7 @@ fn test_is_graphic() {
     );
     assert_eq!(
         chars_increasing().filter(|&c| char_is_graphic(c)).count(),
-        141_798
+        141798
     );
     assert_eq!(
         matching_intervals_in_iterator(chars_increasing(), |&c| char_is_graphic(c))

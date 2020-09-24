@@ -16,8 +16,8 @@ macro_rules! impl_wrapping_square {
             /// use malachite_base::num::arithmetic::traits::WrappingSquare;
             ///
             /// assert_eq!(3u8.wrapping_square(), 9);
-            /// assert_eq!((-1_000i32).wrapping_square(), 1_000_000);
-            /// assert_eq!(1_000u16.wrapping_square(), 16_960);
+            /// assert_eq!((-1000i32).wrapping_square(), 1000000);
+            /// assert_eq!(1000u16.wrapping_square(), 16960);
             /// ```
             #[inline]
             fn wrapping_square(self) -> $t {
@@ -40,13 +40,13 @@ macro_rules! impl_wrapping_square {
             /// x.wrapping_square_assign();
             /// assert_eq!(x, 9);
             ///
-            /// let mut x = -1_000i32;
+            /// let mut x = -1000i32;
             /// x.wrapping_square_assign();
-            /// assert_eq!(x, 1_000_000);
+            /// assert_eq!(x, 1000000);
             ///
-            /// let mut x = 1_000u16;
+            /// let mut x = 1000u16;
             /// x.wrapping_square_assign();
-            /// assert_eq!(x, 16_960);
+            /// assert_eq!(x, 16960);
             /// ```
             #[inline]
             fn wrapping_square_assign(&mut self) {

@@ -76,6 +76,7 @@ pub mod chars {
     }
 }
 pub mod iterators {
+    pub mod bit_distributor;
     pub mod comparison {
         pub mod delta_directions;
         pub mod is_strictly_ascending;

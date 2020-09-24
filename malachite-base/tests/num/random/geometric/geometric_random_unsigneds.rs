@@ -133,8 +133,8 @@ fn test_geometric_random_unsigneds() {
         excess_kurtosis: NiceFloat(6.469904862333731),
     };
     geometric_random_unsigneds_helper::<u64>(
-        12_345,
-        10_000,
+        12345,
+        10000,
         values,
         common_values,
         pop_median,

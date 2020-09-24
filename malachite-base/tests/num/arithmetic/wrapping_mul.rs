@@ -9,9 +9,9 @@ fn test_wrapping_mul() {
         x.wrapping_mul_assign(y);
         assert_eq!(x, out);
     };
-    test::<u16>(123, 456, 56_088);
+    test::<u16>(123, 456, 56088);
     test::<u8>(123, 200, 24);
-    test::<i16>(123, -45, -5_535);
+    test::<i16>(123, -45, -5535);
     test::<i8>(123, 45, -97);
     test::<i8>(-123, 45, 97);
 }

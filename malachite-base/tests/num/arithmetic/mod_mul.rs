@@ -24,16 +24,16 @@ fn test_limbs_invert_limb_u32() {
         assert_eq!(_limbs_invert_limb_u32(x), out);
         assert_eq!(limbs_invert_limb_naive::<u32, u64>(x), out);
     };
-    test(0x8000_0000, u32::MAX);
-    test(0x8000_0001, 0xffff_fffc);
+    test(0x80000000, u32::MAX);
+    test(0x80000001, 0xfffffffc);
     test(u32::MAX - 1, 2);
     test(u32::MAX, 1);
-    test(0x89ab_cdef, 0xdc08_767e);
+    test(0x89abcdef, 0xdc08767e);
 }
 
 #[test]
 #[should_panic]
-fn limbs_invert_limb_u32_fail() {
+fn limbs_invert_limb_u32fail() {
     _limbs_invert_limb_u32(123);
 }
 
@@ -43,16 +43,16 @@ fn test_limbs_invert_limb_u64() {
         assert_eq!(_limbs_invert_limb_u64(x), out);
         assert_eq!(limbs_invert_limb_naive::<u64, u128>(x), out);
     };
-    test(0x8000_0000_0000_0000, u64::MAX);
-    test(0x8000_0000_0000_0001, 0xffff_ffff_ffff_fffc);
-    test(0xffff_ffff_ffff_fffe, 2);
+    test(0x8000000000000000, u64::MAX);
+    test(0x8000000000000001, 0xfffffffffffffffc);
+    test(0xfffffffffffffffe, 2);
     test(u64::MAX, 1);
-    test(0x89ab_cdef_edcb_a987, 0xdc08_767b_33d7_ec8f);
+    test(0x89abcdefedcba987, 0xdc08767b33d7ec8f);
 }
 
 #[test]
 #[should_panic]
-fn limbs_invert_limb_u64_fail() {
+fn limbs_invert_limb_u64fail() {
     _limbs_invert_limb_u64(123);
 }
 

@@ -11,8 +11,8 @@ use malachite_base::random::EXAMPLE_SEED;
 fn test_random_orderings() {
     let xs = random_orderings(EXAMPLE_SEED);
     let values = xs.clone().take(20).collect::<Vec<_>>();
-    let common_values = common_values_map_debug(1_000_000, 10, xs.clone());
-    let median = median(xs.take(1_000_000));
+    let common_values = common_values_map_debug(1000000, 10, xs.clone());
+    let median = median(xs.take(1000000));
     assert_eq!(
         (values.as_slice(), common_values.as_slice(), median),
         (

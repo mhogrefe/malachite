@@ -16,7 +16,7 @@ macro_rules! impl_square {
             /// use malachite_base::num::arithmetic::traits::Square;
             ///
             /// assert_eq!(3u8.square(), 9);
-            /// assert_eq!((-1_000i32).square(), 1_000_000);
+            /// assert_eq!((-1000i32).square(), 1000000);
             /// ```
             #[inline]
             fn square(self) -> $t {
@@ -39,9 +39,9 @@ macro_rules! impl_square {
             /// x.square_assign();
             /// assert_eq!(x, 9);
             ///
-            /// let mut x = -1_000i32;
+            /// let mut x = -1000i32;
             /// x.square_assign();
-            /// assert_eq!(x, 1_000_000);
+            /// assert_eq!(x, 1000000);
             /// ```
             #[inline]
             fn square_assign(&mut self) {

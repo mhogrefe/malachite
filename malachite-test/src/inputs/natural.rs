@@ -20,6 +20,7 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
@@ -55,9 +56,7 @@ use rust_wheels::iterators::tuples::{
     lex_pairs, lex_triples, log_pairs, random_pairs, random_pairs_from_single, random_quadruples,
     random_quadruples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
-use rust_wheels::iterators::vecs::{
-    exhaustive_fixed_size_vecs_from_single, exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs,
-};
+use rust_wheels::iterators::vecs::{exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs};
 
 use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, RandomValueAndVecOfBool};
@@ -1528,7 +1527,10 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Natural| {
-                exhaustive_fixed_size_vecs_from_single(n.limb_count(), exhaustive_bools())
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::exact_from(n.limb_count()),
+                    exhaustive_bools(),
+                )
             };
             Box::new(dependent_pairs(exhaustive_naturals(), f))
         }
@@ -1568,7 +1570,10 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Natural
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Natural| {
-                exhaustive_fixed_size_vecs_from_single(n.significant_bits(), exhaustive_bools())
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::exact_from(n.significant_bits()),
+                    exhaustive_bools(),
+                )
             };
             Box::new(dependent_pairs(exhaustive_naturals(), f))
         }
@@ -1819,9 +1824,11 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |(n, log_base): &(Natural, u64)| {
-                exhaustive_fixed_size_vecs_from_single(
-                    n.significant_bits()
-                        .div_round(*log_base, RoundingMode::Ceiling),
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::exact_from(
+                        n.significant_bits()
+                            .div_round(*log_base, RoundingMode::Ceiling),
+                    ),
                     exhaustive_bools(),
                 )
             };
@@ -1881,9 +1888,11 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |(n, log_base): &(Natural, u64)| {
-                exhaustive_fixed_size_vecs_from_single(
-                    n.significant_bits()
-                        .div_round(*log_base, RoundingMode::Ceiling),
+                exhaustive_fixed_length_vecs_from_single(
+                    usize::exact_from(
+                        n.significant_bits()
+                            .div_round(*log_base, RoundingMode::Ceiling),
+                    ),
                     exhaustive_bools(),
                 )
             };

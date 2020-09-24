@@ -3,6 +3,7 @@
 /// After wrapping an iterator with an `IteratorCache`, you can retrieve a reference to the $n$th
 /// element of an iterator, and then retrieve a reference to the $m$th element in constant time for
 /// any $m \leq n$.
+#[derive(Clone, Debug)]
 pub struct IteratorCache<I: Iterator> {
     xs: I,
     cache: Vec<I::Item>,
