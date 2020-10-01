@@ -101,5 +101,27 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
     RandomValuesFromVec { xs, indices }
 }
 
+/// This module contains iterators that generate `Vec`s without repetition.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # exhaustive_length_[n]_vecs
+/// ```
+/// use malachite_base::vecs::exhaustive::exhaustive_length_2_vecs;
+///
+/// let xss = exhaustive_length_2_vecs(
+///     ['a', 'b', 'c'].iter().cloned(),
+///     ['x', 'y', 'z'].iter().cloned()
+/// )
+///     .take(20)
+///     .collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['a', 'x'], &['a', 'y'], &['b', 'x'], &['b', 'y'], &['a', 'z'], &['b', 'z'],
+///         &['c', 'x'], &['c', 'y'], &['c', 'z']
+///     ]
+/// );
+/// ```
 pub mod exhaustive;
 pub mod from_str;

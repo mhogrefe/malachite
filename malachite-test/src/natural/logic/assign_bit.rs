@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{
@@ -32,7 +32,7 @@ fn benchmark_natural_assign_bit_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.assign_bit(u64, bool)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_natural_small_u64_and_bool(gm),
@@ -43,7 +43,7 @@ fn benchmark_natural_assign_bit_library_comparison(
         "index",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (mut n, index, bit))| n.assign_bit(index, bit)),
             ),
             (

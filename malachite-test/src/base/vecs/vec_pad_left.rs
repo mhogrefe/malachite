@@ -1,5 +1,5 @@
 use malachite_base::vecs::vec_pad_left;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::platform::Limb;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -24,7 +24,7 @@ fn demo_vec_pad_left(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_vec_pad_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "vec_pad_left(&mut Vec<u32>, usize, u32)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_usize_and_unsigned::<Limb>(gm),
@@ -34,7 +34,7 @@ fn benchmark_vec_pad_left(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref xs, _, _)| xs.len()),
         "xs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, pad_size, pad_value)| vec_pad_left(&mut xs, pad_size, pad_value)),
         )],
     );

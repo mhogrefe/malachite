@@ -68,7 +68,7 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
 ///
 /// assert!(!limbs_divisible_by(&mut [1, 2, 3], &mut [4, 5]));
 /// assert!(
-///     limbs_divisible_by(&mut [10_200, 20_402, 30_605, 20_402, 10_200], &mut [100, 101, 102])
+///     limbs_divisible_by(&mut [10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102])
 /// );
 /// ```
 ///
@@ -176,7 +176,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 ///
 /// assert!(!limbs_divisible_by_val_ref(&mut [1, 2, 3], &[4, 5]));
 /// assert!(
-///     limbs_divisible_by_val_ref(&mut [10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102])
+///     limbs_divisible_by_val_ref(&mut [10200, 20402, 30605, 20402, 10200], &[100, 101, 102])
 /// );
 /// ```
 ///
@@ -287,7 +287,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 ///
 /// assert!(!limbs_divisible_by_ref_val(&[1, 2, 3], &mut [4, 5]));
 /// assert!(
-///     limbs_divisible_by_ref_val(&[10_200, 20_402, 30_605, 20_402, 10_200], &mut [100, 101, 102])
+///     limbs_divisible_by_ref_val(&[10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102])
 /// );
 /// ```
 ///
@@ -394,7 +394,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 ///
 /// assert!(!limbs_divisible_by_ref_ref(&[1, 2, 3], &[4, 5]));
 /// assert!(
-///     limbs_divisible_by_ref_ref(&[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102])
+///     limbs_divisible_by_ref_ref(&[10200, 20402, 30605, 20402, 10200], &[100, 101, 102])
 /// );
 /// ```
 ///

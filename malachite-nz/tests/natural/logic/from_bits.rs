@@ -35,7 +35,7 @@ fn test_limbs_asc_from_bits_asc() {
                 false, false, true, false, true, false, true, true, false, false, false, true,
                 false, true, true, true,
             ],
-            vec![3_567_587_328, 232],
+            vec![3567587328, 232],
         );
         test(
             &[
@@ -44,7 +44,7 @@ fn test_limbs_asc_from_bits_asc() {
                 false, false, true, false, true, false, true, true, false, false, false, true,
                 false, true, true, true, false,
             ],
-            vec![3_567_587_328, 232],
+            vec![3567587328, 232],
         );
     }
     #[cfg(not(feature = "32_bit_limbs"))]
@@ -56,7 +56,7 @@ fn test_limbs_asc_from_bits_asc() {
                 false, false, true, false, true, false, true, true, false, false, false, true,
                 false, true, true, true,
             ],
-            vec![1_000_000_000_000],
+            vec![1000000000000],
         );
         test(
             &[
@@ -65,7 +65,7 @@ fn test_limbs_asc_from_bits_asc() {
                 false, false, true, false, true, false, true, true, false, false, false, true,
                 false, true, true, true, false,
             ],
-            vec![1_000_000_000_000],
+            vec![1000000000000],
         );
     }
 }
@@ -100,7 +100,7 @@ fn test_limbs_asc_from_bits_desc() {
                 false, false, true, false, false, false, false, false, false, false, false, false,
                 false, false, false,
             ],
-            vec![3_567_587_328, 232],
+            vec![3567587328, 232],
         );
         test(
             &[
@@ -109,7 +109,7 @@ fn test_limbs_asc_from_bits_desc() {
                 false, false, false, true, false, false, false, false, false, false, false, false,
                 false, false, false, false,
             ],
-            vec![3_567_587_328, 232],
+            vec![3567587328, 232],
         );
     }
     #[cfg(not(feature = "32_bit_limbs"))]
@@ -121,7 +121,7 @@ fn test_limbs_asc_from_bits_desc() {
                 false, false, true, false, false, false, false, false, false, false, false, false,
                 false, false, false,
             ],
-            vec![1_000_000_000_000],
+            vec![1000000000000],
         );
         test(
             &[
@@ -130,7 +130,7 @@ fn test_limbs_asc_from_bits_desc() {
                 false, false, false, true, false, false, false, false, false, false, false, false,
                 false, false, false, false,
             ],
-            vec![1_000_000_000_000],
+            vec![1000000000000],
         );
     }
 }

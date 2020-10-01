@@ -240,6 +240,18 @@ pub fn unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T>
     Box::new(unsigneds(gm).filter(|&x| x <= T::power_of_two(T::WIDTH - 1)))
 }
 
+// All `u64`s less than `T::WIDTH`.
+pub fn unsigneds_var_3<T: PrimitiveInt>(gm: NoSpecialGenerationMode) -> It<u64> {
+    match gm {
+        NoSpecialGenerationMode::Exhaustive => {
+            Box::new(primitive_int_increasing_range(0, T::WIDTH))
+        }
+        NoSpecialGenerationMode::Random(_) => {
+            Box::new(random_range::<u64>(&EXAMPLE_SEED, 0, T::WIDTH))
+        }
+    }
+}
+
 // All signed `T`s that are not 0 or -1.
 pub fn signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
 where
@@ -930,6 +942,38 @@ pub fn triples_of_unsigned_unsigned_and_unsigned<
     }
 }
 
+pub fn triples_of_unsigned_signed_and_unsigned<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveSigned + Rand,
+    V: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, V)>
+where
+    U::UnsignedOfEqualWidth: Rand,
+    U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_unsigneds(),
+            exhaustive_signeds(),
+            exhaustive_unsigneds(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_signed(seed)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
 pub fn quadruples_of_four_unsigneds<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -973,6 +1017,21 @@ pub fn triples_of_unsigned_unsigned_and_unsigned_var_1<
     Box::new(triples_of_unsigned_unsigned_and_unsigned(gm).filter(|&(x, _, m)| x < m))
 }
 
+// All triples of `T`, `U`, and `T`, where `T` is unsigned, `U` is signed, and the first `T`s is
+// smaller than the second.
+pub fn triples_of_unsigned_signed_and_unsigned_var_1<
+    T: PrimitiveUnsigned + Rand,
+    U: PrimitiveSigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U, T)>
+where
+    U::UnsignedOfEqualWidth: Rand,
+    U: WrappingFrom<<U as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    Box::new(triples_of_unsigned_signed_and_unsigned(gm).filter(|&(x, _, m)| x < m))
+}
+
 pub fn pairs_of_unsigned_and_positive_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -992,6 +1051,34 @@ pub fn pairs_of_unsigned_and_positive_unsigned<
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
+            &(|seed| special_random_positive_unsigned(seed)),
+        )),
+    }
+}
+
+pub fn pairs_of_signed_and_positive_unsigned<
+    T: PrimitiveSigned + Rand,
+    U: PrimitiveUnsigned + Rand,
+>(
+    gm: GenerationMode,
+) -> It<(T, U)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_signeds(),
+            exhaustive_positive_primitive_ints(),
+        )),
+        GenerationMode::Random(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random(seed)),
+            &(|seed| random_positive_unsigned(seed)),
+        )),
+        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_signed(seed)),
             &(|seed| special_random_positive_unsigned(seed)),
         )),
     }

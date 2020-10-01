@@ -33,15 +33,15 @@ use platform::{DoubleLimb, Limb};
 ///
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul(&mut vec![100, 101, 102], &mut vec![102, 101, 100], 90),
-///     &[10_200, 20_402, 30_605]
+///     &[10200, 20402, 30605]
 /// );
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul(&mut vec![100, 101, 102], &mut vec![102, 101, 100], 140),
-///     &[10_200, 20_402, 30_605, 20_402, 2_008]
+///     &[10200, 20402, 30605, 20402, 2008]
 /// );
 /// assert_eq!(
-///     limbs_mod_power_of_two_mul(&mut vec![100, 101, 102], &mut vec![102, 101, 100], 1_000),
-///     &[10_200, 20_402, 30_605, 20_402, 10_200, 0]
+///     limbs_mod_power_of_two_mul(&mut vec![100, 101, 102], &mut vec![102, 101, 100], 1000),
+///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
@@ -92,15 +92,15 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
 ///
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul_val_ref(&mut vec![100, 101, 102], &[102, 101, 100], 90),
-///     &[10_200, 20_402, 30_605]
+///     &[10200, 20402, 30605]
 /// );
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul_val_ref(&mut vec![100, 101, 102], &[102, 101, 100], 140),
-///     &[10_200, 20_402, 30_605, 20_402, 2_008]
+///     &[10200, 20402, 30605, 20402, 2008]
 /// );
 /// assert_eq!(
-///     limbs_mod_power_of_two_mul_val_ref(&mut vec![100, 101, 102], &[102, 101, 100], 1_000),
-///     &[10_200, 20_402, 30_605, 20_402, 10_200, 0]
+///     limbs_mod_power_of_two_mul_val_ref(&mut vec![100, 101, 102], &[102, 101, 100], 1000),
+///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) -> Vec<Limb> {
@@ -155,15 +155,15 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
 ///
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul_ref_ref(&[100, 101, 102], &[102, 101, 100], 90),
-///     &[10_200, 20_402, 30_605]
+///     &[10200, 20402, 30605]
 /// );
 /// assert_eq!(
 ///     limbs_mod_power_of_two_mul_ref_ref(&[100, 101, 102], &[102, 101, 100], 140),
-///     &[10_200, 20_402, 30_605, 20_402, 2_008]
+///     &[10200, 20402, 30605, 20402, 2008]
 /// );
 /// assert_eq!(
-///     limbs_mod_power_of_two_mul_ref_ref(&[100, 101, 102], &[102, 101, 100], 1_000),
-///     &[10_200, 20_402, 30_605, 20_402, 10_200, 0]
+///     limbs_mod_power_of_two_mul_ref_ref(&[100, 101, 102], &[102, 101, 100], 1000),
+///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {

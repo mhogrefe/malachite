@@ -51,8 +51,8 @@ fn test_partial_cmp_u64() {
     test("123", 124, Some(Ordering::Less));
     test("123", 122, Some(Ordering::Greater));
     test("1000000000000", 123, Some(Ordering::Greater));
-    test("1000000000000", 1_000_000_000_000, Some(Ordering::Equal));
-    test("1000000000000", 1_000_000_000_001, Some(Ordering::Less));
+    test("1000000000000", 1000000000000, Some(Ordering::Equal));
+    test("1000000000000", 1000000000001, Some(Ordering::Less));
 }
 
 #[test]
@@ -101,8 +101,8 @@ fn test_partial_cmp_i64() {
     test("123", -122, Some(Ordering::Greater));
     test("1000000000000", 123, Some(Ordering::Greater));
     test("1000000000000", -123, Some(Ordering::Greater));
-    test("1000000000000", 1_000_000_000_000, Some(Ordering::Equal));
-    test("1000000000000", -1_000_000_000_000, Some(Ordering::Greater));
-    test("1000000000000", 1_000_000_000_001, Some(Ordering::Less));
-    test("1000000000000", -1_000_000_000_001, Some(Ordering::Greater));
+    test("1000000000000", 1000000000000, Some(Ordering::Equal));
+    test("1000000000000", -1000000000000, Some(Ordering::Greater));
+    test("1000000000000", 1000000000001, Some(Ordering::Less));
+    test("1000000000000", -1000000000001, Some(Ordering::Greater));
 }

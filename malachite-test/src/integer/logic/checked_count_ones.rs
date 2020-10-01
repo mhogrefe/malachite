@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz_test_util::integer::logic::checked_count_ones::{
     integer_checked_count_ones_alt_1, integer_checked_count_ones_alt_2,
 };
@@ -28,7 +28,7 @@ fn benchmark_integer_checked_count_ones_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.checked_count_ones()",
         BenchmarkType::Algorithms,
         integers(gm),

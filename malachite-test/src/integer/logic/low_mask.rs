@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
@@ -18,7 +18,7 @@ fn demo_integer_low_mask(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_low_mask(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer.low_mask(u64)"),
         BenchmarkType::Single,
         small_unsigneds(gm),
@@ -27,6 +27,6 @@ fn benchmark_integer_low_mask(gm: NoSpecialGenerationMode, limit: usize, file_na
         file_name,
         &(|&bits| usize::exact_from(bits)),
         "bits",
-        &mut [("malachite", &mut (|bits| no_out!(Integer::low_mask(bits))))],
+        &mut [("Malachite", &mut (|bits| no_out!(Integer::low_mask(bits))))],
     );
 }

@@ -40,7 +40,10 @@ pub mod arithmetic {
     pub mod mod_power_of_two_pow;
     pub mod mod_power_of_two_shl;
     pub mod mod_power_of_two_shr;
+    pub mod mod_power_of_two_square;
     pub mod mod_power_of_two_sub;
+    pub mod mod_shl;
+    pub mod mod_shr;
     pub mod mod_sub;
     pub mod neg;
     pub mod next_power_of_two;

@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -34,7 +34,7 @@ fn benchmark_integer_from_natural_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from(Natural)",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),

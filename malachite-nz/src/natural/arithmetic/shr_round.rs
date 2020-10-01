@@ -30,11 +30,11 @@ use platform::Limb;
 /// assert_eq!(limbs_shr_round_up(&[3], 1), &[2]);
 /// assert_eq!(limbs_shr_round_up(&[122, 456], 1), &[61, 228]);
 /// assert_eq!(limbs_shr_round_up(&[123, 456], 1), &[62, 228]);
-/// assert_eq!(limbs_shr_round_up(&[123, 455], 1), &[2_147_483_710, 227]);
+/// assert_eq!(limbs_shr_round_up(&[123, 455], 1), &[2147483710, 227]);
 /// assert_eq!(limbs_shr_round_up(&[123, 456], 31), &[913, 0]);
 /// assert_eq!(limbs_shr_round_up(&[123, 456], 32), &[457]);
 /// assert_eq!(limbs_shr_round_up(&[123, 456], 100), &[1]);
-/// assert_eq!(limbs_shr_round_up(&[256, 456], 8), &[3_355_443_201, 1]);
+/// assert_eq!(limbs_shr_round_up(&[256, 456], 8), &[3355443201, 1]);
 /// assert_eq!(limbs_shr_round_up(&[u32::MAX, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_up(&[u32::MAX, u32::MAX], 32), &[0, 1]);
 /// ```
@@ -96,11 +96,11 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_round_nearest(&[3], 1), &[2]);
 /// assert_eq!(limbs_shr_round_nearest(&[122, 456], 1), &[61, 228]);
 /// assert_eq!(limbs_shr_round_nearest(&[123, 456], 1), &[62, 228]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 455], 1), &[2_147_483_710, 227]);
+/// assert_eq!(limbs_shr_round_nearest(&[123, 455], 1), &[2147483710, 227]);
 /// assert_eq!(limbs_shr_round_nearest(&[123, 456], 31), &[912, 0]);
 /// assert_eq!(limbs_shr_round_nearest(&[123, 456], 32), &[456]);
 /// assert_eq!(limbs_shr_round_nearest(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_shr_round_nearest(&[256, 456], 8), &[3_355_443_201, 1]);
+/// assert_eq!(limbs_shr_round_nearest(&[256, 456], 8), &[3355443201, 1]);
 /// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, u32::MAX], 32), &[0, 1]);
 /// ```
@@ -138,7 +138,7 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_exact(&[123, 456], 31), None);
 /// assert_eq!(limbs_shr_exact(&[123, 456], 32), None);
 /// assert_eq!(limbs_shr_exact(&[123, 456], 100), None);
-/// assert_eq!(limbs_shr_exact(&[256, 456], 8), Some(vec![3_355_443_201, 1]));
+/// assert_eq!(limbs_shr_exact(&[256, 456], 8), Some(vec![3355443201, 1]));
 /// assert_eq!(limbs_shr_exact(&[u32::MAX, 1], 1), None);
 /// assert_eq!(limbs_shr_exact(&[u32::MAX, u32::MAX], 32), None);
 /// ```
@@ -173,11 +173,11 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 /// assert_eq!(limbs_shr_round(&[122, 456], 1, RoundingMode::Floor), Some(vec![61, 228]));
 /// assert_eq!(limbs_shr_round(&[123, 456], 1, RoundingMode::Floor), Some(vec![61, 228]));
 /// assert_eq!(limbs_shr_round(&[123, 455], 1, RoundingMode::Floor),
-///     Some(vec![2_147_483_709, 227]));
+///     Some(vec![2147483709, 227]));
 /// assert_eq!(limbs_shr_round(&[123, 456], 31, RoundingMode::Ceiling), Some(vec![913, 0]));
 /// assert_eq!(limbs_shr_round(&[123, 456], 32, RoundingMode::Up), Some(vec![457]));
 /// assert_eq!(limbs_shr_round(&[123, 456], 100, RoundingMode::Down), Some(vec![]));
-/// assert_eq!(limbs_shr_round(&[256, 456], 8, RoundingMode::Exact), Some(vec![3_355_443_201, 1]));
+/// assert_eq!(limbs_shr_round(&[256, 456], 8, RoundingMode::Exact), Some(vec![3355443201, 1]));
 /// assert_eq!(limbs_shr_round(&[u32::MAX, 1], 1, RoundingMode::Exact), None);
 /// assert_eq!(limbs_shr_round(&[u32::MAX, u32::MAX], 32, RoundingMode::Down),
 ///     Some(vec![u32::MAX]));
@@ -223,7 +223,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 ///
 /// let mut xs = vec![123, 455];
 /// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2_147_483_710, 227]);
+/// assert_eq!(xs, &[2147483710, 227]);
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_shr_round_up_in_place(&mut xs, 31);
@@ -239,7 +239,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 ///
 /// let mut xs = vec![256, 456];
 /// limbs_vec_shr_round_up_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3_355_443_201, 1]);
+/// assert_eq!(xs, &[3355443201, 1]);
 ///
 /// let mut xs = vec![u32::MAX, 1];
 /// limbs_vec_shr_round_up_in_place(&mut xs, 1);
@@ -319,7 +319,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 ///
 /// let mut xs = vec![123, 455];
 /// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2_147_483_710, 227]);
+/// assert_eq!(xs, &[2147483710, 227]);
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_shr_round_nearest_in_place(&mut xs, 31);
@@ -335,7 +335,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 ///
 /// let mut xs = vec![256, 456];
 /// limbs_vec_shr_round_nearest_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3_355_443_201, 1]);
+/// assert_eq!(xs, &[3355443201, 1]);
 ///
 /// let mut xs = vec![u32::MAX, 1];
 /// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
@@ -398,7 +398,7 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 ///
 /// let mut xs = vec![256, 456];
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 8), true);
-/// assert_eq!(xs, &[3_355_443_201, 1]);
+/// assert_eq!(xs, &[3355443201, 1]);
 ///
 /// let mut xs = vec![u32::MAX, 1];
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
@@ -453,7 +453,7 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 ///
 /// let mut xs = vec![123, 455];
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Floor), true);
-/// assert_eq!(xs, &[2_147_483_709, 227]);
+/// assert_eq!(xs, &[2147483709, 227]);
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 31, RoundingMode::Ceiling), true);
@@ -469,7 +469,7 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 ///
 /// let mut xs = vec![256, 456];
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 8, RoundingMode::Exact), true);
-/// assert_eq!(xs, vec![3_355_443_201, 1]);
+/// assert_eq!(xs, vec![3355443201, 1]);
 ///
 /// let mut xs = vec![u32::MAX, 1];
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Exact), false);

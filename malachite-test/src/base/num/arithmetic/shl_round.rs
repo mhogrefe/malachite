@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
@@ -246,7 +246,7 @@ macro_rules! shl_round_u_i {
         }
 
         fn $benchmark_shl_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.shl_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -256,14 +256,14 @@ macro_rules! shl_round_u_i {
                 &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
                 )],
             );
         }
 
         fn $benchmark_shl_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.shl_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -272,7 +272,7 @@ macro_rules! shl_round_u_i {
                 file_name,
                 &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
-                &mut [("malachite", &mut (|(x, y, rm)| no_out!(x.shl_round(y, rm))))],
+                &mut [("Malachite", &mut (|(x, y, rm)| no_out!(x.shl_round(y, rm))))],
             );
         }
     };
@@ -513,7 +513,7 @@ macro_rules! shl_round_i_i {
         }
 
         fn $benchmark_shl_round_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.shl_round_assign({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -523,14 +523,14 @@ macro_rules! shl_round_i_i {
                 &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
                 )],
             );
         }
 
         fn $benchmark_shl_round(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.shl_round({}, RoundingMode)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_signed_small_signed_and_rounding_mode_var_2::<$t, $u>(gm),
@@ -539,7 +539,7 @@ macro_rules! shl_round_i_i {
                 file_name,
                 &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
-                &mut [("malachite", &mut (|(x, y, rm)| no_out!(x.shl_round(y, rm))))],
+                &mut [("Malachite", &mut (|(x, y, rm)| no_out!(x.shl_round(y, rm))))],
             );
         }
     };

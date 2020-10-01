@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{pairs_of_integer_and_natural, pairs_of_natural_and_integer};
@@ -76,7 +76,7 @@ fn demo_natural_ge_abs_integer(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_lt_abs_natural(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.lt_abs(&Natural)",
         BenchmarkType::Single,
         pairs_of_integer_and_natural(gm),
@@ -85,12 +85,12 @@ fn benchmark_integer_lt_abs_natural(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
 fn benchmark_natural_lt_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.lt_abs(&Integer)",
         BenchmarkType::Single,
         pairs_of_natural_and_integer(gm),
@@ -99,12 +99,12 @@ fn benchmark_natural_lt_abs_integer(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
 fn benchmark_integer_gt_abs_natural(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.gt_abs(&Natural)",
         BenchmarkType::Single,
         pairs_of_integer_and_natural(gm),
@@ -113,12 +113,12 @@ fn benchmark_integer_gt_abs_natural(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
 fn benchmark_natural_gt_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.gt_abs(&Integer)",
         BenchmarkType::Single,
         pairs_of_natural_and_integer(gm),
@@ -127,12 +127,12 @@ fn benchmark_natural_gt_abs_integer(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
 fn benchmark_integer_le_abs_natural(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.le_abs(&Natural)",
         BenchmarkType::Single,
         pairs_of_integer_and_natural(gm),
@@ -141,12 +141,12 @@ fn benchmark_integer_le_abs_natural(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
 fn benchmark_natural_le_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.le_abs(&Integer)",
         BenchmarkType::Single,
         pairs_of_natural_and_integer(gm),
@@ -155,12 +155,12 @@ fn benchmark_natural_le_abs_integer(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
 fn benchmark_integer_ge_abs_natural(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ge_abs(&Natural)",
         BenchmarkType::Single,
         pairs_of_integer_and_natural(gm),
@@ -169,12 +169,12 @@ fn benchmark_integer_ge_abs_natural(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 
 fn benchmark_natural_ge_abs_integer(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ge_abs(&Integer)",
         BenchmarkType::Single,
         pairs_of_natural_and_integer(gm),
@@ -183,6 +183,6 @@ fn benchmark_natural_ge_abs_integer(gm: GenerationMode, limit: usize, file_name:
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }

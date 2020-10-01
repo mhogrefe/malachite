@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -184,7 +184,7 @@ fn benchmark_mod_unsigned_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_op({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -208,7 +208,7 @@ fn benchmark_mod_signed_algorithms<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_op({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_signeds_var_2::<T>(gm),
@@ -229,7 +229,7 @@ fn benchmark_mod_assign_unsigned<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -238,7 +238,7 @@ fn benchmark_mod_assign_unsigned<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y)| no_out!(x.mod_assign(y))))],
+        &mut [("Malachite", &mut (|(mut x, y)| no_out!(x.mod_assign(y))))],
     );
 }
 
@@ -250,7 +250,7 @@ fn benchmark_mod_assign_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_nonzero_signed::<T, T>(gm),
@@ -259,7 +259,7 @@ fn benchmark_mod_assign_signed<T: PrimitiveSigned + Rand + SampleRange>(
         file_name,
         &(|&(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y)| no_out!(x.mod_assign(y))))],
+        &mut [("Malachite", &mut (|(mut x, y)| no_out!(x.mod_assign(y))))],
     );
 }
 
@@ -268,7 +268,7 @@ fn benchmark_neg_mod_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -295,7 +295,7 @@ fn benchmark_ceiling_mod_algorithms<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ceiling_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_signeds_var_2::<T>(gm),
@@ -322,7 +322,7 @@ fn benchmark_neg_mod_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.neg_mod_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -332,7 +332,7 @@ fn benchmark_neg_mod_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         &(|&(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y)| no_out!(x.neg_mod_assign(y))),
         )],
     );
@@ -346,7 +346,7 @@ fn benchmark_ceiling_mod_assign<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ceiling_mod_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_nonzero_signed::<T, T>(gm),
@@ -356,7 +356,7 @@ fn benchmark_ceiling_mod_assign<T: PrimitiveSigned + Rand + SampleRange>(
         &(|&(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y)| no_out!(x.ceiling_mod_assign(y))),
         )],
     );

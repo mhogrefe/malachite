@@ -30,9 +30,8 @@ macro_rules! natural_signed_single_arg_bench_with_trait {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&x| usize::exact_from(x.significant_bits())),
-                "x",
-                &mut [("malachite", &mut (|x| no_out!(Natural::$f(x))))],
+                &signed_bit_bucketer(),
+                &mut [("Malachite", &mut (|x| no_out!(Natural::$f(x))))],
             );
         }
     };

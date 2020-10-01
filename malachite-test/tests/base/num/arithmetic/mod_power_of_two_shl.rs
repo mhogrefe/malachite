@@ -10,7 +10,7 @@ use rand::Rand;
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
     pairs_of_signed_and_small_u64_var_1, pairs_of_unsigned_and_small_u64_var_2,
-    pairs_of_unsigned_and_small_u64_var_3, small_signeds, small_unsigneds,
+    pairs_of_unsigned_and_small_u64_var_3,
     triples_of_unsigned_small_signed_and_small_unsigned_var_1,
     triples_of_unsigned_small_unsigned_and_small_unsigned_var_3,
 };
@@ -43,10 +43,7 @@ where
     );
 
     test_properties_no_special(pairs_of_unsigned_and_small_u64_var_2::<T>, |&(n, pow)| {
-        assert_eq!(
-            n.mod_power_of_two_shl(U::ZERO, pow),
-            n.mod_power_of_two(pow)
-        );
+        assert_eq!(n.mod_power_of_two_shl(U::ZERO, pow), n);
     });
 
     test_properties(
@@ -55,10 +52,6 @@ where
             assert_eq!(T::ZERO.mod_power_of_two_shl(u, pow), T::ZERO);
         },
     );
-
-    test_properties_no_special(small_unsigneds::<U>, |&u| {
-        assert_eq!(T::ZERO.mod_power_of_two_shl(u, 0), T::ZERO);
-    });
 }
 
 fn mod_power_of_two_shl_unsigned_signed_helper<
@@ -95,22 +88,12 @@ where
         },
     );
 
-    test_properties(
-        pairs_of_unsigned_and_small_u64_var_3::<T, T>,
-        |&(n, pow)| {
-            assert_eq!(
-                n.mod_power_of_two_shl(U::ZERO, pow),
-                n.mod_power_of_two(pow)
-            );
-        },
-    );
+    test_properties_no_special(pairs_of_unsigned_and_small_u64_var_2::<T>, |&(n, pow)| {
+        assert_eq!(n.mod_power_of_two_shl(U::ZERO, pow), n);
+    });
 
     test_properties(pairs_of_signed_and_small_u64_var_1::<U, T>, |&(u, pow)| {
         assert_eq!(T::ZERO.mod_power_of_two_shl(u, pow), T::ZERO);
-    });
-
-    test_properties_no_special(small_signeds::<U>, |&u| {
-        assert_eq!(T::ZERO.mod_power_of_two_shl(u, 0), T::ZERO);
     });
 }
 

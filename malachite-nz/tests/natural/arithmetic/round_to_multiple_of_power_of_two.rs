@@ -67,7 +67,7 @@ fn test_limbs_round_to_multiple_of_power_of_two_up_in_place() {
     test(&[123, 456], 0, &[123, 456]);
     test(&[123, 456], 1, &[124, 456]);
     test(&[123, 455], 1, &[124, 455]);
-    test(&[123, 456], 31, &[0x8000_0000, 456]);
+    test(&[123, 456], 31, &[0x80000000, 456]);
     test(&[123, 456], 32, &[0, 457]);
     test(&[123, 456], 100, &[0, 0, 0, 16]);
     test(&[256, 456], 8, &[256, 456]);
@@ -133,7 +133,7 @@ fn test_limbs_round_to_multiple_of_power_of_two() {
         &[123, 456],
         31,
         RoundingMode::Ceiling,
-        Some(vec![0x8000_0000, 456]),
+        Some(vec![0x80000000, 456]),
     );
     test(&[123, 456], 32, RoundingMode::Up, Some(vec![0, 457]));
     test(&[123, 456], 100, RoundingMode::Down, Some(vec![]));

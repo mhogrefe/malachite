@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
@@ -35,7 +35,7 @@ fn demo_integer_clone_from(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_clone_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.clone()",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -45,7 +45,7 @@ fn benchmark_integer_clone_library_comparison(gm: GenerationMode, limit: usize, 
         &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, n)| no_out!(n.clone()))),
+            ("Malachite", &mut (|(_, _, n)| no_out!(n.clone()))),
             ("num", &mut (|(n, _, _)| no_out!(n.clone()))),
             ("rug", &mut (|(_, n, _)| no_out!(n.clone()))),
         ],
@@ -57,7 +57,7 @@ fn benchmark_integer_clone_from_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.clone_from(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integers(gm),
@@ -69,7 +69,7 @@ fn benchmark_integer_clone_from_library_comparison(
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, _, (mut x, y))| x.clone_from(&y))),
+            ("Malachite", &mut (|(_, _, (mut x, y))| x.clone_from(&y))),
             ("num", &mut (|((mut x, y), _, _)| x.clone_from(&y))),
             ("rug", &mut (|(_, (mut x, y), _)| x.clone_from(&y))),
         ],

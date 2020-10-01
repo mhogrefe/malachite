@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::Natural;
 
@@ -122,7 +122,7 @@ fn benchmark_natural_checked_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals(gm),
@@ -157,7 +157,7 @@ fn benchmark_natural_checked_sub_mul_evaluation_strategy(
 }
 
 fn benchmark_natural_checked_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),
@@ -184,7 +184,7 @@ fn benchmark_natural_checked_sub_mul_val_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub_mul(Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),
@@ -211,7 +211,7 @@ fn benchmark_natural_checked_sub_mul_val_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub_mul(&Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),
@@ -238,7 +238,7 @@ fn benchmark_natural_checked_sub_mul_val_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),
@@ -265,7 +265,7 @@ fn benchmark_natural_checked_sub_mul_ref_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "(&Natural).checked_sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),

@@ -24,9 +24,9 @@ use platform::Limb;
 ///
 /// assert_eq!(limbs_divisible_by_power_of_two(&[3], 1), false);
 /// // 10^12 = 232 * 2^32 + 3567587328
-/// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 11), true);
-/// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 12), true);
-/// assert_eq!(limbs_divisible_by_power_of_two(&[3_567_587_328, 232], 13), false);
+/// assert_eq!(limbs_divisible_by_power_of_two(&[3567587328, 232], 11), true);
+/// assert_eq!(limbs_divisible_by_power_of_two(&[3567587328, 232], 12), true);
+/// assert_eq!(limbs_divisible_by_power_of_two(&[3567587328, 232], 13), false);
 /// ```
 ///
 /// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, GMP 6.1.2, where a is non-negative.

@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -52,7 +52,7 @@ fn demo_natural_ceiling_log_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_floor_log_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -62,14 +62,14 @@ fn benchmark_limbs_floor_log_two(gm: GenerationMode, limit: usize, file_name: &s
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref limbs| no_out!(limbs_floor_log_two(limbs))),
         )],
     );
 }
 
 fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_ceiling_log_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -79,14 +79,14 @@ fn benchmark_limbs_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: 
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref limbs| no_out!(limbs_ceiling_log_two(limbs))),
         )],
     );
 }
 
 fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.floor_log_two()",
         BenchmarkType::Single,
         positive_naturals(gm),
@@ -95,12 +95,12 @@ fn benchmark_natural_floor_log_two(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.floor_log_two())))],
+        &mut [("Malachite", &mut (|n| no_out!(n.floor_log_two())))],
     );
 }
 
 fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ceiling_log_two()",
         BenchmarkType::Single,
         positive_naturals(gm),
@@ -109,6 +109,6 @@ fn benchmark_natural_ceiling_log_two(gm: GenerationMode, limit: usize, file_name
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
+        &mut [("Malachite", &mut (|n| no_out!(n.ceiling_log_two())))],
     );
 }

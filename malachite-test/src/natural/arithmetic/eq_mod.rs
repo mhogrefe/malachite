@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
     _limbs_limb_mod_exact_odd_limb, _limbs_mod_exact_odd_limb, limbs_eq_limb_mod,
@@ -354,7 +354,7 @@ fn demo_natural_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_limb_mod_exact_odd_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_limb_mod_exact_odd_limb(Limb, Limb, Limb)",
         BenchmarkType::Single,
         triples_of_unsigneds_var_6::<Limb>(gm),
@@ -364,14 +364,14 @@ fn benchmark_limbs_limb_mod_exact_odd_limb(gm: GenerationMode, limit: usize, fil
         &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, d, carry)| no_out!(_limbs_limb_mod_exact_odd_limb(n, d, carry))),
         )],
     );
 }
 
 fn benchmark_limbs_mod_exact_odd_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_exact_odd_limb(&[Limb], Limb, Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_unsigned_var_1::<Limb>(gm),
@@ -381,14 +381,14 @@ fn benchmark_limbs_mod_exact_odd_limb(gm: GenerationMode, limit: usize, file_nam
         &(|&(ref ns, _, _)| ns.len()),
         "ns.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref ns, d, carry)| no_out!(_limbs_mod_exact_odd_limb(ns, d, carry))),
         )],
     );
 }
 
 fn benchmark_limbs_eq_limb_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_limb_mod_limb(&mut [Limb], Limb, Limb)",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm.with_scale(512)),
@@ -421,7 +421,7 @@ fn benchmark_limbs_eq_limb_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_limb_mod(&[Limb], Limb, &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm),
@@ -452,7 +452,7 @@ fn benchmark_limbs_eq_limb_mod_evaluation_strategy(
 }
 
 fn benchmark_limbs_eq_limb_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_limb_mod_ref_ref(&[Limb], Limb, &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm),
@@ -483,7 +483,7 @@ fn benchmark_limbs_eq_mod_limb_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_limb_val_ref(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::EvaluationStrategy,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm),
@@ -510,7 +510,7 @@ fn benchmark_limbs_eq_mod_limb_evaluation_strategy(
 }
 
 fn benchmark_limbs_eq_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_limb_ref_ref(&[Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm),
@@ -537,7 +537,7 @@ fn benchmark_limbs_eq_mod_limb_algorithms(gm: GenerationMode, limit: usize, file
 }
 
 fn benchmark_limbs_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_ref_ref_ref(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
         triples_of_unsigned_vec_var_55(gm),
@@ -570,7 +570,7 @@ fn benchmark_limbs_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, 
 }
 
 fn benchmark_limbs_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_ref_ref_ref(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_55(gm),
@@ -597,7 +597,7 @@ fn benchmark_limbs_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name
 }
 
 fn benchmark_natural_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals(gm),
@@ -644,7 +644,7 @@ fn benchmark_natural_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_natural_eq_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_naturals(gm),
@@ -656,7 +656,7 @@ fn benchmark_natural_eq_mod_library_comparison(gm: GenerationMode, limit: usize,
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, (x, y, m))| no_out!(x.eq_mod(y, m)))),
+            ("Malachite", &mut (|(_, (x, y, m))| no_out!(x.eq_mod(y, m)))),
             (
                 "rug",
                 &mut (|((x, y, m), _)| no_out!(x.is_congruent(&y, &m))),
@@ -666,7 +666,7 @@ fn benchmark_natural_eq_mod_library_comparison(gm: GenerationMode, limit: usize,
 }
 
 fn benchmark_natural_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.eq_mod(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals(gm),

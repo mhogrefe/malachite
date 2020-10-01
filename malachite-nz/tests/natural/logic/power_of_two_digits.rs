@@ -84,17 +84,17 @@ pub fn test_power_of_two_digits_primitive() {
     let n = Natural::trillion();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 16),
-        &[4_096, 54_437, 232]
+        &[4096, 54437, 232]
     );
     let mut digits = PowerOfTwoDigitIterable::<u64>::power_of_two_digits(&n, 16);
-    assert_eq!(digits.next(), Some(4_096));
+    assert_eq!(digits.next(), Some(4096));
     assert_eq!(digits.next_back(), Some(232));
-    assert_eq!(digits.next_back(), Some(54_437));
+    assert_eq!(digits.next_back(), Some(54437));
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 4_096);
-    assert_eq!(digits.get(1), 54_437);
+    assert_eq!(digits.get(0), 4096);
+    assert_eq!(digits.get(1), 54437);
     assert_eq!(digits.get(2), 232);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
@@ -102,17 +102,17 @@ pub fn test_power_of_two_digits_primitive() {
     let n = Natural::trillion();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 17),
-        &[69_632, 27_218, 58]
+        &[69632, 27218, 58]
     );
     let mut digits = PowerOfTwoDigitIterable::<u64>::power_of_two_digits(&n, 17);
-    assert_eq!(digits.next(), Some(69_632));
+    assert_eq!(digits.next(), Some(69632));
     assert_eq!(digits.next_back(), Some(58));
-    assert_eq!(digits.next_back(), Some(27_218));
+    assert_eq!(digits.next_back(), Some(27218));
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 69_632);
-    assert_eq!(digits.get(1), 27_218);
+    assert_eq!(digits.get(0), 69632);
+    assert_eq!(digits.get(1), 27218);
     assert_eq!(digits.get(2), 58);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
@@ -120,51 +120,51 @@ pub fn test_power_of_two_digits_primitive() {
     let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 32),
-        &[2_701_131_776, 466_537_709, 54_210]
+        &[2701131776, 466537709, 54210]
     );
     let mut digits = PowerOfTwoDigitIterable::<u64>::power_of_two_digits(&n, 32);
-    assert_eq!(digits.next(), Some(2_701_131_776));
-    assert_eq!(digits.next_back(), Some(54_210));
-    assert_eq!(digits.next_back(), Some(466_537_709));
+    assert_eq!(digits.next(), Some(2701131776));
+    assert_eq!(digits.next_back(), Some(54210));
+    assert_eq!(digits.next_back(), Some(466537709));
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 2_701_131_776);
-    assert_eq!(digits.get(1), 466_537_709);
-    assert_eq!(digits.get(2), 54_210);
+    assert_eq!(digits.get(0), 2701131776);
+    assert_eq!(digits.get(1), 466537709);
+    assert_eq!(digits.get(2), 54210);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
 
     let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 64),
-        &[2_003_764_205_206_896_640, 54_210]
+        &[2003764205206896640, 54210]
     );
     let mut digits = PowerOfTwoDigitIterable::<u64>::power_of_two_digits(&n, 64);
-    assert_eq!(digits.next(), Some(2_003_764_205_206_896_640));
-    assert_eq!(digits.next_back(), Some(54_210));
+    assert_eq!(digits.next(), Some(2003764205206896640));
+    assert_eq!(digits.next_back(), Some(54210));
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 2_003_764_205_206_896_640);
-    assert_eq!(digits.get(1), 54_210);
+    assert_eq!(digits.get(0), 2003764205206896640);
+    assert_eq!(digits.get(1), 54210);
     assert_eq!(digits.get(2), 0);
     assert_eq!(digits.get(3), 0);
 
     let n = Natural::trillion().square();
     assert_eq!(
         PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&n, 37),
-        &[58_535_706_624, 129_132_033_639, 52]
+        &[58535706624, 129132033639, 52]
     );
     let mut digits = PowerOfTwoDigitIterable::<u64>::power_of_two_digits(&n, 37);
-    assert_eq!(digits.next(), Some(58_535_706_624));
+    assert_eq!(digits.next(), Some(58535706624));
     assert_eq!(digits.next_back(), Some(52));
-    assert_eq!(digits.next_back(), Some(129_132_033_639));
+    assert_eq!(digits.next_back(), Some(129132033639));
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 58_535_706_624);
-    assert_eq!(digits.get(1), 129_132_033_639);
+    assert_eq!(digits.get(0), 58535706624);
+    assert_eq!(digits.get(1), 129132033639);
     assert_eq!(digits.get(2), 52);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
@@ -292,14 +292,14 @@ pub fn test_power_of_two_digits() {
         "[4096, 54437, 232]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 16);
-    assert_eq!(digits.next().unwrap(), 4_096);
+    assert_eq!(digits.next().unwrap(), 4096);
     assert_eq!(digits.next_back().unwrap(), 232);
-    assert_eq!(digits.next_back().unwrap(), 54_437);
+    assert_eq!(digits.next_back().unwrap(), 54437);
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 4_096);
-    assert_eq!(digits.get(1), 54_437);
+    assert_eq!(digits.get(0), 4096);
+    assert_eq!(digits.get(1), 54437);
     assert_eq!(digits.get(2), 232);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
@@ -310,14 +310,14 @@ pub fn test_power_of_two_digits() {
         "[69632, 27218, 58]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 17);
-    assert_eq!(digits.next().unwrap(), 69_632);
+    assert_eq!(digits.next().unwrap(), 69632);
     assert_eq!(digits.next_back().unwrap(), 58);
-    assert_eq!(digits.next_back().unwrap(), 27_218);
+    assert_eq!(digits.next_back().unwrap(), 27218);
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 69_632);
-    assert_eq!(digits.get(1), 27_218);
+    assert_eq!(digits.get(0), 69632);
+    assert_eq!(digits.get(1), 27218);
     assert_eq!(digits.get(2), 58);
     assert_eq!(digits.get(3), 0);
     assert_eq!(digits.get(4), 0);
@@ -328,15 +328,15 @@ pub fn test_power_of_two_digits() {
         "[2701131776, 466537709, 54210]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 32);
-    assert_eq!(digits.next().unwrap(), 2_701_131_776u32);
-    assert_eq!(digits.next_back().unwrap(), 54_210u32);
-    assert_eq!(digits.next_back().unwrap(), 466_537_709u32);
+    assert_eq!(digits.next().unwrap(), 2701131776u32);
+    assert_eq!(digits.next_back().unwrap(), 54210u32);
+    assert_eq!(digits.next_back().unwrap(), 466537709u32);
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 2_701_131_776u32);
-    assert_eq!(digits.get(1), 466_537_709u32);
-    assert_eq!(digits.get(2), 54_210u32);
+    assert_eq!(digits.get(0), 2701131776u32);
+    assert_eq!(digits.get(1), 466537709u32);
+    assert_eq!(digits.get(2), 54210u32);
     assert_eq!(digits.get(3), 0u32);
     assert_eq!(digits.get(4), 0u32);
 
@@ -346,13 +346,13 @@ pub fn test_power_of_two_digits() {
         "[2003764205206896640, 54210]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 64);
-    assert_eq!(digits.next().unwrap(), 2_003_764_205_206_896_640u64);
-    assert_eq!(digits.next_back().unwrap(), 54_210u64);
+    assert_eq!(digits.next().unwrap(), 2003764205206896640u64);
+    assert_eq!(digits.next_back().unwrap(), 54210u64);
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 2_003_764_205_206_896_640u64);
-    assert_eq!(digits.get(1), 54_210u64);
+    assert_eq!(digits.get(0), 2003764205206896640u64);
+    assert_eq!(digits.get(1), 54210u64);
     assert_eq!(digits.get(2), 0u64);
     assert_eq!(digits.get(3), 0u64);
 
@@ -362,14 +362,14 @@ pub fn test_power_of_two_digits() {
         "[58535706624, 129132033639, 52]"
     );
     let mut digits = PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 37);
-    assert_eq!(digits.next().unwrap(), 58_535_706_624u64);
+    assert_eq!(digits.next().unwrap(), 58535706624u64);
     assert_eq!(digits.next_back().unwrap(), 52u64);
-    assert_eq!(digits.next_back().unwrap(), 129_132_033_639u64);
+    assert_eq!(digits.next_back().unwrap(), 129132033639u64);
     assert_eq!(digits.next(), None);
     assert_eq!(digits.next_back(), None);
 
-    assert_eq!(digits.get(0), 58_535_706_624u64);
-    assert_eq!(digits.get(1), 129_132_033_639u64);
+    assert_eq!(digits.get(0), 58535706624u64);
+    assert_eq!(digits.get(1), 129132033639u64);
     assert_eq!(digits.get(2), 52u64);
     assert_eq!(digits.get(3), 0u64);
     assert_eq!(digits.get(4), 0u64);

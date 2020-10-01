@@ -1,5 +1,5 @@
 use malachite_base::strings::string_sort;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::{ascii_strings, strings};
@@ -23,7 +23,7 @@ fn demo_ascii_string_sort(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_string_sort(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "string_sort(&str)",
         BenchmarkType::Single,
         strings(gm),
@@ -32,6 +32,6 @@ fn benchmark_string_sort(gm: NoSpecialGenerationMode, limit: usize, file_name: &
         file_name,
         &(|s| s.len()),
         "s.len()",
-        &mut [("malachite", &mut (|s| no_out!(string_sort(&s))))],
+        &mut [("Malachite", &mut (|s| no_out!(string_sort(&s))))],
     );
 }

@@ -26,9 +26,9 @@ fn test_limbs_divisible_by_power_of_two() {
     test(&[0, 0, 1], 64, true);
     test(&[0, 0, 1], 65, false);
     test(&[0, 0, 1], 100, false);
-    test(&[3_567_587_328, 232], 11, true);
-    test(&[3_567_587_328, 232], 12, true);
-    test(&[3_567_587_328, 232], 13, false);
+    test(&[3567587328, 232], 11, true);
+    test(&[3567587328, 232], 12, true);
+    test(&[3567587328, 232], 13, false);
 }
 
 #[test]

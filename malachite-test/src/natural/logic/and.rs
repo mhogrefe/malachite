@@ -2,7 +2,7 @@ use std::cmp::{max, min};
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
     limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
@@ -199,7 +199,7 @@ fn demo_natural_and_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_and_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_and_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
@@ -209,14 +209,14 @@ fn benchmark_limbs_and_limb(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, limb)| no_out!(limbs_and_limb(&limbs, limb))),
         )],
     );
 }
 
 fn benchmark_limbs_and(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_and(&[u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -225,12 +225,12 @@ fn benchmark_limbs_and(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|&(ref xs, _)| xs.len()),
         "xs.len() = ys.len()",
-        &mut [("malachite", &mut (|(xs, ys)| no_out!(limbs_and(&xs, &ys))))],
+        &mut [("Malachite", &mut (|(xs, ys)| no_out!(limbs_and(&xs, &ys))))],
     );
 }
 
 fn benchmark_limbs_and_same_length_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_and_same_length_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_3(gm),
@@ -240,14 +240,14 @@ fn benchmark_limbs_and_same_length_to_out(gm: GenerationMode, limit: usize, file
         &(|&(_, ref ys, _)| ys.len()),
         "xs.len() = ys.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, ys, zs)| limbs_and_same_length_to_out(&mut xs, &ys, &zs)),
         )],
     );
 }
 
 fn benchmark_limbs_and_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_and_to_out(&mut [u32], &[u32], &[u32])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_4(gm),
@@ -257,7 +257,7 @@ fn benchmark_limbs_and_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         &(|&(_, ref ys, ref zs)| max(ys.len(), zs.len())),
         "xs.len() = ys.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, ys, zs)| limbs_and_to_out(&mut xs, &ys, &zs)),
         )],
     );
@@ -268,7 +268,7 @@ fn benchmark_limbs_slice_and_same_length_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_and_same_length_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
@@ -278,14 +278,14 @@ fn benchmark_limbs_slice_and_same_length_in_place_left(
         &(|&(ref xs, _)| xs.len()),
         "xs.len() = ys.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, ys)| limbs_slice_and_same_length_in_place_left(&mut xs, &ys)),
         )],
     );
 }
 
 fn benchmark_limbs_slice_and_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_and_in_place_left(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -295,14 +295,14 @@ fn benchmark_limbs_slice_and_in_place_left(gm: GenerationMode, limit: usize, fil
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
         "min(xs.len(), ys.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, ys)| no_out!(limbs_slice_and_in_place_left(&mut xs, &ys))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_and_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_and_in_place_left(&Vec<u32>, &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -312,14 +312,14 @@ fn benchmark_limbs_vec_and_in_place_left(gm: GenerationMode, limit: usize, file_
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
         "min(xs.len(), ys.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, ys)| limbs_vec_and_in_place_left(&mut xs, &ys)),
         )],
     );
 }
 
 fn benchmark_limbs_and_in_place_either(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_and_in_place_either(&mut [u32], &mut [u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec(gm),
@@ -329,7 +329,7 @@ fn benchmark_limbs_and_in_place_either(gm: GenerationMode, limit: usize, file_na
         &(|&(ref xs, ref ys)| min(xs.len(), ys.len())),
         "min(xs.len(), ys.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, mut ys)| no_out!(limbs_and_in_place_either(&mut xs, &mut ys))),
         )],
     );
@@ -340,7 +340,7 @@ fn benchmark_natural_and_assign_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural &= Natural",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_naturals(gm),
@@ -352,7 +352,7 @@ fn benchmark_natural_and_assign_library_comparison(
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, (mut x, y))| x &= y)),
+            ("Malachite", &mut (|(_, (mut x, y))| x &= y)),
             ("rug", &mut (|((mut x, y), _)| x &= y)),
         ],
     );
@@ -363,7 +363,7 @@ fn benchmark_natural_and_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural &= Natural",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),
@@ -380,7 +380,7 @@ fn benchmark_natural_and_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_and_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural & Natural",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),
@@ -392,7 +392,7 @@ fn benchmark_natural_and_library_comparison(gm: GenerationMode, limit: usize, fi
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x & y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x & y))),
             ("num", &mut (|((x, y), _, _)| no_out!(x & y))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x & y))),
         ],
@@ -400,7 +400,7 @@ fn benchmark_natural_and_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_natural_and_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural & Natural",
         BenchmarkType::Algorithms,
         pairs_of_naturals(gm),
@@ -424,7 +424,7 @@ fn benchmark_natural_and_algorithms(gm: GenerationMode, limit: usize, file_name:
 }
 
 fn benchmark_natural_and_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural & Natural",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),

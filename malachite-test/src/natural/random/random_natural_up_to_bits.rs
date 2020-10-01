@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::random::random_natural_up_to_bits::{
     limbs_random_up_to_bits, random_natural_up_to_bits,
 };
@@ -45,7 +45,7 @@ fn demo_natural_random_natural_up_to_bits(gm: NoSpecialGenerationMode, limit: us
 
 fn benchmark_limbs_random_up_to_bits(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    run_benchmark(
+    run_benchmark_old(
         "limbs_random_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_positive_unsigneds(gm),
@@ -55,7 +55,7 @@ fn benchmark_limbs_random_up_to_bits(gm: NoSpecialGenerationMode, limit: usize, 
         &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|bits| no_out!(limbs_random_up_to_bits::<u32, _>(&mut rng, bits))),
         )],
     );
@@ -67,7 +67,7 @@ fn benchmark_natural_random_natural_up_to_bits(
     file_name: &str,
 ) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    run_benchmark(
+    run_benchmark_old(
         "random_natural_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_unsigneds(gm),
@@ -77,7 +77,7 @@ fn benchmark_natural_random_natural_up_to_bits(
         &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|bits| no_out!(random_natural_up_to_bits(&mut rng, bits))),
         )],
     );

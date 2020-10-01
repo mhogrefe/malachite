@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::natural::Natural;
@@ -44,7 +44,7 @@ fn demo_natural_assign_bits(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_assign_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_assign_bits(&mut [Limb], u64, u64, &[Limb])",
         BenchmarkType::Single,
         quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec_var_1(gm),
@@ -63,7 +63,7 @@ fn benchmark_limbs_assign_bits(gm: GenerationMode, limit: usize, file_name: &str
 }
 
 fn benchmark_natural_assign_bits_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.assign_bits(u64, u64, &Natural)",
         BenchmarkType::Algorithms,
         quadruples_of_natural_small_unsigned_small_unsigned_and_natural_var_1(gm),

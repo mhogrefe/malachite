@@ -6,7 +6,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -80,7 +80,7 @@ fn benchmark_integer_round_to_multiple_of_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.round_to_multiple_of_power_of_two_assign(u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_integer_small_unsigned_and_rounding_mode_var_1(gm),
@@ -90,7 +90,7 @@ fn benchmark_integer_round_to_multiple_of_power_of_two_assign(
         &(|&(ref n, pow, _)| usize::exact_from(max(n.significant_bits(), pow))),
         "max(self.significant_bits(), pow)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y, rm)| x.round_to_multiple_of_power_of_two_assign(y, rm)),
         )],
     );
@@ -101,7 +101,7 @@ fn benchmark_integer_round_to_multiple_of_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::Algorithms,
         triples_of_integer_small_unsigned_and_rounding_mode_var_1(gm),
@@ -132,7 +132,7 @@ fn benchmark_integer_round_to_multiple_of_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integer_small_unsigned_and_rounding_mode_var_1(gm),

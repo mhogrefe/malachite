@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -51,7 +51,7 @@ fn benchmark_unsigned_sign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -60,7 +60,7 @@ fn benchmark_unsigned_sign<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
-        &mut [("malachite", &mut (|u| no_out!(u.sign())))],
+        &mut [("Malachite", &mut (|u| no_out!(u.sign())))],
     );
 }
 
@@ -72,7 +72,7 @@ fn benchmark_signed_sign<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sign()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -81,7 +81,7 @@ fn benchmark_signed_sign<T: PrimitiveSigned + Rand>(
         file_name,
         &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
-        &mut [("malachite", &mut (|i| no_out!(i.sign())))],
+        &mut [("Malachite", &mut (|i| no_out!(i.sign())))],
     );
 }
 

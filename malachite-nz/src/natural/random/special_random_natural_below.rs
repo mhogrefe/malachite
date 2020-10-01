@@ -31,7 +31,7 @@ use natural::Natural;
 /// assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(10u32))),
 ///     "101");
 /// assert_eq!(
-///     format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(1_000_000u32))),
+///     format!("{:b}", special_random_natural_below(&mut rng, &Natural::from(1000000u32))),
 ///     "1100000111110000"
 /// );
 /// assert_eq!(format!("{:b}", special_random_natural_below(&mut rng, &Natural::trillion())),

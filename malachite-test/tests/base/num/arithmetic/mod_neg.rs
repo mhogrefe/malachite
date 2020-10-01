@@ -16,7 +16,7 @@ fn mod_neg_properties_helper<T: PrimitiveUnsigned + Rand + SampleRange>() {
         assert_eq!(n_alt, neg);
 
         assert_eq!(neg.mod_neg(m), n);
-        //TODO use mod_add
+        assert_eq!(n.mod_add(neg, m), T::ZERO);
         assert_eq!(n == neg, n == T::ZERO || m.even() && n == m >> 1);
     });
 }

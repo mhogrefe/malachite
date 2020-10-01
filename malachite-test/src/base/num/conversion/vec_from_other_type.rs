@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, VecFromOtherType};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -95,7 +95,7 @@ fn bench_vec_from_other_type<T: PrimitiveUnsigned + Rand, U: Named>(
 ) where
     U: VecFromOtherType<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.from_other_type({})", U::NAME, T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -104,7 +104,7 @@ fn bench_vec_from_other_type<T: PrimitiveUnsigned + Rand, U: Named>(
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(U::vec_from_other_type(n))))],
+        &mut [("Malachite", &mut (|n| no_out!(U::vec_from_other_type(n))))],
     );
 }
 

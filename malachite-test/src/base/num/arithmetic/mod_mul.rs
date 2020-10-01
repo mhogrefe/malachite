@@ -11,7 +11,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
@@ -144,7 +144,7 @@ fn demo_mod_mul_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
 }
 
 fn benchmark_limbs_invert_limb_u32_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_invert_limb_u32(u32)",
         BenchmarkType::Algorithms,
         unsigneds_var_1::<u32>(gm),
@@ -164,7 +164,7 @@ fn benchmark_limbs_invert_limb_u32_algorithms(gm: GenerationMode, limit: usize, 
 }
 
 fn benchmark_limbs_invert_limb_u64_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_invert_limb_u64(u64)",
         BenchmarkType::Algorithms,
         unsigneds_var_1::<u64>(gm),
@@ -194,7 +194,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
     DT: From<T> + HasHalf<Half = T>,
     T: CheckedFrom<DT>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "_limbs_mod_preinverted({}, {}, {}, {})",
             T::NAME,
@@ -231,7 +231,7 @@ fn benchmark_mod_mul_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),
@@ -258,7 +258,7 @@ fn benchmark_mod_mul_algorithms_with_fast<
     T: ModMulPrecomputed<Data = T>,
     DT: From<T> + HasHalf<Half = T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),
@@ -290,7 +290,7 @@ fn benchmark_mod_mul_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_mul_assign({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds_var_1::<T>(gm),
@@ -299,7 +299,7 @@ fn benchmark_mod_mul_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y, m)| x.mod_mul_assign(y, m)))],
+        &mut [("Malachite", &mut (|(mut x, y, m)| x.mod_mul_assign(y, m)))],
     );
 }
 
@@ -308,7 +308,7 @@ fn benchmark_mod_mul_precomputed_algorithms<T: PrimitiveUnsigned + Rand + Sample
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_mul({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigneds_var_1::<T>(gm),

@@ -860,7 +860,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
         _limbs_shl_and_sub_same_length(r4, r5, 8, scratch); // can be negative
     }
     // A division by 2835 * 4 follows. Warning: the operand can be negative!
-    limbs_div_exact_limb_in_place(r4, 2_835 << 2);
+    limbs_div_exact_limb_in_place(r4, 2835 << 2);
     let r4_last = r4.last_mut().unwrap();
     if r4_last.leading_zeros() < 3 {
         *r4_last |= Limb::MAX << (Limb::WIDTH - 2);
@@ -881,7 +881,7 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
         assert_eq!(_limbs_shl_and_sub_same_length(r1, r2, 2, scratch), 0);
     }
     assert_eq!(_limbs_shl_and_sub_same_length(r1, r3, 9, scratch), 0);
-    limbs_div_exact_limb_in_place(r1, 42_525);
+    limbs_div_exact_limb_in_place(r1, 42525);
     if AORSMUL_FASTER_AORS_2AORSLSH {
         assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 225), 0);
     } else {
@@ -1119,31 +1119,31 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
         r4_last.wrapping_sub_assign(1);
     }
     if AORSMUL_FASTER_2AORSLSH {
-        limbs_sub_mul_limb_same_length_in_place_left(r5, r6, 1_028); // can be negative
+        limbs_sub_mul_limb_same_length_in_place_left(r5, r6, 1028); // can be negative
     } else {
         _limbs_shl_and_sub_same_length(r5, r6, 2, scratch); // can be negative
         _limbs_shl_and_sub_same_length(r5, r6, 10, scratch); // can be negative
     }
-    limbs_sub_mul_limb_same_length_in_place_left(r7, r5, 1_300); // can be negative
+    limbs_sub_mul_limb_same_length_in_place_left(r7, r5, 1300); // can be negative
     if AORSMUL_FASTER_3AORSLSH {
-        limbs_sub_mul_limb_same_length_in_place_left(r7, r6, 1_052_688); // can be negative
+        limbs_sub_mul_limb_same_length_in_place_left(r7, r6, 1052688); // can be negative
     } else {
         _limbs_shl_and_sub_same_length(r7, r6, 4, scratch); // can be negative
         _limbs_shl_and_sub_same_length(r7, r6, 12, scratch); // can be negative
         _limbs_shl_and_sub_same_length(r7, r6, 20, scratch); // can be negative
     }
-    limbs_div_exact_limb_in_place(r7, 188_513_325);
+    limbs_div_exact_limb_in_place(r7, 188513325);
     limbs_div_255_in_place(r7);
     // can be negative
-    limbs_sub_mul_limb_same_length_in_place_left(r5, r7, 12_567_555);
+    limbs_sub_mul_limb_same_length_in_place_left(r5, r7, 12567555);
     // A division by 2835x64 follows. Warning: the operand can be negative!
-    limbs_div_exact_limb_in_place(r5, 2_835 << 6);
+    limbs_div_exact_limb_in_place(r5, 2835 << 6);
     let r5_last = r5.last_mut().unwrap();
     if r5_last.leading_zeros() < 7 {
         *r5_last |= Limb::MAX << (Limb::WIDTH - 6);
     }
     if AORSMUL_FASTER_AORS_AORSLSH {
-        limbs_sub_mul_limb_same_length_in_place_left(r6, r7, 4_095); // can be negative
+        limbs_sub_mul_limb_same_length_in_place_left(r6, r7, 4095); // can be negative
     } else {
         // can give a carry
         limbs_slice_add_same_length_in_place_left(r6, r7);
@@ -1167,18 +1167,18 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(r2, r3, 400), 0);
     // If `Limb::WIDTH` < 42 next operations on r1 can give a carry!
     _limbs_shl_and_sub_same_length(r1, r4, 19, scratch);
-    limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 1_428);
-    limbs_sub_mul_limb_same_length_in_place_left(r1, r3, 112_896);
-    limbs_div_exact_limb_in_place(r1, 182_712_915);
+    limbs_sub_mul_limb_same_length_in_place_left(r1, r2, 1428);
+    limbs_sub_mul_limb_same_length_in_place_left(r1, r3, 112896);
+    limbs_div_exact_limb_in_place(r1, 182712915);
     limbs_div_255_in_place(r1);
     assert_eq!(
-        limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 15_181_425),
+        limbs_sub_mul_limb_same_length_in_place_left(r2, r1, 15181425),
         0
     );
-    limbs_div_exact_limb_in_place(r2, 42_525 << 4);
+    limbs_div_exact_limb_in_place(r2, 42525 << 4);
     if AORSMUL_FASTER_AORS_2AORSLSH {
         assert_eq!(
-            limbs_sub_mul_limb_same_length_in_place_left(r3, r1, 3_969),
+            limbs_sub_mul_limb_same_length_in_place_left(r3, r1, 3969),
             0
         );
     } else {

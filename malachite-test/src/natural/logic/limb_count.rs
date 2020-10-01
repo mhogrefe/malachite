@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::naturals;
@@ -17,7 +17,7 @@ fn demo_natural_limb_count(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.limb_count()",
         BenchmarkType::Single,
         naturals(gm),
@@ -26,6 +26,6 @@ fn benchmark_natural_limb_count(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.limb_count())))],
+        &mut [("Malachite", &mut (|n| no_out!(n.limb_count())))],
     );
 }

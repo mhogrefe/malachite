@@ -460,10 +460,10 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// let mut x = Natural::from(u32::MAX);
-/// x &= Natural::from(0xf0ff_ffffu32);
+/// x &= Natural::from(0xf0ffffffu32);
 /// x &= Natural::from(0xfff0_ffffu32);
-/// x &= Natural::from(0xffff_f0ffu32);
-/// x &= Natural::from(0xffff_fff0u32);
+/// x &= Natural::from(0xfffff0ffu32);
+/// x &= Natural::from(0xfffffff0u32);
 /// assert_eq!(x, 0xf0f0_f0f0u32);
 /// ```
 impl BitAndAssign<Natural> for Natural {
@@ -495,10 +495,10 @@ impl BitAndAssign<Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// let mut x = Natural::from(u32::MAX);
-/// x &= &Natural::from(0xf0ff_ffffu32);
+/// x &= &Natural::from(0xf0ffffffu32);
 /// x &= &Natural::from(0xfff0_ffffu32);
-/// x &= &Natural::from(0xffff_f0ffu32);
-/// x &= &Natural::from(0xffff_fff0u32);
+/// x &= &Natural::from(0xfffff0ffu32);
+/// x &= &Natural::from(0xfffffff0u32);
 /// assert_eq!(x, 0xf0f0_f0f0u32);
 /// ```
 impl<'a> BitAndAssign<&'a Natural> for Natural {

@@ -4,7 +4,7 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::shr::{
     limbs_shr, limbs_shr_to_out, limbs_slice_shr_in_place, limbs_vec_shr_in_place,
 };
@@ -186,7 +186,7 @@ fn demo_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -201,14 +201,14 @@ fn benchmark_limbs_shr(gm: GenerationMode, limit: usize, file_name: &str) {
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_shr(&limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr_to_out(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_u64_var_6(gm),
@@ -218,14 +218,14 @@ fn benchmark_limbs_shr_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         &(|&(_, ref in_limbs, _)| in_limbs.len()),
         "in_limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut out, in_limbs, bits)| no_out!(limbs_shr_to_out(&mut out, &in_limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_shr_in_place(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_u64_var_2(gm),
@@ -235,14 +235,14 @@ fn benchmark_limbs_slice_shr_in_place(gm: GenerationMode, limit: usize, file_nam
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| no_out!(limbs_slice_shr_in_place(&mut limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_shr_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -252,7 +252,7 @@ fn benchmark_limbs_vec_shr_in_place(gm: GenerationMode, limit: usize, file_name:
         &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_vec_shr_in_place(&mut limbs, bits)),
         )],
     );
@@ -292,7 +292,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_natural_and_small_unsigned::<$t>(gm),
@@ -385,7 +385,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_natural_and_small_signed::<i32>(gm),
@@ -449,7 +449,7 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural >>= u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
@@ -459,14 +459,14 @@ fn benchmark_natural_shr_assign_u32_library_comparison(
         &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
-            ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
+            ("Malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
         ],
     );
 }
 
 fn benchmark_natural_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural >> u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_unsigned::<u32>(gm),
@@ -476,7 +476,7 @@ fn benchmark_natural_shr_u32_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
         ],
     );
@@ -487,7 +487,7 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural >>= i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_signed::<i32>(gm),
@@ -497,14 +497,14 @@ fn benchmark_natural_shr_assign_i32_library_comparison(
         &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
-            ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
+            ("Malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
         ],
     );
 }
 
 fn benchmark_natural_shr_i32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural >> i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_small_signed::<i32>(gm),
@@ -514,7 +514,7 @@ fn benchmark_natural_shr_i32_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
         ],
     );

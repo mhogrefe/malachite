@@ -1,5 +1,5 @@
 use malachite_base::slices::slice_test_zero;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::vecs_of_unsigned;
@@ -16,7 +16,7 @@ fn demo_slice_test_zero(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_slice_test_zero(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "slice_test_zero(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned::<u32>(gm),
@@ -25,6 +25,6 @@ fn benchmark_slice_test_zero(gm: GenerationMode, limit: usize, file_name: &str) 
         file_name,
         &(|xs| xs.len()),
         "xs.len()",
-        &mut [("malachite", &mut (|xs| no_out!(slice_test_zero(&xs))))],
+        &mut [("Malachite", &mut (|xs| no_out!(slice_test_zero(&xs))))],
     );
 }

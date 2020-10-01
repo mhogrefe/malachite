@@ -30,7 +30,7 @@ impl SaturatingSubMul<Natural, Natural> for Natural {
     /// assert_eq!(Natural::from(10u32).saturating_sub_mul(Natural::from(3u32),
     ///     Natural::from(4u32)).to_string(), "0");
     /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///     Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
     ///     "995705032704");
     /// ```
     #[inline]
@@ -64,7 +64,7 @@ impl<'a> SaturatingSubMul<Natural, &'a Natural> for Natural {
     /// assert_eq!(Natural::from(10u32).saturating_sub_mul(Natural::from(3u32),
     ///     &Natural::from(4u32)).to_string(), "0");
     /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///     Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
     ///     "995705032704");
     /// ```
     #[inline]
@@ -98,7 +98,7 @@ impl<'a> SaturatingSubMul<&'a Natural, Natural> for Natural {
     /// assert_eq!(Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32),
     ///     Natural::from(4u32)).to_string(), "0");
     /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     &Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///     &Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
     ///     "995705032704");
     /// ```
     #[inline]
@@ -132,7 +132,7 @@ impl<'a, 'b> SaturatingSubMul<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(Natural::from(10u32).saturating_sub_mul(&Natural::from(3u32),
     ///     &Natural::from(4u32)).to_string(), "0");
     /// assert_eq!(Natural::trillion().saturating_sub_mul(
-    ///     &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
     ///     "995705032704");
     /// ```
     #[inline]
@@ -166,7 +166,7 @@ impl<'a, 'b, 'c> SaturatingSubMul<&'b Natural, &'c Natural> for &'a Natural {
     /// assert_eq!((&Natural::from(10u32)).saturating_sub_mul(&Natural::from(3u32),
     ///     &Natural::from(4u32)).to_string(), "0");
     /// assert_eq!((&Natural::trillion()).saturating_sub_mul(
-    ///     &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32)).to_string(),
+    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32)).to_string(),
     ///     "995705032704");
     /// ```
     #[inline]
@@ -202,7 +202,7 @@ impl SaturatingSubMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::trillion();
-    /// x.saturating_sub_mul_assign(Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    /// x.saturating_sub_mul_assign(Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     #[inline]
@@ -241,7 +241,7 @@ impl<'a> SaturatingSubMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::trillion();
-    /// x.saturating_sub_mul_assign(Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    /// x.saturating_sub_mul_assign(Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     #[inline]
@@ -280,7 +280,7 @@ impl<'a> SaturatingSubMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::trillion();
-    /// x.saturating_sub_mul_assign(&Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    /// x.saturating_sub_mul_assign(&Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     #[inline]
@@ -318,7 +318,7 @@ impl<'a, 'b> SaturatingSubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 0);
     ///
     /// let mut x = Natural::trillion();
-    /// x.saturating_sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    /// x.saturating_sub_mul_assign(&Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     #[inline]

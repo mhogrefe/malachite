@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -105,7 +105,7 @@ fn benchmark_unsigned_saturating_square<T: PrimitiveUnsigned + Rand + SampleRang
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.saturating_square()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -114,7 +114,7 @@ fn benchmark_unsigned_saturating_square<T: PrimitiveUnsigned + Rand + SampleRang
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.saturating_square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.saturating_square())))],
     );
 }
 
@@ -123,7 +123,7 @@ fn benchmark_unsigned_saturating_square_assign<T: PrimitiveUnsigned + Rand + Sam
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.saturating_square_assign()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -132,7 +132,7 @@ fn benchmark_unsigned_saturating_square_assign<T: PrimitiveUnsigned + Rand + Sam
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|mut x| x.saturating_square_assign()))],
+        &mut [("Malachite", &mut (|mut x| x.saturating_square_assign()))],
     );
 }
 
@@ -144,7 +144,7 @@ fn benchmark_signed_saturating_square<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.saturating_square()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -153,7 +153,7 @@ fn benchmark_signed_saturating_square<T: PrimitiveSigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.saturating_square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.saturating_square())))],
     );
 }
 
@@ -165,7 +165,7 @@ fn benchmark_signed_saturating_square_assign<T: PrimitiveSigned + Rand + SampleR
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.saturating_square_assign()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -174,7 +174,7 @@ fn benchmark_signed_saturating_square_assign<T: PrimitiveSigned + Rand + SampleR
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|mut x| x.saturating_square_assign()))],
+        &mut [("Malachite", &mut (|mut x| x.saturating_square_assign()))],
     );
 }
 

@@ -19,7 +19,7 @@ use platform::{DoubleLimb, Limb};
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
 ///
-/// assert_eq!(limbs_mul_limb(&[123, 456], 789), &[97_047, 359_784]);
+/// assert_eq!(limbs_mul_limb(&[123, 456], 789), &[97047, 359784]);
 /// assert_eq!(limbs_mul_limb(&[u32::MAX, 5], 2), &[u32::MAX - 1, 11]);
 /// assert_eq!(limbs_mul_limb(&[u32::MAX], 2), &[u32::MAX - 1, 1]);
 /// ```
@@ -59,7 +59,7 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[123, 456], 789, 10), 0);
-/// assert_eq!(out, &[97_057, 359_784, 0]);
+/// assert_eq!(out, &[97057, 359784, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[u32::MAX], 2, 3), 2);
@@ -101,7 +101,7 @@ pub fn limbs_mul_limb_with_carry_to_out(
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_mul_limb_to_out(&mut out, &[123, 456], 789), 0);
-/// assert_eq!(out, &[97_047, 359_784, 0]);
+/// assert_eq!(out, &[97047, 359784, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_mul_limb_to_out(&mut out, &[u32::MAX], 2), 1);
@@ -130,7 +130,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 789, 10), 0);
-/// assert_eq!(xs, &[97_057, 359_784]);
+/// assert_eq!(xs, &[97057, 359784]);
 ///
 /// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 2, 3), 2);
@@ -161,7 +161,7 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut ca
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 789), 0);
-/// assert_eq!(xs, &[97_047, 359_784]);
+/// assert_eq!(xs, &[97047, 359784]);
 ///
 /// let mut xs = vec![u32::MAX];
 /// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 2), 1);
@@ -187,7 +187,7 @@ pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_mul_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[97_047, 359_784]);
+/// assert_eq!(xs, &[97047, 359784]);
 ///
 /// let mut xs = vec![u32::MAX];
 /// limbs_vec_mul_limb_in_place(&mut xs, 2);

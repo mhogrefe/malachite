@@ -36,7 +36,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_eq_neg_limb_mod_limb;
 ///
 /// assert_eq!(limbs_eq_neg_limb_mod_limb(&[6, 7], 3, 2), false);
-/// assert_eq!(limbs_eq_neg_limb_mod_limb(&[100, 101, 102], 1_232, 10), true);
+/// assert_eq!(limbs_eq_neg_limb_mod_limb(&[100, 101, 102], 1232, 10), true);
 /// ```
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is negative.

@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::random::special_random_natural_up_to_bits::*;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{
@@ -52,7 +52,7 @@ fn benchmark_limbs_special_random_up_to_bits(
     file_name: &str,
 ) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    run_benchmark(
+    run_benchmark_old(
         "limbs_special_random_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_positive_unsigneds(gm),
@@ -62,7 +62,7 @@ fn benchmark_limbs_special_random_up_to_bits(
         &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|bits| no_out!(limbs_special_random_up_to_bits::<u32, _>(&mut rng, bits))),
         )],
     );
@@ -74,7 +74,7 @@ fn benchmark_natural_special_random_natural_up_to_bits(
     file_name: &str,
 ) {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    run_benchmark(
+    run_benchmark_old(
         "special_random_natural_up_to_bits(&mut Rng, u64)",
         BenchmarkType::Single,
         small_unsigneds(gm),
@@ -84,7 +84,7 @@ fn benchmark_natural_special_random_natural_up_to_bits(
         &(|&bits| usize::exact_from(bits)),
         "bits",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|bits| no_out!(special_random_natural_up_to_bits(&mut rng, bits))),
         )],
     );

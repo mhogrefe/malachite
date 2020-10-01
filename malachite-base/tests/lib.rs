@@ -76,7 +76,16 @@ pub mod chars {
     }
 }
 pub mod iterators {
-    pub mod bit_distributor;
+    pub mod bit_distributor {
+        pub mod bit_map_as_slice;
+        pub mod clone;
+        pub mod debug;
+        pub mod eq;
+        pub mod get_output;
+        pub mod increment_counter;
+        pub mod new;
+        pub mod set_max_bits;
+    }
     pub mod comparison {
         pub mod delta_directions;
         pub mod is_strictly_ascending;
@@ -96,6 +105,10 @@ pub mod iterators {
     pub mod nonzero_values;
 }
 pub mod named;
+pub mod nevers {
+    #[allow(clippy::module_inception)]
+    pub mod nevers;
+}
 pub mod num {
     pub mod arithmetic {
         pub mod abs;
@@ -129,7 +142,10 @@ pub mod num {
         pub mod mod_power_of_two_pow;
         pub mod mod_power_of_two_shl;
         pub mod mod_power_of_two_shr;
+        pub mod mod_power_of_two_square;
         pub mod mod_power_of_two_sub;
+        pub mod mod_shl;
+        pub mod mod_shr;
         pub mod mod_sub;
         pub mod neg;
         pub mod next_power_of_two;
@@ -310,11 +326,17 @@ pub mod slices {
 }
 pub mod strings {
     pub mod string_is_subset;
-    pub mod string_nub;
     pub mod string_sort;
+    pub mod string_unique;
     pub mod to_debug_string;
 }
 pub mod tuples {
+    pub mod exhaustive {
+        pub mod exhaustive_units;
+    }
+    pub mod random {
+        pub mod random_units;
+    }
     pub mod singletons;
 }
 pub mod vecs;

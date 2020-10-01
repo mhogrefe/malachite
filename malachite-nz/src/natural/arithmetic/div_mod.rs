@@ -60,7 +60,7 @@ use platform::{
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
 ///
-/// assert_eq!(limbs_invert_limb(0x8000_0002), 0xffff_fff8);
+/// assert_eq!(limbs_invert_limb(0x80000002), 0xfffffff8);
 /// assert_eq!(limbs_invert_limb(u32::MAX - 1), 2);
 /// ```
 ///
@@ -110,9 +110,9 @@ pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb)
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_mod;
 ///
-/// assert_eq!(limbs_div_limb_mod(&[123, 456], 789), (vec![2_482_262_467, 0], 636));
+/// assert_eq!(limbs_div_limb_mod(&[123, 456], 789), (vec![2482262467, 0], 636));
 /// assert_eq!(limbs_div_limb_mod(&[u32::MAX, u32::MAX], 3),
-///     (vec![0x5555_5555, 0x5555_5555], 0));
+///     (vec![0x55555555, 0x55555555], 0));
 /// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0, un > 1, and both
@@ -144,11 +144,11 @@ pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[123, 456], 789), 636);
-/// assert_eq!(out, &[2_482_262_467, 0, 10, 10]);
+/// assert_eq!(out, &[2482262467, 0, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[u32::MAX, u32::MAX], 3), 0);
-/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1.
@@ -229,11 +229,11 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
 ///
 /// let mut ns = vec![123, 456];
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut ns, 789), 636);
-/// assert_eq!(ns, &[2_482_262_467, 0]);
+/// assert_eq!(ns, &[2482262467, 0]);
 ///
 /// let mut ns = vec![u32::MAX, u32::MAX];
 /// assert_eq!(limbs_div_limb_in_place_mod(&mut ns, 3), 0);
-/// assert_eq!(ns, &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qp == up, qxn is 0, and
@@ -306,7 +306,7 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 ///
-/// assert_eq!(limbs_two_limb_inverse_helper(0x8000_0001, 3), 0xffff_fffb);
+/// assert_eq!(limbs_two_limb_inverse_helper(0x80000001, 3), 0xfffffffb);
 /// assert_eq!(limbs_two_limb_inverse_helper(2325651385, 3907343530), 3636893938);
 /// ```
 ///
@@ -347,22 +347,22 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::*;
 ///
-/// let d_1 = 0x8000_0004;
+/// let d_1 = 0x80000004;
 /// let d_0 = 5;
 /// assert_eq!(
 ///     limbs_div_mod_three_limb_by_two_limb(
 ///         1, 2, 3, d_1, d_0,
 ///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     (1, 0x7fff_fffd_ffff_fffe)
+///     (1, 0x7ffffffdfffffffe)
 /// );
 ///
-/// let d_1 = 0x8000_0000;
+/// let d_1 = 0x80000000;
 /// let d_0 = 0;
 /// assert_eq!(
 ///     limbs_div_mod_three_limb_by_two_limb(
-///         2, 0x4000_0000, 4, d_1, d_0,
+///         2, 0x40000000, 4, d_1, d_0,
 ///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     (4, 0x4000_0000_0000_0004)
+///     (4, 0x4000000000000004)
 /// );
 /// ```
 ///
@@ -419,7 +419,7 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
 ///
 /// let qs = &mut [10, 10, 10, 10];
 /// let ns = &mut [1, 2, 3, 4, 5];
-/// assert_eq!(limbs_div_mod_by_two_limb_normalized(qs, ns, &[3, 0x8000_0000]), false);
+/// assert_eq!(limbs_div_mod_by_two_limb_normalized(qs, ns, &[3, 0x80000000]), false);
 /// assert_eq!(qs, &[4294967241, 7, 10, 10]);
 /// assert_eq!(ns, &[166, 2147483626, 3, 4, 5]);
 /// ```

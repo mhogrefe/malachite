@@ -34,14 +34,14 @@ use platform::Limb;
 /// use malachite_nz::natural::logic::bit_block_access::limbs_slice_get_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// assert_eq!(limbs_slice_get_bits(&[0x1234_5678, 0xabcd_ef01], 16, 48), vec![0xef01_1234]);
-/// assert_eq!(limbs_slice_get_bits(&[0x1234_5678, 0xabcd_ef01], 4, 16), vec![0x567]);
+/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 16, 48), vec![0xef011234]);
+/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 4, 16), vec![0x567]);
 /// assert_eq!(
-///     limbs_slice_get_bits(&[0x1234_5678, 0xabcd_ef01], 0, 100),
-///     vec![0x1234_5678, 0xabcd_ef01]
+///     limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 0, 100),
+///     vec![0x12345678, 0xabcdef01]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_slice_get_bits(&[0x1234_5678, 0xabcd_ef01], 10, 10), empty);
+/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
 pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -85,13 +85,13 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 /// use malachite_nz::natural::logic::bit_block_access::limbs_vec_get_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// assert_eq!(limbs_vec_get_bits(vec![0x1234_5678, 0xabcd_ef01], 16, 48), &[0xef01_1234, 0]);
-/// assert_eq!(limbs_vec_get_bits(vec![0x1234_5678, 0xabcd_ef01], 4, 16), &[0x567]);
+/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 16, 48), &[0xef011234, 0]);
+/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 4, 16), &[0x567]);
 /// assert_eq!(
-///     limbs_vec_get_bits(vec![0x1234_5678, 0xabcd_ef01], 0, 100),
-///     &[0x1234_5678, 0xabcd_ef01]
+///     limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 0, 100),
+///     &[0x12345678, 0xabcdef01]
 /// );
-/// assert_eq!(limbs_vec_get_bits(vec![0x1234_5678, 0xabcd_ef01], 10, 10), &[0]);
+/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), &[0]);
 /// ```
 pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -236,18 +236,18 @@ impl BitBlockAccess for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits(16, 48),
-    ///     Natural::from(0xef01_1234u32)
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(16, 48),
+    ///     Natural::from(0xef011234u32)
     /// );
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits(4, 16),
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(4, 16),
     ///     Natural::from(0x567u32)
     /// );
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits(0, 100),
-    ///     Natural::from(0xabcd_ef01_1234_5678u64)
+    ///     Natural::from(0xabcdef0112345678u64).get_bits(0, 100),
+    ///     Natural::from(0xabcdef0112345678u64)
     /// );
-    /// assert_eq!(Natural::from(0xabcd_ef01_1234_5678u64).get_bits(10, 10), Natural::ZERO);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits(10, 10), Natural::ZERO);
     /// ```
     fn get_bits(&self, start: u64, end: u64) -> Natural {
         match *self {
@@ -280,18 +280,18 @@ impl BitBlockAccess for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits_owned(16, 48),
-    ///     Natural::from(0xef01_1234u32)
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(16, 48),
+    ///     Natural::from(0xef011234u32)
     /// );
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits_owned(4, 16),
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(4, 16),
     ///     Natural::from(0x567u32)
     /// );
     /// assert_eq!(
-    ///     Natural::from(0xabcd_ef01_1234_5678u64).get_bits_owned(0, 100),
-    ///     Natural::from(0xabcd_ef01_1234_5678u64)
+    ///     Natural::from(0xabcdef0112345678u64).get_bits_owned(0, 100),
+    ///     Natural::from(0xabcdef0112345678u64)
     /// );
-    /// assert_eq!(Natural::from(0xabcd_ef01_1234_5678u64).get_bits_owned(10, 10), 0);
+    /// assert_eq!(Natural::from(0xabcdef0112345678u64).get_bits_owned(10, 10), 0);
     /// ```
     fn get_bits_owned(self, start: u64, end: u64) -> Natural {
         match self {

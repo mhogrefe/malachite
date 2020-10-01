@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::pow::limbs_pow;
 use malachite_nz_test_util::natural::arithmetic::pow::{
     natural_pow_naive, natural_pow_simple_binary,
@@ -55,7 +55,7 @@ fn demo_natural_pow_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_pow(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_pow(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_3(gm),
@@ -65,14 +65,14 @@ fn benchmark_limbs_pow(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref xs, exp)| xs.len() * usize::exact_from(exp)),
         "xs.len() * exp",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref xs, exp)| no_out!(limbs_pow(xs, exp))),
         )],
     );
 }
 
 fn benchmark_natural_pow_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.pow_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm.with_scale(16)),
@@ -81,12 +81,12 @@ fn benchmark_natural_pow_assign(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|&(ref n, exp)| usize::exact_from(n.significant_bits() * exp)),
         "self.significant_bits() * exp",
-        &mut [("malachite", &mut (|(mut x, exp)| x.pow_assign(exp)))],
+        &mut [("Malachite", &mut (|(mut x, exp)| x.pow_assign(exp)))],
     );
 }
 
 fn benchmark_natural_pow_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.pow(u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm.with_scale(16)),
@@ -111,7 +111,7 @@ fn benchmark_natural_pow_algorithms(gm: GenerationMode, limit: usize, file_name:
 }
 
 fn benchmark_natural_pow_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.pow(u64)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_small_unsigned(gm.with_scale(16)),
@@ -121,7 +121,7 @@ fn benchmark_natural_pow_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref x, exp))| usize::exact_from(x.significant_bits() * exp)),
         "self.significant_bits() * exp",
         &mut [
-            ("malachite", &mut (|(_, _, (x, exp))| no_out!(x.pow(exp)))),
+            ("Malachite", &mut (|(_, _, (x, exp))| no_out!(x.pow(exp)))),
             ("num", &mut (|((x, exp), _, _)| no_out!(x.pow(exp)))),
             (
                 "rug",
@@ -132,7 +132,7 @@ fn benchmark_natural_pow_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_natural_pow_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.pow(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm.with_scale(16)),

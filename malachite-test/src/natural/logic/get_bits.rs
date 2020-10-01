@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
@@ -86,7 +86,7 @@ fn demo_natural_get_bits_owned(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_get_bits_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_get_bits(&[Limb], u64, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_unsigned_vec_small_unsigned_and_small_unsigned_var_1(gm),
@@ -113,7 +113,7 @@ fn benchmark_natural_get_bits_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.get_bits(u64, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_small_unsigned_and_small_unsigned_var_1(gm),
@@ -136,7 +136,7 @@ fn benchmark_natural_get_bits_evaluation_strategy(
 }
 
 fn benchmark_natural_get_bits_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.get_bits(u64, u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_small_unsigned_and_small_unsigned_var_1(gm),

@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
@@ -50,7 +50,7 @@ fn benchmark_integer_partial_eq_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer == Natural",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_natural(gm),
@@ -62,7 +62,7 @@ fn benchmark_integer_partial_eq_natural_library_comparison(
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x == y))),
             ("rug", &mut (|((x, y), _)| no_out!(x == y))),
         ],
     );
@@ -73,7 +73,7 @@ fn benchmark_natural_partial_eq_integer_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural == Integer",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_integer(gm),
@@ -85,7 +85,7 @@ fn benchmark_natural_partial_eq_integer_library_comparison(
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x == y))),
             ("rug", &mut (|((x, y), _)| no_out!(x == y))),
         ],
     );

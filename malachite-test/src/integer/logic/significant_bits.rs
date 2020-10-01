@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, nrm_integers};
@@ -17,7 +17,7 @@ fn demo_integer_significant_bits(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.significant_bits()",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -28,7 +28,7 @@ fn benchmark_integer_significant_bits(gm: GenerationMode, limit: usize, file_nam
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, n)| no_out!(n.significant_bits())),
             ),
             ("num", &mut (|(n, _, _)| no_out!(n.bits()))),

@@ -485,7 +485,7 @@ impl<'a> AddMul<Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x10000u32),
     ///     Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
@@ -517,7 +517,7 @@ impl<'a> AddMul<Natural, &'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x1_0000u32),
+    /// assert_eq!(Natural::trillion().add_mul(Natural::from(0x10000u32),
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
@@ -549,7 +549,7 @@ impl<'a> AddMul<&'a Natural, Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x10000u32),
     ///     Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
@@ -581,7 +581,7 @@ impl<'a, 'b> AddMul<&'a Natural, &'b Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::from(10u32).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x1_0000u32),
+    /// assert_eq!(Natural::trillion().add_mul(&Natural::from(0x10000u32),
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     #[inline]
@@ -613,7 +613,7 @@ impl<'a, 'b, 'c> AddMul<&'a Natural, &'b Natural> for &'c Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::from(10u32)).add_mul(&Natural::from(3u32), &Natural::from(4u32)), 22);
-    /// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x1_0000u32),
+    /// assert_eq!((&Natural::trillion()).add_mul(&Natural::from(0x10000u32),
     ///     &Natural::trillion()).to_string(), "65537000000000000");
     /// ```
     fn add_mul(self, y: &'a Natural, z: &'b Natural) -> Natural {
@@ -652,7 +652,7 @@ impl AddMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(Natural::from(0x1_0000u32), Natural::trillion());
+    /// x.add_mul_assign(Natural::from(0x10000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
     fn add_mul_assign(&mut self, mut y: Natural, mut z: Natural) {
@@ -691,7 +691,7 @@ impl<'a> AddMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(Natural::from(0x1_0000u32), &Natural::trillion());
+    /// x.add_mul_assign(Natural::from(0x10000u32), &Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
     fn add_mul_assign(&mut self, mut y: Natural, z: &'a Natural) {
@@ -730,7 +730,7 @@ impl<'a> AddMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(&Natural::from(0x1_0000u32), Natural::trillion());
+    /// x.add_mul_assign(&Natural::from(0x10000u32), Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
     fn add_mul_assign(&mut self, y: &'a Natural, mut z: Natural) {
@@ -769,7 +769,7 @@ impl<'a, 'b> AddMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = Natural::trillion();
-    /// x.add_mul_assign(&Natural::from(0x1_0000u32), &Natural::trillion());
+    /// x.add_mul_assign(&Natural::from(0x10000u32), &Natural::trillion());
     /// assert_eq!(x.to_string(), "65537000000000000");
     /// ```
     fn add_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {

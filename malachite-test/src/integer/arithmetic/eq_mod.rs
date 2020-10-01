@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::arithmetic::eq_mod::{
     limbs_eq_neg_limb_mod_limb, limbs_pos_eq_neg_limb_mod, limbs_pos_eq_neg_limb_mod_ref,
     limbs_pos_eq_neg_mod, limbs_pos_eq_neg_mod_limb, limbs_pos_eq_neg_mod_ref,
@@ -241,7 +241,7 @@ fn demo_integer_eq_mod_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_neg_limb_mod_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_neg_limb_mod_limb(&mut [Limb], Limb, Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_positive_unsigned_var_1(gm),
@@ -258,7 +258,7 @@ fn benchmark_limbs_eq_neg_limb_mod_limb(gm: GenerationMode, limit: usize, file_n
 }
 
 fn benchmark_limbs_pos_limb_eq_neg_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_pos_limb_eq_neg_limb_mod(Limb, Limb, &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_unsigned_and_unsigned_vec_var_1(gm),
@@ -279,7 +279,7 @@ fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_limb(&[Limb], Limb, &[Limb])",
         BenchmarkType::EvaluationStrategy,
         triples_of_unsigned_vec_unsigned_and_unsigned_vec_var_1(gm),
@@ -302,7 +302,7 @@ fn benchmark_limbs_pos_eq_neg_limb_mod_evaluation_strategy(
 }
 
 fn benchmark_limbs_pos_eq_neg_mod_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_pos_eq_neg_mod_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8(gm),
@@ -323,7 +323,7 @@ fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_limb(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
         triples_of_unsigned_vec_var_55(gm),
@@ -346,7 +346,7 @@ fn benchmark_limbs_pos_eq_neg_mod_evaluation_strategy(
 }
 
 fn benchmark_integer_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integer_integer_and_natural(gm),
@@ -393,7 +393,7 @@ fn benchmark_integer_eq_mod_evaluation_strategy(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_integer_eq_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_integer_integer_and_natural(gm),
@@ -405,7 +405,7 @@ fn benchmark_integer_eq_mod_library_comparison(gm: GenerationMode, limit: usize,
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, (x, y, m))| no_out!(x.eq_mod(y, m)))),
+            ("Malachite", &mut (|(_, (x, y, m))| no_out!(x.eq_mod(y, m)))),
             (
                 "rug",
                 &mut (|((x, y, m), _)| no_out!(x.is_congruent(&y, &m))),
@@ -415,7 +415,7 @@ fn benchmark_integer_eq_mod_library_comparison(gm: GenerationMode, limit: usize,
 }
 
 fn benchmark_integer_eq_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.eq_mod(Integer, Natural)",
         BenchmarkType::Algorithms,
         triples_of_integer_integer_and_natural(gm),

@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{integers, nrm_integers};
@@ -36,7 +36,7 @@ fn demo_integer_neg_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.neg_assign()",
         BenchmarkType::Single,
         integers(gm),
@@ -45,12 +45,12 @@ fn benchmark_integer_neg_assign(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|mut n| n.neg_assign()))],
+        &mut [("Malachite", &mut (|mut n| n.neg_assign()))],
     );
 }
 
 fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "-Integer",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -60,7 +60,7 @@ fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, n)| no_out!(-n))),
+            ("Malachite", &mut (|(_, _, n)| no_out!(-n))),
             ("num", &mut (|(n, _, _)| no_out!(-n))),
             ("rug", &mut (|(_, n, _)| no_out!(-n))),
         ],
@@ -68,7 +68,7 @@ fn benchmark_integer_neg_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_neg_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "-Integer",
         BenchmarkType::EvaluationStrategy,
         integers(gm),

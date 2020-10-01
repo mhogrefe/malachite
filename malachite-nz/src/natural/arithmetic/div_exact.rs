@@ -50,14 +50,14 @@ const INVERT_LIMB_TABLE_SIZE: usize = 1 << INVERT_LIMB_TABLE_LOG_SIZE;
 
 // The entry at index `i` is the multiplicative inverse of 2 * `i` + 1 mod 2<sup>8</sup>.
 const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
-    0x01, 0xAB, 0xCD, 0xB7, 0x39, 0xA3, 0xC5, 0xEF, 0xF1, 0x1B, 0x3D, 0xA7, 0x29, 0x13, 0x35, 0xDF,
-    0xE1, 0x8B, 0xAD, 0x97, 0x19, 0x83, 0xA5, 0xCF, 0xD1, 0xFB, 0x1D, 0x87, 0x09, 0xF3, 0x15, 0xBF,
-    0xC1, 0x6B, 0x8D, 0x77, 0xF9, 0x63, 0x85, 0xAF, 0xB1, 0xDB, 0xFD, 0x67, 0xE9, 0xD3, 0xF5, 0x9F,
-    0xA1, 0x4B, 0x6D, 0x57, 0xD9, 0x43, 0x65, 0x8F, 0x91, 0xBB, 0xDD, 0x47, 0xC9, 0xB3, 0xD5, 0x7F,
-    0x81, 0x2B, 0x4D, 0x37, 0xB9, 0x23, 0x45, 0x6F, 0x71, 0x9B, 0xBD, 0x27, 0xA9, 0x93, 0xB5, 0x5F,
-    0x61, 0x0B, 0x2D, 0x17, 0x99, 0x03, 0x25, 0x4F, 0x51, 0x7B, 0x9D, 0x07, 0x89, 0x73, 0x95, 0x3F,
-    0x41, 0xEB, 0x0D, 0xF7, 0x79, 0xE3, 0x05, 0x2F, 0x31, 0x5B, 0x7D, 0xE7, 0x69, 0x53, 0x75, 0x1F,
-    0x21, 0xCB, 0xED, 0xD7, 0x59, 0xC3, 0xE5, 0x0F, 0x11, 0x3B, 0x5D, 0xC7, 0x49, 0x33, 0x55, 0xFF,
+    0x01, 0xab, 0xcd, 0xb7, 0x39, 0xa3, 0xc5, 0xef, 0xf1, 0x1b, 0x3d, 0xa7, 0x29, 0x13, 0x35, 0xdf,
+    0xe1, 0x8b, 0xad, 0x97, 0x19, 0x83, 0xa5, 0xcf, 0xd1, 0xfb, 0x1d, 0x87, 0x09, 0xf3, 0x15, 0xbf,
+    0xc1, 0x6b, 0x8d, 0x77, 0xf9, 0x63, 0x85, 0xaf, 0xb1, 0xdb, 0xfd, 0x67, 0xe9, 0xd3, 0xf5, 0x9f,
+    0xa1, 0x4b, 0x6d, 0x57, 0xd9, 0x43, 0x65, 0x8f, 0x91, 0xbb, 0xdd, 0x47, 0xc9, 0xb3, 0xd5, 0x7f,
+    0x81, 0x2b, 0x4d, 0x37, 0xb9, 0x23, 0x45, 0x6f, 0x71, 0x9b, 0xbd, 0x27, 0xa9, 0x93, 0xb5, 0x5f,
+    0x61, 0x0b, 0x2d, 0x17, 0x99, 0x03, 0x25, 0x4f, 0x51, 0x7b, 0x9d, 0x07, 0x89, 0x73, 0x95, 0x3f,
+    0x41, 0xeb, 0x0d, 0xf7, 0x79, 0xe3, 0x05, 0x2f, 0x31, 0x5b, 0x7d, 0xe7, 0x69, 0x53, 0x75, 0x1f,
+    0x21, 0xcb, 0xed, 0xd7, 0x59, 0xc3, 0xe5, 0x0f, 0x11, 0x3b, 0x5d, 0xc7, 0x49, 0x33, 0x55, 0xff,
 ];
 
 /// Tests that `INVERT_LIMB_TABLE` is correct.
@@ -95,8 +95,8 @@ pub fn test_invert_limb_table() {
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_modular_invert_limb;
 ///
-/// assert_eq!(limbs_modular_invert_limb(3), 2_863_311_531);
-/// assert_eq!(limbs_modular_invert_limb(1_000_000_001), 2_211_001_857);
+/// assert_eq!(limbs_modular_invert_limb(3), 2863311531);
+/// assert_eq!(limbs_modular_invert_limb(1000000001), 2211001857);
 /// ```
 ///
 /// This is binvert_limb from gmp-impl.h, GMP 6.1.2.
@@ -266,8 +266,8 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3;
 ///
-/// assert_eq!(limbs_div_exact_3(&[8, 7]), &[1_431_655_768, 2]);
-/// assert_eq!(limbs_div_exact_3(&[u32::MAX, u32::MAX]), &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(limbs_div_exact_3(&[8, 7]), &[1431655768, 2]);
+/// assert_eq!(limbs_div_exact_3(&[u32::MAX, u32::MAX]), &[0x55555555, 0x55555555]);
 /// ```
 ///
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0
@@ -298,11 +298,11 @@ pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_div_exact_3_to_out(&mut out, &[8, 7]);
-/// assert_eq!(out, &[1_431_655_768, 2, 10, 10]);
+/// assert_eq!(out, &[1431655768, 2, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_div_exact_3_to_out(&mut out, &[u32::MAX, u32::MAX]);
-/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 ///
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0,
@@ -335,11 +335,11 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 ///
 /// let mut ns = vec![8, 7];
 /// limbs_div_exact_3_in_place(&mut ns);
-/// assert_eq!(ns, &[1_431_655_768, 2]);
+/// assert_eq!(ns, &[1431655768, 2]);
 ///
 /// let mut ns = vec![u32::MAX, u32::MAX];
 /// limbs_div_exact_3_in_place(&mut ns);
-/// assert_eq!(ns, &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
 /// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value, where rp == up.
@@ -371,11 +371,11 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_div_exact_limb_to_out(&mut out, &[6, 7], 2);
-/// assert_eq!(out, &[2_147_483_651, 3, 10, 10]);
+/// assert_eq!(out, &[2147483651, 3, 10, 10]);
 ///
 /// let mut out = vec![10, 10, 10, 10];
 /// limbs_div_exact_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
-/// assert_eq!(out, &[0x5555_5555, 0x5555_5555, 10, 10]);
+/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
@@ -403,8 +403,8 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb;
 ///
-/// assert_eq!(limbs_div_exact_limb(&[6, 7], 2), &[2_147_483_651, 3]);
-/// assert_eq!(limbs_div_exact_limb(&[u32::MAX, u32::MAX], 3), &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(limbs_div_exact_limb(&[6, 7], 2), &[2147483651, 3]);
+/// assert_eq!(limbs_div_exact_limb(&[u32::MAX, u32::MAX], 3), &[0x55555555, 0x55555555]);
 /// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where the result is returned.
@@ -436,11 +436,11 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 ///
 /// let mut ns = vec![6, 7];
 /// limbs_div_exact_limb_in_place(&mut ns, 2);
-/// assert_eq!(ns, &[2_147_483_651, 3]);
+/// assert_eq!(ns, &[2147483651, 3]);
 ///
 /// let mut ns = vec![u32::MAX, u32::MAX];
 /// limbs_div_exact_limb_in_place(&mut ns, 3);
-/// assert_eq!(ns, &[0x5555_5555, 0x5555_5555]);
+/// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
 pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
@@ -1508,7 +1508,7 @@ pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch
 ///
 /// assert_eq!(limbs_div_exact(&[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]), vec![0, 6, 7]);
 /// assert_eq!(
-///     limbs_div_exact(&[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]),
+///     limbs_div_exact(&[10200, 20402, 30605, 20402, 10200], &[100, 101, 102]),
 ///     vec![102, 101, 100]
 /// );
 /// ```
@@ -1550,7 +1550,7 @@ pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(qs, &[0, 6, 7, 10]);
 ///
 /// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out(qs, &mut [10_200, 20_402, 30_605, 20_402, 10_200], &mut [100, 101, 102]);
+/// limbs_div_exact_to_out(qs, &mut [10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102]);
 /// assert_eq!(qs, &[102, 101, 100, 10]);
 /// ```
 ///
@@ -1617,7 +1617,7 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
 /// let qs = &mut [10; 4];
 /// limbs_div_exact_to_out_val_ref(
 ///     qs,
-///     &mut [10_200, 20_402, 30_605, 20_402, 10_200],
+///     &mut [10200, 20402, 30605, 20402, 10200],
 ///     &[100, 101, 102]
 /// );
 /// assert_eq!(qs, &[102, 101, 100, 10]);
@@ -1689,7 +1689,7 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
 /// let qs = &mut [10; 4];
 /// limbs_div_exact_to_out_ref_val(
 ///     qs,
-///     &[10_200, 20_402, 30_605, 20_402, 10_200],
+///     &[10200, 20402, 30605, 20402, 10200],
 ///     &mut [100, 101, 102]
 /// );
 /// assert_eq!(qs, &[102, 101, 100, 10]);
@@ -1760,7 +1760,7 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
 /// assert_eq!(qs, &[0, 6, 7, 10]);
 ///
 /// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_ref_ref(qs, &[10_200, 20_402, 30_605, 20_402, 10_200], &[100, 101, 102]);
+/// limbs_div_exact_to_out_ref_ref(qs, &[10200, 20402, 30605, 20402, 10200], &[100, 101, 102]);
 /// assert_eq!(qs, &[102, 101, 100, 10]);
 /// ```
 ///

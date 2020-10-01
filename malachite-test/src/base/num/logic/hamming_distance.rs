@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -61,7 +61,7 @@ fn benchmark_unsigned_checked_hamming_distance<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.hamming_distance({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -70,7 +70,7 @@ fn benchmark_unsigned_checked_hamming_distance<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(u, v)| usize::exact_from(max(u.significant_bits(), v.significant_bits()))),
         "max(u.significant_bits(), v.significant_bits())",
-        &mut [("malachite", &mut (|(u, v)| no_out!(u.hamming_distance(v))))],
+        &mut [("Malachite", &mut (|(u, v)| no_out!(u.hamming_distance(v))))],
     );
 }
 
@@ -82,7 +82,7 @@ fn benchmark_signed_checked_hamming_distance<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.checked_hamming_distance({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -92,7 +92,7 @@ fn benchmark_signed_checked_hamming_distance<T: PrimitiveSigned + Rand>(
         &(|(i, j)| usize::exact_from(max(i.significant_bits(), j.significant_bits()))),
         "max(i.significant_bits(), j.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(i, j)| no_out!(i.checked_hamming_distance(j))),
         )],
     );

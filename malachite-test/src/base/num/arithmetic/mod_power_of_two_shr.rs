@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ModPowerOfTwoShr, ModPowerOfTwoShrAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::triples_of_unsigned_small_signed_and_small_unsigned_var_1;
@@ -249,7 +249,7 @@ macro_rules! mod_power_of_two_shr_u_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!(
                     "{}.mod_power_of_two_shr_assign({}, u64)",
                     $t::NAME,
@@ -263,7 +263,7 @@ macro_rules! mod_power_of_two_shr_u_i {
                 &(|&(_, _, pow)| usize::exact_from(pow)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, pow)| x.mod_power_of_two_shr_assign(y, pow)),
                 )],
             );
@@ -274,7 +274,7 @@ macro_rules! mod_power_of_two_shr_u_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.mod_power_of_two_shr({}, u64)", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 triples_of_unsigned_small_signed_and_small_unsigned_var_1::<$t, $u>(gm),
@@ -284,7 +284,7 @@ macro_rules! mod_power_of_two_shr_u_i {
                 &(|&(_, _, pow)| usize::exact_from(pow)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(x, y, pow)| no_out!(x.mod_power_of_two_shr(y, pow))),
                 )],
             );

@@ -110,22 +110,22 @@ pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_three_limb_by_two_limb;
 ///
-/// let d_1 = 0x8000_0004;
+/// let d_1 = 0x80000004;
 /// let d_0 = 5;
 /// assert_eq!(
 ///     limbs_mod_three_limb_by_two_limb(
 ///         1, 2, 3, d_1, d_0,
 ///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     0x7fff_fffd_ffff_fffe
+///     0x7ffffffdfffffffe
 /// );
 ///
-/// let d_1 = 0x8000_0000;
+/// let d_1 = 0x80000000;
 /// let d_0 = 0;
 /// assert_eq!(
 ///     limbs_mod_three_limb_by_two_limb(
-///         2, 0x4000_0000, 4, d_1, d_0,
+///         2, 0x40000000, 4, d_1, d_0,
 ///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     0x4000_0000_0000_0004
+///     0x4000000000000004
 /// );
 /// ```
 ///
@@ -176,7 +176,7 @@ pub fn limbs_mod_three_limb_by_two_limb(
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_by_two_limb_normalized;
 ///
 /// assert_eq!(
-///     limbs_mod_by_two_limb_normalized(&[1, 2, 3, 4, 5], &[3, 0x8000_0000]),
+///     limbs_mod_by_two_limb_normalized(&[1, 2, 3, 4, 5], &[3, 0x80000000]),
 ///     (166, 2147483626)
 /// );
 /// ```

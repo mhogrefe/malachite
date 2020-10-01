@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
@@ -294,7 +294,7 @@ fn demo_natural_sub_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_sub_mul_limb_greater(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_limb_greater(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
@@ -304,7 +304,7 @@ fn benchmark_limbs_sub_mul_limb_greater(gm: GenerationMode, limit: usize, file_n
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, b, c)| no_out!(limbs_sub_mul_limb_greater(&a, &b, c))),
         )],
     );
@@ -315,7 +315,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_limb_same_length_in_place_left(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7(gm),
@@ -325,7 +325,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_left(
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, b, c)| {
                 no_out!(limbs_sub_mul_limb_same_length_in_place_left(&mut a, &b, c))
             }),
@@ -338,7 +338,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_limb_greater_in_place_left(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
@@ -348,7 +348,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_left(
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, b, c)| no_out!(limbs_sub_mul_limb_greater_in_place_left(&mut a, &b, c))),
         )],
     );
@@ -359,7 +359,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_right(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_limb_same_length_in_place_right(&[Limb], &mut [Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_7(gm),
@@ -369,7 +369,7 @@ fn benchmark_limbs_sub_mul_limb_same_length_in_place_right(
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, mut b, c)| {
                 no_out!(limbs_sub_mul_limb_same_length_in_place_right(&a, &mut b, c))
             }),
@@ -382,7 +382,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_right(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_limb_greater_in_place_right(&[Limb], &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
@@ -392,7 +392,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_right(
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, mut b, c)| {
                 no_out!(limbs_sub_mul_limb_same_length_in_place_right(&a, &mut b, c))
             }),
@@ -401,7 +401,7 @@ fn benchmark_limbs_sub_mul_limb_greater_in_place_right(
 }
 
 fn benchmark_limbs_sub_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_28(gm),
@@ -411,14 +411,14 @@ fn benchmark_limbs_sub_mul(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, b, c)| no_out!(limbs_sub_mul(&a, &b, &c))),
         )],
     );
 }
 
 fn benchmark_limbs_sub_mul_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_sub_mul_in_place_left(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_28(gm),
@@ -428,7 +428,7 @@ fn benchmark_limbs_sub_mul_in_place_left(gm: GenerationMode, limit: usize, file_
         &(|&(ref a, _, _)| a.len()),
         "a.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, b, c)| no_out!(limbs_sub_mul_in_place_left(&mut a, &b, &c))),
         )],
     );
@@ -437,7 +437,7 @@ fn benchmark_limbs_sub_mul_in_place_left(gm: GenerationMode, limit: usize, file_
 triple_significant_bits_fn!(Natural, bucketing_function);
 
 fn benchmark_natural_sub_mul_assign_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul_assign(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -464,7 +464,7 @@ fn benchmark_natural_sub_mul_assign_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul_assign(Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -491,7 +491,7 @@ fn benchmark_natural_sub_mul_assign_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul_assign(&Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -518,7 +518,7 @@ fn benchmark_natural_sub_mul_assign_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul_assign(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -545,7 +545,7 @@ fn benchmark_natural_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_1(gm),
@@ -580,7 +580,7 @@ fn benchmark_natural_sub_mul_evaluation_strategy(
 }
 
 fn benchmark_natural_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -607,7 +607,7 @@ fn benchmark_natural_sub_mul_val_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul(Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -634,7 +634,7 @@ fn benchmark_natural_sub_mul_val_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul(&Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -661,7 +661,7 @@ fn benchmark_natural_sub_mul_val_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -688,7 +688,7 @@ fn benchmark_natural_sub_mul_ref_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "(&Natural).sub_mul(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),

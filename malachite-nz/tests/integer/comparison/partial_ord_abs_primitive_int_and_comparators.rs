@@ -127,7 +127,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "1000000000000",
-        1_000_000_000_000,
+        1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -136,7 +136,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "-1000000000000",
-        1_000_000_000_000,
+        1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -145,7 +145,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "1000000000000",
-        1_000_000_000_001,
+        1000000000001,
         Some(Ordering::Less),
         true,
         false,
@@ -154,7 +154,7 @@ fn test_partial_cmp_abs_u64() {
     );
     test(
         "-1000000000000",
-        1_000_000_000_001,
+        1000000000001,
         Some(Ordering::Less),
         true,
         false,
@@ -383,7 +383,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        1_000_000_000_000,
+        1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -392,7 +392,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        -1_000_000_000_000,
+        -1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -401,7 +401,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        1_000_000_000_000,
+        1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -410,7 +410,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        -1_000_000_000_000,
+        -1000000000000,
         Some(Ordering::Equal),
         false,
         false,
@@ -419,7 +419,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        1_000_000_000_001,
+        1000000000001,
         Some(Ordering::Less),
         true,
         false,
@@ -428,7 +428,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "1000000000000",
-        -1_000_000_000_001,
+        -1000000000001,
         Some(Ordering::Less),
         true,
         false,
@@ -437,7 +437,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        1_000_000_000_001,
+        1000000000001,
         Some(Ordering::Less),
         true,
         false,
@@ -446,7 +446,7 @@ fn test_partial_cmp_abs_i64() {
     );
     test(
         "-1000000000000",
-        -1_000_000_000_001,
+        -1000000000001,
         Some(Ordering::Less),
         true,
         false,

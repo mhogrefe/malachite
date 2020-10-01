@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{SaturatingSubMul, SaturatingSubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::natural::Natural;
 
@@ -169,7 +169,7 @@ fn benchmark_natural_saturating_sub_mul_assign_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.saturating_sub_mul_assign(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -196,7 +196,7 @@ fn benchmark_natural_saturating_sub_mul_assign_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.saturating_sub_mul_assign(Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -223,7 +223,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.saturating_sub_mul_assign(&Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -250,7 +250,7 @@ fn benchmark_natural_saturating_sub_mul_assign_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.saturating_sub_mul_assign(&Natural, &Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_1(gm),
@@ -277,7 +277,7 @@ fn benchmark_natural_saturating_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.saturating_sub_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_1(gm),

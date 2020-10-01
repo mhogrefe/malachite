@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::xx_add_yy_is_zz::_explicit_xx_add_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
@@ -46,7 +46,7 @@ fn benchmark_xx_add_yy_is_zz_algorithms<T: PrimitiveUnsigned + Rand + SampleRang
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.xx_add_yy_is_zz({}, {}, {}, {})",
             T::NAME,

@@ -150,7 +150,7 @@ impl CheckedSubMul<Natural, Natural> for Natural {
     /// assert_eq!(format!("{:?}", Natural::from(10u32).checked_sub_mul(Natural::from(3u32),
     ///     Natural::from(4u32))), "None");
     /// assert_eq!(format!("{:?}", Natural::trillion().checked_sub_mul(
-    ///     Natural::from(0x1_0000u32), Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     Natural::from(0x10000u32), Natural::from(0x10000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(mut self, b: Natural, c: Natural) -> Option<Natural> {
         if self.sub_mul_assign_no_panic(b, c) {
@@ -188,7 +188,7 @@ impl<'a> CheckedSubMul<Natural, &'a Natural> for Natural {
     /// assert_eq!(format!("{:?}", Natural::from(10u32).checked_sub_mul(Natural::from(3u32),
     ///     &Natural::from(4u32))), "None");
     /// assert_eq!(format!("{:?}", Natural::trillion().checked_sub_mul(
-    ///     Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     Natural::from(0x10000u32), &Natural::from(0x10000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(mut self, b: Natural, c: &'a Natural) -> Option<Natural> {
         if self.sub_mul_assign_val_ref_no_panic(b, c) {
@@ -226,7 +226,7 @@ impl<'a> CheckedSubMul<&'a Natural, Natural> for Natural {
     /// assert_eq!(format!("{:?}", Natural::from(10u32).checked_sub_mul(&Natural::from(3u32),
     ///     Natural::from(4u32))), "None");
     /// assert_eq!(format!("{:?}", Natural::trillion().checked_sub_mul(
-    ///     &Natural::from(0x1_0000u32), Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     &Natural::from(0x10000u32), Natural::from(0x10000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(mut self, b: &'a Natural, c: Natural) -> Option<Natural> {
         if self.sub_mul_assign_ref_val_no_panic(b, c) {
@@ -264,7 +264,7 @@ impl<'a, 'b> CheckedSubMul<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(format!("{:?}", Natural::from(10u32).checked_sub_mul(&Natural::from(3u32),
     ///     &Natural::from(4u32))), "None");
     /// assert_eq!(format!("{:?}", Natural::trillion().checked_sub_mul(
-    ///     &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(mut self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         if self.sub_mul_assign_ref_ref_no_panic(b, c) {
@@ -299,7 +299,7 @@ impl<'a, 'b, 'c> CheckedSubMul<&'a Natural, &'b Natural> for &'c Natural {
     /// assert_eq!(format!("{:?}", (&Natural::from(10u32)).checked_sub_mul(&Natural::from(3u32),
     ///     &Natural::from(4u32))), "None");
     /// assert_eq!(format!("{:?}", (&Natural::trillion()).checked_sub_mul(
-    ///     &Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))), "Some(995705032704)");
+    ///     &Natural::from(0x10000u32), &Natural::from(0x10000u32))), "Some(995705032704)");
     /// ```
     fn checked_sub_mul(self, b: &'a Natural, c: &'b Natural) -> Option<Natural> {
         match (self, b, c) {

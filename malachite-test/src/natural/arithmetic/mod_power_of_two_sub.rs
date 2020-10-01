@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mod_power_of_two_sub::{
     limbs_mod_power_of_two_limb_sub_limbs, limbs_mod_power_of_two_limb_sub_limbs_in_place,
@@ -229,7 +229,7 @@ fn benchmark_limbs_mod_power_of_two_limb_sub_limbs(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_limb_sub_limbs(Limb, &[Limb], u64)",
         BenchmarkType::Single,
         triples_of_limb_limb_vec_and_u64_var_1(gm),
@@ -239,7 +239,7 @@ fn benchmark_limbs_mod_power_of_two_limb_sub_limbs(
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(x, ys, pow)| no_out!(limbs_mod_power_of_two_limb_sub_limbs(x, &ys, pow))),
         )],
     );
@@ -250,7 +250,7 @@ fn benchmark_limbs_mod_power_of_two_limb_sub_limbs_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_limb_sub_limbs(Limb, &mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         triples_of_limb_limb_vec_and_u64_var_1(gm),
@@ -260,7 +260,7 @@ fn benchmark_limbs_mod_power_of_two_limb_sub_limbs_in_place(
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(x, mut ys, pow)| {
                 limbs_mod_power_of_two_limb_sub_limbs_in_place(x, &mut ys, pow)
             }),
@@ -269,7 +269,7 @@ fn benchmark_limbs_mod_power_of_two_limb_sub_limbs_in_place(
 }
 
 fn benchmark_limbs_mod_power_of_two_sub(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_sub(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
         triples_of_limb_vec_limb_vec_and_u64_var_13(gm),
@@ -279,7 +279,7 @@ fn benchmark_limbs_mod_power_of_two_sub(gm: GenerationMode, limit: usize, file_n
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref xs, ref ys, pow)| no_out!(limbs_mod_power_of_two_sub(xs, ys, pow))),
         )],
     );
@@ -290,7 +290,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_sub_in_place_left(&mut Vec<Limb>, &[Limb], u64)",
         BenchmarkType::Single,
         triples_of_limb_vec_limb_vec_and_u64_var_13(gm),
@@ -300,7 +300,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_left(
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut xs, ref ys, pow)| {
                 limbs_mod_power_of_two_sub_in_place_left(xs, ys, pow)
             }),
@@ -313,7 +313,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_right(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_sub_in_place_right(&[Limb], &mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         triples_of_limb_vec_limb_vec_and_u64_var_15(gm),
@@ -323,7 +323,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_right(
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref xs, ref mut ys, pow)| {
                 limbs_mod_power_of_two_sub_in_place_right(xs, ys, pow)
             }),
@@ -336,7 +336,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_either(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_sub_in_place_left(&mut Vec<Limb>, &mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         triples_of_limb_vec_limb_vec_and_u64_var_15(gm),
@@ -346,7 +346,7 @@ fn benchmark_limbs_mod_power_of_two_sub_in_place_either(
         &(|&(_, _, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut xs, ref mut ys, pow)| {
                 no_out!(limbs_mod_power_of_two_sub_in_place_either(xs, ys, pow))
             }),
@@ -359,7 +359,7 @@ fn benchmark_natural_mod_power_of_two_sub_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_sub_assign(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_u64_var_1(gm),
@@ -386,7 +386,7 @@ fn benchmark_natural_mod_power_of_two_sub_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_sub(Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_natural_and_u64_var_1(gm),
@@ -431,7 +431,7 @@ fn benchmark_natural_mod_power_of_two_sub_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_sub(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_u64_var_1(gm),

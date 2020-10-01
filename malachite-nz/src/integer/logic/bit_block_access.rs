@@ -38,14 +38,14 @@ use platform::Limb;
 /// use malachite_nz::integer::logic::bit_block_access::limbs_neg_limb_get_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// assert_eq!(limbs_neg_limb_get_bits(0x1234_5678, 16, 48), vec![0xffff_edcb]);
-/// assert_eq!(limbs_neg_limb_get_bits(0x1234_5678, 4, 16), vec![0xa98]);
+/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 16, 48), vec![0xffff_edcb]);
+/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 4, 16), vec![0xa98]);
 /// assert_eq!(
-///     limbs_neg_limb_get_bits(0x1234_5678, 0, 100),
+///     limbs_neg_limb_get_bits(0x12345678, 0, 100),
 ///     vec![0xedcb_a988, u32::MAX, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_neg_limb_get_bits(0x1234_5678, 10, 10), empty);
+/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 10, 10), empty);
 /// ```
 pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -94,14 +94,14 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 /// use malachite_nz::integer::logic::bit_block_access::limbs_slice_neg_get_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 16, 48), vec![0x10fe_edcb]);
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 4, 16), vec![0xa98]);
+/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 16, 48), vec![0x10feedcb]);
+/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 4, 16), vec![0xa98]);
 /// assert_eq!(
-///     limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 0, 100),
-///     vec![0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf]
+///     limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 0, 100),
+///     vec![0xedcb_a988, 0x543210fe, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x1234_5678, 0xabcd_ef01], 10, 10), empty);
+/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
 pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -163,14 +163,14 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
 /// use malachite_nz::integer::logic::bit_block_access::limbs_vec_neg_get_bits;
 /// use malachite_nz::platform::Limb;
 ///
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 16, 48), vec![0x10fe_edcb]);
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 4, 16), vec![0xa98]);
+/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 16, 48), vec![0x10feedcb]);
+/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 4, 16), vec![0xa98]);
 /// assert_eq!(
-///     limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 0, 100),
-///     vec![0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf]
+///     limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 0, 100),
+///     vec![0xedcb_a988, 0x543210fe, u32::MAX, 0xf]
 /// );
 /// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x1234_5678, 0xabcd_ef01], 10, 10), empty);
+/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
 pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -321,18 +321,18 @@ impl BitBlockAccess for Integer {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     (-Natural::from(0xabcd_ef01_1234_5678u64)).get_bits(16, 48),
-    ///     Natural::from(0x10fe_edcbu32)
+    ///     (-Natural::from(0xabcdef0112345678u64)).get_bits(16, 48),
+    ///     Natural::from(0x10feedcbu32)
     /// );
     /// assert_eq!(
-    ///     Integer::from(0xabcd_ef01_1234_5678u64).get_bits(4, 16),
+    ///     Integer::from(0xabcdef0112345678u64).get_bits(4, 16),
     ///     Natural::from(0x567u32)
     /// );
     /// assert_eq!(
-    ///     (-Natural::from(0xabcd_ef01_1234_5678u64)).get_bits(0, 100),
+    ///     (-Natural::from(0xabcdef0112345678u64)).get_bits(0, 100),
     ///     Natural::from_str("1267650600215849587758112418184").unwrap()
     /// );
-    /// assert_eq!(Integer::from(0xabcd_ef01_1234_5678u64).get_bits(10, 10), Natural::ZERO);
+    /// assert_eq!(Integer::from(0xabcdef0112345678u64).get_bits(10, 10), Natural::ZERO);
     /// ```
     fn get_bits(&self, start: u64, end: u64) -> Natural {
         if self.sign {
@@ -368,18 +368,18 @@ impl BitBlockAccess for Integer {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     (-Natural::from(0xabcd_ef01_1234_5678u64)).get_bits_owned(16, 48),
-    ///     Natural::from(0x10fe_edcbu32)
+    ///     (-Natural::from(0xabcdef0112345678u64)).get_bits_owned(16, 48),
+    ///     Natural::from(0x10feedcbu32)
     /// );
     /// assert_eq!(
-    ///     Integer::from(0xabcd_ef01_1234_5678u64).get_bits_owned(4, 16),
+    ///     Integer::from(0xabcdef0112345678u64).get_bits_owned(4, 16),
     ///     Natural::from(0x567u32)
     /// );
     /// assert_eq!(
-    ///     (-Natural::from(0xabcd_ef01_1234_5678u64)).get_bits_owned(0, 100),
+    ///     (-Natural::from(0xabcdef0112345678u64)).get_bits_owned(0, 100),
     ///     Natural::from_str("1267650600215849587758112418184").unwrap()
     /// );
-    /// assert_eq!(Integer::from(0xabcd_ef01_1234_5678u64).get_bits_owned(10, 10), Natural::ZERO);
+    /// assert_eq!(Integer::from(0xabcdef0112345678u64).get_bits_owned(10, 10), Natural::ZERO);
     /// ```
     fn get_bits_owned(self, start: u64, end: u64) -> Natural {
         if self.sign {

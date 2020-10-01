@@ -3,7 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 use rand::Rand;
 
@@ -347,7 +347,7 @@ fn benchmark_natural_lt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Natural: PartialOrdAbs<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.lt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_unsigned::<T>(gm),
@@ -356,7 +356,7 @@ fn benchmark_natural_lt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -365,7 +365,7 @@ fn benchmark_unsigned_lt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.lt_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_natural::<T>(gm),
@@ -374,7 +374,7 @@ fn benchmark_unsigned_lt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -387,7 +387,7 @@ fn benchmark_natural_lt_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.lt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_signed::<T>(gm),
@@ -396,7 +396,7 @@ fn benchmark_natural_lt_abs_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -408,7 +408,7 @@ fn benchmark_signed_lt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.lt_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_natural::<T>(gm),
@@ -417,7 +417,7 @@ fn benchmark_signed_lt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -428,7 +428,7 @@ fn benchmark_natural_gt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Natural: PartialOrdAbs<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.gt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_unsigned::<T>(gm),
@@ -437,7 +437,7 @@ fn benchmark_natural_gt_abs_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -446,7 +446,7 @@ fn benchmark_unsigned_gt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.gt_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_natural::<T>(gm),
@@ -455,7 +455,7 @@ fn benchmark_unsigned_gt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -468,7 +468,7 @@ fn benchmark_natural_gt_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.gt_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_signed::<T>(gm),
@@ -477,7 +477,7 @@ fn benchmark_natural_gt_abs_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -489,7 +489,7 @@ fn benchmark_signed_gt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.gt_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_natural::<T>(gm),
@@ -498,7 +498,7 @@ fn benchmark_signed_gt_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -509,7 +509,7 @@ fn benchmark_natural_le_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Natural: PartialOrdAbs<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.le_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_unsigned::<T>(gm),
@@ -518,7 +518,7 @@ fn benchmark_natural_le_abs_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -527,7 +527,7 @@ fn benchmark_unsigned_le_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.le_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_natural::<T>(gm),
@@ -536,7 +536,7 @@ fn benchmark_unsigned_le_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -549,7 +549,7 @@ fn benchmark_natural_le_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.le_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_signed::<T>(gm),
@@ -558,7 +558,7 @@ fn benchmark_natural_le_abs_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -570,7 +570,7 @@ fn benchmark_signed_le_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.le_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_natural::<T>(gm),
@@ -579,7 +579,7 @@ fn benchmark_signed_le_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -590,7 +590,7 @@ fn benchmark_natural_ge_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Natural: PartialOrdAbs<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.ge_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_unsigned::<T>(gm),
@@ -599,7 +599,7 @@ fn benchmark_natural_ge_abs_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 
@@ -608,7 +608,7 @@ fn benchmark_unsigned_ge_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ge_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_natural::<T>(gm),
@@ -617,7 +617,7 @@ fn benchmark_unsigned_ge_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveUnsign
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 
@@ -630,7 +630,7 @@ fn benchmark_natural_ge_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural.ge_abs(&{})", T::NAME),
         BenchmarkType::Single,
         pairs_of_natural_and_signed::<T>(gm),
@@ -639,7 +639,7 @@ fn benchmark_natural_ge_abs_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 
@@ -651,7 +651,7 @@ fn benchmark_signed_ge_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ge_abs(&Natural)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_natural::<T>(gm),
@@ -660,7 +660,7 @@ fn benchmark_signed_ge_abs_natural<T: PartialOrdAbs<Natural> + PrimitiveSigned +
         file_name,
         &(|(_, y)| usize::exact_from(y.significant_bits())),
         "y.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 

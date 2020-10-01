@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz_test_util::natural::arithmetic::checked_sub::checked_sub;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -64,7 +64,7 @@ fn benchmark_natural_checked_sub_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),
@@ -77,7 +77,7 @@ fn benchmark_natural_checked_sub_library_comparison(
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, (x, y))| no_out!(x.checked_sub(y))),
             ),
             ("num", &mut (|((x, y), _, _)| no_out!(checked_sub(x, y)))),
@@ -91,7 +91,7 @@ fn benchmark_natural_checked_sub_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.checked_sub(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),

@@ -21,7 +21,7 @@ use platform::Limb;
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb;
 ///
 /// assert_eq!(limbs_sub_limb(&[123, 456], 78), (vec![45, 456], false));
-/// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4_294_966_630, 455], false));
+/// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4294966630, 455], false));
 /// assert_eq!(limbs_sub_limb(&[1], 2), (vec![u32::MAX], true));
 /// ```
 ///
@@ -67,7 +67,7 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 789), false);
-/// assert_eq!(out, &[4_294_966_630, 455, 0]);
+/// assert_eq!(out, &[4294966630, 455, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
@@ -111,7 +111,7 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_sub_limb_in_place(&mut xs, 789), false);
-/// assert_eq!(xs, &[4_294_966_630, 455]);
+/// assert_eq!(xs, &[4294966630, 455]);
 ///
 /// let mut xs = vec![1];
 /// assert_eq!(limbs_sub_limb_in_place(&mut xs, 2), true);
@@ -159,8 +159,8 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub;
 ///
-/// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4_294_966_630, 455], false));
-/// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4_294_966_963, 4_294_966_962], true));
+/// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4294966630, 455], false));
+/// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4294966963, 4294966962], true));
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.1.2, where the output is returned.
@@ -203,11 +203,11 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[789, 123]), false);
-/// assert_eq!(out, &[4_294_966_630, 332, 0]);
+/// assert_eq!(out, &[4294966630, 332, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
+/// assert_eq!(out, &[4294966963, 4294966962, 0]);
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2.
@@ -243,11 +243,11 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[789]), false);
-/// assert_eq!(out, &[4_294_966_630, 455, 0]);
+/// assert_eq!(out, &[4294966630, 455, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out, &[4_294_966_963, 4_294_966_962, 0]);
+/// assert_eq!(out, &[4294966963, 4294966962, 0]);
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.1.2.
@@ -287,11 +287,11 @@ pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 ///
 /// let xs = &mut [123, 456];
 /// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[789, 123]), false);
-/// assert_eq!(xs, &[4_294_966_630, 332]);
+/// assert_eq!(xs, &[4294966630, 332]);
 ///
 /// let xs = &mut [123, 456];
 /// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[456, 789]), true);
-/// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
+/// assert_eq!(xs, &[4294966963, 4294966962]);
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the first input.
@@ -325,11 +325,11 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 ///
 /// let xs = &mut [123, 456];
 /// assert_eq!(limbs_sub_in_place_left(xs, &[789]), false);
-/// assert_eq!(xs, &[4_294_966_630, 455]);
+/// assert_eq!(xs, &[4294966630, 455]);
 ///
 /// let xs = &mut [123, 456];
 /// assert_eq!(limbs_sub_in_place_left(xs, &[456, 789]), true);
-/// assert_eq!(xs, &[4_294_966_963, 4_294_966_962]);
+/// assert_eq!(xs, &[4294966963, 4294966962]);
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.1.2, where the output is written to the first input.
@@ -367,11 +367,11 @@ pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 ///
 /// let ys = &mut [789, 123];
 /// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), false);
-/// assert_eq!(ys, &[4_294_966_630, 332]);
+/// assert_eq!(ys, &[4294966630, 332]);
 ///
 /// let ys = &mut [456, 789];
 /// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), true);
-/// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
+/// assert_eq!(ys, &[4294966963, 4294966962]);
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the second input.
@@ -404,11 +404,11 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 ///
 /// let ys = &mut [789, 123];
 /// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 2), false);
-/// assert_eq!(ys, &[4_294_966_630, 332]);
+/// assert_eq!(ys, &[4294966630, 332]);
 ///
 /// let ys = &mut [789, 123];
 /// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 1), false);
-/// assert_eq!(ys, &[4_294_966_630, 455]);
+/// assert_eq!(ys, &[4294966630, 455]);
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.1.2, where the output is written to the second input (which
@@ -450,11 +450,11 @@ pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) 
 ///
 /// let mut ys = vec![789];
 /// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), false);
-/// assert_eq!(ys, &[4_294_966_630, 455]);
+/// assert_eq!(ys, &[4294966630, 455]);
 ///
 /// let mut ys = vec![456, 789];
 /// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), true);
-/// assert_eq!(ys, &[4_294_966_963, 4_294_966_962]);
+/// assert_eq!(ys, &[4294966963, 4294966962]);
 /// ```
 pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();

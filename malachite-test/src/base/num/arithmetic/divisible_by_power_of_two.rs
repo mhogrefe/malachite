@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -67,7 +67,7 @@ fn benchmark_unsigned_divisible_by_power_of_two<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.divisible_by_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -77,7 +77,7 @@ fn benchmark_unsigned_divisible_by_power_of_two<T: PrimitiveUnsigned + Rand>(
         &(|&(u, _)| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(u, pow)| no_out!(u.divisible_by_power_of_two(pow))),
         )],
     );
@@ -91,7 +91,7 @@ fn benchmark_signed_divisible_by_power_of_two<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.divisible_by_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -101,7 +101,7 @@ fn benchmark_signed_divisible_by_power_of_two<T: PrimitiveSigned + Rand>(
         &(|&(i, _)| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(i, pow)| no_out!(i.divisible_by_power_of_two(pow))),
         )],
     );

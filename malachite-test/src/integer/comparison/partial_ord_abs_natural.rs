@@ -3,7 +3,7 @@ use std::cmp::{max, Ordering};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
@@ -51,7 +51,7 @@ fn benchmark_integer_partial_cmp_abs_natural_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.partial_cmp_abs(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_natural(gm),
@@ -64,7 +64,7 @@ fn benchmark_integer_partial_cmp_abs_natural_library_comparison(
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.partial_cmp_abs(&y))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.cmp_abs(&y)))),
@@ -77,7 +77,7 @@ fn benchmark_natural_partial_cmp_abs_integer_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.partial_cmp_abs(&Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_integer(gm),
@@ -90,7 +90,7 @@ fn benchmark_natural_partial_cmp_abs_integer_library_comparison(
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.partial_cmp_abs(&y))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.cmp_abs(&y)))),

@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{
@@ -155,7 +155,7 @@ macro_rules! demos_and_benches_u {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_integer_and_small_unsigned::<$t>(gm),
@@ -213,7 +213,7 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer >>= u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned::<u32>(gm),
@@ -223,14 +223,14 @@ fn benchmark_integer_shr_assign_u32_library_comparison(
         &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
-            ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
+            ("Malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
         ],
     );
 }
 
 fn benchmark_integer_shr_u32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer >> u32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned::<u32>(gm),
@@ -240,7 +240,7 @@ fn benchmark_integer_shr_u32_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, other))| usize::exact_from(other)),
         "other",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
         ],
     );
@@ -280,7 +280,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer >> {}", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 pairs_of_integer_and_small_signed::<i32>(gm),
@@ -344,7 +344,7 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer >>= i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_signed::<i32>(gm),
@@ -354,14 +354,14 @@ fn benchmark_integer_shr_assign_i32_library_comparison(
         &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
-            ("malachite", &mut (|(_, (mut x, y))| x >>= y)),
+            ("Malachite", &mut (|(_, (mut x, y))| x >>= y)),
             ("rug", &mut (|((mut x, y), _)| x >>= y)),
         ],
     );
 }
 
 fn benchmark_integer_shr_i32_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer >> i32",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_signed::<i32>(gm),
@@ -371,7 +371,7 @@ fn benchmark_integer_shr_i32_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, other))| usize::exact_from(other.unsigned_abs())),
         "|other|",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x >> y))),
             ("rug", &mut (|((x, y), _)| no_out!(x >> y))),
         ],
     );

@@ -1,9 +1,9 @@
-use malachite_base::strings::string_nub;
+use malachite_base::strings::string_unique;
 
 #[test]
-fn test_string_nub() {
+fn test_string_unique() {
     let test = |s, out| {
-        assert_eq!(string_nub(s), out);
+        assert_eq!(string_unique(s), out);
     };
     test("", "");
     test("x", "x");

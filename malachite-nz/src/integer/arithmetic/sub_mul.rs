@@ -435,7 +435,7 @@ impl<'a> SubMul<Integer, Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x1_0000),
+    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x10000),
     ///     -Integer::trillion()).to_string(), "-65537000000000000");
     /// ```
     #[inline]
@@ -467,7 +467,7 @@ impl<'a> SubMul<Integer, &'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x1_0000),
+    /// assert_eq!((-Integer::trillion()).sub_mul(Integer::from(-0x10000),
     ///     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
     #[inline]
@@ -499,7 +499,7 @@ impl<'a> SubMul<&'a Integer, Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x1_0000),
+    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x10000),
     ///     -Integer::trillion()).to_string(), "-65537000000000000");
     /// ```
     #[inline]
@@ -531,7 +531,7 @@ impl<'a, 'b> SubMul<&'a Integer, &'b Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::from(10u32).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x1_0000),
+    /// assert_eq!((-Integer::trillion()).sub_mul(&Integer::from(-0x10000),
     ///                     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
     #[inline]
@@ -563,7 +563,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!((&Integer::from(10u32)).sub_mul(&Integer::from(3u32), &Integer::from(-4)), 22);
-    /// assert_eq!((&(-Integer::trillion())).sub_mul(&Integer::from(-0x1_0000),
+    /// assert_eq!((&(-Integer::trillion())).sub_mul(&Integer::from(-0x10000),
     ///                     &(-Integer::trillion())).to_string(), "-65537000000000000");
     /// ```
     fn sub_mul(self, y: &'a Integer, z: &'b Integer) -> Integer {
@@ -606,7 +606,7 @@ impl<'a> SubMulAssign<Integer, Integer> for Integer {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(Integer::from(-0x1_0000), -Integer::trillion());
+    /// x.sub_mul_assign(Integer::from(-0x10000), -Integer::trillion());
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
     fn sub_mul_assign(&mut self, y: Integer, z: Integer) {
@@ -638,7 +638,7 @@ impl<'a> SubMulAssign<Integer, &'a Integer> for Integer {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(Integer::from(-0x1_0000), &(-Integer::trillion()));
+    /// x.sub_mul_assign(Integer::from(-0x10000), &(-Integer::trillion()));
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
     fn sub_mul_assign(&mut self, y: Integer, z: &'a Integer) {
@@ -670,7 +670,7 @@ impl<'a> SubMulAssign<&'a Integer, Integer> for Integer {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(&Integer::from(-0x1_0000), -Integer::trillion());
+    /// x.sub_mul_assign(&Integer::from(-0x10000), -Integer::trillion());
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Integer, z: Integer) {
@@ -702,7 +702,7 @@ impl<'a, 'b> SubMulAssign<&'a Integer, &'b Integer> for Integer {
     /// assert_eq!(x, 22);
     ///
     /// let mut x = -Integer::trillion();
-    /// x.sub_mul_assign(&Integer::from(-0x1_0000), &(-Integer::trillion()));
+    /// x.sub_mul_assign(&Integer::from(-0x10000), &(-Integer::trillion()));
     /// assert_eq!(x.to_string(), "-65537000000000000");
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Integer, z: &'b Integer) {

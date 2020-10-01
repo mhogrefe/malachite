@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
@@ -49,7 +49,7 @@ fn benchmark_xxxx_add_yyyy_is_zzzz<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.xxxx_add_yyyy_is_zzzz({}, {}, {}, {}, {}, {}, {}, {})",
             T::NAME,
@@ -75,7 +75,7 @@ fn benchmark_xxxx_add_yyyy_is_zzzz<T: PrimitiveUnsigned + Rand + SampleRange>(
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0)| {
                 no_out!(T::xxxx_add_yyyy_is_zzzz(
                     x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0

@@ -1,5 +1,5 @@
 use malachite_base::slices::slice_move_left;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::slices::slice_move_left_naive;
 use malachite_nz::platform::Limb;
 
@@ -23,7 +23,7 @@ fn demo_slice_move_left(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_slice_move_left_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "slice_move_left(&mut Vec<Limb>, usize)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_small_usize_var_1::<Limb>(gm),

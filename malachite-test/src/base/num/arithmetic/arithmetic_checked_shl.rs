@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
@@ -248,7 +248,7 @@ macro_rules! arithmetic_checked_shl_u_u {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_unsigned_and_small_unsigned::<$t, $u>(gm),
@@ -258,7 +258,7 @@ macro_rules! arithmetic_checked_shl_u_u {
                 &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(x, y)| no_out!(x.arithmetic_checked_shl(y))),
                 )],
             );
@@ -435,7 +435,7 @@ macro_rules! arithmetic_checked_shl_u_i {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_unsigned_and_small_signed::<$t, $u>(gm),
@@ -445,7 +445,7 @@ macro_rules! arithmetic_checked_shl_u_i {
                 &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(x, y)| no_out!(x.arithmetic_checked_shl(y))),
                 )],
             );
@@ -622,7 +622,7 @@ macro_rules! arithmetic_checked_shl_i_u {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_signed_and_small_unsigned::<$t, $u>(gm),
@@ -632,7 +632,7 @@ macro_rules! arithmetic_checked_shl_i_u {
                 &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(x, y)| no_out!(x.arithmetic_checked_shl(y))),
                 )],
             );
@@ -809,7 +809,7 @@ macro_rules! arithmetic_checked_shl_i_i {
         }
 
         fn $benchmark_arithmetic_checked_shl(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}.arithmetic_checked_shl({})", $t::NAME, $u::NAME),
                 BenchmarkType::Single,
                 pairs_of_signed_and_small_signed::<$t, $u>(gm),
@@ -819,7 +819,7 @@ macro_rules! arithmetic_checked_shl_i_i {
                 &(|&(_, other)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(x, y)| no_out!(x.arithmetic_checked_shl(y))),
                 )],
             );

@@ -148,8 +148,8 @@ pub fn limbs_vec_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_neg_mod_power_of_two;
 ///
 /// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 10), &[901]);
-/// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 33), &[4_294_967_173, 1]);
-/// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 40), &[4_294_967_173, 55]);
+/// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 33), &[4294967173, 1]);
+/// assert_eq!(limbs_neg_mod_power_of_two(&[123, 456], 40), &[4294967173, 55]);
 /// ```
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and the result
@@ -178,11 +178,11 @@ pub fn limbs_neg_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_neg_mod_power_of_two_in_place(&mut xs, 33);
-/// assert_eq!(xs, &[4_294_967_173, 1]);
+/// assert_eq!(xs, &[4294967173, 1]);
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_neg_mod_power_of_two_in_place(&mut xs, 40);
-/// assert_eq!(xs, &[4_294_967_173, 55]);
+/// assert_eq!(xs, &[4294967173, 55]);
 /// ```
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.1.2, where in is negative and res == in.

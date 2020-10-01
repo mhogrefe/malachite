@@ -27,11 +27,11 @@ use platform::Limb;
 /// assert_eq!(limbs_shr(&[3], 1), &[1]);
 /// assert_eq!(limbs_shr(&[122, 456], 1), &[61, 228]);
 /// assert_eq!(limbs_shr(&[123, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr(&[123, 455], 1), &[2_147_483_709, 227]);
+/// assert_eq!(limbs_shr(&[123, 455], 1), &[2147483709, 227]);
 /// assert_eq!(limbs_shr(&[123, 456], 31), &[912, 0]);
 /// assert_eq!(limbs_shr(&[123, 456], 32), &[456]);
 /// assert_eq!(limbs_shr(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_shr(&[256, 456], 8), &[3_355_443_201, 1]);
+/// assert_eq!(limbs_shr(&[256, 456], 8), &[3355443201, 1]);
 /// assert_eq!(limbs_shr(&[u32::MAX, 1], 1), &[u32::MAX, 0]);
 /// assert_eq!(limbs_shr(&[u32::MAX, u32::MAX], 32), &[u32::MAX]);
 /// ```
@@ -72,12 +72,12 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// use malachite_nz::natural::arithmetic::shr::limbs_shr_to_out;
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shr_to_out(&mut out, &[123, 456], 1), 2_147_483_648);
+/// assert_eq!(limbs_shr_to_out(&mut out, &[123, 456], 1), 2147483648);
 /// assert_eq!(out, &[61, 228, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_shr_to_out(&mut out, &[122, 455], 1), 0);
-/// assert_eq!(out, &[2_147_483_709, 227, 0]);
+/// assert_eq!(out, &[2147483709, 227, 0]);
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2.
@@ -119,12 +119,12 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// use malachite_nz::natural::arithmetic::shr::limbs_slice_shr_in_place;
 ///
 /// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_shr_in_place(&mut xs, 1), 2_147_483_648);
+/// assert_eq!(limbs_slice_shr_in_place(&mut xs, 1), 2147483648);
 /// assert_eq!(xs, &[61, 228]);
 ///
 /// let mut xs = vec![122, 455];
 /// assert_eq!(limbs_slice_shr_in_place(&mut xs, 1), 0);
-/// assert_eq!(xs, &[2_147_483_709, 227]);
+/// assert_eq!(xs, &[2147483709, 227]);
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the rp == up.
@@ -177,7 +177,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// let mut xs = vec![123, 455];
 /// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2_147_483_709, 227]);
+/// assert_eq!(xs, &[2147483709, 227]);
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_shr_in_place(&mut xs, 31);
@@ -193,7 +193,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// let mut xs = vec![256, 456];
 /// limbs_vec_shr_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3_355_443_201, 1]);
+/// assert_eq!(xs, &[3355443201, 1]);
 ///
 /// let mut xs = vec![u32::MAX, 1];
 /// limbs_vec_shr_in_place(&mut xs, 1);

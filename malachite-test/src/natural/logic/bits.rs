@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
@@ -36,7 +36,7 @@ fn demo_natural_bits_size_hint(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_bits_get_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.bits()[u64]",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),
@@ -64,7 +64,7 @@ fn benchmark_natural_bits_get_algorithms(gm: GenerationMode, limit: usize, file_
 }
 
 fn benchmark_natural_bits_size_hint(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.bits().size_hint()",
         BenchmarkType::Single,
         naturals(gm),

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ModNeg, ModPowerOfTwo, ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -69,7 +69,7 @@ fn benchmark_natural_mod_power_of_two_neg_assign(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_neg_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_u64_var_1(gm),
@@ -90,7 +90,7 @@ fn benchmark_natural_mod_power_of_two_neg_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_neg(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_u64_var_1(gm),
@@ -117,7 +117,7 @@ fn benchmark_natural_mod_power_of_two_neg_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_neg(u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_u64_var_1(gm),

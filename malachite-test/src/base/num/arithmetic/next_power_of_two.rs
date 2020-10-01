@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -49,7 +49,7 @@ fn benchmark_next_power_of_two<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.next_power_of_two()", T::NAME),
         BenchmarkType::Single,
         unsigneds_var_2::<T>(gm),
@@ -58,7 +58,7 @@ fn benchmark_next_power_of_two<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.next_power_of_two())))],
+        &mut [("Malachite", &mut (|n| no_out!(n.next_power_of_two())))],
     );
 }
 
@@ -67,7 +67,7 @@ fn benchmark_next_power_of_two_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.next_power_of_two_assign()", T::NAME),
         BenchmarkType::Single,
         unsigneds_var_2::<T>(gm),
@@ -76,7 +76,7 @@ fn benchmark_next_power_of_two_assign<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|mut n| n.next_power_of_two_assign()))],
+        &mut [("Malachite", &mut (|mut n| n.next_power_of_two_assign()))],
     );
 }
 

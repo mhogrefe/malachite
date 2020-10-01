@@ -48,7 +48,10 @@ pub mod base {
             pub mod mod_power_of_two_pow;
             pub mod mod_power_of_two_shl;
             pub mod mod_power_of_two_shr;
+            pub mod mod_power_of_two_square;
             pub mod mod_power_of_two_sub;
+            pub mod mod_shl;
+            pub mod mod_shr;
             pub mod mod_sub;
             pub mod neg;
             pub mod next_power_of_two;
@@ -147,8 +150,8 @@ pub mod base {
 
     pub mod strings {
         pub mod string_is_subset;
-        pub mod string_nub;
         pub mod string_sort;
+        pub mod string_unique;
     }
 
     pub mod vecs {

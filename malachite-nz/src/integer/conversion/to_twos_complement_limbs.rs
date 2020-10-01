@@ -22,8 +22,8 @@ use platform::Limb;
 /// ```
 /// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement;
 ///
-/// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
-/// assert_eq!(limbs_twos_complement(&[u32::MAX, 0xffff_fffd, 0xffff_fffc]), &[1, 2, 3]);
+/// assert_eq!(limbs_twos_complement(&[1, 2, 3]), &[u32::MAX, 0xfffffffd, 0xfffffffc]);
+/// assert_eq!(limbs_twos_complement(&[u32::MAX, 0xfffffffd, 0xfffffffc]), &[1, 2, 3]);
 /// ```
 pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
@@ -82,7 +82,7 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 ///
 /// let mut xs = &mut [1, 2, 3];
 /// assert!(!limbs_twos_complement_in_place(xs));
-/// assert_eq!(xs, &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(xs, &[u32::MAX, 0xfffffffd, 0xfffffffc]);
 ///
 /// let mut xs = &mut [0, 0, 0];
 /// assert!(limbs_twos_complement_in_place(xs));
@@ -113,7 +113,7 @@ pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 ///
 /// let mut xs = vec![1, 2, 3];
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
+/// assert_eq!(xs, &[u32::MAX, 0xfffffffd, 0xfffffffc]);
 ///
 /// let mut xs = vec![0, u32::MAX];
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);

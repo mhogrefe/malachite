@@ -4,7 +4,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::natural::comparison::partial_ord_primitive_int::*;
 use num::BigUint;
@@ -206,7 +206,7 @@ fn benchmark_natural_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsigne
     rug::Integer: PartialOrd<T>,
     BigUint: From<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_unsigned::<T>(gm),
@@ -217,7 +217,7 @@ fn benchmark_natural_partial_cmp_unsigned_library_comparison<T: PrimitiveUnsigne
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, (x, y))| no_out!(x.partial_cmp(&y))),
             ),
             (
@@ -236,7 +236,7 @@ fn benchmark_unsigned_partial_cmp_natural_library_comparison<
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Natural", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_natural::<T>(gm),
@@ -246,7 +246,7 @@ fn benchmark_unsigned_partial_cmp_natural_library_comparison<
         &(|&(_, (_, ref n))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],
     );
@@ -262,7 +262,7 @@ fn benchmark_natural_partial_cmp_signed_library_comparison<T: PrimitiveSigned + 
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Natural == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_signed::<T>(gm),
@@ -272,7 +272,7 @@ fn benchmark_natural_partial_cmp_signed_library_comparison<T: PrimitiveSigned + 
         &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],
     );
@@ -288,7 +288,7 @@ fn benchmark_signed_partial_cmp_natural_library_comparison<
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Natural", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_signed_and_natural::<T>(gm),
@@ -298,7 +298,7 @@ fn benchmark_signed_partial_cmp_natural_library_comparison<
         &(|&(_, (_, ref n))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x.partial_cmp(&y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.partial_cmp(&y)))),
         ],
     );

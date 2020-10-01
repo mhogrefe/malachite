@@ -71,7 +71,7 @@ pub fn test_join_halves() {
     join_halves_helper(1, 0, u16::from(u8::MAX) + 1);
     join_halves_helper(u8::MAX, u8::MAX, u16::MAX);
     join_halves_helper(1, 2, 258u16);
-    join_halves_helper(0xabcd, 0x1234, 0xabcd_1234u32);
+    join_halves_helper(0xabcd, 0x1234, 0xabcd1234u32);
 }
 
 #[test]

@@ -367,7 +367,7 @@ impl SubMul<Natural, Natural> for Natural {
     ///     "8"
     /// );
     /// assert_eq!(Natural::trillion().sub_mul(
-    ///     Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///     Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
     ///     "995705032704"
     /// );
     /// ```
@@ -405,7 +405,7 @@ impl<'a> SubMul<Natural, &'a Natural> for Natural {
     ///     "8"
     /// );
     /// assert_eq!(
-    ///     Natural::trillion().sub_mul(Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))
+    ///     Natural::trillion().sub_mul(Natural::from(0x10000u32), &Natural::from(0x10000u32))
     ///     .to_string(),
     ///     "995705032704"
     /// );
@@ -444,7 +444,7 @@ impl<'a> SubMul<&'a Natural, Natural> for Natural {
     ///     "8"
     /// );
     /// assert_eq!(Natural::trillion().sub_mul(
-    ///     &Natural::from(0x1_0000u32), Natural::from(0x1_0000u32)).to_string(),
+    ///     &Natural::from(0x10000u32), Natural::from(0x10000u32)).to_string(),
     ///     "995705032704"
     /// );
     /// ```
@@ -482,7 +482,7 @@ impl<'a, 'b> SubMul<&'a Natural, &'b Natural> for Natural {
     ///     "8"
     /// );
     /// assert_eq!(
-    ///     Natural::trillion().sub_mul(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))
+    ///     Natural::trillion().sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
     ///     .to_string(),
     ///     "995705032704"
     /// );
@@ -521,7 +521,7 @@ impl<'a, 'b, 'c> SubMul<&'a Natural, &'b Natural> for &'c Natural {
     ///     "8"
     /// );
     /// assert_eq!(
-    ///     (&Natural::trillion()).sub_mul(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32))
+    ///     (&Natural::trillion()).sub_mul(&Natural::from(0x10000u32), &Natural::from(0x10000u32))
     ///         .to_string(),
     ///     "995705032704"
     /// );
@@ -559,7 +559,7 @@ impl SubMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::trillion();
-    /// x.sub_mul_assign(Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    /// x.sub_mul_assign(Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: Natural) {
@@ -595,7 +595,7 @@ impl<'a> SubMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::trillion();
-    /// x.sub_mul_assign(Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    /// x.sub_mul_assign(Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     fn sub_mul_assign(&mut self, y: Natural, z: &'a Natural) {
@@ -631,7 +631,7 @@ impl<'a> SubMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::trillion();
-    /// x.sub_mul_assign(&Natural::from(0x1_0000u32), Natural::from(0x1_0000u32));
+    /// x.sub_mul_assign(&Natural::from(0x10000u32), Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: Natural) {
@@ -667,7 +667,7 @@ impl<'a, 'b> SubMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x, 8);
     ///
     /// let mut x = Natural::trillion();
-    /// x.sub_mul_assign(&Natural::from(0x1_0000u32), &Natural::from(0x1_0000u32));
+    /// x.sub_mul_assign(&Natural::from(0x10000u32), &Natural::from(0x10000u32));
     /// assert_eq!(x.to_string(), "995705032704");
     /// ```
     fn sub_mul_assign(&mut self, y: &'a Natural, z: &'b Natural) {

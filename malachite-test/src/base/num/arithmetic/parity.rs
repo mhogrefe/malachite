@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -82,7 +82,7 @@ fn benchmark_unsigned_even<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.even()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -91,7 +91,7 @@ fn benchmark_unsigned_even<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
-        &mut [("malachite", &mut (|u| no_out!(u.even())))],
+        &mut [("Malachite", &mut (|u| no_out!(u.even())))],
     );
 }
 
@@ -103,7 +103,7 @@ fn benchmark_signed_even<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.even()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -112,7 +112,7 @@ fn benchmark_signed_even<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
-        &mut [("malachite", &mut (|i| no_out!(i.even())))],
+        &mut [("Malachite", &mut (|i| no_out!(i.even())))],
     );
 }
 
@@ -189,7 +189,7 @@ fn benchmark_unsigned_odd<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.odd()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -198,7 +198,7 @@ fn benchmark_unsigned_odd<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
-        &mut [("malachite", &mut (|u| no_out!(u.odd())))],
+        &mut [("Malachite", &mut (|u| no_out!(u.odd())))],
     );
 }
 
@@ -210,7 +210,7 @@ fn benchmark_signed_odd<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.odd()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -219,7 +219,7 @@ fn benchmark_signed_odd<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
-        &mut [("malachite", &mut (|i| no_out!(i.odd())))],
+        &mut [("Malachite", &mut (|i| no_out!(i.odd())))],
     );
 }
 

@@ -39,13 +39,13 @@ fn test_limbs_neg_limb_get_bits() {
     test(1, 40, 50, &[0x3ff]);
     // start < Limb::WIDTH
     // trailing_zeros < start
-    test(0x1234_5678, 16, 48, &[0xffff_edcb]);
-    test(0x1234_5678, 4, 16, &[0xa98]);
+    test(0x12345678, 16, 48, &[0xffffedcb]);
+    test(0x12345678, 4, 16, &[0xa98]);
     // trailing_zeros >= start
-    test(0x1234_5678, 0, 100, &[0xedcb_a988, u32::MAX, u32::MAX, 0xf]);
-    test(0x1234_5678, 10, 10, &[]);
+    test(0x12345678, 0, 100, &[0xedcba988, u32::MAX, u32::MAX, 0xf]);
+    test(0x12345678, 10, 10, &[]);
     // trailing_zeros >= end
-    test(0x8000_0000, 5, 10, &[]);
+    test(0x80000000, 5, 10, &[]);
 }
 
 #[test]
@@ -68,20 +68,20 @@ fn test_limbs_slice_neg_get_bits() {
     // limb_end >= len
     // offset != 0
     // trailing_zeros < start
-    test(&[0x1234_5678, 0xabcd_ef01], 16, 48, &[0x10fe_edcb]);
+    test(&[0x12345678, 0xabcdef01], 16, 48, &[0x10feedcb]);
     // limb_end < len
-    test(&[0x1234_5678, 0xabcd_ef01], 4, 16, &[0xa98]);
+    test(&[0x12345678, 0xabcdef01], 4, 16, &[0xa98]);
     // offset == 0
     // trailing_zeros >= start
     test(
-        &[0x1234_5678, 0xabcd_ef01],
+        &[0x12345678, 0xabcdef01],
         0,
         100,
-        &[0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf],
+        &[0xedcba988, 0x543210fe, u32::MAX, 0xf],
     );
-    test(&[0x1234_5678, 0xabcd_ef01], 10, 10, &[]);
+    test(&[0x12345678, 0xabcdef01], 10, 10, &[]);
     // trailing_zeros >= end
-    test(&[0, 0x8000_0000], 5, 10, &[]);
+    test(&[0, 0x80000000], 5, 10, &[]);
 }
 
 #[test]
@@ -98,16 +98,16 @@ fn test_limbs_vec_neg_get_bits() {
         verify_limbs_neg_get_bits(xs, start, end, out);
     };
     test(&[1], 40, 50, &[0x3ff]);
-    test(&[0x1234_5678, 0xabcd_ef01], 16, 48, &[0x10fe_edcb]);
-    test(&[0x1234_5678, 0xabcd_ef01], 4, 16, &[0xa98]);
+    test(&[0x12345678, 0xabcdef01], 16, 48, &[0x10feedcb]);
+    test(&[0x12345678, 0xabcdef01], 4, 16, &[0xa98]);
     test(
-        &[0x1234_5678, 0xabcd_ef01],
+        &[0x12345678, 0xabcdef01],
         0,
         100,
-        &[0xedcb_a988, 0x5432_10fe, u32::MAX, 0xf],
+        &[0xedcba988, 0x543210fe, u32::MAX, 0xf],
     );
-    test(&[0x1234_5678, 0xabcd_ef01], 10, 10, &[]);
-    test(&[0, 0x8000_0000], 5, 10, &[]);
+    test(&[0x12345678, 0xabcdef01], 10, 10, &[]);
+    test(&[0, 0x80000000], 5, 10, &[]);
 }
 
 #[test]

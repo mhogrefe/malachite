@@ -1,7 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -702,7 +702,7 @@ fn benchmark_to_power_of_two_digits_asc_evaluation_strategy<
     T: PowerOfTwoDigits<U>,
     T: PowerOfTwoDigitIterable<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc(&{}, u64)",
             U::NAME,
@@ -717,7 +717,7 @@ fn benchmark_to_power_of_two_digits_asc_evaluation_strategy<
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(n, log_base)| {
                     no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(
                         &n, log_base
@@ -752,7 +752,7 @@ fn benchmark_to_power_of_two_digits_desc_evaluation_strategy<
     T: PowerOfTwoDigits<U>,
     T: PowerOfTwoDigitIterable<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigits::<{}>::to_power_of_two_digits_desc(&{}, u64)",
             U::NAME,
@@ -767,7 +767,7 @@ fn benchmark_to_power_of_two_digits_desc_evaluation_strategy<
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(n, log_base)| {
                     no_out!(PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(
                         &n, log_base
@@ -802,7 +802,7 @@ fn benchmark_from_power_of_two_digits_asc<
 ) where
     T: PowerOfTwoDigits<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}::from_power_of_two_digits_asc(u64, &[{}])",
             T::NAME,
@@ -816,7 +816,7 @@ fn benchmark_from_power_of_two_digits_asc<
         &(|(_, digits)| digits.len()),
         "bits.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(log_base, ref digits)| {
                 no_out!(T::from_power_of_two_digits_asc(log_base, digits))
             }),
@@ -834,7 +834,7 @@ fn benchmark_from_power_of_two_digits_desc<
 ) where
     T: PowerOfTwoDigits<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}::from_power_of_two_digits_desc(u64, &[{}])",
             T::NAME,
@@ -848,7 +848,7 @@ fn benchmark_from_power_of_two_digits_desc<
         &(|(_, digits)| digits.len()),
         "bits.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(log_base, ref digits)| {
                 no_out!(T::from_power_of_two_digits_desc(log_base, digits))
             }),

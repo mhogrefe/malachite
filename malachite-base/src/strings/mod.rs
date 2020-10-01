@@ -34,12 +34,12 @@ pub fn string_sort(s: &str) -> String {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::strings::string_nub;
+/// use malachite_base::strings::string_unique;
 ///
-/// assert_eq!(string_nub("Hello, world!"), "Helo, wrd!");
-/// assert_eq!(string_nub("Mississippi"), "Misp");
+/// assert_eq!(string_unique("Hello, world!"), "Helo, wrd!");
+/// assert_eq!(string_unique("Mississippi"), "Misp");
 /// ```
-pub fn string_nub(s: &str) -> String {
+pub fn string_unique(s: &str) -> String {
     let mut chars = HashSet::new();
     let mut nub = String::new();
     for c in s.chars() {

@@ -121,7 +121,7 @@ pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb 
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
 ///
 /// assert_eq!(limbs_eq_limb_mod_limb(&[6, 7], 3, 2), false);
-/// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1_238, 10), true);
+/// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1238, 10), true);
 /// ```
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.1.2, where a is positive and the

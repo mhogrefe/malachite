@@ -23,20 +23,73 @@ fn exhaustive_fixed_length_vecs_from_single_helper<I: Iterator>(
     );
 }
 
+fn exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
+    len: usize,
+    xs: I,
+    out_len: usize,
+    out: &[&[I::Item]],
+) where
+    I::Item: Clone + Debug + Eq,
+{
+    let xss = exhaustive_fixed_length_vecs_from_single(len, xs);
+    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    assert_eq!(
+        xss_prefix
+            .iter()
+            .map(Vec::as_slice)
+            .collect::<Vec<_>>()
+            .as_slice(),
+        out
+    );
+    assert_eq!(xss.count(), out_len);
+}
+
 #[test]
 fn test_exhaustive_fixed_length_vecs_from_single() {
     // This demonstrates that 0 ^ 0 == 1:
-    exhaustive_fixed_length_vecs_from_single_helper(0, nevers(), &[&[]]);
-    exhaustive_fixed_length_vecs_from_single_helper(1, nevers(), &[]);
-    exhaustive_fixed_length_vecs_from_single_helper(2, nevers(), &[]);
-    exhaustive_fixed_length_vecs_from_single_helper(5, nevers(), &[]);
-    exhaustive_fixed_length_vecs_from_single_helper(1, exhaustive_units(), &[&[()]]);
-    exhaustive_fixed_length_vecs_from_single_helper(2, exhaustive_units(), &[&[(), ()]]);
-    exhaustive_fixed_length_vecs_from_single_helper(5, exhaustive_units(), &[&[(); 5]]);
-    exhaustive_fixed_length_vecs_from_single_helper(0, exhaustive_unsigneds::<u8>(), &[&[]]);
-    exhaustive_fixed_length_vecs_from_single_helper(
+    exhaustive_fixed_length_vecs_from_single_finite_helper(0, nevers(), 1, &[&[]]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(1, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(2, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(5, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(1, exhaustive_units(), 1, &[&[()]]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(2, exhaustive_units(), 1, &[&[(), ()]]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(5, exhaustive_units(), 1, &[&[(); 5]]);
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
+        0,
+        exhaustive_unsigneds::<u8>(),
+        1,
+        &[&[]],
+    );
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
         1,
         exhaustive_unsigneds::<u8>(),
+        256,
+        &[
+            &[0],
+            &[1],
+            &[2],
+            &[3],
+            &[4],
+            &[5],
+            &[6],
+            &[7],
+            &[8],
+            &[9],
+            &[10],
+            &[11],
+            &[12],
+            &[13],
+            &[14],
+            &[15],
+            &[16],
+            &[17],
+            &[18],
+            &[19],
+        ],
+    );
+    exhaustive_fixed_length_vecs_from_single_helper(
+        1,
+        exhaustive_unsigneds::<u64>(),
         &[
             &[0],
             &[1],
@@ -112,9 +165,10 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[0, 3, 1],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_helper(
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
         2,
         exhaustive_ascii_chars(),
+        0x4000,
         &[
             &['a', 'a'],
             &['a', 'b'],
@@ -138,10 +192,16 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &['b', 'f'],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_helper(1, exhaustive_bools(), &[&[false], &[true]]);
-    exhaustive_fixed_length_vecs_from_single_helper(
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
+        1,
+        exhaustive_bools(),
+        2,
+        &[&[false], &[true]],
+    );
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
         2,
         exhaustive_bools(),
+        4,
         &[
             &[false, false],
             &[false, true],
@@ -149,9 +209,10 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[true, true],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_helper(
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
         4,
         exhaustive_bools(),
+        16,
         &[
             &[false, false, false, false],
             &[false, false, false, true],
@@ -169,6 +230,126 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[true, true, false, true],
             &[true, true, true, false],
             &[true, true, true, true],
+        ],
+    );
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
+        10,
+        exhaustive_bools(),
+        1024,
+        &[
+            &[
+                false, false, false, false, false, false, false, false, false, false,
+            ],
+            &[
+                false, false, false, false, false, false, false, false, false, true,
+            ],
+            &[
+                false, false, false, false, false, false, false, false, true, false,
+            ],
+            &[
+                false, false, false, false, false, false, false, false, true, true,
+            ],
+            &[
+                false, false, false, false, false, false, false, true, false, false,
+            ],
+            &[
+                false, false, false, false, false, false, false, true, false, true,
+            ],
+            &[
+                false, false, false, false, false, false, false, true, true, false,
+            ],
+            &[
+                false, false, false, false, false, false, false, true, true, true,
+            ],
+            &[
+                false, false, false, false, false, false, true, false, false, false,
+            ],
+            &[
+                false, false, false, false, false, false, true, false, false, true,
+            ],
+            &[
+                false, false, false, false, false, false, true, false, true, false,
+            ],
+            &[
+                false, false, false, false, false, false, true, false, true, true,
+            ],
+            &[
+                false, false, false, false, false, false, true, true, false, false,
+            ],
+            &[
+                false, false, false, false, false, false, true, true, false, true,
+            ],
+            &[
+                false, false, false, false, false, false, true, true, true, false,
+            ],
+            &[
+                false, false, false, false, false, false, true, true, true, true,
+            ],
+            &[
+                false, false, false, false, false, true, false, false, false, false,
+            ],
+            &[
+                false, false, false, false, false, true, false, false, false, true,
+            ],
+            &[
+                false, false, false, false, false, true, false, false, true, false,
+            ],
+            &[
+                false, false, false, false, false, true, false, false, true, true,
+            ],
+        ],
+    );
+    exhaustive_fixed_length_vecs_from_single_finite_helper(
+        10,
+        0..3,
+        59049,
+        &[
+            &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+            &[0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            &[0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+            &[0, 0, 0, 0, 0, 0, 0, 1, 1, 0],
+            &[0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+            &[0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            &[0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+            &[0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+            &[0, 0, 0, 0, 0, 0, 1, 0, 1, 1],
+            &[0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+            &[0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
+            &[0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+            &[0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+            &[0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            &[0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+            &[0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+            &[0, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+        ],
+    );
+    exhaustive_fixed_length_vecs_from_single_helper(
+        2,
+        exhaustive_fixed_length_vecs_from_single(2, exhaustive_unsigneds::<u8>()),
+        &[
+            &[vec![0, 0], vec![0, 0]],
+            &[vec![0, 0], vec![0, 1]],
+            &[vec![0, 1], vec![0, 0]],
+            &[vec![0, 1], vec![0, 1]],
+            &[vec![0, 0], vec![1, 0]],
+            &[vec![0, 0], vec![1, 1]],
+            &[vec![0, 1], vec![1, 0]],
+            &[vec![0, 1], vec![1, 1]],
+            &[vec![1, 0], vec![0, 0]],
+            &[vec![1, 0], vec![0, 1]],
+            &[vec![1, 1], vec![0, 0]],
+            &[vec![1, 1], vec![0, 1]],
+            &[vec![1, 0], vec![1, 0]],
+            &[vec![1, 0], vec![1, 1]],
+            &[vec![1, 1], vec![1, 0]],
+            &[vec![1, 1], vec![1, 1]],
+            &[vec![0, 0], vec![0, 2]],
+            &[vec![0, 0], vec![0, 3]],
+            &[vec![0, 1], vec![0, 2]],
+            &[vec![0, 1], vec![0, 3]],
         ],
     );
 }

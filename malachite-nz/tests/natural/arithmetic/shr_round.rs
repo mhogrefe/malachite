@@ -31,11 +31,11 @@ fn test_limbs_shr_round_up_and_limbs_vec_shr_round_up_in_place() {
     test(&[122, 456], 1, &[61, 228]);
     test(&[123, 456], 0, &[123, 456]);
     test(&[123, 456], 1, &[62, 228]);
-    test(&[123, 455], 1, &[2_147_483_710, 227]);
+    test(&[123, 455], 1, &[2147483710, 227]);
     test(&[123, 456], 31, &[913, 0]);
     test(&[123, 456], 32, &[457]);
     test(&[123, 456], 100, &[1]);
-    test(&[256, 456], 8, &[3_355_443_201, 1]);
+    test(&[256, 456], 8, &[3355443201, 1]);
     test(&[u32::MAX, 1], 1, &[0, 1]);
     test(&[u32::MAX, u32::MAX], 32, &[0, 1]);
 }
@@ -62,11 +62,11 @@ fn test_limbs_shr_round_nearest_and_limbs_vec_shr_round_nearest_in_place() {
     test(&[122, 456], 1, &[61, 228]);
     test(&[123, 456], 0, &[123, 456]);
     test(&[123, 456], 1, &[62, 228]);
-    test(&[123, 455], 1, &[2_147_483_710, 227]);
+    test(&[123, 455], 1, &[2147483710, 227]);
     test(&[123, 456], 31, &[912, 0]);
     test(&[123, 456], 32, &[456]);
     test(&[123, 456], 100, &[]);
-    test(&[256, 456], 8, &[3_355_443_201, 1]);
+    test(&[256, 456], 8, &[3355443201, 1]);
     test(&[u32::MAX, 1], 1, &[0, 1]);
     test(&[u32::MAX, u32::MAX], 32, &[0, 1]);
 }
@@ -94,7 +94,7 @@ fn test_limbs_shr_exact_and_limbs_vec_shr_exact_in_place() {
     test(&[123, 456], 31, None);
     test(&[123, 456], 32, None);
     test(&[123, 456], 100, None);
-    test(&[256, 456], 8, Some(vec![3_355_443_201, 1]));
+    test(&[256, 456], 8, Some(vec![3355443201, 1]));
     test(&[u32::MAX, 1], 1, None);
     test(&[u32::MAX, u32::MAX], 32, None);
 }
@@ -122,7 +122,7 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
         &[123, 455],
         1,
         RoundingMode::Floor,
-        Some(vec![2_147_483_709, 227]),
+        Some(vec![2147483709, 227]),
     );
     test(&[123, 456], 31, RoundingMode::Ceiling, Some(vec![913, 0]));
     test(&[123, 456], 32, RoundingMode::Up, Some(vec![457]));
@@ -131,7 +131,7 @@ fn test_limbs_shr_round_and_limbs_vec_shr_round_in_place() {
         &[256, 456],
         8,
         RoundingMode::Exact,
-        Some(vec![3_355_443_201, 1]),
+        Some(vec![3355443201, 1]),
     );
     test(&[u32::MAX, 1], 1, RoundingMode::Exact, None);
     test(

@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -94,7 +94,7 @@ fn benchmark_sub_mul_unsigned<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sub_mul({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds_var_4::<T>(gm),
@@ -103,7 +103,7 @@ fn benchmark_sub_mul_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y, z)| no_out!(x.sub_mul(y, z))))],
+        &mut [("Malachite", &mut (|(x, y, z)| no_out!(x.sub_mul(y, z))))],
     );
 }
 
@@ -115,7 +115,7 @@ fn benchmark_sub_mul_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sub_mul({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds_var_3::<T>(gm),
@@ -124,7 +124,7 @@ fn benchmark_sub_mul_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y, z)| no_out!(x.sub_mul(y, z))))],
+        &mut [("Malachite", &mut (|(x, y, z)| no_out!(x.sub_mul(y, z))))],
     );
 }
 
@@ -133,7 +133,7 @@ fn benchmark_sub_mul_assign_unsigned<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sub_mul_assign({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds_var_4::<T>(gm),
@@ -142,7 +142,7 @@ fn benchmark_sub_mul_assign_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y, z)| x.sub_mul_assign(y, z)))],
+        &mut [("Malachite", &mut (|(mut x, y, z)| x.sub_mul_assign(y, z)))],
     );
 }
 
@@ -154,7 +154,7 @@ fn benchmark_sub_mul_assign_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.sub_mul_assign({}, u64)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds_var_3::<T>(gm),
@@ -163,7 +163,7 @@ fn benchmark_sub_mul_assign_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y, z)| x.sub_mul_assign(y, z)))],
+        &mut [("Malachite", &mut (|(mut x, y, z)| x.sub_mul_assign(y, z)))],
     );
 }
 

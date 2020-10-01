@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 use malachite_nz_test_util::integer::logic::checked_count_zeros::{
     integer_checked_count_zeros_alt_1, integer_checked_count_zeros_alt_2,
@@ -38,7 +38,7 @@ fn demo_integer_checked_count_zeros(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_count_zeros_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_count_zeros_neg(&[u32])",
         BenchmarkType::Single,
         nonempty_vecs_of_unsigned(gm),
@@ -48,7 +48,7 @@ fn benchmark_limbs_count_zeros_neg(gm: GenerationMode, limit: usize, file_name: 
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|limbs| no_out!(limbs_count_zeros_neg(&limbs))),
         )],
     );
@@ -59,7 +59,7 @@ fn benchmark_integer_checked_count_zeros_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.checked_count_zeros()",
         BenchmarkType::Algorithms,
         integers(gm),

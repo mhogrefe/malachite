@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{
     ModMul, ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoMulAssign, PowerOfTwo,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_power_of_two_mul::{
     limbs_mod_power_of_two_mul, limbs_mod_power_of_two_mul_ref_ref,
     limbs_mod_power_of_two_mul_val_ref,
@@ -164,7 +164,7 @@ fn benchmark_limbs_mod_power_of_two_mul_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two_mul(&[Limb], &[Limb], u64)",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_limb_vec_and_u64_var_16(gm),
@@ -201,7 +201,7 @@ fn benchmark_natural_mod_power_of_two_mul_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_mul_assign(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_u64_var_1(gm),
@@ -228,7 +228,7 @@ fn benchmark_natural_mod_power_of_two_mul_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_mul(Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_natural_and_u64_var_1(gm),
@@ -259,7 +259,7 @@ fn benchmark_natural_mod_power_of_two_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_mul(Natural, u64)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_u64_var_1(gm),

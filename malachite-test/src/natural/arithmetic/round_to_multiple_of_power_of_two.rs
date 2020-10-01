@@ -7,7 +7,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{
     limbs_round_to_multiple_of_power_of_two, limbs_round_to_multiple_of_power_of_two_down,
     limbs_round_to_multiple_of_power_of_two_down_in_place,
@@ -258,7 +258,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_down(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -268,7 +268,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, pow)| {
                 no_out!(limbs_round_to_multiple_of_power_of_two_down(&limbs, pow))
             }),
@@ -281,7 +281,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_up(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -291,7 +291,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, pow)| no_out!(limbs_round_to_multiple_of_power_of_two_up(&limbs, pow))),
         )],
     );
@@ -302,7 +302,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -312,7 +312,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, pow)| {
                 no_out!(limbs_round_to_multiple_of_power_of_two_nearest(&limbs, pow))
             }),
@@ -325,7 +325,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -335,7 +335,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two(
         &(|&(ref limbs, pow, _)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, pow, rm)| {
                 no_out!(limbs_round_to_multiple_of_power_of_two(&limbs, pow, rm))
             }),
@@ -348,7 +348,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_down_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -358,7 +358,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_down_in_place(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, pow)| {
                 limbs_round_to_multiple_of_power_of_two_down_in_place(&mut limbs, pow)
             }),
@@ -371,7 +371,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -381,7 +381,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_up_in_place(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, pow)| {
                 limbs_round_to_multiple_of_power_of_two_up_in_place(&mut limbs, pow)
             }),
@@ -394,7 +394,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -404,7 +404,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_nearest_in_place(
         &(|&(ref limbs, pow)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, pow)| {
                 limbs_round_to_multiple_of_power_of_two_nearest_in_place(&mut limbs, pow)
             }),
@@ -417,7 +417,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_round_to_multiple_of_power_of_two_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -427,7 +427,7 @@ fn benchmark_limbs_round_to_multiple_of_power_of_two_in_place(
         &(|&(ref limbs, pow, _)| max(limbs.len(), usize::exact_from(pow) >> Limb::LOG_WIDTH)),
         "max(limbs.len(), pow / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, pow, rm)| {
                 no_out!(limbs_round_to_multiple_of_power_of_two_in_place(
                     &mut limbs, pow, rm
@@ -442,7 +442,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.round_to_multiple_of_power_of_two_assign(u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),
@@ -452,7 +452,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_assign(
         &(|&(ref n, pow, _)| usize::exact_from(max(n.significant_bits(), pow))),
         "max(self.significant_bits(), pow)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y, rm)| x.round_to_multiple_of_power_of_two_assign(y, rm)),
         )],
     );
@@ -463,7 +463,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::Algorithms,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),
@@ -494,7 +494,7 @@ fn benchmark_natural_round_to_multiple_of_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.round_to_multiple_of_power_of_two(u64, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_small_unsigned_and_rounding_mode_var_1(gm),

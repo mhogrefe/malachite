@@ -1,29 +1,22 @@
 use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 
-fn bit_map_helper(
-    output_types: &[BitDistributorOutputType],
-    bit_map: &[usize],
-    expected_outputs: &[&[usize]],
-) {
-    let mut distributor = BitDistributor::new(output_types);
-    assert_eq!(distributor.bit_map_as_slice(), bit_map);
+fn bit_distributor_helper(mut bit_distributor: BitDistributor, expected_outputs: &[&[usize]]) {
     let mut outputs = Vec::new();
     for _ in 0..20 {
         outputs.push(
-            (0..output_types.len())
-                .map(|i| distributor.get_output(i))
+            (0..bit_distributor.output_types.len())
+                .map(|i| bit_distributor.get_output(i))
                 .collect::<Vec<usize>>(),
         );
-        distributor.increment_counter();
+        bit_distributor.increment_counter();
     }
     assert_eq!(outputs, expected_outputs);
 }
 
 #[test]
-fn test_bit_map() {
-    bit_map_helper(
-        &[BitDistributorOutputType::normal(1)],
-        &[0; 64],
+fn test_get_output() {
+    bit_distributor_helper(
+        BitDistributor::new(&[BitDistributorOutputType::normal(1)]),
         &[
             &[0],
             &[1],
@@ -47,13 +40,8 @@ fn test_bit_map() {
             &[19],
         ],
     );
-    bit_map_helper(
-        &[BitDistributorOutputType::normal(1); 2],
-        &[
-            1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
-            0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 0,
-        ],
+    bit_distributor_helper(
+        BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]),
         &[
             &[0, 0],
             &[0, 1],
@@ -77,13 +65,8 @@ fn test_bit_map() {
             &[1, 5],
         ],
     );
-    bit_map_helper(
-        &[BitDistributorOutputType::normal(1); 3],
-        &[
-            2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1,
-            0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2,
-            1, 0, 2, 1, 0, 2,
-        ],
+    bit_distributor_helper(
+        BitDistributor::new(&[BitDistributorOutputType::normal(1); 3]),
         &[
             &[0, 0, 0],
             &[0, 0, 1],
@@ -107,13 +90,8 @@ fn test_bit_map() {
             &[0, 3, 1],
         ],
     );
-    bit_map_helper(
-        &[BitDistributorOutputType::normal(1); 5],
-        &[
-            4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1,
-            0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0, 4, 3, 2,
-            1, 0, 4, 3, 2, 1,
-        ],
+    bit_distributor_helper(
+        BitDistributor::new(&[BitDistributorOutputType::normal(1); 5]),
         &[
             &[0, 0, 0, 0, 0],
             &[0, 0, 0, 0, 1],
@@ -137,13 +115,8 @@ fn test_bit_map() {
             &[1, 0, 0, 1, 1],
         ],
     );
-    bit_map_helper(
-        &[BitDistributorOutputType::normal(2); 2],
-        &[
-            1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1,
-            1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1,
-            0, 0, 1, 1, 0, 0,
-        ],
+    bit_distributor_helper(
+        BitDistributor::new(&[BitDistributorOutputType::normal(2); 2]),
         &[
             &[0, 0],
             &[0, 1],
@@ -167,16 +140,11 @@ fn test_bit_map() {
             &[0, 7],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::normal(2),
-        ],
-        &[
-            1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1,
-            0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1,
-            1, 0, 1, 1, 0, 1,
-        ],
+        ]),
         &[
             &[0, 0],
             &[0, 1],
@@ -200,16 +168,11 @@ fn test_bit_map() {
             &[0, 11],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(2),
             BitDistributorOutputType::normal(1),
-        ],
-        &[
-            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-            0, 0, 1, 0, 0, 1,
-        ],
+        ]),
         &[
             &[0, 0],
             &[0, 1],
@@ -233,16 +196,11 @@ fn test_bit_map() {
             &[5, 1],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(2),
             BitDistributorOutputType::normal(3),
-        ],
-        &[
-            1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0,
-            0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1,
-            0, 0, 1, 1, 1, 0,
-        ],
+        ]),
         &[
             &[0, 0],
             &[0, 1],
@@ -266,16 +224,11 @@ fn test_bit_map() {
             &[2, 3],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::tiny(),
-        ],
-        &[
-            1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 1,
-        ],
+        ]),
         &[
             &[0, 0],
             &[0, 1],
@@ -299,16 +252,11 @@ fn test_bit_map() {
             &[2, 3],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::tiny(),
             BitDistributorOutputType::normal(1),
-        ],
-        &[
-            0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 0,
-        ],
+        ]),
         &[
             &[0, 0],
             &[1, 0],
@@ -332,17 +280,12 @@ fn test_bit_map() {
             &[3, 2],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::tiny(),
             BitDistributorOutputType::tiny(),
-        ],
-        &[
-            2, 1, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 2,
-        ],
+        ]),
         &[
             &[0, 0, 0],
             &[0, 0, 1],
@@ -366,18 +309,13 @@ fn test_bit_map() {
             &[2, 1, 1],
         ],
     );
-    bit_map_helper(
-        &[
+    bit_distributor_helper(
+        BitDistributor::new(&[
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::tiny(),
             BitDistributorOutputType::tiny(),
-        ],
-        &[
-            3, 2, 1, 3, 0, 1, 0, 2, 1, 0, 1, 0, 1, 0, 1, 3, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-            1, 0, 2, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 3,
-        ],
+        ]),
         &[
             &[0, 0, 0, 0],
             &[0, 0, 0, 1],
@@ -401,74 +339,10 @@ fn test_bit_map() {
             &[1, 0, 1, 1],
         ],
     );
-    bit_map_helper(
-        &[BitDistributorOutputType::normal_with_max_bits(1, 5)],
-        &[
-            0,
-            0,
-            0,
-            0,
-            0,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-        ],
+    let mut bit_distributor = BitDistributor::new(&[BitDistributorOutputType::normal(1)]);
+    bit_distributor.set_max_bits(&[0], 5);
+    bit_distributor_helper(
+        bit_distributor,
         &[
             &[0],
             &[1],
@@ -492,16 +366,10 @@ fn test_bit_map() {
             &[19],
         ],
     );
-    bit_map_helper(
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal_with_max_bits(1, 2),
-        ],
-        &[
-            1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0,
-        ],
+    let mut bit_distributor = BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]);
+    bit_distributor.set_max_bits(&[1], 2);
+    bit_distributor_helper(
+        bit_distributor,
         &[
             &[0, 0],
             &[0, 1],
@@ -525,16 +393,10 @@ fn test_bit_map() {
             &[5, 1],
         ],
     );
-    bit_map_helper(
-        &[
-            BitDistributorOutputType::normal_with_max_bits(1, 2),
-            BitDistributorOutputType::normal(1),
-        ],
-        &[
-            1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-        ],
+    let mut bit_distributor = BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]);
+    bit_distributor.set_max_bits(&[0], 2);
+    bit_distributor_helper(
+        bit_distributor,
         &[
             &[0, 0],
             &[0, 1],
@@ -558,16 +420,13 @@ fn test_bit_map() {
             &[1, 5],
         ],
     );
-    bit_map_helper(
-        &[
-            BitDistributorOutputType::normal_with_max_bits(1, 2),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1,
-        ],
+    let mut bit_distributor = BitDistributor::new(&[
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ]);
+    bit_distributor.set_max_bits(&[0], 2);
+    bit_distributor_helper(
+        bit_distributor,
         &[
             &[0, 0],
             &[0, 1],
@@ -591,80 +450,44 @@ fn test_bit_map() {
             &[2, 3],
         ],
     );
-    bit_map_helper(
+    let mut bit_distributor = BitDistributor::new(&[
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ]);
+    bit_distributor.set_max_bits(&[1], 2);
+    bit_distributor_helper(
+        bit_distributor,
         &[
-            BitDistributorOutputType::normal_with_max_bits(1, 2),
-            BitDistributorOutputType::normal_with_max_bits(1, 1),
-            BitDistributorOutputType::normal_with_max_bits(1, 5),
-            BitDistributorOutputType::normal_with_max_bits(1, 3),
-            BitDistributorOutputType::normal_with_max_bits(1, 4),
+            &[0, 0],
+            &[0, 1],
+            &[0, 2],
+            &[0, 3],
+            &[1, 0],
+            &[1, 1],
+            &[1, 2],
+            &[1, 3],
+            &[2, 0],
+            &[2, 1],
+            &[2, 2],
+            &[2, 3],
+            &[3, 0],
+            &[3, 1],
+            &[3, 2],
+            &[3, 3],
+            &[4, 0],
+            &[4, 1],
+            &[4, 2],
+            &[4, 3],
         ],
-        &[
-            4,
-            3,
-            2,
-            1,
-            0,
-            4,
-            3,
-            2,
-            0,
-            4,
-            3,
-            2,
-            4,
-            2,
-            2,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-            usize::MAX,
-        ],
+    );
+    let mut bit_distributor = BitDistributor::new(&[BitDistributorOutputType::normal(1); 5]);
+    bit_distributor.set_max_bits(&[0], 2);
+    bit_distributor.set_max_bits(&[1], 1);
+    bit_distributor.set_max_bits(&[2], 5);
+    bit_distributor.set_max_bits(&[3], 3);
+    bit_distributor.set_max_bits(&[4], 4);
+    bit_distributor_helper(
+        bit_distributor,
         &[
             &[0, 0, 0, 0, 0],
             &[0, 0, 0, 0, 1],
@@ -688,4 +511,69 @@ fn test_bit_map() {
             &[1, 0, 0, 1, 1],
         ],
     );
+    let mut bit_distributor = BitDistributor::new(&[BitDistributorOutputType::normal(2); 2]);
+    bit_distributor.set_max_bits(&[0], 5);
+    bit_distributor_helper(
+        bit_distributor,
+        &[
+            &[0, 0],
+            &[0, 1],
+            &[0, 2],
+            &[0, 3],
+            &[1, 0],
+            &[1, 1],
+            &[1, 2],
+            &[1, 3],
+            &[2, 0],
+            &[2, 1],
+            &[2, 2],
+            &[2, 3],
+            &[3, 0],
+            &[3, 1],
+            &[3, 2],
+            &[3, 3],
+            &[0, 4],
+            &[0, 5],
+            &[0, 6],
+            &[0, 7],
+        ],
+    );
+    let mut bit_distributor = BitDistributor::new(&[
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ]);
+    bit_distributor.set_max_bits(&[0], 5);
+    bit_distributor_helper(
+        bit_distributor,
+        &[
+            &[0, 0, 0],
+            &[0, 0, 1],
+            &[0, 1, 0],
+            &[0, 1, 1],
+            &[1, 0, 0],
+            &[1, 0, 1],
+            &[1, 1, 0],
+            &[1, 1, 1],
+            &[0, 0, 2],
+            &[0, 0, 3],
+            &[0, 1, 2],
+            &[0, 1, 3],
+            &[1, 0, 2],
+            &[1, 0, 3],
+            &[1, 1, 2],
+            &[1, 1, 3],
+            &[2, 0, 0],
+            &[2, 0, 1],
+            &[2, 1, 0],
+            &[2, 1, 1],
+        ],
+    );
+}
+
+#[test]
+#[should_panic]
+fn get_output_fail() {
+    let bd = BitDistributor::new(&[BitDistributorOutputType::normal(2); 3]);
+    bd.get_output(4);
 }

@@ -32,11 +32,11 @@ fn test_limbs_not_to_out() {
         assert_eq!(mut_out, out_after);
     };
     test(&[], &[], &[]);
-    test(&[0x1111_1111], &[5], &[0xeeee_eeee]);
+    test(&[0x11111111], &[5], &[0xeeeeeeee]);
     test(
-        &[0xffff_0000, 0xf0f0_f0f0],
+        &[0xffff0000, 0xf0f0f0f0],
         &[0, 1, 2],
-        &[0xffff, 0xf0f_0f0f, 2],
+        &[0xffff, 0xf0f0f0f, 2],
     );
 }
 

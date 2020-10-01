@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     RemPowerOfTwoAssign,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
     limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,
@@ -230,7 +230,7 @@ fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -240,7 +240,7 @@ fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name:
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_mod_power_of_two(&limbs, bits))),
         )],
     );
@@ -251,7 +251,7 @@ fn benchmark_limbs_slice_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -261,7 +261,7 @@ fn benchmark_limbs_slice_mod_power_of_two_in_place(
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_slice_mod_power_of_two_in_place(&mut limbs, bits)),
         )],
     );
@@ -272,7 +272,7 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -282,14 +282,14 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_vec_mod_power_of_two_in_place(&mut limbs, bits)),
         )],
     );
 }
 
 fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_neg_mod_power_of_two(&[u32], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -299,7 +299,7 @@ fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_n
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_neg_mod_power_of_two(&limbs, bits))),
         )],
     );
@@ -310,7 +310,7 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_neg_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -320,14 +320,14 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
         &(|&(_, pow)| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_neg_mod_power_of_two_in_place(&mut limbs, bits)),
         )],
     );
 }
 
 fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -337,7 +337,7 @@ fn benchmark_natural_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
         )],
     );
@@ -348,7 +348,7 @@ fn benchmark_natural_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),
@@ -371,7 +371,7 @@ fn benchmark_natural_mod_power_of_two_evaluation_strategy(
 }
 
 fn benchmark_natural_rem_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.rem_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -381,7 +381,7 @@ fn benchmark_natural_rem_power_of_two_assign(gm: GenerationMode, limit: usize, f
         &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.rem_power_of_two_assign(u)),
         )],
     );
@@ -392,7 +392,7 @@ fn benchmark_natural_rem_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.rem_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),
@@ -419,7 +419,7 @@ fn benchmark_natural_neg_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned(gm),
@@ -429,7 +429,7 @@ fn benchmark_natural_neg_mod_power_of_two_assign(
         &(|&(_, index)| usize::exact_from(index)),
         "other",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.neg_mod_power_of_two_assign(u)),
         )],
     );
@@ -440,7 +440,7 @@ fn benchmark_natural_neg_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_small_unsigned(gm),

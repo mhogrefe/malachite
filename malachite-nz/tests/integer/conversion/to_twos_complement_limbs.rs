@@ -43,8 +43,8 @@ fn test_limbs_twos_complement() {
     let test = |xs: &[Limb], out: &[Limb]| {
         assert_eq!(limbs_twos_complement(xs), out);
     };
-    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
-    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3]);
+    test(&[1, 2, 3], &[u32::MAX, 0xfffffffd, 0xfffffffc]);
+    test(&[u32::MAX, 0xfffffffd, 0xfffffffc], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -77,8 +77,8 @@ fn test_limbs_twos_complement_in_place() {
         assert_eq!(mut_xs, out);
     };
     test(&[], &[], true);
-    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc], false);
-    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3], false);
+    test(&[1, 2, 3], &[u32::MAX, 0xfffffffd, 0xfffffffc], false);
+    test(&[u32::MAX, 0xfffffffd, 0xfffffffc], &[1, 2, 3], false);
     test(&[0, 0, 0], &[0, 0, 0], true);
 }
 
@@ -90,8 +90,8 @@ fn test_limbs_twos_complement_and_maybe_sign_extend_negative_in_place() {
         limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_xs);
         assert_eq!(mut_xs, out);
     };
-    test(&[1, 2, 3], &[u32::MAX, 0xffff_fffd, 0xffff_fffc]);
-    test(&[u32::MAX, 0xffff_fffd, 0xffff_fffc], &[1, 2, 3, u32::MAX]);
+    test(&[1, 2, 3], &[u32::MAX, 0xfffffffd, 0xfffffffc]);
+    test(&[u32::MAX, 0xfffffffd, 0xfffffffc], &[1, 2, 3, u32::MAX]);
     test(&[0, u32::MAX], &[0, 1, u32::MAX]);
 }
 
@@ -114,9 +114,9 @@ fn test_twos_complement_limbs_asc() {
     };
     test("0", vec![]);
     test("123", vec![123]);
-    test("-123", vec![4_294_967_173]);
-    test("1000000000000", vec![3_567_587_328, 232]);
-    test("-1000000000000", vec![727_379_968, 4_294_967_063]);
+    test("-123", vec![4294967173]);
+    test("1000000000000", vec![3567587328, 232]);
+    test("-1000000000000", vec![727379968, 4294967063]);
     test(
         "1701411834921604967429270619762735448065",
         vec![1, 2, 3, 4, 5],
@@ -186,9 +186,9 @@ fn test_twos_complement_limbs_desc() {
     };
     test("0", vec![]);
     test("123", vec![123]);
-    test("-123", vec![4_294_967_173]);
-    test("1000000000000", vec![232, 3_567_587_328]);
-    test("-1000000000000", vec![4_294_967_063, 727_379_968]);
+    test("-123", vec![4294967173]);
+    test("1000000000000", vec![232, 3567587328]);
+    test("-1000000000000", vec![4294967063, 727379968]);
     test(
         "1701411834921604967429270619762735448065",
         vec![5, 4, 3, 2, 1],

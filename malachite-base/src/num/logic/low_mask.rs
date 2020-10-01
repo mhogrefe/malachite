@@ -31,7 +31,7 @@ macro_rules! impl_low_mask_unsigned {
             /// assert_eq!(u16::low_mask(0), 0);
             /// assert_eq!(u8::low_mask(3), 0x7);
             /// assert_eq!(u8::low_mask(8), 0xff);
-            /// assert_eq!(u64::low_mask(40), 0xff_ffff_ffff);
+            /// assert_eq!(u64::low_mask(40), 0xffffffffff);
             /// ```
             #[inline]
             fn low_mask(bits: u64) -> $t {
@@ -73,7 +73,7 @@ macro_rules! impl_low_mask_signed {
             /// assert_eq!(u16::low_mask(0), 0);
             /// assert_eq!(u8::low_mask(3), 0x7);
             /// assert_eq!(u8::low_mask(8), 0xff);
-            /// assert_eq!(u64::low_mask(40), 0xff_ffff_ffff);
+            /// assert_eq!(u64::low_mask(40), 0xffffffffff);
             /// ```
             #[inline]
             fn low_mask(bits: u64) -> $t {

@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -112,7 +112,7 @@ fn benchmark_unsigned_div_round<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.div_round({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigned_positive_unsigned_and_rounding_mode_var_1::<T>(gm),
@@ -121,7 +121,7 @@ fn benchmark_unsigned_div_round<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y, rm)| no_out!(x.div_round(y, rm))))],
+        &mut [("Malachite", &mut (|(x, y, rm)| no_out!(x.div_round(y, rm))))],
     );
 }
 
@@ -133,7 +133,7 @@ fn benchmark_signed_div_round<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.div_round({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signed_nonzero_signed_and_rounding_mode_var_1::<T>(gm),
@@ -142,7 +142,7 @@ fn benchmark_signed_div_round<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y, rm)| no_out!(x.div_round(y, rm))))],
+        &mut [("Malachite", &mut (|(x, y, rm)| no_out!(x.div_round(y, rm))))],
     );
 }
 
@@ -151,7 +151,7 @@ fn benchmark_unsigned_div_round_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.div_round_assign({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigned_positive_unsigned_and_rounding_mode_var_1::<T>(gm),
@@ -161,7 +161,7 @@ fn benchmark_unsigned_div_round_assign<T: PrimitiveUnsigned + Rand>(
         &(|(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y, rm)| x.div_round_assign(y, rm)),
         )],
     );
@@ -175,7 +175,7 @@ fn benchmark_signed_div_round_assign<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.div_round_assign({}, RoundingMode)", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signed_nonzero_signed_and_rounding_mode_var_1::<T>(gm),
@@ -185,7 +185,7 @@ fn benchmark_signed_div_round_assign<T: PrimitiveSigned + Rand>(
         &(|(x, y, _)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y, rm)| x.div_round_assign(y, rm)),
         )],
     );

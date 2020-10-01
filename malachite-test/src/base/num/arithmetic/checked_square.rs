@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -58,7 +58,7 @@ fn benchmark_unsigned_checked_square<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.checked_square()", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -67,7 +67,7 @@ fn benchmark_unsigned_checked_square<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.checked_square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.checked_square())))],
     );
 }
 
@@ -79,7 +79,7 @@ fn benchmark_signed_checked_square<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.checked_square()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -88,7 +88,7 @@ fn benchmark_signed_checked_square<T: PrimitiveSigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.checked_square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.checked_square())))],
     );
 }
 macro_rules! unsigned {

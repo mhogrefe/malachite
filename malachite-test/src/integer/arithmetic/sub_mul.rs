@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
@@ -300,7 +300,7 @@ fn demo_integer_sub_mul_ref_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_overflowing_sub_mul_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul_limb(&[Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -310,7 +310,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb(gm: GenerationMode, limit: usize, fi
         &(|&(ref a, ref b, _)| max(a.len(), b.len())),
         "max(a.len(), b.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, b, c)| no_out!(limbs_overflowing_sub_mul_limb(&a, &b, c))),
         )],
     );
@@ -321,7 +321,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul_limb_in_place_left(&mut Vec<Limb>, &[Limb], Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -331,7 +331,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_left(
         &(|&(ref a, ref b, _)| max(a.len(), b.len())),
         "max(a.len(), b.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, b, c)| {
                 no_out!(limbs_overflowing_sub_mul_limb_in_place_left(&mut a, &b, c))
             }),
@@ -344,7 +344,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_right(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul_limb_in_place_right(&[Limb], &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -354,7 +354,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_right(
         &(|&(ref a, ref b, _)| max(a.len(), b.len())),
         "max(a.len(), b.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, mut b, c)| {
                 no_out!(limbs_overflowing_sub_mul_limb_in_place_right(&a, &mut b, c))
             }),
@@ -367,7 +367,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul_limb_in_place_either(&mut Vec<Limb>, &mut Vec<Limb>, Limb)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -377,7 +377,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
         &(|&(ref a, ref b, _)| max(a.len(), b.len())),
         "max(a.len(), b.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, mut b, c)| {
                 no_out!(limbs_overflowing_sub_mul_limb_in_place_either(
                     &mut a, &mut b, c
@@ -388,7 +388,7 @@ fn benchmark_limbs_overflowing_sub_mul_limb_in_place_either(
 }
 
 fn benchmark_limbs_overflowing_sub_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul(&[Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_29(gm),
@@ -398,7 +398,7 @@ fn benchmark_limbs_overflowing_sub_mul(gm: GenerationMode, limit: usize, file_na
         &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
         "max(a.len(), b.len(), c.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(a, b, c)| no_out!(limbs_overflowing_sub_mul(&a, &b, &c))),
         )],
     );
@@ -409,7 +409,7 @@ fn benchmark_limbs_overflowing_sub_mul_in_place_left(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_overflowing_sub_mul_in_place_left(&mut Vec<Limb>, &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_29(gm),
@@ -419,7 +419,7 @@ fn benchmark_limbs_overflowing_sub_mul_in_place_left(
         &(|&(ref a, ref b, ref c)| max!(a.len(), b.len(), c.len())),
         "max(a.len(), b.len(), c.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut a, b, c)| no_out!(limbs_overflowing_sub_mul_in_place_left(&mut a, &b, &c))),
         )],
     );
@@ -432,7 +432,7 @@ fn benchmark_integer_sub_mul_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul_assign(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integers(gm),
@@ -463,7 +463,7 @@ fn benchmark_integer_sub_mul_assign_evaluation_strategy(
 }
 
 fn benchmark_integer_sub_mul_assign_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul_assign(Integer, Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -490,7 +490,7 @@ fn benchmark_integer_sub_mul_assign_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul_assign(Integer, &Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -517,7 +517,7 @@ fn benchmark_integer_sub_mul_assign_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul_assign(&Integer, Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -544,7 +544,7 @@ fn benchmark_integer_sub_mul_assign_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul_assign(&Integer, &Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -571,7 +571,7 @@ fn benchmark_integer_sub_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul(Integer, Integer)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integers(gm),
@@ -606,7 +606,7 @@ fn benchmark_integer_sub_mul_evaluation_strategy(
 }
 
 fn benchmark_integer_sub_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul(Integer, Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -633,7 +633,7 @@ fn benchmark_integer_sub_mul_val_val_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul(Integer, &Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -660,7 +660,7 @@ fn benchmark_integer_sub_mul_val_ref_val_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul(&Integer, Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -687,7 +687,7 @@ fn benchmark_integer_sub_mul_val_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.sub_mul(Integer, Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),
@@ -714,7 +714,7 @@ fn benchmark_integer_sub_mul_ref_ref_ref_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "(&Integer).sub_mul(&Integer, &Integer)",
         BenchmarkType::Algorithms,
         triples_of_integers(gm),

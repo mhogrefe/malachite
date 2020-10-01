@@ -499,10 +499,10 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// let mut x = Natural::ZERO;
-/// x |= Natural::from(0x0000_000fu32);
-/// x |= Natural::from(0x0000_0f00u32);
+/// x |= Natural::from(0x0000000fu32);
+/// x |= Natural::from(0x00000f00u32);
 /// x |= Natural::from(0x000f_0000u32);
-/// x |= Natural::from(0x0f00_0000u32);
+/// x |= Natural::from(0x0f000000u32);
 /// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl BitOrAssign<Natural> for Natural {
@@ -539,10 +539,10 @@ impl BitOrAssign<Natural> for Natural {
 /// use malachite_nz::natural::Natural;
 ///
 /// let mut x = Natural::ZERO;
-/// x |= &Natural::from(0x0000_000fu32);
-/// x |= &Natural::from(0x0000_0f00u32);
+/// x |= &Natural::from(0x0000000fu32);
+/// x |= &Natural::from(0x00000f00u32);
 /// x |= &Natural::from(0x000f_0000u32);
-/// x |= &Natural::from(0x0f00_0000u32);
+/// x |= &Natural::from(0x0f000000u32);
 /// assert_eq!(x, 0x0f0f_0f0f);
 /// ```
 impl<'a> BitOrAssign<&'a Natural> for Natural {

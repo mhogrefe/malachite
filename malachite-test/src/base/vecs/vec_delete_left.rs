@@ -1,5 +1,5 @@
 use malachite_base::vecs::vec_delete_left;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::platform::Limb;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -22,7 +22,7 @@ fn demo_vec_delete_left(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_vec_delete_left(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "vec_delete_left(&mut Vec<Limb>, usize)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_usize_var_1::<Limb>(gm),
@@ -32,7 +32,7 @@ fn benchmark_vec_delete_left(gm: GenerationMode, limit: usize, file_name: &str) 
         &(|&(ref xs, _)| xs.len()),
         "xs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut xs, delete_size)| vec_delete_left(&mut xs, delete_size)),
         )],
     );

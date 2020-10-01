@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -49,7 +49,7 @@ fn benchmark_mod_neg<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_neg(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),
@@ -58,7 +58,7 @@ fn benchmark_mod_neg<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(n, m)| no_out!(n.mod_neg(m))))],
+        &mut [("Malachite", &mut (|(n, m)| no_out!(n.mod_neg(m))))],
     );
 }
 
@@ -67,7 +67,7 @@ fn benchmark_mod_neg_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_neg_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),
@@ -76,7 +76,7 @@ fn benchmark_mod_neg_assign<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(mut n, m)| n.mod_neg_assign(m)))],
+        &mut [("Malachite", &mut (|(mut n, m)| n.mod_neg_assign(m)))],
     );
 }
 

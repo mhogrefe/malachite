@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::platform::Limb;
 
@@ -32,7 +32,7 @@ fn demo_natural_significant_bits(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_significant_bits(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1::<Limb>(gm),
@@ -42,14 +42,14 @@ fn benchmark_limbs_significant_bits(gm: GenerationMode, limit: usize, file_name:
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|limbs| no_out!(limbs_significant_bits(&limbs))),
         )],
     );
 }
 
 fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.significant_bits()",
         BenchmarkType::LibraryComparison,
         nrm_naturals(gm),
@@ -60,7 +60,7 @@ fn benchmark_natural_significant_bits(gm: GenerationMode, limit: usize, file_nam
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, n)| no_out!(n.significant_bits())),
             ),
             ("num", &mut (|(n, _, _)| no_out!(n.bits()))),

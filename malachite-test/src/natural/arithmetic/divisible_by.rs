@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::slice_test_zero;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
@@ -157,7 +157,7 @@ fn demo_natural_divisible_by_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_divisible_by_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
@@ -184,7 +184,7 @@ fn benchmark_limbs_divisible_by_limb_algorithms(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_divisible_by_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_divisible_by(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         pairs_of_limb_vec_var_14(gm.with_scale(512)),
@@ -211,7 +211,7 @@ fn benchmark_limbs_divisible_by_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_divisible_by(&[Limb], &[Limb])",
         BenchmarkType::EvaluationStrategy,
         pairs_of_unsigned_vec_var_13(gm.with_scale(512)),
@@ -242,7 +242,7 @@ fn benchmark_limbs_divisible_by_evaluation_strategy(
 }
 
 fn benchmark_natural_divisible_by_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.divisible_by(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_naturals(gm),
@@ -266,7 +266,7 @@ fn benchmark_natural_divisible_by_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.divisible_by(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_naturals(gm),
@@ -301,7 +301,7 @@ fn benchmark_natural_divisible_by_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.divisible_by(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_naturals(gm),
@@ -312,7 +312,7 @@ fn benchmark_natural_divisible_by_library_comparison(
         "y.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, (x, y))| no_out!(x.divisible_by(y))),
             ),
             (

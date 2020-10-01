@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     RemPowerOfTwo, RemPowerOfTwoAssign,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::pairs_of_integer_and_small_unsigned;
@@ -145,7 +145,7 @@ fn demo_integer_ceiling_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm),
@@ -155,7 +155,7 @@ fn benchmark_integer_mod_power_of_two_assign(gm: GenerationMode, limit: usize, f
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.mod_power_of_two_assign(u)),
         )],
     );
@@ -166,7 +166,7 @@ fn benchmark_integer_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_unsigned(gm),
@@ -189,7 +189,7 @@ fn benchmark_integer_mod_power_of_two_evaluation_strategy(
 }
 
 fn benchmark_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.rem_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm),
@@ -199,7 +199,7 @@ fn benchmark_integer_rem_power_of_two_assign(gm: GenerationMode, limit: usize, f
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.rem_power_of_two_assign(u)),
         )],
     );
@@ -210,7 +210,7 @@ fn benchmark_integer_rem_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.rem_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_unsigned(gm),
@@ -237,7 +237,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_assign(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod_power_of_two_assign(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm),
@@ -247,7 +247,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_assign(
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, u)| n.ceiling_mod_power_of_two_assign(u)),
         )],
     );
@@ -258,7 +258,7 @@ fn benchmark_integer_ceiling_mod_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod_power_of_two(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_unsigned(gm),

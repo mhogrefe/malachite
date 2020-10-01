@@ -2,7 +2,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::floats::PrimitiveFloat;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -115,7 +115,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::rounding_from({}, RoundingMode)", stringify!($f)),
                 BenchmarkType::Single,
                 $pairs_of_float_and_rounding_mode_var_1(gm),
@@ -125,14 +125,14 @@ macro_rules! float_demos_and_benches {
                 &(|&(f, _)| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(f, rm)| no_out!(Integer::rounding_from(f, rm))),
                 )],
             );
         }
 
         fn $benchmark_integer_from_float(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats_var_1(gm),
@@ -141,7 +141,7 @@ macro_rules! float_demos_and_benches {
                 file_name,
                 &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
-                &mut [("malachite", &mut (|f| no_out!(Integer::from(f))))],
+                &mut [("Malachite", &mut (|f| no_out!(Integer::from(f))))],
             );
         }
 
@@ -150,7 +150,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::checked_from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats(gm),
@@ -159,12 +159,12 @@ macro_rules! float_demos_and_benches {
                 file_name,
                 &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
-                &mut [("malachite", &mut (|f| no_out!(Integer::checked_from(f))))],
+                &mut [("Malachite", &mut (|f| no_out!(Integer::checked_from(f))))],
             );
         }
 
         fn $benchmark_integer_exact_from_float(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::exact_from({})", stringify!($f)),
                 BenchmarkType::Single,
                 $floats_exactly_equal_to_integer(gm),
@@ -173,7 +173,7 @@ macro_rules! float_demos_and_benches {
                 file_name,
                 &(|&f| usize::exact_from(f.adjusted_exponent())),
                 "f.adjusted_exponent()",
-                &mut [("malachite", &mut (|f| no_out!(Integer::exact_from(f))))],
+                &mut [("Malachite", &mut (|f| no_out!(Integer::exact_from(f))))],
             );
         }
 
@@ -182,7 +182,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::convertible_from({})", stringify!($f)),
                 BenchmarkType::Algorithms,
                 $floats(gm),

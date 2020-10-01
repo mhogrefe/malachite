@@ -1,7 +1,7 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::triples_of_integer_small_signed_and_rounding_mode_var_1;
@@ -114,7 +114,7 @@ macro_rules! demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer.shl_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_integer_small_signed_and_rounding_mode_var_1::<$t>(gm),
@@ -124,7 +124,7 @@ macro_rules! demos_and_benches {
                 &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
                 "|other|",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, rm)| x.shl_round_assign(y, rm)),
                 )],
             );
@@ -135,7 +135,7 @@ macro_rules! demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer.shl_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_integer_small_signed_and_rounding_mode_var_1::<$t>(gm),

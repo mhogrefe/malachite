@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOfTwoIsReduced, PowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -31,7 +31,7 @@ fn benchmark_natural_mod_power_of_two_is_reduced(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_power_of_two_is_reduced(u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),

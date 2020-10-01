@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -236,7 +236,7 @@ fn benchmark_unsigned_get_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.get_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -245,7 +245,7 @@ fn benchmark_unsigned_get_bit<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
+        &mut [("Malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );
 }
 
@@ -257,7 +257,7 @@ fn benchmark_signed_get_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.get_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -266,7 +266,7 @@ fn benchmark_signed_get_bit<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
+        &mut [("Malachite", &mut (|(n, index)| no_out!(n.get_bit(index))))],
     );
 }
 
@@ -275,7 +275,7 @@ fn benchmark_unsigned_set_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.set_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_u64_width_range::<T>(gm),
@@ -284,7 +284,7 @@ fn benchmark_unsigned_set_bit<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.set_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.set_bit(index)))],
     );
 }
 
@@ -296,7 +296,7 @@ fn benchmark_signed_set_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.set_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range_var_1::<T>(gm),
@@ -305,7 +305,7 @@ fn benchmark_signed_set_bit<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.set_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.set_bit(index)))],
     );
 }
 
@@ -314,7 +314,7 @@ fn benchmark_unsigned_clear_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.clear_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -323,7 +323,7 @@ fn benchmark_unsigned_clear_bit<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
     );
 }
 
@@ -335,7 +335,7 @@ fn benchmark_signed_clear_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.clear_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range_var_2::<T>(gm),
@@ -344,7 +344,7 @@ fn benchmark_signed_clear_bit<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
     );
 }
 
@@ -353,7 +353,7 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
         triples_of_unsigned_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
@@ -363,7 +363,7 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned + Rand>(
         &(|&(_, index, _)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
         )],
     );
@@ -377,7 +377,7 @@ fn benchmark_signed_assign_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.assign_bit(u64)", T::NAME),
         BenchmarkType::Single,
         triples_of_signed_unsigned_width_range_and_bool_var_1::<T, u64>(gm),
@@ -387,7 +387,7 @@ fn benchmark_signed_assign_bit<T: PrimitiveSigned + Rand>(
         &(|&(_, index, _)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, index, bit)| n.assign_bit(index, bit)),
         )],
     );
@@ -398,7 +398,7 @@ fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_u64_width_range::<T>(gm),
@@ -407,7 +407,7 @@ fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );
 }
 
@@ -419,7 +419,7 @@ fn benchmark_signed_flip_bit<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.flip_bit(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_u64_width_range::<T>(gm),
@@ -428,7 +428,7 @@ fn benchmark_signed_flip_bit<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(_, index)| usize::exact_from(index)),
         "index",
-        &mut [("malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.flip_bit(index)))],
     );
 }
 

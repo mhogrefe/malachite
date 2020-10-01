@@ -918,7 +918,7 @@ impl Square for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::ZERO.square(), 0);
-    /// assert_eq!(Natural::from(123u32).square(), 15_129);
+    /// assert_eq!(Natural::from(123u32).square(), 15129);
     /// ```
     #[inline]
     fn square(mut self) -> Natural {
@@ -948,7 +948,7 @@ impl<'a> Square for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((&Natural::ZERO).square(), 0);
-    /// assert_eq!((&Natural::from(123u32)).square(), 15_129);
+    /// assert_eq!((&Natural::from(123u32)).square(), 15129);
     /// ```
     #[inline]
     fn square(self) -> Natural {
@@ -991,7 +991,7 @@ impl SquareAssign for Natural {
     ///
     /// let mut x = Natural::from(123u32);
     /// x.square_assign();
-    /// assert_eq!(x, 15_129);
+    /// assert_eq!(x, 15129);
     /// ```
     fn square_assign(&mut self) {
         match self {

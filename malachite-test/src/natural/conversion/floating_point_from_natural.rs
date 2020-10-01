@@ -3,7 +3,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{
@@ -207,7 +207,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}::rounding_from(Natural, RoundingMode)", stringify!($f)),
                 BenchmarkType::EvaluationStrategy,
                 $pairs_of_natural_and_rounding_mode_var_1(gm),
@@ -234,7 +234,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}::from(Natural)", stringify!($f)),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -261,7 +261,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}::checked_from(Natural)", stringify!($f)),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),
@@ -288,7 +288,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}::checked_from(Natural)", stringify!($f)),
                 BenchmarkType::EvaluationStrategy,
                 $naturals_exactly_equal_to_float(gm),
@@ -315,7 +315,7 @@ macro_rules! float_demos_and_benches {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("{}::convertible_from(Natural)", stringify!($f)),
                 BenchmarkType::EvaluationStrategy,
                 naturals(gm),

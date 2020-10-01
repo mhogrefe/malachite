@@ -23,9 +23,9 @@ use platform::Limb;
 /// use malachite_nz::natural::arithmetic::shl::limbs_shl;
 ///
 /// assert_eq!(limbs_shl(&[123, 456], 1), &[246, 912]);
-/// assert_eq!(limbs_shl(&[123, 456], 31), &[2_147_483_648, 61, 228]);
+/// assert_eq!(limbs_shl(&[123, 456], 31), &[2147483648, 61, 228]);
 /// assert_eq!(limbs_shl(&[123, 456], 32), &[0, 123, 456]);
-/// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1_968, 7_296]);
+/// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1968, 7296]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where the result is returned.
@@ -73,7 +73,7 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// let mut out = vec![0, 0, 0];
 /// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 31), 228);
-/// assert_eq!(out, &[2_147_483_648, 61, 0]);
+/// assert_eq!(out, &[2147483648, 61, 0]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2.
@@ -110,7 +110,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 ///
 /// let mut xs = vec![123, 456];
 /// assert_eq!(limbs_slice_shl_in_place(&mut xs, 31), 228);
-/// assert_eq!(xs, &[2_147_483_648, 61]);
+/// assert_eq!(xs, &[2147483648, 61]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up.
@@ -149,7 +149,7 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// let mut xs = vec![123, 456];
 /// limbs_vec_shl_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[2_147_483_648, 61, 228]);
+/// assert_eq!(xs, &[2147483648, 61, 228]);
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up and the carry is

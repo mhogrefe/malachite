@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign, ModMulPrecomputed};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_mul::{
     _limbs_mod_mul_two_limbs, _limbs_precompute_mod_mul_two_limbs,
 };
@@ -207,7 +207,7 @@ fn benchmark_limbs_precompute_mod_mul_two_limbs_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_precompute_mod_mul_two_limbs(Limb, Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigneds_var_6(gm),
@@ -230,7 +230,7 @@ fn benchmark_limbs_precompute_mod_mul_two_limbs_algorithms(
 }
 
 fn benchmark_limbs_mod_mul_two_limbs(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_mul_two_limbs(Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)",
         BenchmarkType::Algorithms,
         nonuples_of_limbs_var_1(gm),
@@ -268,7 +268,7 @@ fn benchmark_natural_mod_mul_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_mul_assign(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_4(gm),
@@ -299,7 +299,7 @@ fn benchmark_natural_mod_mul_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_mod_mul_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_mul(Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_4(gm),
@@ -320,7 +320,7 @@ fn benchmark_natural_mod_mul_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_mul(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_4(gm),
@@ -371,7 +371,7 @@ fn benchmark_natural_mod_mul_precomputed_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_mul(Natural, Natural)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_4(gm),

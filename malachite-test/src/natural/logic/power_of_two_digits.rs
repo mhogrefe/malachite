@@ -4,7 +4,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits, SignificantBits,
 };
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -187,7 +187,7 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!(
                     "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&Natural, u64).size_hint()",
                     $t::NAME
@@ -216,7 +216,7 @@ macro_rules! demo_and_bench {
         }
 
         fn $power_of_two_digits_get_bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!(
                     "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&Natural, u64).get(u64)",
                     $t::NAME
@@ -365,7 +365,7 @@ fn benchmark_natural_power_of_two_digits_size_hint_natural(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&Natural, u64).size_hint()",
         BenchmarkType::Single,
         pairs_of_natural_and_small_unsigned_var_3(gm),
@@ -392,7 +392,7 @@ fn benchmark_natural_power_of_two_digits_get_natural(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&Natural, u64).get(u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_small_u64_and_small_u64_var_3(gm),

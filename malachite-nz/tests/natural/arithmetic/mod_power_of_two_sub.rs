@@ -34,7 +34,7 @@ fn test_limbs_mod_power_of_two_limb_sub_limbs_and_limbs_mod_power_of_two_limb_su
         &[
             2,
             u32::MAX - 1,
-            0xffff_fffc,
+            0xfffffffc,
             u32::MAX,
             u32::MAX,
             u32::MAX,
@@ -73,14 +73,14 @@ fn test_limbs_mod_power_of_two_sub() {
     test(&[2], &[], 3, &[2]);
     test(&[], &[2], 3, &[6]);
     test(&[2], &[3], 2, &[3]);
-    test(&[1, 2, 3], &[6, 7], 100, &[0xffff_fffb, 0xffff_fffa, 2]);
-    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xffff_fffd, 15]);
+    test(&[1, 2, 3], &[6, 7], 100, &[0xfffffffb, 0xfffffffa, 2]);
+    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xfffffffd, 15]);
     test(&[6, 7], &[1, 2], 100, &[5, 5]);
     test(
         &[1, 2],
         &[6, 7],
         100,
-        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
+        &[0xfffffffb, 0xfffffffa, u32::MAX, 15],
     );
     test(&[6, 7], &[2, 3, 0], 100, &[4, 4, 0]);
 }
@@ -98,14 +98,14 @@ fn test_limbs_mod_power_of_two_sub_in_place_right() {
     test(&[2], &[], 3, &[2]);
     test(&[], &[2], 3, &[6]);
     test(&[2], &[3], 2, &[3]);
-    test(&[1, 2, 3], &[6, 7], 100, &[0xffff_fffb, 0xffff_fffa, 2]);
-    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xffff_fffd, 15]);
+    test(&[1, 2, 3], &[6, 7], 100, &[0xfffffffb, 0xfffffffa, 2]);
+    test(&[6, 7], &[1, 2, 3], 100, &[5, 5, 0xfffffffd, 15]);
     test(&[6, 7], &[1, 2], 100, &[5, 5]);
     test(
         &[1, 2],
         &[6, 7],
         100,
-        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
+        &[0xfffffffb, 0xfffffffa, u32::MAX, 15],
     );
 }
 
@@ -137,7 +137,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         &[6, 7],
         100,
         false,
-        &[0xffff_fffb, 0xffff_fffa, 2],
+        &[0xfffffffb, 0xfffffffa, 2],
         &[6, 7],
     );
     test(
@@ -146,7 +146,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         100,
         true,
         &[6, 7],
-        &[5, 5, 0xffff_fffd, 15],
+        &[5, 5, 0xfffffffd, 15],
     );
     test(&[6, 7], &[1, 2], 100, false, &[5, 5], &[1, 2]);
     test(
@@ -154,7 +154,7 @@ fn test_limbs_mod_power_of_two_sub_in_place_either() {
         &[6, 7],
         100,
         false,
-        &[0xffff_fffb, 0xffff_fffa, u32::MAX, 15],
+        &[0xfffffffb, 0xfffffffa, u32::MAX, 15],
         &[6, 7],
     );
 }

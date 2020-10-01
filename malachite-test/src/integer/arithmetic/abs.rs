@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use num::Signed;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -64,7 +64,7 @@ fn demo_integer_unsigned_abs_ref_out(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.abs_assign()",
         BenchmarkType::Single,
         integers(gm),
@@ -73,12 +73,12 @@ fn benchmark_integer_abs_assign(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|mut n| n.abs_assign()))],
+        &mut [("Malachite", &mut (|mut n| n.abs_assign()))],
     );
 }
 
 fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.abs()",
         BenchmarkType::LibraryComparison,
         nrm_integers(gm),
@@ -88,7 +88,7 @@ fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, n)| no_out!(n.abs()))),
+            ("Malachite", &mut (|(_, _, n)| no_out!(n.abs()))),
             ("num", &mut (|(n, _, _)| no_out!(n.abs()))),
             ("rug", &mut (|(_, n, _)| no_out!(n.abs().cmp0()))),
         ],
@@ -96,7 +96,7 @@ fn benchmark_integer_abs_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.abs()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -113,7 +113,7 @@ fn benchmark_integer_abs_evaluation_strategy(gm: GenerationMode, limit: usize, f
 }
 
 fn benchmark_integer_unsigned_abs(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.unsigned_abs()",
         BenchmarkType::Single,
         integers(gm),
@@ -122,7 +122,7 @@ fn benchmark_integer_unsigned_abs(gm: GenerationMode, limit: usize, file_name: &
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(n.unsigned_abs())))],
+        &mut [("Malachite", &mut (|n| no_out!(n.unsigned_abs())))],
     );
 }
 
@@ -131,7 +131,7 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.unsigned_abs()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),

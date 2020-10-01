@@ -4,7 +4,7 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -43,7 +43,7 @@ fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
 ) where
     T::Half: PrimitiveUnsigned + Rand,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}::join_halves({}, {})",
             T::NAME,
@@ -57,7 +57,7 @@ fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
         file_name,
         &(|&(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
     );
 }
 

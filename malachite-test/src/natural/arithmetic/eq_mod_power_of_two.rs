@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{
     limbs_eq_limb_mod_power_of_two, limbs_eq_mod_power_of_two,
 };
@@ -72,7 +72,7 @@ fn demo_natural_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_limb_mod_power_of_two(&[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_1(gm),
@@ -82,7 +82,7 @@ fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, fi
         &(|&(ref limbs, _, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref limbs, limb, pow)| {
                 no_out!(limbs_eq_limb_mod_power_of_two(limbs, limb, pow))
             }),
@@ -91,7 +91,7 @@ fn benchmark_limbs_eq_limb_mod_power_of_two(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_power_of_two(&[u32], &[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -101,7 +101,7 @@ fn benchmark_limbs_eq_mod_power_of_two(gm: GenerationMode, limit: usize, file_na
         &(|&(ref xs, ref ys, pow)| min!(usize::exact_from(pow), xs.len(), ys.len())),
         "min(pow, xs.len(), ys.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref xs, ref ys, pow)| no_out!(limbs_eq_mod_power_of_two(xs, ys, pow))),
         )],
     );
@@ -112,7 +112,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.eq_mod_power_of_two(&Natural, u64)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_natural_natural_and_small_unsigned::<u64>(gm),
@@ -123,7 +123,7 @@ fn benchmark_natural_eq_mod_power_of_two_library_comparison(
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (ref n, ref u, pow))| no_out!(n.eq_mod_power_of_two(u, pow))),
             ),
             (
@@ -141,7 +141,7 @@ fn benchmark_natural_eq_mod_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.eq_mod_power_of_two(&Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_natural_natural_and_small_unsigned::<u64>(gm),

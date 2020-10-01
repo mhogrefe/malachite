@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -161,7 +161,7 @@ fn benchmark_unsigned_lt_abs<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.lt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -170,7 +170,7 @@ fn benchmark_unsigned_lt_abs<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -182,7 +182,7 @@ fn benchmark_signed_lt_abs<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.lt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -191,7 +191,7 @@ fn benchmark_signed_lt_abs<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.lt_abs(&y))))],
     );
 }
 
@@ -200,7 +200,7 @@ fn benchmark_unsigned_gt_abs<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.gt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -209,7 +209,7 @@ fn benchmark_unsigned_gt_abs<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -221,7 +221,7 @@ fn benchmark_signed_gt_abs<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.gt_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -230,7 +230,7 @@ fn benchmark_signed_gt_abs<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.gt_abs(&y))))],
     );
 }
 
@@ -239,7 +239,7 @@ fn benchmark_unsigned_le_abs<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.le_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -248,7 +248,7 @@ fn benchmark_unsigned_le_abs<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -260,7 +260,7 @@ fn benchmark_signed_le_abs<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.le_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -269,7 +269,7 @@ fn benchmark_signed_le_abs<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.le_abs(&y))))],
     );
 }
 
@@ -278,7 +278,7 @@ fn benchmark_unsigned_ge_abs<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ge_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -287,7 +287,7 @@ fn benchmark_unsigned_ge_abs<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 
@@ -299,7 +299,7 @@ fn benchmark_signed_ge_abs<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ge_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -308,7 +308,7 @@ fn benchmark_signed_ge_abs<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ge_abs(&y))))],
     );
 }
 

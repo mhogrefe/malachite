@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::next_power_of_two::{
     limbs_next_power_of_two, limbs_slice_next_power_of_two_in_place,
     limbs_vec_next_power_of_two_in_place,
@@ -102,7 +102,7 @@ fn demo_natural_next_power_of_two_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_next_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_next_power_of_two(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -112,7 +112,7 @@ fn benchmark_limbs_next_power_of_two(gm: GenerationMode, limit: usize, file_name
         &(|ref limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref limbs| no_out!(limbs_next_power_of_two(limbs))),
         )],
     );
@@ -123,7 +123,7 @@ fn benchmark_limbs_slice_next_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_next_power_of_two_in_place(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -133,7 +133,7 @@ fn benchmark_limbs_slice_next_power_of_two_in_place(
         &(|ref limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref mut limbs| no_out!(limbs_slice_next_power_of_two_in_place(limbs))),
         )],
     );
@@ -144,7 +144,7 @@ fn benchmark_limbs_vec_next_power_of_two_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_next_power_of_two_in_place(&mut Vec<u32>)",
         BenchmarkType::Single,
         vecs_of_unsigned_var_1(gm),
@@ -154,14 +154,14 @@ fn benchmark_limbs_vec_next_power_of_two_in_place(
         &(|ref limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref mut limbs| limbs_vec_next_power_of_two_in_place(limbs)),
         )],
     );
 }
 
 fn benchmark_natural_next_power_of_two_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.next_power_of_two_assign()",
         BenchmarkType::Single,
         naturals(gm),
@@ -170,7 +170,7 @@ fn benchmark_natural_next_power_of_two_assign(gm: GenerationMode, limit: usize, 
         file_name,
         &(|ref n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|mut n| n.next_power_of_two_assign()))],
+        &mut [("Malachite", &mut (|mut n| n.next_power_of_two_assign()))],
     );
 }
 
@@ -179,7 +179,7 @@ fn benchmark_natural_next_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.next_power_of_two()",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -189,7 +189,7 @@ fn benchmark_natural_next_power_of_two_library_comparison(
         &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, n)| no_out!(n.next_power_of_two()))),
+            ("Malachite", &mut (|(_, n)| no_out!(n.next_power_of_two()))),
             ("rug", &mut (|(n, _)| no_out!(n.next_power_of_two()))),
         ],
     );
@@ -200,7 +200,7 @@ fn benchmark_natural_next_power_of_two_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.next_power_of_two()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),

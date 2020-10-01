@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive,
     from_bits_desc_alt, from_bits_desc_signed_naive, from_bits_desc_unsigned_naive,
@@ -291,7 +291,7 @@ fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
         unsigneds::<T>(gm),
@@ -301,7 +301,7 @@ fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
         &(|u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
-            ("malachite", &mut (|u| no_out!(u.to_bits_asc()))),
+            ("Malachite", &mut (|u| no_out!(u.to_bits_asc()))),
             ("alt", &mut (|u| no_out!(to_bits_asc_alt(&u)))),
             ("naive", &mut (|u| no_out!(to_bits_asc_unsigned_naive(u)))),
         ],
@@ -316,7 +316,7 @@ fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
         signeds::<T>(gm),
@@ -326,7 +326,7 @@ fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
         &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
-            ("malachite", &mut (|i| no_out!(i.to_bits_asc()))),
+            ("Malachite", &mut (|i| no_out!(i.to_bits_asc()))),
             ("alt", &mut (|i| no_out!(to_bits_asc_alt(&i)))),
             ("naive", &mut (|i| no_out!(to_bits_asc_signed_naive(i)))),
         ],
@@ -338,7 +338,7 @@ fn benchmark_unsigned_to_bits_asc_evaluation_strategy<T: PrimitiveUnsigned + Ran
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
         unsigneds::<T>(gm),
@@ -368,7 +368,7 @@ fn benchmark_signed_to_bits_asc_evaluation_strategy<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
         signeds::<T>(gm),
@@ -395,7 +395,7 @@ fn benchmark_unsigned_to_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
         unsigneds::<T>(gm),
@@ -420,7 +420,7 @@ fn benchmark_signed_to_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_asc()", T::NAME),
         BenchmarkType::Algorithms,
         signeds::<T>(gm),
@@ -442,7 +442,7 @@ fn benchmark_unsigned_to_bits_desc_evaluation_strategy<T: PrimitiveUnsigned + Ra
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
         unsigneds::<T>(gm),
@@ -472,7 +472,7 @@ fn benchmark_signed_to_bits_desc_evaluation_strategy<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.to_bits_desc()", T::NAME),
         BenchmarkType::EvaluationStrategy,
         signeds::<T>(gm),
@@ -499,7 +499,7 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}::from_bits_asc(&[bool])", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_2::<T>(gm),
@@ -530,7 +530,7 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}::from_bits_asc(&[bool])", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_3::<T>(gm),
@@ -558,7 +558,7 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}::from_bits_desc(&[bool])", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_4::<T>(gm),
@@ -569,7 +569,7 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
         "bits.len()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|ref bits| no_out!(T::from_bits_desc(bits))),
             ),
             (
@@ -592,7 +592,7 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}::from_bits_desc(&[bool])", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_5::<T>(gm),
@@ -603,7 +603,7 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
         "bits.len()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|ref bits| no_out!(T::from_bits_desc(bits))),
             ),
             (

@@ -85,7 +85,7 @@ fn test_limbs_neg_and_limb_neg_and_limbs_vec_neg_and_limb_neg_in_place() {
         assert_eq!(xs, out);
     };
     test(&[0, 2], 3, &[0, 2]);
-    test(&[1, 1], 3, &[0xffff_fffd, 1]);
+    test(&[1, 1], 3, &[0xfffffffd, 1]);
     test(&[u32::MAX - 1, 1], 1, &[0, 2]);
     test(&[u32::MAX - 1, u32::MAX], 1, &[0, 0, 1]);
 }
@@ -107,7 +107,7 @@ fn test_limbs_neg_and_limb_neg_to_out() {
     };
     test(&[0, 0], &[0, 2], 3, false, &[0, 2]);
     test(&[1, 2, 100], &[0, 2, 100], 3, false, &[0, 2, 100]);
-    test(&[0, 0], &[1, 1], 3, false, &[0xffff_fffd, 1]);
+    test(&[0, 0], &[1, 1], 3, false, &[0xfffffffd, 1]);
     test(&[0, 0], &[u32::MAX - 1, 1], 1, false, &[0, 2]);
     test(&[0, 0], &[u32::MAX - 1, u32::MAX], 1, true, &[0, 0]);
     test(
@@ -142,7 +142,7 @@ fn test_limbs_slice_neg_and_limb_neg_in_place() {
         assert_eq!(xs, xs_after);
     };
     test(&[0, 2], 3, false, &[0, 2]);
-    test(&[1, 1], 3, false, &[0xffff_fffd, 1]);
+    test(&[1, 1], 3, false, &[0xfffffffd, 1]);
     test(&[u32::MAX - 1, 1], 1, false, &[0, 2]);
     test(&[u32::MAX - 1, u32::MAX], 1, true, &[0, 0]);
 }

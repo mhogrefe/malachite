@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -349,7 +349,7 @@ fn benchmark_mod_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -359,7 +359,7 @@ fn benchmark_mod_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.mod_power_of_two(pow))),
         )],
     );
@@ -374,7 +374,7 @@ fn benchmark_mod_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
     <T as ModPowerOfTwo>::Output: PrimitiveUnsigned,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_2::<T>(gm),
@@ -384,7 +384,7 @@ fn benchmark_mod_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.mod_power_of_two(pow))),
         )],
     );
@@ -395,7 +395,7 @@ fn benchmark_mod_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -405,7 +405,7 @@ fn benchmark_mod_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.mod_power_of_two_assign(pow)),
         )],
     );
@@ -419,7 +419,7 @@ fn benchmark_mod_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_3::<T>(gm),
@@ -429,7 +429,7 @@ fn benchmark_mod_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.mod_power_of_two_assign(pow)),
         )],
     );
@@ -440,7 +440,7 @@ fn benchmark_rem_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.rem_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -450,7 +450,7 @@ fn benchmark_rem_power_of_two_unsigned<T: PrimitiveUnsigned + Rand + SampleRange
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.rem_power_of_two(pow))),
         )],
     );
@@ -464,7 +464,7 @@ fn benchmark_rem_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.rem_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -474,7 +474,7 @@ fn benchmark_rem_power_of_two_signed<T: PrimitiveSigned + Rand + SampleRange>(
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.rem_power_of_two(pow))),
         )],
     );
@@ -485,7 +485,7 @@ fn benchmark_rem_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.rem_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -495,7 +495,7 @@ fn benchmark_rem_power_of_two_assign_unsigned<T: PrimitiveUnsigned + Rand + Samp
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.rem_power_of_two_assign(pow)),
         )],
     );
@@ -509,7 +509,7 @@ fn benchmark_rem_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.rem_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_unsigned::<T, u64>(gm),
@@ -519,7 +519,7 @@ fn benchmark_rem_power_of_two_assign_signed<T: PrimitiveSigned + Rand + SampleRa
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.rem_power_of_two_assign(pow)),
         )],
     );
@@ -530,7 +530,7 @@ fn benchmark_neg_mod_power_of_two<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.neg_mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_4::<T>(gm),
@@ -540,7 +540,7 @@ fn benchmark_neg_mod_power_of_two<T: PrimitiveUnsigned + Rand + SampleRange>(
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.neg_mod_power_of_two(pow))),
         )],
     );
@@ -551,7 +551,7 @@ fn benchmark_neg_mod_power_of_two_assign<T: PrimitiveUnsigned + Rand + SampleRan
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.neg_mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_u64_var_4::<T>(gm),
@@ -561,7 +561,7 @@ fn benchmark_neg_mod_power_of_two_assign<T: PrimitiveUnsigned + Rand + SampleRan
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.neg_mod_power_of_two_assign(pow)),
         )],
     );
@@ -575,7 +575,7 @@ fn benchmark_ceiling_mod_power_of_two<T: PrimitiveSigned + Rand + SampleRange>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ceiling_mod_power_of_two(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_4::<T>(gm),
@@ -585,7 +585,7 @@ fn benchmark_ceiling_mod_power_of_two<T: PrimitiveSigned + Rand + SampleRange>(
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.ceiling_mod_power_of_two(pow))),
         )],
     );
@@ -599,7 +599,7 @@ fn benchmark_ceiling_mod_power_of_two_assign<T: PrimitiveSigned + Rand + SampleR
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.ceiling_mod_power_of_two_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_small_u64_var_4::<T>(gm),
@@ -609,7 +609,7 @@ fn benchmark_ceiling_mod_power_of_two_assign<T: PrimitiveSigned + Rand + SampleR
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow)| n.ceiling_mod_power_of_two_assign(pow)),
         )],
     );

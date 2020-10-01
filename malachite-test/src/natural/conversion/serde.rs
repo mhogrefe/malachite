@@ -3,7 +3,7 @@ extern crate serde_json;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::naturals;
@@ -25,7 +25,7 @@ fn demo_natural_serialize_json(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_natural_serialize_json(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "serde_json::to_string(&Natural)",
         BenchmarkType::Single,
         naturals(gm),
@@ -35,7 +35,7 @@ fn benchmark_natural_serialize_json(gm: GenerationMode, limit: usize, file_name:
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|n| no_out!(serde_json::to_string(&n).unwrap())),
         )],
     );

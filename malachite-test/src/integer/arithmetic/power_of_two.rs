@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
@@ -18,7 +18,7 @@ fn demo_integer_power_of_two(gm: NoSpecialGenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_power_of_two(gm: NoSpecialGenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer.power_of_two(u64)"),
         BenchmarkType::Single,
         small_unsigneds(gm),
@@ -28,7 +28,7 @@ fn benchmark_integer_power_of_two(gm: NoSpecialGenerationMode, limit: usize, fil
         &(|&pow| usize::exact_from(pow)),
         "pow",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|pow| no_out!(Integer::power_of_two(pow))),
         )],
     );

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{CeilingDivMod, DivRound, DivRoundA
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use num::Integer;
 use rug::ops::DivRounding;
 
@@ -134,7 +134,7 @@ fn benchmark_integer_div_round_down_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round(Integer, RoundingMode::Down)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_nonzero_integer(gm),
@@ -145,7 +145,7 @@ fn benchmark_integer_div_round_down_library_comparison(
         "x.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.div_round(y, RoundingMode::Down))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.div_trunc(y)))),
@@ -158,7 +158,7 @@ fn benchmark_integer_div_round_floor_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round(Integer, RoundingMode::Floor)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer(gm),
@@ -169,7 +169,7 @@ fn benchmark_integer_div_round_floor_library_comparison(
         "x.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, _, (x, y))| no_out!(x.div_round(y, RoundingMode::Floor))),
             ),
             ("num", &mut (|((x, y), _, _)| no_out!(x.div_floor(&y)))),
@@ -183,7 +183,7 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_nonzero_integer(gm),
@@ -194,7 +194,7 @@ fn benchmark_integer_div_round_ceiling_library_comparison(
         "x.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.div_round(y, RoundingMode::Ceiling))),
             ),
             ("rug", &mut (|((x, y), _)| no_out!(x.div_ceil(y)))),
@@ -207,7 +207,7 @@ fn benchmark_integer_div_round_ceiling_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round(Integer, RoundingMode::Ceiling)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -234,7 +234,7 @@ fn benchmark_integer_div_round_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),
@@ -269,7 +269,7 @@ fn benchmark_integer_div_round_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_round_assign(Integer, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_integer_nonzero_integer_and_rounding_mode_var_1(gm),

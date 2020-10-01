@@ -78,7 +78,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u32::wrapping_from(Natural::trillion()), 3_567_587_328);
+            /// assert_eq!(u32::wrapping_from(Natural::trillion()), 3567587328);
             /// ```
             #[inline]
             fn wrapping_from(value: Natural) -> $u {
@@ -103,7 +103,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::wrapping_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(u32::wrapping_from(&Natural::trillion()), 3_567_587_328);
+            /// assert_eq!(u32::wrapping_from(&Natural::trillion()), 3567587328);
             /// ```
             fn wrapping_from(value: &Natural) -> $u {
                 match *value {
@@ -183,7 +183,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(u32::overflowing_from(Natural::trillion()), (3_567_587_328, true));
+            /// assert_eq!(u32::overflowing_from(Natural::trillion()), (3567587328, true));
             /// ```
             #[inline]
             fn overflowing_from(value: Natural) -> ($u, bool) {
@@ -209,7 +209,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::overflowing_from(&Natural::from(123u32)), (123, false));
-            /// assert_eq!(u32::overflowing_from(&Natural::trillion()), (3_567_587_328, true));
+            /// assert_eq!(u32::overflowing_from(&Natural::trillion()), (3567587328, true));
             /// ```
             fn overflowing_from(value: &Natural) -> ($u, bool) {
                 match *value {
@@ -340,7 +340,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i32::wrapping_from(Natural::trillion()), -727_379_968);
+            /// assert_eq!(i32::wrapping_from(Natural::trillion()), -727379968);
             /// ```
             #[inline]
             fn wrapping_from(value: Natural) -> $s {
@@ -365,7 +365,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::wrapping_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(i32::wrapping_from(&Natural::trillion()), -727_379_968);
+            /// assert_eq!(i32::wrapping_from(&Natural::trillion()), -727379968);
             /// ```
             #[inline]
             fn wrapping_from(value: &Natural) -> $s {
@@ -390,7 +390,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i32::saturating_from(Natural::trillion()), 2_147_483_647);
+            /// assert_eq!(i32::saturating_from(Natural::trillion()), 2147483647);
             /// ```
             #[inline]
             fn saturating_from(value: Natural) -> $s {
@@ -415,7 +415,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::saturating_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(i32::saturating_from(&Natural::trillion()), 2_147_483_647);
+            /// assert_eq!(i32::saturating_from(&Natural::trillion()), 2147483647);
             /// ```
             #[inline]
             fn saturating_from(value: &Natural) -> $s {
@@ -441,7 +441,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(i32::overflowing_from(Natural::trillion()), (-727_379_968, true));
+            /// assert_eq!(i32::overflowing_from(Natural::trillion()), (-727379968, true));
             /// ```
             #[inline]
             fn overflowing_from(value: Natural) -> ($s, bool) {
@@ -467,7 +467,7 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::overflowing_from(&Natural::from(123u32)), (123, false));
-            /// assert_eq!(i32::overflowing_from(&Natural::trillion()), (-727_379_968, true));
+            /// assert_eq!(i32::overflowing_from(&Natural::trillion()), (-727379968, true));
             /// ```
             fn overflowing_from(value: &Natural) -> ($s, bool) {
                 let (result, overflow_1) = $u::overflowing_from(value);
@@ -1170,7 +1170,7 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u64::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u64::saturating_from(Natural::ONE << 100), 18_446_744_073_709_551_615);
+            /// assert_eq!(u64::saturating_from(Natural::ONE << 100), 18446744073709551615);
             /// ```
             #[inline]
             fn saturating_from(value: Natural) -> $u {
@@ -1360,7 +1360,7 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i64::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i64::saturating_from(Natural::ONE << 100), 9_223_372_036_854_775_807);
+            /// assert_eq!(i64::saturating_from(Natural::ONE << 100), 9223372036854775807);
             /// ```
             #[inline]
             fn saturating_from(value: Natural) -> $s {
@@ -1387,7 +1387,7 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i64::saturating_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(i64::saturating_from(&(Natural::ONE << 100)), 9_223_372_036_854_775_807);
+            /// assert_eq!(i64::saturating_from(&(Natural::ONE << 100)), 9223372036854775807);
             /// ```
             #[inline]
             fn saturating_from(value: &Natural) -> $s {
@@ -1539,7 +1539,7 @@ macro_rules! impl_from_larger_than_limb {
             /// assert_eq!(u64::saturating_from(&Natural::from(123u32)), 123);
             /// assert_eq!(
             ///     u64::saturating_from(&(Natural::ONE << 100)),
-            ///     18_446_744_073_709_551_615
+            ///     18446744073709551615
             /// );
             /// ```
             fn saturating_from(value: &Natural) -> $u {

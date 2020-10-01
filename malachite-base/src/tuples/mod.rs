@@ -35,5 +35,6 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
     Singletons { xs }
 }
 
+/// This module contains iterators that generate tuples without repetition.
 pub mod exhaustive;
 pub mod random;

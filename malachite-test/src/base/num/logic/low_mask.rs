@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
 use malachite_test::inputs::base::small_u64s_var_4;
@@ -51,7 +51,7 @@ fn benchmark_unsigned_low_mask<T: PrimitiveUnsigned>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.low_mask(u64)", T::NAME),
         BenchmarkType::Single,
         small_u64s_var_4::<T>(gm),
@@ -60,7 +60,7 @@ fn benchmark_unsigned_low_mask<T: PrimitiveUnsigned>(
         file_name,
         &(|&bits| usize::exact_from(bits)),
         "bits",
-        &mut [("malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
+        &mut [("Malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
     );
 }
 
@@ -69,7 +69,7 @@ fn benchmark_signed_low_mask<T: PrimitiveSigned>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.low_mask(u64)", T::NAME),
         BenchmarkType::Single,
         small_u64s_var_4::<T>(gm),
@@ -78,7 +78,7 @@ fn benchmark_signed_low_mask<T: PrimitiveSigned>(
         file_name,
         &(|&bits| usize::exact_from(bits)),
         "bits",
-        &mut [("malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
+        &mut [("Malachite", &mut (|bits| no_out!(T::low_mask(bits))))],
     );
 }
 

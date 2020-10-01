@@ -3,8 +3,9 @@ use std::fmt::Display;
 use malachite_base::named::Named;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 
+use malachite_base_test_util::bench::bucketers::{signed_bit_bucketer, unsigned_bit_bucketer};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
@@ -72,9 +73,8 @@ fn benchmark_primitive_int_wrapping_from_unsigned<
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
     );
 }
 
@@ -91,8 +91,7 @@ fn benchmark_primitive_int_wrapping_from_signed<T: WrappingFrom<U> + Named, U: P
         gm.name(),
         limit,
         file_name,
-        &(|n| usize::exact_from(n.significant_bits())),
-        "n.significant_bits()",
-        &mut [("malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
+        &signed_bit_bucketer(),
+        &mut [("Malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
     );
 }

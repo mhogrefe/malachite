@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitScan, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::logic::index_of_next_false_bit::*;
@@ -43,7 +43,7 @@ fn demo_natural_index_of_next_false_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_index_of_next_false_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_index_of_next_false_bit(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm),
@@ -53,7 +53,7 @@ fn benchmark_limbs_index_of_next_false_bit(gm: GenerationMode, limit: usize, fil
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref limbs, u)| no_out!(limbs_index_of_next_false_bit(limbs, u))),
         )],
     );
@@ -64,7 +64,7 @@ fn benchmark_natural_index_of_next_false_bit_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.index_of_next_false_bit(u64)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_small_unsigned(gm),

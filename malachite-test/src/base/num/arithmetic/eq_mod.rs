@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::common::TRIPLE_SIGNIFICANT_BITS_LABEL;
 use rand::Rand;
 
@@ -70,7 +70,7 @@ fn benchmark_unsigned_eq_mod<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.eq_mod({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigneds::<T>(gm),
@@ -79,7 +79,7 @@ fn benchmark_unsigned_eq_mod<T: PrimitiveUnsigned + Rand>(
         file_name,
         &bucketing_function,
         TRIPLE_SIGNIFICANT_BITS_LABEL,
-        &mut [("malachite", &mut (|(x, y, z)| no_out!(x.eq_mod(y, z))))],
+        &mut [("Malachite", &mut (|(x, y, z)| no_out!(x.eq_mod(y, z))))],
     );
 }
 
@@ -91,7 +91,7 @@ fn benchmark_signed_eq_mod<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.eq_mod({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_signeds::<T>(gm),
@@ -100,7 +100,7 @@ fn benchmark_signed_eq_mod<T: PrimitiveSigned + Rand>(
         file_name,
         &bucketing_function,
         TRIPLE_SIGNIFICANT_BITS_LABEL,
-        &mut [("malachite", &mut (|(x, y, z)| no_out!(x.eq_mod(y, z))))],
+        &mut [("Malachite", &mut (|(x, y, z)| no_out!(x.eq_mod(y, z))))],
     );
 }
 

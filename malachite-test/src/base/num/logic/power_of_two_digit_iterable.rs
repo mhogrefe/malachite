@@ -3,7 +3,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
 };
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -515,7 +515,7 @@ fn benchmark_power_of_two_digits_size_hint<T: PrimitiveUnsigned + Rand, U: Primi
 ) where
     T: PowerOfTwoDigitIterable<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&{}, u64).size_hint()",
             U::NAME,
@@ -548,7 +548,7 @@ fn benchmark_power_of_two_digits_get_algorithms<T: PrimitiveUnsigned + Rand, U: 
 ) where
     T: PowerOfTwoDigits<U> + PowerOfTwoDigitIterable<U>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigitIterable::<{}>::power_of_two_digits(&{}, u64).size_hint()",
             U::NAME,

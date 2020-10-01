@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -34,7 +34,7 @@ fn benchmark_mod_power_of_two_is_reduced<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_power_of_two_is_reduced(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_small_unsigned::<T, u64>(gm),
@@ -44,7 +44,7 @@ fn benchmark_mod_power_of_two_is_reduced<T: PrimitiveUnsigned + Rand>(
         &(|&(n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow)| no_out!(n.mod_power_of_two_is_reduced(pow))),
         )],
     );

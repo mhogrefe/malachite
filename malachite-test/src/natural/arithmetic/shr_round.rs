@@ -4,7 +4,7 @@ use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,
@@ -239,7 +239,7 @@ fn demo_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr_round_up(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -254,14 +254,14 @@ fn benchmark_limbs_shr_round_up(gm: GenerationMode, limit: usize, file_name: &st
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_shr_round_up(&limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_shr_round_nearest(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr_round_nearest(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -276,14 +276,14 @@ fn benchmark_limbs_shr_round_nearest(gm: GenerationMode, limit: usize, file_name
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_shr_round_nearest(&limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr_exact(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -298,14 +298,14 @@ fn benchmark_limbs_shr_exact(gm: GenerationMode, limit: usize, file_name: &str) 
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits)| no_out!(limbs_shr_exact(&limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_shr_round(&[Limb], u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -320,14 +320,14 @@ fn benchmark_limbs_shr_round(gm: GenerationMode, limit: usize, file_name: &str) 
         }),
         "max(1, limbs.len() - bits / Limb::WIDTH)",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, bits, rm)| no_out!(limbs_shr_round(&limbs, bits, rm))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_shr_round_up_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -337,7 +337,7 @@ fn benchmark_limbs_vec_shr_round_up_in_place(gm: GenerationMode, limit: usize, f
         &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_vec_shr_round_up_in_place(&mut limbs, bits)),
         )],
     );
@@ -348,7 +348,7 @@ fn benchmark_limbs_vec_shr_round_nearest_in_place(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_shr_round_nearest_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -358,14 +358,14 @@ fn benchmark_limbs_vec_shr_round_nearest_in_place(
         &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| limbs_vec_shr_round_nearest_in_place(&mut limbs, bits)),
         )],
     );
 }
 
 fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_shr_exact_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -375,14 +375,14 @@ fn benchmark_limbs_vec_shr_exact_in_place(gm: GenerationMode, limit: usize, file
         &(|&(ref limbs, bits)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits)| no_out!(limbs_vec_shr_exact_in_place(&mut limbs, bits))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_shr_round_in_place(&mut Vec<Limb>, u64, RoundingMode)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_small_unsigned_and_rounding_mode_var_1(gm),
@@ -392,7 +392,7 @@ fn benchmark_limbs_vec_shr_round_in_place(gm: GenerationMode, limit: usize, file
         &(|&(ref limbs, bits, _)| limbs.len() + usize::exact_from(bits >> Limb::LOG_WIDTH)),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut limbs, bits, rm)| {
                 no_out!(limbs_vec_shr_round_in_place(&mut limbs, bits, rm))
             }),
@@ -456,7 +456,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_natural_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -466,7 +466,7 @@ macro_rules! demos_and_benches_unsigned {
                 &(|&(_, other, _)| usize::exact_from(other)),
                 "other",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
                 )],
             );
@@ -477,7 +477,7 @@ macro_rules! demos_and_benches_unsigned {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_natural_small_unsigned_and_rounding_mode_var_1::<$t>(gm),
@@ -597,7 +597,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.shr_round_assign({}, RoundingMode)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_natural_small_signed_and_rounding_mode_var_2::<$t>(gm),
@@ -607,7 +607,7 @@ macro_rules! demos_and_benches_signed {
                 &(|&(_, other, _)| usize::exact_from(other.unsigned_abs())),
                 "|other|",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, rm)| x.shr_round_assign(y, rm)),
                 )],
             );
@@ -618,7 +618,7 @@ macro_rules! demos_and_benches_signed {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.shr_round({}, RoundingMode)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_natural_small_signed_and_rounding_mode_var_2::<$t>(gm),

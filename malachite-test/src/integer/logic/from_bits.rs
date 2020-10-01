@@ -1,5 +1,5 @@
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_desc_alt,
 };
@@ -39,7 +39,7 @@ fn demo_integer_from_bits_desc(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from_bits_asc(&[bool])",
         BenchmarkType::Algorithms,
         vecs_of_bool(gm),
@@ -66,7 +66,7 @@ fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, 
 }
 
 fn benchmark_integer_from_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from_bits_desc(&[bool])",
         BenchmarkType::Algorithms,
         vecs_of_bool(gm),

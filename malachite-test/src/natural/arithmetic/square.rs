@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::square::{
@@ -106,7 +106,7 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_basecase(&mut [Limb], &[Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_17(gm),
@@ -133,7 +133,7 @@ fn benchmark_limbs_square_to_out_toom_2_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_toom_2(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_18(gm),
@@ -163,7 +163,7 @@ fn benchmark_limbs_square_to_out_toom_3_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_toom_3(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_19(gm),
@@ -196,7 +196,7 @@ fn benchmark_limbs_square_to_out_toom_4_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_toom_4(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_21(gm),
@@ -229,7 +229,7 @@ fn benchmark_limbs_square_to_out_toom_6_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_toom_6(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_22(gm),
@@ -262,7 +262,7 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_square_to_out_toom_8(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_23(gm),
@@ -291,7 +291,7 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
 }
 
 fn benchmark_limbs_square_to_out_fft_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_23(gm),
@@ -317,7 +317,7 @@ fn benchmark_limbs_square_to_out_fft_algorithms(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_natural_square_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.square_assign()",
         BenchmarkType::Single,
         naturals(gm),
@@ -326,12 +326,12 @@ fn benchmark_natural_square_assign(gm: GenerationMode, limit: usize, file_name: 
         file_name,
         &(|n| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|mut n| n.square_assign()))],
+        &mut [("Malachite", &mut (|mut n| n.square_assign()))],
     );
 }
 
 fn benchmark_natural_square_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.square()",
         BenchmarkType::Algorithms,
         pairs_of_naturals_var_3(gm),
@@ -348,7 +348,7 @@ fn benchmark_natural_square_algorithms(gm: GenerationMode, limit: usize, file_na
 }
 
 fn benchmark_natural_square_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.square()",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),

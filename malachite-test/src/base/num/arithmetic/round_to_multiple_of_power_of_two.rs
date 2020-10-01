@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -214,7 +214,7 @@ fn benchmark_unsigned_round_to_multiple_of_power_of_two<T: PrimitiveUnsigned + R
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.round_to_multiple_of_power_of_two(u64, RoundingMode)",
             T::NAME
@@ -227,7 +227,7 @@ fn benchmark_unsigned_round_to_multiple_of_power_of_two<T: PrimitiveUnsigned + R
         &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow, rm)| no_out!(n.round_to_multiple_of_power_of_two(pow, rm))),
         )],
     );
@@ -238,7 +238,7 @@ fn benchmark_unsigned_round_to_multiple_of_power_of_two_assign<T: PrimitiveUnsig
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.round_to_multiple_of_power_of_two_assign(u64, RoundingMode)",
             T::NAME
@@ -251,7 +251,7 @@ fn benchmark_unsigned_round_to_multiple_of_power_of_two_assign<T: PrimitiveUnsig
         &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow, rm)| n.round_to_multiple_of_power_of_two_assign(pow, rm)),
         )],
     );
@@ -265,7 +265,7 @@ fn benchmark_signed_round_to_multiple_of_power_of_two<T: PrimitiveSigned + Rand>
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.round_to_multiple_of_power_of_two(u64, RoundingMode)",
             T::NAME
@@ -278,7 +278,7 @@ fn benchmark_signed_round_to_multiple_of_power_of_two<T: PrimitiveSigned + Rand>
         &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(n, pow, rm)| no_out!(n.round_to_multiple_of_power_of_two(pow, rm))),
         )],
     );
@@ -292,7 +292,7 @@ fn benchmark_signed_round_to_multiple_of_power_of_two_assign<T: PrimitiveSigned 
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "{}.round_to_multiple_of_power_of_two_assign(u64, RoundingMode)",
             T::NAME
@@ -305,7 +305,7 @@ fn benchmark_signed_round_to_multiple_of_power_of_two_assign<T: PrimitiveSigned 
         &(|&(n, _, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut n, pow, rm)| n.round_to_multiple_of_power_of_two_assign(pow, rm)),
         )],
     );

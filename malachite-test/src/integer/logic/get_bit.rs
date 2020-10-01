@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::platform::Limb;
 
@@ -41,7 +41,7 @@ fn demo_integer_get_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_get_bit_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_get_bit_neg(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -51,14 +51,14 @@ fn benchmark_limbs_get_bit_neg(gm: GenerationMode, limit: usize, file_name: &str
         &(|&(ref limbs, _)| limbs.len()),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref limbs, index)| no_out!(limbs_get_bit_neg(limbs, index))),
         )],
     );
 }
 
 fn benchmark_integer_get_bit_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.get_bit(u64)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_small_unsigned(gm),
@@ -69,7 +69,7 @@ fn benchmark_integer_get_bit_library_comparison(gm: GenerationMode, limit: usize
         "index",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (n, index))| no_out!(n.get_bit(index))),
             ),
             (

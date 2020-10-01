@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -61,7 +61,7 @@ fn demo_natural_not_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_not(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_not(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
@@ -70,12 +70,12 @@ fn benchmark_limbs_not(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|limbs| limbs.len()),
         "limbs.len()",
-        &mut [("malachite", &mut (|limbs| no_out!(limbs_not(&limbs))))],
+        &mut [("Malachite", &mut (|limbs| no_out!(limbs_not(&limbs))))],
     );
 }
 
 fn benchmark_limbs_not_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_not_to_out(&mut [u32], &[u32])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_3(gm),
@@ -85,14 +85,14 @@ fn benchmark_limbs_not_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         &(|&(_, ref limbs_in)| limbs_in.len()),
         "limbs_in.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut out, ref limbs_in)| limbs_not_to_out(out, limbs_in)),
         )],
     );
 }
 
 fn benchmark_limbs_not_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_not_in_place(&mut [u32])",
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
@@ -102,14 +102,14 @@ fn benchmark_limbs_not_in_place(gm: GenerationMode, limit: usize, file_name: &st
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|mut limbs| limbs_not_in_place(&mut limbs)),
         )],
     );
 }
 
 fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "!Natural",
         BenchmarkType::LibraryComparison,
         rm_naturals(gm),
@@ -119,14 +119,14 @@ fn benchmark_natural_not_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, n)| no_out!(!n))),
+            ("Malachite", &mut (|(_, n)| no_out!(!n))),
             ("rug", &mut (|(n, _)| no_out!(!n))),
         ],
     );
 }
 
 fn benchmark_natural_not_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "!Natural",
         BenchmarkType::EvaluationStrategy,
         naturals(gm),

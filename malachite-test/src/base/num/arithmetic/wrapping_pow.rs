@@ -4,7 +4,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode, ScaleType};
@@ -63,7 +63,7 @@ fn benchmark_unsigned_wrapping_pow_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.wrapping_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_small_unsigneds::<T, u64>(gm),
@@ -72,7 +72,7 @@ fn benchmark_unsigned_wrapping_pow_assign<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y)| x.wrapping_pow_assign(y)))],
+        &mut [("Malachite", &mut (|(mut x, y)| x.wrapping_pow_assign(y)))],
     );
 }
 
@@ -81,7 +81,7 @@ fn benchmark_signed_wrapping_pow_assign<T: PrimitiveSigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.wrapping_pow_assign(u64)", T::NAME),
         BenchmarkType::Single,
         pairs_of_small_signed_and_small_unsigned::<T, u64>(gm),
@@ -90,7 +90,7 @@ fn benchmark_signed_wrapping_pow_assign<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(mut x, y)| x.wrapping_pow_assign(y)))],
+        &mut [("Malachite", &mut (|(mut x, y)| x.wrapping_pow_assign(y)))],
     );
 }
 

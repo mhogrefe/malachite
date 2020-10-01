@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 
@@ -32,7 +32,7 @@ fn demo_natural_trailing_zeros(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_trailing_zeros(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_trailing_zeros(&[u32])",
         BenchmarkType::Single,
         vecs_of_unsigned_var_3(gm),
@@ -42,14 +42,14 @@ fn benchmark_limbs_trailing_zeros(gm: GenerationMode, limit: usize, file_name: &
         &(|limbs| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|limbs| no_out!(limbs_trailing_zeros(&limbs))),
         )],
     );
 }
 
 fn benchmark_natural_trailing_zeros_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.trailing_zeros()",
         BenchmarkType::Algorithms,
         naturals(gm),

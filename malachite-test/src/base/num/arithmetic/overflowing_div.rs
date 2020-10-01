@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -69,7 +69,7 @@ fn benchmark_unsigned_overflowing_div_assign<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.overflowing_div_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_positive_unsigned::<T, T>(gm),
@@ -79,7 +79,7 @@ fn benchmark_unsigned_overflowing_div_assign<T: PrimitiveUnsigned + Rand>(
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y)| no_out!(x.overflowing_div_assign(y))),
         )],
     );
@@ -93,7 +93,7 @@ fn benchmark_signed_overflowing_div_assign<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.overflowing_div_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_nonzero_signed::<T, T>(gm),
@@ -103,7 +103,7 @@ fn benchmark_signed_overflowing_div_assign<T: PrimitiveSigned + Rand>(
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, y)| no_out!(x.overflowing_div_assign(y))),
         )],
     );

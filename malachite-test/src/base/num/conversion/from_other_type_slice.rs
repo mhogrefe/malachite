@@ -3,7 +3,7 @@ use std::fmt::Display;
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::FromOtherTypeSlice;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -95,7 +95,7 @@ fn bench_from_other_type_slice<T: PrimitiveUnsigned + Rand, U: Named>(
 ) where
     U: FromOtherTypeSlice<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.from_other_type_slice(&[{}])", U::NAME, T::NAME),
         BenchmarkType::Single,
         vecs_of_unsigned(gm),
@@ -105,7 +105,7 @@ fn bench_from_other_type_slice<T: PrimitiveUnsigned + Rand, U: Named>(
         &(|xs| xs.len()),
         "xs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref xs| no_out!(U::from_other_type_slice(xs))),
         )],
     );

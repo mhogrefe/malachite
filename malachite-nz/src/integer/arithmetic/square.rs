@@ -23,8 +23,8 @@ impl Square for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO.square(), 0);
-    /// assert_eq!(Integer::from(123).square(), 15_129);
-    /// assert_eq!(Integer::from(-123).square(), 15_129);
+    /// assert_eq!(Integer::from(123).square(), 15129);
+    /// assert_eq!(Integer::from(-123).square(), 15129);
     /// ```
     #[inline]
     fn square(mut self) -> Integer {
@@ -54,8 +54,8 @@ impl<'a> Square for &'a Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!((&Integer::ZERO).square(), 0);
-    /// assert_eq!((&Integer::from(123)).square(), 15_129);
-    /// assert_eq!((&Integer::from(-123)).square(), 15_129);
+    /// assert_eq!((&Integer::from(123)).square(), 15129);
+    /// assert_eq!((&Integer::from(-123)).square(), 15129);
     /// ```
     #[inline]
     fn square(self) -> Integer {
@@ -90,11 +90,11 @@ impl SquareAssign for Integer {
     ///
     /// let mut x = Integer::from(123);
     /// x.square_assign();
-    /// assert_eq!(x, 15_129);
+    /// assert_eq!(x, 15129);
     ///
     /// let mut x = Integer::from(-123);
     /// x.square_assign();
-    /// assert_eq!(x, 15_129);
+    /// assert_eq!(x, 15129);
     /// ```
     fn square_assign(&mut self) {
         self.sign = true;

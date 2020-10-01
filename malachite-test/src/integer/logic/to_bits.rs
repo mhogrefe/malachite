@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
@@ -98,7 +98,7 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "bits_to_twos_complement_bits_non_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool(gm),
@@ -108,7 +108,7 @@ fn benchmark_bits_to_twos_complement_bits_non_negative(
         &(|bits| bits.len()),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref mut bits| bits_to_twos_complement_bits_non_negative(bits)),
         )],
     );
@@ -119,7 +119,7 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "bits_slice_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool(gm),
@@ -129,7 +129,7 @@ fn benchmark_bits_slice_to_twos_complement_bits_negative(
         &(|bits| bits.len()),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref mut bits| no_out!(bits_slice_to_twos_complement_bits_negative(bits))),
         )],
     );
@@ -140,7 +140,7 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "bits_vec_to_twos_complement_bits_negative(&mut [bool])",
         BenchmarkType::Single,
         vecs_of_bool_var_1(gm),
@@ -150,7 +150,7 @@ fn benchmark_bits_vec_to_twos_complement_bits_negative(
         &(|bits| bits.len()),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|ref mut bits| bits_vec_to_twos_complement_bits_negative(bits)),
         )],
     );
@@ -161,7 +161,7 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.to_bits_asc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -181,7 +181,7 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
 }
 
 fn benchmark_integer_to_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.to_bits_asc()",
         BenchmarkType::Algorithms,
         integers(gm),
@@ -203,7 +203,7 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.to_bits_desc()",
         BenchmarkType::EvaluationStrategy,
         integers(gm),
@@ -226,7 +226,7 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
 }
 
 fn benchmark_integer_to_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.to_bits_desc()",
         BenchmarkType::Algorithms,
         integers(gm),

@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
 use malachite_nz_test_util::natural::logic::set_bit::num_set_bit;
 
@@ -56,7 +56,7 @@ fn demo_natural_set_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_slice_set_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_set_bit(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_limb_vec_and_small_u64_var_2(gm),
@@ -66,14 +66,14 @@ fn benchmark_limbs_slice_set_bit(gm: GenerationMode, limit: usize, file_name: &s
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut limbs, index)| no_out!(limbs_slice_set_bit(limbs, index))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_set_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_set_bit(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
@@ -83,14 +83,14 @@ fn benchmark_limbs_vec_set_bit(gm: GenerationMode, limit: usize, file_name: &str
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut limbs, index)| no_out!(limbs_vec_set_bit(limbs, index))),
         )],
     );
 }
 
 fn benchmark_natural_set_bit_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.set_bit(u64)",
         BenchmarkType::LibraryComparison,
         nm_pairs_of_natural_and_small_unsigned(gm),
@@ -100,7 +100,7 @@ fn benchmark_natural_set_bit_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (_, index))| usize::exact_from(index)),
         "index",
         &mut [
-            ("malachite", &mut (|(_, (mut n, index))| n.set_bit(index))),
+            ("Malachite", &mut (|(_, (mut n, index))| n.set_bit(index))),
             (
                 "num",
                 &mut (|((mut n, index), _)| num_set_bit(&mut n, index)),

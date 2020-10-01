@@ -3,7 +3,7 @@ use std::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{EqModPowerOfTwo, ModPowerOfTwo};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::arithmetic::eq_mod_power_of_two::{
     limbs_eq_mod_power_of_two_neg_limb, limbs_eq_mod_power_of_two_neg_pos,
 };
@@ -78,7 +78,7 @@ fn demo_integer_eq_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_power_of_two_neg_limb(&[Limb], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_and_small_unsigned_var_2(gm),
@@ -88,7 +88,7 @@ fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize
         &(|&(ref limbs, _, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref limbs, limb, pow)| {
                 no_out!(limbs_eq_mod_power_of_two_neg_limb(limbs, limb, pow))
             }),
@@ -97,7 +97,7 @@ fn benchmark_limbs_eq_mod_power_of_two_neg_limb(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_eq_mod_power_of_two_neg_pos(&[u32], &[u32], u64)",
         BenchmarkType::Single,
         triples_of_unsigned_vec_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -107,7 +107,7 @@ fn benchmark_limbs_eq_mod_power_of_two_neg_pos(gm: GenerationMode, limit: usize,
         &(|&(ref xs, ref ys, pow)| min(usize::exact_from(pow), max(xs.len(), ys.len()))),
         "min(pow, max(xs.len(), ys.len()))",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref xs, ref ys, pow)| no_out!(limbs_eq_mod_power_of_two_neg_pos(xs, ys, pow))),
         )],
     );
@@ -118,7 +118,7 @@ fn benchmark_integer_eq_mod_power_of_two_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.eq_mod_power_of_two(&Integer, u64)",
         BenchmarkType::LibraryComparison,
         rm_triples_of_integer_integer_and_small_unsigned::<u64>(gm),
@@ -129,7 +129,7 @@ fn benchmark_integer_eq_mod_power_of_two_library_comparison(
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (ref n, ref u, pow))| no_out!(n.eq_mod_power_of_two(u, pow))),
             ),
             (
@@ -147,7 +147,7 @@ fn benchmark_integer_eq_mod_power_of_two_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.eq_mod_power_of_two(&Integer, u64)",
         BenchmarkType::Algorithms,
         triples_of_integer_integer_and_small_unsigned::<u64>(gm),

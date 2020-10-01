@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
     _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
@@ -548,7 +548,7 @@ fn demo_natural_ceiling_div_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_invert_limb(Limb)",
         BenchmarkType::Single,
         unsigneds_var_1::<Limb>(gm),
@@ -557,12 +557,12 @@ fn benchmark_limbs_invert_limb(gm: GenerationMode, limit: usize, file_name: &str
         file_name,
         &(|limb| usize::exact_from(limb.significant_bits())),
         "limb.significant_bits()",
-        &mut [("malachite", &mut (|limb| no_out!(limbs_invert_limb(limb))))],
+        &mut [("Malachite", &mut (|limb| no_out!(limbs_invert_limb(limb))))],
     );
 }
 
 fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_limb_mod(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -572,7 +572,7 @@ fn benchmark_limbs_div_limb_mod(gm: GenerationMode, limit: usize, file_name: &st
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(limbs, limb)| no_out!(limbs_div_limb_mod(&limbs, limb))),
         )],
     );
@@ -583,7 +583,7 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_limb_to_out_mod(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -620,7 +620,7 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_limb_in_place_mod(&mut [Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -655,7 +655,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_mod_by_two_limb_normalized(&mut [Limb], &mut [Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_37(gm),
@@ -665,7 +665,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
         &(|&(_, ref ns, _)| ns.len()),
         "ns.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut qs, mut ns, ds)| {
                 no_out!(limbs_div_mod_by_two_limb_normalized(&mut qs, &mut ns, &ds))
             }),
@@ -674,7 +674,7 @@ fn benchmark_limbs_div_mod_by_two_limb_normalized(
 }
 
 fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_mod_schoolbook(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Single,
         quadruples_of_three_limb_vecs_and_limb_var_1(gm),
@@ -684,7 +684,7 @@ fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_nam
         &(|&(_, ref ns, _, _)| ns.len()),
         "ns.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut qs, mut ns, ds, inverse)| {
                 no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
             }),
@@ -697,7 +697,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         quadruples_of_three_limb_vecs_and_limb_var_2(gm.with_scale(512)),
@@ -726,7 +726,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
 }
 
 fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_invert_basecase_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Single,
         triples_of_limb_vec_var_38(gm),
@@ -736,7 +736,7 @@ fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file
         &(|&(_, ref ds, _)| ds.len()),
         "ds.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut is, ds, mut scratch)| {
                 no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
             }),
@@ -749,7 +749,7 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_invert_newton_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_39(gm.with_scale(2_048)),
@@ -776,7 +776,7 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
 }
 
 fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_invert_approx(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_38(gm.with_scale(2_048)),
@@ -803,7 +803,7 @@ fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Single,
         quadruples_of_limb_vec_var_1(gm),
@@ -813,7 +813,7 @@ fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: 
         &(|&(_, _, _, ref ds)| ds.len()),
         "ds.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut qs, mut rs, ns, ds)| {
                 let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
                 no_out!(_limbs_div_mod_barrett(
@@ -833,7 +833,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
         triples_of_limb_vec_var_40(gm.with_scale(4_096)),
@@ -886,7 +886,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_barrett_large_product(\
          &mut [Limb], &[Limb], &[Limb], &[Limb], usize, usize)",
         BenchmarkType::Algorithms,
@@ -925,7 +925,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_div_mod_barrett_helper(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         quadruples_of_limb_vec_var_3(gm.with_scale(2_048)),
@@ -970,7 +970,7 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
 }
 
 fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_limb_vec_var_9(gm),
@@ -980,14 +980,14 @@ fn benchmark_limbs_div_mod(gm: GenerationMode, limit: usize, file_name: &str) {
         &(|&(ref ns, _)| ns.len()),
         "ns.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ns, ds)| no_out!(limbs_div_mod(&ns, &ds))),
         )],
     );
 }
 
 fn benchmark_limbs_div_mod_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_div_mod_to_out(&mut [Limb], &mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         quadruples_of_limb_vec_var_2(gm),
@@ -997,7 +997,7 @@ fn benchmark_limbs_div_mod_to_out(gm: GenerationMode, limit: usize, file_name: &
         &(|&(_, _, ref ns, _)| ns.len()),
         "ns.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut qs, mut rs, ns, ds)| limbs_div_mod_to_out(&mut qs, &mut rs, &ns, &ds)),
         )],
     );
@@ -1008,7 +1008,7 @@ fn benchmark_natural_div_assign_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_assign_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1031,7 +1031,7 @@ fn benchmark_natural_div_assign_mod_evaluation_strategy(
 }
 
 fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_mod(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -1041,7 +1041,7 @@ fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.div_mod(y)))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x.div_mod(y)))),
             ("num", &mut (|((x, y), _, _)| no_out!(x.div_mod_floor(&y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.div_rem_floor(y)))),
         ],
@@ -1049,7 +1049,7 @@ fn benchmark_natural_div_mod_library_comparison(gm: GenerationMode, limit: usize
 }
 
 fn benchmark_natural_div_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -1070,7 +1070,7 @@ fn benchmark_natural_div_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1105,7 +1105,7 @@ fn benchmark_natural_div_assign_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_assign_rem(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1128,7 +1128,7 @@ fn benchmark_natural_div_assign_rem_evaluation_strategy(
 }
 
 fn benchmark_natural_div_rem_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_rem(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -1138,7 +1138,7 @@ fn benchmark_natural_div_rem_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.div_rem(y)))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x.div_rem(y)))),
             ("num", &mut (|((x, y), _, _)| no_out!(x.div_rem(&y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.div_rem(y)))),
         ],
@@ -1150,7 +1150,7 @@ fn benchmark_natural_div_rem_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_rem(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1185,7 +1185,7 @@ fn benchmark_natural_ceiling_div_assign_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ceiling_div_assign_neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1212,7 +1212,7 @@ fn benchmark_natural_ceiling_div_neg_mod_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_positive_natural(gm),
@@ -1223,7 +1223,7 @@ fn benchmark_natural_ceiling_div_neg_mod_library_comparison(
         "n.significant_bits()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.ceiling_div_neg_mod(y))),
             ),
             (
@@ -1239,7 +1239,7 @@ fn benchmark_natural_ceiling_div_neg_mod_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -1268,7 +1268,7 @@ fn benchmark_natural_ceiling_div_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.ceiling_div_neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),

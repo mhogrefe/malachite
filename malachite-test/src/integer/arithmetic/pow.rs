@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use num::traits::Pow as NumPow;
 use rug::ops::Pow as RugPow;
 
@@ -41,7 +41,7 @@ fn demo_integer_pow_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_pow_assign(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.pow_assign(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm.with_scale(16)),
@@ -50,12 +50,12 @@ fn benchmark_integer_pow_assign(gm: GenerationMode, limit: usize, file_name: &st
         file_name,
         &(|&(ref n, exp)| usize::exact_from(n.significant_bits() * exp)),
         "self.significant_bits() * exp",
-        &mut [("malachite", &mut (|(mut x, exp)| x.pow_assign(exp)))],
+        &mut [("Malachite", &mut (|(mut x, exp)| x.pow_assign(exp)))],
     );
 }
 
 fn benchmark_integer_pow_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.pow(u64)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_small_unsigned(gm.with_scale(16)),
@@ -65,7 +65,7 @@ fn benchmark_integer_pow_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref x, exp))| usize::exact_from(x.significant_bits() * exp)),
         "self.significant_bits() * exp",
         &mut [
-            ("malachite", &mut (|(_, _, (x, exp))| no_out!(x.pow(exp)))),
+            ("Malachite", &mut (|(_, _, (x, exp))| no_out!(x.pow(exp)))),
             ("num", &mut (|((x, exp), _, _)| no_out!(x.pow(exp)))),
             (
                 "rug",
@@ -76,7 +76,7 @@ fn benchmark_integer_pow_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_pow_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.pow(u64)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_small_unsigned(gm.with_scale(16)),

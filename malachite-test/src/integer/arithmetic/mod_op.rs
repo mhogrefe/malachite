@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use num::Integer;
 use rug::ops::RemRounding;
 
@@ -205,7 +205,7 @@ fn benchmark_integer_mod_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_assign(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -228,7 +228,7 @@ fn benchmark_integer_mod_assign_evaluation_strategy(
 }
 
 fn benchmark_integer_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_op(Integer)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer(gm),
@@ -238,7 +238,7 @@ fn benchmark_integer_mod_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.mod_op(y)))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x.mod_op(y)))),
             ("num", &mut (|((x, y), _, _)| no_out!(x.mod_floor(&y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.rem_floor(y)))),
         ],
@@ -246,7 +246,7 @@ fn benchmark_integer_mod_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_op(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -263,7 +263,7 @@ fn benchmark_integer_mod_algorithms(gm: GenerationMode, limit: usize, file_name:
 }
 
 fn benchmark_integer_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.mod_op(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -298,7 +298,7 @@ fn benchmark_integer_rem_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.div_assign_rem(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -315,7 +315,7 @@ fn benchmark_integer_rem_assign_evaluation_strategy(
 }
 
 fn benchmark_integer_rem_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer % Integer",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_nonzero_integer(gm),
@@ -325,7 +325,7 @@ fn benchmark_integer_rem_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x % y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x % y))),
             ("num", &mut (|((x, y), _, _)| no_out!(x % y))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x % y))),
         ],
@@ -333,7 +333,7 @@ fn benchmark_integer_rem_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_integer_rem_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer % Integer",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -356,7 +356,7 @@ fn benchmark_integer_ceiling_mod_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod_assign(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -383,7 +383,7 @@ fn benchmark_integer_ceiling_mod_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod(Integer)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_integer_and_nonzero_integer(gm),
@@ -393,14 +393,14 @@ fn benchmark_integer_ceiling_mod_library_comparison(
         &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.ceiling_mod(y)))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x.ceiling_mod(y)))),
             ("rug", &mut (|((x, y), _)| no_out!(x.rem_ceil(y)))),
         ],
     );
 }
 
 fn benchmark_integer_ceiling_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod(Integer)",
         BenchmarkType::Algorithms,
         pairs_of_integer_and_nonzero_integer(gm),
@@ -424,7 +424,7 @@ fn benchmark_integer_ceiling_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.ceiling_mod(Integer)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_integer_and_nonzero_integer(gm),

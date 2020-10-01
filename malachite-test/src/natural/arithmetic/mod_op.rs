@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb_normalized, limbs_div_mod_to_out,
@@ -454,7 +454,7 @@ fn demo_natural_neg_mod_ref_ref(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_mod_limb_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_1(gm.with_scale(512)),
@@ -497,7 +497,7 @@ fn benchmark_limbs_mod_limb_small_normalized_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_small_normalized(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_unsigned_var_1(gm),
@@ -548,7 +548,7 @@ fn benchmark_limbs_mod_limb_small_unnormalized_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_small_unnormalized(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_1(gm),
@@ -607,7 +607,7 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_normalized_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from normalized",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_unsigned_var_1(gm),
@@ -638,7 +638,7 @@ fn benchmark_limbs_mod_limb_any_leading_zeros_from_unnormalized_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_any_leading_zeros(&[Limb], Limb) from unnormalized",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -669,7 +669,7 @@ fn benchmark_limbs_mod_limb_at_least_1_leading_zero_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_at_least_1_leading_zero(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_and_positive_unsigned_var_3(gm),
@@ -700,7 +700,7 @@ fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_limb_at_least_2_leading_zeros(&[Limb], Limb)",
         BenchmarkType::Algorithms,
         pairs_of_nonempty_unsigned_vec_and_positive_unsigned_var_2(gm),
@@ -711,7 +711,7 @@ fn benchmark_limbs_mod_limb_at_least_2_leading_zeros_algorithms(
         "limbs.len()",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(limbs, divisor)| {
                     no_out!(_limbs_mod_limb_at_least_1_leading_zero(&limbs, divisor))
                 }),
@@ -731,7 +731,7 @@ fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_by_two_limb_normalized(&[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         triples_of_unsigned_vec_var_37(gm),
@@ -756,7 +756,7 @@ fn benchmark_limbs_mod_by_two_limb_normalized_algorithms(
 }
 
 fn benchmark_limbs_mod_schoolbook_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_schoolbook(&mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         quadruples_of_three_limb_vecs_and_limb_var_1(gm),
@@ -785,7 +785,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_divide_and_conquer(&mut [Limb], &mut [Limb], &[Limb], Limb)",
         BenchmarkType::Algorithms,
         quadruples_of_three_limb_vecs_and_limb_var_2(gm.with_scale(512)),
@@ -818,7 +818,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
 }
 
 fn benchmark_limbs_mod_barrett_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "_limbs_mod_barrett(&mut [Limb], &mut [Limb], &[Limb], &[Limb], &mut Limb)",
         BenchmarkType::Algorithms,
         quadruples_of_limb_vec_var_1(gm),
@@ -849,7 +849,7 @@ fn benchmark_limbs_mod_barrett_algorithms(gm: GenerationMode, limit: usize, file
 }
 
 fn benchmark_limbs_mod(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_limb_vec_var_9(gm),
@@ -858,12 +858,12 @@ fn benchmark_limbs_mod(gm: GenerationMode, limit: usize, file_name: &str) {
         file_name,
         &(|&(ref ns, _)| ns.len()),
         "ns.len()",
-        &mut [("malachite", &mut (|(ns, ds)| no_out!(limbs_mod(&ns, &ds))))],
+        &mut [("Malachite", &mut (|(ns, ds)| no_out!(limbs_mod(&ns, &ds))))],
     );
 }
 
 fn benchmark_limbs_mod_to_out_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_mod_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Algorithms,
         quadruples_of_limb_vec_var_2(gm),
@@ -894,7 +894,7 @@ fn benchmark_natural_mod_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -917,7 +917,7 @@ fn benchmark_natural_mod_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_op(Natural)",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -927,7 +927,7 @@ fn benchmark_natural_mod_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x.mod_op(y)))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x.mod_op(y)))),
             ("num", &mut (|((x, y), _, _)| no_out!(x.mod_floor(&y)))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x.rem_floor(y)))),
         ],
@@ -935,7 +935,7 @@ fn benchmark_natural_mod_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_natural_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_op(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -952,7 +952,7 @@ fn benchmark_natural_mod_algorithms(gm: GenerationMode, limit: usize, file_name:
 }
 
 fn benchmark_natural_mod_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_op(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -987,7 +987,7 @@ fn benchmark_natural_rem_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.div_assign_rem(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1004,7 +1004,7 @@ fn benchmark_natural_rem_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_rem_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural % Natural",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_natural_and_positive_natural(gm),
@@ -1014,7 +1014,7 @@ fn benchmark_natural_rem_library_comparison(gm: GenerationMode, limit: usize, fi
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x % y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x % y))),
             ("num", &mut (|((x, y), _, _)| no_out!(x % y))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x % y))),
         ],
@@ -1022,7 +1022,7 @@ fn benchmark_natural_rem_library_comparison(gm: GenerationMode, limit: usize, fi
 }
 
 fn benchmark_natural_rem_evaluation_strategy(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural % Natural",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1045,7 +1045,7 @@ fn benchmark_natural_neg_mod_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod_assign(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),
@@ -1068,7 +1068,7 @@ fn benchmark_natural_neg_mod_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_neg_mod_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod(Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_natural_and_positive_natural(gm),
@@ -1078,14 +1078,14 @@ fn benchmark_natural_neg_mod_library_comparison(gm: GenerationMode, limit: usize
         &(|&(_, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x.neg_mod(y)))),
             ("rug", &mut (|((x, y), _)| no_out!(rug_neg_mod(x, y)))),
         ],
     );
 }
 
 fn benchmark_natural_neg_mod_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod(Natural)",
         BenchmarkType::Algorithms,
         pairs_of_natural_and_positive_natural(gm),
@@ -1109,7 +1109,7 @@ fn benchmark_natural_neg_mod_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.neg_mod(Natural)",
         BenchmarkType::EvaluationStrategy,
         pairs_of_natural_and_positive_natural(gm),

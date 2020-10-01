@@ -36,7 +36,8 @@ where
     }
 }
 
-/// Returns an iterator that generates the `Ordering`s of adjacent elements of a given iterator.
+/// Returns an iterator that generates the `Ordering`s of adjacent pairs of elements of a given
+/// iterator.
 ///
 /// To put it another way, the returned iterator produces the signs of the finite differences of the
 /// input iterator.
@@ -202,18 +203,6 @@ where
 ///
 /// This function will hang if given an infinite strictly zigzagging iterator.
 ///
-/// $$
-/// f((x_k)\_{k=0}^N) =
-///     \left ( \\bigwedge {x\_{2k+1} > x\_{2k} \wedge x\_{2k+1} > x\_{2k+2}} \right ) \vee
-///     \left ( \\bigwedge {x\_{2k+1} < x\_{2k} \wedge x\_{2k+1} < x\_{2k+2}} \right )
-/// $$
-/// where $N$ may be $\infty$, and the big $\wedge$s range over all existing triples of $x_{2k},
-/// x_{2k+1}, x_{2k+2}$.
-///
-/// The above expression isn't entirely correct: it neglects the case where `xs.count()` is even, in
-/// which case the last odd-indexed element only has one neighbor. For that case, refer to the
-/// informal definition.
-///
 /// # Worst-case complexity
 /// $T(n) = O(n)$
 ///
@@ -256,18 +245,6 @@ where
 /// even-indexed neighbors.
 ///
 /// This function will hang if given an infinite strictly zigzagging iterator.
-///
-/// $$
-/// f((x_k)\_{k=0}^N) =
-///     \left ( \\bigwedge {x\_{2k+1} \geq x\_{2k} \wedge x\_{2k+1} \geq x\_{2k+2}} \right ) \vee
-///     \left ( \\bigwedge {x\_{2k+1} \leq x\_{2k} \wedge x\_{2k+1} \leq x\_{2k+2}} \right )
-/// $$
-/// where $N$ may be $\infty$, and the big $\wedge$s range over all existing triples of $x_{2k},
-/// x_{2k+1}, x_{2k+2}$.
-///
-/// The above expression isn't entirely correct: it neglects the case where `xs.count()` is even, in
-/// which case the last odd-indexed element only has one neighbor. For that case, refer to the
-/// informal definition.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n)$

@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ModAdd, ModAddAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::triples_of_naturals_var_4;
@@ -151,7 +151,7 @@ fn benchmark_natural_mod_add_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_add_assign(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_4(gm),
@@ -182,7 +182,7 @@ fn benchmark_natural_mod_add_assign_evaluation_strategy(
 }
 
 fn benchmark_natural_mod_add_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_add(Natural, u64)",
         BenchmarkType::Algorithms,
         triples_of_naturals_var_4(gm),
@@ -203,7 +203,7 @@ fn benchmark_natural_mod_add_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.mod_add(Natural, Natural)",
         BenchmarkType::EvaluationStrategy,
         triples_of_naturals_var_4(gm),

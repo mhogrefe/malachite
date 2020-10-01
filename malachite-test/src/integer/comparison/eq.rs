@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::integer::{nrm_pairs_of_integers, pairs_of_integers};
@@ -23,7 +23,7 @@ fn demo_integer_eq(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_eq_library_comparison(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer == Integer",
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integers(gm),
@@ -35,7 +35,7 @@ fn benchmark_integer_eq_library_comparison(gm: GenerationMode, limit: usize, fil
         }),
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
             ("num", &mut (|((x, y), _, _)| no_out!(x == y))),
             ("rug", &mut (|(_, (x, y), _)| no_out!(x == y))),
         ],

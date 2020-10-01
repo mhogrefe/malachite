@@ -21,8 +21,8 @@ fn test_limbs_slice_clear_bit_neg() {
     test(&[3, 2, 1], 0, &[4, 2, 1]);
     test(&[0, 0, 3], 32, &[0, 0, 3]);
     test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
-    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, u32::MAX - 1]);
-    test(&[0xffff_fff7], 3, &[u32::MAX]);
+    test(&[0, 0, 0xfffffffd], 64, &[0, 0, u32::MAX - 1]);
+    test(&[0xfffffff7], 3, &[u32::MAX]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -52,11 +52,11 @@ fn test_limbs_vec_clear_bit_neg() {
     test(&[3, 2, 1], 0, &[4, 2, 1]);
     test(&[0, 0, 3], 32, &[0, 0, 3]);
     test(&[0, 3, 2, 1], 64, &[0, 3, 3, 1]);
-    test(&[0, 0, 0xffff_fffd], 64, &[0, 0, u32::MAX - 1]);
+    test(&[0, 0, 0xfffffffd], 64, &[0, 0, u32::MAX - 1]);
     test(&[0, 0, u32::MAX], 64, &[0, 0, 0, 1]);
     test(&[3, 2, 1], 100, &[3, 2, 1, 16]);
-    test(&[0xffff_fff7], 3, &[u32::MAX]);
-    test(&[0xffff_fff8], 3, &[0, 1]);
+    test(&[0xfffffff7], 3, &[u32::MAX]);
+    test(&[0xfffffff8], 3, &[0, 1]);
 }
 
 #[test]

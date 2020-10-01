@@ -1250,10 +1250,10 @@ impl BitAndAssign<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::NEGATIVE_ONE;
-    /// x &= Integer::from(0x70ff_ffff);
+    /// x &= Integer::from(0x70ffffff);
     /// x &= Integer::from(0x7ff0_ffff);
-    /// x &= Integer::from(0x7fff_f0ff);
-    /// x &= Integer::from(0x7fff_fff0);
+    /// x &= Integer::from(0x7ffff0ff);
+    /// x &= Integer::from(0x7ffffff0);
     /// assert_eq!(x, 0x70f0f0f0);
     /// ```
     fn bitand_assign(&mut self, other: Integer) {
@@ -1288,10 +1288,10 @@ impl<'a> BitAndAssign<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::NEGATIVE_ONE;
-    /// x &= &Integer::from(0x70ff_ffff);
+    /// x &= &Integer::from(0x70ffffff);
     /// x &= &Integer::from(0x7ff0_ffff);
-    /// x &= &Integer::from(0x7fff_f0ff);
-    /// x &= &Integer::from(0x7fff_fff0);
+    /// x &= &Integer::from(0x7ffff0ff);
+    /// x &= &Integer::from(0x7ffffff0);
     /// assert_eq!(x, 0x70f0f0f0);
     /// ```
     fn bitand_assign(&mut self, other: &'a Integer) {

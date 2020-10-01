@@ -107,16 +107,16 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64)
 /// use malachite_nz::integer::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two_neg_pos;
 ///
 /// assert_eq!(
-///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb],
+///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcdabcd, 0x12341234], &[0x54325433, 0xedcbedcb],
 ///     64), true);
 /// assert_eq!(
-///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x0000_0000, 0xedcb_edcb],
+///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcdabcd, 0x12341234], &[0, 0xedcbedcb],
 ///     64), false);
 /// assert_eq!(
-///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb],
+///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcdabcd, 0x12341234], &[0x54325433, 0xedcbedcb],
 ///     65), false);
 /// assert_eq!(
-///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcd_abcd, 0x1234_1234], &[0x5432_5433, 0xedcb_edcb],
+///     limbs_eq_mod_power_of_two_neg_pos(&[0xabcdabcd, 0x12341234], &[0x54325433, 0xedcbedcb],
 ///     128), false);
 /// ```
 ///

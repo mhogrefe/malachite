@@ -3,7 +3,7 @@ use std::cmp::max;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -62,7 +62,7 @@ fn benchmark_unsigned_divisible_by<T: PrimitiveUnsigned + Rand>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.divisible_by({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds::<T>(gm),
@@ -71,7 +71,7 @@ fn benchmark_unsigned_divisible_by<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.divisible_by(y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.divisible_by(y))))],
     );
 }
 
@@ -83,7 +83,7 @@ fn benchmark_signed_divisible_by<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.divisible_by({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_signeds::<T>(gm),
@@ -92,7 +92,7 @@ fn benchmark_signed_divisible_by<T: PrimitiveSigned + Rand>(
         file_name,
         &(|(x, y)| usize::exact_from(max(x.significant_bits(), y.significant_bits()))),
         "max(x.significant_bits(), y.significant_bits())",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.divisible_by(y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.divisible_by(y))))],
     );
 }
 

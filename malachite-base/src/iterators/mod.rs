@@ -260,6 +260,7 @@ where
         .collect()
 }
 
+/// This module contains `BitDistributor`, which helps generate tuples exhaustively.
 pub mod bit_distributor;
 /// This module contains functions that compare adjacent iterator elements.
 pub mod comparison;

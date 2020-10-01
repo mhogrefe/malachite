@@ -2,7 +2,7 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 use num::BigInt;
 use rand::Rand;
@@ -70,7 +70,7 @@ fn benchmark_integer_from_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: From<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer::from({})", T::NAME),
         BenchmarkType::Single,
         unsigneds::<T>(gm),
@@ -79,7 +79,7 @@ fn benchmark_integer_from_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
-        &mut [("malachite", &mut (|u| no_out!(Integer::from(u))))],
+        &mut [("Malachite", &mut (|u| no_out!(Integer::from(u))))],
     );
 }
 
@@ -104,7 +104,7 @@ macro_rules! demo_and_bench_signed {
         }
 
         fn $bench_name(gm: GenerationMode, limit: usize, file_name: &str) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Integer::from({})", $t::NAME),
                 BenchmarkType::Single,
                 signeds::<$t>(gm),
@@ -113,7 +113,7 @@ macro_rules! demo_and_bench_signed {
                 file_name,
                 &(|&i| usize::exact_from(i.significant_bits())),
                 "i.significant_bits()",
-                &mut [("malachite", &mut (|i| no_out!(Integer::from(i))))],
+                &mut [("Malachite", &mut (|i| no_out!(Integer::from(i))))],
             );
         }
     };
@@ -136,7 +136,7 @@ fn benchmark_integer_from_u32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from(u32)",
         BenchmarkType::LibraryComparison,
         unsigneds::<u32>(gm),
@@ -146,7 +146,7 @@ fn benchmark_integer_from_u32_library_comparison(
         &(|&u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
-            ("malachite", &mut (|u| no_out!(Integer::from(u)))),
+            ("Malachite", &mut (|u| no_out!(Integer::from(u)))),
             ("num", &mut (|u| no_out!(BigInt::from(u)))),
             ("rug", &mut (|u| no_out!(rug::Integer::from(u)))),
         ],
@@ -158,7 +158,7 @@ fn benchmark_integer_from_u64_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from(u64)",
         BenchmarkType::LibraryComparison,
         unsigneds::<u64>(gm),
@@ -168,7 +168,7 @@ fn benchmark_integer_from_u64_library_comparison(
         &(|&u| usize::exact_from(u.significant_bits())),
         "u.significant_bits()",
         &mut [
-            ("malachite", &mut (|u| no_out!(Integer::from(u)))),
+            ("Malachite", &mut (|u| no_out!(Integer::from(u)))),
             ("num", &mut (|u| no_out!(BigInt::from(u)))),
             ("rug", &mut (|u| no_out!(rug::Integer::from(u)))),
         ],
@@ -180,7 +180,7 @@ fn benchmark_integer_from_i32_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from(i32)",
         BenchmarkType::LibraryComparison,
         signeds::<i32>(gm),
@@ -190,7 +190,7 @@ fn benchmark_integer_from_i32_library_comparison(
         &(|&i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
-            ("malachite", &mut (|i| no_out!(Integer::from(i)))),
+            ("Malachite", &mut (|i| no_out!(Integer::from(i)))),
             ("num", &mut (|i| no_out!(BigInt::from(i)))),
             ("rug", &mut (|i| no_out!(rug::Integer::from(i)))),
         ],
@@ -202,7 +202,7 @@ fn benchmark_integer_from_i64_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer::from(i32)",
         BenchmarkType::LibraryComparison,
         signeds::<i64>(gm),
@@ -212,7 +212,7 @@ fn benchmark_integer_from_i64_library_comparison(
         &(|&i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [
-            ("malachite", &mut (|i| no_out!(Integer::from(i)))),
+            ("Malachite", &mut (|i| no_out!(Integer::from(i)))),
             ("num", &mut (|i| no_out!(BigInt::from(i)))),
             ("rug", &mut (|i| no_out!(rug::Integer::from(i)))),
         ],

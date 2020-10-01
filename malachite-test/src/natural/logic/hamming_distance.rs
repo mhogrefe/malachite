@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{HammingDistance, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::logic::hamming_distance::{
     limbs_hamming_distance, limbs_hamming_distance_limb, limbs_hamming_distance_same_length,
 };
@@ -86,7 +86,7 @@ fn demo_natural_hamming_distance(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_hamming_distance_limb(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_hamming_distance_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         pairs_of_nonempty_unsigned_vec_and_unsigned(gm),
@@ -96,14 +96,14 @@ fn benchmark_limbs_hamming_distance_limb(gm: GenerationMode, limit: usize, file_
         &(|&(ref limbs, _)| limbs.len()),
         "limbs.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref limbs, limb)| no_out!(limbs_hamming_distance_limb(limbs, limb))),
         )],
     );
 }
 
 fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_hamming_distance_same_length(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_1(gm),
@@ -113,14 +113,14 @@ fn benchmark_limbs_hamming_distance_same_length(gm: GenerationMode, limit: usize
         &(|&(ref xs, _)| xs.len()),
         "xs.len() = ys.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(xs, ys)| no_out!(limbs_hamming_distance_same_length(&xs, &ys))),
         )],
     );
 }
 
 fn benchmark_limbs_hamming_distance(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_hamming_distance(&[Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_2(gm),
@@ -130,7 +130,7 @@ fn benchmark_limbs_hamming_distance(gm: GenerationMode, limit: usize, file_name:
         &(|&(ref xs, ref ys)| max(xs.len(), ys.len())),
         "max(xs.len(), ys.len())",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(xs, ys)| no_out!(limbs_hamming_distance(&xs, &ys))),
         )],
     );
@@ -141,7 +141,7 @@ fn benchmark_natural_hamming_distance_library_comparison(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::LibraryComparison,
         rm_pairs_of_naturals(gm),
@@ -154,7 +154,7 @@ fn benchmark_natural_hamming_distance_library_comparison(
         "max(x.significant_bits(), y.significant_bits())",
         &mut [
             (
-                "malachite",
+                "Malachite",
                 &mut (|(_, (x, y))| no_out!(x.hamming_distance(&y))),
             ),
             (
@@ -170,7 +170,7 @@ fn benchmark_natural_hamming_distance_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.hamming_distance(&Natural)",
         BenchmarkType::Algorithms,
         pairs_of_naturals(gm),

@@ -28,17 +28,12 @@ fn test_limbs_slice_get_bits() {
     // limb_start < len
     // limb_end >= len
     // offset != 0
-    test(&[0x1234_5678, 0xabcd_ef01], 16, 48, &[0xef01_1234]);
+    test(&[0x12345678, 0xabcdef01], 16, 48, &[0xef011234]);
     // limb_end < len
-    test(&[0x1234_5678, 0xabcd_ef01], 4, 16, &[0x567]);
+    test(&[0x12345678, 0xabcdef01], 4, 16, &[0x567]);
     // offset == 0
-    test(
-        &[0x1234_5678, 0xabcd_ef01],
-        0,
-        100,
-        &[0x1234_5678, 0xabcd_ef01],
-    );
-    test(&[0x1234_5678, 0xabcd_ef01], 10, 10, &[]);
+    test(&[0x12345678, 0xabcdef01], 0, 100, &[0x12345678, 0xabcdef01]);
+    test(&[0x12345678, 0xabcdef01], 10, 10, &[]);
 }
 
 #[test]
@@ -54,15 +49,15 @@ fn test_limbs_vec_get_bits() {
         assert_eq!(limbs_vec_get_bits(xs, start, end), out);
     };
     test(vec![], 10, 20, &[]);
-    test(vec![0x1234_5678, 0xabcd_ef01], 16, 48, &[0xef01_1234, 0]);
-    test(vec![0x1234_5678, 0xabcd_ef01], 4, 16, &[0x567]);
+    test(vec![0x12345678, 0xabcdef01], 16, 48, &[0xef011234, 0]);
+    test(vec![0x12345678, 0xabcdef01], 4, 16, &[0x567]);
     test(
-        vec![0x1234_5678, 0xabcd_ef01],
+        vec![0x12345678, 0xabcdef01],
         0,
         100,
-        &[0x1234_5678, 0xabcd_ef01],
+        &[0x12345678, 0xabcdef01],
     );
-    test(vec![0x1234_5678, 0xabcd_ef01], 10, 10, &[0]);
+    test(vec![0x12345678, 0xabcdef01], 10, 10, &[0]);
 }
 
 #[test]

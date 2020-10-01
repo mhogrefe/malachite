@@ -1553,10 +1553,10 @@ impl BitXorAssign<Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(u32::MAX);
-    /// x ^= Integer::from(0x0000_000f);
-    /// x ^= Integer::from(0x0000_0f00);
+    /// x ^= Integer::from(0x0000000f);
+    /// x ^= Integer::from(0x00000f00);
     /// x ^= Integer::from(0x000f_0000);
-    /// x ^= Integer::from(0x0f00_0000);
+    /// x ^= Integer::from(0x0f000000);
     /// assert_eq!(x, 0xf0f0_f0f0u32);
     /// ```
     fn bitxor_assign(&mut self, other: Integer) {
@@ -1594,10 +1594,10 @@ impl<'a> BitXorAssign<&'a Integer> for Integer {
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(u32::MAX);
-    /// x ^= &Integer::from(0x0000_000f);
-    /// x ^= &Integer::from(0x0000_0f00);
+    /// x ^= &Integer::from(0x0000000f);
+    /// x ^= &Integer::from(0x00000f00);
     /// x ^= &Integer::from(0x000f_0000);
-    /// x ^= &Integer::from(0x0f00_0000);
+    /// x ^= &Integer::from(0x0f000000);
     /// assert_eq!(x, 0xf0f0_f0f0u32);
     /// ```
     fn bitxor_assign(&mut self, other: &'a Integer) {

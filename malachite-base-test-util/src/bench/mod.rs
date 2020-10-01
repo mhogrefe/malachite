@@ -6,6 +6,8 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::ExactFrom;
 use time::precise_time_ns;
 
+use bench::bucketers::Bucketer;
+
 fn escape_label_string(s: &str) -> String {
     let mut escaped = String::new();
     for c in s.chars() {
@@ -136,6 +138,63 @@ pub fn run_benchmark<'a, I: Iterator>(
     generation_mode_name: &'a str,
     limit: usize,
     file_name: &'a str,
+    bucketer: &Bucketer<'a, I::Item>,
+    series: &mut [(&'a str, &'a mut dyn FnMut(I::Item))],
+) where
+    I::Item: Clone,
+{
+    if (benchmark_type == BenchmarkType::Single) != (series.len() == 1) {
+        panic!(
+            "Bad benchmark: {}. \
+             Benchmarks should have type Single iff they have only one series.",
+            title
+        );
+    }
+    if limit == 0 {
+        return;
+    }
+    let title = match benchmark_type {
+        BenchmarkType::Single => title.to_string(),
+        BenchmarkType::LibraryComparison => format!("{} library comparison", title),
+        BenchmarkType::EvaluationStrategy => format!("{} evaluation strategy", title),
+        BenchmarkType::Algorithms => format!("{} algorithms", title),
+    };
+    println!("benchmarking {} {}", generation_mode_name, title);
+    let colors = vec![
+        "green", "blue", "red", "black", "orange", "yellow", "gray", "purple",
+    ];
+    if series.len() > colors.len() {
+        panic!("not enough available colors");
+    }
+    let mut series_options = Vec::new();
+    for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {
+        series_options.push(BenchmarkSeriesOptions {
+            name: label,
+            function,
+            color,
+        });
+    }
+    let options = BenchmarkOptions {
+        generator,
+        title: &title,
+        limit,
+        bucketing_function: bucketer.bucketing_function,
+        x_axis_label: bucketer.bucketing_label,
+        y_axis_label: "time (ns)",
+        file_name: format!("benchmarks/{}", file_name),
+        series_options,
+    };
+    run_benchmark_internal(options);
+}
+
+#[allow(clippy::type_complexity)]
+pub fn run_benchmark_old<'a, I: Iterator>(
+    title: &'a str,
+    benchmark_type: BenchmarkType,
+    generator: I,
+    generation_mode_name: &'a str,
+    limit: usize,
+    file_name: &'a str,
     bucketing_function: &'a dyn Fn(&I::Item) -> usize,
     bucketing_label: &'a str,
     series: &mut [(&'a str, &'a mut dyn FnMut(I::Item))],
@@ -192,3 +251,5 @@ macro_rules! no_out {
         $e;
     }};
 }
+
+pub mod bucketers;

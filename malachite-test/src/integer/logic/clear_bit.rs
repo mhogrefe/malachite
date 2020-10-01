@@ -2,7 +2,7 @@ use std::cmp::max;
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };
@@ -56,7 +56,7 @@ fn demo_integer_clear_bit(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_limbs_slice_clear_bit_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_slice_clear_bit_neg(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_limb_vec_and_small_u64_var_3(gm),
@@ -66,14 +66,14 @@ fn benchmark_limbs_slice_clear_bit_neg(gm: GenerationMode, limit: usize, file_na
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut limbs, index)| no_out!(limbs_slice_clear_bit_neg(limbs, index))),
         )],
     );
 }
 
 fn benchmark_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "limbs_vec_clear_bit_neg(&mut [Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned_var_1(gm),
@@ -83,14 +83,14 @@ fn benchmark_limbs_vec_clear_bit_neg(gm: GenerationMode, limit: usize, file_name
         &(|&(_, index)| usize::exact_from(index)),
         "index",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(ref mut limbs, index)| no_out!(limbs_vec_clear_bit_neg(limbs, index))),
         )],
     );
 }
 
 fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.clear_bit(u64)",
         BenchmarkType::Single,
         pairs_of_integer_and_small_unsigned(gm),
@@ -99,6 +99,6 @@ fn benchmark_integer_clear_bit(gm: GenerationMode, limit: usize, file_name: &str
         file_name,
         &(|&(ref n, index)| usize::exact_from(max(n.significant_bits(), index))),
         "max(n.significant_bits(), index)",
-        &mut [("malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
+        &mut [("Malachite", &mut (|(mut n, index)| n.clear_bit(index)))],
     );
 }

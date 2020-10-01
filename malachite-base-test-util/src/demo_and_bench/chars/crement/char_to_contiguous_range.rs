@@ -1,6 +1,6 @@
 use malachite_base::chars::crement::char_to_contiguous_range;
-use malachite_base::num::conversion::traits::ExactFrom;
 
+use malachite_base_test_util::bench::bucketers::char_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::char_gen;
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -34,8 +34,7 @@ fn benchmark_char_to_contiguous_range(
         gm.name(),
         limit,
         file_name,
-        &(|&c| usize::exact_from(char_to_contiguous_range(c))),
-        "char_to_contiguous_range(char)",
-        &mut [("malachite", &mut (|c| no_out!(char_to_contiguous_range(c))))],
+        &char_bucketer(),
+        &mut [("Malachite", &mut (|c| no_out!(char_to_contiguous_range(c))))],
     );
 }

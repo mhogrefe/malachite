@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
@@ -99,7 +99,7 @@ fn benchmark_unsigned_square<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.square()", T::NAME),
         BenchmarkType::Single,
         unsigneds_var_8::<T>(gm),
@@ -108,7 +108,7 @@ fn benchmark_unsigned_square<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.square())))],
     );
 }
 
@@ -117,7 +117,7 @@ fn benchmark_unsigned_square_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.square_assign()", T::NAME),
         BenchmarkType::Single,
         unsigneds_var_8::<T>(gm),
@@ -126,7 +126,7 @@ fn benchmark_unsigned_square_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|mut x| x.square_assign()))],
+        &mut [("Malachite", &mut (|mut x| x.square_assign()))],
     );
 }
 
@@ -135,7 +135,7 @@ fn benchmark_signed_square<T: PrimitiveSigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.square()", T::NAME),
         BenchmarkType::Single,
         signeds_var_2::<T>(gm),
@@ -144,7 +144,7 @@ fn benchmark_signed_square<T: PrimitiveSigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|x| no_out!(x.square())))],
+        &mut [("Malachite", &mut (|x| no_out!(x.square())))],
     );
 }
 
@@ -153,7 +153,7 @@ fn benchmark_signed_square_assign<T: PrimitiveSigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.square_assign()", T::NAME),
         BenchmarkType::Single,
         signeds_var_2::<T>(gm),
@@ -162,7 +162,7 @@ fn benchmark_signed_square_assign<T: PrimitiveSigned + Rand + SampleRange>(
         file_name,
         &(|x| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|mut x| x.square_assign()))],
+        &mut [("Malachite", &mut (|mut x| x.square_assign()))],
     );
 }
 

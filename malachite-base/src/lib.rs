@@ -115,4 +115,5 @@ pub mod slices;
 pub mod strings;
 /// This module contains functions for working with tuples.
 pub mod tuples;
+/// This module contains functions for working with `Vec`s.
 pub mod vecs;

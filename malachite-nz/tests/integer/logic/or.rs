@@ -29,7 +29,7 @@ fn test_limbs_neg_or_limb_and_limbs_neg_or_limb_in_place() {
     test(&[6, 7], 2, &[6, 7]);
     test(&[100, 101, 102], 10, &[98, 101, 102]);
     test(&[123, 456], 789, &[107, 456]);
-    test(&[0, 0, 456], 789, &[0xffff_fceb, u32::MAX, 455]);
+    test(&[0, 0, 456], 789, &[0xfffffceb, u32::MAX, 455]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -62,7 +62,7 @@ fn test_limbs_neg_or_limb_to_out() {
         &[10, 10, 10, 10],
         &[0, 0, 456],
         789,
-        &[0xffff_fceb, u32::MAX, 455, 10],
+        &[0xfffffceb, u32::MAX, 455, 10],
     );
 }
 
@@ -86,9 +86,9 @@ fn test_limbs_pos_or_neg_limb() {
     let test = |xs: &[Limb], y: Limb, out: Limb| {
         assert_eq!(limbs_pos_or_neg_limb(xs, y), out);
     };
-    test(&[6, 7], 3, 0xffff_fff9);
-    test(&[100, 101, 102], 10, 0xffff_ff92);
-    test(&[0, 0, 1], 100, 0xffff_ff9c);
+    test(&[6, 7], 3, 0xfffffff9);
+    test(&[100, 101, 102], 10, 0xffffff92);
+    test(&[0, 0, 1], 100, 0xffffff9c);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -106,7 +106,7 @@ fn test_limbs_neg_or_neg_limb() {
     };
     test(&[6, 7], 3, 5);
     test(&[100, 101, 102], 10, 98);
-    test(&[0, 0, 1], 100, 0xffff_ff9c);
+    test(&[0, 0, 1], 100, 0xffffff9c);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -136,10 +136,10 @@ fn test_limbs_or_pos_neg_limbs_vec_or_pos_neg_in_place_left_and_limbs_or_pos_neg
     test(&[1, 2, 3], &[6, 7], vec![5, 5]);
     test(&[100, 101, 102], &[102, 101, 100], vec![2, 0, 0]);
     test(&[0, 0, 1], &[3], vec![3]);
-    test(&[3], &[0, 0, 1], vec![0xffff_fffd, u32::MAX, 0]);
-    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 0]);
+    test(&[3], &[0, 0, 1], vec![0xfffffffd, u32::MAX, 0]);
+    test(&[0, 3, 3], &[0, 0, 3], vec![0, 0xfffffffd, 0]);
     test(&[0, 0, 3], &[0, 3, 3], vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], vec![0, 0xffff_fffd, 2]);
+    test(&[0, 3], &[0, 0, 3], vec![0, 0xfffffffd, 2]);
     test(&[0, 0, 3], &[0, 3], vec![0, 3]);
 }
 
@@ -180,20 +180,20 @@ fn test_limbs_or_pos_neg_to_out() {
         &[3],
         &[0, 0, 1],
         &[10, 10, 10, 10],
-        vec![0xffff_fffd, u32::MAX, 0, 10],
+        vec![0xfffffffd, u32::MAX, 0, 10],
     );
     test(
         &[0, 3, 3],
         &[0, 0, 3],
         &[10, 10, 10, 10],
-        vec![0, 0xffff_fffd, 0, 10],
+        vec![0, 0xfffffffd, 0, 10],
     );
     test(&[0, 0, 3], &[0, 3, 3], &[10, 10, 10, 10], vec![0, 3, 0, 10]);
     test(
         &[0, 3],
         &[0, 0, 3],
         &[10, 10, 10, 10],
-        vec![0, 0xffff_fffd, 2, 10],
+        vec![0, 0xfffffffd, 2, 10],
     );
     test(&[0, 0, 3], &[0, 3], &[10, 10, 10, 10], vec![0, 3, 10, 10]);
 }
@@ -236,10 +236,10 @@ fn test_limbs_slice_or_pos_neg_in_place_left() {
     test(&[1, 2, 3], &[6, 7], false, vec![5, 5, 0]);
     test(&[100, 101, 102], &[102, 101, 100], false, vec![2, 0, 0]);
     test(&[0, 0, 1], &[3], false, vec![3, 0, 0]);
-    test(&[3], &[0, 0, 1], true, vec![0xffff_fffd]);
-    test(&[0, 3, 3], &[0, 0, 3], false, vec![0, 0xffff_fffd, 0]);
+    test(&[3], &[0, 0, 1], true, vec![0xfffffffd]);
+    test(&[0, 3, 3], &[0, 0, 3], false, vec![0, 0xfffffffd, 0]);
     test(&[0, 0, 3], &[0, 3, 3], false, vec![0, 3, 0]);
-    test(&[0, 3], &[0, 0, 3], true, vec![0, 0xffff_fffd]);
+    test(&[0, 3], &[0, 0, 3], true, vec![0, 0xfffffffd]);
     test(&[0, 0, 3], &[0, 3], false, vec![0, 3, 0]);
 }
 

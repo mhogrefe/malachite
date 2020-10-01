@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::triples_of_natural_natural_and_rounding_mode_var_2;
@@ -105,7 +105,7 @@ fn benchmark_natural_round_to_multiple_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.round_to_multiple(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_rounding_mode_var_2(gm),
@@ -140,7 +140,7 @@ fn benchmark_natural_round_to_multiple_assign_evaluation_strategy(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural.round_to_multiple_assign(Natural, RoundingMode)",
         BenchmarkType::EvaluationStrategy,
         triples_of_natural_natural_and_rounding_mode_var_2(gm),

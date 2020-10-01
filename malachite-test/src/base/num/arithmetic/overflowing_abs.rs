@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use rand::Rand;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -42,7 +42,7 @@ fn benchmark_overflowing_abs_assign<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.overflowing_abs_assign()", T::NAME),
         BenchmarkType::Single,
         signeds::<T>(gm),
@@ -52,7 +52,7 @@ fn benchmark_overflowing_abs_assign<T: PrimitiveSigned + Rand>(
         &(|i| usize::exact_from(i.significant_bits())),
         "i.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|mut i| no_out!(i.overflowing_abs_assign())),
         )],
     );

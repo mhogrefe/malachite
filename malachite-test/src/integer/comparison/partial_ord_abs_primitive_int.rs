@@ -3,7 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 use rand::Rand;
 
@@ -126,7 +126,7 @@ fn benchmark_integer_partial_cmp_abs_unsigned<T: PrimitiveUnsigned + Rand>(
 ) where
     Integer: PartialOrdAbs<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer == {}", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_unsigned::<T>(gm),
@@ -135,7 +135,7 @@ fn benchmark_integer_partial_cmp_abs_unsigned<T: PrimitiveUnsigned + Rand>(
         file_name,
         &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }
 
@@ -146,7 +146,7 @@ fn benchmark_unsigned_partial_cmp_abs_integer<
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Integer", T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigned_and_integer::<T>(gm),
@@ -155,7 +155,7 @@ fn benchmark_unsigned_partial_cmp_abs_integer<
         file_name,
         &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }
 
@@ -168,7 +168,7 @@ fn benchmark_integer_partial_cmp_abs_signed<T: PrimitiveSigned + Rand>(
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer == {}", T::NAME),
         BenchmarkType::Single,
         pairs_of_integer_and_signed::<T>(gm),
@@ -177,7 +177,7 @@ fn benchmark_integer_partial_cmp_abs_signed<T: PrimitiveSigned + Rand>(
         file_name,
         &(|&(ref n, _)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }
 
@@ -189,7 +189,7 @@ fn benchmark_signed_partial_cmp_abs_integer<T: PartialOrdAbs<Integer> + Primitiv
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Integer", T::NAME),
         BenchmarkType::Single,
         pairs_of_signed_and_integer::<T>(gm),
@@ -198,7 +198,7 @@ fn benchmark_signed_partial_cmp_abs_integer<T: PartialOrdAbs<Integer> + Primitiv
         file_name,
         &(|&(_, ref n)| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
-        &mut [("malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
     );
 }
 

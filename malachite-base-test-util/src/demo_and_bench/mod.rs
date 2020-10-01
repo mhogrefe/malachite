@@ -35,9 +35,8 @@ macro_rules! unsigned_single_arg_bench {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&u| usize::exact_from(u.significant_bits())),
-                "u",
-                &mut [("malachite", &mut (|u| no_out!(u.$f())))],
+                &unsigned_bit_bucketer(),
+                &mut [("Malachite", &mut (|u| no_out!(u.$f())))],
             );
         }
     };
@@ -58,9 +57,8 @@ macro_rules! signed_single_arg_bench {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&i| usize::exact_from(i.significant_bits())),
-                "i",
-                &mut [("malachite", &mut (|i| no_out!(i.$f())))],
+                &signed_bit_bucketer(),
+                &mut [("Malachite", &mut (|i| no_out!(i.$f())))],
             );
         }
     };

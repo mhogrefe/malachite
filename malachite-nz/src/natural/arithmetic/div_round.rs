@@ -48,7 +48,7 @@ use platform::Limb;
 /// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX - 1, 1],
 ///     RoundingMode::Nearest), Some(0));
 ///
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xffff_fffd, 1],
+/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xfffffffd, 1],
 ///     RoundingMode::Nearest), Some(1));
 /// ```
 pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {

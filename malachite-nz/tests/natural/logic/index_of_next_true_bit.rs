@@ -32,8 +32,8 @@ fn test_limbs_index_of_next_true_bit() {
     test(&[0, 0b1011], 35, Some(35));
     test(&[0, 0b1011], 36, None);
     test(&[0, 0b1011], 100, None);
-    test(&[0, 0b1011, 0xfff_ffff, 0, 1], 91, Some(91));
-    test(&[0, 0b1011, 0xfff_ffff, 0, 1], 92, Some(128));
+    test(&[0, 0b1011, 0xfffffff, 0, 1], 91, Some(91));
+    test(&[0, 0b1011, 0xfffffff, 0, 1], 92, Some(128));
 }
 
 #[test]

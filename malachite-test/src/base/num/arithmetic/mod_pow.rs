@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::mod_pow::_simple_binary_mod_pow;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
@@ -145,7 +145,7 @@ fn benchmark_mod_pow_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigned_unsigned_and_unsigned_var_1::<T, u64>(gm),
@@ -169,7 +169,7 @@ fn benchmark_mod_pow_naive_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigned_small_unsigned_and_unsigned_var_1::<T, u64>(gm),
@@ -197,7 +197,7 @@ fn benchmark_mod_pow_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_pow_assign(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Single,
         triples_of_unsigned_unsigned_and_unsigned_var_1::<T, u64>(gm),
@@ -207,7 +207,7 @@ fn benchmark_mod_pow_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         &(|&(x, exp, _)| usize::exact_from(x.significant_bits() * exp.significant_bits())),
         "x.significant_bits() * exp.significant_bits()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(mut x, exp, m)| x.mod_pow_assign(exp, m)),
         )],
     );
@@ -218,7 +218,7 @@ fn benchmark_mod_pow_precomputed_algorithms<T: PrimitiveUnsigned + Rand + Sample
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_pow(u64, {})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         triples_of_unsigned_unsigned_and_unsigned_var_1::<T, u64>(gm),
@@ -254,7 +254,7 @@ fn benchmark_mod_square<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_square({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),
@@ -263,7 +263,7 @@ fn benchmark_mod_square<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(x, m)| no_out!(x.mod_square(m))))],
+        &mut [("Malachite", &mut (|(x, m)| no_out!(x.mod_square(m))))],
     );
 }
 
@@ -272,7 +272,7 @@ fn benchmark_mod_square_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_square_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         pairs_of_unsigneds_var_5::<T>(gm),
@@ -281,7 +281,7 @@ fn benchmark_mod_square_assign<T: PrimitiveUnsigned + Rand + SampleRange>(
         file_name,
         &(|&(x, _)| usize::exact_from(x.significant_bits())),
         "x.significant_bits()",
-        &mut [("malachite", &mut (|(mut x, m)| x.mod_square_assign(m)))],
+        &mut [("Malachite", &mut (|(mut x, m)| x.mod_square_assign(m)))],
     );
 }
 
@@ -290,7 +290,7 @@ fn benchmark_mod_square_precomputed_algorithms<T: PrimitiveUnsigned + Rand + Sam
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{}.mod_square({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         pairs_of_unsigneds_var_5::<T>(gm),

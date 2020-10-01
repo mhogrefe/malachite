@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz_test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
@@ -18,7 +18,7 @@ fn demo_integer_trailing_zeros(gm: GenerationMode, limit: usize) {
 }
 
 fn benchmark_integer_trailing_zeros_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark(
+    run_benchmark_old(
         "Integer.trailing_zeros()",
         BenchmarkType::Algorithms,
         integers(gm),

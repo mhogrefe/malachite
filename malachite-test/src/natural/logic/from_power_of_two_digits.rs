@@ -1,7 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
@@ -159,7 +159,7 @@ fn benchmark_from_power_of_two_digits_asc_algorithms<
 ) where
     Natural: PowerOfTwoDigits<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_asc(&[{}], u64)",
             T::NAME
@@ -195,7 +195,7 @@ fn benchmark_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleR
 ) where
     Natural: PowerOfTwoDigits<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!(
             "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_desc(&[{}], u64)",
             T::NAME
@@ -208,7 +208,7 @@ fn benchmark_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleR
         &(|(_, digits)| digits.len()),
         "digits.len()",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(log_base, ref digits)| {
                 no_out!(Natural::from_power_of_two_digits_desc(log_base, digits))
             }),
@@ -221,7 +221,7 @@ fn benchmark_natural_from_power_of_two_digits_asc_natural_algorithms(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural::from_power_of_two_digits_asc(u64, &[Natural])",
         BenchmarkType::Algorithms,
         pairs_of_u64_and_natural_vec_var_1(gm),
@@ -254,7 +254,7 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         "Natural::from_power_of_two_digits_desc(u64, &[Natural])",
         BenchmarkType::Single,
         pairs_of_u64_and_natural_vec_var_1(gm),
@@ -264,7 +264,7 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
         &(|&(log_base, ref digits)| digits.len() * usize::exact_from(log_base)),
         "digits.len() * log_base",
         &mut [(
-            "malachite",
+            "Malachite",
             &mut (|(log_base, ref digits)| {
                 no_out!(Natural::from_power_of_two_digits_desc(log_base, digits))
             }),

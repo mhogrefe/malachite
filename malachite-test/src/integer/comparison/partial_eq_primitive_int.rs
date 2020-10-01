@@ -2,7 +2,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::integer::Integer;
 use malachite_nz_test_util::integer::comparison::partial_eq_primitive_int::*;
 use num::BigInt;
@@ -205,7 +205,7 @@ fn benchmark_integer_partial_eq_unsigned_library_comparison<T: PrimitiveUnsigned
     Integer: PartialEq<T>,
     rug::Integer: PartialEq<T>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_unsigned::<T>(gm),
@@ -215,7 +215,7 @@ fn benchmark_integer_partial_eq_unsigned_library_comparison<T: PrimitiveUnsigned
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
             (
                 "num",
                 &mut (|((x, y), _, _)| no_out!(num_partial_eq_primitive(&x, y))),
@@ -232,7 +232,7 @@ fn benchmark_unsigned_partial_eq_integer_library_comparison<
     limit: usize,
     file_name: &str,
 ) {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Integer", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_unsigned_and_integer::<T>(gm),
@@ -242,7 +242,7 @@ fn benchmark_unsigned_partial_eq_integer_library_comparison<
         &(|&(_, (_, ref n))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x == y))),
             ("rug", &mut (|((x, y), _)| no_out!(x == y))),
         ],
     );
@@ -259,7 +259,7 @@ fn benchmark_integer_partial_eq_signed_library_comparison<T: PrimitiveSigned + R
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("Integer == {}", T::NAME),
         BenchmarkType::LibraryComparison,
         nrm_pairs_of_integer_and_signed::<T>(gm),
@@ -269,7 +269,7 @@ fn benchmark_integer_partial_eq_signed_library_comparison<T: PrimitiveSigned + R
         &(|&(_, _, (ref n, _))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, _, (x, y))| no_out!(x == y))),
             (
                 "num",
                 &mut (|((x, y), _, _)| no_out!(num_partial_eq_primitive(&x, y))),
@@ -289,7 +289,7 @@ fn benchmark_signed_partial_eq_integer_library_comparison<
     T::UnsignedOfEqualWidth: Rand,
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
-    run_benchmark(
+    run_benchmark_old(
         &format!("{} == Integer", T::NAME),
         BenchmarkType::LibraryComparison,
         rm_pairs_of_signed_and_integer::<T>(gm),
@@ -299,7 +299,7 @@ fn benchmark_signed_partial_eq_integer_library_comparison<
         &(|&(_, (_, ref n))| usize::exact_from(n.significant_bits())),
         "n.significant_bits()",
         &mut [
-            ("malachite", &mut (|(_, (x, y))| no_out!(x == y))),
+            ("Malachite", &mut (|(_, (x, y))| no_out!(x == y))),
             ("rug", &mut (|((x, y), _)| no_out!(x == y))),
         ],
     );

@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::triples_of_natural_small_signed_and_u64_var_1;
@@ -159,7 +159,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.mod_power_of_two_shr_assign({}, u64)", $t::NAME),
                 BenchmarkType::Single,
                 triples_of_natural_small_signed_and_u64_var_1::<$t>(gm),
@@ -169,7 +169,7 @@ macro_rules! demos_and_benches_i {
                 &(|&(_, _, pow)| usize::exact_from(pow)),
                 "pow",
                 &mut [(
-                    "malachite",
+                    "Malachite",
                     &mut (|(mut x, y, pow)| x.mod_power_of_two_shr_assign(y, pow)),
                 )],
             );
@@ -180,7 +180,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.mod_power_of_two_shr({}, u64)", $t::NAME),
                 BenchmarkType::EvaluationStrategy,
                 triples_of_natural_small_signed_and_u64_var_1::<$t>(gm),
@@ -207,7 +207,7 @@ macro_rules! demos_and_benches_i {
             limit: usize,
             file_name: &str,
         ) {
-            run_benchmark(
+            run_benchmark_old(
                 &format!("Natural.mod_power_of_two_shr({}, u64)", $t::NAME),
                 BenchmarkType::Algorithms,
                 triples_of_natural_small_signed_and_u64_var_1::<$t>(gm),

@@ -31,8 +31,8 @@ fn test_limbs_index_of_next_false_bit() {
     test(&[0, 0b1011], 34, 34);
     test(&[0, 0b1011], 35, 36);
     test(&[0, 0b1011], 100, 100);
-    test(&[0, 0b1011, 0xffff_fff0, u32::MAX, 1], 64, 64);
-    test(&[0, 0b1011, 0xffff_fff0, u32::MAX, 1], 68, 129);
+    test(&[0, 0b1011, 0xfffffff0, u32::MAX, 1], 64, 64);
+    test(&[0, 0b1011, 0xfffffff0, u32::MAX, 1], 68, 129);
 }
 
 #[test]
