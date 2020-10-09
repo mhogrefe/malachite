@@ -1,4 +1,4 @@
-#![allow(unused_must_use)]
+#![allow(unstable_name_collisions, unused_must_use)]
 
 extern crate itertools;
 #[macro_use]

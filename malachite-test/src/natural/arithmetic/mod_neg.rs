@@ -49,27 +49,27 @@ fn demo_natural_mod_neg(gm: GenerationMode, limit: usize) {
     for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
-        println!("{} === {} mod {}", n_old, n.mod_neg(m), m_old);
+        println!("-{} === {} mod {}", n_old, n.mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_val_ref(gm: GenerationMode, limit: usize) {
     for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let n_old = n.clone();
-        println!("{} === {} mod &{}", n_old, n.mod_neg(&m), m);
+        println!("-{} === {} mod &{}", n_old, n.mod_neg(&m), m);
     }
 }
 
 fn demo_natural_mod_neg_ref_val(gm: GenerationMode, limit: usize) {
     for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
         let m_old = m.clone();
-        println!("&{} === {} mod {}", n, (&n).mod_neg(m), m_old);
+        println!("&(-{}) === {} mod {}", n, (&n).mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_ref_ref(gm: GenerationMode, limit: usize) {
     for (n, m) in pairs_of_naturals_var_2(gm).take(limit) {
-        println!("&{} === {} mod &{}", n, (&n).mod_neg(&m), m);
+        println!("&(-{}) === {} mod &{}", n, (&n).mod_neg(&m), m);
     }
 }
 

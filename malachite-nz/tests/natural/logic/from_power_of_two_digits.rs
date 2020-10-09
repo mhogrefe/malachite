@@ -6,38 +6,24 @@ use malachite_nz::natural::Natural;
 
 #[test]
 fn test_from_power_of_two_digits_asc() {
-    fn test<T: PrimitiveUnsigned, F: Fn(u64, &[T]) -> Natural>(
-        from_power_of_two_digits_asc_naive: F,
-        log_base: u64,
-        digits: &[T],
-        out: &str,
-    ) where
-        Natural: PowerOfTwoDigits<T>,
+    fn test<T: PrimitiveUnsigned>(log_base: u64, digits: &[T], out: &str)
+    where
+        Natural: From<T> + PowerOfTwoDigits<T>,
     {
         assert_eq!(
-            Natural::from_power_of_two_digits_asc(log_base, digits).to_string(),
+            Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()).to_string(),
             out
         );
         assert_eq!(
-            from_power_of_two_digits_asc_naive(log_base, digits).to_string(),
+            Natural::_from_power_of_two_digits_asc_naive(log_base, digits.iter().cloned())
+                .to_string(),
             out
         );
     };
-    test::<u8, _>(Natural::_from_power_of_two_digits_asc_naive, 1, &[], "0");
-    test::<u8, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-        1,
-        &[0, 0, 0],
-        "0",
-    );
-    test::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-        10,
-        &[123],
-        "123",
-    );
-    test::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
+    test::<u8>(1, &[], "0");
+    test::<u8>(1, &[0, 0, 0], "0");
+    test::<u16>(10, &[123], "123");
+    test::<u16>(
         1,
         &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1,
@@ -45,32 +31,15 @@ fn test_from_power_of_two_digits_asc() {
         ],
         "1000000000000",
     );
-    test::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
+    test::<u32>(
         3,
         &[0, 0, 0, 0, 1, 2, 1, 5, 4, 2, 3, 4, 6, 1, 0],
         "1000000000000",
     );
-    test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-        4,
-        &[0, 0, 0, 1, 5, 10, 4, 13, 8, 14],
-        "1000000000000",
-    );
-    test::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-        32,
-        &[3567587328, 232],
-        "1000000000000",
-    );
-    test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-        64,
-        &[1000000000000],
-        "1000000000000",
-    );
-    test::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
+    test::<u64>(4, &[0, 0, 0, 1, 5, 10, 4, 13, 8, 14], "1000000000000");
+    test::<u32>(32, &[3567587328, 232], "1000000000000");
+    test::<u64>(64, &[1000000000000], "1000000000000");
+    test::<u64>(
         64,
         &[2003764205206896640, 54210],
         "1000000000000000000000000",
@@ -82,19 +51,19 @@ macro_rules! from_power_of_two_digits_asc_fail_helper {
         #[test]
         #[should_panic]
         fn $fail_1() {
-            Natural::from_power_of_two_digits_asc(0, &[0u32]);
+            Natural::from_power_of_two_digits_asc(0, [0u32].iter().cloned());
         }
 
         #[test]
         #[should_panic]
         fn $fail_2() {
-            Natural::from_power_of_two_digits_asc(33, &[2u32]);
+            Natural::from_power_of_two_digits_asc(33, [2u32].iter().cloned());
         }
 
         #[test]
         #[should_panic]
         fn $fail_3() {
-            Natural::from_power_of_two_digits_asc(1, &[2u32]);
+            Natural::from_power_of_two_digits_asc(1, [2u32].iter().cloned());
         }
     };
 }
@@ -143,7 +112,7 @@ fn test_from_power_of_two_digits_desc() {
         Natural: PowerOfTwoDigits<T>,
     {
         assert_eq!(
-            Natural::from_power_of_two_digits_desc(log_base, digits).to_string(),
+            Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()).to_string(),
             out
         );
     };
@@ -178,19 +147,19 @@ macro_rules! from_power_of_two_digits_desc_fail_helper {
         #[test]
         #[should_panic]
         fn $fail_1() {
-            Natural::from_power_of_two_digits_desc(0, &[0u32]);
+            Natural::from_power_of_two_digits_desc(0, [0u32].iter().cloned());
         }
 
         #[test]
         #[should_panic]
         fn $fail_2() {
-            Natural::from_power_of_two_digits_desc(33, &[2u32]);
+            Natural::from_power_of_two_digits_desc(33, [2u32].iter().cloned());
         }
 
         #[test]
         #[should_panic]
         fn $fail_3() {
-            Natural::from_power_of_two_digits_desc(1, &[2u32]);
+            Natural::from_power_of_two_digits_desc(1, [2u32].iter().cloned());
         }
     };
 }
@@ -237,11 +206,12 @@ fn test_from_power_of_two_digits_asc_natural() {
     let test = |log_base, digits, out| {
         let digits = vec_from_str(digits).unwrap();
         assert_eq!(
-            Natural::from_power_of_two_digits_asc(log_base, &digits).to_string(),
+            Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()).to_string(),
             out
         );
         assert_eq!(
-            Natural::_from_power_of_two_digits_asc_natural_naive(log_base, &digits).to_string(),
+            Natural::_from_power_of_two_digits_asc_natural_naive(log_base, digits.iter().cloned())
+                .to_string(),
             out
         );
     };
@@ -278,14 +248,14 @@ fn test_from_power_of_two_digits_asc_natural() {
 #[should_panic]
 fn from_power_of_two_digits_asc_natural_fail_1() {
     let digits: Vec<Natural> = vec_from_str("[0, 0, 0]").unwrap();
-    Natural::from_power_of_two_digits_asc(0, &digits);
+    Natural::from_power_of_two_digits_asc(0, digits.iter().cloned());
 }
 
 #[test]
 #[should_panic]
 fn from_power_of_two_digits_asc_natural_fail_2() {
     let digits: Vec<Natural> = vec_from_str("[2]").unwrap();
-    Natural::from_power_of_two_digits_asc(1, &digits);
+    Natural::from_power_of_two_digits_asc(1, digits.iter().cloned());
 }
 
 #[test]
@@ -293,7 +263,7 @@ fn test_from_power_of_two_digits_desc_natural() {
     let test = |log_base, digits, out| {
         let digits: Vec<Natural> = vec_from_str(digits).unwrap();
         assert_eq!(
-            Natural::from_power_of_two_digits_desc(log_base, &digits).to_string(),
+            Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()).to_string(),
             out
         );
     };
@@ -330,12 +300,12 @@ fn test_from_power_of_two_digits_desc_natural() {
 #[should_panic]
 fn from_power_of_two_digits_desc_natural_fail_1() {
     let digits: Vec<Natural> = vec_from_str("[0, 0, 0]").unwrap();
-    Natural::from_power_of_two_digits_desc(0, &digits);
+    Natural::from_power_of_two_digits_desc(0, digits.iter().cloned());
 }
 
 #[test]
 #[should_panic]
 fn from_power_of_two_digits_desc_natural_fail_2() {
     let digits: Vec<Natural> = vec_from_str("[2]").unwrap();
-    Natural::from_power_of_two_digits_desc(1, &digits);
+    Natural::from_power_of_two_digits_desc(1, digits.iter().cloned());
 }

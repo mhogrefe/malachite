@@ -23,7 +23,7 @@ fn demo_integer_from_bits_asc(gm: GenerationMode, limit: usize) {
         println!(
             "from_bits_asc({:?}) = {:?}",
             bits,
-            Integer::from_bits_asc(&bits)
+            Integer::from_bits_asc(bits.iter().cloned())
         );
     }
 }
@@ -33,14 +33,14 @@ fn demo_integer_from_bits_desc(gm: GenerationMode, limit: usize) {
         println!(
             "from_bits_desc({:?}) = {:?}",
             bits,
-            Integer::from_bits_desc(&bits)
+            Integer::from_bits_desc(bits.iter().cloned())
         );
     }
 }
 
 fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "Integer::from_bits_asc(&[bool])",
+        "Integer::from_bits_asc<I: Iterator<Item=bool>>(I)",
         BenchmarkType::Algorithms,
         vecs_of_bool(gm),
         gm.name(),
@@ -51,15 +51,15 @@ fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, 
         &mut [
             (
                 "default",
-                &mut (|ref bits| no_out!(Integer::from_bits_asc(bits))),
+                &mut (|ref bits| no_out!(Integer::from_bits_asc(bits.iter().cloned()))),
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_asc_alt::<Integer>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<Integer, _>(bits.iter().cloned()))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(from_bits_asc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_naive(bits.iter().cloned()))),
             ),
         ],
     );
@@ -67,7 +67,7 @@ fn benchmark_integer_from_bits_asc_algorithms(gm: GenerationMode, limit: usize, 
 
 fn benchmark_integer_from_bits_desc_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "Integer::from_bits_desc(&[bool])",
+        "Integer::from_bits_desc<I: Iterator<Item=bool>>(I)",
         BenchmarkType::Algorithms,
         vecs_of_bool(gm),
         gm.name(),
@@ -78,15 +78,15 @@ fn benchmark_integer_from_bits_desc_algorithms(gm: GenerationMode, limit: usize,
         &mut [
             (
                 "default",
-                &mut (|ref bits| no_out!(Integer::from_bits_desc(bits))),
+                &mut (|ref bits| no_out!(Integer::from_bits_desc(bits.iter().cloned()))),
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_desc_alt::<Integer>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<Integer, _>(bits.iter().cloned()))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(from_bits_desc_naive(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_naive(bits.iter().cloned()))),
             ),
         ],
     );

@@ -1,11 +1,12 @@
+use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
+
 use comparison::traits::Max;
 use named::Named;
 use num::arithmetic::traits::{Parity, WrappingNeg};
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::{NegativeOne, One, Zero};
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitConvertible, LeadingZeros};
-use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
 
 fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
@@ -34,40 +35,7 @@ fn _to_bits_desc_unsigned<T: PrimitiveInt>(x: &T) -> Vec<bool> {
     bits
 }
 
-fn _from_bits_asc_unsigned<T: PrimitiveInt>(bits: &[bool]) -> T {
-    let width = usize::exact_from(T::WIDTH);
-    if bits.len() > width {
-        assert!(bits[width..].iter().all(|&bit| !bit));
-    }
-    let mut n = T::ZERO;
-    let mut mask = T::ONE;
-    for &bit in bits {
-        if bit {
-            n |= mask;
-        }
-        mask <<= 1;
-    }
-    n
-}
-
-fn _from_bits_desc_unsigned<T: PrimitiveInt>(mut bits: &[bool]) -> T {
-    let width = usize::exact_from(T::WIDTH);
-    if bits.len() > width {
-        let (bits_lo, bits_hi) = bits.split_at(bits.len() - width);
-        assert!(bits_lo.iter().all(|&bit| !bit));
-        bits = bits_hi;
-    }
-    let mut n = T::ZERO;
-    for &bit in bits {
-        n <<= 1;
-        if bit {
-            n |= T::ONE;
-        }
-    }
-    n
-}
-
-fn _from_bit_iterator_asc_unsigned<
+fn _from_bits_asc_unsigned<
     T: BitOrAssign<T> + Copy + Eq + Named + One + ShlAssign<u64> + Zero,
     I: Iterator<Item = bool>,
 >(
@@ -89,7 +57,7 @@ fn _from_bit_iterator_asc_unsigned<
 }
 
 #[inline]
-fn _from_bit_iterator_desc_unsigned<T: PrimitiveInt, I: Iterator<Item = bool>>(bits: I) -> T {
+fn _from_bits_desc_unsigned<T: PrimitiveInt, I: Iterator<Item = bool>>(bits: I) -> T {
     let mut n = T::ZERO;
     let high_mask = T::power_of_two(T::WIDTH - 1);
     for bit in bits {
@@ -151,58 +119,6 @@ macro_rules! impl_bit_convertible_unsigned {
                 _to_bits_desc_unsigned(self)
             }
 
-            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
-            /// to most-significant. The function panics if the input represents a number that can't
-            /// fit in $t.
-            ///
-            /// Time: worst case O(n)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// where n = `bits.len()`
-            ///
-            /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $t.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(u8::from_bits_asc(&[]), 0);
-            /// assert_eq!(u16::from_bits_asc(&[false, true, false]), 2);
-            /// assert_eq!(u32::from_bits_asc(&[true, true, false, true, true, true, true]), 123);
-            /// ```
-            #[inline]
-            fn from_bits_asc(bits: &[bool]) -> $t {
-                _from_bits_asc_unsigned(bits)
-            }
-
-            /// Converts a slice of bits into a value. The input bits are in descending order: most-
-            /// to least-significant. The function panics if the input represents a number that
-            /// can't fit in $t.
-            ///
-            /// Time: worst case O(n)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// where n = `bits.len()`
-            ///
-            /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $t.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(u8::from_bits_desc(&[]), 0);
-            /// assert_eq!(u16::from_bits_desc(&[false, true, false]), 2);
-            /// assert_eq!(u32::from_bits_desc(&[true, true, true, true, false, true, true]), 123);
-            /// ```
-            #[inline]
-            fn from_bits_desc(bits: &[bool]) -> $t {
-                _from_bits_desc_unsigned(bits)
-            }
-
             /// TODO doc
             ///
             /// # Examples
@@ -210,18 +126,18 @@ macro_rules! impl_bit_convertible_unsigned {
             /// use malachite_base::num::logic::traits::BitConvertible;
             /// use std::iter::empty;
             ///
-            /// assert_eq!(u8::from_bit_iterator_asc(empty()), 0);
-            /// assert_eq!(u16::from_bit_iterator_asc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(u8::from_bits_asc(empty()), 0);
+            /// assert_eq!(u16::from_bits_asc([false, true, false].iter().cloned()), 2);
             /// assert_eq!(
-            ///     u32::from_bit_iterator_asc(
+            ///     u32::from_bits_asc(
             ///         [true, true, false, true, true, true, true].iter().cloned()
             ///     ),
             ///     123
             /// );
             /// ```
             #[inline]
-            fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
-                _from_bit_iterator_asc_unsigned(bits)
+            fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
+                _from_bits_asc_unsigned(bits)
             }
 
             /// TODO doc
@@ -231,18 +147,18 @@ macro_rules! impl_bit_convertible_unsigned {
             /// use malachite_base::num::logic::traits::BitConvertible;
             /// use std::iter::empty;
             ///
-            /// assert_eq!(u8::from_bit_iterator_desc(empty()), 0);
-            /// assert_eq!(u16::from_bit_iterator_desc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(u8::from_bits_desc(empty()), 0);
+            /// assert_eq!(u16::from_bits_desc([false, true, false].iter().cloned()), 2);
             /// assert_eq!(
-            ///     u32::from_bit_iterator_desc(
+            ///     u32::from_bits_desc(
             ///         [true, true, true, true, false, true, true].iter().cloned()
             ///     ),
             ///     123
             /// );
             /// ```
             #[inline]
-            fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
-                _from_bit_iterator_desc_unsigned(bits)
+            fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
+                _from_bits_desc_unsigned(bits)
             }
         }
     };
@@ -306,53 +222,7 @@ fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
     bits
 }
 
-fn _from_bits_asc_signed<U: PrimitiveInt, S: ExactFrom<U> + PrimitiveInt + WrappingFrom<U>>(
-    bits: &[bool],
-) -> S {
-    match bits {
-        &[] => S::ZERO,
-        &[.., false] => S::exact_from(_from_bits_asc_unsigned::<U>(bits)),
-        bits => {
-            let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
-            let significant_bits = bits.len() - trailing_trues;
-            assert!(significant_bits < usize::exact_from(S::WIDTH));
-            let mut u = !U::low_mask(u64::exact_from(significant_bits));
-            let mut mask = U::ONE;
-            for &bit in &bits[..significant_bits] {
-                if bit {
-                    u |= mask;
-                }
-                mask <<= 1;
-            }
-            S::wrapping_from(u)
-        }
-    }
-}
-
-fn _from_bits_desc_signed<U: PrimitiveInt, S: ExactFrom<U> + PrimitiveInt + WrappingFrom<U>>(
-    bits: &[bool],
-) -> S {
-    match bits {
-        &[] => S::ZERO,
-        &[false, ..] => S::exact_from(_from_bits_desc_unsigned::<U>(bits)),
-        bits => {
-            let leading_trues = bits.iter().take_while(|&&bit| bit).count();
-            let significant_bits = u64::exact_from(bits.len() - leading_trues);
-            assert!(significant_bits < S::WIDTH);
-            let mut mask = U::power_of_two(significant_bits);
-            let mut u = !(mask - U::ONE);
-            for &bit in &bits[leading_trues..] {
-                mask >>= 1;
-                if bit {
-                    u |= mask;
-                }
-            }
-            S::wrapping_from(u)
-        }
-    }
-}
-
-fn _from_bit_iterator_asc_signed<
+fn _from_bits_asc_signed<
     U: BitOr<U, Output = U>
         + BitOrAssign<U>
         + Copy
@@ -394,11 +264,7 @@ fn _from_bit_iterator_asc_signed<
 }
 
 #[inline]
-fn _from_bit_iterator_desc_signed<
-    U: PrimitiveInt,
-    S: Named + WrappingFrom<U>,
-    I: Iterator<Item = bool>,
->(
+fn _from_bits_desc_signed<U: PrimitiveInt, S: Named + WrappingFrom<U>, I: Iterator<Item = bool>>(
     bits: I,
 ) -> S {
     let mut n = U::ZERO;
@@ -481,64 +347,6 @@ macro_rules! impl_bit_convertible_signed {
                 _to_bits_desc_signed(self)
             }
 
-            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
-            /// to most-significant. The function panics if the input represents a number that can't
-            /// fit in $s.
-            ///
-            /// Time: worst case O(n)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// where n = `bits.len()`
-            ///
-            /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $s.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(i8::from_bits_asc(&[]), 0);
-            /// assert_eq!(i16::from_bits_asc(&[false, true, false]), 2);
-            /// assert_eq!(
-            ///     i32::from_bits_asc(&[true, false, true, false, false, false, false, true]),
-            ///     -123
-            /// );
-            /// ```
-            #[inline]
-            fn from_bits_asc(bits: &[bool]) -> $s {
-                _from_bits_asc_signed::<$u, $s>(bits)
-            }
-
-            /// Converts a slice of bits into a value. The input bits are in ascending order: least-
-            /// to most-significant. The function panics if the input represents a number that can't
-            /// fit in $s.
-            ///
-            /// Time: worst case O(n)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// where n = `bits.len()`
-            ///
-            /// # Panics
-            /// Panics if the bits represent a value that isn't representable by $s.
-            ///
-            /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(i8::from_bits_desc(&[]), 0);
-            /// assert_eq!(i16::from_bits_desc(&[false, true, false]), 2);
-            /// assert_eq!(
-            ///     i32::from_bits_desc(&[true, false, false, false, false, true, false, true]),
-            ///     -123
-            /// );
-            /// ```
-            #[inline]
-            fn from_bits_desc(bits: &[bool]) -> $s {
-                _from_bits_desc_signed::<$u, $s>(bits)
-            }
-
             /// TODO doc
             ///
             /// # Examples
@@ -546,18 +354,18 @@ macro_rules! impl_bit_convertible_signed {
             /// use malachite_base::num::logic::traits::BitConvertible;
             /// use std::iter::empty;
             ///
-            /// assert_eq!(i8::from_bit_iterator_asc(empty()), 0);
-            /// assert_eq!(i16::from_bit_iterator_asc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(i8::from_bits_asc(empty()), 0);
+            /// assert_eq!(i16::from_bits_asc([false, true, false].iter().cloned()), 2);
             /// assert_eq!(
-            ///     i32::from_bit_iterator_asc(
+            ///     i32::from_bits_asc(
             ///         [true, false, true, false, false, false, false, true].iter().cloned()
             ///     ),
             ///     -123
             /// );
             /// ```
             #[inline]
-            fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
-                _from_bit_iterator_asc_signed::<$u, $s, _>(bits)
+            fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
+                _from_bits_asc_signed::<$u, $s, _>(bits)
             }
 
             /// TODO doc
@@ -567,18 +375,18 @@ macro_rules! impl_bit_convertible_signed {
             /// use malachite_base::num::logic::traits::BitConvertible;
             /// use std::iter::empty;
             ///
-            /// assert_eq!(i8::from_bit_iterator_desc(empty()), 0);
-            /// assert_eq!(i16::from_bit_iterator_desc([false, true, false].iter().cloned()), 2);
+            /// assert_eq!(i8::from_bits_desc(empty()), 0);
+            /// assert_eq!(i16::from_bits_desc([false, true, false].iter().cloned()), 2);
             /// assert_eq!(
-            ///     i32::from_bit_iterator_desc(
+            ///     i32::from_bits_desc(
             ///         [true, false, false, false, false, true, false, true].iter().cloned()
             ///     ),
             ///     -123
             /// );
             /// ```
             #[inline]
-            fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
-                _from_bit_iterator_desc_signed::<$u, $s, _>(bits)
+            fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
+                _from_bits_desc_signed::<$u, $s, _>(bits)
             }
         }
     };

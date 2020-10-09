@@ -102,14 +102,10 @@ impl Natural {
                 *self = Natural::ZERO;
                 false
             }
-            (Natural(Small(x)), y) => {
-                if let Some(result) = y.checked_sub_limb_ref(*x) {
-                    *self = result;
-                    false
-                } else {
-                    true
-                }
-            }
+            (Natural(Small(x)), y) => y.checked_sub_limb_ref(*x).map_or(true, |result| {
+                *self = result;
+                false
+            }),
             (_, Natural(Small(_))) => true,
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
                 let borrow = xs.len() > ys.len() || limbs_vec_sub_in_place_right(ys, xs);

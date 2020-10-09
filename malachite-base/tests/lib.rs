@@ -18,6 +18,7 @@
     clippy::print_stdout,
     clippy::redundant_closure_for_method_calls,
     clippy::single_match_else,
+    clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
     clippy::unused_self
 )]
@@ -78,9 +79,6 @@ pub mod chars {
 pub mod iterators {
     pub mod bit_distributor {
         pub mod bit_map_as_slice;
-        pub mod clone;
-        pub mod debug;
-        pub mod eq;
         pub mod get_output;
         pub mod increment_counter;
         pub mod new;
@@ -146,6 +144,7 @@ pub mod num {
         pub mod mod_power_of_two_sub;
         pub mod mod_shl;
         pub mod mod_shr;
+        pub mod mod_square;
         pub mod mod_sub;
         pub mod neg;
         pub mod next_power_of_two;
@@ -328,6 +327,7 @@ pub mod strings {
     pub mod string_is_subset;
     pub mod string_sort;
     pub mod string_unique;
+    pub mod to_binary_string;
     pub mod to_debug_string;
 }
 pub mod tuples {

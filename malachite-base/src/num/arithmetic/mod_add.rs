@@ -1,5 +1,6 @@
-use num::arithmetic::traits::{ModAdd, ModAddAssign};
 use std::ops::{Add, AddAssign, Sub};
+
+use num::arithmetic::traits::{ModAdd, ModAddAssign};
 
 fn _mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other: T, m: T) -> T {
     let neg = m - x;

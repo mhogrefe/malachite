@@ -2,12 +2,11 @@ use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitConvertible, LeadingZeros, LowMask, NotAssign};
+use malachite_base::num::logic::traits::{BitConvertible, LowMask, NotAssign};
 
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
-use natural::logic::bit_convertible::{limbs_asc_from_bits_asc, limbs_asc_from_bits_desc};
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 
@@ -106,25 +105,7 @@ pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     }
 }
 
-fn limbs_asc_from_negative_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Vec<Limb> {
-    let x_high = xs.last_mut().unwrap();
-    let leading_zeros = LeadingZeros::leading_zeros(*x_high);
-    if leading_zeros != 0 {
-        *x_high |= !Limb::low_mask(Limb::WIDTH - leading_zeros);
-    }
-    assert!(!limbs_twos_complement_in_place(&mut xs));
-    xs
-}
-
-fn limbs_asc_from_negative_twos_complement_bits_asc(bits: &[bool]) -> Vec<Limb> {
-    limbs_asc_from_negative_twos_complement_limbs_asc(limbs_asc_from_bits_asc(bits))
-}
-
-fn limbs_asc_from_negative_twos_complement_bits_desc(bits: &[bool]) -> Vec<Limb> {
-    limbs_asc_from_negative_twos_complement_limbs_asc(limbs_asc_from_bits_desc(bits))
-}
-
-fn from_bit_iterator_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: u64) -> Integer {
+fn from_bits_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: u64) -> Integer {
     if sign_bit {
         if last_width != Limb::WIDTH {
             *limbs.last_mut().unwrap() |= !Limb::low_mask(last_width);
@@ -227,100 +208,6 @@ impl BitConvertible for Integer {
         bits
     }
 
-    /// Converts a slice of bits to an `Integer`, in ascending order, so that less significant bits
-    /// have lower indices in the input slice. The bits are in two's complement, and the most
-    /// significant bit indicates the sign; if the bit is `false`, the `Integer` is non-negative,
-    /// and if the bit is `true` it is negative. If `bits` is empty, zero is returned.
-    ///
-    /// This method is more efficient than `from_bits_desc`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(n)
-    ///
-    /// where n = `bits.len()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::logic::traits::BitConvertible;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from_bits_asc(&[]).to_string(), "0");
-    /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(
-    ///     Integer::from_bits_asc(
-    ///         &[true, false, false, true, false, true, true, false]
-    ///     ).to_string(),
-    ///     "105"
-    /// );
-    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(
-    ///     Integer::from_bits_asc(
-    ///         &[true, true, true, false, true, false, false, true]
-    ///     ).to_string(),
-    ///     "-105"
-    /// );
-    /// ```
-    fn from_bits_asc(bits: &[bool]) -> Integer {
-        match bits {
-            &[] => Integer::ZERO,
-            &[.., false] => Integer::from(Natural::from_bits_asc(bits)),
-            bits => -Natural::from_owned_limbs_asc(
-                limbs_asc_from_negative_twos_complement_bits_asc(bits),
-            ),
-        }
-    }
-
-    /// Converts a slice of bits to an `Integer`, in descending order, so that less significant bits
-    /// have higher indices in the input slice. The bits are in two's complement, and the most
-    /// significant bit indicates the sign; if the bit is `false`, the `Integer` is non-negative,
-    /// and if the bit is `true` it is negative. If `bits` is empty, zero is returned.
-    ///
-    /// This method is less efficient than `from_bits_asc`.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(n)
-    ///
-    /// where n = `bits.len()`
-    ///
-    /// # Examples
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::logic::traits::BitConvertible;
-    /// use malachite_nz::integer::Integer;
-    ///
-    /// assert_eq!(Integer::from_bits_desc(&[]).to_string(), "0");
-    /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(
-    ///     Integer::from_bits_desc(
-    ///         &[false, true, true, false, true, false, false, true]
-    ///     ).to_string(),
-    ///     "105"
-    /// );
-    /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(
-    ///     Integer::from_bits_desc(
-    ///         &[true, false, false, true, false, true, true, true]
-    ///     ).to_string(),
-    ///     "-105"
-    /// );
-    /// ```
-    fn from_bits_desc(bits: &[bool]) -> Integer {
-        match bits {
-            &[] => Integer::ZERO,
-            &[false, ..] => Integer::from(Natural::from_bits_desc(bits)),
-            bits => -Natural::from_owned_limbs_asc(
-                limbs_asc_from_negative_twos_complement_bits_desc(bits),
-            ),
-        }
-    }
-
     /// TODO doc
     ///
     /// # Example
@@ -332,23 +219,23 @@ impl BitConvertible for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::iter::empty;
     ///
-    /// assert_eq!(Integer::from_bit_iterator_asc(empty()), 0);
+    /// assert_eq!(Integer::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Integer::from_bit_iterator_asc(
+    ///     Integer::from_bits_asc(
     ///         [true, false, false, true, false, true, true, false].iter().cloned()
     ///     ),
     ///     105
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
-    ///     Integer::from_bit_iterator_asc(
+    ///     Integer::from_bits_asc(
     ///         [true, true, true, false, true, false, false, true].iter().cloned()
     ///     ),
     ///     -105
     /// );
     /// ```
-    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Integer {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         let mut last_bit = false;
@@ -367,7 +254,7 @@ impl BitConvertible for Integer {
             last_width = i;
             limbs.push(limb);
         }
-        from_bit_iterator_helper(limbs, last_bit, last_width)
+        from_bits_helper(limbs, last_bit, last_width)
     }
 
     /// TODO doc
@@ -381,23 +268,23 @@ impl BitConvertible for Integer {
     /// use malachite_nz::integer::Integer;
     /// use std::iter::empty;
     ///
-    /// assert_eq!(Integer::from_bit_iterator_desc(empty()), 0);
+    /// assert_eq!(Integer::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Integer::from_bit_iterator_desc(
+    ///     Integer::from_bits_desc(
     ///         [false, true, true, false, true, false, false, true].iter().cloned()
     ///     ),
     ///     105
     /// );
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
     /// assert_eq!(
-    ///     Integer::from_bit_iterator_desc(
+    ///     Integer::from_bits_desc(
     ///         [true, false, false, true, false, true, true, true].iter().cloned()
     ///     ),
     ///     -105
     /// );
     /// ```
-    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(xs: I) -> Integer {
+    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Integer {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         let mut first_bit = false;
@@ -439,7 +326,7 @@ impl BitConvertible for Integer {
                     limbs_slice_shr_in_place(&mut limbs, Limb::WIDTH - last_width);
                     limbs[0] |= smallest_limb;
                 }
-                from_bit_iterator_helper(limbs, first_bit, last_width)
+                from_bits_helper(limbs, first_bit, last_width)
             }
         }
     }

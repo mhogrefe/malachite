@@ -33,6 +33,7 @@ pub mod mod_power_of_two_square;
 pub mod mod_power_of_two_sub;
 pub mod mod_shl;
 pub mod mod_shr;
+pub mod mod_square;
 pub mod mod_sub;
 pub mod neg;
 pub mod next_power_of_two;
@@ -117,6 +118,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_power_of_two_sub::register(registry);
     mod_shl::register(registry);
     mod_shr::register(registry);
+    mod_square::register(registry);
     mod_sub::register(registry);
     neg::register(registry);
     next_power_of_two::register(registry);

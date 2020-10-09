@@ -1,3 +1,5 @@
+#![allow(unstable_name_collisions)]
+
 extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
@@ -52,6 +54,7 @@ pub mod base {
             pub mod mod_power_of_two_sub;
             pub mod mod_shl;
             pub mod mod_shr;
+            pub mod mod_square;
             pub mod mod_sub;
             pub mod neg;
             pub mod next_power_of_two;
@@ -265,6 +268,7 @@ pub mod natural {
         pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
+        pub mod mod_pow;
         pub mod mod_power_of_two;
         pub mod mod_power_of_two_add;
         pub mod mod_power_of_two_is_reduced;
@@ -273,6 +277,7 @@ pub mod natural {
         pub mod mod_power_of_two_shl;
         pub mod mod_power_of_two_shr;
         pub mod mod_power_of_two_sub;
+        pub mod mod_square;
         pub mod mod_sub;
         pub mod mul;
         pub mod neg;

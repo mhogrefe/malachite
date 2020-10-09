@@ -1,8 +1,12 @@
+use std::iter::repeat;
+
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
@@ -16,23 +20,22 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::pairs_of_u64_and_natural_vec_var_1;
 
-fn from_power_of_two_digits_asc_properties_helper<
-    T: PrimitiveUnsigned + Rand + SampleRange,
-    F: Fn(u64, &[T]) -> Natural,
->(
-    from_power_of_two_digits_asc_naive: F,
-) where
-    Natural: PowerOfTwoDigits<T>,
+fn from_power_of_two_digits_asc_properties_helper<T: PrimitiveUnsigned + Rand + SampleRange>()
+where
+    Integer: From<Limb>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
     Limb: PowerOfTwoDigits<T>,
 {
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_3::<T>,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_asc(log_base, &digits);
-            assert_eq!(from_power_of_two_digits_asc_naive(log_base, &digits), n);
-            let digits_rev: Vec<T> = digits.iter().rev().cloned().collect();
+            let n = Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &digits_rev),
+                Natural::_from_power_of_two_digits_asc_naive(log_base, digits.iter().cloned()),
+                n
+            );
+            assert_eq!(
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().rev().cloned()),
                 n
             );
             let trailing_zeros = slice_trailing_zeros(&digits);
@@ -48,7 +51,7 @@ fn from_power_of_two_digits_asc_properties_helper<
         pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, &vec![T::ZERO; u]),
+                Natural::from_power_of_two_digits_asc(log_base, repeat(T::ZERO).take(u)),
                 0
             );
         },
@@ -57,10 +60,10 @@ fn from_power_of_two_digits_asc_properties_helper<
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_1::<Limb, T>,
         |&(log_base, ref digits)| {
-            let n = Limb::from_power_of_two_digits_asc(log_base, &digits);
+            let n = Limb::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, &digits),
-                Natural::from(n)
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+                Natural::checked_from(Integer::from(n)).unwrap()
             );
         },
     );
@@ -68,25 +71,15 @@ fn from_power_of_two_digits_asc_properties_helper<
 
 #[test]
 fn from_power_of_two_digits_asc_properties() {
-    from_power_of_two_digits_asc_properties_helper::<u8, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-    );
-    from_power_of_two_digits_asc_properties_helper::<u16, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-    );
-    from_power_of_two_digits_asc_properties_helper::<u32, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-    );
-    from_power_of_two_digits_asc_properties_helper::<u64, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-    );
-    from_power_of_two_digits_asc_properties_helper::<usize, _>(
-        Natural::_from_power_of_two_digits_asc_naive,
-    );
+    from_power_of_two_digits_asc_properties_helper::<u8>();
+    from_power_of_two_digits_asc_properties_helper::<u16>();
+    from_power_of_two_digits_asc_properties_helper::<u32>();
+    from_power_of_two_digits_asc_properties_helper::<u64>();
+    from_power_of_two_digits_asc_properties_helper::<usize>();
 
     test_properties(vecs_of_unsigned, |limbs| {
         assert_eq!(
-            Natural::from_power_of_two_digits_asc(Limb::WIDTH, &limbs),
+            Natural::from_power_of_two_digits_asc(Limb::WIDTH, limbs.iter().cloned()),
             Natural::from_limbs_asc(&limbs)
         );
     });
@@ -100,10 +93,9 @@ where
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_3::<T>,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_desc(log_base, &digits);
-            let digits_rev: Vec<T> = digits.iter().rev().cloned().collect();
+            let n = Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, &digits_rev),
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().rev().cloned()),
                 n
             );
             let leading_zeros = slice_leading_zeros(&digits);
@@ -119,7 +111,7 @@ where
         pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &vec![T::ZERO; u]),
+                Natural::from_power_of_two_digits_desc(log_base, repeat(T::ZERO).take(u)),
                 0
             );
         },
@@ -128,9 +120,9 @@ where
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_2::<Limb, T>,
         |&(log_base, ref digits)| {
-            let n = Limb::from_power_of_two_digits_desc(log_base, &digits);
+            let n = Limb::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &digits),
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
                 Natural::from(n)
             );
         },
@@ -147,7 +139,7 @@ fn from_power_of_two_digits_desc_properties() {
 
     test_properties(vecs_of_unsigned, |limbs| {
         assert_eq!(
-            Natural::from_power_of_two_digits_desc(Limb::WIDTH, &limbs),
+            Natural::from_power_of_two_digits_desc(Limb::WIDTH, limbs.iter().cloned()),
             Natural::from_limbs_desc(&limbs)
         );
     });
@@ -158,14 +150,16 @@ fn from_power_of_two_digits_asc_natural_properties() {
     test_properties(
         pairs_of_u64_and_natural_vec_var_1,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_asc(log_base, &digits);
+            let n = Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::_from_power_of_two_digits_asc_natural_naive(log_base, &digits),
+                Natural::_from_power_of_two_digits_asc_natural_naive(
+                    log_base,
+                    digits.iter().cloned()
+                ),
                 n
             );
-            let digits_rev: Vec<Natural> = digits.iter().rev().cloned().collect();
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &digits_rev),
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().rev().cloned()),
                 n
             );
             let trailing_zeros = slice_trailing_zeros(&digits);
@@ -181,7 +175,7 @@ fn from_power_of_two_digits_asc_natural_properties() {
         pairs_of_small_u64_and_small_usize_var_2,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, &vec![Natural::ZERO; u]),
+                Natural::from_power_of_two_digits_asc(log_base, repeat(Natural::ZERO).take(u)),
                 0
             );
         },
@@ -190,9 +184,12 @@ fn from_power_of_two_digits_asc_natural_properties() {
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_3::<Limb>,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_asc(log_base, &digits);
+            let n = Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
             let digits: Vec<Natural> = digits.iter().cloned().map(Natural::from).collect();
-            assert_eq!(Natural::from_power_of_two_digits_asc(log_base, &digits), n);
+            assert_eq!(
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+                n
+            );
         },
     );
 }
@@ -202,10 +199,9 @@ fn from_power_of_two_digits_desc_natural_properties() {
     test_properties(
         pairs_of_u64_and_natural_vec_var_1,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_desc(log_base, &digits);
-            let digits_rev: Vec<Natural> = digits.iter().rev().cloned().collect();
+            let n = Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, &digits_rev),
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().rev().cloned()),
                 n
             );
             let leading_zeros = slice_leading_zeros(&digits);
@@ -221,7 +217,7 @@ fn from_power_of_two_digits_desc_natural_properties() {
         pairs_of_small_u64_and_small_usize_var_2,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &vec![Natural::ZERO; u]),
+                Natural::from_power_of_two_digits_desc(log_base, repeat(Natural::ZERO).take(u)),
                 0
             );
         },
@@ -230,9 +226,12 @@ fn from_power_of_two_digits_desc_natural_properties() {
     test_properties_no_special(
         pairs_of_u64_and_unsigned_vec_var_3::<Limb>,
         |&(log_base, ref digits)| {
-            let n = Natural::from_power_of_two_digits_desc(log_base, &digits);
+            let n = Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
             let digits: Vec<Natural> = digits.iter().cloned().map(Natural::from).collect();
-            assert_eq!(Natural::from_power_of_two_digits_desc(log_base, &digits), n);
+            assert_eq!(
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
+                n
+            );
         },
     );
 }

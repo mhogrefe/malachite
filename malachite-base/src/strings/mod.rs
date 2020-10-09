@@ -1,14 +1,16 @@
-use named::Named;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug};
 
-/// Returns a `String` with the same characters and multiplicities, but in order.
+use named::Named;
+
+/// Sorts the characters of a string and returns them in a new `String`.
 ///
-/// Time: worst case O(n * log(n))
+/// # Worst-case complexity
+/// $T(n) = O(n \log n)$
 ///
-/// Additional memory: worst case O(n)
+/// $M(n) = O(n)$
 ///
-/// where n = `s.len()`
+/// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
 ///
 /// # Examples
 /// ```
@@ -23,14 +25,16 @@ pub fn string_sort(s: &str) -> String {
     chars.iter().collect()
 }
 
-/// Returns a `String` with the same characters, but each character appears no more than once. If a
-/// previously-seen character is seen, it is not included in the output.
+/// Removes duplicate characters from a string and returns the result in a new `String`.
 ///
-/// Time: worst case O(n)
+/// The unique characters are output in order of appearance.
 ///
-/// Additional memory: worst case O(n)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// where n = `s.len()`
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
 ///
 /// # Examples
 /// ```
@@ -50,15 +54,16 @@ pub fn string_unique(s: &str) -> String {
     nub
 }
 
-/// Returns whether all of the first `&str`'s characters are present in the second `&str`. Does not
-/// take multiplicities into account.
+/// Returns whether all of the first `&str`'s characters are present in the second `&str`.
 ///
-/// Time: worst case O(n)
+/// Does not take multiplicities into account.
 ///
-/// Additional memory: worst case O(m)
+/// # Worst-case complexity
+/// $T(n) = O(n)$
 ///
-/// where n = `s.len()` + `t.len()`,
-///       m = `t.len()`
+/// $M(n) = O(n + m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `t.len()`.
 ///
 /// # Examples
 /// ```
@@ -112,7 +117,7 @@ pub trait ToBinaryString: Binary {
 impl<T: Binary> ToBinaryString for T {
     /// Returns the `String` produced by `T`s `Binary` implementation.
     ///
-    /// Time: depends on `Debug` implementation
+    /// Time: depends on `Binary` implementation
     ///
     /// Additional memory: depends on `Binary` implementation
     ///

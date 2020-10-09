@@ -26,13 +26,11 @@ where
                 return None;
             }
         }
-        if let Some(x) = self.xs.next() {
+        self.xs.next().and_then(|x| {
             let result = Some(x.cmp(self.previous.as_ref().unwrap()));
             self.previous = Some(x);
             result
-        } else {
-            None
-        }
+        })
     }
 }
 

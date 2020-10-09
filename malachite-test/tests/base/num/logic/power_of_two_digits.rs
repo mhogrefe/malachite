@@ -1,3 +1,5 @@
+use std::iter::repeat;
+
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -26,7 +28,10 @@ where
         pairs_of_unsigned_and_small_u64_var_1::<T, U>,
         |&(u, log_base)| {
             let digits = u.to_power_of_two_digits_asc(log_base);
-            assert_eq!(T::from_power_of_two_digits_asc(log_base, &digits), u);
+            assert_eq!(
+                T::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+                u
+            );
             if u != T::ZERO {
                 assert_ne!(*digits.last().unwrap(), U::ZERO);
             }
@@ -107,7 +112,10 @@ where
         pairs_of_unsigned_and_small_u64_var_1::<T, U>,
         |&(u, log_base)| {
             let digits = u.to_power_of_two_digits_desc(log_base);
-            assert_eq!(T::from_power_of_two_digits_desc(log_base, &digits), u);
+            assert_eq!(
+                T::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
+                u
+            );
             if u != T::ZERO {
                 assert_ne!(digits[0], U::ZERO);
             }
@@ -193,9 +201,11 @@ where
         limit,
         pairs_of_u64_and_unsigned_vec_var_1::<T, U>,
         |&(log_base, ref digits)| {
-            let n = T::from_power_of_two_digits_asc(log_base, &digits);
-            let digits_rev: Vec<U> = digits.iter().rev().cloned().collect();
-            assert_eq!(T::from_power_of_two_digits_desc(log_base, &digits_rev), n);
+            let n = T::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
+            assert_eq!(
+                T::from_power_of_two_digits_desc(log_base, digits.iter().rev().cloned()),
+                n
+            );
             let trailing_zeros = slice_trailing_zeros(&digits);
             let trimmed_digits = digits[..digits.len() - trailing_zeros].to_vec();
             assert_eq!(
@@ -209,7 +219,7 @@ where
         pairs_of_u64_and_small_unsigned_var_1::<U, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                T::from_power_of_two_digits_asc(log_base, &vec![U::ZERO; u]),
+                T::from_power_of_two_digits_asc(log_base, repeat(U::ZERO).take(u)),
                 T::ZERO
             );
         },
@@ -266,9 +276,11 @@ where
         limit,
         pairs_of_u64_and_unsigned_vec_var_2::<T, U>,
         |&(log_base, ref digits)| {
-            let n = T::from_power_of_two_digits_desc(log_base, &digits);
-            let digits_rev: Vec<U> = digits.iter().rev().cloned().collect();
-            assert_eq!(T::from_power_of_two_digits_asc(log_base, &digits_rev), n);
+            let n = T::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
+            assert_eq!(
+                T::from_power_of_two_digits_asc(log_base, digits.iter().rev().cloned()),
+                n
+            );
             let leading_zeros = slice_leading_zeros(&digits);
             let trimmed_digits = digits[leading_zeros..].to_vec();
             assert_eq!(
@@ -282,7 +294,7 @@ where
         pairs_of_u64_and_small_unsigned_var_1::<U, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                T::from_power_of_two_digits_desc(log_base, &vec![U::ZERO; u]),
+                T::from_power_of_two_digits_desc(log_base, repeat(U::ZERO).take(u)),
                 T::ZERO
             );
         },

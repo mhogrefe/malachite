@@ -6,6 +6,7 @@ pub mod divisible_by;
 pub mod eq_mod;
 pub mod mod_mul;
 pub mod mod_op;
+pub mod mod_pow;
 pub mod mul;
 pub mod neg;
 pub mod pow;

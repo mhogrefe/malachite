@@ -53,7 +53,7 @@ pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
-/// slice. If the input slice is to small to hold the result, the limbs are all set to zero and the
+/// slice. If the input slice is too small to hold the result, the limbs are all set to zero and the
 /// carry bit, `true`, is returned. Otherwise, `false` is returned.
 ///
 /// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.

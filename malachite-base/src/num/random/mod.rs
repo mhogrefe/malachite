@@ -1,3 +1,9 @@
+use std::convert::identity;
+use std::fmt::Debug;
+
+use rand::Rng;
+use rand_chacha::ChaCha20Rng;
+
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -5,11 +11,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::iterator::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
 use random::Seed;
-use std::convert::identity;
-use std::fmt::Debug;
 
 /// Uniformly generates random primitive integers.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]

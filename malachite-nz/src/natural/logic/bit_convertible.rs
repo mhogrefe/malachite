@@ -9,64 +9,6 @@ use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
 use platform::Limb;
 
-/// Converts a slice of bits in ascending order to a `Vec` of limbs in ascending order. There may be
-/// trailing zero limbs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `bits.len()`
-///
-/// # Example
-/// ```
-/// use malachite_nz::natural::logic::bit_convertible::limbs_asc_from_bits_asc;
-///
-/// assert!(limbs_asc_from_bits_asc(&[]).is_empty());
-/// // 10^12 = 232 * 2^32 + 3567587328 = 1110100011010100101001010001000000000000b
-/// assert_eq!(
-///     limbs_asc_from_bits_asc(
-///         &[false, false, false, false, false, false, false, false, false, false, false, false,
-///           true, false, false, false, true, false, true, false, false, true, false, true, false,
-///           false, true, false, true, false, true, true, false, false, false, true, false, true,
-///           true, true]),
-///     vec![3567587328, 232]);
-/// ```
-pub fn limbs_asc_from_bits_asc(bits: &[bool]) -> Vec<Limb> {
-    bits.chunks(usize::wrapping_from(Limb::WIDTH))
-        .map(Limb::from_bits_asc)
-        .collect()
-}
-
-/// Converts a slice of bits in descending order to a `Vec` of limbs in ascending order. There may
-/// be trailing zero limbs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `bits.len()`
-///
-/// # Example
-/// ```
-/// use malachite_nz::natural::logic::bit_convertible::limbs_asc_from_bits_desc;
-///
-/// assert!(limbs_asc_from_bits_desc(&[]).is_empty());
-/// // 10^12 = 232 * 2^32 + 3567587328 = 1110100011010100101001010001000000000000b
-/// assert_eq!(
-///     limbs_asc_from_bits_desc(
-///         &[true, true, true, false, true, false, false, false, true, true, false, true, false,
-///           true, false, false, true, false, true, false, false, true, false, true, false, false,
-///           false, true, false, false, false, false, false, false, false, false, false, false,
-///           false, false]),
-///     vec![3567587328, 232]);
-/// ```
-pub fn limbs_asc_from_bits_desc(bits: &[bool]) -> Vec<Limb> {
-    bits.rchunks(usize::wrapping_from(Limb::WIDTH))
-        .map(Limb::from_bits_desc)
-        .collect()
-}
-
 impl BitConvertible for Natural {
     /// Returns the bits of a `Natural` in ascending order, so that less significant bits have lower
     /// indices in the output vector. There are no trailing false bits.
@@ -140,60 +82,6 @@ impl BitConvertible for Natural {
         bits
     }
 
-    /// Converts a slice of bits to a `Natural`, in ascending order, so that less significant bits
-    /// have lower indices in the input slice.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(n)
-    ///
-    /// where n = `bits.len()`
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::logic::traits::BitConvertible;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(Natural::from_bits_asc(&[]).to_string(), "0");
-    /// // 105 = 1101001b
-    /// assert_eq!(
-    ///     Natural::from_bits_asc(&[true, false, false, true, false, true, true]).to_string(),
-    ///     "105");
-    /// ```
-    fn from_bits_asc(bits: &[bool]) -> Natural {
-        Natural::from_owned_limbs_asc(limbs_asc_from_bits_asc(bits))
-    }
-
-    /// Converts a slice of bits to a `Natural`, in descending order, so that less significant bits
-    /// have higher indices in the input slice.
-    ///
-    /// Time: worst case O(n)
-    ///
-    /// Additional memory: worst case O(n)
-    ///
-    /// where n = `bits.len()`
-    ///
-    /// # Example
-    /// ```
-    /// extern crate malachite_base;
-    /// extern crate malachite_nz;
-    ///
-    /// use malachite_base::num::logic::traits::BitConvertible;
-    /// use malachite_nz::natural::Natural;
-    ///
-    /// assert_eq!(Natural::from_bits_desc(&[]).to_string(), "0");
-    /// // 105 = 1101001b
-    /// assert_eq!(
-    ///     Natural::from_bits_desc(&[true, true, false, true, false, false, true]).to_string(),
-    ///     "105");
-    /// ```
-    fn from_bits_desc(bits: &[bool]) -> Natural {
-        Natural::from_owned_limbs_asc(limbs_asc_from_bits_desc(bits))
-    }
-
     /// TODO doc
     ///
     /// # Example
@@ -205,20 +93,18 @@ impl BitConvertible for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::iter::empty;
     ///
-    /// assert_eq!(Natural::from_bit_iterator_asc(empty()), 0);
+    /// assert_eq!(Natural::from_bits_asc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Natural::from_bit_iterator_asc(
-    ///         [true, false, false, true, false, true, true].iter().cloned()
-    ///     ),
+    ///     Natural::from_bits_asc([true, false, false, true, false, true, true].iter().cloned()),
     ///     105
     /// );
     /// ```
-    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(xs: I) -> Natural {
+    fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Natural {
         Natural::from_owned_limbs_asc(
             xs.chunks(usize::wrapping_from(Limb::WIDTH))
                 .into_iter()
-                .map(Limb::from_bit_iterator_asc)
+                .map(Limb::from_bits_asc)
                 .collect(),
         )
     }
@@ -234,16 +120,14 @@ impl BitConvertible for Natural {
     /// use malachite_nz::natural::Natural;
     /// use std::iter::empty;
     ///
-    /// assert_eq!(Natural::from_bit_iterator_desc(empty()), 0);
+    /// assert_eq!(Natural::from_bits_desc(empty()), 0);
     /// // 105 = 1101001b
     /// assert_eq!(
-    ///     Natural::from_bit_iterator_desc(
-    ///         [true, true, false, true, false, false, true].iter().cloned()
-    ///     ),
+    ///     Natural::from_bits_desc([true, true, false, true, false, false, true].iter().cloned()),
     ///     105
     /// );
     /// ```
-    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
+    fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {

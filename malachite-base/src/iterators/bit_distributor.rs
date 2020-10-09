@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Formatter, Result};
+use std::fmt::Debug;
 
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{BitConvertible, NotAssign};
@@ -80,129 +80,11 @@ impl BitDistributorOutputType {
 /// The above discussion of growth rates assumes that `max_bits` is not specified for any output
 /// type. But if `max_bits` is set to $b$, then the corresponding element will start growing just as
 /// if `max_bits` wasn't specified, but will stop growing once it reaches $2^b-1$.
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct BitDistributor {
     pub output_types: Vec<BitDistributorOutputType>,
     bit_map: [usize; COUNTER_WIDTH],
     counter: [bool; COUNTER_WIDTH],
-}
-
-impl PartialEq<BitDistributor> for BitDistributor {
-    /// Compares two `BitDistributor`s for equality.
-    ///
-    /// # Worst-case complexity
-    ///
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(1)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.output_types.len()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-    ///
-    /// assert_eq!(
-    ///     BitDistributor::new(
-    ///         &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    ///     ),
-    ///     BitDistributor::new(
-    ///         &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    ///     )
-    /// );
-    /// ```
-    fn eq(&self, other: &BitDistributor) -> bool {
-        self.output_types == other.output_types
-            && self.bit_map[..] == other.bit_map[..]
-            && self.counter[..] == other.counter[..]
-    }
-}
-
-impl Eq for BitDistributor {}
-
-impl Clone for BitDistributor {
-    /// Clones a `BitDistributor`s.
-    ///
-    /// # Worst-case complexity
-    ///
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.output_types.len()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-    ///
-    /// let bd = BitDistributor::new(
-    ///         &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    /// );
-    /// assert_eq!(bd.clone(), bd);
-    /// ```
-    fn clone(&self) -> BitDistributor {
-        let mut bit_map = [0; COUNTER_WIDTH];
-        let mut counter = [false; COUNTER_WIDTH];
-        bit_map.copy_from_slice(&self.bit_map);
-        counter.copy_from_slice(&self.counter);
-        BitDistributor {
-            output_types: self.output_types.clone(),
-            bit_map,
-            counter,
-        }
-    }
-}
-
-impl Debug for BitDistributor {
-    /// Writes a string representation of a `BitDistributor`.
-    ///
-    /// # Worst-case complexity
-    ///
-    /// $T(n) = O(n)$
-    ///
-    /// $M(n) = O(1)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.output_types.len()`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-    /// use malachite_base::strings::ToDebugString;
-    ///
-    /// let bd = BitDistributor::new(
-    ///         &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    /// );
-    /// assert_eq!(
-    ///     bd.to_debug_string(),
-    ///     "BitDistributor { \
-    ///          output_types: [\
-    ///              BitDistributorOutputType { weight: 2, max_bits: None }, \
-    ///              BitDistributorOutputType { weight: 0, max_bits: None }\
-    ///          ], \
-    ///          bit_map: [\
-    ///              1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
-    ///              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
-    ///              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1\
-    ///          ], \
-    ///          counter: [\
-    ///              false, false, false, false, false, false, false, false, false, false, false, \
-    ///              false, false, false, false, false, false, false, false, false, false, false, \
-    ///              false, false, false, false, false, false, false, false, false, false, false, \
-    ///              false, false, false, false, false, false, false, false, false, false, false, \
-    ///              false, false, false, false, false, false, false, false, false, false, false, \
-    ///              false, false, false, false, false, false, false, false, false\
-    ///          ] \
-    ///      }"
-    /// );
-    /// ```
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(
-            f,
-            "BitDistributor {{ output_types: {:?}, bit_map: {:?}, counter: {:?} }}",
-            self.output_types,
-            &self.bit_map[..],
-            &self.counter[..],
-        )
-    }
 }
 
 impl BitDistributor {
@@ -447,7 +329,7 @@ impl BitDistributor {
     /// ```
     pub fn get_output(&self, index: usize) -> usize {
         assert!(index < self.output_types.len());
-        usize::from_bit_iterator_asc(
+        usize::from_bits_asc(
             self.bit_map
                 .iter()
                 .zip(self.counter.iter())

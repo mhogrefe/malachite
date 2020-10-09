@@ -1,9 +1,11 @@
+use std::iter::Rev;
+use std::iter::{once, Chain, Once};
+
 use itertools::{Interleave, Itertools};
+
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use std::iter::Rev;
-use std::iter::{once, Chain, Once};
 
 /// Generates all primitive integers in an interval.
 ///
@@ -34,11 +36,7 @@ impl<T: PrimitiveInt> DoubleEndedIterator for PrimitiveIntIncreasingRange<T> {
         if self.a == self.b {
             None
         } else {
-            self.b = Some(if let Some(b) = self.b {
-                b - T::ONE
-            } else {
-                T::MAX
-            });
+            self.b = Some(self.b.map_or(T::MAX, |b| b - T::ONE));
             self.b
         }
     }

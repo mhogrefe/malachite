@@ -209,15 +209,13 @@ pub fn first_and_last<I: Iterator>(xs: &mut I) -> Option<(I::Item, I::Item)>
 where
     I::Item: Clone,
 {
-    if let Some(first) = xs.next() {
+    xs.next().map(|first| {
         if let Some(last) = xs.last() {
-            Some((first, last))
+            (first, last)
         } else {
-            Some((first.clone(), first))
+            (first.clone(), first)
         }
-    } else {
-        None
-    }
+    })
 }
 
 /// Groups elements of an iterator into intervals of adjacent elements that match a predicate.

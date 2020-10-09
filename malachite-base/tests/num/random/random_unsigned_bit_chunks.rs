@@ -39,7 +39,7 @@ fn random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned>(
                 .chunks(usize::exact_from(chunk_size))
                 .into_iter()
                 .take(1000000)
-                .map(|bs| T::from_bits_asc(&bs.collect::<Vec<_>>())),
+                .map(T::from_bits_asc),
             xs.take(1000000),
         );
     }

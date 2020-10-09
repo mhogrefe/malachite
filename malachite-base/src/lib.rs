@@ -18,6 +18,7 @@
     clippy::print_stdout,
     clippy::redundant_closure_for_method_calls,
     clippy::single_match_else,
+    clippy::trait_duplication_in_bounds,
     clippy::type_repetition_in_bounds,
     clippy::unused_self
 )]
@@ -112,6 +113,7 @@ pub mod rounding_modes;
 /// This module contains functions for working with slices.
 #[macro_use]
 pub mod slices;
+/// This module contains functions for working with strings.
 pub mod strings;
 /// This module contains functions for working with tuples.
 pub mod tuples;

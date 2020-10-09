@@ -105,7 +105,7 @@ fn demo_from_power_of_two_digits_asc<T: PrimitiveUnsigned + Rand + SampleRange>(
             "Natural::from_power_of_two_digits_asc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_two_digits_asc(log_base, &digits)
+            Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned())
         );
     }
 }
@@ -121,7 +121,7 @@ fn demo_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleRange>
             "Natural::from_power_of_two_digits_desc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_two_digits_desc(log_base, &digits)
+            Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned())
         );
     }
 }
@@ -132,7 +132,7 @@ fn demo_natural_from_power_of_two_digits_asc_natural(gm: GenerationMode, limit: 
             "Natural.from_power_of_two_digits_asc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_two_digits_asc(log_base, &digits)
+            Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned())
         );
     }
 }
@@ -143,25 +143,22 @@ fn demo_natural_from_power_of_two_digits_desc_natural(gm: GenerationMode, limit:
             "Natural.from_power_of_two_digits_desc({}, {:?}) = {}",
             log_base,
             digits,
-            Natural::from_power_of_two_digits_desc(log_base, &digits)
+            Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned())
         );
     }
 }
 
-fn benchmark_from_power_of_two_digits_asc_algorithms<
-    T: PrimitiveUnsigned + Rand + SampleRange,
-    F: Fn(u64, &[T]) -> Natural,
->(
-    from_power_of_two_digits_asc_naive: F,
+fn benchmark_from_power_of_two_digits_asc_algorithms<T: PrimitiveUnsigned + Rand + SampleRange>(
     gm: NoSpecialGenerationMode,
     limit: usize,
     file_name: &str,
 ) where
-    Natural: PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
 {
     run_benchmark_old(
         &format!(
-            "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_asc(&[{}], u64)",
+            "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_asc\
+                <I: Iterator<Item={}>>(I, u64)",
             T::NAME
         ),
         BenchmarkType::Algorithms,
@@ -175,13 +172,19 @@ fn benchmark_from_power_of_two_digits_asc_algorithms<
             (
                 "default",
                 &mut (|(log_base, ref digits)| {
-                    no_out!(Natural::from_power_of_two_digits_asc(log_base, digits))
+                    no_out!(Natural::from_power_of_two_digits_asc(
+                        log_base,
+                        digits.iter().cloned()
+                    ))
                 }),
             ),
             (
                 "naive",
                 &mut (|(log_base, ref digits)| {
-                    no_out!(from_power_of_two_digits_asc_naive(log_base, digits))
+                    no_out!(Natural::_from_power_of_two_digits_asc_naive(
+                        log_base,
+                        digits.iter().cloned()
+                    ))
                 }),
             ),
         ],
@@ -197,7 +200,8 @@ fn benchmark_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleR
 {
     run_benchmark_old(
         &format!(
-            "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_desc(&[{}], u64)",
+            "PowerOfTwoDigits::<Natural>::from_power_of_two_digits_desc\
+                <I: Iterator<Item={}>>(I, u64)",
             T::NAME
         ),
         BenchmarkType::Single,
@@ -210,7 +214,10 @@ fn benchmark_from_power_of_two_digits_desc<T: PrimitiveUnsigned + Rand + SampleR
         &mut [(
             "Malachite",
             &mut (|(log_base, ref digits)| {
-                no_out!(Natural::from_power_of_two_digits_desc(log_base, digits))
+                no_out!(Natural::from_power_of_two_digits_desc(
+                    log_base,
+                    digits.iter().cloned()
+                ))
             }),
         )],
     );
@@ -222,7 +229,7 @@ fn benchmark_natural_from_power_of_two_digits_asc_natural_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "Natural::from_power_of_two_digits_asc(u64, &[Natural])",
+        "Natural::from_power_of_two_digits_asc<I: Iterator<Item=Natural>>(u64, I)",
         BenchmarkType::Algorithms,
         pairs_of_u64_and_natural_vec_var_1(gm),
         gm.name(),
@@ -234,14 +241,18 @@ fn benchmark_natural_from_power_of_two_digits_asc_natural_algorithms(
             (
                 "default",
                 &mut (|(log_base, ref digits)| {
-                    no_out!(Natural::from_power_of_two_digits_asc(log_base, digits))
+                    no_out!(Natural::from_power_of_two_digits_asc(
+                        log_base,
+                        digits.iter().cloned()
+                    ))
                 }),
             ),
             (
                 "naive",
                 &mut (|(log_base, ref digits)| {
                     no_out!(Natural::_from_power_of_two_digits_asc_natural_naive(
-                        log_base, digits
+                        log_base,
+                        digits.iter().cloned()
                     ))
                 }),
             ),
@@ -255,7 +266,7 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "Natural::from_power_of_two_digits_desc(u64, &[Natural])",
+        "Natural::from_power_of_two_digits_desc<I: Iterator<Item=Natural>>(u64, I)",
         BenchmarkType::Single,
         pairs_of_u64_and_natural_vec_var_1(gm),
         gm.name(),
@@ -266,7 +277,10 @@ fn benchmark_natural_from_power_of_two_digits_desc_natural(
         &mut [(
             "Malachite",
             &mut (|(log_base, ref digits)| {
-                no_out!(Natural::from_power_of_two_digits_desc(log_base, digits))
+                no_out!(Natural::from_power_of_two_digits_desc(
+                    log_base,
+                    digits.iter().cloned()
+                ))
             }),
         )],
     );
@@ -293,12 +307,7 @@ macro_rules! demo_and_bench {
             limit: usize,
             file_name: &str,
         ) {
-            benchmark_from_power_of_two_digits_asc_algorithms::<$t, _>(
-                Natural::_from_power_of_two_digits_asc_naive,
-                gm,
-                limit,
-                file_name,
-            );
+            benchmark_from_power_of_two_digits_asc_algorithms::<$t>(gm, limit, file_name);
         }
 
         fn $from_power_of_two_digits_desc_bench_name(

@@ -666,7 +666,7 @@ fn demo_from_power_of_two_digits_asc<
             T::NAME,
             log_base,
             digits,
-            T::from_power_of_two_digits_asc(log_base, &digits)
+            T::from_power_of_two_digits_asc(log_base, digits.iter().cloned())
         );
     }
 }
@@ -686,7 +686,7 @@ fn demo_from_power_of_two_digits_desc<
             T::NAME,
             log_base,
             digits,
-            T::from_power_of_two_digits_desc(log_base, &digits)
+            T::from_power_of_two_digits_desc(log_base, digits.iter().cloned())
         );
     }
 }
@@ -804,7 +804,7 @@ fn benchmark_from_power_of_two_digits_asc<
 {
     run_benchmark_old(
         &format!(
-            "{}::from_power_of_two_digits_asc(u64, &[{}])",
+            "{}::from_power_of_two_digits_asc<I: Iterator<Item={}>>(u64, I)",
             T::NAME,
             U::NAME
         ),
@@ -818,7 +818,10 @@ fn benchmark_from_power_of_two_digits_asc<
         &mut [(
             "Malachite",
             &mut (|(log_base, ref digits)| {
-                no_out!(T::from_power_of_two_digits_asc(log_base, digits))
+                no_out!(T::from_power_of_two_digits_asc(
+                    log_base,
+                    digits.iter().cloned()
+                ))
             }),
         )],
     );
@@ -836,7 +839,7 @@ fn benchmark_from_power_of_two_digits_desc<
 {
     run_benchmark_old(
         &format!(
-            "{}::from_power_of_two_digits_desc(u64, &[{}])",
+            "{}::from_power_of_two_digits_desc<I: Iterator<Item={}>>(u64, I)",
             T::NAME,
             U::NAME
         ),
@@ -850,7 +853,10 @@ fn benchmark_from_power_of_two_digits_desc<
         &mut [(
             "Malachite",
             &mut (|(log_base, ref digits)| {
-                no_out!(T::from_power_of_two_digits_desc(log_base, digits))
+                no_out!(T::from_power_of_two_digits_desc(
+                    log_base,
+                    digits.iter().cloned()
+                ))
             }),
         )],
     );

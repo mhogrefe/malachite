@@ -4,6 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 
 use natural::Natural;
 
+//TODO clean
+
 macro_rules! impl_mod_power_of_two_shr_signed {
     ($t:ident) => {
         /// Shifts a `Natural` right (divides it by a power of 2) mod 2<sup>`pow`</sup>, taking the

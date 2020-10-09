@@ -30,7 +30,10 @@ fn to_power_of_two_digits_asc_properties_helper<
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_asc(log_base);
             assert_eq!(to_power_of_two_digits_asc_naive(n, log_base), digits);
-            assert_eq!(Natural::from_power_of_two_digits_asc(log_base, &digits), *n);
+            assert_eq!(
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+                *n
+            );
             if *n != 0 {
                 assert_ne!(*digits.last().unwrap(), T::ZERO);
             }
@@ -127,7 +130,7 @@ where
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_desc(log_base);
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &digits),
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
                 *n
             );
             if *n != 0 {
@@ -214,7 +217,10 @@ fn to_power_of_two_digits_asc_natural_properties() {
                 n._to_power_of_two_digits_asc_natural_naive(log_base),
                 digits
             );
-            assert_eq!(Natural::from_power_of_two_digits_asc(log_base, &digits), *n);
+            assert_eq!(
+                Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+                *n
+            );
             if *n != 0 {
                 assert_ne!(*digits.last().unwrap(), 0);
             }
@@ -260,7 +266,7 @@ fn to_power_of_two_digits_desc_natural_properties() {
         |&(ref n, log_base)| {
             let digits = n.to_power_of_two_digits_desc(log_base);
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, &digits),
+                Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
                 *n
             );
             if *n != 0 {

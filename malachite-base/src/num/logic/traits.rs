@@ -180,21 +180,13 @@ pub trait BitConvertible {
     /// significant.
     fn to_bits_desc(&self) -> Vec<bool>;
 
-    /// Converts a slice of bits into a value. The input bits are in ascending order: least- to
-    /// most-significant.
-    fn from_bits_asc(bits: &[bool]) -> Self;
-
-    /// Converts a slice of bits into a value. The input bits are in descending order: most- to
-    /// least-significant.
-    fn from_bits_desc(bits: &[bool]) -> Self;
-
     /// Converts an iterator of bits into a value. The input bits are in ascending order: least- to
     /// most-significant.
-    fn from_bit_iterator_asc<I: Iterator<Item = bool>>(bits: I) -> Self;
+    fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> Self;
 
     /// Converts an iterator of bits into a value. The input bits are in descending order: most- to
     /// least-significant.
-    fn from_bit_iterator_desc<I: Iterator<Item = bool>>(bits: I) -> Self;
+    fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> Self;
 }
 
 /// This trait defines an iterator over a value's bits.
@@ -218,27 +210,13 @@ pub trait PowerOfTwoDigits<T> {
     /// significant. The base is 2<sup>`log_base`</sup>.
     fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<T>;
 
-    /// Converts a slice of digits into a value. The input digits are in ascending order: least- to
-    /// most-significant. The base is 2<sup>`log_base`</sup>.
-    fn from_power_of_two_digits_asc(log_base: u64, digits: &[T]) -> Self;
-
-    /// Converts a slice of digits into a value. The input digits are in descending order: most- to
-    /// least-significant. The base is 2<sup>`log_base`</sup>.
-    fn from_power_of_two_digits_desc(log_base: u64, digits: &[T]) -> Self;
-
     /// Converts an iterator of digits into a value. The input digits are in ascending order: least-
-    /// to most-significant.
-    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = T>>(
-        log_base: u64,
-        digits: I,
-    ) -> Self;
+    /// to most-significant. The base is 2<sup>`log_base`</sup>.
+    fn from_power_of_two_digits_asc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Self;
 
-    /// Converts an iterator of digits into a value. The input bits are in descending order: most-
-    /// to least-significant.
-    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = T>>(
-        log_base: u64,
-        digits: I,
-    ) -> Self;
+    /// Converts an iterator of digits into a value. The input digits are in descending order: most-
+    /// to least-significant. The base is 2<sup>`log_base`</sup>.
+    fn from_power_of_two_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Self;
 }
 
 /// An iterator over a value's base-power-of-two digits.

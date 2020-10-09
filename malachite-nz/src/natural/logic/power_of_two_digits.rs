@@ -1,5 +1,6 @@
 use std::cmp::{min, Ordering};
 
+use itertools::Itertools;
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{CheckedLogTwo, DivRound, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -14,6 +15,15 @@ use malachite_base::slices::slice_trailing_zeros;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+
+macro_rules! check_digits_size {
+    ($ds: expr, $log_base: expr) => {
+        $ds.filter(|d| {
+            assert!(d.significant_bits() <= $log_base);
+            true
+        })
+    };
+}
 
 impl Natural {
     pub fn _to_power_of_two_digits_asc_naive<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
@@ -41,9 +51,9 @@ impl Natural {
         digits
     }
 
-    pub fn _from_power_of_two_digits_asc_naive<T: PrimitiveUnsigned>(
+    pub fn _from_power_of_two_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
         log_base: u64,
-        digits: &[T],
+        digits: I,
     ) -> Natural
     where
         Natural: From<T>,
@@ -58,7 +68,7 @@ impl Natural {
         }
         let mut n = Natural::ZERO;
         let mut previous_index = 0;
-        for &digit in digits {
+        for digit in digits {
             let index = previous_index + log_base;
             n.assign_bits(previous_index, index, &Natural::from(digit));
             previous_index = index;
@@ -179,16 +189,16 @@ macro_rules! power_of_two_digits_primitive {
                 digits
             }
 
-            /// Converts a slice of digits into a `Natural`, where the base is a power of two. The
-            /// base-2 logarithm of the base is specified. The input digits are in ascending order:
-            /// least- to most-significant. The type of each digit is `$t`, and `log_base` must be
-            /// no larger than the width of `$t`.
+            /// Converts an iterator of digits into a `Natural`, where the base is a power of two.
+            /// The base-2 logarithm of the base is specified. The input digits are in ascending
+            /// order: least- to most-significant. The type of each digit is `$t`, and `log_base`
+            /// must be no larger than the width of `$t`.
             ///
             /// Time: worst case O(n)
             ///
             /// Additional memory: worst case O(n)
             ///
-            /// where n = `digits.len()`
+            /// where n = `digits.count()`
             ///
             /// # Panics
             /// Panics if `log_base` is greater than the width of `$t`, if `log_base` is zero, or if
@@ -203,16 +213,19 @@ macro_rules! power_of_two_digits_primitive {
             /// use malachite_nz::natural::Natural;
             ///
             /// let digits: &[u64] = &[0, 0, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits), 0);
+            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 0);
             ///
             /// let digits: &[u64] = &[2, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits), 2);
+            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 2);
             ///
             /// let digits: &[u16] = &[3, 7, 1];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits), 123);
+            /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits.iter().cloned()), 123);
             /// ```
             #[allow(arithmetic_overflow)]
-            fn from_power_of_two_digits_asc(log_base: u64, digits: &[$t]) -> Natural {
+            fn from_power_of_two_digits_asc<I: Iterator<Item = $t>>(
+                log_base: u64,
+                digits: I,
+            ) -> Natural {
                 assert_ne!(log_base, 0);
                 if log_base > $t::WIDTH {
                     panic!(
@@ -221,24 +234,26 @@ macro_rules! power_of_two_digits_primitive {
                         log_base
                     );
                 }
-                assert!(digits
-                    .iter()
-                    .all(|digit| digit.significant_bits() <= log_base));
                 Natural::from_owned_limbs_asc(
-                    iterator_to_bit_chunks(digits.iter().cloned(), log_base, Limb::WIDTH).collect(),
+                    iterator_to_bit_chunks(
+                        check_digits_size!(digits, log_base),
+                        log_base,
+                        Limb::WIDTH,
+                    )
+                    .collect(),
                 )
             }
 
-            /// Converts a slice of digits into a `Natural`, where the base is a power of two. The
-            /// base-2 logarithm of the base is specified. The input digits are in descending order:
-            /// most- to least-significant. The type of each digit is `$t`, and `log_base` must be
-            /// no larger than the width of `$t`.
+            /// Converts an iterator of digits into a `Natural`, where the base is a power of two.
+            /// The base-2 logarithm of the base is specified. The input digits are in descending
+            /// order: most- to least-significant. The type of each digit is `$t`, and `log_base`
+            /// must be no larger than the width of `$t`.
             ///
             /// Time: worst case O(n)
             ///
             /// Additional memory: worst case O(n)
             ///
-            /// where n = `digits.len()`
+            /// where n = `digits.count()`
             ///
             /// # Panics
             /// Panics if `log_base` is greater than the width of `$t`, if `log_base` is zero, or if
@@ -253,16 +268,19 @@ macro_rules! power_of_two_digits_primitive {
             /// use malachite_nz::natural::Natural;
             ///
             /// let digits: &[u64] = &[0, 0, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits), 0);
+            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 0);
             ///
             /// let digits: &[u64] = &[0, 2];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits), 2);
+            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 2);
             ///
             /// let digits: &[u16] = &[1, 7, 3];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits), 123);
+            /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits.iter().cloned()), 123);
             /// ```
             #[allow(arithmetic_overflow)]
-            fn from_power_of_two_digits_desc(log_base: u64, digits: &[$t]) -> Natural {
+            fn from_power_of_two_digits_desc<I: Iterator<Item = $t>>(
+                log_base: u64,
+                digits: I,
+            ) -> Natural {
                 assert_ne!(log_base, 0);
                 if log_base > $t::WIDTH {
                     panic!(
@@ -271,6 +289,7 @@ macro_rules! power_of_two_digits_primitive {
                         log_base
                     );
                 }
+                let digits: Vec<_> = digits.collect();
                 assert!(digits
                     .iter()
                     .all(|digit| digit.significant_bits() <= log_base));
@@ -278,24 +297,6 @@ macro_rules! power_of_two_digits_primitive {
                     iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
                         .collect::<Vec<_>>(),
                 )
-            }
-
-            /// TODO doc
-            #[inline]
-            fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = $t>>(
-                _log_base: u64,
-                _digits: I,
-            ) -> Natural {
-                unimplemented!();
-            }
-
-            /// TODO doc
-            #[inline]
-            fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = $t>>(
-                _log_base: u64,
-                _digits: I,
-            ) -> Natural {
-                unimplemented!();
             }
         }
     };
@@ -462,15 +463,15 @@ impl PowerOfTwoDigits<Natural> for Natural {
         digits
     }
 
-    /// Converts a slice of digits into a `Natural`, where the base is a power of two. The base-2
-    /// logarithm of the base is specified. The input digits are in ascending order: least- to most-
-    /// significant. The type of each digit is `Natural`.
+    /// Converts an iterator of digits into a `Natural`, where the base is a power of two. The
+    /// base-2 logarithm of the base is specified. The input digits are in ascending order: least-
+    /// to most-significant. The type of each digit is `Natural`.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `digits.len()` * `log_base`
+    /// where n = `digits.count()` * `log_base`
     ///
     /// # Panics
     /// Panics if `log_base` is zero or if some digit is greater than 2<sup>`log_base`.</sup>
@@ -485,27 +486,29 @@ impl PowerOfTwoDigits<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let digits = &[Natural::ZERO, Natural::ZERO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits), 0);
+    /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 0);
     ///
     /// let digits = &[Natural::TWO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits), 2);
+    /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 2);
     ///
     /// let digits = &[Natural::from(3u32), Natural::from(7u32), Natural::ONE];
-    /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits), 123);
+    /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits.iter().cloned()), 123);
     /// ```
-    fn from_power_of_two_digits_asc(log_base: u64, digits: &[Natural]) -> Natural {
+    fn from_power_of_two_digits_asc<I: Iterator<Item = Natural>>(
+        log_base: u64,
+        digits: I,
+    ) -> Natural {
         assert_ne!(log_base, 0);
-        assert!(digits
-            .iter()
-            .all(|digit| digit.significant_bits() <= log_base));
-        if digits.is_empty() {
-            Natural::ZERO
-        } else if let Some(log_log_base) = log_base.checked_log_two() {
+        if let Some(log_log_base) = log_base.checked_log_two() {
             let mut limbs = Vec::new();
             match log_log_base.cmp(&Limb::LOG_WIDTH) {
-                Ordering::Equal => limbs.extend(digits.iter().cloned().map(Limb::wrapping_from)),
+                Ordering::Equal => {
+                    limbs.extend(check_digits_size!(digits, log_base).map(Limb::wrapping_from))
+                }
                 Ordering::Less => {
-                    for chunk in digits.chunks(usize::wrapping_from(Limb::WIDTH >> log_log_base)) {
+                    for chunk in &check_digits_size!(digits, log_base)
+                        .chunks(usize::wrapping_from(Limb::WIDTH >> log_log_base))
+                    {
                         let mut limb = 0;
                         let mut offset = 0;
                         for digit in chunk {
@@ -518,7 +521,7 @@ impl PowerOfTwoDigits<Natural> for Natural {
                 Ordering::Greater => {
                     let mut offset = 0;
                     let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
-                    for digit in digits {
+                    for digit in check_digits_size!(digits, log_base) {
                         offset += chunk_size;
                         for limb in digit.limbs() {
                             limbs.push(limb);
@@ -531,24 +534,24 @@ impl PowerOfTwoDigits<Natural> for Natural {
         } else {
             let mut n = Natural::ZERO;
             let mut previous_index = 0;
-            for digit in digits {
+            for digit in check_digits_size!(digits, log_base) {
                 let index = previous_index + log_base;
-                n.assign_bits(previous_index, index, digit);
+                n.assign_bits(previous_index, index, &digit);
                 previous_index = index;
             }
             n
         }
     }
 
-    /// Converts a slice of digits into a `Natural`, where the base is a power of two. The base-2
-    /// logarithm of the base is specified. The input digits are in descending order: least- to
-    /// most-significant. The type of each digit is `Natural`.
+    /// Converts an iterator of digits into a `Natural`, where the base is a power of two. The
+    /// base-2 logarithm of the base is specified. The input digits are in descending order: least-
+    /// to most-significant. The type of each digit is `Natural`.
     ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// where n = `digits.len()` * `log_base`
+    /// where n = `digits.count()` * `log_base`
     ///
     /// # Panics
     /// Panics if `log_base` is zero or if some digit is greater than 2<sup>`log_base`.</sup>
@@ -563,16 +566,20 @@ impl PowerOfTwoDigits<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let digits = &[Natural::ZERO, Natural::ZERO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits), 0);
+    /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 0);
     ///
     /// let digits = &[Natural::ZERO, Natural::TWO];
-    /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits), 2);
+    /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 2);
     ///
     /// let digits = &[Natural::ONE, Natural::from(7u32), Natural::from(3u32)];
-    /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits), 123);
+    /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits.iter().cloned()), 123);
     /// ```
-    fn from_power_of_two_digits_desc(log_base: u64, digits: &[Natural]) -> Natural {
+    fn from_power_of_two_digits_desc<I: Iterator<Item = Natural>>(
+        log_base: u64,
+        digits: I,
+    ) -> Natural {
         assert_ne!(log_base, 0);
+        let digits: Vec<_> = digits.collect();
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));
@@ -619,24 +626,6 @@ impl PowerOfTwoDigits<Natural> for Natural {
             n
         }
     }
-
-    /// TODO doc
-    #[inline]
-    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = Natural>>(
-        _log_base: u64,
-        _digits: I,
-    ) -> Natural {
-        unimplemented!();
-    }
-
-    /// TODO doc
-    #[inline]
-    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = Natural>>(
-        _log_base: u64,
-        _digits: I,
-    ) -> Natural {
-        unimplemented!();
-    }
 }
 
 impl Natural {
@@ -655,16 +644,16 @@ impl Natural {
         digits
     }
 
-    pub fn _from_power_of_two_digits_asc_natural_naive(
+    pub fn _from_power_of_two_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
         log_base: u64,
-        digits: &[Natural],
+        digits: I,
     ) -> Natural {
         assert_ne!(log_base, 0);
         let mut n = Natural::ZERO;
         let mut previous_index = 0;
         for digit in digits {
             let index = previous_index + log_base;
-            n.assign_bits(previous_index, index, digit);
+            n.assign_bits(previous_index, index, &digit);
             previous_index = index;
         }
         n

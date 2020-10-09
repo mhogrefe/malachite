@@ -1,9 +1,10 @@
+use std::cmp::min;
+use std::ops::Neg;
+
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
-use std::cmp::min;
-use std::ops::Neg;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 

@@ -7,9 +7,9 @@ use num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoPow, ModPowerOfTwoPowAssign,
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
     ModPowerOfTwoSquare, ModPowerOfTwoSquareAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign,
-    ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
-    NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ,
-    XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    ModSquare, ModSquareAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
+    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ,
+    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -93,6 +93,8 @@ pub trait PrimitiveUnsigned:
     + ModPowerOfTwoSubAssign<Self>
     + ModPowPrecomputed<u64, Self, Output = Self>
     + ModPowPrecomputedAssign<u64, Self>
+    + ModSquare<Self, Output = Self>
+    + ModSquareAssign<Self>
     + ModSub<Self, Self, Output = Self>
     + ModSubAssign<Self, Self>
     + NegMod<Self, Output = Self>

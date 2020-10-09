@@ -15,16 +15,16 @@ pub fn to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
     bits
 }
 
-pub fn from_bits_asc_alt<T: BitConvertible>(bits: &[bool]) -> T {
-    let mut bits = bits.to_vec();
+pub fn from_bits_asc_alt<T: BitConvertible, I: Iterator<Item = bool>>(bits: I) -> T {
+    let mut bits: Vec<_> = bits.collect();
     bits.reverse();
-    T::from_bits_desc(&bits)
+    T::from_bits_desc(bits.into_iter())
 }
 
-pub fn from_bits_desc_alt<T: BitConvertible>(bits: &[bool]) -> T {
-    let mut bits = bits.to_vec();
+pub fn from_bits_desc_alt<T: BitConvertible, I: Iterator<Item = bool>>(bits: I) -> T {
+    let mut bits: Vec<_> = bits.collect();
     bits.reverse();
-    T::from_bits_asc(&bits)
+    T::from_bits_asc(bits.into_iter())
 }
 
 pub fn to_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
@@ -43,25 +43,11 @@ pub fn to_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn from_bits_asc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
+pub fn from_bits_asc_unsigned_naive<T: PrimitiveUnsigned, I: Iterator<Item = bool>>(bits: I) -> T {
     let mut n = T::ZERO;
     for i in bits
-        .iter()
         .enumerate()
-        .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
-    {
-        n.set_bit(i);
-    }
-    n
-}
-
-pub fn from_bits_desc_unsigned_naive<T: PrimitiveUnsigned>(bits: &[bool]) -> T {
-    let mut n = T::ZERO;
-    for i in
-        bits.iter()
-            .rev()
-            .enumerate()
-            .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
+        .filter_map(|(i, bit)| if bit { Some(u64::exact_from(i)) } else { None })
     {
         n.set_bit(i);
     }
@@ -99,7 +85,8 @@ pub fn to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
     bits
 }
 
-pub fn from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
+pub fn from_bits_asc_signed_naive<T: PrimitiveSigned, I: Iterator<Item = bool>>(bits: I) -> T {
+    let bits: Vec<_> = bits.collect();
     if bits.is_empty() {
         return T::ZERO;
     }
@@ -120,37 +107,6 @@ pub fn from_bits_asc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
                 .enumerate()
                 .filter_map(|(i, &bit)| if bit { Some(u64::exact_from(i)) } else { None })
         {
-            n.set_bit(i);
-        }
-    };
-    n
-}
-
-pub fn from_bits_desc_signed_naive<T: PrimitiveSigned>(bits: &[bool]) -> T {
-    if bits.is_empty() {
-        return T::ZERO;
-    }
-    let mut n;
-    if bits[0] {
-        n = T::NEGATIVE_ONE;
-        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
-            if bit {
-                None
-            } else {
-                Some(u64::exact_from(i))
-            }
-        }) {
-            n.clear_bit(i);
-        }
-    } else {
-        n = T::ZERO;
-        for i in bits.iter().rev().enumerate().filter_map(|(i, &bit)| {
-            if bit {
-                Some(u64::exact_from(i))
-            } else {
-                None
-            }
-        }) {
             n.set_bit(i);
         }
     };

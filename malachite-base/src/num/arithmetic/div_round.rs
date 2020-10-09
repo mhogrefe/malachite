@@ -1,9 +1,10 @@
+use std::fmt::Display;
+use std::ops::{Add, Div, Mul, Shr, Sub};
+
 use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs, WrappingNeg};
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use rounding_modes::RoundingMode;
-use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Shr, Sub};
 
 fn _div_round_unsigned<
     T: Add<T, Output = T>

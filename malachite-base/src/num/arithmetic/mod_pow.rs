@@ -388,16 +388,7 @@ macro_rules! impl_mod_pow {
             }
         }
 
-        /// Provides functions for computing `self.pow(exp)` and `self.square()` mod `m`.
-        ///
-        /// # Examples
-        /// ```
-        /// use malachite_base::num::arithmetic::traits::ModPow;
-        ///
-        /// assert_eq!(100u32.mod_square(497), 60);
-        /// assert_eq!(200u32.mod_square(497), 240);
-        /// assert_eq!(300u32.mod_square(497), 43);
-        /// ```
+        /// Provides functions for computing `self.pow(exp)` mod `m`.
         impl ModPow<u64> for $t {
             type Output = $t;
 
@@ -418,24 +409,7 @@ macro_rules! impl_mod_pow {
             }
         }
 
-        /// Provides functions for replacing `self` with `self.pow(exp)` or `self.square()` mod `m`.
-        ///
-        /// # Examples
-        /// ```
-        /// use malachite_base::num::arithmetic::traits::ModPowAssign;
-        ///
-        /// let mut n = 100u32;
-        /// n.mod_square_assign(497);
-        /// assert_eq!(n, 60);
-        ///
-        /// let mut n = 200u32;
-        /// n.mod_square_assign(497);
-        /// assert_eq!(n, 240);
-        ///
-        /// let mut n = 300u32;
-        /// n.mod_square_assign(497);
-        /// assert_eq!(n, 43);
-        /// ```
+        /// Provides functions for replacing `self` with `self.pow(exp)` mod `m`.
         impl ModPowAssign<u64> for $t {
             /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the input is already reduced
             /// mod `m`.

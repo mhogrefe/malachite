@@ -1,3 +1,5 @@
+use std::ops::{Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoShl, ModPowerOfTwoShlAssign, UnsignedAbs,
 };
@@ -6,7 +8,30 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 use natural::Natural;
 
-//TODO clean
+fn _mod_power_of_two_shl_unsigned<T>(x: &Natural, bits: T, pow: u64) -> Natural
+where
+    u64: ExactFrom<T>,
+{
+    let bits = u64::exact_from(bits);
+    if bits >= pow {
+        Natural::ZERO
+    } else {
+        x.mod_power_of_two(pow - bits) << bits
+    }
+}
+
+fn _mod_power_of_two_shl_assign_unsigned<T>(x: &mut Natural, bits: T, pow: u64)
+where
+    u64: ExactFrom<T>,
+{
+    let bits = u64::exact_from(bits);
+    if bits >= pow {
+        *x = Natural::ZERO;
+    } else {
+        x.mod_power_of_two_assign(pow - bits);
+        *x <<= bits;
+    }
+}
 
 macro_rules! impl_mod_power_of_two_shl_unsigned {
     ($t:ident) => {
@@ -63,13 +88,9 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
         impl<'a> ModPowerOfTwoShl<$t> for &'a Natural {
             type Output = Natural;
 
+            #[inline]
             fn mod_power_of_two_shl(self, bits: $t, pow: u64) -> Natural {
-                let bits = u64::exact_from(bits);
-                if bits >= pow {
-                    Natural::ZERO
-                } else {
-                    self.mod_power_of_two(pow - bits) << bits
-                }
+                _mod_power_of_two_shl_unsigned(self, bits, pow)
             }
         }
 
@@ -99,19 +120,43 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
         /// assert_eq!(n, 0);
         /// ```
         impl ModPowerOfTwoShlAssign<$t> for Natural {
+            #[inline]
             fn mod_power_of_two_shl_assign(&mut self, bits: $t, pow: u64) {
-                let bits = u64::exact_from(bits);
-                if bits >= pow {
-                    *self = Natural::ZERO;
-                } else {
-                    self.mod_power_of_two_assign(pow - bits);
-                    *self <<= bits;
-                }
+                _mod_power_of_two_shl_assign_unsigned(self, bits, pow);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_mod_power_of_two_shl_unsigned);
+
+fn _mod_power_of_two_shl_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+    pow: u64,
+) -> Natural
+where
+    &'a Natural: ModPowerOfTwoShl<U, Output = Natural> + Shr<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x.mod_power_of_two_shl(bits.unsigned_abs(), pow)
+    } else {
+        x >> bits.unsigned_abs()
+    }
+}
+
+fn _mod_power_of_two_shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &mut Natural,
+    bits: S,
+    pow: u64,
+) where
+    Natural: ModPowerOfTwoShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        x.mod_power_of_two_shl_assign(bits.unsigned_abs(), pow);
+    } else {
+        *x >>= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_mod_power_of_two_shl_signed {
     ($t:ident) => {
@@ -170,12 +215,9 @@ macro_rules! impl_mod_power_of_two_shl_signed {
         impl<'a> ModPowerOfTwoShl<$t> for &'a Natural {
             type Output = Natural;
 
+            #[inline]
             fn mod_power_of_two_shl(self, bits: $t, pow: u64) -> Natural {
-                if bits >= 0 {
-                    self.mod_power_of_two_shl(bits.unsigned_abs(), pow)
-                } else {
-                    self >> bits.unsigned_abs()
-                }
+                _mod_power_of_two_shl_signed(self, bits, pow)
             }
         }
 
@@ -209,12 +251,9 @@ macro_rules! impl_mod_power_of_two_shl_signed {
         /// assert_eq!(n, 30);
         /// ```
         impl ModPowerOfTwoShlAssign<$t> for Natural {
+            #[inline]
             fn mod_power_of_two_shl_assign(&mut self, bits: $t, pow: u64) {
-                if bits >= 0 {
-                    self.mod_power_of_two_shl_assign(bits.unsigned_abs(), pow);
-                } else {
-                    *self >>= bits.unsigned_abs();
-                }
+                _mod_power_of_two_shl_assign_signed(self, bits, pow)
             }
         }
     };

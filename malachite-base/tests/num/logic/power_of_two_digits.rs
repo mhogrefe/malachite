@@ -90,7 +90,10 @@ pub fn test_from_power_of_two_digits_asc() {
         digits: &[U],
         out: T,
     ) {
-        assert_eq!(T::from_power_of_two_digits_asc(log_base, digits), out);
+        assert_eq!(
+            T::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
+            out
+        );
     };
 
     test::<u8, u64>(6, &[], 0);
@@ -107,19 +110,19 @@ fn from_power_of_two_digits_asc_fail_helper<
 >() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_two_digits_asc(U::WIDTH + 1, digits);
+        T::from_power_of_two_digits_asc(U::WIDTH + 1, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_two_digits_asc(0, digits);
+        T::from_power_of_two_digits_asc(0, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE; 100];
-        T::from_power_of_two_digits_asc(4, digits);
+        T::from_power_of_two_digits_asc(4, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::TWO];
-        T::from_power_of_two_digits_asc(1, digits);
+        T::from_power_of_two_digits_asc(1, digits.iter().cloned());
     });
 }
 
@@ -135,7 +138,10 @@ pub fn test_from_power_of_two_digits_desc() {
         digits: &[U],
         out: T,
     ) {
-        assert_eq!(T::from_power_of_two_digits_desc(log_base, digits), out);
+        assert_eq!(
+            T::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
+            out
+        );
     };
 
     test::<u8, u64>(6, &[], 0);
@@ -152,19 +158,19 @@ fn from_power_of_two_digits_desc_fail_helper<
 >() {
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_two_digits_desc(U::WIDTH + 1, digits);
+        T::from_power_of_two_digits_desc(U::WIDTH + 1, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE];
-        T::from_power_of_two_digits_desc(0, digits);
+        T::from_power_of_two_digits_desc(0, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::ONE; 100];
-        T::from_power_of_two_digits_desc(4, digits);
+        T::from_power_of_two_digits_desc(4, digits.iter().cloned());
     });
     assert_panic!({
         let digits: &[U] = &[U::TWO];
-        T::from_power_of_two_digits_desc(1, digits);
+        T::from_power_of_two_digits_desc(1, digits.iter().cloned());
     });
 }
 

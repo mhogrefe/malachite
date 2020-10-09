@@ -12,11 +12,7 @@ pub fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Int
     } else {
         Box::new(x.bits().chain(repeat(x_negative)).zip(y.bits()))
     };
-    let mut bits = Vec::new();
-    for (b, c) in bit_zip {
-        bits.push(bit_fn(b, c));
-    }
-    Integer::from_bits_asc(&bits)
+    Integer::from_bits_asc(bit_zip.map(|(b, c)| bit_fn(b, c)))
 }
 
 pub fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integer) -> Integer {

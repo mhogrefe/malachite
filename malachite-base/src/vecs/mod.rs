@@ -105,6 +105,52 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
+/// # lex_exhaustive_length_[n]_vecs
+/// ```
+/// use malachite_base::vecs::exhaustive::lex_exhaustive_length_2_vecs;
+///
+/// let xss = lex_exhaustive_length_2_vecs(
+///     ['a', 'b', 'c'].iter().cloned(),
+///     ['x', 'y', 'z'].iter().cloned()
+/// ).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['a', 'x'], &['a', 'y'], &['a', 'z'], &['b', 'x'], &['b', 'y'], &['b', 'z'],
+///         &['c', 'x'], &['c', 'y'], &['c', 'z']
+///     ]
+/// );
+/// ```
+///
+/// # lex_exhaustive_fixed_length_vecs_[m]_inputs
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::vecs::exhaustive::lex_exhaustive_fixed_length_vecs_2_inputs;
+///
+/// // We are generating length-3 `Vec`s of chars using two input iterators. The first iterator
+/// // (with index 0) produces all ASCII chars, and the second (index 1) produces the three chars
+/// // `'x'`, `'y'`, and `'z'`. The second elements of `output_types` are 0, 1, and 0, meaning that
+/// // the first element of the output `Vec`s will be taken from iterator 0, the second element from
+/// // iterator 1, and the third also from iterator 0.
+/// let xss = lex_exhaustive_fixed_length_vecs_2_inputs(
+///     exhaustive_ascii_chars(),
+///     ['x', 'y', 'z'].iter().cloned(),
+///     &[0, 1, 0],
+/// );
+/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
+///         &['a', 'x', 'e'], &['a', 'x', 'f'], &['a', 'x', 'g'], &['a', 'x', 'h'],
+///         &['a', 'x', 'i'], &['a', 'x', 'j'], &['a', 'x', 'k'], &['a', 'x', 'l'],
+///         &['a', 'x', 'm'], &['a', 'x', 'n'], &['a', 'x', 'o'], &['a', 'x', 'p'],
+///         &['a', 'x', 'q'], &['a', 'x', 'r'], &['a', 'x', 's'], &['a', 'x', 't']
+///     ]
+/// );
+/// ```
+///
 /// # exhaustive_length_[n]_vecs
 /// ```
 /// use malachite_base::vecs::exhaustive::exhaustive_length_2_vecs;
@@ -112,14 +158,47 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// let xss = exhaustive_length_2_vecs(
 ///     ['a', 'b', 'c'].iter().cloned(),
 ///     ['x', 'y', 'z'].iter().cloned()
-/// )
-///     .take(20)
-///     .collect::<Vec<_>>();
+/// ).collect::<Vec<_>>();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
 ///     &[
 ///         &['a', 'x'], &['a', 'y'], &['b', 'x'], &['b', 'y'], &['a', 'z'], &['b', 'z'],
 ///         &['c', 'x'], &['c', 'y'], &['c', 'z']
+///     ]
+/// );
+/// ```
+///
+/// # exhaustive_fixed_length_vecs_[m]_inputs
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_2_inputs;
+///
+/// // We are generating length-3 `Vec`s of chars using two input iterators. The first iterator
+/// // (with index 0) produces all ASCII chars, and the second (index 1) produces the three chars
+/// // `'x'`, `'y'`, and `'z'`. The second elements of `output_types` are 0, 1, and 0, meaning that
+/// // the first element of the output `Vec`s will be taken from iterator 0, the second element from
+/// // iterator 1, and the third also from iterator 0. The third element has a tiny output type, so
+/// // it will grow more slowly than the other two elements (though it doesn't look that way from
+/// // the first few `Vec`s).
+/// let xss = exhaustive_fixed_length_vecs_2_inputs(
+///     exhaustive_ascii_chars(),
+///     ['x', 'y', 'z'].iter().cloned(),
+///     &[
+///         (BitDistributorOutputType::normal(1), 0),
+///         (BitDistributorOutputType::normal(1), 1),
+///         (BitDistributorOutputType::tiny(), 0),
+///     ],
+/// );
+/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
+///         &['a', 'y', 'a'], &['a', 'y', 'b'], &['a', 'y', 'c'], &['a', 'y', 'd'],
+///         &['a', 'x', 'e'], &['a', 'x', 'f'], &['a', 'x', 'g'], &['a', 'x', 'h'],
+///         &['a', 'y', 'e'], &['a', 'y', 'f'], &['a', 'y', 'g'], &['a', 'y', 'h'],
+///         &['b', 'x', 'a'], &['b', 'x', 'b'], &['b', 'x', 'c'], &['b', 'x', 'd']
 ///     ]
 /// );
 /// ```

@@ -1,5 +1,6 @@
-use rounding_modes::RoundingMode;
 use std::ops::Neg;
+
+use rounding_modes::RoundingMode;
 
 /// Returns the negative of a `RoundingMode`.
 ///

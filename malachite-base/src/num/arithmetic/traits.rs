@@ -1,6 +1,7 @@
+use std::cmp::Ordering;
+
 use num::basic::traits::Two;
 use rounding_modes::RoundingMode;
-use std::cmp::Ordering;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoIsReduced {
@@ -1132,28 +1133,15 @@ pub trait ModPowerOfTwoPowAssign<RHS = Self> {
 }
 
 /// Computes `self.pow(exp)` mod `m`. Assumes the input is already reduced mod `m`.
-pub trait ModPow<RHS: Two = Self, M = Self>
-where
-    Self: Sized,
-{
+pub trait ModPow<RHS = Self, M = Self> {
     type Output;
 
     fn mod_pow(self, exp: RHS, m: M) -> Self::Output;
-
-    /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
-    fn mod_square(self, m: M) -> Self::Output {
-        self.mod_pow(RHS::TWO, m)
-    }
 }
 
 /// Replaces `self` with `self.pow(other)` mod `m`. Assumes the inputs are already reduced mod `m`.
-pub trait ModPowAssign<RHS: Two = Self, M = Self> {
+pub trait ModPowAssign<RHS = Self, M = Self> {
     fn mod_pow_assign(&mut self, exp: RHS, m: M);
-
-    /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced  mod `m`.
-    fn mod_square_assign(&mut self, m: M) {
-        self.mod_pow_assign(RHS::TWO, m);
-    }
 }
 
 /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
@@ -1270,6 +1258,18 @@ pub trait ModPowerOfTwoSquare {
 /// mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoSquareAssign {
     fn mod_power_of_two_square_assign(&mut self, pow: u64);
+}
+
+/// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+pub trait ModSquare<M = Self> {
+    type Output;
+
+    fn mod_square(self, m: M) -> Self::Output;
+}
+
+/// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced  mod `m`.
+pub trait ModSquareAssign<M = Self> {
+    fn mod_square_assign(&mut self, m: M);
 }
 
 pub trait CheckedLogTwo {

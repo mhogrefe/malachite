@@ -17,10 +17,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     ///
     #[inline]
     fn lt_abs(&self, other: &Rhs) -> bool {
-        match self.partial_cmp_abs(other) {
-            Some(Ordering::Less) => true,
-            _ => false,
-        }
+        matches!(self.partial_cmp_abs(other), Some(Ordering::Less))
     }
 
     /// Determines whether |`self`| <= |`other`|.
@@ -33,10 +30,10 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     ///
     #[inline]
     fn le_abs(&self, other: &Rhs) -> bool {
-        match self.partial_cmp_abs(other) {
-            Some(Ordering::Less) | Some(Ordering::Equal) => true,
-            _ => false,
-        }
+        matches!(
+            self.partial_cmp_abs(other),
+            Some(Ordering::Less) | Some(Ordering::Equal)
+        )
     }
 
     /// Determines whether |`self`| > |`other`|.
@@ -49,10 +46,7 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     ///
     #[inline]
     fn gt_abs(&self, other: &Rhs) -> bool {
-        match self.partial_cmp_abs(other) {
-            Some(Ordering::Greater) => true,
-            _ => false,
-        }
+        matches!(self.partial_cmp_abs(other), Some(Ordering::Greater))
     }
 
     /// Determines whether |`self`| >= |`other`|.
@@ -65,10 +59,10 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self>: PartialEq<Rhs> {
     ///
     #[inline]
     fn ge_abs(&self, other: &Rhs) -> bool {
-        match self.partial_cmp_abs(other) {
-            Some(Ordering::Greater) | Some(Ordering::Equal) => true,
-            _ => false,
-        }
+        matches!(
+            self.partial_cmp_abs(other),
+            Some(Ordering::Greater) | Some(Ordering::Equal)
+        )
     }
 }
 

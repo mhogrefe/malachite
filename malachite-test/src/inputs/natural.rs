@@ -249,6 +249,11 @@ pub fn triples_of_naturals_var_4(gm: GenerationMode) -> It<(Natural, Natural, Na
     Box::new(triples_of_naturals(gm).filter(|&(ref x, ref y, ref m)| x < m && y < m))
 }
 
+// All triples of `Natural`s where the first is smaller than the third.
+pub fn triples_of_naturals_var_5(gm: GenerationMode) -> It<(Natural, Natural, Natural)> {
+    Box::new(triples_of_naturals(gm).filter(|&(ref x, _, ref m)| x < m))
+}
+
 pub fn triples_of_natural_natural_and_positive_natural(
     gm: GenerationMode,
 ) -> It<(Natural, Natural, Natural)> {
@@ -1609,6 +1614,20 @@ pub fn quadruples_of_naturals_var_1(
     Box::new(
         quadruples_of_naturals(gm).filter(|&(ref x, ref y, ref z, ref m)| x < m && y < m && z < m),
     )
+}
+
+// All quadruples of `Natural`s where the first two are smaller than the fourth.
+pub fn quadruples_of_naturals_var_2(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(quadruples_of_naturals(gm).filter(|&(ref x, ref y, _, ref m)| x < m && y < m))
+}
+
+// All quadruples of `Natural`s where the first is smaller than the fourth.
+pub fn quadruples_of_naturals_var_3(
+    gm: GenerationMode,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(quadruples_of_naturals(gm).filter(|&(ref x, _, _, ref m)| x < m))
 }
 
 // All quadruples of `Natural`, `Natural`, `Natural` and `u64`, where the `u64` is greater than or

@@ -43,5 +43,8 @@ pub mod exhaustive {
     pub mod exhaustive_fixed_length_vecs_from_single;
     pub mod exhaustive_fixed_length_vecs_m_inputs;
     pub mod exhaustive_length_n_vecs;
+    pub mod lex_exhaustive_fixed_length_vecs_from_single;
+    pub mod lex_exhaustive_fixed_length_vecs_m_inputs;
+    pub mod lex_exhaustive_length_n_vecs;
 }
 pub mod random_values_from_vec;

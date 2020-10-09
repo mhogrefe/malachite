@@ -511,14 +511,12 @@ pub fn negative_truncated_geometric_dist_assertions<
         abs_max.unsigned_abs(),
         abs_unadjusted_mean,
     );
-    let (x, y) = if let Some(y) = y {
+    let (x, y) = y.map_or((S::wrapping_from(x.wrapping_neg()), None), |y| {
         (
             S::wrapping_from(y.wrapping_neg()),
             Some(S::wrapping_from(x.wrapping_neg())),
         )
-    } else {
-        (S::wrapping_from(x.wrapping_neg()), None)
-    };
+    });
     assert_eq!(
         (
             actual_values.as_slice(),

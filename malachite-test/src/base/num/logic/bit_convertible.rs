@@ -4,9 +4,8 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive,
-    from_bits_desc_alt, from_bits_desc_signed_naive, from_bits_desc_unsigned_naive,
-    to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive, to_bits_desc_alt,
-    to_bits_desc_signed_naive, to_bits_desc_unsigned_naive,
+    from_bits_desc_alt, to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive,
+    to_bits_desc_alt, to_bits_desc_signed_naive, to_bits_desc_unsigned_naive,
 };
 use rand::Rand;
 
@@ -15,8 +14,6 @@ use malachite_test::inputs::base::{
     signeds, unsigneds, vecs_of_bool_var_2, vecs_of_bool_var_3, vecs_of_bool_var_4,
     vecs_of_bool_var_5,
 };
-
-//TODO from_bit_iterator_asc and from_bit_iterator_desc
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_u8_to_bits_asc);
@@ -240,7 +237,7 @@ fn demo_unsigned_from_bits_asc<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, 
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
             bits,
-            T::from_bits_asc(&bits)
+            T::from_bits_asc(bits.iter().cloned())
         );
     }
 }
@@ -255,7 +252,7 @@ where
             "{}::from_bits_asc({:?}) = {}",
             T::NAME,
             bits,
-            T::from_bits_asc(&bits)
+            T::from_bits_asc(bits.iter().cloned())
         );
     }
 }
@@ -266,7 +263,7 @@ fn demo_unsigned_from_bits_desc<T: PrimitiveUnsigned + Rand>(gm: GenerationMode,
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
             bits,
-            T::from_bits_desc(&bits)
+            T::from_bits_desc(bits.iter().cloned())
         );
     }
 }
@@ -281,7 +278,7 @@ where
             "{}::from_bits_desc({:?}) = {}",
             T::NAME,
             bits,
-            T::from_bits_desc(&bits)
+            T::from_bits_desc(bits.iter().cloned())
         );
     }
 }
@@ -500,7 +497,7 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
     file_name: &str,
 ) {
     run_benchmark_old(
-        &format!("{}::from_bits_asc(&[bool])", T::NAME),
+        &format!("{}::from_bits_asc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_2::<T>(gm),
         gm.name(),
@@ -509,14 +506,19 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned + Rand>(
         &(|bits| bits.len()),
         "bits.len()",
         &mut [
-            ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
+            (
+                "default",
+                &mut (|ref bits| no_out!(T::from_bits_asc(bits.iter().cloned()))),
+            ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_asc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<T, _>(bits.iter().cloned()))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(from_bits_asc_unsigned_naive::<T>(bits))),
+                &mut (|ref bits| {
+                    no_out!(from_bits_asc_unsigned_naive::<T, _>(bits.iter().cloned()))
+                }),
             ),
         ],
     );
@@ -531,7 +533,7 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     run_benchmark_old(
-        &format!("{}::from_bits_asc(&[bool])", T::NAME),
+        &format!("{}::from_bits_asc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_3::<T>(gm),
         gm.name(),
@@ -540,14 +542,17 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned + Rand>(
         &(|bits| bits.len()),
         "bits.len()",
         &mut [
-            ("default", &mut (|ref bits| no_out!(T::from_bits_asc(bits)))),
+            (
+                "default",
+                &mut (|ref bits| no_out!(T::from_bits_asc(bits.iter().cloned()))),
+            ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_asc_alt::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_alt::<T, _>(bits.iter().cloned()))),
             ),
             (
                 "naive",
-                &mut (|ref bits| no_out!(from_bits_asc_signed_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_asc_signed_naive::<T, _>(bits.iter().cloned()))),
             ),
         ],
     );
@@ -559,7 +564,7 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
     file_name: &str,
 ) {
     run_benchmark_old(
-        &format!("{}::from_bits_desc(&[bool])", T::NAME),
+        &format!("{}::from_bits_desc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_4::<T>(gm),
         gm.name(),
@@ -570,15 +575,11 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned + Rand>(
         &mut [
             (
                 "Malachite",
-                &mut (|ref bits| no_out!(T::from_bits_desc(bits))),
+                &mut (|ref bits| no_out!(T::from_bits_desc(bits.iter().cloned()))),
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_desc_alt::<T>(bits))),
-            ),
-            (
-                "naive",
-                &mut (|ref bits| no_out!(from_bits_desc_unsigned_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<T, _>(bits.iter().cloned()))),
             ),
         ],
     );
@@ -593,7 +594,7 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     run_benchmark_old(
-        &format!("{}::from_bits_desc(&[bool])", T::NAME),
+        &format!("{}::from_bits_desc<I: Iterator<Item=bool>>(I)", T::NAME),
         BenchmarkType::Algorithms,
         vecs_of_bool_var_5::<T>(gm),
         gm.name(),
@@ -604,15 +605,11 @@ fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned + Rand>(
         &mut [
             (
                 "Malachite",
-                &mut (|ref bits| no_out!(T::from_bits_desc(bits))),
+                &mut (|ref bits| no_out!(T::from_bits_desc(bits.iter().cloned()))),
             ),
             (
                 "alt",
-                &mut (|ref bits| no_out!(from_bits_desc_alt::<T>(bits))),
-            ),
-            (
-                "naive",
-                &mut (|ref bits| no_out!(from_bits_desc_signed_naive::<T>(bits))),
+                &mut (|ref bits| no_out!(from_bits_desc_alt::<T, _>(bits.iter().cloned()))),
             ),
         ],
     );

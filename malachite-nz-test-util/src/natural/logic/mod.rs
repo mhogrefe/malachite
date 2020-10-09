@@ -11,11 +11,7 @@ pub fn natural_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Natural, y: &Nat
         } else {
             Box::new(x.bits().chain(repeat(false)).zip(y.bits()))
         };
-    let mut and_bits = Vec::new();
-    for (b, c) in bit_zip {
-        and_bits.push(bit_fn(b, c));
-    }
-    Natural::from_bits_asc(&and_bits)
+    Natural::from_bits_asc(bit_zip.map(|(b, c)| bit_fn(b, c)))
 }
 
 pub fn natural_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Natural, y: &Natural) -> Natural {

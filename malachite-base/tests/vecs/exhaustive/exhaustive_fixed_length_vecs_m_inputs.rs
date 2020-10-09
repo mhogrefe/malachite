@@ -254,4 +254,34 @@ fn test_exhaustive_fixed_length_vecs_2_inputs() {
     );
 }
 
-//TODO failures
+#[test]
+#[should_panic]
+fn exhaustive_fixed_length_vecs_2_inputs_fail_1() {
+    exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[]);
+}
+
+#[test]
+#[should_panic]
+fn exhaustive_fixed_length_vecs_2_inputs_fail_2() {
+    exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[(BitDistributorOutputType::normal(1), 0)]);
+}
+
+#[test]
+#[should_panic]
+fn exhaustive_fixed_length_vecs_2_inputs_fail_3() {
+    exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[(BitDistributorOutputType::normal(1), 1)]);
+}
+
+#[test]
+#[should_panic]
+fn exhaustive_fixed_length_vecs_2_inputs_fail_4() {
+    exhaustive_fixed_length_vecs_2_inputs(
+        0..2,
+        0..3,
+        &[
+            (BitDistributorOutputType::normal(1), 0),
+            (BitDistributorOutputType::normal(1), 1),
+            (BitDistributorOutputType::normal(1), 2),
+        ],
+    );
+}

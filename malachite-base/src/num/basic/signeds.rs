@@ -1,3 +1,5 @@
+use std::ops::Neg;
+
 use num::arithmetic::traits::{
     Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign,
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, CheckedAbs, NegAssign, OverflowingAbs,
@@ -9,7 +11,6 @@ use num::basic::traits::NegativeOne;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::CheckedHammingDistance;
 use num::random::{HasRandomSignedRange, RandomSignedChunkable};
-use std::ops::Neg;
 
 /// This trait defines functions on primitive unsigned integral types: ixx and isize.
 pub trait PrimitiveSigned:

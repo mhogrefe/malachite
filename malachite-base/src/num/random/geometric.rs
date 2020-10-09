@@ -81,6 +81,8 @@ impl SimpleRational {
         }
     }
 
+    // unwrap not const yet
+    #[allow(clippy::missing_const_for_fn)]
     pub(crate) fn add_u64(self, x: u64) -> SimpleRational {
         SimpleRational {
             n: self.n.checked_add(x.checked_mul(self.d).unwrap()).unwrap(),
@@ -88,6 +90,8 @@ impl SimpleRational {
         }
     }
 
+    // unwrap not const yet
+    #[allow(clippy::missing_const_for_fn)]
     fn sub_u64(self, x: u64) -> SimpleRational {
         SimpleRational {
             n: self.n.checked_sub(x.checked_mul(self.d).unwrap()).unwrap(),

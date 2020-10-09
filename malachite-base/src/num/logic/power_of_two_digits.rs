@@ -1,9 +1,10 @@
+use std::ops::{BitOr, BitOrAssign, ShrAssign};
+
 use num::arithmetic::traits::ArithmeticCheckedShl;
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
-use num::conversion::traits::WrappingFrom;
+use num::conversion::traits::{CheckedFrom, WrappingFrom};
 use num::logic::traits::{PowerOfTwoDigits, SignificantBits};
-use std::ops::{BitOr, ShrAssign};
 
 fn _to_power_of_two_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
@@ -48,11 +49,16 @@ fn _to_power_of_two_digits_desc<
 }
 
 fn _from_power_of_two_digits_asc<
-    T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
+    T: ArithmeticCheckedShl<u64, Output = T>
+        + BitOrAssign<T>
+        + CheckedFrom<U>
+        + WrappingFrom<U>
+        + Zero,
     U: PrimitiveInt,
+    I: Iterator<Item = U>,
 >(
     log_base: u64,
-    digits: &[U],
+    digits: I,
 ) -> T {
     assert_ne!(log_base, 0);
     if log_base > U::WIDTH {
@@ -63,12 +69,13 @@ fn _from_power_of_two_digits_asc<
         );
     }
     let mut n = T::ZERO;
-    for &digit in digits.iter().rev() {
+    let mut shift = 0;
+    for digit in digits {
         assert!(digit.significant_bits() <= log_base);
-        let shifted = n
-            .arithmetic_checked_shl(log_base)
+        n |= T::checked_from(digit)
+            .and_then(|d| d.arithmetic_checked_shl(shift))
             .expect("value represented by digits is too large");
-        n = shifted | T::wrapping_from(digit);
+        shift += log_base;
     }
     n
 }
@@ -76,9 +83,10 @@ fn _from_power_of_two_digits_asc<
 fn _from_power_of_two_digits_desc<
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
     U: PrimitiveInt,
+    I: Iterator<Item = U>,
 >(
     log_base: u64,
-    digits: &[U],
+    digits: I,
 ) -> T {
     assert_ne!(log_base, 0);
     if log_base > U::WIDTH {
@@ -89,7 +97,7 @@ fn _from_power_of_two_digits_desc<
         );
     }
     let mut n = T::ZERO;
-    for &digit in digits {
+    for digit in digits {
         assert!(digit.significant_bits() <= log_base);
         let shifted = n
             .arithmetic_checked_shl(log_base)
@@ -182,8 +190,8 @@ macro_rules! impl_power_of_two_digits {
                         _to_power_of_two_digits_desc(self, log_base)
                     }
 
-                    /// Converts a slice of digits into a value, where the base is a power of two.
-                    /// The base-2 logarithm of the base is specified. The input digits are in
+                    /// Converts an iterator of digits into a value, where the base is a power of
+                    /// two. The base-2 logarithm of the base is specified. The input digits are in
                     /// ascending order: least- to most-significant. The type of each digit is `$u`,
                     /// and `log_base` must be no larger than the width of `$u`. The function panics
                     /// if the input represents a number that can't fit in $t.
@@ -192,7 +200,7 @@ macro_rules! impl_power_of_two_digits {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// where n = `digits.len()`
+                    /// where n = `digits.count()`
                     ///
                     /// # Panics
                     /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
@@ -204,21 +212,27 @@ macro_rules! impl_power_of_two_digits {
                     /// use malachite_base::num::logic::traits::PowerOfTwoDigits;
                     ///
                     /// let digits: &[u64] = &[0, 0, 0];
-                    /// assert_eq!(u8::from_power_of_two_digits_asc(6, digits), 0);
+                    /// assert_eq!(u8::from_power_of_two_digits_asc(6, digits.iter().cloned()), 0);
                     ///
                     /// let digits: &[u64] = &[2, 0];
-                    /// assert_eq!(u16::from_power_of_two_digits_asc(6, digits), 2);
+                    /// assert_eq!(u16::from_power_of_two_digits_asc(6, digits.iter().cloned()), 2);
                     ///
                     /// let digits: &[u16] = &[3, 7, 1];
-                    /// assert_eq!(u32::from_power_of_two_digits_asc(3, digits), 123);
+                    /// assert_eq!(
+                    ///     u32::from_power_of_two_digits_asc(3, digits.iter().cloned()),
+                    ///     123
+                    /// );
                     /// ```
                     #[inline]
-                    fn from_power_of_two_digits_asc(log_base: u64, digits: &[$u]) -> $t {
+                    fn from_power_of_two_digits_asc<I: Iterator<Item = $u>>(
+                        log_base: u64,
+                        digits: I,
+                    ) -> $t {
                         _from_power_of_two_digits_asc(log_base, digits)
                     }
 
-                    /// Converts a slice of digits into a value, where the base is a power of two.
-                    /// The base-2 logarithm of the base is specified. The input digits are in
+                    /// Converts an iterator of digits into a value, where the base is a power of
+                    /// two. The base-2 logarithm of the base is specified. The input digits are in
                     /// descending order: most- to least-significant. The type of each digit is
                     /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
                     /// panics if the input represents a number that can't fit in $t.
@@ -227,7 +241,7 @@ macro_rules! impl_power_of_two_digits {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// where n = `digits.len()`
+                    /// where n = `digits.count()`
                     ///
                     /// # Panics
                     /// Panics if `log_base` is greater than the width of `$u`, if `log_base` is
@@ -239,34 +253,25 @@ macro_rules! impl_power_of_two_digits {
                     /// use malachite_base::num::logic::traits::PowerOfTwoDigits;
                     ///
                     /// let digits: &[u64] = &[0, 0, 0];
-                    /// assert_eq!(u8::from_power_of_two_digits_desc(6, digits), 0);
+                    /// assert_eq!(u8::from_power_of_two_digits_desc(6, digits.iter().cloned()), 0);
                     ///
                     /// let digits: &[u64] = &[0, 2];
-                    /// assert_eq!(u16::from_power_of_two_digits_desc(6, digits), 2);
+                    /// assert_eq!(
+                    ///     u16::from_power_of_two_digits_desc(6, digits.iter().cloned()),
+                    ///     2
+                    /// );
                     ///
                     /// let digits: &[u16] = &[1, 7, 3];
-                    /// assert_eq!(u32::from_power_of_two_digits_desc(3, digits), 123);
+                    /// assert_eq!(
+                    ///     u32::from_power_of_two_digits_desc(3, digits.iter().cloned()),
+                    ///     123
+                    /// );
                     /// ```
-                    fn from_power_of_two_digits_desc(log_base: u64, digits: &[$u]) -> $t {
+                    fn from_power_of_two_digits_desc<I: Iterator<Item = $u>>(
+                        log_base: u64,
+                        digits: I,
+                    ) -> $t {
                         _from_power_of_two_digits_desc(log_base, digits)
-                    }
-
-                    /// TODO doc
-                    #[inline]
-                    fn from_power_of_two_digit_iterator_asc<I: Iterator<Item = $u>>(
-                        _log_base: u64,
-                        _digits: I,
-                    ) -> $t {
-                        unimplemented!();
-                    }
-
-                    /// TODO doc
-                    #[inline]
-                    fn from_power_of_two_digit_iterator_desc<I: Iterator<Item = $u>>(
-                        _log_base: u64,
-                        _digits: I,
-                    ) -> $t {
-                        unimplemented!();
                     }
                 }
             };
