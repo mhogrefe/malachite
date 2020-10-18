@@ -6,7 +6,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::floats::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::Natural;
 
 macro_rules! float_impls {

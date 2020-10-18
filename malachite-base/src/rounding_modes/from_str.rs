@@ -7,6 +7,9 @@ impl FromStr for RoundingMode {
 
     /// Converts a `String` to a `RoundingMode`.
     ///
+    /// If the `&str` does not represent a valid `RoundingMode`, an `Err` is returned with the
+    /// unparseable `String`.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///

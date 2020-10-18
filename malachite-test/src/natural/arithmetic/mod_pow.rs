@@ -2,11 +2,16 @@ use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
+use malachite_nz::natural::arithmetic::mod_pow::{
+    limbs_mod_pow_odd, limbs_mod_pow_odd_scratch_len,
+};
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
+use malachite_test::inputs::base::quadruples_of_unsigned_vec_var_1;
 use malachite_test::inputs::natural::triples_of_naturals_var_5;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_mod_pow_odd);
     register_demo!(registry, demo_natural_mod_pow_assign);
     register_demo!(registry, demo_natural_mod_pow_assign_val_ref);
     register_demo!(registry, demo_natural_mod_pow_assign_ref_val);
@@ -20,6 +25,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mod_pow_ref_ref_val);
     register_demo!(registry, demo_natural_mod_pow_ref_ref_ref);
 
+    register_bench!(registry, Small, benchmark_limbs_mod_pow_odd);
     register_bench!(
         registry,
         Large,
@@ -30,6 +36,18 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_mod_pow_evaluation_strategy
     );
+}
+
+fn demo_limbs_mod_pow_odd(gm: GenerationMode, limit: usize) {
+    for (mut out, xs, es, ms) in quadruples_of_unsigned_vec_var_1(gm.with_scale(32)).take(limit) {
+        let out_old = out.clone();
+        let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(ms.len())];
+        limbs_mod_pow_odd(&mut out, &xs, &es, &ms, &mut scratch);
+        println!(
+            "out := {:?}; limbs_mod_pow_odd(&mut out, {:?}, {:?}, {:?}, &mut scratch); out = {:?}",
+            out_old, xs, es, ms, out
+        );
+    }
 }
 
 fn demo_natural_mod_pow_assign(gm: GenerationMode, limit: usize) {
@@ -186,6 +204,26 @@ fn demo_natural_mod_pow_ref_ref_ref(gm: GenerationMode, limit: usize) {
             m
         );
     }
+}
+
+fn benchmark_limbs_mod_pow_odd(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark_old(
+        "limbs_mod_pow_odd(&mut [Limb], &[Limb], &[Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Single,
+        quadruples_of_unsigned_vec_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, _, ref ms)| ms.len()),
+        "ms.len()",
+        &mut [(
+            "Malachite",
+            &mut (|(mut out, xs, es, ms)| {
+                let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(ms.len())];
+                limbs_mod_pow_odd(&mut out, &xs, &es, &ms, &mut scratch);
+            }),
+        )],
+    );
 }
 
 fn benchmark_natural_mod_pow_assign_evaluation_strategy(

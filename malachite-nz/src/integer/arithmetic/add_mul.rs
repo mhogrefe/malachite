@@ -1,11 +1,10 @@
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
-
 use integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left,
 };
 use integer::Integer;
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

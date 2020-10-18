@@ -16,6 +16,7 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::tuples::exhaustive::lex_pairs;
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_nz::integer::exhaustive::{
@@ -49,7 +50,7 @@ use rust_wheels::iterators::primitive_ints::{special_random_signed, special_rand
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, log_pairs, random_pairs, random_pairs_from_single,
+    exhaustive_triples_from_single, log_pairs, random_pairs, random_pairs_from_single,
     random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
 };
 

@@ -1,7 +1,3 @@
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::ops::{Rem, RemAssign};
-
 use malachite_base::num::arithmetic::traits::{
     Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, PowerOfTwo, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
@@ -11,7 +7,6 @@ use malachite_base::num::basic::traits::{Iverson, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -44,6 +39,9 @@ use platform::{
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
     MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use std::cmp::Ordering;
+use std::mem::swap;
+use std::ops::{Rem, RemAssign};
 
 /// Time: O(1)
 ///
@@ -870,8 +868,7 @@ pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(rs, &[2576980381, 2, 10, 10]);
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where just the remainder is
-/// calculated.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where qp is not calculated.
 pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();

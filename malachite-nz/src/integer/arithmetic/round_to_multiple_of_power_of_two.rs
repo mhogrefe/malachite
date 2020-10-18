@@ -1,9 +1,8 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign,
 };
 use malachite_base::rounding_modes::RoundingMode;
-
-use integer::Integer;
 
 impl RoundToMultipleOfPowerOfTwo<u64> for Integer {
     type Output = Integer;

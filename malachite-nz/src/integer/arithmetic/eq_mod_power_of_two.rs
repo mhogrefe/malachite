@@ -1,8 +1,7 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-
-use integer::Integer;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;

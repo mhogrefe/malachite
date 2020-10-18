@@ -1,5 +1,5 @@
 use std::char;
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
@@ -32,6 +32,7 @@ use malachite_base::num::logic::traits::{
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base::tuples::exhaustive::{lex_pairs, lex_triples};
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
@@ -79,6 +80,7 @@ use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
 };
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
+use malachite_nz::natural::comparison::ord::limbs_cmp;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
@@ -113,8 +115,8 @@ use rust_wheels::iterators::tuples::{
     exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
     exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
     exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
-    lex_pairs, lex_triples, log_pairs, random_octuples_from_single, random_pairs,
-    random_pairs_from_single, random_quadruples, random_quadruples_from_single, random_quintuples,
+    log_pairs, random_octuples_from_single, random_pairs, random_pairs_from_single,
+    random_quadruples, random_quadruples_from_single, random_quintuples,
     random_sextuples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{
@@ -2934,6 +2936,43 @@ fn triples_of_unsigned_vec<T: PrimitiveUnsigned + Rand>(
             special_random_unsigned_vecs(&EXAMPLE_SEED, scale),
         )),
     }
+}
+
+fn quadruples_of_unsigned_vec<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>, Vec<T>, Vec<T>)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_quadruples_from_single(exhaustive_vecs(
+            exhaustive_unsigneds(),
+        ))),
+        GenerationMode::Random(scale) => Box::new(random_quadruples_from_single(random_vecs(
+            &EXAMPLE_SEED,
+            scale,
+            &(|seed| random(seed)),
+        ))),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_quadruples_from_single(
+            special_random_unsigned_vecs(&EXAMPLE_SEED, scale),
+        )),
+    }
+}
+
+// All quadruples of `Vec<Limb>` that are valid inputs to `limbs_mod_pow_odd`.
+pub fn quadruples_of_unsigned_vec_var_1(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        quadruples_of_unsigned_vec::<Limb>(gm).filter(|&(ref out, ref bs, ref es, ref ms)| {
+            !bs.is_empty()
+                && !ms.is_empty()
+                && out.len() >= ms.len()
+                && (es.len() > 1 || es.len() == 1 && es[0] > 1)
+                && *bs.last().unwrap() != 0
+                && *es.last().unwrap() != 0
+                && *ms.last().unwrap() != 0
+                && ms[0].odd()
+                && limbs_cmp(bs, ms) == Ordering::Less
+        }),
+    )
 }
 
 // All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same

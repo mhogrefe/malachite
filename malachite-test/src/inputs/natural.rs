@@ -20,6 +20,8 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::tuples::exhaustive::lex_pairs;
+use malachite_base::tuples::exhaustive::{lex_pairs_from_single, lex_triples_from_single};
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
 use malachite_nz::natural::exhaustive::{
@@ -53,7 +55,7 @@ use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
     exhaustive_quadruples_from_single, exhaustive_triples, exhaustive_triples_from_single,
-    lex_pairs, lex_triples, log_pairs, random_pairs, random_pairs_from_single, random_quadruples,
+    log_pairs, random_pairs, random_pairs_from_single, random_quadruples,
     random_quadruples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
 };
 use rust_wheels::iterators::vecs::{exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs};
@@ -978,9 +980,10 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, Natural, u64)> {
     let ps: It<(u64, (Natural, Natural))> = match gm {
         GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
-            let range = exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow));
-            //TODO use lex_pairs_from_single
-            lex_pairs(range.clone(), range)
+            lex_pairs_from_single(exhaustive_natural_range(
+                Natural::ZERO,
+                Natural::power_of_two(pow),
+            ))
         })),
         GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
             (),
@@ -1637,9 +1640,10 @@ pub fn quadruples_of_three_naturals_and_u64_var_1(
 ) -> It<(Natural, Natural, Natural, u64)> {
     let ps: It<(u64, (Natural, Natural, Natural))> = match gm {
         GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
-            let range = exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow));
-            //TODO use lex_triples_from_single
-            lex_triples(range.clone(), range.clone(), range)
+            lex_triples_from_single(exhaustive_natural_range(
+                Natural::ZERO,
+                Natural::power_of_two(pow),
+            ))
         })),
         GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
             (),

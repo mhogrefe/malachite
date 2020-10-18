@@ -5,16 +5,13 @@ use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::tuples::exhaustive::exhaustive_units;
-use malachite_base::vecs::exhaustive::lex_exhaustive_fixed_length_vecs_from_single;
+use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_from_single;
 
-fn lex_exhaustive_fixed_length_vecs_from_single_helper<I: Iterator>(
-    len: usize,
-    xs: I,
-    out: &[&[I::Item]],
-) where
+fn lex_fixed_length_vecs_from_single_helper<I: Iterator>(len: usize, xs: I, out: &[&[I::Item]])
+where
     I::Item: Clone + Debug + Eq,
 {
-    let xss = lex_exhaustive_fixed_length_vecs_from_single(len, xs)
+    let xss = lex_fixed_length_vecs_from_single(len, xs)
         .take(20)
         .collect::<Vec<_>>();
     assert_eq!(
@@ -23,7 +20,7 @@ fn lex_exhaustive_fixed_length_vecs_from_single_helper<I: Iterator>(
     );
 }
 
-fn lex_exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
+fn lex_fixed_length_vecs_from_single_small_helper<I: Clone + Iterator>(
     len: usize,
     xs: I,
     out_len: usize,
@@ -31,7 +28,7 @@ fn lex_exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterato
 ) where
     I::Item: Clone + Debug + Eq,
 {
-    let xss = lex_exhaustive_fixed_length_vecs_from_single(len, xs);
+    let xss = lex_fixed_length_vecs_from_single(len, xs);
     let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
     assert_eq!(
         xss_prefix
@@ -45,32 +42,17 @@ fn lex_exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterato
 }
 
 #[test]
-fn test_lex_exhaustive_fixed_length_vecs_from_single() {
+fn test_lex_fixed_length_vecs_from_single() {
     // This demonstrates that 0 ^ 0 == 1:
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(0, nevers(), 1, &[&[]]);
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(1, nevers(), 0, &[]);
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(2, nevers(), 0, &[]);
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(5, nevers(), 0, &[]);
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(1, exhaustive_units(), 1, &[&[()]]);
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
-        2,
-        exhaustive_units(),
-        1,
-        &[&[(), ()]],
-    );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
-        5,
-        exhaustive_units(),
-        1,
-        &[&[(); 5]],
-    );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
-        0,
-        exhaustive_unsigneds::<u8>(),
-        1,
-        &[&[]],
-    );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(0, nevers(), 1, &[&[]]);
+    lex_fixed_length_vecs_from_single_small_helper(1, nevers(), 0, &[]);
+    lex_fixed_length_vecs_from_single_small_helper(2, nevers(), 0, &[]);
+    lex_fixed_length_vecs_from_single_small_helper(5, nevers(), 0, &[]);
+    lex_fixed_length_vecs_from_single_small_helper(1, exhaustive_units(), 1, &[&[()]]);
+    lex_fixed_length_vecs_from_single_small_helper(2, exhaustive_units(), 1, &[&[(), ()]]);
+    lex_fixed_length_vecs_from_single_small_helper(5, exhaustive_units(), 1, &[&[(); 5]]);
+    lex_fixed_length_vecs_from_single_small_helper(0, exhaustive_unsigneds::<u8>(), 1, &[&[]]);
+    lex_fixed_length_vecs_from_single_small_helper(
         1,
         exhaustive_unsigneds::<u8>(),
         256,
@@ -97,7 +79,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[19],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_helper(
+    lex_fixed_length_vecs_from_single_helper(
         1,
         exhaustive_unsigneds::<u64>(),
         &[
@@ -123,7 +105,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[19],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_helper(
+    lex_fixed_length_vecs_from_single_helper(
         2,
         exhaustive_unsigneds::<u8>(),
         &[
@@ -149,7 +131,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[0, 19],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_helper(
+    lex_fixed_length_vecs_from_single_helper(
         3,
         exhaustive_unsigneds::<u8>(),
         &[
@@ -175,7 +157,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[0, 0, 19],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_ascii_chars(),
         0x4000,
@@ -202,13 +184,8 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &['a', 't'],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
-        1,
-        exhaustive_bools(),
-        2,
-        &[&[false], &[true]],
-    );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(1, exhaustive_bools(), 2, &[&[false], &[true]]);
+    lex_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_bools(),
         4,
@@ -219,7 +196,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[true, true],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(
         4,
         exhaustive_bools(),
         16,
@@ -242,7 +219,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[true, true, true, true],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(
         10,
         exhaustive_bools(),
         1024,
@@ -309,7 +286,7 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             ],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_finite_helper(
+    lex_fixed_length_vecs_from_single_small_helper(
         10,
         0..3,
         59049,
@@ -336,9 +313,9 @@ fn test_lex_exhaustive_fixed_length_vecs_from_single() {
             &[0, 0, 0, 0, 0, 0, 0, 2, 0, 1],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_from_single_helper(
+    lex_fixed_length_vecs_from_single_helper(
         2,
-        lex_exhaustive_fixed_length_vecs_from_single(2, exhaustive_unsigneds::<u8>()),
+        lex_fixed_length_vecs_from_single(2, exhaustive_unsigneds::<u8>()),
         &[
             &[vec![0, 0], vec![0, 0]],
             &[vec![0, 0], vec![0, 1]],

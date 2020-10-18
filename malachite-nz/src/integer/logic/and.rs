@@ -1,15 +1,13 @@
-use std::cmp::{max, Ordering};
-use std::ops::{BitAnd, BitAndAssign};
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-
-use integer::Integer;
 use natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{max, Ordering};
+use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by

@@ -1,10 +1,38 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, UnsignedAbs,
 };
-
+use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
+use std::ops::{Shr, ShrAssign};
 
-//TODO clean
+fn _mod_power_of_two_shr_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+    pow: u64,
+) -> Natural
+where
+    &'a Natural: ModPowerOfTwoShl<U, Output = Natural> + Shr<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x >> bits.unsigned_abs()
+    } else {
+        x.mod_power_of_two_shl(bits.unsigned_abs(), pow)
+    }
+}
+
+fn _mod_power_of_two_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &mut Natural,
+    bits: S,
+    pow: u64,
+) where
+    Natural: ModPowerOfTwoShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x >>= bits.unsigned_abs();
+    } else {
+        x.mod_power_of_two_shl_assign(bits.unsigned_abs(), pow);
+    }
+}
 
 macro_rules! impl_mod_power_of_two_shr_signed {
     ($t:ident) => {
@@ -63,12 +91,9 @@ macro_rules! impl_mod_power_of_two_shr_signed {
         impl<'a> ModPowerOfTwoShr<$t> for &'a Natural {
             type Output = Natural;
 
+            #[inline]
             fn mod_power_of_two_shr(self, bits: $t, pow: u64) -> Natural {
-                if bits >= 0 {
-                    self >> bits.unsigned_abs()
-                } else {
-                    self.mod_power_of_two_shl(bits.unsigned_abs(), pow)
-                }
+                _mod_power_of_two_shr_ref(self, bits, pow)
             }
         }
 
@@ -102,12 +127,9 @@ macro_rules! impl_mod_power_of_two_shr_signed {
         /// assert_eq!(n, 30);
         /// ```
         impl ModPowerOfTwoShrAssign<$t> for Natural {
+            #[inline]
             fn mod_power_of_two_shr_assign(&mut self, bits: $t, pow: u64) {
-                if bits >= 0 {
-                    *self >>= bits.unsigned_abs();
-                } else {
-                    self.mod_power_of_two_shl_assign(bits.unsigned_abs(), pow);
-                }
+                _mod_power_of_two_shr_assign(self, bits, pow);
             }
         }
     };

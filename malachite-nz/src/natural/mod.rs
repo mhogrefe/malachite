@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::slices::slice_trailing_zeros;
-
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
+use std::str::FromStr;
 
 /// A natural (non-negative) integer.
 ///

@@ -289,6 +289,7 @@ pub mod options {
         pub mod exhaustive_options;
         pub mod exhaustive_somes;
     }
+    pub mod option_from_str;
     pub mod random {
         pub mod random_options;
         pub mod random_somes;
@@ -296,6 +297,7 @@ pub mod options {
 }
 pub mod orderings {
     pub mod exhaustive;
+    pub mod ordering_from_str;
     pub mod random;
 }
 pub mod random {
@@ -333,10 +335,26 @@ pub mod strings {
 pub mod tuples {
     pub mod exhaustive {
         pub mod exhaustive_units;
+        pub mod lex_custom_tuples;
+        pub mod lex_tuples;
+        pub mod lex_tuples_from_single;
     }
     pub mod random {
         pub mod random_units;
     }
     pub mod singletons;
 }
-pub mod vecs;
+pub mod vecs {
+    pub mod exhaustive {
+        pub mod exhaustive_fixed_length_vecs_from_single;
+        pub mod exhaustive_fixed_length_vecs_m_inputs;
+        pub mod exhaustive_length_n_vecs;
+        pub mod lex_fixed_length_vecs_from_single;
+        pub mod lex_fixed_length_vecs_m_inputs;
+        pub mod lex_length_n_vecs;
+    }
+    pub mod random_values_from_vec;
+    pub mod vec_delete_left;
+    pub mod vec_from_str;
+    pub mod vec_pad_left;
+}

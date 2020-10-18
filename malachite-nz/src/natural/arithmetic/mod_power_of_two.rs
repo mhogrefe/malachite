@@ -1,3 +1,4 @@
+use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo,
     RemPowerOfTwoAssign, ShrRound,
@@ -7,8 +8,6 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_set_zero;
-
-use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

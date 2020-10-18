@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::PowerOfTwoDigits;
-use malachite_base::vecs::from_str::vec_from_str;
+use malachite_base::vecs::vec_from_str;
 
 use malachite_nz::natural::Natural;
 

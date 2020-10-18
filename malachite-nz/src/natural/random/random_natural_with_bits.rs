@@ -1,8 +1,7 @@
 use malachite_base::num::logic::traits::BitAccess;
-use rand::Rng;
-
 use natural::random::random_natural_up_to_bits::random_natural_up_to_bits;
 use natural::Natural;
+use rand::Rng;
 
 /// Returns a random `Natural` with exactly `bits` bits; equivalently, returns a random `Natural`
 /// uniformly sampled from [2<sup>`bits`-1</sup>, 2<sup>`bits`</sup>).

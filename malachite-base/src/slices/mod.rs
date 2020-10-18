@@ -245,11 +245,8 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T(n)] = O(n)$
 ///
-/// $E[M(n)] = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+/// Constant time and additional memory.
 ///
 /// # Panics
 /// Panics if `xs` is empty.

@@ -1,7 +1,3 @@
-use std::cmp::{min, Ordering};
-use std::marker::PhantomData;
-use std::slice::Chunks;
-
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, DivRound, FloorLogTwo, ModPowerOfTwo, PowerOfTwo, SaturatingSubAssign, ShrRound,
 };
@@ -14,12 +10,14 @@ use malachite_base::num::logic::traits::{
     LowMask, PowerOfTwoDigitIterable, PowerOfTwoDigitIterator,
 };
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::logic::bit_block_access::limbs_slice_get_bits;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{min, Ordering};
+use std::marker::PhantomData;
+use std::slice::Chunks;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct FitsInLimbIterator<'a, T>(FILIterator<'a, T>);

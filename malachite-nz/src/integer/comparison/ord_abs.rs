@@ -1,8 +1,6 @@
-use std::cmp::Ordering;
-
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-
 use integer::Integer;
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use std::cmp::Ordering;
 
 impl PartialOrdAbs for Integer {
     /// Compares the absolute value of an `Integer` to the absolute value of another `Integer`.

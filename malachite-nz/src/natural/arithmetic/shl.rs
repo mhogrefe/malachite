@@ -1,13 +1,12 @@
-use std::ops::{Shl, ShlAssign};
-
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::ops::{Shl, ShlAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` left-shifted by a `Limb`.
@@ -215,6 +214,48 @@ pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64
     remaining_bits
 }
 
+fn _shl_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T) -> Natural
+where
+    u64: ExactFrom<T>,
+    Limb: ArithmeticCheckedShl<T, Output = Limb>,
+{
+    match (x, bits) {
+        (natural_zero!(), _) => x.clone(),
+        (_, bits) if bits == T::ZERO => x.clone(),
+        (Natural(Small(small)), bits) => {
+            Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
+                Small(shifted)
+            } else {
+                Large(limbs_shl(&[*small], u64::exact_from(bits)))
+            })
+        }
+        (Natural(Large(ref limbs)), bits) => {
+            Natural(Large(limbs_shl(limbs, u64::exact_from(bits))))
+        }
+    }
+}
+
+fn _shl_assign<T: Copy + Eq + Zero>(x: &mut Natural, bits: T)
+where
+    u64: ExactFrom<T>,
+    Limb: ArithmeticCheckedShl<T, Output = Limb>,
+{
+    match (&mut *x, bits) {
+        (natural_zero!(), _) => {}
+        (_, bits) if bits == T::ZERO => {}
+        (Natural(Small(ref mut small)), bits) => {
+            if let Some(shifted) = small.arithmetic_checked_shl(bits) {
+                *small = shifted;
+            } else {
+                *x = Natural(Large(limbs_shl(&[*small], u64::exact_from(bits))));
+            }
+        }
+        (Natural(Large(ref mut limbs)), bits) => {
+            limbs_vec_shl_in_place(limbs, u64::exact_from(bits));
+        }
+    }
+}
+
 macro_rules! impl_natural_shl_unsigned {
     ($t:ident) => {
         /// Shifts a `Natural` left (multiplies it by a power of 2), taking the `Natural` by value.
@@ -272,20 +313,9 @@ macro_rules! impl_natural_shl_unsigned {
         impl<'a> Shl<$t> for &'a Natural {
             type Output = Natural;
 
+            #[inline]
             fn shl(self, bits: $t) -> Natural {
-                match (self, bits) {
-                    (_, 0) | (natural_zero!(), _) => self.clone(),
-                    (Natural(Small(small)), bits) => {
-                        Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
-                            Small(shifted)
-                        } else {
-                            Large(limbs_shl(&[*small], u64::exact_from(bits)))
-                        })
-                    }
-                    (Natural(Large(ref limbs)), bits) => {
-                        Natural(Large(limbs_shl(limbs, u64::exact_from(bits))))
-                    }
-                }
+                _shl_ref_unsigned(self, bits)
             }
         }
 
@@ -313,25 +343,16 @@ macro_rules! impl_natural_shl_unsigned {
         /// assert_eq!(x.to_string(), "1024");
         /// ```
         impl ShlAssign<$t> for Natural {
+            #[inline]
             fn shl_assign(&mut self, bits: $t) {
-                match (&mut *self, bits) {
-                    (_, 0) | (natural_zero!(), _) => {}
-                    (Natural(Small(ref mut small)), bits) => {
-                        if let Some(shifted) = small.arithmetic_checked_shl(bits) {
-                            *small = shifted;
-                        } else {
-                            *self = Natural(Large(limbs_shl(&[*small], u64::exact_from(bits))));
-                        }
-                    }
-                    (Natural(Large(ref mut limbs)), bits) => {
-                        limbs_vec_shl_in_place(limbs, u64::exact_from(bits));
-                    }
-                }
+                _shl_assign(self, bits);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shl_unsigned);
+
+//TODO clean
 
 macro_rules! impl_natural_shl_signed {
     ($t:ident) => {

@@ -1,17 +1,15 @@
-use std::cmp::Ordering;
-use std::fmt::Display;
-
 use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
 };
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::SplitInHalf;
-
 use natural::arithmetic::mul::limbs_mul;
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
 use natural::comparison::ord::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
+use std::cmp::Ordering;
+use std::fmt::Display;
 
 /// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
 /// y * z > x, `None` is returned.

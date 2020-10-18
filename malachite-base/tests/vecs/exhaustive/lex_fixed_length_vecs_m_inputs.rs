@@ -4,10 +4,10 @@ use std::iter::empty;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::{exhaustive_positive_primitive_ints, exhaustive_unsigneds};
-use malachite_base::vecs::exhaustive::lex_exhaustive_fixed_length_vecs_2_inputs;
+use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_2_inputs;
 
-fn lex_exhaustive_fixed_length_vecs_2_inputs_helper<
-    T,
+fn lex_fixed_length_vecs_2_inputs_helper<
+    T: Clone + Debug + Eq,
     I: Clone + Iterator<Item = T>,
     J: Clone + Iterator<Item = T>,
 >(
@@ -16,11 +16,8 @@ fn lex_exhaustive_fixed_length_vecs_2_inputs_helper<
     output_to_input_map: &[usize],
     out_len: Option<usize>,
     out: &[&[T]],
-) where
-    T: Clone + Debug + Eq,
-{
-    let xss =
-        lex_exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), output_to_input_map);
+) {
+    let xss = lex_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), output_to_input_map);
     let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
     assert_eq!(
         xss_prefix
@@ -36,16 +33,16 @@ fn lex_exhaustive_fixed_length_vecs_2_inputs_helper<
 }
 
 #[test]
-fn test_lex_exhaustive_fixed_length_vecs_2_inputs() {
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(&nevers(), &nevers(), &[0, 1], Some(0), &[]);
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(
+fn test_lex_fixed_length_vecs_2_inputs() {
+    lex_fixed_length_vecs_2_inputs_helper(&nevers(), &nevers(), &[0, 1], Some(0), &[]);
+    lex_fixed_length_vecs_2_inputs_helper(
         &empty(),
         &exhaustive_unsigneds::<u8>(),
         &[0, 1],
         Some(0),
         &[],
     );
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(
+    lex_fixed_length_vecs_2_inputs_helper(
         &exhaustive_unsigneds::<u64>(),
         &exhaustive_positive_primitive_ints::<u64>(),
         &[0, 1],
@@ -73,7 +70,7 @@ fn test_lex_exhaustive_fixed_length_vecs_2_inputs() {
             &[0, 20],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(
+    lex_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
         &[0, 1],
@@ -101,7 +98,7 @@ fn test_lex_exhaustive_fixed_length_vecs_2_inputs() {
             &['g', 'y'],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(
+    lex_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
         &[0, 1, 1],
@@ -129,7 +126,7 @@ fn test_lex_exhaustive_fixed_length_vecs_2_inputs() {
             &['c', 'x', 'y'],
         ],
     );
-    lex_exhaustive_fixed_length_vecs_2_inputs_helper(
+    lex_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
         &[0, 1, 0],
@@ -161,24 +158,24 @@ fn test_lex_exhaustive_fixed_length_vecs_2_inputs() {
 
 #[test]
 #[should_panic]
-fn lex_exhaustive_fixed_length_vecs_2_inputs_fail_1() {
-    lex_exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[]);
+fn lex_fixed_length_vecs_2_inputs_fail_1() {
+    lex_fixed_length_vecs_2_inputs(0..2, 0..3, &[]);
 }
 
 #[test]
 #[should_panic]
-fn lex_exhaustive_fixed_length_vecs_2_inputs_fail_2() {
-    lex_exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[0]);
+fn lex_fixed_length_vecs_2_inputs_fail_2() {
+    lex_fixed_length_vecs_2_inputs(0..2, 0..3, &[0]);
 }
 
 #[test]
 #[should_panic]
-fn lex_exhaustive_fixed_length_vecs_2_inputs_fail_3() {
-    lex_exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[1]);
+fn lex_fixed_length_vecs_2_inputs_fail_3() {
+    lex_fixed_length_vecs_2_inputs(0..2, 0..3, &[1]);
 }
 
 #[test]
 #[should_panic]
-fn lex_exhaustive_fixed_length_vecs_2_inputs_fail_4() {
-    lex_exhaustive_fixed_length_vecs_2_inputs(0..2, 0..3, &[0, 1, 2]);
+fn lex_fixed_length_vecs_2_inputs_fail_4() {
+    lex_fixed_length_vecs_2_inputs(0..2, 0..3, &[0, 1, 2]);
 }

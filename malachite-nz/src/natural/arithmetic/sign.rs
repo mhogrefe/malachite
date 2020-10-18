@@ -1,8 +1,6 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::Sign;
-
 use natural::Natural;
+use std::cmp::Ordering;
 
 impl Sign for Natural {
     /// Returns the sign of an `Natural`. Interpret the result as the result of a comparison to

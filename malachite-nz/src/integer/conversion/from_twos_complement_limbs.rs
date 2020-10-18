@@ -1,10 +1,9 @@
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
-
 use integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement, limbs_twos_complement_in_place,
 };
 use integer::Integer;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
 use platform::Limb;
 

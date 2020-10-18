@@ -1,15 +1,13 @@
-use std::cmp::{max, Ordering};
-use std::iter::repeat;
-use std::ops::{BitOr, BitOrAssign};
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-
-use integer::Integer;
 use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{max, Ordering};
+use std::iter::repeat;
+use std::ops::{BitOr, BitOrAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, returns the limbs of the bitwise or of the `Integer` and a `Limb`. `xs` cannot be

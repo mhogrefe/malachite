@@ -1,7 +1,6 @@
+use integer::Integer;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{CountOnes, CountZeros};
-
-use integer::Integer;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

@@ -1,13 +1,11 @@
+use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+use iterators::iterator_cache::IteratorCache;
+use itertools::Itertools;
+use num::conversion::traits::WrappingFrom;
+use num::logic::traits::SignificantBits;
 use std::iter::{once, repeat, Once};
 use std::marker::PhantomData;
 use std::mem::swap;
-
-use itertools::Itertools;
-
-use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use iterators::iterator_cache::IteratorCache;
-use num::conversion::traits::WrappingFrom;
-use num::logic::traits::SignificantBits;
 
 fn set_slice_to_none<T>(xs: &mut [Option<T>]) {
     for x in xs {
@@ -16,12 +14,12 @@ fn set_slice_to_none<T>(xs: &mut [Option<T>]) {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-struct LexExhaustiveFixedLengthVecsOutput {
+struct LexFixedLengthVecsOutput {
     input_index: usize,
     counter: usize,
 }
 
-macro_rules! lex_exhaustive_fixed_length_vecs {
+macro_rules! lex_fixed_length_vecs {
     (
         $exhaustive_struct: ident,
         $exhaustive_custom_fn: ident,
@@ -45,7 +43,7 @@ macro_rules! lex_exhaustive_fixed_length_vecs {
                 $xs: IteratorCache<$it>,
                 $xs_outputs: Vec<usize>,
             )*
-            outputs: Vec<LexExhaustiveFixedLengthVecsOutput>,
+            outputs: Vec<LexFixedLengthVecsOutput>,
         }
 
         impl<T: Clone, $($it: Iterator<Item = T>,)*> $exhaustive_struct<T, $($it,)*> {
@@ -127,11 +125,12 @@ macro_rules! lex_exhaustive_fixed_length_vecs {
         /// This function is macro-generated. The value of $m$ is in the function's name. Remember
         /// that $m$ is the number of input iterators, not the length of the output `Vec`s!
         ///
-        /// All of `ys`, `zs`, ... (but not necessarily `xs`) must be finite. If `xs` is finite, the
-        /// output length is the product of the lengths of all the input iterators. If `xs` is
-        /// infinite, the output is also infinite.
+        /// Let `xs` be the input iterator mapped to the first slot of the output `Vec`s. All the
+        /// input iterators, except possibly `xs`, must be finite. If `xs` is finite, the output
+        /// length is the product of the lengths of all the input iterators. If `xs` is infinite,
+        /// the output is also infinite.
         ///
-        /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
+        /// If any of the input iterators is empty, the output is also empty.
         ///
         /// # Complexity per iteration
         ///
@@ -189,7 +188,7 @@ macro_rules! lex_exhaustive_fixed_length_vecs {
                 )*
                 outputs: output_to_input_map
                     .iter()
-                    .map(|&i| LexExhaustiveFixedLengthVecsOutput {
+                    .map(|&i| LexFixedLengthVecsOutput {
                         input_index: i,
                         counter: 0,
                     })
@@ -244,44 +243,44 @@ macro_rules! lex_exhaustive_fixed_length_vecs {
     }
 }
 
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs2Inputs,
-    lex_exhaustive_fixed_length_vecs_2_inputs,
-    lex_exhaustive_length_2_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs2Inputs,
+    lex_fixed_length_vecs_2_inputs,
+    lex_length_2_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs3Inputs,
-    lex_exhaustive_fixed_length_vecs_3_inputs,
-    lex_exhaustive_length_3_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs3Inputs,
+    lex_fixed_length_vecs_3_inputs,
+    lex_length_3_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs4Inputs,
-    lex_exhaustive_fixed_length_vecs_4_inputs,
-    lex_exhaustive_length_4_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs4Inputs,
+    lex_fixed_length_vecs_4_inputs,
+    lex_length_4_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
     [3, L, ws, ws_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs5Inputs,
-    lex_exhaustive_fixed_length_vecs_5_inputs,
-    lex_exhaustive_length_5_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs5Inputs,
+    lex_fixed_length_vecs_5_inputs,
+    lex_length_5_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
     [3, L, ws, ws_outputs],
     [4, M, vs, vs_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs6Inputs,
-    lex_exhaustive_fixed_length_vecs_6_inputs,
-    lex_exhaustive_length_6_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs6Inputs,
+    lex_fixed_length_vecs_6_inputs,
+    lex_length_6_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -289,10 +288,10 @@ lex_exhaustive_fixed_length_vecs!(
     [4, M, vs, vs_outputs],
     [5, N, us, us_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs7Inputs,
-    lex_exhaustive_fixed_length_vecs_7_inputs,
-    lex_exhaustive_length_7_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs7Inputs,
+    lex_fixed_length_vecs_7_inputs,
+    lex_length_7_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -301,10 +300,10 @@ lex_exhaustive_fixed_length_vecs!(
     [5, N, us, us_outputs],
     [6, O, ts, ts_outputs]
 );
-lex_exhaustive_fixed_length_vecs!(
-    LexExhaustiveFixedLengthVecs8Inputs,
-    lex_exhaustive_fixed_length_vecs_8_inputs,
-    lex_exhaustive_length_8_vecs,
+lex_fixed_length_vecs!(
+    LexFixedLengthVecs8Inputs,
+    lex_fixed_length_vecs_8_inputs,
+    lex_length_8_vecs,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -317,7 +316,7 @@ lex_exhaustive_fixed_length_vecs!(
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct LexExhaustiveFixedLengthVecsFromSingleG<I: Iterator>
+pub struct LexFixedLengthVecsFromSingleG<I: Iterator>
 where
     I::Item: Clone,
 {
@@ -328,7 +327,7 @@ where
     phantom: PhantomData<*const I::Item>,
 }
 
-impl<I: Iterator> LexExhaustiveFixedLengthVecsFromSingleG<I>
+impl<I: Iterator> LexFixedLengthVecsFromSingleG<I>
 where
     I::Item: Clone,
 {
@@ -347,7 +346,7 @@ where
     }
 }
 
-impl<I: Iterator> Iterator for LexExhaustiveFixedLengthVecsFromSingleG<I>
+impl<I: Iterator> Iterator for LexFixedLengthVecsFromSingleG<I>
 where
     I::Item: Clone,
 {
@@ -377,14 +376,14 @@ where
     }
 }
 
-pub fn lex_exhaustive_fixed_length_vecs_from_single_g<I: Iterator>(
+pub fn lex_fixed_length_vecs_from_single_g<I: Iterator>(
     len: usize,
     xs: I,
-) -> LexExhaustiveFixedLengthVecsFromSingleG<I>
+) -> LexFixedLengthVecsFromSingleG<I>
 where
     I::Item: Clone,
 {
-    LexExhaustiveFixedLengthVecsFromSingleG {
+    LexFixedLengthVecsFromSingleG {
         first: true,
         done: false,
         xs: IteratorCache::new(xs),
@@ -393,17 +392,21 @@ where
     }
 }
 
+/// Generates all `Vec`s of a given length with elements from a single iterator, in lexicographic
+/// order.
+///
+/// The order is lexicographic with respect to the order of the element iterator.
 #[derive(Clone, Debug)]
-pub enum LexExhaustiveFixedLengthVecsFromSingle<I: Iterator>
+pub enum LexFixedLengthVecsFromSingle<I: Iterator>
 where
     I::Item: Clone,
 {
     Zero(Once<Vec<I::Item>>),
     One(I),
-    GreaterThanOne(LexExhaustiveFixedLengthVecsFromSingleG<I>),
+    GreaterThanOne(LexFixedLengthVecsFromSingleG<I>),
 }
 
-impl<I: Iterator> Iterator for LexExhaustiveFixedLengthVecsFromSingle<I>
+impl<I: Iterator> Iterator for LexFixedLengthVecsFromSingle<I>
 where
     I::Item: Clone,
 {
@@ -411,9 +414,9 @@ where
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            LexExhaustiveFixedLengthVecsFromSingle::Zero(ref mut xs) => xs.next(),
-            LexExhaustiveFixedLengthVecsFromSingle::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            LexExhaustiveFixedLengthVecsFromSingle::GreaterThanOne(ref mut xs) => xs.next(),
+            LexFixedLengthVecsFromSingle::Zero(ref mut xs) => xs.next(),
+            LexFixedLengthVecsFromSingle::One(ref mut xs) => xs.next().map(|x| vec![x]),
+            LexFixedLengthVecsFromSingle::GreaterThanOne(ref mut xs) => xs.next(),
         }
     }
 }
@@ -421,24 +424,17 @@ where
 /// Generates all `Vec`s of a given length with elements from a single iterator, in lexicographic
 /// order.
 ///
-/// The order is lexicographic with respect to the order of the element iterators.
+/// The order is lexicographic with respect to the order of the element iterator.
 ///
-/// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
-/// If `xs` is infinite, the output is also infinite.
+/// `xs` must be finite.
+///
+/// The output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
 ///
 /// If `len` is 0, the output consists of one empty list.
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
-/// If `xs` is finite:
-///
-/// $T(i, n) = O(n)$
-///
-/// $M(i, n) = O(n)$
-///
-/// If `xs` is infinite:
 ///
 /// $$
 /// T(i, n) = O(n + T^\prime{i})
@@ -453,9 +449,9 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::vecs::exhaustive::lex_exhaustive_fixed_length_vecs_from_single;
+/// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_from_single;
 ///
-/// let xss = lex_exhaustive_fixed_length_vecs_from_single(2, 0..4).collect::<Vec<_>>();
+/// let xss = lex_fixed_length_vecs_from_single(2, 0..4).collect::<Vec<_>>();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
 ///     &[
@@ -464,19 +460,19 @@ where
 ///     ]
 /// );
 /// ```
-pub fn lex_exhaustive_fixed_length_vecs_from_single<I: Iterator>(
+pub fn lex_fixed_length_vecs_from_single<I: Iterator>(
     len: usize,
     xs: I,
-) -> LexExhaustiveFixedLengthVecsFromSingle<I>
+) -> LexFixedLengthVecsFromSingle<I>
 where
     I::Item: Clone,
 {
     match len {
-        0 => LexExhaustiveFixedLengthVecsFromSingle::Zero(once(Vec::new())),
-        1 => LexExhaustiveFixedLengthVecsFromSingle::One(xs),
-        len => LexExhaustiveFixedLengthVecsFromSingle::GreaterThanOne(
-            lex_exhaustive_fixed_length_vecs_from_single_g(len, xs),
-        ),
+        0 => LexFixedLengthVecsFromSingle::Zero(once(Vec::new())),
+        1 => LexFixedLengthVecsFromSingle::One(xs),
+        len => LexFixedLengthVecsFromSingle::GreaterThanOne(lex_fixed_length_vecs_from_single_g(
+            len, xs,
+        )),
     }
 }
 
@@ -717,7 +713,7 @@ macro_rules! exhaustive_fixed_length_vecs {
 
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs1Input,
-    exhaustive_fixed_length_vecs_1_input, //TODO test
+    exhaustive_fixed_length_vecs_1_input,
     _dont_use_this,
     [0, I, xs, xs_done, xs_outputs]
 );

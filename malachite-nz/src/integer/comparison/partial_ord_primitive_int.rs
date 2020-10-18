@@ -1,10 +1,8 @@
-use std::cmp::Ordering;
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
-
-use integer::Integer;
 use natural::Natural;
+use std::cmp::Ordering;
 
 fn _partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>
 where

@@ -164,7 +164,7 @@ impl Iterator for ExhaustiveChars {
 /// 3. ASCII digits
 /// 4. "Printable" ASCII characters (not alphanumeric and not control), including ' ' but no other
 ///     whitespace
-/// 5. All remaining characters.
+/// 5. All remaining ASCII characters.
 ///
 /// Within each group, the characters are ordered according to their usual order.
 ///
