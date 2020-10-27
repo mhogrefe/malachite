@@ -1148,7 +1148,7 @@ pub trait ModPowAssign<RHS = Self, M = Self> {
 /// modular exponentiations with the same modulus are necessary, it can be quicker to precompute
 /// some piece of data and reuse it in the exponentiation calls. This trait provides a method for
 /// precomputing the data and a method for using it during exponentiation.
-pub trait ModPowPrecomputed<RHS: Two = Self, M = Self>
+pub trait ModPowPrecomputed<RHS = Self, M = Self>
 where
     Self: Sized,
 {
@@ -1158,13 +1158,6 @@ where
     fn precompute_mod_pow_data(m: &M) -> Self::Data;
 
     fn mod_pow_precomputed(self, exp: RHS, m: M, data: &Self::Data) -> Self::Output;
-
-    /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`. Some
-    /// precomputed data is provided. The precomputed data should be obtained using
-    /// `precompute_mod_pow_data`.
-    fn mod_square_precomputed(self, m: M, data: &Self::Data) -> Self::Output {
-        self.mod_pow_precomputed(RHS::TWO, m, data)
-    }
 }
 
 /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If
@@ -1174,13 +1167,6 @@ where
 /// `precompute_mod_pow_data` function in `ModPowPrecomputed`.
 pub trait ModPowPrecomputedAssign<RHS: Two = Self, M = Self>: ModPowPrecomputed<RHS, M> {
     fn mod_pow_precomputed_assign(&mut self, exp: RHS, m: M, data: &Self::Data);
-
-    /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
-    /// Some precomputed data is provided. The precomputed data should be obtained using
-    /// `precompute_mod_pow_data`.
-    fn mod_square_precomputed_assign(&mut self, m: M, data: &Self::Data) {
-        self.mod_pow_precomputed_assign(RHS::TWO, m, data);
-    }
 }
 
 /// Squares `self`.
@@ -1270,6 +1256,29 @@ pub trait ModSquare<M = Self> {
 /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced  mod `m`.
 pub trait ModSquareAssign<M = Self> {
     fn mod_square_assign(&mut self, m: M);
+}
+
+/// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`. If multiple
+/// modular squarings with the same modulus are necessary, it can be quicker to precompute some
+/// piece of data using `precompute_mod_pow_data` and reuse it in the squaring calls.
+pub trait ModSquarePrecomputed<RHS = Self, M = Self>: ModPowPrecomputed<RHS, M>
+where
+    Self: Sized,
+{
+    /// Computes `self.square()` mod `m`. Assumes the input is already reduced mod `m`. Some
+    /// precomputed data is provided. The precomputed data should be obtained using
+    /// `precompute_mod_pow_data`.
+    fn mod_square_precomputed(self, m: M, data: &Self::Data) -> Self::Output;
+}
+
+/// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced mod `m`. If
+/// multiple modular squarings with the same modulus are necessary, it can be quicker to precompute
+/// some piece of data using `precompute_mod_pow_data` and reuse it in the squaring calls.
+pub trait ModSquarePrecomputedAssign<RHS = Self, M = Self>: ModPowPrecomputed<RHS, M> {
+    /// Replaces `self` with `self.square()` mod `m`. Assumes the input is already reduced mod `m`.
+    /// Some precomputed data is provided. The precomputed data should be obtained using
+    /// `precompute_mod_pow_data`.
+    fn mod_square_precomputed_assign(&mut self, m: M, data: &Self::Data);
 }
 
 pub trait CheckedLogTwo {

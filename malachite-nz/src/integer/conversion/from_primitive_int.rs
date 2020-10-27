@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+
+use integer::Integer;
 use natural::Natural;
 
 macro_rules! impl_from_unsigned {

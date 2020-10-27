@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::iter::empty;
 
+use get_sample_output_types;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::nevers::nevers;
@@ -11,14 +12,14 @@ use malachite_base::vecs::exhaustive::{
 
 fn exhaustive_fixed_length_vecs_1_input_helper<T, I: Clone + Iterator<Item = T>>(
     xs: &I,
-    output_types: &[(BitDistributorOutputType, usize)],
-    alternative_output_types: &[&[BitDistributorOutputType]],
+    len: usize,
     out_len: Option<usize>,
     out: &[&[T]],
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_fixed_length_vecs_1_input(xs.clone(), output_types);
+    let output_types = get_sample_output_types(len);
+    let xss = exhaustive_fixed_length_vecs_1_input(xs.clone(), &output_types[0]);
     let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
     assert_eq!(
         xss_prefix
@@ -31,13 +32,8 @@ fn exhaustive_fixed_length_vecs_1_input_helper<T, I: Clone + Iterator<Item = T>>
     if let Some(out_len) = out_len {
         assert_eq!(xss.count(), out_len);
     }
-    for alt_output_types in alternative_output_types {
-        let alt_output_types: Vec<(BitDistributorOutputType, usize)> = alt_output_types
-            .iter()
-            .cloned()
-            .zip(output_types.iter().cloned().map(|(_, i)| i))
-            .collect();
-        let xss = exhaustive_fixed_length_vecs_1_input(xs.clone(), &alt_output_types);
+    for alt_output_types in &output_types[1..] {
+        let xss = exhaustive_fixed_length_vecs_1_input(xs.clone(), alt_output_types);
         xss.clone().take(20).for_each(drop);
         if let Some(out_len) = out_len {
             assert_eq!(xss.count(), out_len);
@@ -47,73 +43,10 @@ fn exhaustive_fixed_length_vecs_1_input_helper<T, I: Clone + Iterator<Item = T>>
 
 #[test]
 fn test_exhaustive_fixed_length_vecs_1_input() {
-    let length_2_alts: &[&[BitDistributorOutputType]] = &[
-        &[BitDistributorOutputType::normal(2); 2],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-    ];
-    let length_3_alts: &[&[BitDistributorOutputType]] = &[
-        &[BitDistributorOutputType::normal(2); 3],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-            BitDistributorOutputType::normal(3),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-        ],
-    ];
-
-    exhaustive_fixed_length_vecs_1_input_helper(
-        &nevers(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_2_alts,
-        Some(0),
-        &[],
-    );
+    exhaustive_fixed_length_vecs_1_input_helper(&nevers(), 2, Some(0), &[]);
     exhaustive_fixed_length_vecs_1_input_helper(
         &exhaustive_unsigneds::<u8>(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_2_alts,
+        2,
         Some(1 << 16),
         &[
             &[0, 0],
@@ -140,11 +73,7 @@ fn test_exhaustive_fixed_length_vecs_1_input() {
     );
     exhaustive_fixed_length_vecs_1_input_helper(
         &exhaustive_positive_primitive_ints::<u64>(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_2_alts,
+        2,
         None,
         &[
             &[1, 1],
@@ -171,11 +100,7 @@ fn test_exhaustive_fixed_length_vecs_1_input() {
     );
     exhaustive_fixed_length_vecs_1_input_helper(
         &['x', 'y', 'z'].iter().cloned(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_2_alts,
+        2,
         Some(9),
         &[
             &['x', 'x'],
@@ -191,12 +116,7 @@ fn test_exhaustive_fixed_length_vecs_1_input() {
     );
     exhaustive_fixed_length_vecs_1_input_helper(
         &['x', 'y', 'z'].iter().cloned(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_3_alts,
+        3,
         Some(27),
         &[
             &['x', 'x', 'x'],
@@ -223,12 +143,7 @@ fn test_exhaustive_fixed_length_vecs_1_input() {
     );
     exhaustive_fixed_length_vecs_1_input_helper(
         &exhaustive_ascii_chars(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_3_alts,
+        3,
         None,
         &[
             &['a', 'a', 'a'],
@@ -255,30 +170,6 @@ fn test_exhaustive_fixed_length_vecs_1_input() {
     );
 }
 
-#[test]
-#[should_panic]
-fn exhaustive_fixed_length_vecs_1_input_fail_1() {
-    exhaustive_fixed_length_vecs_1_input(0..3, &[]);
-}
-
-#[test]
-#[should_panic]
-fn exhaustive_fixed_length_vecs_1_input_fail_2() {
-    exhaustive_fixed_length_vecs_1_input(0..3, &[(BitDistributorOutputType::normal(1), 1)]);
-}
-
-#[test]
-#[should_panic]
-fn exhaustive_fixed_length_vecs_1_input_fail_3() {
-    exhaustive_fixed_length_vecs_1_input(
-        0..3,
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-    );
-}
-
 fn exhaustive_fixed_length_vecs_2_inputs_helper<
     T,
     I: Clone + Iterator<Item = T>,
@@ -286,14 +177,20 @@ fn exhaustive_fixed_length_vecs_2_inputs_helper<
 >(
     xs: &I,
     ys: &J,
-    output_types: &[(BitDistributorOutputType, usize)],
-    alternative_output_types: &[&[BitDistributorOutputType]],
+    len: usize,
+    input_indices: &[usize],
     out_len: Option<usize>,
     out: &[&[T]],
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), output_types);
+    let output_types = get_sample_output_types(len);
+    let output_configs: Vec<(BitDistributorOutputType, usize)> = output_types[0]
+        .iter()
+        .cloned()
+        .zip(input_indices.iter().cloned())
+        .collect();
+    let xss = exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), &output_configs);
     let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
     assert_eq!(
         xss_prefix
@@ -306,13 +203,13 @@ fn exhaustive_fixed_length_vecs_2_inputs_helper<
     if let Some(out_len) = out_len {
         assert_eq!(xss.count(), out_len);
     }
-    for alt_output_types in alternative_output_types {
-        let alt_output_types: Vec<(BitDistributorOutputType, usize)> = alt_output_types
+    for alt_output_types in &output_types[1..] {
+        let output_configs: Vec<(BitDistributorOutputType, usize)> = alt_output_types
             .iter()
             .cloned()
-            .zip(output_types.iter().cloned().map(|(_, i)| i))
+            .zip(input_indices.iter().cloned())
             .collect();
-        let xss = exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), &alt_output_types);
+        let xss = exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), &output_configs);
         xss.clone().take(20).for_each(drop);
         if let Some(out_len) = out_len {
             assert_eq!(xss.count(), out_len);
@@ -322,86 +219,20 @@ fn exhaustive_fixed_length_vecs_2_inputs_helper<
 
 #[test]
 fn test_exhaustive_fixed_length_vecs_2_inputs() {
-    let length_2_alts: &[&[BitDistributorOutputType]] = &[
-        &[BitDistributorOutputType::normal(2); 2],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-    ];
-    let length_3_alts: &[&[BitDistributorOutputType]] = &[
-        &[BitDistributorOutputType::normal(2); 3],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(2),
-            BitDistributorOutputType::normal(3),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::tiny(),
-        ],
-        &[
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::tiny(),
-            BitDistributorOutputType::normal(1),
-        ],
-    ];
-
-    exhaustive_fixed_length_vecs_2_inputs_helper(
-        &nevers(),
-        &nevers(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-        length_2_alts,
-        Some(0),
-        &[],
-    );
+    exhaustive_fixed_length_vecs_2_inputs_helper(&nevers(), &nevers(), 2, &[0, 1], Some(0), &[]);
     exhaustive_fixed_length_vecs_2_inputs_helper(
         &empty(),
         &exhaustive_unsigneds::<u8>(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-        length_2_alts,
+        2,
+        &[0, 1],
         Some(0),
         &[],
     );
     exhaustive_fixed_length_vecs_2_inputs_helper(
         &exhaustive_unsigneds::<u64>(),
         &exhaustive_positive_primitive_ints::<u64>(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-        length_2_alts,
+        2,
+        &[0, 1],
         None,
         &[
             &[0, 1],
@@ -429,11 +260,8 @@ fn test_exhaustive_fixed_length_vecs_2_inputs() {
     exhaustive_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-        length_2_alts,
+        2,
+        &[0, 1],
         Some(384),
         &[
             &['a', 'x'],
@@ -461,12 +289,8 @@ fn test_exhaustive_fixed_length_vecs_2_inputs() {
     exhaustive_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-            (BitDistributorOutputType::normal(1), 1),
-        ],
-        length_3_alts,
+        3,
+        &[0, 1, 1],
         Some(1152),
         &[
             &['a', 'x', 'x'],
@@ -494,12 +318,8 @@ fn test_exhaustive_fixed_length_vecs_2_inputs() {
     exhaustive_fixed_length_vecs_2_inputs_helper(
         &exhaustive_ascii_chars(),
         &['x', 'y', 'z'].iter().cloned(),
-        &[
-            (BitDistributorOutputType::normal(1), 0),
-            (BitDistributorOutputType::normal(1), 1),
-            (BitDistributorOutputType::normal(1), 0),
-        ],
-        length_3_alts,
+        3,
+        &[0, 1, 0],
         Some(49152),
         &[
             &['a', 'x', 'a'],

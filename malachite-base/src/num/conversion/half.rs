@@ -28,12 +28,14 @@ macro_rules! impl_half_traits {
         /// Implements `JoinHalves` for unsigned primitive integers.
         impl JoinHalves for $t {
             /// Joins two unsigned integers to form an unsigned integer with twice the width.
-            /// `join_halves(upper, lower)`, where `upper` and `lower` are integers with w bits,
-            /// yields an integer with 2w bits whose value is `upper` * 2<sup>w</sup> + `lower`.
             ///
-            /// Time: worst case O(1)
+            /// Let $W$ be `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x, y) = 2^{W/2} x + y$.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -59,12 +61,14 @@ macro_rules! impl_half_traits {
         /// ```
         impl SplitInHalf for $t {
             /// Extracts the lower, or least significant half, of and unsigned integer.
-            /// `n.lower_half()`, where `n` is an integer with w bits, yields an integer with w/2
-            /// bits whose value is `n` mod 2<sup>w/2</sup>.
             ///
-            /// Time: worst case O(1)
+            /// Let $W$ be `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(n) = m$, where $m < 2^{W/2}$ and $n + 2^{W/2} k = m$ for some $k \in Z$.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -78,13 +82,13 @@ macro_rules! impl_half_traits {
                 $ht::wrapping_from(*self)
             }
 
-            /// Extracts the upper, or most significant half, of and unsigned integer.
-            /// `n.upper_half()`, where `n` is an integer with w bits, yields an integer with w/2
-            /// bits whose value is floor(`n` / 2<sup>w/2</sup>).
+            /// Extracts the upper, or most significant half, of an unsigned integer.
             ///
-            /// Time: worst case O(1)
+            /// $f(n) = \lfloor \frac{n}{2^{W/2}} \rfloor$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```

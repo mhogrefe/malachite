@@ -1,8 +1,10 @@
-use integer::Integer;
+use std::ops::Not;
+
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::NotAssign;
+
+use integer::Integer;
 use natural::Natural;
-use std::ops::Not;
 
 impl Not for Integer {
     type Output = Integer;

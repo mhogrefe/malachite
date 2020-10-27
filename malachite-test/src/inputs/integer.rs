@@ -16,9 +16,13 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::tuples::exhaustive::lex_pairs;
+use malachite_base::tuples::exhaustive::{
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
+    exhaustive_triples_from_single, lex_pairs,
+};
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::integer::exhaustive::{
     exhaustive_integer_range_to_infinity, exhaustive_integer_range_to_negative_infinity,
     exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
@@ -49,9 +53,8 @@ use rust_wheels::iterators::naturals::{
 use rust_wheels::iterators::primitive_ints::{special_random_signed, special_random_unsigned};
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_triples,
-    exhaustive_triples_from_single, log_pairs, random_pairs, random_pairs_from_single,
-    random_quadruples, random_triples, random_triples_from_single, sqrt_pairs,
+    random_pairs, random_pairs_from_single, random_quadruples, random_triples,
+    random_triples_from_single,
 };
 
 use common::GenerationMode;
@@ -479,7 +482,10 @@ pub fn pairs_of_integer_and_nonzero_integer_var_2(gm: GenerationMode) -> It<(Int
 }
 
 fn log_pairs_of_integer_and_unsigned<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_unsigneds()))
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 pub fn pairs_of_integer_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -550,7 +556,7 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(Integer, T, U)> {
     match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_tiny(
             exhaustive_integers(),
             exhaustive_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()),
         ))),
@@ -581,7 +587,10 @@ pub fn triples_of_integer_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUn
 }
 
 fn log_pairs_of_integer_and_signed<T: PrimitiveSigned>() -> It<(Integer, T)> {
-    Box::new(log_pairs(exhaustive_integers(), exhaustive_signeds()))
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_signeds(),
+    ))
 }
 
 pub fn pairs_of_integer_and_small_signed<T: PrimitiveSigned + Rand>(
@@ -1468,7 +1477,7 @@ fn quadruples_of_integer_small_unsigned_small_unsigned_and_natural<T: PrimitiveU
     gm: GenerationMode,
 ) -> It<(Integer, T, T, Natural)> {
     permute_1_3_4_2(reshape_2_2_to_4(match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_pairs(exhaustive_integers(), exhaustive_naturals()),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),

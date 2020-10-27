@@ -73,11 +73,9 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 ///
 /// # Worst-case complexity
 ///
-/// $T(n) = O(n + \max\sum_{p \in P}T^\prime(p))$, where the maximum is taken over all multisets $P$
-/// that sum to $n$.
+/// $T(n) = O(n + T^\prime(n))$
 ///
-/// $M(n) = O(\max\sum_{p \in P}M^\prime(p))$, where the maximum is taken over all multisets $P$
-/// that sum to $n$.
+/// $M(n) = O(n + M^\prime(n))$
 ///
 /// where $T$ is time, $M$ is additional memory, $n$ = `src.len()`, and $T^\prime$ and $M^\prime$
 /// are the time and memory complexity functions of `T::from_str`.
@@ -255,9 +253,9 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_2_inputs;
 ///
-/// // We are generating length-3 `Vec`s of chars using two input iterators. The first iterator
-/// // (with index 0) produces all ASCII chars, and the second (index 1) produces the three chars
-/// // `'x'`, `'y'`, and `'z'`. The second elements of `output_types` are 0, 1, and 0, meaning that
+/// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
+/// // (with index 0) produces all ASCII `char`s, and the second (index 1) produces the three
+/// // `char`s `'x'`, `'y'`, and `'z'`. The elements of `output_types` are 0, 1, and 0, meaning that
 /// // the first element of the output `Vec`s will be taken from iterator 0, the second element from
 /// // iterator 1, and the third also from iterator 0.
 /// let xss = lex_fixed_length_vecs_2_inputs(
@@ -301,13 +299,13 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_2_inputs;
 ///
-/// // We are generating length-3 `Vec`s of chars using two input iterators. The first iterator
-/// // (with index 0) produces all ASCII chars, and the second (index 1) produces the three chars
-/// // `'x'`, `'y'`, and `'z'`. The second elements of `output_types` are 0, 1, and 0, meaning that
-/// // the first element of the output `Vec`s will be taken from iterator 0, the second element from
-/// // iterator 1, and the third also from iterator 0. The third element has a tiny output type, so
-/// // it will grow more slowly than the other two elements (though it doesn't look that way from
-/// // the first few `Vec`s).
+/// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
+/// // (with index 0) produces all ASCII `char`s, and the second (index 1) produces the three
+/// // `char`s `'x'`, `'y'`, and `'z'`. The elements of `output_types` have the indices 0, 1, and 0,
+/// // meaning that the first element of the output `Vec`s will be taken from iterator 0, the second
+/// // element from iterator 1, and the third also from iterator 0. The third element has a tiny
+/// // output type, so it will grow more slowly than the other two elements (though it doesn't look
+/// // that way from the first few `Vec`s).
 /// let xss = exhaustive_fixed_length_vecs_2_inputs(
 ///     exhaustive_ascii_chars(),
 ///     ['x', 'y', 'z'].iter().cloned(),

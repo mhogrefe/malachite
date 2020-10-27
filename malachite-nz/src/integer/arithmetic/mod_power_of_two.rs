@@ -1,8 +1,9 @@
-use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     NegModPowerOfTwo, NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
 };
+
+use integer::Integer;
 use natural::Natural;
 
 impl ModPowerOfTwo for Integer {

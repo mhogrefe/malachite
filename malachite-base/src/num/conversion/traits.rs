@@ -51,15 +51,18 @@ impl<T, U: ExactFrom<T>> ExactInto<U> for T {
 }
 
 /// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result can wrap around. If `WrappingFrom` is implemented, it usually makes sense to implement
-/// `OverflowingFrom` as well.
+/// result can wrap around.
+///
+/// If `WrappingFrom` is implemented, it usually makes sense to implement `OverflowingFrom` as well.
 pub trait WrappingFrom<T>: Sized {
     fn wrapping_from(value: T) -> Self;
 }
 
 /// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// can wrap around. It is recommended that this trait is not implemented directly; it is
-/// automatically implemented when `WrappingFrom` is implemented.
+/// can wrap around.
+///
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `WrappingFrom` is implemented.
 pub trait WrappingInto<T>: Sized {
     fn wrapping_into(self) -> T;
 }
@@ -78,9 +81,10 @@ pub trait SaturatingFrom<T>: Sized {
 }
 
 /// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// is set to the maximum or minimum value of the result type, whichever is closer. It is
-/// recommended that this trait is not implemented directly; it is automatically implemented when
-/// `SaturatingFrom` is implemented.
+/// is set to the maximum or minimum value of the result type, whichever is closer.
+///
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `SaturatingFrom` is implemented.
 pub trait SaturatingInto<T>: Sized {
     fn saturating_into(self) -> T;
 }
@@ -93,17 +97,20 @@ impl<T, U: SaturatingFrom<T>> SaturatingInto<U> for T {
 }
 
 /// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result can wrap around. The result is returned along with a `bool` that indicates whether
-/// wrapping has occurred. If `OverflowingFrom` is implemented, it usually makes sense to implement
-/// `WrappingFrom` as well.
+/// result can wrap around.
+///
+/// The result is returned along with a `bool` that indicates whether wrapping has occurred. If
+/// `OverflowingFrom` is implemented, it usually makes sense to implement `WrappingFrom` as well.
 pub trait OverflowingFrom<T>: Sized {
     fn overflowing_from(value: T) -> (Self, bool);
 }
 
 /// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// can wrap around. The result is returned along with a `bool` that indicates whether wrapping has
-/// occurred. It is recommended that this trait is not implemented directly; it is automatically
-/// implemented when `OverflowingFrom` is implemented.
+/// can wrap around.
+///
+/// The result is returned along with a `bool` that indicates whether wrapping has occurred. It is
+/// recommended that this trait is not implemented directly; it is automatically implemented when
+/// `OverflowingFrom` is implemented.
 pub trait OverflowingInto<T>: Sized {
     fn overflowing_into(self) -> (T, bool);
 }
@@ -122,8 +129,10 @@ pub trait RoundingFrom<T>: Sized {
 }
 
 /// This trait defines a conversion to another type, where the conversion is made according to a
-/// specified `RoundingMode`. It is recommended that this trait is not implemented directly; it is
-/// automatically implemented when `OverflowingFrom` is implemented.
+/// specified `RoundingMode`.
+///
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `OverflowingFrom` is implemented.
 pub trait RoundingInto<T>: Sized {
     fn rounding_into(self, rm: RoundingMode) -> T;
 }
@@ -136,8 +145,10 @@ impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
 }
 
 /// This trait provides a function that tests whether a value of type `T` is convertible into a
-/// value of type `Self`. If `ConvertibleFrom<T>` for `Self` is implemented, it usually makes sense
-/// to implement `CheckedFrom` for `T` as well.
+/// value of type `Self`.
+///
+/// If `ConvertibleFrom<T>` for `Self` is implemented, it usually makes sense to implement
+/// `CheckedFrom` for `T` as well.
 pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
 }

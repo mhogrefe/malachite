@@ -56,7 +56,7 @@ fn demo_natural_mod_power_of_two_neg_ref(gm: GenerationMode, limit: usize) {
     for (n, pow) in pairs_of_natural_and_u64_var_1(gm).take(limit) {
         let n_old = n.clone();
         println!(
-            "-{} === {} mod 2^{}",
+            "-(&{}) === {} mod 2^{}",
             n_old,
             n.mod_power_of_two_neg(pow),
             pow

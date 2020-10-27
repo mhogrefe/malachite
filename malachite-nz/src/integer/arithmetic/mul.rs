@@ -1,5 +1,6 @@
-use integer::Integer;
 use std::ops::{Mul, MulAssign};
+
+use integer::Integer;
 
 impl Mul<Integer> for Integer {
     type Output = Integer;

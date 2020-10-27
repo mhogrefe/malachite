@@ -1,6 +1,8 @@
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
 
 use generators::common::Generator;
 use generators::exhaustive::{
@@ -20,6 +22,44 @@ use generators::special_random::{
     special_random_signed_gen_var_2, special_random_unsigned_gen,
     special_random_unsigned_gen_var_1,
 };
+
+// general
+
+#[inline]
+pub fn exhaustive_pairs_big_tiny<
+    X: Clone,
+    I: Iterator<Item = X>,
+    Y: Clone,
+    J: Iterator<Item = Y>,
+>(
+    xs: I,
+    ys: J,
+) -> ExhaustivePairs<X, I, Y, J> {
+    exhaustive_pairs_custom_output(
+        xs,
+        ys,
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    )
+}
+
+#[inline]
+pub fn exhaustive_pairs_big_small<
+    X: Clone,
+    I: Iterator<Item = X>,
+    Y: Clone,
+    J: Iterator<Item = Y>,
+>(
+    xs: I,
+    ys: J,
+) -> ExhaustivePairs<X, I, Y, J> {
+    exhaustive_pairs_custom_output(
+        xs,
+        ys,
+        BitDistributorOutputType::normal(2),
+        BitDistributorOutputType::normal(1),
+    )
+}
 
 // -- bool --
 

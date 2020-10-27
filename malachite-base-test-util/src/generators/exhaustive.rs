@@ -1,3 +1,4 @@
+use generators::common::It;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
 use malachite_base::comparison::traits::{Max, Min};
@@ -9,8 +10,6 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-
-use generators::common::It;
 
 // -- bool --
 

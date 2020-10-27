@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
+
+use integer::Integer;
 
 impl DivisibleBy<Integer> for Integer {
     /// Returns whether an `Integer` is divisible by another `Integer`; in other words, whether the

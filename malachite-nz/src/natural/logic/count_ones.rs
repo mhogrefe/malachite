@@ -1,4 +1,5 @@
 use malachite_base::num::logic::traits::CountOnes;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

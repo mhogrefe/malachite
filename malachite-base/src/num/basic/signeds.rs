@@ -53,9 +53,9 @@ macro_rules! impl_basic_traits {
 
         /// The constant -1.
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         impl NegativeOne for $s {
             const NEGATIVE_ONE: $s = -1;
         }

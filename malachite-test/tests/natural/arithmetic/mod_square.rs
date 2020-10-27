@@ -1,5 +1,6 @@
-use malachite_base::num::arithmetic::traits::ModIsReduced;
-use malachite_base::num::arithmetic::traits::{ModMul, ModNeg, ModSquare, ModSquareAssign};
+use malachite_base::num::arithmetic::traits::{
+    ModIsReduced, ModMul, ModNeg, ModSquare, ModSquareAssign, Square,
+};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -37,11 +38,12 @@ fn mod_square_properties() {
         assert_eq!(mut_x, square);
 
         assert_eq!(x.mod_mul(x, m), square);
+        assert_eq!(x.square() % m, square);
         assert_eq!(x.mod_neg(m).mod_square(m), square);
     });
 
     test_properties(positive_naturals, |m| {
-        assert_eq!(Natural::ZERO.mod_square(m), 0,);
+        assert_eq!(Natural::ZERO.mod_square(m), 0);
         if *m != 1 {
             assert_eq!(Natural::ONE.mod_square(m), 1);
         }

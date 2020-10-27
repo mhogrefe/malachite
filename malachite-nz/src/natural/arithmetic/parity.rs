@@ -1,4 +1,5 @@
 use malachite_base::num::arithmetic::traits::Parity;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 

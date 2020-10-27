@@ -1,17 +1,14 @@
-use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use iterators::iterator_cache::IteratorCache;
-use itertools::Itertools;
-use num::conversion::traits::WrappingFrom;
-use num::logic::traits::SignificantBits;
+use std::cmp::max;
 use std::iter::{once, repeat, Once};
 use std::marker::PhantomData;
-use std::mem::swap;
 
-fn set_slice_to_none<T>(xs: &mut [Option<T>]) {
-    for x in xs {
-        *x = None;
-    }
-}
+use itertools::Itertools;
+
+use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
+use iterators::iterator_cache::IteratorCache;
+use num::arithmetic::traits::CheckedPow;
+use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::logic::traits::SignificantBits;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct LexFixedLengthVecsOutput {
@@ -109,8 +106,8 @@ macro_rules! lex_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s of a given length with elements from $m$ iterators,
-        /// where $m \leq n$, in lexicographic order.
+        /// Generates all length-$n$ `Vec`s with elements from $m$ iterators, where $m \leq n$, in
+        /// lexicographic order.
         ///
         /// The order is lexicographic with respect to the order of the element iterators.
         ///
@@ -148,11 +145,11 @@ macro_rules! lex_fixed_length_vecs {
         /// Finally, we have
         ///
         /// $$
-        /// T(i, n) = O(n + T^\prime{i / P})
+        /// T(i, n) = O(n + T^\prime (i / P))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + M^\prime{i / P})
+        /// M(i, n) = O(n + M^\prime (i / P))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory and $n$ is the number of input iterators.
@@ -196,8 +193,8 @@ macro_rules! lex_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s of a given length with elements from $n$ iterators, in
-        /// lexicographic order.
+        /// Generates all length-$n$ `Vec`s with elements from $n$ iterators, in lexicographic
+        /// order.
         ///
         /// The order is lexicographic with respect to the order of the element iterators.
         ///
@@ -220,11 +217,11 @@ macro_rules! lex_fixed_length_vecs {
         /// If `xs`, is infinite:
         ///
         /// $$
-        /// T(i, n) = O(n + T^\prime{i / P})
+        /// T(i, n) = O(n + T^\prime (i / P))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + M^\prime{i / P})
+        /// M(i, n) = O(n + M^\prime (i / P))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators,
@@ -376,7 +373,7 @@ where
     }
 }
 
-pub fn lex_fixed_length_vecs_from_single_g<I: Iterator>(
+fn lex_fixed_length_vecs_from_single_g<I: Iterator>(
     len: usize,
     xs: I,
 ) -> LexFixedLengthVecsFromSingleG<I>
@@ -437,11 +434,11 @@ where
 /// # Complexity per iteration
 ///
 /// $$
-/// T(i, n) = O(n + T^\prime{i})
+/// T(i, n) = O(n + T^\prime (i))
 /// $$
 ///
 /// $$
-/// M(i, n) = O(n + M^\prime{i})
+/// M(i, n) = O(n + M^\prime (i))
 /// $$
 ///
 /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
@@ -491,8 +488,9 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// $m$ is the number of input iterators, not the length of the output `Vec`s!
         #[derive(Clone, Debug)]
         pub struct $exhaustive_struct<T: Clone, $($it: Iterator<Item=T>,)*> {
-            done: bool,
-            next: Vec<Option<T>>,
+            i: u64,
+            len: usize,
+            limit: Option<u64>,
             distributor: BitDistributor,
             $(
                 $xs: IteratorCache<$it>,
@@ -502,73 +500,101 @@ macro_rules! exhaustive_fixed_length_vecs {
             oi_map: Vec<usize>,
         }
 
+        impl<T: Clone, $($it: Iterator<Item=T>,)*> $exhaustive_struct<T, $($it,)*> {
+            fn try_getting_limit(&mut self) {
+                let mut all_limits_known = true;
+                $(
+                    if let Some(xs_len) = self.$xs.known_len() {
+                        if xs_len == 0 {
+                            self.limit = Some(0);
+                            return;
+                        }
+                    } else {
+                        all_limits_known = false;
+                    }
+                )*
+                if !all_limits_known {
+                    return;
+                }
+                let mut product = 1u64;
+                $(
+                    let xs_len = u64::exact_from(self.$xs.known_len().unwrap());
+                    for _ in 0..self.$outputs.len() {
+                        if let Some(new_product) = product.checked_mul(xs_len) {
+                            product = new_product;
+                        } else {
+                            return;
+                        }
+                    }
+                )*
+                self.limit = Some(product);
+            }
+        }
+
         impl<T: Clone, $($it: Iterator<Item=T>,)*> Iterator for $exhaustive_struct<T, $($it,)*> {
             type Item = Vec<T>;
 
             fn next(&mut self) -> Option<Vec<T>> {
-                if self.done {
+                if Some(self.i) == self.limit {
                     None
                 } else {
+                    if self.i == u64::MAX {
+                        panic!("Too many iterations");
+                    }
                     loop {
-                        let mut some_are_valid = false;
                         let mut all_are_valid = true;
                         $(
-                            let mut no_x = false;
                             for &output_index in &self.$outputs {
-                                if let Some(x) = self.$xs.get(
+                                if self.$xs.get(
                                     self.distributor.get_output(output_index)
-                                ) {
-                                    self.next[output_index] = Some(x.clone());
-                                    some_are_valid = true;
-                                } else {
-                                    no_x = true;
+                                ).is_none() {
                                     all_are_valid = false;
-                                    if some_are_valid {
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
-                            if no_x {
-                                if !self.$xs_done {
-                                    let xs_len = self.$xs.known_len().unwrap();
-                                    if xs_len == 0 {
-                                        self.done = true;
+                            if !all_are_valid {
+                                if self.i == 0 {
+                                    self.limit = Some(0);
+                                    return None;
+                                } else if !self.$xs_done {
+                                    self.try_getting_limit();
+                                    if Some(self.i) == self.limit {
                                         return None;
                                     }
                                     self.$xs_done = true;
+                                    let xs_len = self.$xs.known_len().unwrap();
+                                    // xs_len > 0 at this point
                                     self.distributor.set_max_bits(
                                         &self.$outputs,
-                                        usize::wrapping_from(xs_len.significant_bits())
+                                        max(
+                                            1,
+                                            usize::wrapping_from((xs_len - 1).significant_bits())
+                                        )
                                     );
-                                    set_slice_to_none(&mut self.next);
-                                    continue;
-                                } else if some_are_valid {
-                                    set_slice_to_none(&mut self.next);
+                                } else {
                                     self.distributor.increment_counter();
-                                    continue;
                                 }
+                                continue;
                             }
                         )*
-                        if !some_are_valid {
-                            self.done = true;
-                            return None;
-                        } else if all_are_valid {
-                            break;
-                        } else {
-                            set_slice_to_none(&mut self.next);
-                            self.distributor.increment_counter();
-                        }
+                        break;
                     }
-                    let mut out = vec![None; self.next.len()];
-                    swap(&mut self.next, &mut out);
+                    let mut out = vec![None; self.len];
+                    $(
+                        for &output_index in &self.$outputs {
+                            let x = self.$xs.get(self.distributor.get_output(output_index));
+                            out[output_index] = Some(x.unwrap().clone());
+                        }
+                    )*
+                    self.i += 1;
                     self.distributor.increment_counter();
                     Some(out.into_iter().map(Option::unwrap).collect())
                 }
             }
         }
 
-        /// Generates all length-$n$ `Vec`s of a given length with elements from $m$ iterators,
-        /// where $m \leq n$.
+        /// Generates all `Vec`s of a given length with elements from $m$ iterators, where
+        /// $m \leq n$.
         ///
         /// The `output_types` parameter defines which iterators are mapped to which slot in the
         /// output `Vec`s, and how quickly each output slot advances through its iterator. The
@@ -593,9 +619,9 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O(n)$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
         ///
-        /// $M(i, n) = O(n)$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
         ///
         /// If some of `xs`, `ys`, `zs`, ... are infinite, but all the infinite ones are associated
         /// with tiny outputs: Let $k$ be the number of outputs associated with the infinite
@@ -635,6 +661,12 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
         ///
+        /// # Panics
+        ///
+        /// Panics if the `usize`s in `output_types`, do not include all indices from 0 to $m-1$,
+        /// inclusive, possibly with repetitions. In particular, the length of `output_types` must
+        /// be at least $m$.
+        ///
         /// # Examples
         ///
         /// See the documentation of the `vecs::exhaustive` module.
@@ -651,8 +683,9 @@ macro_rules! exhaustive_fixed_length_vecs {
             assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
             assert_eq!(*oi_sorted_unique.last().unwrap(), _max_input_index);
             $exhaustive_struct {
-                done: false,
-                next: vec![None; output_types.len()],
+                i: 0,
+                len: output_types.len(),
+                limit: None,
                 distributor: BitDistributor::new(output_types.iter().map(|(ot, _)| *ot)
                     .collect::<Vec<_>>().as_slice()),
                 $(
@@ -665,7 +698,7 @@ macro_rules! exhaustive_fixed_length_vecs {
             }
         }
 
-        /// Generates all length-$n$ `Vec`s of a given length with elements from $n$ iterators.
+        /// Generates all length-$n$ `Vec`s with elements from $n$ iterators.
         ///
         /// This function is macro-generated. The value of $n$ is in the function's name.
         ///
@@ -678,22 +711,22 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O(n)$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))$
         ///
-        /// $M(i, n) = O(n)$
+        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))$
         ///
         /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
         ///
         /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))
+        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))
+        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_0, T_1, \ldots T_{k-1}$ and $M_0, M_1, \ldots M_{k-1}$ are the time and additional
+        /// $T_0, T_1, \ldots T_{n-1}$ and $M_0, M_1, \ldots M_{n-1}$ are the time and additional
         /// memory functions of the infinite input iterators.
         ///
         /// # Examples
@@ -711,12 +744,6 @@ macro_rules! exhaustive_fixed_length_vecs {
     }
 }
 
-exhaustive_fixed_length_vecs!(
-    ExhaustiveFixedLengthVecs1Input,
-    exhaustive_fixed_length_vecs_1_input,
-    _dont_use_this,
-    [0, I, xs, xs_done, xs_outputs]
-);
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs2Inputs,
     exhaustive_fixed_length_vecs_2_inputs,
@@ -790,82 +817,84 @@ exhaustive_fixed_length_vecs!(
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct ExhaustiveFixedLengthVecsFromSingleG<I: Iterator>
+pub struct ExhaustiveFixedLengthVecs1InputG<I: Iterator>
 where
     I::Item: Clone,
 {
-    done: bool,
-    next: Vec<Option<I::Item>>,
+    i: u64,
+    len: usize,
+    limit: Option<u64>,
     distributor: BitDistributor,
     xs: IteratorCache<I>,
     xs_done: bool,
+    phantom: PhantomData<*const I::Item>,
 }
 
-impl<I: Iterator> Iterator for ExhaustiveFixedLengthVecsFromSingleG<I>
+impl<I: Iterator> Iterator for ExhaustiveFixedLengthVecs1InputG<I>
 where
     I::Item: Clone,
 {
     type Item = Vec<I::Item>;
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
-        if self.done {
+        if Some(self.i) == self.limit {
             None
         } else {
+            if self.i == u64::MAX {
+                panic!("Too many iterations");
+            }
             loop {
-                let mut some_are_valid = false;
                 let mut all_are_valid = true;
-                for (i, n) in self.next.iter_mut().enumerate() {
-                    if let Some(x) = self.xs.get(self.distributor.get_output(i)) {
-                        *n = Some(x.clone());
-                        some_are_valid = true;
-                    } else {
+                for i in 0..self.len {
+                    if self.xs.get(self.distributor.get_output(i)).is_none() {
                         all_are_valid = false;
-                        if some_are_valid {
-                            break;
-                        }
+                        break;
                     }
                 }
                 if all_are_valid {
                     break;
                 } else if !self.xs_done {
                     let xs_len = self.xs.known_len().unwrap();
-                    if xs_len == 0 {
-                        self.done = true;
+                    self.limit =
+                        CheckedPow::checked_pow(u64::exact_from(xs_len), u64::exact_from(self.len));
+                    if Some(self.i) == self.limit {
                         return None;
                     }
                     self.xs_done = true;
-                    self.distributor
-                        .set_max_bits(&[0], usize::wrapping_from(xs_len.significant_bits()));
-                    set_slice_to_none(&mut self.next);
-                } else if some_are_valid {
-                    set_slice_to_none(&mut self.next);
-                    self.distributor.increment_counter();
+                    // xs_len > 0 at this point
+                    self.distributor.set_max_bits(
+                        &[0],
+                        max(1, usize::wrapping_from((xs_len - 1).significant_bits())),
+                    );
                 } else {
-                    self.done = true;
-                    return None;
+                    self.distributor.increment_counter();
                 }
             }
-            let mut out = vec![None; self.next.len()];
-            swap(&mut self.next, &mut out);
+            let out = (0..self.len)
+                .map(|i| self.xs.get(self.distributor.get_output(i)).unwrap().clone())
+                .collect();
+            self.i += 1;
             self.distributor.increment_counter();
-            Some(out.into_iter().map(Option::unwrap).collect())
+            Some(out)
         }
     }
 }
 
-fn exhaustive_fixed_length_vecs_from_single_g<I: Iterator>(
-    len: usize,
+fn exhaustive_fixed_length_vecs_1_input_g<I: Iterator>(
     xs: I,
-) -> ExhaustiveFixedLengthVecsFromSingleG<I>
+    output_types: &[BitDistributorOutputType],
+) -> ExhaustiveFixedLengthVecs1InputG<I>
 where
     I::Item: Clone,
 {
-    ExhaustiveFixedLengthVecsFromSingleG {
-        done: false,
-        next: vec![None; len],
-        distributor: BitDistributor::new(&vec![BitDistributorOutputType::normal(1); len]),
+    ExhaustiveFixedLengthVecs1InputG {
+        i: 0,
+        len: output_types.len(),
+        limit: None,
+        distributor: BitDistributor::new(output_types),
         xs: IteratorCache::new(xs),
         xs_done: false,
+        phantom: PhantomData,
     }
 }
 
@@ -874,16 +903,16 @@ where
 /// This `struct` is created by the `exhaustive_fixed_length_vecs_from_single` method. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
-pub enum ExhaustiveFixedLengthVecsFromSingle<I: Iterator>
+pub enum ExhaustiveFixedLengthVecs1Input<I: Iterator>
 where
     I::Item: Clone,
 {
     Zero(Once<Vec<I::Item>>),
     One(I),
-    GreaterThanOne(ExhaustiveFixedLengthVecsFromSingleG<I>),
+    GreaterThanOne(ExhaustiveFixedLengthVecs1InputG<I>),
 }
 
-impl<I: Iterator> Iterator for ExhaustiveFixedLengthVecsFromSingle<I>
+impl<I: Iterator> Iterator for ExhaustiveFixedLengthVecs1Input<I>
 where
     I::Item: Clone,
 {
@@ -891,10 +920,101 @@ where
 
     fn next(&mut self) -> Option<Vec<I::Item>> {
         match self {
-            ExhaustiveFixedLengthVecsFromSingle::Zero(ref mut xs) => xs.next(),
-            ExhaustiveFixedLengthVecsFromSingle::One(ref mut xs) => xs.next().map(|x| vec![x]),
-            ExhaustiveFixedLengthVecsFromSingle::GreaterThanOne(ref mut xs) => xs.next(),
+            ExhaustiveFixedLengthVecs1Input::Zero(ref mut xs) => xs.next(),
+            ExhaustiveFixedLengthVecs1Input::One(ref mut xs) => xs.next().map(|x| vec![x]),
+            ExhaustiveFixedLengthVecs1Input::GreaterThanOne(ref mut xs) => xs.next(),
         }
+    }
+}
+
+/// Generates all length-$n$ `Vec`s with elements from a single iterator.
+///
+/// This function differs from `exhaustive_fixed_length_vecs_from_single` in that different
+/// `BitDistributorOutputType`s may be specified for each output element.
+///
+/// The $i$th element of `output_types` is a `BitDistributorOutputType` that determines how quickly
+/// the $i$th output slot advances through the iterator; see the `BitDistributor` documentation for
+/// a description of the different types. The length of the output `Vec`s, $n$, is specified by the
+/// length of `output_types`.
+///
+/// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
+/// If `xs` is infinite, the output is also infinite.
+///
+/// If `len` is 0, the output consists of one empty list.
+///
+/// If `xs` is empty, the output is also empty, unless `len` is 0.
+///
+/// # Complexity per iteration
+///
+/// If all of `xs` is finite:
+///
+/// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
+///
+/// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+///
+/// If `xs` is infinite:
+///
+/// Let $s$ be the sum of the weights of the normal output types, and let $t$ be the number of tiny
+/// outputs. Then define a weight function $W$ for each of the $k$ infinite outputs.
+/// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
+/// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt[t]{\log i}$.
+///
+/// Finally, we have
+///
+/// $$
+/// T(i, n) = O(n + \sum_{j=0}^{n-1}T^\prime(W_j(i)))
+/// $$
+///
+/// $$
+/// M(i, n) = O(n + \sum_{j=0}^{n-1}M^\prime(W_j(i)))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
+/// time and additional memory functions of `xs`.
+///
+/// # Examples
+///
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_1_input;
+///
+/// // We are generating length-3 `Vec`s of chars using one input iterator, which produces all ASCII
+/// // chars. The third element has a tiny output type, so it will grow more slowly than the other
+/// // two elements (though it doesn't look that way from the first few `Vec`s).
+/// let xss = exhaustive_fixed_length_vecs_1_input(
+///     exhaustive_ascii_chars(),
+///     &[
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::tiny(),
+///     ],
+/// );
+/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['a', 'a', 'a'], &['a', 'a', 'b'], &['a', 'a', 'c'], &['a', 'a', 'd'],
+///         &['a', 'b', 'a'], &['a', 'b', 'b'], &['a', 'b', 'c'], &['a', 'b', 'd'],
+///         &['a', 'a', 'e'], &['a', 'a', 'f'], &['a', 'a', 'g'], &['a', 'a', 'h'],
+///         &['a', 'b', 'e'], &['a', 'b', 'f'], &['a', 'b', 'g'], &['a', 'b', 'h'],
+///         &['b', 'a', 'a'], &['b', 'a', 'b'], &['b', 'a', 'c'], &['b', 'a', 'd']
+///     ]
+/// );
+/// ```
+pub fn exhaustive_fixed_length_vecs_1_input<I: Iterator>(
+    xs: I,
+    output_types: &[BitDistributorOutputType],
+) -> ExhaustiveFixedLengthVecs1Input<I>
+where
+    I::Item: Clone,
+{
+    match output_types.len() {
+        0 => ExhaustiveFixedLengthVecs1Input::Zero(once(Vec::new())),
+        1 => ExhaustiveFixedLengthVecs1Input::One(xs),
+        _ => ExhaustiveFixedLengthVecs1Input::GreaterThanOne(
+            exhaustive_fixed_length_vecs_1_input_g(xs, output_types),
+        ),
     }
 }
 
@@ -911,9 +1031,9 @@ where
 ///
 /// If `xs` is finite:
 ///
-/// $T(i, n) = O(n)$
+/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt[n]{i}))$
 ///
-/// $M(i, n) = O(n)$
+/// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
 ///
 /// If `xs` is infinite:
 ///
@@ -937,18 +1057,13 @@ where
 ///     ]
 /// );
 /// ```
+#[inline]
 pub fn exhaustive_fixed_length_vecs_from_single<I: Iterator>(
     len: usize,
     xs: I,
-) -> ExhaustiveFixedLengthVecsFromSingle<I>
+) -> ExhaustiveFixedLengthVecs1Input<I>
 where
     I::Item: Clone,
 {
-    match len {
-        0 => ExhaustiveFixedLengthVecsFromSingle::Zero(once(Vec::new())),
-        1 => ExhaustiveFixedLengthVecsFromSingle::One(xs),
-        len => ExhaustiveFixedLengthVecsFromSingle::GreaterThanOne(
-            exhaustive_fixed_length_vecs_from_single_g(len, xs),
-        ),
-    }
+    exhaustive_fixed_length_vecs_1_input(xs, &vec![BitDistributorOutputType::normal(1); len])
 }

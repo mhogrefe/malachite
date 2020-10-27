@@ -1,4 +1,5 @@
 use malachite_base::num::basic::traits::{One, Zero};
+
 use natural::Natural;
 
 /// Generates all `Natural`s in a finite interval.

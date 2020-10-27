@@ -1,9 +1,11 @@
+use std::ops::{Add, AddAssign};
+
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Add, AddAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the sum of the `Natural` and a `Limb`.

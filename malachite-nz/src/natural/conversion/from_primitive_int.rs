@@ -3,6 +3,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, SaturatingFrom, VecFromOtherType,
 };
+
 use natural::InnerNatural::Small;
 use natural::Natural;
 use platform::Limb;

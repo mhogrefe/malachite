@@ -2,6 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitScan, TrailingZeros};
 use malachite_base::slices::slice_leading_zeros;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

@@ -1,12 +1,14 @@
+use std::ops::{Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::vecs::vec_delete_left;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Shr, ShrAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `Limb`, rounding down.
@@ -217,6 +219,43 @@ pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     }
 }
 
+fn _shr_unsigned_ref<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &Natural, bits: T) -> Natural
+where
+    u64: ExactFrom<T>,
+    Limb: Shr<T, Output = Limb>,
+{
+    match (x, bits) {
+        (natural_zero!(), _) => x.clone(),
+        (_, bits) if bits == T::ZERO => x.clone(),
+        (Natural(Small(_)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => Natural::ZERO,
+        (Natural(Small(small)), bits) => Natural(Small(*small >> bits)),
+        (Natural(Large(ref limbs)), bits) => {
+            Natural::from_owned_limbs_asc(limbs_shr(limbs, u64::exact_from(bits)))
+        }
+    }
+}
+
+fn _shr_assign_unsigned<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &mut Natural, bits: T)
+where
+    u64: ExactFrom<T>,
+    Limb: ShrAssign<T>,
+{
+    match (&mut *x, bits) {
+        (natural_zero!(), _) => {}
+        (_, bits) if bits == T::ZERO => {}
+        (Natural(Small(ref mut small)), bits) if bits >= T::wrapping_from(Limb::WIDTH) => {
+            *small = 0;
+        }
+        (Natural(Small(ref mut small)), bits) => {
+            *small >>= bits;
+        }
+        (Natural(Large(ref mut limbs)), bits) => {
+            limbs_vec_shr_in_place(limbs, u64::exact_from(bits));
+            x.trim();
+        }
+    }
+}
+
 macro_rules! impl_natural_shr_unsigned {
     ($t:ident) => {
         impl Shr<$t> for Natural {
@@ -274,17 +313,9 @@ macro_rules! impl_natural_shr_unsigned {
             /// assert_eq!((&Natural::from(492u32) >> 2u32).to_string(), "123");
             /// assert_eq!((&Natural::trillion() >> 10u64).to_string(), "976562500");
             /// ```
+            #[inline]
             fn shr(self, bits: $t) -> Natural {
-                match (self, bits) {
-                    (_, 0) | (natural_zero!(), _) => self.clone(),
-                    (Natural(Small(_)), bits) if bits >= $t::wrapping_from(Limb::WIDTH) => {
-                        Natural::ZERO
-                    }
-                    (Natural(Small(small)), bits) => Natural(Small(small >> bits)),
-                    (Natural(Large(ref limbs)), bits) => {
-                        Natural::from_owned_limbs_asc(limbs_shr(limbs, u64::exact_from(bits)))
-                    }
-                }
+                _shr_unsigned_ref(self, bits)
             }
         }
 
@@ -308,27 +339,16 @@ macro_rules! impl_natural_shr_unsigned {
             /// x >>= 4u64;
             /// assert_eq!(x.to_string(), "1");
             /// ```
+            #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                match (&mut *self, bits) {
-                    (_, 0) | (natural_zero!(), _) => {}
-                    (Natural(Small(ref mut small)), bits)
-                        if bits >= $t::wrapping_from(Limb::WIDTH) =>
-                    {
-                        *small = 0;
-                    }
-                    (Natural(Small(ref mut small)), bits) => {
-                        *small >>= bits;
-                    }
-                    (Natural(Large(ref mut limbs)), bits) => {
-                        limbs_vec_shr_in_place(limbs, u64::exact_from(bits));
-                        self.trim();
-                    }
-                }
+                _shr_assign_unsigned(self, bits);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shr_unsigned);
+
+//TODO clean
 
 macro_rules! impl_natural_shr_signed {
     ($t:ident) => {

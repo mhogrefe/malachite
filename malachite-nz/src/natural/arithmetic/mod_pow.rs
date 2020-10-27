@@ -1,4 +1,5 @@
-use fail_on_untested_path;
+use std::cmp::{max, Ordering};
+
 use malachite_base::num::arithmetic::traits::{
     ModMulAssign, ModPow, ModPowAssign, ModPowerOfTwo, Parity, WrappingNegAssign,
 };
@@ -7,6 +8,8 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitIterable, TrailingZeros};
 use malachite_base::slices::slice_set_zero;
+
+use fail_on_untested_path;
 use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
@@ -31,7 +34,6 @@ use natural::logic::bit_access::limbs_get_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::Natural;
 use platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
-use std::cmp::{max, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //

@@ -1,11 +1,13 @@
-use integer::Integer;
+use std::mem::swap;
+use std::ops::{Sub, SubAssign};
+
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
+
+use integer::Integer;
 use natural::InnerNatural::Small;
 use natural::Natural;
-use std::mem::swap;
-use std::ops::{Sub, SubAssign};
 
 impl Sub<Integer> for Integer {
     type Output = Integer;

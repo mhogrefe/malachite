@@ -1,5 +1,6 @@
-use integer::Integer;
 use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign};
+
+use integer::Integer;
 
 impl Pow<u64> for Integer {
     type Output = Integer;

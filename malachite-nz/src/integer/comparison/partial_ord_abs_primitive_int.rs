@@ -1,7 +1,9 @@
-use integer::Integer;
+use std::cmp::Ordering;
+
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use std::cmp::Ordering;
+
+use integer::Integer;
 
 macro_rules! impl_unsigned {
     ($t: ident) => {

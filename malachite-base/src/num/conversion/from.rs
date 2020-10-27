@@ -11,20 +11,16 @@ use num::conversion::traits::{
 macro_rules! identity_conversion {
     ($t:ty) => {
         impl CheckedFrom<$t> for $t {
-            /// Converts a value to the value's type. Since this conversion is always valid and
-            /// always leaves the value unchanged, `None` is never returned.
+            /// Converts a value to its own type. Since this conversion is always valid and always
+            /// leaves the value unchanged, `None` is never returned.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
             ///
-            /// assert_eq!(u8::checked_from(123u8), Some(123));
-            /// assert_eq!(i32::checked_from(-5i32), Some(-5));
-            /// ```
+            /// See the documentation of the `num::comparison::from` module.
             #[inline]
             fn checked_from(value: $t) -> Option<$t> {
                 Some(value)
@@ -32,20 +28,16 @@ macro_rules! identity_conversion {
         }
 
         impl WrappingFrom<$t> for $t {
-            /// Converts a value to the value's type. This conversion is always valid and always
-            /// leaves the value unchanged.
+            /// Converts a value to its own type. This conversion is always valid and always leaves
+            /// the value unchanged.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
             ///
-            /// assert_eq!(u8::wrapping_from(123u8), 123);
-            /// assert_eq!(i32::wrapping_from(-5i32), -5);
-            /// ```
+            /// See the documentation of the `num::comparison::from` module.
             #[inline]
             fn wrapping_from(value: $t) -> $t {
                 value
@@ -53,20 +45,16 @@ macro_rules! identity_conversion {
         }
 
         impl SaturatingFrom<$t> for $t {
-            /// Converts a value to the value's type. This conversion is always valid and always
-            /// leaves the value unchanged.
+            /// Converts a value to its own type. This conversion is always valid and always leaves
+            /// the value unchanged.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
             ///
-            /// assert_eq!(u8::saturating_from(123u8), 123);
-            /// assert_eq!(i32::saturating_from(-5i32), -5);
-            /// ```
+            /// See the documentation of the `num::comparison::from` module.
             #[inline]
             fn saturating_from(value: $t) -> $t {
                 value
@@ -74,21 +62,17 @@ macro_rules! identity_conversion {
         }
 
         impl OverflowingFrom<$t> for $t {
-            /// Converts a value to the value's type. Since this conversion is always valid and
-            /// always leaves the value unchanged, the second component of the result is always
-            /// false (no overflow).
+            /// Converts a value to its own type. Since this conversion is always valid and always
+            /// leaves the value unchanged, the second component of the result is always false (no
+            /// overflow).
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
             ///
-            /// assert_eq!(u8::overflowing_from(123u8), (123, false));
-            /// assert_eq!(i32::overflowing_from(-5i32), (-5, false));
-            /// ```
+            /// See the documentation of the `num::comparison::from` module.
             #[inline]
             fn overflowing_from(value: $t) -> ($t, bool) {
                 (value, false)
@@ -98,17 +82,13 @@ macro_rules! identity_conversion {
         impl ConvertibleFrom<$t> for $t {
             /// Checks whether a value is convertible to its own type. The result is always `true`.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             ///
-            /// assert!(u8::convertible_from(123u8));
-            /// assert!(i32::convertible_from(-5i32));
-            /// ```
+            /// See the documentation of the `num::comparison::from` module.
             #[inline]
             fn convertible_from(_: $t) -> bool {
                 true
@@ -128,17 +108,13 @@ macro_rules! lossless_conversion {
         /// Converts a value to another type. Since this conversion is always lossless and leaves
         /// the value unchanged, `None` is never returned.
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
         ///
-        /// assert_eq!(u16::checked_from(123u8), Some(123));
-        /// assert_eq!(i64::checked_from(-5i32), Some(-5));
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
@@ -149,17 +125,13 @@ macro_rules! lossless_conversion {
         /// Converts a value to another type. This conversion is always valid and always leaves the
         /// value unchanged.
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::WrappingFrom;
         ///
-        /// assert_eq!(u16::wrapping_from(123u8), 123);
-        /// assert_eq!(i64::wrapping_from(-5i32), -5);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl WrappingFrom<$a> for $b {
             #[inline]
             fn wrapping_from(value: $a) -> $b {
@@ -170,17 +142,13 @@ macro_rules! lossless_conversion {
         /// Converts a value to another type. This conversion is always valid and always leaves the
         /// value unchanged.
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::SaturatingFrom;
         ///
-        /// assert_eq!(u16::saturating_from(123u8), 123);
-        /// assert_eq!(i64::saturating_from(-5i32), -5);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
@@ -188,21 +156,17 @@ macro_rules! lossless_conversion {
             }
         }
 
-        /// Converts a value to the value's type. Since this conversion is always valid and
-        /// always leaves the value unchanged, the second component of the result is always
-        /// false (no overflow).
+        /// Converts a value to the value's type. Since this conversion is always valid and always
+        /// leaves the value unchanged, the second component of the result is always false (no
+        /// overflow).
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::OverflowingFrom;
         ///
-        /// assert_eq!(u16::overflowing_from(123u8), (123, false));
-        /// assert_eq!(i64::overflowing_from(-5i32), (-5, false));
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
@@ -212,17 +176,13 @@ macro_rules! lossless_conversion {
 
         /// Checks whether a value is convertible to a different type. The result is always `true`.
         ///
-        /// Time: worst case O(1)
+        /// # Worst-case complexity
         ///
-        /// Additional memory: worst case O(1)
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         ///
-        /// assert!(u16::convertible_from(123u8));
-        /// assert!(i64::convertible_from(-5i32));
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]
             fn convertible_from(_: $a) -> bool {
@@ -290,20 +250,31 @@ macro_rules! lossy_conversion {
         /// Converts a value to another type. If the value cannot be represented in the new type,
         /// `None` is returned.
         ///
-        /// Time: worst case O(1)
+        /// Let $W$ be `$b::WIDTH`.
         ///
-        /// Additional memory: worst case O(1)
+        /// If the target type `$b` is unsigned,
+        /// $$
+        /// f_W(n) = \\begin{cases}
+        ///     \operatorname{Some}(n) & 0 \leq n < 2^W \\\\
+        ///     \operatorname{None} & \\text{otherwise}.
+        /// \\end{cases}
+        /// $$
+        ///
+        /// If the target type is signed,
+        /// $$
+        /// f_W(n) = \\begin{cases}
+        ///     \operatorname{Some}(n) & -2^{W-1} \leq n < 2^{W-1}-1 \\\\
+        ///     \operatorname{None} & \\text{otherwise}.
+        /// \\end{cases}
+        /// $$
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::CheckedFrom;
         ///
-        /// assert_eq!(u32::checked_from(5u64), Some(5));
-        /// assert_eq!(u8::checked_from(1000u16), None);
-        /// assert_eq!(u32::checked_from(-5i32), None);
-        /// assert_eq!(i32::checked_from(3000000000u32), None);
-        /// assert_eq!(i8::checked_from(-1000i16), None);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
@@ -314,20 +285,22 @@ macro_rules! lossy_conversion {
         /// Converts a value to another type. If the value cannot be represented in the new type, it
         /// is wrapped.
         ///
-        /// Time: worst case O(1)
+        /// Let $W$ be `$b::WIDTH`.
         ///
-        /// Additional memory: worst case O(1)
+        /// If the target type `$b` is unsigned,
+        /// $f_W(n) = m$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+        ///
+        /// If the target type is signed,
+        /// $f_W(n) = m$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
+        /// $k \in \Z$.
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::WrappingFrom;
         ///
-        /// assert_eq!(u32::wrapping_from(5u64), 5);
-        /// assert_eq!(u8::wrapping_from(1000u16), 232);
-        /// assert_eq!(u32::wrapping_from(-5i32), 4294967291);
-        /// assert_eq!(i32::wrapping_from(3000000000u32), -1294967296);
-        /// assert_eq!(i8::wrapping_from(-1000i16), 24);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
             #[inline]
@@ -339,20 +312,33 @@ macro_rules! lossy_conversion {
         /// Converts a value to another type. If the value cannot be represented in the new type,
         /// the maximum or minimum value of the new type, whichever is closer, is returned.
         ///
-        /// Time: worst case O(1)
+        /// Let $W$ be `$b::WIDTH`.
         ///
-        /// Additional memory: worst case O(1)
+        /// If the target type `$b` is unsigned,
+        /// $$
+        /// f_W(n) = \\begin{cases}
+        ///     0 & n < 0 \\\\
+        ///     2^W-1 & n \geq 2^W \\\\
+        ///     n & \\text{otherwise}.
+        /// \\end{cases}
+        /// $$
+        ///
+        /// If the target type is signed,
+        /// $$
+        /// f_W(n) = \\begin{cases}
+        ///     -2^{W-1} & n < -2^{W-1} \\\\
+        ///     2^{W-1}-1 & n \geq 2^{W-1} \\\\
+        ///     n & \\text{otherwise}.
+        /// \\end{cases}
+        /// $$
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::SaturatingFrom;
         ///
-        /// assert_eq!(u32::saturating_from(5u64), 5);
-        /// assert_eq!(u8::saturating_from(1000u16), 255);
-        /// assert_eq!(u32::saturating_from(-5i32), 0);
-        /// assert_eq!(i32::saturating_from(3000000000u32), 2147483647);
-        /// assert_eq!(i8::saturating_from(-1000i16), -128);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
@@ -363,20 +349,22 @@ macro_rules! lossy_conversion {
         /// Converts a value to another type. If the value cannot be represented in the new type, it
         /// is wrapped. The second component of the result indicates whether overflow occurred.
         ///
-        /// Time: worst case O(1)
+        /// Let $W$ be `$b::WIDTH`.
         ///
-        /// Additional memory: worst case O(1)
+        /// If the target type `$b` is unsigned,
+        /// $f_W(n) = (m, k \neq 0)$, where $m < 2^W$ and $n + 2^W k = m$ for some $k \in \Z$.
+        ///
+        /// If the target type is signed,
+        /// $f_W(n) = (m, k \neq 0)$, where $-2^{W-1} \leq m < 2^{W-1}$ and $n + 2^W k = m$ for some
+        /// $k \in \Z$.
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::OverflowingFrom;
         ///
-        /// assert_eq!(u32::overflowing_from(5u64), (5, false));
-        /// assert_eq!(u8::overflowing_from(1000u16), (232, true));
-        /// assert_eq!(u32::overflowing_from(-5i32), (4294967291, true));
-        /// assert_eq!(i32::overflowing_from(3000000000u32), (-1294967296, true));
-        /// assert_eq!(i8::overflowing_from(-1000i16), (24, true));
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
@@ -386,20 +374,25 @@ macro_rules! lossy_conversion {
 
         /// Determines whether a value is convertible to a different type.
         ///
-        /// Time: worst case O(1)
+        /// Let $W$ be `$b::WIDTH`.
         ///
-        /// Additional memory: worst case O(1)
+        /// If the target type `$b` is unsigned,
+        /// $$
+        /// f_W(n) = (0 \leq n < 2^W).
+        /// $$
+        ///
+        /// If the target type is signed,
+        /// $$
+        /// f_W(n) = (-2^{W-1} \leq n < 2^{W-1}-1).
+        /// $$
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::ConvertibleFrom;
         ///
-        /// assert_eq!(u32::convertible_from(5u64), true);
-        /// assert_eq!(u8::convertible_from(1000u16), false);
-        /// assert_eq!(u32::convertible_from(-5i32), false);
-        /// assert_eq!(i32::convertible_from(3000000000u32), false);
-        /// assert_eq!(i8::convertible_from(-1000i16), false);
-        /// ```
+        /// See the documentation of the `num::comparison::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]
             fn convertible_from(value: $a) -> bool {

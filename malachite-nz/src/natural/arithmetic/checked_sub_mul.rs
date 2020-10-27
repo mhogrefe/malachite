@@ -1,4 +1,5 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul};
+
 use natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
     limbs_sub_mul_limb_greater_in_place_left,

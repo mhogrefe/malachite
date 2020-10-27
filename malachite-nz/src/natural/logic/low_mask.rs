@@ -3,6 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

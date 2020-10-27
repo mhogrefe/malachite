@@ -37,6 +37,67 @@ extern crate malachite_base_test_util;
 extern crate rand;
 extern crate rand_chacha;
 
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+
+fn get_sample_output_types(len: usize) -> Vec<Vec<BitDistributorOutputType>> {
+    if len == 2 {
+        vec![
+            vec![BitDistributorOutputType::normal(1); 2],
+            vec![BitDistributorOutputType::normal(2); 2],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(2),
+            ],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ],
+        ]
+    } else if len == 3 {
+        vec![
+            vec![BitDistributorOutputType::normal(1); 3],
+            vec![BitDistributorOutputType::normal(2); 3],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(2),
+                BitDistributorOutputType::normal(3),
+            ],
+            vec![
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ],
+            vec![
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ],
+            vec![
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ],
+            vec![
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ],
+        ]
+    } else {
+        panic!()
+    }
+}
+
 pub mod bools {
     pub mod constants;
     pub mod exhaustive;
@@ -334,6 +395,10 @@ pub mod strings {
 }
 pub mod tuples {
     pub mod exhaustive {
+        pub mod exhaustive_custom_tuples;
+        pub mod exhaustive_tuples_1_input;
+        pub mod exhaustive_tuples_custom_output;
+        pub mod exhaustive_tuples_from_single;
         pub mod exhaustive_units;
         pub mod lex_custom_tuples;
         pub mod lex_tuples;

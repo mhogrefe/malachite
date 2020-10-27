@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign, ModSquare, ModSquareAssign};
 use malachite_base::num::basic::traits::Two;
+
 use natural::Natural;
 
 impl ModSquare<Natural> for Natural {

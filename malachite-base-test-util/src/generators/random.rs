@@ -1,3 +1,4 @@
+use generators::common::{GenConfig, It};
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::random::{
     random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
@@ -12,8 +13,6 @@ use malachite_base::num::random::{
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-
-use generators::common::{GenConfig, It};
 
 // -- bool --
 

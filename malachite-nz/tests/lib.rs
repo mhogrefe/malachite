@@ -171,6 +171,7 @@ pub mod natural {
         pub mod mod_power_of_two_neg;
         pub mod mod_power_of_two_shl;
         pub mod mod_power_of_two_shr;
+        pub mod mod_power_of_two_square;
         pub mod mod_power_of_two_sub;
         pub mod mod_square;
         pub mod mod_sub;

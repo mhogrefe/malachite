@@ -1,10 +1,12 @@
+use std::ops::{Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoShl, ModPowerOfTwoShlAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+
 use natural::Natural;
-use std::ops::{Shr, ShrAssign};
 
 fn _mod_power_of_two_shl_unsigned<T>(x: &Natural, bits: T, pow: u64) -> Natural
 where

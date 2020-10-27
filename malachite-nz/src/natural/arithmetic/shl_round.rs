@@ -1,8 +1,41 @@
+use std::ops::{Shl, ShlAssign};
+
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
+
 use natural::Natural;
+
+fn _shl_round_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+    rm: RoundingMode,
+) -> Natural
+where
+    &'a Natural: Shl<U, Output = Natural> + ShrRound<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x << bits.unsigned_abs()
+    } else {
+        x.shr_round(bits.unsigned_abs(), rm)
+    }
+}
+
+fn _shl_round_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &mut Natural,
+    bits: S,
+    rm: RoundingMode,
+) where
+    Natural: ShlAssign<U> + ShrRoundAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x <<= bits.unsigned_abs();
+    } else {
+        x.shr_round_assign(bits.unsigned_abs(), rm);
+    }
+}
 
 macro_rules! impl_natural_shl_round_signed {
     ($t:ident) => {
@@ -151,12 +184,9 @@ macro_rules! impl_natural_shl_round_signed {
             ///     "155921023828072216384094494261248"
             /// );
             /// ```
+            #[inline]
             fn shl_round(self, bits: $t, rm: RoundingMode) -> Natural {
-                if bits >= 0 {
-                    self << bits.unsigned_abs()
-                } else {
-                    self.shr_round(bits.unsigned_abs(), rm)
-                }
+                _shl_round_ref(self, bits, rm)
             }
         }
 
@@ -224,12 +254,9 @@ macro_rules! impl_natural_shl_round_signed {
             /// x.shl_round_assign(4i64, RoundingMode::Exact);
             /// assert_eq!(x.to_string(), "1024");
             /// ```
+            #[inline]
             fn shl_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                if bits >= 0 {
-                    *self <<= bits.unsigned_abs();
-                } else {
-                    self.shr_round_assign(bits.unsigned_abs(), rm);
-                }
+                _shl_round_assign(self, bits, rm);
             }
         }
     };

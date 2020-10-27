@@ -4,6 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
+
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
 use platform::Limb;

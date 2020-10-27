@@ -1,6 +1,7 @@
-use integer::Integer;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode;
+
+use integer::Integer;
 use natural::Natural;
 
 macro_rules! float_impls {

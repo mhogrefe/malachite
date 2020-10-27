@@ -1,5 +1,6 @@
-use integer::Integer;
 use std::ops::{Div, DivAssign};
+
+use integer::Integer;
 
 impl Div<Integer> for Integer {
     type Output = Integer;

@@ -7,9 +7,10 @@ use num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoPow, ModPowerOfTwoPowAssign,
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
     ModPowerOfTwoSquare, ModPowerOfTwoSquareAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign,
-    ModSquare, ModSquareAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo,
-    NegModPowerOfTwoAssign, NextPowerOfTwo, NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ,
-    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub,
+    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
+    NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
+    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -95,6 +96,8 @@ pub trait PrimitiveUnsigned:
     + ModPowPrecomputedAssign<u64, Self>
     + ModSquare<Self, Output = Self>
     + ModSquareAssign<Self>
+    + ModSquarePrecomputed<u64, Self, Output = Self>
+    + ModSquarePrecomputedAssign<u64, Self>
     + ModSub<Self, Self, Output = Self>
     + ModSubAssign<Self, Self>
     + NegMod<Self, Output = Self>
@@ -136,6 +139,7 @@ pub trait PrimitiveUnsigned:
     + XXXSubYYYIsZZZ
     + XXXXAddYYYYIsZZZZ
 {
+    //TODO remove
     type SignedOfEqualWidth: PrimitiveSigned;
 }
 

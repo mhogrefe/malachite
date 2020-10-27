@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+
 use natural::InnerNatural::Small;
 use natural::Natural;
-use std::str::FromStr;
 
 /// An integer.
 ///

@@ -20,10 +20,14 @@ use malachite_base::num::floats::{increment_float, PrimitiveFloat};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::tuples::exhaustive::lex_pairs;
-use malachite_base::tuples::exhaustive::{lex_pairs_from_single, lex_triples_from_single};
+use malachite_base::tuples::exhaustive::{
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
+    exhaustive_quadruples_from_single, exhaustive_triples, exhaustive_triples_from_single,
+    lex_pairs, lex_pairs_from_single, lex_triples_from_single,
+};
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
     exhaustive_positive_naturals,
@@ -53,10 +57,8 @@ use rust_wheels::iterators::primitive_ints::{
 };
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
-    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
-    exhaustive_quadruples_from_single, exhaustive_triples, exhaustive_triples_from_single,
-    log_pairs, random_pairs, random_pairs_from_single, random_quadruples,
-    random_quadruples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
+    random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
+    random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::{exhaustive_vecs, exhaustive_vecs_shortlex, random_vecs};
 
@@ -564,7 +566,10 @@ pub fn pairs_of_natural_and_positive_natural_var_2(gm: GenerationMode) -> It<(Na
 }
 
 fn log_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_unsigneds()))
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 pub fn pairs_of_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
@@ -649,7 +654,7 @@ pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>
     gm: GenerationMode,
 ) -> It<(Natural, T)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_tiny(
             exhaustive_positive_naturals(),
             exhaustive_unsigneds(),
         )),
@@ -667,7 +672,10 @@ pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>
 }
 
 fn log_pairs_of_natural_and_signed<T: PrimitiveSigned>() -> It<(Natural, T)> {
-    Box::new(log_pairs(exhaustive_naturals(), exhaustive_signeds()))
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_signeds(),
+    ))
 }
 
 pub fn pairs_of_natural_and_small_signed<T: PrimitiveSigned + Rand>(
@@ -721,7 +729,7 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
     gm: GenerationMode,
 ) -> It<(Natural, T, T)> {
     match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_tiny(
             exhaustive_naturals(),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
@@ -1041,7 +1049,7 @@ pub fn triples_of_natural_small_unsigned_and_u64_var_1<T: PrimitiveUnsigned>(
         GenerationMode::Exhaustive => Box::new(
             exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
-                    sqrt_pairs(
+                    exhaustive_pairs_big_small(
                         exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
                         exhaustive_unsigneds(),
                     )
@@ -1094,7 +1102,7 @@ pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
         GenerationMode::Exhaustive => Box::new(
             exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
-                    sqrt_pairs(
+                    exhaustive_pairs_big_small(
                         exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
                         exhaustive_signeds(),
                     )
@@ -1702,7 +1710,7 @@ fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural<T: PrimitiveU
     gm: GenerationMode,
 ) -> It<(Natural, T, T, Natural)> {
     permute_1_3_4_2(reshape_2_2_to_4(match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_pairs_from_single(exhaustive_naturals()),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
@@ -1920,7 +1928,10 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
                 )
             };
             reshape_2_1_to_3(Box::new(dependent_pairs(
-                log_pairs(exhaustive_naturals(), exhaustive_positive_primitive_ints()),
+                exhaustive_pairs_big_tiny(
+                    exhaustive_naturals(),
+                    exhaustive_positive_primitive_ints(),
+                ),
                 f,
             )))
         }

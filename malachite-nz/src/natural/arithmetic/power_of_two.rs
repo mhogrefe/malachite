@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::traits::One;
+
 use natural::Natural;
 
 impl PowerOfTwo for Natural {

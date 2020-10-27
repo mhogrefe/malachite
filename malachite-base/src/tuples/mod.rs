@@ -67,19 +67,141 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::lex_triples_xyx;
 ///
-/// // We are generating triples of chars using two input iterators. The first iterator, `xs`,
-/// // produces all ASCII chars, and the second, `ys`, produces the three chars `'x'`, `'y'`, and
-/// // `'z'`. The function we're using is `lex_triples_xyx`, meaning that the first element of the
-/// // output triples will be taken from `xs`, the second element from `ys`, and the third also from
-/// // `xs`.
-/// let ts = lex_triples_xyx(exhaustive_ascii_chars(), ['x', 'y', 'z'].iter().cloned());
+/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
+/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
+/// // function we're using is `lex_triples_xyx`, meaning that the first element of the output
+/// // triples will be taken from `xs`, the second element from `ys`, and the third also from `xs`.
+/// let ts = lex_triples_xyx(exhaustive_ascii_chars(), 0..3);
 /// assert_eq!(
 ///     ts.take(20).collect::<Vec<_>>(),
 ///     &[
-///         ('a', 'x', 'a'), ('a', 'x', 'b'), ('a', 'x', 'c'), ('a', 'x', 'd'), ('a', 'x', 'e'),
-///         ('a', 'x', 'f'), ('a', 'x', 'g'), ('a', 'x', 'h'), ('a', 'x', 'i'), ('a', 'x', 'j'),
-///         ('a', 'x', 'k'), ('a', 'x', 'l'), ('a', 'x', 'm'), ('a', 'x', 'n'), ('a', 'x', 'o'),
-///         ('a', 'x', 'p'), ('a', 'x', 'q'), ('a', 'x', 'r'), ('a', 'x', 's'), ('a', 'x', 't')
+///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 0, 'd'), ('a', 0, 'e'),
+///         ('a', 0, 'f'), ('a', 0, 'g'), ('a', 0, 'h'), ('a', 0, 'i'), ('a', 0, 'j'),
+///         ('a', 0, 'k'), ('a', 0, 'l'), ('a', 0, 'm'), ('a', 0, 'n'), ('a', 0, 'o'),
+///         ('a', 0, 'p'), ('a', 0, 'q'), ('a', 0, 'r'), ('a', 0, 's'), ('a', 0, 't')
+///     ]
+/// );
+/// ```
+///
+/// # exhaustive_[n-tuples]
+/// ```
+/// use malachite_base::tuples::exhaustive::exhaustive_pairs;
+///
+/// let xss = exhaustive_pairs(['a', 'b', 'c'].iter().cloned(), 0..3).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss,
+///     &[('a', 0), ('a', 1), ('b', 0), ('b', 1), ('a', 2), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
+/// );
+/// ```
+///
+/// # exhaustive_[n-tuples]_custom_output
+/// ```
+/// use malachite_base::tuples::exhaustive::exhaustive_pairs_custom_output;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+///
+/// let xss = exhaustive_pairs_custom_output(
+///     ['a', 'b', 'c'].iter().cloned(),
+///     0..3,
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::tiny(),
+/// ).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss,
+///     &[('a', 0), ('a', 1), ('a', 2), ('b', 0), ('b', 1), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
+/// );
+/// ```
+///
+/// # exhaustive_[n-tuples]_from_single
+/// ```
+/// use malachite_base::tuples::exhaustive::exhaustive_pairs_from_single;
+///
+/// assert_eq!(
+///     exhaustive_pairs_from_single(0..4).collect::<Vec<_>>(),
+///     &[
+///         (0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 0), (2, 1), (3, 0),
+///         (3, 1), (2, 2), (2, 3), (3, 2), (3, 3)
+///     ]
+/// );
+/// ```
+///
+/// # exhaustive_[n-tuples]_1_input
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::tuples::exhaustive::exhaustive_triples_1_input;
+///
+/// // We are generating triples of `char`s using one input iterator, which produces all ASCII
+/// // `char`s. The third element has a tiny output type, so it will grow more slowly than the other
+/// // two elements (though it doesn't look that way from the first few tuples).
+/// let ts = exhaustive_triples_1_input(
+///     exhaustive_ascii_chars(),
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::tiny(),
+/// );
+/// assert_eq!(
+///     ts.take(20).collect::<Vec<_>>(),
+///     &[
+///         ('a', 'a', 'a'), ('a', 'a', 'b'), ('a', 'a', 'c'), ('a', 'a', 'd'), ('a', 'b', 'a'),
+///         ('a', 'b', 'b'), ('a', 'b', 'c'), ('a', 'b', 'd'), ('a', 'a', 'e'), ('a', 'a', 'f'),
+///         ('a', 'a', 'g'), ('a', 'a', 'h'), ('a', 'b', 'e'), ('a', 'b', 'f'), ('a', 'b', 'g'),
+///         ('a', 'b', 'h'), ('b', 'a', 'a'), ('b', 'a', 'b'), ('b', 'a', 'c'), ('b', 'a', 'd')
+///     ]
+/// );
+/// ```
+///
+/// # exhaustive_custom_tuples
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx;
+///
+/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
+/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
+/// // function we're using is `exhaustive_triples_xyx`, meaning that the first element of the
+/// // output triples will be taken from `xs`, the second element from `ys`, and the third also from
+/// // `xs`.
+/// let ts = exhaustive_triples_xyx(exhaustive_ascii_chars(), 0..3);
+/// assert_eq!(
+///     ts.take(20).collect::<Vec<_>>(),
+///     &[
+///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 1, 'a'), ('a', 1, 'b'), ('b', 0, 'a'),
+///         ('b', 0, 'b'), ('b', 1, 'a'), ('b', 1, 'b'), ('a', 0, 'c'), ('a', 0, 'd'),
+///         ('a', 1, 'c'), ('a', 1, 'd'), ('b', 0, 'c'), ('b', 0, 'd'), ('b', 1, 'c'),
+///         ('b', 1, 'd'), ('a', 2, 'a'), ('a', 2, 'b'), ('b', 2, 'a'), ('b', 2, 'b')
+///     ]
+/// );
+/// ```
+///
+/// # exhaustive_custom_tuples_custom_output
+/// ```
+/// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
+/// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx_custom_output;
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+///
+/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
+/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
+/// // function we're using is `exhaustive_triples_xyx_custom_output`, meaning that the first
+/// // element of the output triples will be taken from `xs`, the second element from `ys`, and the
+/// // third also from `xs`.
+/// //
+/// // The third element has a tiny output type, so it will grow more slowly than the other two
+/// // elements (though it doesn't look that way from the first few tuples).
+/// let ts = exhaustive_triples_xyx_custom_output(
+///     exhaustive_ascii_chars(),
+///     0..3,
+///     &[
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::tiny()
+///     ],
+/// );
+/// assert_eq!(
+///     ts.take(20).collect::<Vec<_>>(),
+///     &[
+///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 0, 'd'), ('a', 1, 'a'),
+///         ('a', 1, 'b'), ('a', 1, 'c'), ('a', 1, 'd'), ('a', 0, 'e'), ('a', 0, 'f'),
+///         ('a', 0, 'g'), ('a', 0, 'h'), ('a', 1, 'e'), ('a', 1, 'f'), ('a', 1, 'g'),
+///         ('a', 1, 'h'), ('b', 0, 'a'), ('b', 0, 'b'), ('b', 0, 'c'), ('b', 0, 'd')
 ///     ]
 /// );
 /// ```

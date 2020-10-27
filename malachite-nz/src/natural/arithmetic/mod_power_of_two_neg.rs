@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign,
 };
+
 use natural::Natural;
 
 impl ModPowerOfTwoNeg for Natural {

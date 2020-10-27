@@ -5,6 +5,7 @@ use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_set_zero;
 use malachite_base::vecs::vec_delete_left;
+
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 use natural::arithmetic::shl::limbs_slice_shl_in_place;
 use natural::arithmetic::shr::limbs_slice_shr_in_place;

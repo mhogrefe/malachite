@@ -1,12 +1,14 @@
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::vecs::vec_pad_left;
+
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::ops::{Shl, ShlAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` left-shifted by a `Limb`.
@@ -352,7 +354,30 @@ macro_rules! impl_natural_shl_unsigned {
 }
 apply_to_unsigneds!(impl_natural_shl_unsigned);
 
-//TODO clean
+fn _shl_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+) -> Natural
+where
+    &'a Natural: Shl<U, Output = Natural> + Shr<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x << bits.unsigned_abs()
+    } else {
+        x >> bits.unsigned_abs()
+    }
+}
+
+fn _shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+where
+    Natural: ShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x <<= bits.unsigned_abs();
+    } else {
+        *x >>= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_natural_shl_signed {
     ($t:ident) => {
@@ -415,12 +440,9 @@ macro_rules! impl_natural_shl_signed {
             /// assert_eq!((&Natural::from(492u32) << -2i8).to_string(), "123");
             /// assert_eq!((&Natural::trillion() << -10i16).to_string(), "976562500");
             /// ```
+            #[inline]
             fn shl(self, bits: $t) -> Natural {
-                if bits >= 0 {
-                    self << bits.unsigned_abs()
-                } else {
-                    self >> bits.unsigned_abs()
-                }
+                _shl_ref_signed(self, bits)
             }
         }
 
@@ -454,12 +476,9 @@ macro_rules! impl_natural_shl_signed {
             /// x <<= -4i64;
             /// assert_eq!(x.to_string(), "1");
             /// ```
+            #[inline]
             fn shl_assign(&mut self, bits: $t) {
-                if bits >= 0 {
-                    *self <<= bits.unsigned_abs();
-                } else {
-                    *self >>= bits.unsigned_abs();
-                }
+                _shl_assign_signed(self, bits);
             }
         }
     };

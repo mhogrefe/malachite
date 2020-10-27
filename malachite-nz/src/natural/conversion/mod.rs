@@ -1,9 +1,11 @@
-use error::ParseIntegerError;
-use malachite_base::num::basic::traits::Zero;
-use natural::InnerNatural::{Large, Small};
-use natural::Natural;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::str::FromStr;
+
+use malachite_base::num::basic::traits::Zero;
+
+use error::ParseIntegerError;
+use natural::InnerNatural::{Large, Small};
+use natural::Natural;
 
 impl Natural {
     //TODO test

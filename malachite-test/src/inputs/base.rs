@@ -32,9 +32,15 @@ use malachite_base::num::logic::traits::{
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
-use malachite_base::tuples::exhaustive::{lex_pairs, lex_triples};
+use malachite_base::tuples::exhaustive::{
+    exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
+    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
+    lex_pairs, lex_triples,
+};
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
@@ -112,12 +118,9 @@ use rust_wheels::iterators::strings::{
     exhaustive_strings, exhaustive_strings_with_chars, random_strings, random_strings_with_chars,
 };
 use rust_wheels::iterators::tuples::{
-    exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
-    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
-    log_pairs, random_octuples_from_single, random_pairs, random_pairs_from_single,
-    random_quadruples, random_quadruples_from_single, random_quintuples,
-    random_sextuples_from_single, random_triples, random_triples_from_single, sqrt_pairs,
+    random_octuples_from_single, random_pairs, random_pairs_from_single, random_quadruples,
+    random_quadruples_from_single, random_quintuples, random_sextuples_from_single, random_triples,
+    random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::{
     exhaustive_vecs, exhaustive_vecs_min_length, exhaustive_vecs_shortlex, random_vecs,
@@ -1220,19 +1223,31 @@ pub fn small_signeds<T: PrimitiveSigned>(gm: NoSpecialGenerationMode) -> It<T> {
 }
 
 fn sqrt_pairs_of_unsigneds<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
-    Box::new(sqrt_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()))
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 fn sqrt_pairs_of_unsigned_and_signed<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> It<(T, U)> {
-    Box::new(sqrt_pairs(exhaustive_unsigneds(), exhaustive_signeds()))
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_unsigneds(),
+        exhaustive_signeds(),
+    ))
 }
 
 fn sqrt_pairs_of_signed_and_unsigned<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
-    Box::new(sqrt_pairs(exhaustive_signeds(), exhaustive_unsigneds()))
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_signeds(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 fn sqrt_pairs_of_signeds<T: PrimitiveSigned, U: PrimitiveSigned>() -> It<(T, U)> {
-    Box::new(sqrt_pairs(exhaustive_signeds(), exhaustive_signeds()))
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_signeds(),
+        exhaustive_signeds(),
+    ))
 }
 
 fn random_pairs_of_primitive_and_geometric<T: PrimitiveInt + Rand, U: PrimitiveInt>(
@@ -1417,7 +1432,7 @@ pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(usize, T)> {
     match gm {
-        GenerationMode::Exhaustive => permute_2_1(Box::new(log_pairs(
+        GenerationMode::Exhaustive => permute_2_1(Box::new(exhaustive_pairs_big_tiny(
             exhaustive_unsigneds(),
             exhaustive_unsigneds(),
         ))),
@@ -1543,7 +1558,7 @@ pub fn pairs_of_small_u64_and_small_usize_var_2(gm: NoSpecialGenerationMode) -> 
 
 fn sqrt_pairs_of_positive_primitive_and_unsigned<T: PrimitiveInt, U: PrimitiveUnsigned + Rand>(
 ) -> It<(T, U)> {
-    Box::new(sqrt_pairs(
+    Box::new(exhaustive_pairs_big_small(
         exhaustive_positive_primitive_ints(),
         exhaustive_unsigneds(),
     ))
@@ -1839,7 +1854,7 @@ pub fn triples_of_unsigned_small_unsigned_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(T, U, U)> {
     match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
             exhaustive_unsigneds(),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
@@ -1949,7 +1964,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     let ts = match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
             exhaustive_signeds(),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
@@ -1980,7 +1995,7 @@ pub fn triples_of_positive_unsigned_small_unsigned_and_small_unsigned_var_1<
     gm: GenerationMode,
 ) -> It<(T, U, U)> {
     let ts = match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_small(
             exhaustive_positive_primitive_ints(),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
@@ -2007,10 +2022,12 @@ pub fn triples_of_unsigned_small_unsigned_and_unsigned<
     gm: GenerationMode,
 ) -> It<(T, U, T)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(sqrt_pairs(
-            exhaustive_pairs_from_single(exhaustive_unsigneds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            permute_1_3_2(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_unsigneds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -2049,10 +2066,12 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(sqrt_pairs(
-            exhaustive_pairs(exhaustive_signeds(), exhaustive_unsigneds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            permute_1_3_2(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
+                exhaustive_pairs(exhaustive_signeds(), exhaustive_unsigneds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -2115,7 +2134,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_negative_signeds().filter(|&i| i != T::MIN),
             exhaustive_unsigneds(),
         )),
@@ -2143,10 +2162,12 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => Box::new(reshape_2_1_to_3(Box::new(sqrt_pairs(
-            exhaustive_pairs_from_single(exhaustive_signeds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            Box::new(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_signeds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -2351,7 +2372,7 @@ pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Lim
         )
     };
     let quints: It<(((Limb, Limb), (Limb, Limb)), Limb)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             filtered_quads(&EXAMPLE_SEED),
             exhaustive_unsigneds(),
         )),
@@ -2851,7 +2872,7 @@ fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_tiny(
             exhaustive_vecs(exhaustive_unsigneds()),
             exhaustive_bools(),
         )),
@@ -3015,7 +3036,7 @@ pub fn triples_of_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_var_1(gm),
             exhaustive_vecs(exhaustive_unsigneds()),
         )),
@@ -3303,7 +3324,7 @@ pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let xs: It<(Vec<T>, (Vec<T>, Vec<T>))> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
             pairs_of_unsigned_vec_var_1(gm),
         )),
@@ -3774,7 +3795,7 @@ pub fn triples_of_unsigned_vec_var_46<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_var_11(gm),
             exhaustive_vecs(exhaustive_unsigneds()),
         )),
@@ -3801,7 +3822,7 @@ pub fn triples_of_unsigned_vec_var_47<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_var_11(gm),
             exhaustive_vecs(exhaustive_unsigneds()),
         )),
@@ -4097,7 +4118,7 @@ fn triples_of_unsigned_vec_min_sizes_1_2<T: PrimitiveUnsigned + Rand>(
     min_ys_zs_len: u64,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     let xss: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_min_sizes_var_1(gm, min_ys_zs_len),
             exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
         )),
@@ -4542,7 +4563,7 @@ fn quadruples_of_unsigned_small_unsigned_small_unsigned_and_unsigned<
     gm: GenerationMode,
 ) -> It<(T, U, U, V)> {
     let ps: It<((T, V), (U, U))> = match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_tiny(
             exhaustive_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
@@ -4616,7 +4637,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     let ps: It<((T, V), (U, U))> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_pairs(exhaustive_signeds(), exhaustive_unsigneds()),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
@@ -4724,14 +4745,16 @@ fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_2_4_3(reshape_3_1_to_4(Box::new(sqrt_pairs(
-            exhaustive_triples(
-                exhaustive_vecs(exhaustive_unsigneds()),
-                exhaustive_vecs(exhaustive_unsigneds()),
-                exhaustive_unsigneds(),
-            ),
-            factors_of_limb_max().into_iter(),
-        )))),
+        GenerationMode::Exhaustive => {
+            permute_1_2_4_3(reshape_3_1_to_4(Box::new(exhaustive_pairs_big_small(
+                exhaustive_triples(
+                    exhaustive_vecs(exhaustive_unsigneds()),
+                    exhaustive_vecs(exhaustive_unsigneds()),
+                    exhaustive_unsigneds(),
+                ),
+                factors_of_limb_max().into_iter(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
@@ -4995,13 +5018,15 @@ pub fn quadruples_of_three_limb_vecs_and_limb_var_7(
 // All triples of `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor of `Limb::MAX`.
 pub fn triples_of_limb_vec_limb_and_limb_var_1(gm: GenerationMode) -> It<(Vec<Limb>, Limb, Limb)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(sqrt_pairs(
-            exhaustive_pairs(
-                exhaustive_vecs(exhaustive_unsigneds()),
-                exhaustive_unsigneds(),
-            ),
-            factors_of_limb_max().into_iter(),
-        )))),
+        GenerationMode::Exhaustive => {
+            permute_1_3_2(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
+                exhaustive_pairs(
+                    exhaustive_vecs(exhaustive_unsigneds()),
+                    exhaustive_unsigneds(),
+                ),
+                factors_of_limb_max().into_iter(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
@@ -5028,10 +5053,12 @@ pub fn triples_of_unsigned_vec_small_usize_and_unsigned<T: PrimitiveUnsigned + R
     gm: GenerationMode,
 ) -> It<(Vec<T>, usize, T)> {
     match gm {
-        GenerationMode::Exhaustive => permute_1_3_2(reshape_2_1_to_3(Box::new(log_pairs(
-            exhaustive_pairs_of_unsigned_vec_and_unsigned(),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            permute_1_3_2(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_tiny(
+                exhaustive_pairs_of_unsigned_vec_and_unsigned(),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random_vecs(seed, scale, &(|seed_2| random(seed_2)))),
@@ -5333,7 +5360,7 @@ pub fn pairs_of_unsigned_vec_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(Vec<T>, U)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(log_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_tiny(
             exhaustive_vecs(exhaustive_unsigneds()),
             exhaustive_unsigneds(),
         )),
@@ -5436,7 +5463,7 @@ fn triples_of_unsigned_vec_small_unsigned_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(Vec<T>, U, U)> {
     match gm {
-        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(log_pairs(
+        GenerationMode::Exhaustive => reshape_1_2_to_3(Box::new(exhaustive_pairs_big_tiny(
             exhaustive_vecs(exhaustive_unsigneds()),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         ))),
@@ -5700,7 +5727,7 @@ pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_8<T: PrimitiveUnsig
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, T)> {
     let ps: It<((Vec<T>, Vec<T>), T)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_pairs_from_single(
                 exhaustive_vecs_min_length(2, exhaustive_unsigneds())
                     .filter(|xs| *xs.last().unwrap() != T::ZERO),
@@ -6021,10 +6048,12 @@ pub fn triples_of_unsigned_unsigned_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(T, T, U)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(reshape_2_1_to_3(Box::new(sqrt_pairs(
-            exhaustive_pairs_from_single(exhaustive_unsigneds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            Box::new(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_unsigneds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -6315,7 +6344,7 @@ pub fn triples_of_unsigned_vec_unsigned_and_small_usize_var_1<T: PrimitiveUnsign
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, usize)> {
     let ts: It<((Vec<T>, Vec<T>), usize)> = match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_var_1(gm),
             exhaustive_unsigneds(),
         )),
@@ -6695,7 +6724,7 @@ fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec<
     gm: GenerationMode,
 ) -> It<(Vec<T>, U, U, Vec<T>)> {
     permute_1_3_4_2(reshape_2_2_to_4(match gm {
-        GenerationMode::Exhaustive => Box::new(sqrt_pairs(
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             exhaustive_pairs_from_single(exhaustive_vecs(exhaustive_unsigneds())),
             exhaustive_pairs_from_single(exhaustive_unsigneds()),
         )),
@@ -6749,10 +6778,12 @@ pub fn quadruples_of_three_unsigneds_and_small_unsigned<
     gm: GenerationMode,
 ) -> It<(T, T, T, U)> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(reshape_3_1_to_4(Box::new(sqrt_pairs(
-            exhaustive_triples_from_single(exhaustive_unsigneds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            Box::new(reshape_3_1_to_4(Box::new(exhaustive_pairs_big_small(
+                exhaustive_triples_from_single(exhaustive_unsigneds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -6781,10 +6812,12 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     match gm {
-        GenerationMode::Exhaustive => Box::new(reshape_3_1_to_4(Box::new(sqrt_pairs(
-            exhaustive_triples_from_single(exhaustive_signeds()),
-            exhaustive_unsigneds(),
-        )))),
+        GenerationMode::Exhaustive => {
+            Box::new(reshape_3_1_to_4(Box::new(exhaustive_pairs_big_small(
+                exhaustive_triples_from_single(exhaustive_signeds()),
+                exhaustive_unsigneds(),
+            ))))
+        }
         GenerationMode::Random(scale) => Box::new(random_quadruples(
             &EXAMPLE_SEED,
             &(|seed| random(seed)),
@@ -7059,7 +7092,7 @@ fn triples_of_unsigned_small_unsigned_and_rounding_mode<
 ) -> It<(T, U, RoundingMode)> {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            log_pairs(exhaustive_unsigneds(), exhaustive_unsigneds()),
+            exhaustive_pairs_big_tiny(exhaustive_unsigneds(), exhaustive_unsigneds()),
             exhaustive_rounding_modes(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -7249,7 +7282,7 @@ where
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            log_pairs(exhaustive_signeds(), exhaustive_unsigneds()),
+            exhaustive_pairs_big_tiny(exhaustive_signeds(), exhaustive_unsigneds()),
             exhaustive_rounding_modes(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
@@ -7327,7 +7360,7 @@ where
 {
     match gm {
         GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            log_pairs(exhaustive_signeds(), exhaustive_signeds()),
+            exhaustive_pairs_big_tiny(exhaustive_signeds(), exhaustive_signeds()),
             exhaustive_rounding_modes(),
         ))),
         GenerationMode::Random(scale) => Box::new(random_triples(
