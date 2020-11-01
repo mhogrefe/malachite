@@ -60,6 +60,7 @@ use malachite_nz::natural::arithmetic::eq_mod::{
 };
 use malachite_nz::natural::arithmetic::mod_mul::_limbs_precompute_mod_mul_two_limbs;
 use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
+use malachite_nz::natural::arithmetic::mod_power_of_two_square::SQRLO_DC_THRESHOLD_LIMIT;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
@@ -919,7 +920,7 @@ pub fn pairs_of_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand, U: PrimitiveU
     }
 }
 
-pub fn triples_of_unsigned_unsigned_and_unsigned<
+fn triples_of_unsigned_unsigned_and_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
     V: PrimitiveUnsigned + Rand,
@@ -947,7 +948,7 @@ pub fn triples_of_unsigned_unsigned_and_unsigned<
     }
 }
 
-pub fn triples_of_unsigned_signed_and_unsigned<
+fn triples_of_unsigned_signed_and_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveSigned + Rand,
     V: PrimitiveUnsigned + Rand,
@@ -979,7 +980,7 @@ where
     }
 }
 
-pub fn quadruples_of_four_unsigneds<
+fn quadruples_of_four_unsigneds<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
     V: PrimitiveUnsigned + Rand,
@@ -2866,6 +2867,16 @@ pub fn pairs_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
                 && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs.len(), xs.len())
         }),
     )
+}
+
+// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` are valud inputs to
+// `_limbs_square_low_basecase`.
+pub fn pairs_of_unsigned_vec_var_26<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| {
+        !ys.is_empty() && ys.len() <= SQRLO_DC_THRESHOLD_LIMIT && xs.len() >= ys.len()
+    }))
 }
 
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(

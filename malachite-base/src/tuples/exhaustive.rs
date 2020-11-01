@@ -1,4 +1,5 @@
 use std::cmp::max;
+use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
 
@@ -30,7 +31,7 @@ macro_rules! lex_custom_tuples {
     (
         $exhaustive_struct: ident,
         $out_t: ty,
-        $none_t: expr,
+        $nones: expr,
         $unwrap_tuple: ident,
         $exhaustive_fn: ident,
         $([$t: ident, $it: ident, $xs: ident, $([$i: tt, $x: ident]),*]),*
@@ -100,7 +101,7 @@ macro_rules! lex_custom_tuples {
                             return None;
                         }
                     )*
-                    let mut out = $none_t;
+                    let mut out = $nones;
                     $(
                         $(
                             out.$i = Some($x);
@@ -111,7 +112,7 @@ macro_rules! lex_custom_tuples {
                     self.done = true;
                     None
                 } else {
-                    let mut out = $none_t;
+                    let mut out = $nones;
                     $(
                         $(
                             out.$i = self.$xs.get(self.counters[$i]).cloned();
@@ -212,6 +213,12 @@ lex_custom_tuples!(
     [X, I, xs, [0, x_0]],
     [Y, J, ys, [1, y_1], [2, y_2]]
 );
+
+// hack for macro
+#[inline]
+fn clone_helper<T: Clone>(x: &T, _i: usize) -> T {
+    x.clone()
+}
 
 macro_rules! lex_tuples {
     (
@@ -371,10 +378,7 @@ macro_rules! lex_tuples {
                 } else if self.first {
                     self.first = false;
                     if let Some(x) = self.xs.get(0) {
-                        $(
-                            let $x = x.clone();
-                        )*
-                        Some(($($x,)*))
+                        Some(($(clone_helper(x, $i),)*))
                     } else {
                         self.done = true;
                         None
@@ -518,7 +522,6 @@ macro_rules! exhaustive_tuples_1_input {
         $exhaustive_fn: ident,
         $exhaustive_fn_from_single: ident,
         $out_type: ty,
-        $nones: expr,
         $([$i: tt, $out_x: ident]),*
     ) => {
         /// Generates all $n$-tuples of a given length with elements from a single iterator.
@@ -585,14 +588,12 @@ macro_rules! exhaustive_tuples_1_input {
                             self.distributor.increment_counter();
                         }
                     }
-                    let mut out = $nones;
-                    $(
-                        let x = self.xs.get(self.distributor.get_output($i)).unwrap();
-                        out.$i = Some(x.clone());
-                    )*
+                    let result = Some(
+                        ($(self.xs.get(self.distributor.get_output($i)).unwrap().clone(),)*)
+                    );
                     self.i += 1;
                     self.distributor.increment_counter();
-                    Some(($(out.$i.unwrap(),)*))
+                    result
                 }
             }
         }
@@ -700,7 +701,6 @@ exhaustive_tuples_1_input!(
     exhaustive_pairs_1_input,
     exhaustive_pairs_from_single,
     (I::Item, I::Item),
-    (None, None),
     [0, output_type_x],
     [1, output_type_y]
 );
@@ -709,7 +709,6 @@ exhaustive_tuples_1_input!(
     exhaustive_triples_1_input,
     exhaustive_triples_from_single,
     (I::Item, I::Item, I::Item),
-    (None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z]
@@ -719,7 +718,6 @@ exhaustive_tuples_1_input!(
     exhaustive_quadruples_1_input,
     exhaustive_quadruples_from_single,
     (I::Item, I::Item, I::Item, I::Item),
-    (None, None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z],
@@ -730,7 +728,6 @@ exhaustive_tuples_1_input!(
     exhaustive_quintuples_1_input,
     exhaustive_quintuples_from_single,
     (I::Item, I::Item, I::Item, I::Item, I::Item),
-    (None, None, None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z],
@@ -742,7 +739,6 @@ exhaustive_tuples_1_input!(
     exhaustive_sextuples_1_input,
     exhaustive_sextuples_from_single,
     (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
-    (None, None, None, None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z],
@@ -763,7 +759,6 @@ exhaustive_tuples_1_input!(
         I::Item,
         I::Item
     ),
-    (None, None, None, None, None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z],
@@ -786,7 +781,6 @@ exhaustive_tuples_1_input!(
         I::Item,
         I::Item
     ),
-    (None, None, None, None, None, None, None, None),
     [0, output_type_x],
     [1, output_type_y],
     [2, output_type_z],
@@ -802,7 +796,6 @@ macro_rules! exhaustive_tuples {
         $exhaustive_struct: ident,
         $exhaustive_fn: ident,
         $exhaustive_fn_custom_output: ident,
-        $nones: expr,
         $([$i: tt, $t: ident, $it: ident, $xs: ident, $xs_done: ident, $out_x: ident]),*
     ) => {
         /// Generates all $n$-tuples with elements from $n$ iterators.
@@ -884,14 +877,12 @@ macro_rules! exhaustive_tuples {
                         )*
                         break;
                     }
-                    let mut out = $nones;
-                    $(
-                        let x = self.$xs.get(self.distributor.get_output($i)).unwrap();
-                        out.$i = Some(x.clone());
-                    )*
+                    let result = Some(
+                        ($(self.$xs.get(self.distributor.get_output($i)).unwrap().clone(),)*)
+                    );
                     self.i += 1;
                     self.distributor.increment_counter();
-                    Some(($(out.$i.unwrap(),)*))
+                    result
                 }
             }
         }
@@ -1020,7 +1011,6 @@ exhaustive_tuples!(
     ExhaustivePairs,
     exhaustive_pairs,
     exhaustive_pairs_custom_output,
-    (None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y]
 );
@@ -1028,7 +1018,6 @@ exhaustive_tuples!(
     ExhaustiveTriples,
     exhaustive_triples,
     exhaustive_triples_custom_output,
-    (None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z]
@@ -1037,7 +1026,6 @@ exhaustive_tuples!(
     ExhaustiveQuadruples,
     exhaustive_quadruples,
     exhaustive_quadruples_custom_output,
-    (None, None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z],
@@ -1047,7 +1035,6 @@ exhaustive_tuples!(
     ExhaustiveQuintuples,
     exhaustive_quintuples,
     exhaustive_quintuples_custom_output,
-    (None, None, None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z],
@@ -1058,7 +1045,6 @@ exhaustive_tuples!(
     ExhaustiveSextuples,
     exhaustive_sextuples,
     exhaustive_sextuples_custom_output,
-    (None, None, None, None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z],
@@ -1070,7 +1056,6 @@ exhaustive_tuples!(
     ExhaustiveSeptuples,
     exhaustive_septuples,
     exhaustive_septuples_custom_output,
-    (None, None, None, None, None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z],
@@ -1083,7 +1068,6 @@ exhaustive_tuples!(
     ExhaustiveOctuples,
     exhaustive_octuples,
     exhaustive_octuples_custom_output,
-    (None, None, None, None, None, None, None, None),
     [0, X, I, xs, xs_done, output_type_x],
     [1, Y, J, ys, ys_done, output_type_y],
     [2, Z, K, zs, zs_done, output_type_z],
@@ -1098,11 +1082,11 @@ macro_rules! custom_tuples {
     (
         $exhaustive_struct: ident,
         $out_t: ty,
-        $none_t: expr,
+        $nones: expr,
         $unwrap_tuple: ident,
         $exhaustive_fn: ident,
         $exhaustive_custom_fn: ident,
-        $([$t: ident, $it: ident, $xs: ident, $xs_done: ident, $([$i: tt]),*]),*
+        $([$t: ident, $it: ident, $xs: ident, $xs_done: ident, $([$i: tt, $out_x: ident]),*]),*
     ) => {
         /// Generates all $n$-tuples with elements from $m$ iterators, where $m \leq n$.
         ///
@@ -1196,7 +1180,7 @@ macro_rules! custom_tuples {
                         )*
                         break;
                     }
-                    let mut out = $none_t;
+                    let mut out = $nones;
                     $(
                         $(
                             let x = self.$xs.get(self.distributor.get_output($i)).unwrap();
@@ -1218,11 +1202,12 @@ macro_rules! custom_tuples {
         /// in the first and third slots of the output triples, and `ys` generates the elements in
         /// the second slots.
         ///
-        /// The $i$th `output_type_[x_i]` parameter is a `BitDistributorOutputType` that determines
-        /// how quickly the $i$th output slot advances through its iterator; see the
-        /// `BitDistributor` documentation for a description of the different types.
+        /// Let $i$ be the index of the input iterators and $j$ be the index of the output slots. So
+        /// for `triples_xyx`, $i=0$ corresponds to $j=0$ and $j=2$, and $i=1$ corresponds to $j=1$.
         ///
-        /// //TODO fix output_type params...
+        /// The $j$th `output_type_[i_j]` parameter is a `BitDistributorOutputType` that determines
+        /// how quickly the $j$th output slot advances through its iterator; see the
+        /// `BitDistributor` documentation for a description of the different types.
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite, then the output length may be obtained by
         /// raising the length of each input iterator to power of the number of outputs it maps to,
@@ -1258,12 +1243,12 @@ macro_rules! custom_tuples {
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_custom_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             $($xs: $it,)*
-            output_types: &[BitDistributorOutputType],
+            $($($out_x: BitDistributorOutputType,)*)*
         ) -> $exhaustive_struct<$($t, $it,)*> {
             $exhaustive_struct {
                 i: 0,
                 limit: None,
-                distributor: BitDistributor::new(output_types),
+                distributor: BitDistributor::new(&[$($($out_x,)*)*]),
                 $(
                     $xs: IteratorCache::new($xs),
                     $xs_done: false,
@@ -1316,7 +1301,7 @@ macro_rules! custom_tuples {
         ) -> $exhaustive_struct<$($t, $it,)*> {
             $exhaustive_custom_fn(
                 $($xs,)*
-                &[$($(BitDistributorOutputType::normal(1 + 0 * $i),)*)*]
+                $($(BitDistributorOutputType::normal(1 + 0 * $i),)*)*
             )
         }
     }
@@ -1329,8 +1314,15 @@ custom_tuples!(
     unwrap_triple,
     exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output,
-    [X, I, xs, xs_done, [0], [1]],
-    [Y, J, ys, ys_done, [2]]
+    [
+        X,
+        I,
+        xs,
+        xs_done,
+        [0, output_type_xs_0],
+        [1, output_type_xs_1]
+    ],
+    [Y, J, ys, ys_done, [2, output_type_ys_2]]
 );
 custom_tuples!(
     ExhaustiveTriplesXYX,
@@ -1339,8 +1331,15 @@ custom_tuples!(
     unwrap_triple,
     exhaustive_triples_xyx,
     exhaustive_triples_xyx_custom_output,
-    [X, I, xs, xs_done, [0], [2]],
-    [Y, J, ys, ys_done, [1]]
+    [
+        X,
+        I,
+        xs,
+        xs_done,
+        [0, output_type_xs_0],
+        [2, output_type_ys_1]
+    ],
+    [Y, J, ys, ys_done, [1, output_type_xs_2]]
 );
 custom_tuples!(
     ExhaustiveTriplesXYY,
@@ -1349,6 +1348,13 @@ custom_tuples!(
     unwrap_triple,
     exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output,
-    [X, I, xs, xs_done, [0]],
-    [Y, J, ys, ys_done, [1], [2]]
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [
+        Y,
+        J,
+        ys,
+        ys_done,
+        [1, output_type_ys_1],
+        [2, output_type_ys_2]
+    ]
 );

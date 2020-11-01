@@ -418,6 +418,11 @@ pub mod vecs {
         pub mod lex_fixed_length_vecs_m_inputs;
         pub mod lex_length_n_vecs;
     }
+    pub mod random {
+        pub mod random_fixed_length_vecs;
+        pub mod random_fixed_length_vecs_from_single;
+        pub mod random_fixed_length_vecs_m_inputs;
+    }
     pub mod random_values_from_vec;
     pub mod vec_delete_left;
     pub mod vec_from_str;

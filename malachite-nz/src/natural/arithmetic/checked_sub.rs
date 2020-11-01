@@ -35,7 +35,7 @@ impl Natural {
     }
 
     // self -= other, return borrow
-    pub(crate) fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
+    fn sub_assign_limb_no_panic(&mut self, other: Limb) -> bool {
         match (&mut *self, other) {
             (_, 0) => false,
             (Natural(Small(ref mut x)), y) => match x.checked_sub(y) {

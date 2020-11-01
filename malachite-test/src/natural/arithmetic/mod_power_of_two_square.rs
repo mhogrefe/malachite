@@ -3,15 +3,19 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
+use malachite_nz::natural::arithmetic::mod_power_of_two_square::_limbs_square_low_basecase;
 use malachite_nz::natural::Natural;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
+use malachite_test::inputs::base::pairs_of_unsigned_vec_var_26;
 use malachite_test::inputs::natural::pairs_of_natural_and_u64_var_1;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
+    register_demo!(registry, demo_limbs_square_low_basecase);
     register_demo!(registry, demo_natural_mod_power_of_two_square_assign);
     register_demo!(registry, demo_natural_mod_power_of_two_square);
     register_demo!(registry, demo_natural_mod_power_of_two_square_ref);
+    register_bench!(registry, Small, benchmark_limbs_square_low_basecase);
     register_bench!(
         registry,
         Large,
@@ -27,6 +31,18 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_mod_power_of_two_square_algorithms
     );
+}
+
+fn demo_limbs_square_low_basecase(gm: GenerationMode, limit: usize) {
+    for (out, xs) in pairs_of_unsigned_vec_var_26(gm).take(limit) {
+        let out_old = out;
+        let mut out = out_old.clone();
+        _limbs_square_low_basecase(&mut out, &xs);
+        println!(
+            "out := {:?}; _limbs_square_low_basecase(&mut out, {:?}); out = {:?}",
+            out_old, xs, out
+        );
+    }
 }
 
 fn demo_natural_mod_power_of_two_square_assign(gm: GenerationMode, limit: usize) {
@@ -62,6 +78,23 @@ fn demo_natural_mod_power_of_two_square_ref(gm: GenerationMode, limit: usize) {
             pow
         );
     }
+}
+
+fn benchmark_limbs_square_low_basecase(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark_old(
+        "_limbs_square_low_basecase(&mut [Limb], &[Limb])",
+        BenchmarkType::Single,
+        pairs_of_unsigned_vec_var_26(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, ref xs)| xs.len()),
+        "xs.len()",
+        &mut [(
+            "Malachite",
+            &mut (|(mut out, xs)| _limbs_square_low_basecase(&mut out, &xs)),
+        )],
+    );
 }
 
 fn benchmark_natural_mod_power_of_two_square_assign(

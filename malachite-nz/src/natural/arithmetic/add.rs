@@ -679,7 +679,7 @@ impl Natural {
         }
     }
 
-    pub(crate) fn add_assign_limb(&mut self, other: Limb) {
+    fn add_assign_limb(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => {}
             (&mut natural_zero!(), _) => *self = Natural::from(other),

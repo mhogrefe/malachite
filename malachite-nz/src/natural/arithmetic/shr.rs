@@ -1,4 +1,4 @@
-use std::ops::{Shr, ShrAssign};
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -348,7 +348,30 @@ macro_rules! impl_natural_shr_unsigned {
 }
 apply_to_unsigneds!(impl_natural_shr_unsigned);
 
-//TODO clean
+fn _shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+) -> Natural
+where
+    &'a Natural: Shl<U, Output = Natural> + Shr<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x >> bits.unsigned_abs()
+    } else {
+        x << bits.unsigned_abs()
+    }
+}
+
+fn _shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+where
+    Natural: ShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x >>= bits.unsigned_abs();
+    } else {
+        *x <<= bits.unsigned_abs();
+    }
+}
 
 macro_rules! impl_natural_shr_signed {
     ($t:ident) => {
@@ -411,12 +434,9 @@ macro_rules! impl_natural_shr_signed {
             /// assert_eq!((&Natural::from(492u32) >> 2i8).to_string(), "123");
             /// assert_eq!((&Natural::trillion() >> 10i16).to_string(), "976562500");
             /// ```
+            #[inline]
             fn shr(self, bits: $t) -> Natural {
-                if bits >= 0 {
-                    self >> bits.unsigned_abs()
-                } else {
-                    self << bits.unsigned_abs()
-                }
+                _shr_signed_ref(self, bits)
             }
         }
 
@@ -450,12 +470,9 @@ macro_rules! impl_natural_shr_signed {
             /// x >>= 4i64;
             /// assert_eq!(x.to_string(), "1");
             /// ```
+            #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                if bits >= 0 {
-                    *self >>= bits.unsigned_abs();
-                } else {
-                    *self <<= bits.unsigned_abs();
-                }
+                _shr_assign_signed(self, bits);
             }
         }
     };

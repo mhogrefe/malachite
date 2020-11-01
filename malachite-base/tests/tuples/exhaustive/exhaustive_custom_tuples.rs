@@ -30,12 +30,24 @@ fn exhaustive_triples_xxy_helper<
     assert_eq!(ts.count(), out_len);
 
     let output_types = get_sample_output_types(3);
-    let ts = exhaustive_triples_xxy_custom_output(xs.clone(), ys.clone(), &output_types[0]);
+    let ts = exhaustive_triples_xxy_custom_output(
+        xs.clone(),
+        ys.clone(),
+        output_types[0][0],
+        output_types[0][1],
+        output_types[0][2],
+    );
     let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
     for alt_output_types in &output_types[1..] {
-        let ts = exhaustive_triples_xxy_custom_output(xs.clone(), ys.clone(), alt_output_types);
+        let ts = exhaustive_triples_xxy_custom_output(
+            xs.clone(),
+            ys.clone(),
+            alt_output_types[0],
+            alt_output_types[1],
+            alt_output_types[2],
+        );
         ts.clone().take(20).for_each(drop);
         assert_eq!(ts.count(), out_len);
     }
@@ -282,12 +294,24 @@ fn exhaustive_triples_xyx_helper<
     assert_eq!(ts.count(), out_len);
 
     let output_types = get_sample_output_types(3);
-    let ts = exhaustive_triples_xyx_custom_output(xs.clone(), ys.clone(), &output_types[0]);
+    let ts = exhaustive_triples_xyx_custom_output(
+        xs.clone(),
+        ys.clone(),
+        output_types[0][0],
+        output_types[0][1],
+        output_types[0][2],
+    );
     let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
     for alt_output_types in &output_types[1..] {
-        let ts = exhaustive_triples_xyx_custom_output(xs.clone(), ys.clone(), alt_output_types);
+        let ts = exhaustive_triples_xyx_custom_output(
+            xs.clone(),
+            ys.clone(),
+            alt_output_types[0],
+            alt_output_types[1],
+            alt_output_types[2],
+        );
         ts.clone().take(20).for_each(drop);
         assert_eq!(ts.count(), out_len);
     }

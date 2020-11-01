@@ -10,6 +10,13 @@ use num::arithmetic::traits::CheckedPow;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::SignificantBits;
 
+pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
+    let oi_sorted_unique = xs.unique().sorted().collect::<Vec<_>>();
+    assert_eq!(oi_sorted_unique.len(), max_input_index + 1);
+    assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
+    assert_eq!(*oi_sorted_unique.last().unwrap(), max_input_index);
+}
+
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 struct LexFixedLengthVecsOutput {
     input_index: usize,
@@ -164,11 +171,7 @@ macro_rules! lex_fixed_length_vecs {
             $(
                 let _max_input_index = $i;
             )*
-            let oi_sorted_unique = output_to_input_map.iter()
-                .cloned().unique().sorted().collect::<Vec<_>>();
-            assert_eq!(oi_sorted_unique.len(), _max_input_index + 1);
-            assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
-            assert_eq!(*oi_sorted_unique.last().unwrap(), _max_input_index);
+            validate_oi_map(_max_input_index, output_to_input_map.iter().cloned());
             $(
                 let $xs_outputs = output_to_input_map
                     .iter()
@@ -497,7 +500,7 @@ macro_rules! exhaustive_fixed_length_vecs {
                 $xs_done: bool,
                 $outputs: Vec<usize>,
             )*
-            oi_map: Vec<usize>,
+            output_to_input_map: Vec<usize>,
         }
 
         impl<T: Clone, $($it: Iterator<Item=T>,)*> $exhaustive_struct<T, $($it,)*> {
@@ -677,11 +680,8 @@ macro_rules! exhaustive_fixed_length_vecs {
             $(
                 let _max_input_index = $i;
             )*
-            let oi_map: Vec<usize> = output_types.iter().map(|(_, i)| *i).collect();
-            let oi_sorted_unique = oi_map.iter().cloned().unique().sorted().collect::<Vec<_>>();
-            assert_eq!(oi_sorted_unique.len(), _max_input_index + 1);
-            assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
-            assert_eq!(*oi_sorted_unique.last().unwrap(), _max_input_index);
+            let output_to_input_map: Vec<usize> = output_types.iter().map(|(_, i)| *i).collect();
+            validate_oi_map(_max_input_index, output_to_input_map.iter().cloned());
             $exhaustive_struct {
                 i: 0,
                 len: output_types.len(),
@@ -694,7 +694,7 @@ macro_rules! exhaustive_fixed_length_vecs {
                     $outputs: output_types.iter().enumerate()
                         .filter_map(|(o, (_, i))| if *i == $i { Some(o) } else { None }).collect(),
                 )*
-                oi_map
+                output_to_input_map
             }
         }
 

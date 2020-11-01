@@ -47,7 +47,7 @@ use platform::{
 
 /// This is MPN_SQR_DIAGONAL from mpn/generic/sqr_basecase.c, GMP 6.1.2.
 #[inline]
-fn _limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
+pub(crate) fn _limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
     for (i, &x) in xs.iter().enumerate() {
         let (square_hi, square_lo) = DoubleLimb::from(x).square().split_in_half();
         let i_2 = i << 1;

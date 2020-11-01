@@ -38,12 +38,8 @@ macro_rules! impl_half_traits {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::JoinHalves;
             ///
-            /// assert_eq!(u16::join_halves(1, 2), 258);
-            /// assert_eq!(u32::join_halves(0xabcd, 0x1234), 0xabcd1234);
-            /// ```
+            /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
                 _join_halves(upper, lower)
@@ -53,12 +49,8 @@ macro_rules! impl_half_traits {
         /// Implements `SplitInHalf` for unsigned primitive integers.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::conversion::traits::SplitInHalf;
         ///
-        /// assert_eq!(258u16.split_in_half(), (1, 2));
-        /// assert_eq!(0xabcd1234u32.split_in_half(), (0xabcd, 0x1234));
-        /// ```
+        /// See the documentation of the `num::comparison::half` module.
         impl SplitInHalf for $t {
             /// Extracts the lower, or least significant half, of and unsigned integer.
             ///
@@ -71,12 +63,8 @@ macro_rules! impl_half_traits {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::SplitInHalf;
             ///
-            /// assert_eq!(258u16.lower_half(), 2);
-            /// assert_eq!(0xabcd1234u32.lower_half(), 0x1234);
-            /// ```
+            /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn lower_half(&self) -> Self::Half {
                 $ht::wrapping_from(*self)
@@ -91,12 +79,8 @@ macro_rules! impl_half_traits {
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::SplitInHalf;
             ///
-            /// assert_eq!(258u16.upper_half(), 1);
-            /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
-            /// ```
+            /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn upper_half(&self) -> Self::Half {
                 _upper_half(self)

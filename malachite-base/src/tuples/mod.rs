@@ -189,11 +189,9 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// let ts = exhaustive_triples_xyx_custom_output(
 ///     exhaustive_ascii_chars(),
 ///     0..3,
-///     &[
-///         BitDistributorOutputType::normal(1),
-///         BitDistributorOutputType::normal(1),
-///         BitDistributorOutputType::tiny()
-///     ],
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::normal(1),
+///     BitDistributorOutputType::tiny()
 /// );
 /// assert_eq!(
 ///     ts.take(20).collect::<Vec<_>>(),

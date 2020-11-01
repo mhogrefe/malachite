@@ -496,6 +496,8 @@ pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingM
     }
 }
 
+//TODO clean
+
 macro_rules! impl_natural_shr_round_unsigned {
     ($t:ident) => {
         impl ShrRound<$t> for Natural {

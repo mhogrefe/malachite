@@ -183,7 +183,6 @@ pub trait JoinHalves: HasHalf {
 /// `u32`s.
 pub trait SplitInHalf: HasHalf {
     /// Extracts the lower, or least significant half, of `self`.
-    ///
     fn lower_half(&self) -> Self::Half;
 
     /// Extracts the upper, or most significant half, of `self`.
@@ -191,12 +190,14 @@ pub trait SplitInHalf: HasHalf {
 
     /// Extracts both halves of `self`; the upper, or most significant half, comes first.
     ///
-    /// Time: worst case O(max(f(n), g(n))), where f(n) is the worst-case time complexity of
-    ///     `Self::lower_half` and g(n) is the worst-case time complexity of `Self::upper_half`.
+    /// # Worst-case complexity
+    /// $T(n) = O(\max(T_U(n), T_L(n)))$
     ///
-    /// Additional memory: worst case O(max(f(n), g(n))), where f(n) is the worst-case
-    ///     additional-memory complexity of `Self::lower_half` and g(n) is the worst-case
-    ///     additional-memory complexity of `Self::upper_half.
+    /// $M(n) = O(\max(M_U(n), M_L(n)))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $T_U$ and $T_L$ are the time complexities of
+    /// the `upper_half` and `lower_half` functions, respectively, and $M_U$ and $M_L$ are the
+    /// memory complexities of the `upper_half` and `lower_half` functions, respectively,
     ///
     #[inline]
     fn split_in_half(&self) -> (Self::Half, Self::Half) {

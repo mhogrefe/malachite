@@ -328,3 +328,59 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// );
 /// ```
 pub mod exhaustive;
+/// This module contains iterators that generate `Vec`s randomly.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # random_length_[n]_vecs
+/// ```
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_length_2_vecs;
+///
+/// let xss = random_length_2_vecs(
+///     EXAMPLE_SEED,
+///     &|seed| random_char_inclusive_range(seed, 'a', 'c'),
+///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
+/// ).take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['b', 'z'], &['b', 'x'], &['b', 'z'], &['b', 'y'], &['c', 'x'], &['a', 'z'],
+///         &['a', 'z'], &['a', 'z'], &['c', 'z'], &['a', 'y'], &['c', 'x'], &['a', 'x'],
+///         &['c', 'z'], &['a', 'z'], &['c', 'x'], &['c', 'x'], &['c', 'y'], &['b', 'y'],
+///         &['a', 'x'], &['c', 'x']
+///     ]
+/// );
+/// ```
+///
+/// # random_fixed_length_vecs_[m]_inputs
+/// ```
+/// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
+/// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToDebugString;
+///
+/// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
+/// // (with index 0) produces random ASCII `char`s, and the second (index 1) produces the three
+/// // `char`s `'x'`, `'y'`, and `'z'`, uniformly at random. The elements of `output_types` are 0,
+/// // 1, and 0, meaning that the first element of the output `Vec`s will be taken from iterator 0,
+/// // the second element from iterator 1, and the third also from iterator 0.
+/// let xss = random_fixed_length_vecs_2_inputs(
+///     EXAMPLE_SEED,
+///     &random_ascii_chars,
+///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
+///     &[0, 1, 0],
+/// ).take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &['U', 'z', '\u{16}'], &[' ', 'x', 'D'], &['<', 'z', ']'], &['a', 'y', 'e'],
+///         &['_', 'x', 'M'], &[',', 'z', 'O'], &['\u{1d}', 'z', 'V'], &['(', 'z', '\u{10}'],
+///         &['&', 'z', 'U'], &['{', 'y', 'P'], &['-', 'x', 'K'], &['Z', 'x', '\u{4}'],
+///         &['X', 'z', '\u{19}'], &['_', 'z', ','], &['\u{1d}', 'x', ','], &['?', 'x', '\''],
+///         &['[', 'y', 'N'], &['|', 'y', '}'], &['*', 'x', '\u{15}'], &['z', 'x', 't']
+///     ]
+/// );
+/// ```
+pub mod random;

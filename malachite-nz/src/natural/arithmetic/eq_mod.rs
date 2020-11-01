@@ -30,7 +30,7 @@ use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c, where size == 1.
+/// This is mpn_modexact_1c_odd, from mpn/generic/mode1o.c, GMP 6.1.2, where size == 1.
 pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
     if n > carry {
         let result = (n - carry) % d;
@@ -68,7 +68,7 @@ pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Li
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_modexact_1c_odd, GMP 6.1.2, from mpn/generic/mode1o.c.
+/// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c, GMP 6.1.2.
 pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {
