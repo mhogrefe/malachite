@@ -391,7 +391,7 @@ impl RoundToMultipleAssign<Integer> for Integer {
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
     /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -492,7 +492,7 @@ impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
     /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

@@ -1,9 +1,9 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
+use malachite_base_test_util::hash::hash;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
-use malachite_test::hash::hash;
 use malachite_test::inputs::natural::{naturals, nrm_naturals};
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {

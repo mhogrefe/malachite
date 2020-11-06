@@ -24,7 +24,7 @@ macro_rules! impl_mod_sub {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModSub;
             ///
@@ -47,7 +47,7 @@ macro_rules! impl_mod_sub {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModSubAssign;
             ///

@@ -12,7 +12,7 @@ macro_rules! impl_mod_power_of_two_square {
             ///
             /// //TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSquare;
             ///
@@ -31,7 +31,7 @@ macro_rules! impl_mod_power_of_two_square {
             ///
             /// //TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSquareAssign;
             ///

@@ -29,7 +29,7 @@ macro_rules! impl_wrapping_sub_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::WrappingSubMul;
             ///
@@ -49,7 +49,7 @@ macro_rules! impl_wrapping_sub_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::WrappingSubMulAssign;
             ///

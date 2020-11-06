@@ -32,7 +32,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::PowerOfTwoDigitIterable;
     /// use malachite_base::num::logic::power_of_two_digit_iterable::*;
@@ -69,7 +69,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::PowerOfTwoDigitIterable;
     /// use malachite_base::num::logic::power_of_two_digit_iterable::*;
@@ -100,7 +100,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::PowerOfTwoDigitIterable;
     /// use malachite_base::num::logic::power_of_two_digit_iterable::*;
@@ -146,7 +146,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::{PowerOfTwoDigitIterable, PowerOfTwoDigitIterator};
     /// use malachite_base::num::logic::power_of_two_digit_iterable::*;
@@ -215,7 +215,7 @@ macro_rules! impl_power_of_two_digit_iterable {
                     ///
                     /// Panics if `log_base` is larger than the width of `$u`.
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::logic::traits::PowerOfTwoDigitIterable;
                     /// use malachite_base::num::logic::power_of_two_digit_iterable::*;

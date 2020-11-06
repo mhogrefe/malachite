@@ -6,113 +6,118 @@ use num::conversion::traits::{
 };
 use rounding_modes::RoundingMode;
 
-fn _from_other_type_slice_ident<T: Copy + Zero>(slice: &[T]) -> T {
-    if slice.is_empty() {
+fn _from_other_type_slice_ident<T: Copy + Zero>(xs: &[T]) -> T {
+    if xs.is_empty() {
         T::ZERO
     } else {
-        slice[0]
+        xs[0]
     }
 }
 
 macro_rules! impl_slice_traits_ident {
     ($a:ty) => {
         impl FromOtherTypeSlice<$a> for $a {
-            /// Converts a slice of one type of value to a single value of the same type. If the
-            /// slice is empty, the output value is 0; otherwise, it's the first element of the
-            /// slice.
+            /// Converts a slice of one type of value to a single value of the same type.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f((x_k)_{k=0}^{n-1}) = \\begin{cases}
+            ///     0 & n = 0 \\\\
+            ///     x_0 & \\text{otherwise}
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is the width of the type.
             ///
-            /// Additional memory: worst case O(1)
+            /// The slice is interpreted as the base-$2^W$ digits of the value, in ascending order,
+            /// where $W$ is the width of the type. If there's more than one element in the input
+            /// slice, the value wraps and all elements past the first are ignored. This means that
+            /// if the slice is empty, the output value is 0; otherwise, it's the first element of
+            /// the slice.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::FromOtherTypeSlice;
             ///
-            /// let xs: &[u32] = &[];
-            /// assert_eq!(u32::from_other_type_slice(xs), 0);
-            /// assert_eq!(u32::from_other_type_slice(&[123u32, 456]), 123);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn from_other_type_slice(slice: &[$a]) -> Self {
-                _from_other_type_slice_ident(slice)
+            fn from_other_type_slice(xs: &[$a]) -> Self {
+                _from_other_type_slice_ident(xs)
             }
         }
 
         impl VecFromOtherTypeSlice<$a> for $a {
-            /// Converts a slice of one type of value to a `Vec` of the same type. In this case, it
-            /// just converts the slice to a `Vec` the usual way.
+            /// Converts a slice of one type of value to a `Vec` of the same type.
             ///
-            /// Time: worst case O(n)
+            /// In this case, it just converts the slice to a `Vec` the usual way.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
             ///
-            /// where n = `slice.len()`
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
             ///
-            /// assert_eq!(u32::vec_from_other_type_slice(&[123u32, 456]), vec![123, 456]);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                slice.to_vec()
+            fn vec_from_other_type_slice(xs: &[$a]) -> Vec<Self> {
+                xs.to_vec()
             }
         }
 
         impl VecFromOtherType<$a> for $a {
-            /// Converts a value of one type to a `Vec` of the same type. In this case, it just
-            /// creates a one-element `Vec`.
+            /// Converts a value of one type to a `Vec` of the same type.
             ///
-            /// Time: worst case O(1)
+            /// In this case, it just creates a one-element `Vec`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherType;
             ///
-            /// assert_eq!(u32::vec_from_other_type(123u32), vec![123]);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type(value: $a) -> Vec<Self> {
-                vec![value]
+            fn vec_from_other_type(x: $a) -> Vec<Self> {
+                vec![x]
             }
         }
     };
 }
 
-fn _from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(slice: &[A]) -> B {
-    if slice.is_empty() {
+fn _from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(xs: &[A]) -> B {
+    if xs.is_empty() {
         B::ZERO
     } else {
-        B::wrapping_from(slice[0])
+        B::wrapping_from(xs[0])
     }
 }
 
 fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
-    slice: &[A],
+    xs: &[A],
 ) -> Vec<B> {
     let log_size_ratio = A::LOG_WIDTH - B::LOG_WIDTH;
-    let mut xs = vec![B::ZERO; slice.len() << log_size_ratio];
-    for (chunk, &u) in xs.chunks_exact_mut(1 << log_size_ratio).zip(slice.iter()) {
+    let mut out = vec![B::ZERO; xs.len() << log_size_ratio];
+    for (chunk, &u) in out.chunks_exact_mut(1 << log_size_ratio).zip(xs.iter()) {
         let mut u = u;
-        for out in chunk {
-            *out = B::wrapping_from(u);
+        for x in chunk {
+            *x = B::wrapping_from(u);
             u >>= B::WIDTH;
         }
     }
-    xs
+    out
 }
 
 fn _vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
-    mut value: A,
+    mut x: A,
 ) -> Vec<B> {
     let mut xs = vec![B::ZERO; 1 << (A::LOG_WIDTH - B::LOG_WIDTH)];
     for out in &mut xs {
-        *out = B::wrapping_from(value);
-        value >>= B::WIDTH;
+        *out = B::wrapping_from(x);
+        x >>= B::WIDTH;
     }
     xs
 }
@@ -121,79 +126,99 @@ macro_rules! impl_slice_traits_large_to_small {
     ($a:ident, $b:ident) => {
         impl FromOtherTypeSlice<$a> for $b {
             /// Converts a slice of one type of unsigned integer to a single value of a smaller
-            /// unsigned type. If the slice is empty, the output value is 0; otherwise, it consists
-            /// of the least-significant bits of the first element of the slice.
+            /// unsigned type.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f((x_k)_{k=0}^{n-1}) = \\begin{cases}
+            ///     0 & n = 0 \\\\
+            ///     y & \\text{otherwise}
+            /// \\end{cases}
+            /// $$
+            /// where $0 \leq y < 2^W$, $x = y + k2^W$ for some integer $k$, and $W$ is the width of
+            /// the output type.
             ///
-            /// Additional memory: worst case O(1)
+            /// The slice is interpreted as the base-$2^W$ digits of the value, in ascending order,
+            /// where $W$ is the width of the type. If the slice is empty, the output value is 0;
+            /// otherwise, it consists of the least-significant bits of the first element of the
+            /// slice.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::FromOtherTypeSlice;
             ///
-            /// assert_eq!(u8::from_other_type_slice(&[0xabcdu16, 0xef01]), 0xcd);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn from_other_type_slice(slice: &[$a]) -> Self {
-                _from_other_type_slice_large_to_small(slice)
+            fn from_other_type_slice(xs: &[$a]) -> Self {
+                _from_other_type_slice_large_to_small(xs)
             }
         }
 
         impl VecFromOtherTypeSlice<$a> for $b {
             /// Converts a slice of one type of unsigned integer to a `Vec` of a smaller unsigned
-            /// type. Each value of the input slice will be broken up into several values in the
-            /// output `Vec`.
+            /// type.
             ///
-            /// Time: worst case O(n)
+            /// Each value of the input slice will be broken up into several values in the output
+            /// `Vec`.
             ///
-            /// Additional memory: worst case O(n)
+            /// Let $V$ be the the width of the input type and $W$ the width of the output type.
             ///
-            /// where n = `slice.len()`
+            /// $f((x_k)_ {k=0}^{n-1}) = (y_k)_ {k=0}^{m-1}$, where
+            ///
+            /// $$
+            /// \sum_{j=0}^{n-1}2^{jV}x_j = \sum_{j=0}^{m-1}2^{jW}y_j,
+            /// $$
+            ///
+            /// $y_j < 2^W$ for all $j$, and $m = 2^{V-W}n$.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
             ///
-            /// assert_eq!(
-            ///     u8::vec_from_other_type_slice(&[0xcdabu16, 0x01ef, 0x4523, 0x8967]),
-            ///     vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89]
-            /// );
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                _vec_from_other_type_slice_large_to_small(slice)
+            fn vec_from_other_type_slice(xs: &[$a]) -> Vec<Self> {
+                _vec_from_other_type_slice_large_to_small(xs)
             }
         }
 
         impl VecFromOtherType<$a> for $b {
             /// Converts a value of one type of unsigned integer to a `Vec` of a smaller unsigned
-            /// type. The input value will be broken up into several values in the output `Vec`.
+            /// type.
             ///
-            /// Time: worst case O(1)
+            /// The input value will be broken up into several values in the output `Vec`.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x) = (y_k)_{k=0}^{m-1}$, where $x = \sum_{j=0}^{m-1}2^{jW}y_j$ and
+            /// $m = 2^{V-W}n$.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherType;
             ///
-            /// assert_eq!(u8::vec_from_other_type(0xcdabu16), vec![0xab, 0xcd]);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type(value: $a) -> Vec<Self> {
-                _vec_from_other_type_large_to_small(value)
+            fn vec_from_other_type(x: $a) -> Vec<Self> {
+                _vec_from_other_type_large_to_small(x)
             }
         }
     };
 }
 
-pub fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
-    slice: &[A],
+fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+    xs: &[A],
 ) -> B {
     let mut result = B::ZERO;
     let mut offset = 0;
-    for &u in slice.iter().take(1 << (B::LOG_WIDTH - A::LOG_WIDTH)) {
+    for &u in xs.iter().take(1 << (B::LOG_WIDTH - A::LOG_WIDTH)) {
         result |= B::wrapping_from(u) << offset;
         offset += A::WIDTH;
     }
@@ -201,91 +226,105 @@ pub fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + 
 }
 
 fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
-    slice: &[A],
+    xs: &[A],
 ) -> Vec<B> {
     let log_size_ratio = B::LOG_WIDTH - A::LOG_WIDTH;
-    let mut xs = vec![B::ZERO; slice.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
-    for (out, chunk) in xs.iter_mut().zip(slice.chunks(1 << log_size_ratio)) {
-        *out = _from_other_type_slice_small_to_large(chunk);
+    let mut out = vec![B::ZERO; xs.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
+    for (x, chunk) in out.iter_mut().zip(xs.chunks(1 << log_size_ratio)) {
+        *x = _from_other_type_slice_small_to_large(chunk);
     }
-    xs
+    out
 }
 
-fn _vec_from_other_type_small_to_large<A, B: WrappingFrom<A>>(value: A) -> Vec<B> {
-    vec![B::wrapping_from(value)]
+fn _vec_from_other_type_small_to_large<A, B: WrappingFrom<A>>(x: A) -> Vec<B> {
+    vec![B::wrapping_from(x)]
 }
 
 macro_rules! impl_slice_traits_small_to_large {
     ($a:ident, $b:ident) => {
         impl FromOtherTypeSlice<$a> for $b {
             /// Converts a slice of one type of unsigned integer to a single value of a larger
-            /// unsigned type. If the input slice contains more values than necessary to build an
-            /// output value, the trailing values are ignored. If the input slice contains too few
-            /// values to build an output value, the most-significant bits of the output value are
-            /// set to 0.
+            /// unsigned type.
             ///
-            /// Time: worst case O(1)
+            /// Let $V$ be the the width of the input type and $W$ the width of the output type.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f((x_k)_{k=0}^{n-1}) = y$, where $y < 2^W$ and
+            ///
+            /// $$
+            /// y = k2^W + \sum_{j=0}^{n-1}2^{jV}x_j
+            /// $$
+            ///
+            /// for some integer $k$.
+            ///
+            /// If the input slice contains more values than necessary to build an output value, the
+            /// trailing values are ignored. If the input slice contains too few values to build an
+            /// output value, the most-significant bits of the output value are set to 0.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::FromOtherTypeSlice;
             ///
-            /// assert_eq!(u16::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xcdab);
-            /// assert_eq!(u64::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xefcdab);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn from_other_type_slice(slice: &[$a]) -> Self {
-                _from_other_type_slice_small_to_large(slice)
+            fn from_other_type_slice(xs: &[$a]) -> Self {
+                _from_other_type_slice_small_to_large(xs)
             }
         }
 
         impl VecFromOtherTypeSlice<$a> for $b {
             /// Converts a slice of one type of unsigned integer to a `Vec` of a larger unsigned
-            /// type. Adjacent chunks of values in the input slice will be joined into values of the
+            /// type.
+            ///
+            /// Adjacent chunks of values in the input slice will be joined into values of the
             /// output `Vec`. If the last few elements of the input slice don't make up a full
             /// chunk, the most-significant bits of the last output value are set to 0.
             ///
-            /// Time: worst case O(n)
+            /// Let $V$ be the the width of the input type and $W$ the width of the output type.
             ///
-            /// Additional memory: worst case O(n)
+            /// $f((x_k)_ {k=0}^{n-1}) = (y_k)_ {k=0}^{m-1}$, where
             ///
-            /// where n = `slice.len()`
+            /// $$
+            /// \sum_{j=0}^{n-1}2^{jV}x_j = \sum_{j=0}^{m-1}2^{jW}y_j,
+            /// $$
+            ///
+            /// $y_j < 2^W$ for all $j$, and $m = \lceil n / 2^{W-V} \rceil$.
+            ///
+            /// # Worst-case complexity
+            ///
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
             ///
-            /// assert_eq!(
-            ///     u16::vec_from_other_type_slice(&[0xabu8, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67]),
-            ///     vec![0xcdab, 0x01ef, 0x4523, 0x67]
-            /// );
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type_slice(slice: &[$a]) -> Vec<Self> {
-                _vec_from_other_type_slice_small_to_large(slice)
+            fn vec_from_other_type_slice(xs: &[$a]) -> Vec<Self> {
+                _vec_from_other_type_slice_small_to_large(xs)
             }
         }
 
         impl VecFromOtherType<$a> for $b {
             /// Converts a value of one type of unsigned integer to a `Vec` of a larger unsigned
-            /// type. The output `Vec` only contains one value. The least-significant bits of the
-            /// output value contain the input value, and the most-significant bits are set to 0.
+            /// type.
             ///
-            /// Time: worst case O(1)
+            /// The output `Vec` only contains one value. The least-significant bits of the output
+            /// value contain the input value, and the most-significant bits are set to 0.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::conversion::traits::VecFromOtherType;
             ///
-            /// assert_eq!(u16::vec_from_other_type(0xabu8), vec![0xab]);
-            /// ```
+            /// See the documentation of the `num::conversion::slice` module.
             #[inline]
-            fn vec_from_other_type(value: $a) -> Vec<Self> {
-                _vec_from_other_type_small_to_large(value)
+            fn vec_from_other_type(x: $a) -> Vec<Self> {
+                _vec_from_other_type_small_to_large(x)
             }
         }
     };
@@ -323,21 +362,21 @@ impl_slice_traits_small_to_large!(usize, u128);
 impl FromOtherTypeSlice<u32> for usize {
     /// Converts a slice of `u32`s to a single `usize`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
-    fn from_other_type_slice(slice: &[u32]) -> Self {
+    /// Constant time and additional memory.
+    fn from_other_type_slice(xs: &[u32]) -> Self {
         if usize::WIDTH == u32::WIDTH {
-            if slice.is_empty() {
+            if xs.is_empty() {
                 0
             } else {
-                usize::wrapping_from(slice[0])
+                usize::wrapping_from(xs[0])
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
             let mut result = 0;
             let mut offset = 0;
-            for &u in slice.iter().take(2) {
+            for &u in xs.iter().take(2) {
                 result |= usize::wrapping_from(u) << offset;
                 offset += u32::WIDTH;
             }
@@ -349,53 +388,55 @@ impl FromOtherTypeSlice<u32> for usize {
 impl VecFromOtherTypeSlice<u32> for usize {
     /// Converts a slice of `u32`s to a `Vec` of `usize`s.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(n)
+    /// $T(n) = O(n)$
     ///
-    /// where n = `slice.len()`
-    fn vec_from_other_type_slice(slice: &[u32]) -> Vec<Self> {
-        let mut xs;
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    fn vec_from_other_type_slice(xs: &[u32]) -> Vec<Self> {
+        let mut out;
         if usize::WIDTH == u32::WIDTH {
-            xs = vec![0; slice.len()];
-            for (out, &u) in xs.iter_mut().zip(slice.iter()) {
-                *out = usize::wrapping_from(u);
+            out = vec![0; xs.len()];
+            for (x, &u) in out.iter_mut().zip(xs.iter()) {
+                *x = usize::wrapping_from(u);
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            xs = vec![0; slice.len().shr_round(1, RoundingMode::Ceiling)];
-            for (out, chunk) in xs.iter_mut().zip(slice.chunks(2)) {
-                *out = usize::from_other_type_slice(chunk);
+            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+            for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
+                *x = usize::from_other_type_slice(chunk);
             }
         }
-        xs
+        out
     }
 }
 
 impl VecFromOtherType<u32> for usize {
     /// Converts a `u32` to a `Vec` of `usize`s.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     #[inline]
-    fn vec_from_other_type(value: u32) -> Vec<Self> {
-        vec![usize::wrapping_from(value)]
+    fn vec_from_other_type(x: u32) -> Vec<Self> {
+        vec![usize::wrapping_from(x)]
     }
 }
 
 impl FromOtherTypeSlice<u64> for usize {
     /// Converts a slice of `u64`s to a single `usize`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     #[inline]
-    fn from_other_type_slice(slice: &[u64]) -> Self {
-        if slice.is_empty() {
+    fn from_other_type_slice(xs: &[u64]) -> Self {
+        if xs.is_empty() {
             0
         } else {
-            usize::wrapping_from(slice[0])
+            usize::wrapping_from(xs[0])
         }
     }
 }
@@ -403,47 +444,49 @@ impl FromOtherTypeSlice<u64> for usize {
 impl VecFromOtherTypeSlice<u64> for usize {
     /// Converts a slice of `u64`s to a `Vec` of `usize`s.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(n)
+    /// $T(n) = O(n)$
     ///
-    /// where n = `slice.len()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     #[allow(arithmetic_overflow)]
-    fn vec_from_other_type_slice(slice: &[u64]) -> Vec<Self> {
-        let mut xs;
+    fn vec_from_other_type_slice(xs: &[u64]) -> Vec<Self> {
+        let mut out;
         if usize::WIDTH == u32::WIDTH {
-            xs = vec![0; slice.len() << 1];
-            for (chunk, &u) in xs.chunks_exact_mut(2).zip(slice.iter()) {
+            out = vec![0; xs.len() << 1];
+            for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
                 let mut u = u;
-                for out in chunk {
-                    *out = usize::wrapping_from(u);
+                for x in chunk {
+                    *x = usize::wrapping_from(u);
                     u >>= usize::WIDTH;
                 }
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            xs = vec![0; slice.len()];
-            for (out, &u) in xs.iter_mut().zip(slice.iter()) {
-                *out = usize::wrapping_from(u);
+            out = vec![0; xs.len()];
+            for (x, &u) in out.iter_mut().zip(xs.iter()) {
+                *x = usize::wrapping_from(u);
             }
         }
-        xs
+        out
     }
 }
 
 impl VecFromOtherType<u64> for usize {
     /// Converts a `u64` to a `Vec` of `usize`s.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
-    fn vec_from_other_type(value: u64) -> Vec<Self> {
+    /// Constant time and additional memory.
+    fn vec_from_other_type(x: u64) -> Vec<Self> {
         if usize::WIDTH == u32::WIDTH {
-            let (upper, lower) = value.split_in_half();
+            let (upper, lower) = x.split_in_half();
             vec![usize::wrapping_from(lower), usize::wrapping_from(upper)]
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            vec![usize::wrapping_from(value)]
+            vec![usize::wrapping_from(x)]
         }
     }
 }
@@ -451,15 +494,15 @@ impl VecFromOtherType<u64> for usize {
 impl FromOtherTypeSlice<usize> for u32 {
     /// Converts a slice of `usize`s to a single `u32`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     #[inline]
-    fn from_other_type_slice(slice: &[usize]) -> Self {
-        if slice.is_empty() {
+    fn from_other_type_slice(xs: &[usize]) -> Self {
+        if xs.is_empty() {
             0
         } else {
-            u32::wrapping_from(slice[0])
+            u32::wrapping_from(xs[0])
         }
     }
 }
@@ -467,47 +510,49 @@ impl FromOtherTypeSlice<usize> for u32 {
 impl VecFromOtherTypeSlice<usize> for u32 {
     /// Converts a slice of `usize`s to a `Vec` of `u32`s.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(n)
+    /// $T(n) = O(n)$
     ///
-    /// where n = `slice.len()`
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
     #[allow(arithmetic_overflow)]
-    fn vec_from_other_type_slice(slice: &[usize]) -> Vec<Self> {
-        let mut xs;
+    fn vec_from_other_type_slice(xs: &[usize]) -> Vec<Self> {
+        let mut out;
         if usize::WIDTH == u32::WIDTH {
-            xs = vec![0; slice.len()];
-            for (out, &u) in xs.iter_mut().zip(slice.iter()) {
-                *out = u32::wrapping_from(u);
+            out = vec![0; xs.len()];
+            for (x, &u) in out.iter_mut().zip(xs.iter()) {
+                *x = u32::wrapping_from(u);
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            xs = vec![0; slice.len() << 1];
-            for (chunk, &u) in xs.chunks_exact_mut(2).zip(slice.iter()) {
+            out = vec![0; xs.len() << 1];
+            for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
                 let mut u = u;
-                for out in chunk {
-                    *out = u32::wrapping_from(u);
+                for x in chunk {
+                    *x = u32::wrapping_from(u);
                     u >>= u32::WIDTH;
                 }
             }
         }
-        xs
+        out
     }
 }
 
 impl VecFromOtherType<usize> for u32 {
     /// Converts a `usize` to a `Vec` of `u32`s.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     #[allow(arithmetic_overflow)]
-    fn vec_from_other_type(value: usize) -> Vec<Self> {
+    fn vec_from_other_type(x: usize) -> Vec<Self> {
         if usize::WIDTH == u32::WIDTH {
-            vec![u32::wrapping_from(value)]
+            vec![u32::wrapping_from(x)]
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            let (upper, lower) = u64::wrapping_from(value).split_in_half();
+            let (upper, lower) = u64::wrapping_from(x).split_in_half();
             vec![lower, upper]
         }
     }
@@ -516,24 +561,24 @@ impl VecFromOtherType<usize> for u32 {
 impl FromOtherTypeSlice<usize> for u64 {
     /// Converts a slice of `usize`s to a single `u64`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
-    fn from_other_type_slice(slice: &[usize]) -> Self {
+    /// Constant time and additional memory.
+    fn from_other_type_slice(xs: &[usize]) -> Self {
         if usize::WIDTH == u32::WIDTH {
             let mut result = 0;
             let mut offset = 0;
-            for &u in slice.iter().take(2) {
+            for &u in xs.iter().take(2) {
                 result |= u64::wrapping_from(u) << offset;
                 offset += usize::WIDTH;
             }
             result
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            if slice.is_empty() {
+            if xs.is_empty() {
                 0
             } else {
-                u64::wrapping_from(slice[0])
+                u64::wrapping_from(xs[0])
             }
         }
     }
@@ -542,37 +587,39 @@ impl FromOtherTypeSlice<usize> for u64 {
 impl VecFromOtherTypeSlice<usize> for u64 {
     /// Converts a slice of `usize`s to a `Vec` of `u64`s.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(n)
+    /// $T(n) = O(n)$
     ///
-    /// where n = `slice.len()`
-    fn vec_from_other_type_slice(slice: &[usize]) -> Vec<Self> {
-        let mut xs;
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+    fn vec_from_other_type_slice(xs: &[usize]) -> Vec<Self> {
+        let mut out;
         if usize::WIDTH == u32::WIDTH {
-            xs = vec![0; slice.len().shr_round(1, RoundingMode::Ceiling)];
-            for (out, chunk) in xs.iter_mut().zip(slice.chunks(2)) {
-                *out = u64::from_other_type_slice(chunk);
+            out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+            for (x, chunk) in out.iter_mut().zip(xs.chunks(2)) {
+                *x = u64::from_other_type_slice(chunk);
             }
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
-            xs = vec![0; slice.len()];
-            for (out, &u) in xs.iter_mut().zip(slice.iter()) {
-                *out = u64::wrapping_from(u);
+            out = vec![0; xs.len()];
+            for (x, &u) in out.iter_mut().zip(xs.iter()) {
+                *x = u64::wrapping_from(u);
             }
         }
-        xs
+        out
     }
 }
 
 impl VecFromOtherType<usize> for u64 {
     /// Converts a `usize` to a `Vec` of `u64`s.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     #[inline]
-    fn vec_from_other_type(value: usize) -> Vec<Self> {
-        vec![u64::wrapping_from(value)]
+    fn vec_from_other_type(x: usize) -> Vec<Self> {
+        vec![u64::wrapping_from(x)]
     }
 }

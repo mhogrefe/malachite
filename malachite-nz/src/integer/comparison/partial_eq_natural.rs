@@ -10,7 +10,7 @@ impl PartialEq<Natural> for Integer {
     ///
     /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
@@ -32,7 +32,7 @@ impl PartialEq<Integer> for Natural {
     ///
     /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;

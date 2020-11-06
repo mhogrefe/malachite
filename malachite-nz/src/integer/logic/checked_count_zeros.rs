@@ -16,7 +16,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;
 ///

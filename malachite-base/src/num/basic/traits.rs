@@ -45,7 +45,7 @@ impl<T: One + Sized + Zero> Iverson for T {
     ///
     /// Constant time and additional memory.
     ///
-    /// # Example
+    /// # Examples
     ///
     /// See the documentation of the `num::basic::traits` module.
     #[inline]

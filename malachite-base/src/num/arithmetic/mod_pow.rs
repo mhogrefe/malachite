@@ -117,7 +117,7 @@ macro_rules! impl_mod_pow_precomputed_fast {
             ///
             /// TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
             ///
@@ -167,7 +167,7 @@ macro_rules! impl_mod_pow_precomputed_promoted {
             ///
             /// TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
             ///
@@ -212,7 +212,7 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     ///
     /// TODO complexity
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
     ///
@@ -295,7 +295,7 @@ macro_rules! impl_mod_pow {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::{
             ///     ModPowPrecomputed, ModPowPrecomputedAssign
@@ -343,7 +343,7 @@ macro_rules! impl_mod_pow {
             ///
             /// TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPow;
             ///
@@ -363,7 +363,7 @@ macro_rules! impl_mod_pow {
             ///
             /// TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowAssign;
             ///

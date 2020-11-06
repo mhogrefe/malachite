@@ -24,7 +24,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 /// use std::cmp::Ordering;
@@ -66,7 +66,7 @@ pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 /// # Panics
 /// If the slice contains only zeros a panic may occur.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 /// use std::cmp::Ordering;
@@ -137,7 +137,7 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 /// Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
 /// only zeros a panic may occur.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_access::limbs_slice_clear_bit_neg;
 /// use std::cmp::Ordering;
@@ -169,7 +169,7 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 /// # Panics
 /// If the slice contains only zeros a panic may occur.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 /// use std::cmp::Ordering;
@@ -300,7 +300,7 @@ impl BitAccess for Integer {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

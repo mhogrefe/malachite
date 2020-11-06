@@ -19,7 +19,7 @@ macro_rules! impl_saturating_add {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingAddAssign;
             ///

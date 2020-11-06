@@ -27,7 +27,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Integer {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -81,7 +81,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Integer {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -147,7 +147,7 @@ impl RoundToMultipleOfPowerOfTwoAssign<u64> for Integer {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

@@ -33,7 +33,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `start` > `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_block_access::limbs_neg_limb_get_bits;
 /// use malachite_nz::platform::Limb;
@@ -89,7 +89,7 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 /// # Panics
 /// Panics if `start` > `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_block_access::limbs_slice_neg_get_bits;
 /// use malachite_nz::platform::Limb;
@@ -158,7 +158,7 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
 /// # Panics
 /// Panics if `start` > `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_block_access::limbs_vec_neg_get_bits;
 /// use malachite_nz::platform::Limb;
@@ -223,7 +223,7 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
 /// # Panics
 /// Panics if `start` >= `end` or `xs` only contains zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 /// use malachite_nz::platform::Limb;
@@ -309,7 +309,7 @@ impl BitBlockAccess for Integer {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -356,7 +356,7 @@ impl BitBlockAccess for Integer {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -405,7 +405,7 @@ impl BitBlockAccess for Integer {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

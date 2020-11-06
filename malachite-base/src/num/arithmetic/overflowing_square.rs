@@ -11,7 +11,7 @@ macro_rules! impl_overflowing_square {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSquare;
             ///
@@ -32,7 +32,7 @@ macro_rules! impl_overflowing_square {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSquareAssign;
             ///

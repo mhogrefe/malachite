@@ -179,7 +179,7 @@ pub fn run_benchmark<'a, I: Iterator>(
         title: &title,
         limit,
         bucketing_function: bucketer.bucketing_function,
-        x_axis_label: bucketer.bucketing_label,
+        x_axis_label: &bucketer.bucketing_label,
         y_axis_label: "time (ns)",
         file_name: format!("benchmarks/{}", file_name),
         series_options,

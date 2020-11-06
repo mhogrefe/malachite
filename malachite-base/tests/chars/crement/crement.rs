@@ -1,4 +1,4 @@
-use malachite_base_test_util::generators::{char_gen_var_2, char_gen_var_3};
+use malachite_base_test_util::generators::{char_gen_var_1, char_gen_var_2};
 
 use malachite_base::chars::constants::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::chars::crement::{decrement_char, increment_char};
@@ -46,7 +46,7 @@ fn decrement_char_fail() {
 
 #[test]
 fn increment_char_properties() {
-    char_gen_var_2().test_properties_no_exhaustive_limit(|c| {
+    char_gen_var_1().test_properties_no_exhaustive_limit(|c| {
         let mut mut_c = c;
         increment_char(&mut mut_c);
         assert_ne!(mut_c, c);
@@ -57,7 +57,7 @@ fn increment_char_properties() {
 
 #[test]
 fn decrement_char_properties() {
-    char_gen_var_3().test_properties_no_exhaustive_limit(|c| {
+    char_gen_var_2().test_properties_no_exhaustive_limit(|c| {
         let mut mut_c = c;
         decrement_char(&mut mut_c);
         assert_ne!(mut_c, c);

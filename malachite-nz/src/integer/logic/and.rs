@@ -24,7 +24,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_pos_and_limb_neg;
 ///
@@ -51,7 +51,7 @@ pub fn limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_pos_and_limb_neg_to_out;
 ///
@@ -83,7 +83,7 @@ pub fn limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_pos_and_limb_neg_in_place;
 ///
@@ -113,7 +113,7 @@ pub fn limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_neg_and_limb_neg;
 ///
@@ -143,7 +143,7 @@ pub fn limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_neg_and_limb_neg_to_out;
 ///
@@ -197,7 +197,7 @@ pub fn limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_slice_neg_and_limb_neg_in_place;
 ///
@@ -246,7 +246,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_vec_neg_and_limb_neg_in_place;
 ///
@@ -285,7 +285,7 @@ pub fn limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_pos_neg;
 ///
@@ -344,7 +344,7 @@ pub fn limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_pos_neg_to_out;
 ///
@@ -406,7 +406,7 @@ pub fn limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_pos_neg_in_place_left;
 ///
@@ -461,7 +461,7 @@ pub fn limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_slice_and_pos_neg_in_place_right;
 ///
@@ -517,7 +517,7 @@ pub fn limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_vec_and_pos_neg_in_place_right;
 ///
@@ -577,7 +577,7 @@ fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) -> Limb 
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_neg_neg;
 ///
@@ -656,7 +656,7 @@ pub fn limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// longer of `xs` and `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_and_neg_neg_to_out;
 ///
@@ -747,7 +747,7 @@ pub fn limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_slice_and_neg_neg_in_place_left;
 ///
@@ -820,7 +820,7 @@ pub fn limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_vec_and_neg_neg_in_place_left;
 ///
@@ -883,7 +883,7 @@ pub fn limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_slice_and_neg_neg_in_place_either;
 ///
@@ -931,7 +931,7 @@ pub fn limbs_slice_and_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb])
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::and::limbs_vec_and_neg_neg_in_place_either;
 ///

@@ -27,7 +27,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_limb_neg;
 ///
@@ -108,7 +108,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 /// # Panics
 /// May panic if `xs` or `ys` only contain zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
 ///

@@ -13,15 +13,6 @@ extern crate rug;
 extern crate rust_wheels;
 
 pub mod base {
-    pub mod chars {
-        pub mod char_to_contiguous_range;
-        pub mod contiguous_range_to_char;
-    }
-
-    pub mod comparison {
-        pub mod macros;
-    }
-
     pub mod num {
         pub mod arithmetic {
             pub mod add_mul;
@@ -97,7 +88,6 @@ pub mod base {
             pub mod wrapping_square;
             pub mod wrapping_sub;
             pub mod wrapping_sub_mul;
-            pub mod x_mul_y_is_zz;
             pub mod xx_add_yy_is_zz;
             pub mod xx_div_mod_y_is_qr;
             pub mod xx_sub_yy_is_zz;
@@ -136,11 +126,7 @@ pub mod base {
     }
 
     pub mod rounding_modes {
-        pub mod clone;
-        pub mod eq;
         pub mod from_str;
-        pub mod hash;
-        pub mod neg;
     }
 
     pub mod slices {

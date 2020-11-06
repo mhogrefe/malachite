@@ -13,7 +13,7 @@ macro_rules! impl_mod_is_reduced {
             /// # Panics
             /// Panics if `m` is 0.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModIsReduced;
             ///

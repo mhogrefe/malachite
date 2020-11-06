@@ -14,7 +14,6 @@ extern crate rust_wheels;
 
 #[macro_use]
 pub mod common;
-pub mod hash;
 
 pub mod inputs {
     pub mod base;

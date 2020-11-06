@@ -31,7 +31,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 /// # Panics
 /// Panics if the length of `limbs` is less than 2.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_eq_neg_limb_mod_limb;
 ///
@@ -66,7 +66,7 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 ///
 /// Additional memory: Worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_limb_eq_neg_limb_mod;
 ///
@@ -142,7 +142,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod_ref;
 ///
@@ -177,7 +177,7 @@ pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod;
 ///
@@ -212,7 +212,7 @@ pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_limb;
 ///
@@ -283,7 +283,7 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_ref;
 ///
@@ -328,7 +328,7 @@ fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod;
 ///

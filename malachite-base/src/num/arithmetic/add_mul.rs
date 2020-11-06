@@ -11,7 +11,7 @@ macro_rules! impl_add_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::AddMul;
             ///
@@ -31,7 +31,7 @@ macro_rules! impl_add_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::AddMulAssign;
             ///

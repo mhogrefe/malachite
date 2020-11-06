@@ -21,7 +21,7 @@ macro_rules! impl_next_power_of_two {
             /// # Panics
             /// Panics if the next power of two is greater than the type's maximum value.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::NextPowerOfTwoAssign;
             ///

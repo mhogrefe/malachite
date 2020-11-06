@@ -30,7 +30,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -68,7 +68,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -89,7 +89,7 @@ impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -135,7 +135,7 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -188,7 +188,7 @@ macro_rules! impl_bit_iterable_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitIterable;
             ///
@@ -227,7 +227,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIt
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -260,7 +260,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -296,7 +296,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::logic::traits::BitIterable;
     ///
@@ -359,7 +359,7 @@ macro_rules! impl_bit_iterable_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitIterable;
             ///

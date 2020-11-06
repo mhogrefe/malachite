@@ -3,7 +3,7 @@ use malachite_base::chars::crement::{decrement_char, increment_char};
 use malachite_base_test_util::bench::bucketers::char_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::{char_gen_var_2, char_gen_var_3};
+use malachite_base_test_util::generators::{char_gen_var_1, char_gen_var_2};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -14,7 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_increment_char(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut c in char_gen_var_2().get(gm, &config).take(limit) {
+    for mut c in char_gen_var_1().get(gm, &config).take(limit) {
         let c_old = c;
         increment_char(&mut c);
         println!("c := {:?}; increment_char(&mut c); c = {:?}", c_old, c);
@@ -22,7 +22,7 @@ fn demo_increment_char(gm: GenMode, config: GenConfig, limit: usize) {
 }
 
 fn demo_decrement_char(gm: GenMode, config: GenConfig, limit: usize) {
-    for mut c in char_gen_var_3().get(gm, &config).take(limit) {
+    for mut c in char_gen_var_2().get(gm, &config).take(limit) {
         let c_old = c;
         increment_char(&mut c);
         println!("c := {:?}; decrement_char(&mut c); c = {:?}", c_old, c);
@@ -33,7 +33,7 @@ fn benchmark_increment_char(gm: GenMode, config: GenConfig, limit: usize, file_n
     run_benchmark(
         "increment_char(&mut char)",
         BenchmarkType::Single,
-        char_gen_var_2().get(gm, &config),
+        char_gen_var_1().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -46,7 +46,7 @@ fn benchmark_decrement_char(gm: GenMode, config: GenConfig, limit: usize, file_n
     run_benchmark(
         "decrement_char(&mut char)",
         BenchmarkType::Single,
-        char_gen_var_3().get(gm, &config),
+        char_gen_var_2().get(gm, &config),
         gm.name(),
         limit,
         file_name,

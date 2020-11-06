@@ -10,7 +10,7 @@ pub trait Named {
 /// It doesn't work very well for types whose names contain several tokens, like `(u8, u8)`, `&str`,
 /// or `Vec<bool>`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 ///

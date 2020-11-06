@@ -18,7 +18,7 @@ macro_rules! impl_wrapping_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::WrappingMulAssign;
             ///

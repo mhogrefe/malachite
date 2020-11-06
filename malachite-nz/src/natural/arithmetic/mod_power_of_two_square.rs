@@ -6,11 +6,18 @@ use malachite_base::num::conversion::traits::SplitInHalf;
 
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use natural::arithmetic::shl::limbs_slice_shl_in_place;
-use natural::arithmetic::square::_limbs_square_diagonal;
+use natural::arithmetic::mul::mul_low::_limbs_mul_low_same_length_basecase;
+use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
+use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
+use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use natural::arithmetic::square::{_limbs_square_diagonal, limbs_square_to_out};
 use natural::Natural;
-use platform::{DoubleLimb, Limb};
+use platform::{
+    DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQRLO_DC_THRESHOLD,
+    SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
+};
 
 /// This is MPN_SQRLO_DIAGONAL from mpn/generic/sqrlo_basecase.c, GMP 6.1.2.
 fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
@@ -23,7 +30,7 @@ fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
 }
 
 /// This is MPN_SQRLO_DIAG_ADDLSH1 from mpn/generic/sqrlo_basecase.c, GMP 6.1.2.
-fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
+pub fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert_eq!(scratch.len(), n - 1);
     assert_eq!(out.len(), n);
@@ -33,7 +40,7 @@ fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[
 }
 
 //TODO tune
-pub const SQRLO_DC_THRESHOLD_LIMIT: usize = 100;
+pub const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
 
 const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
     1
@@ -54,7 +61,7 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
         2 => {
             let (p_hi, p_lo) = DoubleLimb::from(xs_0).square().split_in_half();
             out[0] = p_lo;
-            out[1] = xs_0.wrapping_mul(xs[1]).wrapping_mul(2).wrapping_add(p_hi);
+            out[1] = (xs_0.wrapping_mul(xs[1]) << 1).wrapping_add(p_hi);
         }
         _ => {
             let scratch = &mut [0; SQRLO_BASECASE_ALLOC];
@@ -76,6 +83,75 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
             _limbs_square_diagonal_shl_add(out, scratch, xs);
         }
     }
+}
+
+//TODO tune
+const SQRLO_BASECASE_THRESHOLD: usize = 10;
+
+/// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.1.2.
+const MAYBE_RANGE_BASECASE: bool = TUNE_PROGRAM_BUILD
+    || WANT_FAT_BINARY
+    || (if SQRLO_DC_THRESHOLD == 0 {
+        SQRLO_BASECASE_THRESHOLD
+    } else {
+        SQRLO_DC_THRESHOLD
+    }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
+
+/// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.1.2.
+const MAYBE_RANGE_TOOM22: bool = TUNE_PROGRAM_BUILD
+    || WANT_FAT_BINARY
+    || (if SQRLO_DC_THRESHOLD == 0 {
+        SQRLO_BASECASE_THRESHOLD
+    } else {
+        SQRLO_DC_THRESHOLD
+    }) < SQR_TOOM3_THRESHOLD * 36 / (36 - 11);
+
+/// This is mpn_sqrlo_itch from mpn/generic/sqrlo.c, GMP 6.1.2.
+pub const fn _limbs_square_low_scratch_len(len: usize) -> usize {
+    len << 1
+}
+
+/// Requires a scratch space of 2 * `xs.len()` limbs at `scratch`.
+///
+/// TODO complexity
+///
+/// This is mpn_dc_sqrlo from mpn/generic/sqrlo.c, GMP 6.1.2.
+#[allow(clippy::absurd_extreme_comparisons)]
+pub fn _limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+    let len = xs.len();
+    let out = &mut out[..len];
+    assert!(len > 1);
+    // We need a fractional approximation of the value 0 < a <= 1/2, giving the minimum in the
+    // function k = (1 - a) ^ e / (1 - 2 * a ^ e).
+    let len_small = if MAYBE_RANGE_BASECASE && len < SQR_TOOM2_THRESHOLD * 36 / (36 - 11) {
+        len >> 1
+    } else if MAYBE_RANGE_TOOM22 && len < SQR_TOOM3_THRESHOLD * 36 / (36 - 11) {
+        len * 11 / 36 // n1 ~= n*(1-.694...)
+    } else if len < SQR_TOOM4_THRESHOLD * 40 / (40 - 9) {
+        len * 9 / 40 // n1 ~= n*(1-.775...)
+    } else if len < SQR_TOOM8_THRESHOLD * 10 / 9 {
+        len * 7 / 39 // n1 ~= n*(1-.821...)
+    } else {
+        len / 10 // n1 ~= n*(1-.899...) [TOOM88]
+    };
+    let len_big = len - len_small;
+    // x0 ^ 2
+    let (xs_lo, xs_hi) = xs.split_at(len_big);
+    limbs_square_to_out(scratch, xs_lo);
+    let xs_lo = &xs_lo[..len_small];
+    let (out_lo, out_hi) = out.split_at_mut(len_big);
+    let (scratch_lo, scratch_hi) = scratch.split_at_mut(len);
+    out_lo.copy_from_slice(&scratch_lo[..len_big]);
+    // x1 * x0 * 2^(n2 GMP_NUMB_BITS)
+    if len_small < MULLO_BASECASE_THRESHOLD {
+        _limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, xs_lo);
+    } else if len_small < MULLO_DC_THRESHOLD {
+        _limbs_mul_low_same_length_basecase(scratch_hi, xs_hi, xs_lo);
+    } else {
+        limbs_mul_low_same_length(scratch_hi, xs_hi, xs_lo);
+    }
+    limbs_shl_to_out(out_hi, &scratch_hi[..len_small], 1);
+    limbs_slice_add_same_length_in_place_left(out_hi, &scratch_lo[len_big..]);
 }
 
 impl ModPowerOfTwoSquare for Natural {

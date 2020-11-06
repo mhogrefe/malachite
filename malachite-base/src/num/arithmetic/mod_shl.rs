@@ -48,7 +48,7 @@ macro_rules! impl_mod_shl_unsigned {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModShl;
                     ///
@@ -69,7 +69,7 @@ macro_rules! impl_mod_shl_unsigned {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModShlAssign;
                     ///
@@ -151,7 +151,7 @@ macro_rules! impl_mod_shl_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModShl;
                     ///
@@ -172,7 +172,7 @@ macro_rules! impl_mod_shl_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModShlAssign;
                     ///

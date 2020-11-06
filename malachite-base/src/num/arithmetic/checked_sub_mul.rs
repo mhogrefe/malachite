@@ -21,7 +21,7 @@ macro_rules! impl_checked_sub_mul_unsigned {
             ///
             /// Subitional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
             ///
@@ -88,7 +88,7 @@ macro_rules! impl_checked_sub_mul_signed {
             ///
             /// Subitional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
             ///

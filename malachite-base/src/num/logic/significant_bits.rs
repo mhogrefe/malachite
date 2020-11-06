@@ -16,7 +16,7 @@ macro_rules! impl_significant_bits_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::SignificantBits;
             ///
@@ -45,7 +45,7 @@ macro_rules! impl_significant_bits_signed {
         ///
         /// Additional memory: worst case O(1)
         ///
-        /// # Example
+        /// # Examples
         /// ```
         /// use malachite_base::num::logic::traits::SignificantBits;
         ///

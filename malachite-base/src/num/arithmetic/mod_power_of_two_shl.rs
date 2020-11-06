@@ -54,7 +54,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShl;
                     ///
@@ -75,7 +75,7 @@ macro_rules! impl_mod_power_of_two_shl_unsigned {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShlAssign;
                     ///
@@ -159,7 +159,7 @@ macro_rules! impl_mod_power_of_two_shl_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShl;
                     ///
@@ -180,7 +180,7 @@ macro_rules! impl_mod_power_of_two_shl_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShlAssign;
                     ///

@@ -1,13 +1,12 @@
-use std::cmp::max;
-use std::fmt::Debug;
-use std::iter::{once, Once};
-use std::marker::PhantomData;
-
 use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
 use num::arithmetic::traits::CheckedPow;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::SignificantBits;
+use std::cmp::max;
+use std::fmt::Debug;
+use std::iter::{once, Once};
+use std::marker::PhantomData;
 
 /// Generates the only unit: `()`.
 ///

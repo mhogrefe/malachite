@@ -652,6 +652,7 @@ macro_rules! iterables {
             ///     vec![1, 2, 2, 3]
             /// );
             /// ```
+            #[inline]
             fn power_of_two_digits(
                 self,
                 log_base: u64,

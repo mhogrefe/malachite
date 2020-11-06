@@ -31,7 +31,7 @@ macro_rules! impl_mod_power_of_two_pow {
             ///
             /// //TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoPow;
             ///
@@ -50,7 +50,7 @@ macro_rules! impl_mod_power_of_two_pow {
             ///
             /// //TODO complexity
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoPowAssign;
             ///

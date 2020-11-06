@@ -42,7 +42,7 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
             ///   multiple with a greater absolute value.
             /// - If `rm` is `Nearest`, but the nearest multiple is outside the representable range.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwo;
             /// use malachite_base::rounding_modes::RoundingMode;
@@ -92,7 +92,7 @@ macro_rules! impl_round_to_multiple_of_power_of_two {
             ///   multiple with a greater absolute value.
             /// - If `rm` is `Nearest`, but the nearest multiple is outside the representable range.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOfTwoAssign;
             /// use malachite_base::rounding_modes::RoundingMode;

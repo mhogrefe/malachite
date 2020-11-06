@@ -67,11 +67,13 @@ macro_rules! signed_single_arg_bench {
 pub(crate) fn register(runner: &mut Runner) {
     bools::register(runner);
     chars::register(runner);
+    comparison::register(runner);
     num::register(runner);
     rounding_modes::register(runner);
 }
 
 mod bools;
 mod chars;
+mod comparison;
 mod num;
 mod rounding_modes;

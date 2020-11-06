@@ -33,7 +33,7 @@ use platform::Limb;
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb;
 ///
@@ -71,7 +71,7 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `ys.len()` - `xs.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_left;
 ///
@@ -170,7 +170,7 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `xs.len()` - `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_right;
 ///
@@ -267,7 +267,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_either;
 ///
@@ -325,7 +325,7 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_either(
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul;
 ///
@@ -357,7 +357,7 @@ pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_in_place_left;
 ///

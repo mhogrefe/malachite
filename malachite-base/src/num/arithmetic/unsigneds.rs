@@ -30,7 +30,7 @@ macro_rules! impl_arithmetic_traits {
             /// # Panics
             /// Panics if `self` is 0.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::FloorLogTwo;
             ///
@@ -57,7 +57,7 @@ macro_rules! impl_arithmetic_traits {
             /// # Panics
             /// Panics if `self` is 0.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::CeilingLogTwo;
             ///

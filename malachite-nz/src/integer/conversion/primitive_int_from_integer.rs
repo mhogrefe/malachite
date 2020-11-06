@@ -130,7 +130,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -158,7 +158,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -185,7 +185,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -212,7 +212,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -240,7 +240,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -268,7 +268,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -296,7 +296,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -324,7 +324,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -351,7 +351,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -378,7 +378,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -406,7 +406,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -434,7 +434,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -461,7 +461,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -488,7 +488,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -516,7 +516,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -544,7 +544,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -572,7 +572,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -600,7 +600,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -627,7 +627,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -654,7 +654,7 @@ macro_rules! impl_from {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;

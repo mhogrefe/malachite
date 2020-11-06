@@ -29,7 +29,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSubMul;
             ///
@@ -52,7 +52,7 @@ macro_rules! impl_overflowing_sub_mul_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSubMulAssign;
             ///
@@ -129,7 +129,7 @@ macro_rules! impl_overflowing_sub_mul_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSubMul;
             ///
@@ -152,7 +152,7 @@ macro_rules! impl_overflowing_sub_mul_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::OverflowingSubMulAssign;
             ///

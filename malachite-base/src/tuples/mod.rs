@@ -1,6 +1,7 @@
 /// Generates all singletons (1-element tuples) with values from a given iterator.
 ///
 /// This `struct` is created by the `singletons` method. See its documentation for more.
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Singletons<I: Iterator> {
     xs: I,
 }
@@ -67,10 +68,11 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::lex_triples_xyx;
 ///
-/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
-/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
-/// // function we're using is `lex_triples_xyx`, meaning that the first element of the output
-/// // triples will be taken from `xs`, the second element from `ys`, and the third also from `xs`.
+/// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
+/// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
+/// // 0, 1, and 2. The function we're using is `lex_triples_xyx`, meaning that the first element of
+/// // the output triples will be taken from `xs`, the second element from `ys`, and the third also
+/// // from `xs`.
 /// let ts = lex_triples_xyx(exhaustive_ascii_chars(), 0..3);
 /// assert_eq!(
 ///     ts.take(20).collect::<Vec<_>>(),
@@ -155,11 +157,11 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx;
 ///
-/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
-/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
-/// // function we're using is `exhaustive_triples_xyx`, meaning that the first element of the
-/// // output triples will be taken from `xs`, the second element from `ys`, and the third also from
-/// // `xs`.
+/// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
+/// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
+/// // 0, 1, and 2. The function we're using is `exhaustive_triples_xyx`, meaning that the first
+/// // element of the output triples will be taken from `xs`, the second element from `ys`, and the
+/// // third also from `xs`.
 /// let ts = exhaustive_triples_xyx(exhaustive_ascii_chars(), 0..3);
 /// assert_eq!(
 ///     ts.take(20).collect::<Vec<_>>(),
@@ -178,11 +180,11 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx_custom_output;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 ///
-/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
-/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
-/// // function we're using is `exhaustive_triples_xyx_custom_output`, meaning that the first
-/// // element of the output triples will be taken from `xs`, the second element from `ys`, and the
-/// // third also from `xs`.
+/// // We are generating triples of `char`, `i8`, and `char` using two input iterators. The first
+/// // iterator, `xs`, produces all ASCII `char`s, and the second, `ys`, produces the three numbers
+/// // 0, 1, and 2. The function we're using is `exhaustive_triples_xyx_custom_output`, meaning that
+/// // the first element of the output triples will be taken from `xs`, the second element from
+/// // `ys`, and the third also from `xs`.
 /// //
 /// // The third element has a tiny output type, so it will grow more slowly than the other two
 /// // elements (though it doesn't look that way from the first few tuples).
@@ -205,4 +207,73 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// ```
 pub mod exhaustive;
 /// This module contains iterators that generate tuples randomly.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # random_[n-tuples]
+/// ```
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::tuples::random::random_pairs;
+///
+/// let ps = random_pairs(
+///     EXAMPLE_SEED,
+///     &|seed| random_unsigned_inclusive_range::<u8>(seed, 0, 2),
+///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
+/// );
+/// assert_eq!(
+///     ps.take(20).collect::<Vec<_>>().as_slice(),
+///     &[
+///         (1, 'z'), (1, 'x'), (1, 'z'), (1, 'y'), (2, 'x'), (0, 'z'), (0, 'z'), (0, 'z'),
+///         (2, 'z'), (0, 'y'), (2, 'x'), (0, 'x'), (2, 'z'), (0, 'z'), (2, 'x'), (2, 'x'),
+///         (2, 'y'), (1, 'y'), (0, 'x'), (2, 'x')
+///     ]
+/// );
+/// ```
+///
+/// # random_[n-tuples]_from_single
+/// ```
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::tuples::random::random_pairs_from_single;
+///
+/// let ps = random_pairs_from_single(random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 2));
+/// assert_eq!(
+///     ps.take(20).collect::<Vec<_>>().as_slice(),
+///     &[
+///         (1, 0), (1, 2), (1, 1), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (1, 0), (2, 2), (2, 1),
+///         (0, 2), (2, 1), (1, 1), (0, 0), (2, 0), (2, 2), (1, 0), (1, 1), (0, 2)
+///     ]
+/// );
+/// ```
+///
+/// # random_custom_tuples
+/// ```
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::tuples::random::random_triples_xyx;
+///
+/// // We are generating triples of `char`s using two input iterators. The first iterator, `xs`,
+/// // produces all ASCII `char`s, and the second, `ys`, produces the three numbers 0, 1, and 2. The
+/// // function we're using is `random_triples_xyx`, meaning that the first element of the
+/// // output triples will be taken from `xs`, the second element from `ys`, and the third also from
+/// // `xs`.
+/// let ts = random_triples_xyx(
+///     EXAMPLE_SEED,
+///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
+///     &|seed| random_unsigned_inclusive_range::<u8>(seed, 0, 2),
+/// );
+/// assert_eq!(
+///     ts.take(20).collect::<Vec<_>>().as_slice(),
+///     &[
+///         ('y', 2, 'y'), ('y', 0, 'y'), ('z', 2, 'x'), ('x', 1, 'x'), ('z', 0, 'x'),
+///         ('z', 2, 'x'), ('z', 2, 'x'), ('z', 2, 'z'), ('z', 2, 'y'), ('x', 1, 'z'),
+///         ('z', 0, 'x'), ('y', 0, 'z'), ('y', 2, 'z'), ('x', 2, 'z'), ('z', 0, 'y'),
+///         ('z', 0, 'y'), ('y', 1, 'x'), ('z', 1, 'z'), ('x', 0, 'z'), ('z', 0, 'x')
+///     ]
+/// );
+/// ```
 pub mod random;

@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two_neg_limb;
 /// use std::u32;
@@ -102,7 +102,7 @@ fn limbs_eq_mod_power_of_two_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64)
 ///
 /// where n = min(pow, max(`xs.len()`, `ys.len()`))
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two_neg_pos;
 ///

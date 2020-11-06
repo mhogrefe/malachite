@@ -312,7 +312,7 @@ impl<'a> TwosComplementLimbIterator<'a> {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -350,7 +350,7 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -390,7 +390,7 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -624,7 +624,7 @@ impl Integer {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

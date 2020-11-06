@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
 ///
@@ -81,7 +81,7 @@ pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 ///
@@ -174,7 +174,7 @@ impl<'a> BitScan for &'a Integer {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -209,7 +209,7 @@ impl<'a> BitScan for &'a Integer {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

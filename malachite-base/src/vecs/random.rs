@@ -121,14 +121,14 @@ macro_rules! random_fixed_length_vecs {
         ///
         /// `xs` must be infinite.
         ///
-        /// # Expected omplexity per iteration
+        /// # Expected complexity per iteration
         ///
-        /// If `xs` is infinite: Let $j$ be the largest index of any output associated with `xs`,
-        /// $X$ the set of outputs with indices higher than $j$, $P$ the product of the lengths of
-        /// all the iterators associated with the outputs in $X$, including multiplicities, and
-        /// $T^\prime$ and $M^\prime$ the time and additional memory complexities of `xs`.
+        /// Let $j$ be the largest index of any output associated with `xs`, $X$ the set of outputs
+        /// with indices higher than $j$, $P$ the product of the lengths of all the iterators
+        /// associated with the outputs in $X$, including multiplicities, and $T^\prime$ and
+        /// $M^\prime$ the time and additional memory complexities of `xs`.
         ///
-        /// Finally, we have
+        /// We have
         ///
         /// $$
         /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))
@@ -169,9 +169,7 @@ macro_rules! random_fixed_length_vecs {
         ///
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
-        /// # Expected omplexity per iteration
-        ///
-        /// If all of `xs`, `ys`, `zs`, ... are finite:
+        /// # Expected complexity per iteration
         ///
         /// $$
         /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))

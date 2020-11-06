@@ -9,7 +9,7 @@ macro_rules! impl_parity {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::Parity;
             ///
@@ -28,7 +28,7 @@ macro_rules! impl_parity {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::Parity;
             ///

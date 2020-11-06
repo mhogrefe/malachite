@@ -76,7 +76,6 @@ pub mod wrapping_pow;
 pub mod wrapping_square;
 pub mod wrapping_sub;
 pub mod wrapping_sub_mul;
-pub mod x_mul_y_is_zz;
 pub mod xx_add_yy_is_zz;
 pub mod xx_div_mod_y_is_qr;
 pub mod xx_sub_yy_is_zz;
@@ -161,7 +160,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     wrapping_square::register(registry);
     wrapping_sub::register(registry);
     wrapping_sub_mul::register(registry);
-    x_mul_y_is_zz::register(registry);
     xx_add_yy_is_zz::register(registry);
     xx_div_mod_y_is_qr::register(registry);
     xx_sub_yy_is_zz::register(registry);

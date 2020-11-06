@@ -13,7 +13,7 @@ macro_rules! impl_from_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::integer::Integer;
             ///
@@ -41,7 +41,7 @@ macro_rules! impl_from_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::integer::Integer;
             ///

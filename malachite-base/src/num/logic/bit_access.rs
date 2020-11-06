@@ -59,7 +59,7 @@ macro_rules! impl_bit_access_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitAccess;
             ///
@@ -220,7 +220,7 @@ macro_rules! impl_bit_access_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitAccess;
             ///

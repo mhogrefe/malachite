@@ -11,7 +11,7 @@ macro_rules! impl_saturating_square {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingSquare;
             ///
@@ -33,7 +33,7 @@ macro_rules! impl_saturating_square {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingSquareAssign;
             ///

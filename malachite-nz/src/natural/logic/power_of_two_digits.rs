@@ -1,7 +1,6 @@
 use std::cmp::{min, Ordering};
 
 use itertools::Itertools;
-use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{CheckedLogTwo, DivRound, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -77,7 +76,89 @@ impl Natural {
     }
 }
 
-macro_rules! power_of_two_digits_primitive {
+fn _to_power_of_two_digits_asc<T: PrimitiveUnsigned>(x: &Natural, log_base: u64) -> Vec<T>
+where
+    Limb: PowerOfTwoDigits<T>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > T::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            T::NAME,
+            log_base
+        );
+    }
+    let limbs = match *x {
+        Natural(Small(ref small)) => {
+            return PowerOfTwoDigits::<T>::to_power_of_two_digits_asc(
+                small,
+                min(log_base, Limb::WIDTH),
+            )
+        }
+        Natural(Large(ref limbs)) => limbs,
+    };
+    let mut digits =
+        iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base).collect::<Vec<_>>();
+    digits.truncate(digits.len() - slice_trailing_zeros(&digits));
+    digits
+}
+
+fn _to_power_of_two_digits_desc<T>(x: &Natural, log_base: u64) -> Vec<T>
+where
+    Natural: PowerOfTwoDigits<T>,
+{
+    let mut digits = x.to_power_of_two_digits_asc(log_base);
+    digits.reverse();
+    digits
+}
+
+fn _from_power_of_two_digits_asc<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+    log_base: u64,
+    digits: I,
+) -> Natural
+where
+    Limb: WrappingFrom<T>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > T::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            T::NAME,
+            log_base
+        );
+    }
+    Natural::from_owned_limbs_asc(
+        iterator_to_bit_chunks(check_digits_size!(digits, log_base), log_base, Limb::WIDTH)
+            .collect(),
+    )
+}
+
+fn _from_power_of_two_digits_desc<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+    log_base: u64,
+    digits: I,
+) -> Natural
+where
+    Limb: WrappingFrom<T>,
+{
+    assert_ne!(log_base, 0);
+    if log_base > T::WIDTH {
+        panic!(
+            "type {:?} is too small for a digit of width {}",
+            T::NAME,
+            log_base
+        );
+    }
+    let digits: Vec<_> = digits.collect();
+    assert!(digits
+        .iter()
+        .all(|digit| digit.significant_bits() <= log_base));
+    Natural::from_owned_limbs_asc(
+        iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
+            .collect::<Vec<_>>(),
+    )
+}
+
+macro_rules! power_of_two_digits_unsigned {
     (
         $t: ident
     ) => {
@@ -120,29 +201,9 @@ macro_rules! power_of_two_digits_primitive {
             ///     vec![3, 7, 1]
             /// );
             /// ```
+            #[inline]
             fn to_power_of_two_digits_asc(&self, log_base: u64) -> Vec<$t> {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                let limbs = match *self {
-                    Natural(Small(ref small)) => {
-                        return PowerOfTwoDigits::<$t>::to_power_of_two_digits_asc(
-                            small,
-                            min(log_base, Limb::WIDTH),
-                        )
-                    }
-                    Natural(Large(ref limbs)) => limbs,
-                };
-                let mut digits =
-                    iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base)
-                        .collect::<Vec<_>>();
-                digits.truncate(digits.len() - slice_trailing_zeros(&digits));
-                digits
+                _to_power_of_two_digits_asc(self, log_base)
             }
 
             /// Returns a `Vec` containing the digits of `self` in descending order: most- to least-
@@ -183,10 +244,9 @@ macro_rules! power_of_two_digits_primitive {
             ///     vec![1, 7, 3]
             /// );
             /// ```
+            #[inline]
             fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<$t> {
-                let mut digits = self.to_power_of_two_digits_asc(log_base);
-                digits.reverse();
-                digits
+                _to_power_of_two_digits_desc(self, log_base)
             }
 
             /// Converts an iterator of digits into a `Natural`, where the base is a power of two.
@@ -221,27 +281,12 @@ macro_rules! power_of_two_digits_primitive {
             /// let digits: &[u16] = &[3, 7, 1];
             /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits.iter().cloned()), 123);
             /// ```
-            #[allow(arithmetic_overflow)]
+            #[inline]
             fn from_power_of_two_digits_asc<I: Iterator<Item = $t>>(
                 log_base: u64,
                 digits: I,
             ) -> Natural {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                Natural::from_owned_limbs_asc(
-                    iterator_to_bit_chunks(
-                        check_digits_size!(digits, log_base),
-                        log_base,
-                        Limb::WIDTH,
-                    )
-                    .collect(),
-                )
+                _from_power_of_two_digits_asc(log_base, digits)
             }
 
             /// Converts an iterator of digits into a `Natural`, where the base is a power of two.
@@ -276,32 +321,17 @@ macro_rules! power_of_two_digits_primitive {
             /// let digits: &[u16] = &[1, 7, 3];
             /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits.iter().cloned()), 123);
             /// ```
-            #[allow(arithmetic_overflow)]
+            #[inline]
             fn from_power_of_two_digits_desc<I: Iterator<Item = $t>>(
                 log_base: u64,
                 digits: I,
             ) -> Natural {
-                assert_ne!(log_base, 0);
-                if log_base > $t::WIDTH {
-                    panic!(
-                        "type {:?} is too small for a digit of width {}",
-                        $t::NAME,
-                        log_base
-                    );
-                }
-                let digits: Vec<_> = digits.collect();
-                assert!(digits
-                    .iter()
-                    .all(|digit| digit.significant_bits() <= log_base));
-                Natural::from_owned_limbs_asc(
-                    iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
-                        .collect::<Vec<_>>(),
-                )
+                _from_power_of_two_digits_desc(log_base, digits)
             }
         }
     };
 }
-apply_to_unsigneds!(power_of_two_digits_primitive);
+apply_to_unsigneds!(power_of_two_digits_unsigned);
 
 impl PowerOfTwoDigits<Natural> for Natural {
     /// Returns a `Vec` containing the digits of `self` in ascending order: least- to most-

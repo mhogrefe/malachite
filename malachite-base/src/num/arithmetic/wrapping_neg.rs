@@ -18,7 +18,7 @@ macro_rules! impl_wrapping_neg {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::WrappingNegAssign;
             ///

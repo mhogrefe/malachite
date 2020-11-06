@@ -24,7 +24,7 @@ macro_rules! impl_mod_power_of_two_neg {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoNeg;
             ///
@@ -46,7 +46,7 @@ macro_rules! impl_mod_power_of_two_neg {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoNegAssign;
             ///

@@ -11,7 +11,9 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mod_power_of_two_square::_limbs_square_low_basecase;
+use malachite_nz::natural::arithmetic::mod_power_of_two_square::{
+    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer, _limbs_square_low_scratch_len,
+};
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
@@ -60,6 +62,57 @@ fn limbs_square_low_basecase_fail_1() {
 #[should_panic]
 fn limbs_square_low_basecase_fail_2() {
     _limbs_square_low_basecase(&mut [10, 10], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_square_low_divide_and_conquer() {
+    let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        let mut scratch = vec![0; _limbs_square_low_scratch_len(xs.len())];
+        _limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
+        assert_eq!(out, out_after);
+
+        let len = xs.len();
+        let x = Natural::from_limbs_asc(xs);
+        let pow = u64::exact_from(len) << Limb::LOG_WIDTH;
+        let expected_square = (&x).square().mod_power_of_two(pow);
+        assert_eq!(x.mod_power_of_two_square(pow), expected_square);
+        let square = Natural::from_limbs_asc(&out_after[..len]);
+        assert_eq!(square, expected_square);
+        assert_eq!(&out_before[len..], &out_after[len..]);
+    };
+    test(&[10; 3], &[123, 456], &[15129, 112176, 10]);
+    test(&[10; 4], &[123, 456, 789], &[15129, 112176, 402030, 10]);
+    test(
+        &[10; 5],
+        &[123, 456, 789, 987],
+        &[15129, 112176, 402030, 962370, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_square_low_divide_and_conquer_fail_1() {
+    let mut scratch = vec![0; _limbs_square_low_scratch_len(2)];
+    _limbs_square_low_divide_and_conquer(&mut [10], &[10, 10], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_square_low_divide_and_conquer_fail_2() {
+    let mut scratch = vec![0; _limbs_square_low_scratch_len(0)];
+    _limbs_square_low_divide_and_conquer(&mut [10, 10], &[], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_square_low_divide_and_conquer_fail_3() {
+    let mut scratch = vec![0; _limbs_square_low_scratch_len(1)];
+    _limbs_square_low_divide_and_conquer(&mut [10, 10], &[1], &mut scratch);
 }
 
 #[test]

@@ -10,7 +10,7 @@ macro_rules! impl_divisible_by_power_of_two_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
             ///
@@ -36,7 +36,7 @@ macro_rules! impl_divisible_by_power_of_two_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
             ///

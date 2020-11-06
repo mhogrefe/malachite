@@ -35,7 +35,7 @@ macro_rules! impl_bit_scan_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
@@ -63,7 +63,7 @@ macro_rules! impl_bit_scan_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
@@ -134,7 +134,7 @@ macro_rules! impl_bit_scan_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///
@@ -163,7 +163,7 @@ macro_rules! impl_bit_scan_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::logic::traits::BitScan;
             ///

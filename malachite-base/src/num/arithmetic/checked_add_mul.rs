@@ -21,7 +21,7 @@ macro_rules! impl_checked_add_mul_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::CheckedAddMul;
             ///
@@ -84,7 +84,7 @@ macro_rules! impl_checked_add_mul_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::CheckedAddMul;
             ///

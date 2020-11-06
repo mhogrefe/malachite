@@ -9,7 +9,7 @@ macro_rules! impl_eq_mod_power_of_two {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
             ///

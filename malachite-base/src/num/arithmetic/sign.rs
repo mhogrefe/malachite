@@ -12,7 +12,7 @@ macro_rules! impl_sign {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::Sign;
             /// use std::cmp::Ordering;

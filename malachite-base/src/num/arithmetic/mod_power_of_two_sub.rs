@@ -28,7 +28,7 @@ macro_rules! impl_mod_power_of_two_sub {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSub;
             ///
@@ -49,7 +49,7 @@ macro_rules! impl_mod_power_of_two_sub {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoSubAssign;
             ///

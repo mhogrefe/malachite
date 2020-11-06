@@ -373,6 +373,7 @@ pub mod rounding_modes {
     pub mod eq;
     pub mod exhaustive;
     pub mod from_str;
+    pub mod hash;
     pub mod neg;
     pub mod random;
     pub mod size;
@@ -405,6 +406,9 @@ pub mod tuples {
         pub mod lex_tuples_from_single;
     }
     pub mod random {
+        pub mod random_custom_tuples;
+        pub mod random_tuples;
+        pub mod random_tuples_from_single;
         pub mod random_units;
     }
     pub mod singletons;

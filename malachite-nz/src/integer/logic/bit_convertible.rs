@@ -210,7 +210,7 @@ impl BitConvertible for Integer {
 
     /// TODO doc
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -259,7 +259,7 @@ impl BitConvertible for Integer {
 
     /// TODO doc
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

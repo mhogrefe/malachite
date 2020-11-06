@@ -173,7 +173,7 @@ impl<'a> Iterator for IntegerBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -220,7 +220,7 @@ impl<'a> DoubleEndedIterator for IntegerBitIterator<'a> {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -271,7 +271,7 @@ impl<'a> Index<u64> for IntegerBitIterator<'a> {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -344,7 +344,7 @@ impl<'a> BitIterable for &'a Integer {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

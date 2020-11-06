@@ -29,7 +29,7 @@ macro_rules! impl_mod_power_of_two_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoMul;
             ///
@@ -50,7 +50,7 @@ macro_rules! impl_mod_power_of_two_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoMulAssign;
             ///

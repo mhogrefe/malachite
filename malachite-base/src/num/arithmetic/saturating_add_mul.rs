@@ -33,7 +33,7 @@ macro_rules! impl_saturating_add_mul_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingAddMul;
             ///
@@ -54,7 +54,7 @@ macro_rules! impl_saturating_add_mul_unsigned {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingAddMulAssign;
             ///
@@ -130,7 +130,7 @@ macro_rules! impl_saturating_add_mul_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingAddMul;
             ///
@@ -151,7 +151,7 @@ macro_rules! impl_saturating_add_mul_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::SaturatingAddMulAssign;
             ///

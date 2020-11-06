@@ -103,7 +103,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// - If the multiple is outside the representable range.
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
             /// use malachite_base::rounding_modes::RoundingMode;
@@ -145,7 +145,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// - If the multiple is outside the representable range.
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
             /// use malachite_base::rounding_modes::RoundingMode;
@@ -237,7 +237,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// - If the multiple is outside the representable range.
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
             /// use malachite_base::rounding_modes::RoundingMode;
@@ -286,7 +286,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// - If the multiple is outside the representable range.
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
             /// use malachite_base::rounding_modes::RoundingMode;

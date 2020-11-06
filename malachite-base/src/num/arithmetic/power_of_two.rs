@@ -18,7 +18,7 @@ macro_rules! impl_power_of_two_unsigned {
             /// # Panics
             /// Panics if `pow` is greater than or equal to the width of `$t`.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::PowerOfTwo;
             ///
@@ -52,7 +52,7 @@ macro_rules! impl_power_of_two_signed {
             /// # Panics
             /// Panics if `pow` is greater than or equal to the width of `$t` minus 1.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::PowerOfTwo;
             ///

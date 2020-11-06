@@ -31,7 +31,7 @@ macro_rules! impl_mod_add {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModAdd;
             ///
@@ -54,7 +54,7 @@ macro_rules! impl_mod_add {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModAddAssign;
             ///

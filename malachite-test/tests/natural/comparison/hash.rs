@@ -1,5 +1,6 @@
+use malachite_base_test_util::hash::hash;
+
 use malachite_test::common::test_properties;
-use malachite_test::hash::hash;
 use malachite_test::inputs::natural::naturals;
 
 #[test]

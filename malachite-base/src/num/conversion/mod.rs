@@ -123,5 +123,47 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
+/// This module provides traits converting numbers to `Vec`s of numbers, slices to numbers, or
+/// slices to `Vec`s.
+///
+/// Here are some examples of the macro-generated functions:
+///
+/// # from_other_type_slice
+/// ```
+/// use malachite_base::num::conversion::traits::FromOtherTypeSlice;
+///
+/// let xs: &[u32] = &[];
+/// assert_eq!(u32::from_other_type_slice(xs), 0);
+/// assert_eq!(u32::from_other_type_slice(&[123u32, 456]), 123);
+///
+/// assert_eq!(u8::from_other_type_slice(&[0xabcdu16, 0xef01]), 0xcd);
+///
+/// assert_eq!(u16::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xcdab);
+/// assert_eq!(u64::from_other_type_slice(&[0xabu8, 0xcd, 0xef]), 0xefcdab);
+/// ```
+///
+/// # vec_from_other_type_slice
+/// ```
+/// use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
+///
+/// assert_eq!(u32::vec_from_other_type_slice(&[123u32, 456]), vec![123, 456]);
+/// assert_eq!(
+///     u8::vec_from_other_type_slice(&[0xcdabu16, 0x01ef, 0x4523, 0x8967]),
+///     vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89]
+/// );
+/// assert_eq!(
+///     u16::vec_from_other_type_slice(&[0xabu8, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67]),
+///     vec![0xcdab, 0x01ef, 0x4523, 0x67]
+/// );
+/// ```
+///
+/// # vec_from_other_type
+/// ```
+/// use malachite_base::num::conversion::traits::VecFromOtherType;
+///
+/// assert_eq!(u32::vec_from_other_type(123u32), vec![123]);
+/// assert_eq!(u8::vec_from_other_type(0xcdabu16), vec![0xab, 0xcd]);
+/// assert_eq!(u16::vec_from_other_type(0xabu8), vec![0xab]);
+/// ```
 pub mod slice;
 pub mod traits;

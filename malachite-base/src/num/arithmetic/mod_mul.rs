@@ -278,7 +278,7 @@ macro_rules! impl_mod_mul_precomputed_fast {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
             ///
@@ -330,7 +330,7 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
             ///
@@ -380,7 +380,7 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
     ///
@@ -461,7 +461,7 @@ macro_rules! impl_mod_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::{
             ///     ModMulPrecomputed, ModMulPrecomputedAssign,
@@ -513,7 +513,7 @@ macro_rules! impl_mod_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMul;
             ///
@@ -536,7 +536,7 @@ macro_rules! impl_mod_mul {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_base::num::arithmetic::traits::ModMulAssign;
             ///

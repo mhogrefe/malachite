@@ -1,5 +1,9 @@
+use std::fmt::Display;
+use std::ops::{Shl, ShlAssign};
+
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
@@ -496,7 +500,48 @@ pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingM
     }
 }
 
-//TODO clean
+fn _shr_round_unsigned_ref<T: Copy + Display + Eq + Zero>(
+    x: &Natural,
+    bits: T,
+    rm: RoundingMode,
+) -> Natural
+where
+    u64: ExactFrom<T>,
+    Limb: ShrRound<T, Output = Limb>,
+{
+    match (x, bits) {
+        (natural_zero!(), _) => x.clone(),
+        (_, bits) if bits == T::ZERO => x.clone(),
+        (Natural(Small(ref small)), bits) => Natural(Small(small.shr_round(bits, rm))),
+        (Natural(Large(ref limbs)), bits) => {
+            if let Some(out) = limbs_shr_round(limbs, u64::exact_from(bits), rm) {
+                Natural::from_owned_limbs_asc(out)
+            } else {
+                panic!("Right shift is not exact: {} >> {}", x, bits);
+            }
+        }
+    }
+}
+
+fn _shr_round_assign_unsigned<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, rm: RoundingMode)
+where
+    u64: ExactFrom<T>,
+    Limb: ShrRoundAssign<T>,
+{
+    match (&mut *x, bits) {
+        (natural_zero!(), _) => {}
+        (_, bits) if bits == T::ZERO => {}
+        (Natural(Small(ref mut small)), bits) => {
+            small.shr_round_assign(bits, rm);
+        }
+        (Natural(Large(ref mut limbs)), bits) => {
+            if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm) {
+                panic!("Right shift is not exact.");
+            }
+            x.trim();
+        }
+    }
+}
 
 macro_rules! impl_natural_shr_round_unsigned {
     ($t:ident) => {
@@ -623,18 +668,9 @@ macro_rules! impl_natural_shr_round_unsigned {
             ///     "1"
             /// );
             /// ```
+            #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
-                match (self, bits) {
-                    (_, 0) | (natural_zero!(), _) => self.clone(),
-                    (Natural(Small(ref small)), bits) => Natural(Small(small.shr_round(bits, rm))),
-                    (Natural(Large(ref limbs)), bits) => {
-                        if let Some(out) = limbs_shr_round(limbs, u64::exact_from(bits), rm) {
-                            Natural::from_owned_limbs_asc(out)
-                        } else {
-                            panic!("Right shift is not exact: {} >> {}", self, bits);
-                        }
-                    }
-                }
+                _shr_round_unsigned_ref(self, bits, rm)
             }
         }
 
@@ -695,24 +731,43 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// n.shr_round_assign(8u64, RoundingMode::Exact);
             /// assert_eq!(n.to_string(), "1");
             /// ```
+            #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                match (&mut *self, bits) {
-                    (_, 0) | (natural_zero!(), _) => {}
-                    (Natural(Small(ref mut small)), bits) => {
-                        small.shr_round_assign(bits, rm);
-                    }
-                    (Natural(Large(ref mut limbs)), bits) => {
-                        if !limbs_vec_shr_round_in_place(limbs, u64::exact_from(bits), rm) {
-                            panic!("Right shift is not exact.");
-                        }
-                        self.trim();
-                    }
-                }
+                _shr_round_assign_unsigned(self, bits, rm);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shr_round_unsigned);
+
+fn _shr_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &'a Natural,
+    bits: S,
+    rm: RoundingMode,
+) -> Natural
+where
+    &'a Natural: Shl<U, Output = Natural> + ShrRound<U, Output = Natural>,
+{
+    if bits >= S::ZERO {
+        x.shr_round(bits.unsigned_abs(), rm)
+    } else {
+        x << bits.unsigned_abs()
+    }
+}
+
+fn _shr_round_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+    x: &mut Natural,
+    bits: S,
+    rm: RoundingMode,
+) where
+    Natural: ShlAssign<U> + ShrRoundAssign<U>,
+{
+    if bits >= S::ZERO {
+        x.shr_round_assign(bits.unsigned_abs(), rm);
+    } else {
+        *x <<= bits.unsigned_abs()
+    }
+}
 
 macro_rules! impl_natural_shr_round_signed {
     ($t:ident) => {
@@ -858,12 +913,9 @@ macro_rules! impl_natural_shr_round_signed {
             ///     "155921023828072216384094494261248"
             /// );
             /// ```
+            #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
-                if bits >= 0 {
-                    self.shr_round(bits.unsigned_abs(), rm)
-                } else {
-                    self << bits.unsigned_abs()
-                }
+                _shr_round_signed_ref(self, bits, rm)
             }
         }
 
@@ -931,12 +983,9 @@ macro_rules! impl_natural_shr_round_signed {
             /// x.shr_round_assign(-4i64, RoundingMode::Exact);
             /// assert_eq!(x.to_string(), "1024");
             /// ```
+            #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                if bits >= 0 {
-                    self.shr_round_assign(bits.unsigned_abs(), rm);
-                } else {
-                    *self <<= bits.unsigned_abs()
-                }
+                _shr_round_assign_signed(self, bits, rm);
             }
         }
     };

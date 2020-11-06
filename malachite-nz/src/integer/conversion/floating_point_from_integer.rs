@@ -26,7 +26,7 @@ macro_rules! float_impls {
             /// # Panics
             /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -85,7 +85,7 @@ macro_rules! float_impls {
             /// # Panics
             /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -130,7 +130,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_nz;
             ///
@@ -169,7 +169,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_nz;
             ///
@@ -204,7 +204,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -241,7 +241,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -275,7 +275,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -309,7 +309,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;

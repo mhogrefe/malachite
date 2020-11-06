@@ -45,6 +45,7 @@ extern crate time;
 pub mod bench;
 pub mod common;
 pub mod generators;
+pub mod hash;
 pub mod num {
     pub mod arithmetic {
         pub mod mod_mul;

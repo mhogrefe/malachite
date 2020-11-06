@@ -67,7 +67,7 @@ macro_rules! impl_mod_power_of_two_shr_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShr;
                     ///
@@ -88,7 +88,7 @@ macro_rules! impl_mod_power_of_two_shr_signed {
                     ///
                     /// Additional memory: worst case O(1)
                     ///
-                    /// # Example
+                    /// # Examples
                     /// ```
                     /// use malachite_base::num::arithmetic::traits::ModPowerOfTwoShrAssign;
                     ///
