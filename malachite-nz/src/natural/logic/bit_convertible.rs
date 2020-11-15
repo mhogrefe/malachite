@@ -19,7 +19,7 @@ impl BitConvertible for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -62,7 +62,7 @@ impl BitConvertible for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -84,7 +84,7 @@ impl BitConvertible for Natural {
 
     /// TODO doc
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -111,7 +111,7 @@ impl BitConvertible for Natural {
 
     /// TODO doc
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

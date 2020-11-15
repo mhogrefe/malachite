@@ -14,7 +14,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(`bits`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 /// use malachite_nz::platform::Limb;

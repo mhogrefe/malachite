@@ -28,7 +28,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb;
 ///
@@ -69,7 +69,7 @@ pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_to_out;
 ///
@@ -118,7 +118,7 @@ pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_slice_neg_xor_limb_in_place;
 ///
@@ -161,7 +161,7 @@ pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_vec_neg_xor_limb_in_place;
 ///
@@ -192,7 +192,7 @@ pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_pos_xor_limb_neg;
 ///
@@ -229,7 +229,7 @@ pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty or if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_pos_xor_limb_neg_to_out;
 ///
@@ -273,7 +273,7 @@ pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_slice_pos_xor_limb_neg_in_place;
 ///
@@ -314,7 +314,7 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_vec_pos_xor_limb_neg_in_place;
 ///
@@ -350,7 +350,7 @@ pub fn limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 /// # Panics
 /// Panics if `xs` is empty or only contains zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_neg;
 ///
@@ -386,7 +386,7 @@ pub fn limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_neg_to_out;
 ///
@@ -424,7 +424,7 @@ pub fn limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 /// # Panics
 /// Panics if `xs` is empty or only contains zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_neg_xor_limb_neg_in_place;
 ///
@@ -471,7 +471,7 @@ fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_pos_neg;
 ///
@@ -562,7 +562,7 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// longer of `xs` and `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_pos_neg_to_out;
 ///
@@ -704,7 +704,7 @@ fn limbs_xor_pos_neg_in_place_left_helper(
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_pos_neg_in_place_left;
 ///
@@ -812,7 +812,7 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_pos_neg_in_place_right;
 ///
@@ -879,7 +879,7 @@ pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_pos_neg_in_place_either;
 ///
@@ -957,7 +957,7 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_neg_neg;
 ///
@@ -1021,7 +1021,7 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// longer of `xs` and `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_neg_neg_to_out;
 ///
@@ -1113,7 +1113,7 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_neg_neg_in_place_left;
 ///
@@ -1164,7 +1164,7 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::integer::logic::xor::limbs_xor_neg_neg_in_place_either;
 ///

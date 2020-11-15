@@ -5,7 +5,7 @@ use natural::Natural;
 /// Generates all `Natural`s in a finite interval.
 ///
 /// This `struct` is created by the `exhaustive_natural_range` and
-/// `exhaustive_natural_inclusive_range` methods. See their documentation for more.
+/// `exhaustive_natural_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRange {
     a: Natural,
@@ -39,7 +39,7 @@ impl DoubleEndedIterator for ExhaustiveNaturalRange {
 
 /// Generates all `Natural`s greater than or equal to some `Natural`, in ascending order.
 ///
-/// This `struct` is created by the `exhaustive_natural_range_to_infinity` method. See its
+/// This `struct` is created by the `exhaustive_natural_range_to_infinity` function. See its
 /// documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveNaturalRangeToInfinity {

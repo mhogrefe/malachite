@@ -9,7 +9,7 @@ use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
-use num::iterator::{iterator_to_bit_chunks, IteratorToBitChunks};
+use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
 use random::Seed;
 
@@ -90,7 +90,7 @@ impl_thrifty_random_primitive_ints!(i16);
 
 /// Uniformly generates random primitive integers.
 ///
-/// This `struct` is created by the `random_primitive_ints` method. See its documentation for
+/// This `struct` is created by the `random_primitive_ints` function. See its documentation for
 /// more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveInts<T: HasRandomPrimitiveInts> {
@@ -109,7 +109,7 @@ impl<T: HasRandomPrimitiveInts> Iterator for RandomPrimitiveInts<T> {
 
 /// Uniformly generates random unsigned integers less than a positive limit.
 ///
-/// This `enum` is created by the `random_unsigneds_less_than` method. See its documentation for
+/// This `enum` is created by the `random_unsigneds_less_than` function. See its documentation for
 /// more.
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedsLessThan<T: PrimitiveUnsigned> {
@@ -136,7 +136,8 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedsLessThan<T> {
 
 /// Uniformly generates random unsigned integers in the half-open interval $[a, b)$.
 ///
-/// This `struct` is created by the `random_unsigned_range` method. See its documentation for more.
+/// This `struct` is created by the `random_unsigned_range` function. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedRange<T: PrimitiveUnsigned> {
     pub(crate) xs: RandomUnsignedsLessThan<T>,
@@ -154,8 +155,8 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedRange<T> {
 
 /// Uniformly generates random unsigned integers in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by the `random_unsigned_inclusive_range` method. See its documentation
-/// for more.
+/// This `struct` is created by the `random_unsigned_inclusive_range` function. See its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub enum RandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
     NotAll(RandomUnsignedsLessThan<T>, T),
@@ -222,7 +223,7 @@ apply_to_unsigned_signed_pair!(impl_has_random_signed_range);
 
 /// Uniformly generates random signed integers in the half-open interval $[a, b)$.
 ///
-/// This `struct` is created by the `random_signed_range` method. See its documentation for more.
+/// This `struct` is created by the `random_signed_range` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedRange<T: HasRandomSignedRange> {
     pub(crate) xs: RandomUnsignedRange<T::UnsignedValue>,
@@ -238,7 +239,7 @@ impl<T: HasRandomSignedRange> Iterator for RandomSignedRange<T> {
 
 /// Uniformly generates random signed integers in the closed interval $[a, b]$.
 ///
-/// This `struct` is created by the `random_signed_inclusive_range` method. See its documentation
+/// This `struct` is created by the `random_signed_inclusive_range` function. See its documentation
 /// for more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedInclusiveRange<T: HasRandomSignedRange> {
@@ -255,7 +256,7 @@ impl<T: HasRandomSignedRange> Iterator for RandomSignedInclusiveRange<T> {
 
 /// Uniformly generates unsigned integers of up to `chunk_size` bits.
 ///
-/// This `struct` is created by the `random_unsigned_bit_chunks` method. See its documentation for
+/// This `struct` is created by the `random_unsigned_bit_chunks` function. See its documentation for
 /// more.
 #[derive(Clone, Debug)]
 pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
@@ -298,7 +299,7 @@ apply_to_unsigned_signed_pair!(impl_random_signed_chunkable);
 
 /// Uniformly generates signed integers of up to `chunk_size` bits.
 ///
-/// This `struct` is created by the `random_signed_bit_chunks` method. See its documentation for
+/// This `struct` is created by the `random_signed_bit_chunks` function. See its documentation for
 /// more.
 #[derive(Clone, Debug)]
 pub struct RandomSignedBitChunks<T: RandomSignedChunkable> {

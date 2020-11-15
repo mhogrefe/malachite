@@ -16,7 +16,7 @@ use platform::Limb;
 ///
 /// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp is returned.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not;
 /// use std::cmp::Ordering;
@@ -41,7 +41,7 @@ pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not_to_out;
 ///
@@ -66,7 +66,7 @@ pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
 ///
 /// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp == up.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::not::limbs_not_in_place;
 /// use std::cmp::Ordering;

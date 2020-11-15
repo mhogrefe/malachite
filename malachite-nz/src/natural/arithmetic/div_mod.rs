@@ -56,7 +56,7 @@ use platform::{
 /// # Panics
 /// Panics if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
 ///
@@ -106,7 +106,7 @@ pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb)
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_mod;
 ///
@@ -138,7 +138,7 @@ pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 /// # Panics
 /// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
 ///
@@ -223,7 +223,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_in_place_mod;
 ///
@@ -302,7 +302,7 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 /// # Panics
 /// Panics if `hi` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 ///
@@ -343,7 +343,7 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::*;
 ///
@@ -413,7 +413,7 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
 /// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
 /// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
 ///
@@ -1672,7 +1672,7 @@ pub(crate) fn _limbs_div_mod_balanced(
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod;
 ///
@@ -1707,7 +1707,7 @@ pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 /// Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
 /// the most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
 ///

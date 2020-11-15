@@ -15,7 +15,7 @@ impl ModIsReduced for Natural {
     /// # Panics
     /// Panics if `m` is 0.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

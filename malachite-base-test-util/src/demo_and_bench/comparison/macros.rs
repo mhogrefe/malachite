@@ -19,21 +19,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_unsigned_min_1);
     register_unsigned_demos!(runner, demo_unsigned_min_2);
     register_unsigned_demos!(runner, demo_unsigned_min_3);
-
     register_signed_demos!(runner, demo_signed_max_1);
     register_signed_demos!(runner, demo_signed_max_2);
     register_signed_demos!(runner, demo_signed_max_3);
     register_signed_demos!(runner, demo_signed_min_1);
     register_signed_demos!(runner, demo_signed_min_2);
     register_signed_demos!(runner, demo_signed_min_3);
-
     register_unsigned_benches!(runner, benchmark_unsigned_max_1);
     register_unsigned_benches!(runner, benchmark_unsigned_max_2);
     register_unsigned_benches!(runner, benchmark_unsigned_max_3);
     register_unsigned_benches!(runner, benchmark_unsigned_min_1);
     register_unsigned_benches!(runner, benchmark_unsigned_min_2);
     register_unsigned_benches!(runner, benchmark_unsigned_min_3);
-
     register_signed_benches!(runner, benchmark_signed_max_1);
     register_signed_benches!(runner, benchmark_signed_max_2);
     register_signed_benches!(runner, benchmark_signed_max_3);

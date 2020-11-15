@@ -21,7 +21,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::next_power_of_two::limbs_next_power_of_two;
 ///
@@ -67,7 +67,7 @@ pub fn limbs_next_power_of_two(xs: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::next_power_of_two::*;
 ///
@@ -122,7 +122,7 @@ pub fn limbs_slice_next_power_of_two_in_place(xs: &mut [Limb]) -> bool {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::next_power_of_two::limbs_vec_next_power_of_two_in_place;
 ///

@@ -20,7 +20,7 @@ use natural::Natural;
 /// # Panics
 /// Panics if `limbs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 ///
@@ -42,7 +42,7 @@ impl<'a> SignificantBits for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

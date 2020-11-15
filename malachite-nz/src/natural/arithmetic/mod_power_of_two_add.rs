@@ -24,7 +24,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::limbs_mod_power_of_two_add_limb;
 ///
@@ -54,7 +54,7 @@ pub fn limbs_mod_power_of_two_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Li
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
@@ -94,7 +94,7 @@ pub fn limbs_slice_mod_power_of_two_add_limb_in_place(xs: &mut [Limb], y: Limb, 
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
@@ -131,7 +131,7 @@ pub fn limbs_vec_mod_power_of_two_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb,
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::limbs_mod_power_of_two_add_greater;
 ///
@@ -163,7 +163,7 @@ pub fn limbs_mod_power_of_two_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) ->
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::limbs_mod_power_of_two_add;
 ///
@@ -200,7 +200,7 @@ pub fn limbs_mod_power_of_two_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Lim
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
@@ -247,7 +247,7 @@ pub fn limbs_slice_mod_power_of_two_add_greater_in_place_left(
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///
@@ -299,7 +299,7 @@ pub fn limbs_vec_mod_power_of_two_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Li
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_add::*;
 ///

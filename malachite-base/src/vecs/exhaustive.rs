@@ -367,11 +367,13 @@ where
             self.done = true;
             None
         } else {
-            let mut next = Vec::with_capacity(self.counters.len());
-            for &c in &self.counters {
-                next.push(self.xs.get(c).unwrap().clone());
-            }
-            Some(next)
+            let xs = &mut self.xs;
+            Some(
+                self.counters
+                    .iter()
+                    .map(|&c| xs.get(c).unwrap().clone())
+                    .collect(),
+            )
         }
     }
 }
@@ -396,6 +398,9 @@ where
 /// order.
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
+///
+/// This `struct` is created by the `lex_fixed_length_vecs_from_single` function. See its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub enum LexFixedLengthVecsFromSingle<I: Iterator>
 where
@@ -900,7 +905,7 @@ where
 
 /// Generates all `Vec`s of a given length with elements from a single iterator.
 ///
-/// This `struct` is created by the `exhaustive_fixed_length_vecs_from_single` method. See its
+/// This `struct` is created by the `exhaustive_fixed_length_vecs_from_single` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveFixedLengthVecs1Input<I: Iterator>

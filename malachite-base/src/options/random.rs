@@ -3,7 +3,7 @@ use random::Seed;
 
 /// Generates random `Option`s, except `None`, with values from a given random iterator.
 ///
-/// This `struct` is created by the `random_somes` method. See its documentation for more.
+/// This `struct` is created by the `random_somes` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomSomes<I: Iterator> {
     xs: I,
@@ -50,7 +50,7 @@ pub fn random_somes<I: Iterator>(xs: I) -> RandomSomes<I> {
 
 /// Generates random `Option`s with values from a given random iterator.
 ///
-/// This `struct` is created by the `random_options` method. See its documentation for more.
+/// This `struct` is created by the `random_options` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomOptions<I: Iterator> {
     bs: WeightedRandomBools,
@@ -88,7 +88,7 @@ impl<I: Iterator> Iterator for RandomOptions<I> {
 ///
 /// The output length is infinite.
 ///
-/// # Expected complexity per iteration
+/// # Expected worst-case complexity
 ///
 /// Same as the time and additional memory complexity of iterating `xs`.
 ///

@@ -133,3 +133,49 @@ impl<T: Binary> ToBinaryString for T {
         format!("{:b}", self)
     }
 }
+
+/// Generates `String`s, given an iterator that generates `Vec<char>`s.
+///
+/// This `struct` is created by the `strings_from_char_vecs` function. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct StringsFromCharVecs<I: Iterator<Item = Vec<char>>> {
+    css: I,
+}
+
+impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
+    type Item = String;
+
+    #[inline]
+    fn next(&mut self) -> Option<String> {
+        self.css.next().map(|cs| cs.into_iter().collect())
+    }
+}
+
+/// Generates `String`s, given an iterator that generates `Vec<char>`s.
+///
+/// The elements appear in the same order as they do in the given iterator, but as `String`s.
+///
+/// The output length is `css.count()`.
+///
+/// # Complexity per iteration
+///
+/// Same as the time and additional memory complexity of iterating `css`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::strings::strings_from_char_vecs;
+///
+/// let ss = &strings_from_char_vecs([vec!['a', 'b'], vec!['c', 'd']].iter().cloned())
+///     .collect::<Vec<_>>();
+/// assert_eq!(ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(), &["ab", "cd"]);
+/// ```
+#[inline]
+pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsFromCharVecs<I> {
+    StringsFromCharVecs { css }
+}
+
+/// This module contains iterators that generate `String`s without repetition.
+pub mod exhaustive;
+/// This module contains iterators that generate `String`s randomly.
+pub mod random;

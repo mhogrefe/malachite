@@ -3,7 +3,7 @@ use vecs::exhaustive::validate_oi_map;
 
 /// Generates random `Vec`s of a given length using elements from a single iterator.
 ///
-/// This `struct` is created by the `random_fixed_length_vecs_from_single` method. See its
+/// This `struct` is created by the `random_fixed_length_vecs_from_single` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomFixedLengthVecsFromSingle<I: Iterator> {
@@ -31,9 +31,9 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 ///
 /// # Expected complexity per iteration
 ///
-/// $T(i, n) = O(nT^\prime(i))$
+/// $T(n) = O(nT^\prime(n))$
 ///
-/// $M(i, n) = O(nM^\prime(i))$
+/// $M(n) = O(nM^\prime(n))$
 ///
 /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
 /// time and additional memory functions of `xs`.
@@ -131,16 +131,16 @@ macro_rules! random_fixed_length_vecs {
         /// We have
         ///
         /// $$
-        /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))
+        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(\sum_{j=0}^{n-1}M_j(i))
+        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_j$ and $M_j$ are the time and additional memory functions of the iterator
-        /// corresponding to the $j$th output.
+        /// $T_j$ and $M_j$ are the time and additional memory taken by the iterator corresponding
+        /// to the $j$th output.
         ///
         /// # Examples
         ///
@@ -172,16 +172,16 @@ macro_rules! random_fixed_length_vecs {
         /// # Expected complexity per iteration
         ///
         /// $$
-        /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))
+        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(\sum_{j=0}^{n-1}M_j(i))
+        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
         /// $T_0, T_1, \ldots T_{n-1}$ and $M_0, M_1, \ldots M_{n-1}$ are the time and additional
-        /// memory functions of the input iterators.
+        /// memory of the input iterators.
         ///
         /// # Examples
         ///

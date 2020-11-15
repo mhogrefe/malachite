@@ -6,7 +6,9 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_two_square::{
-    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer, _limbs_square_low_scratch_len,
+    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer,
+    _limbs_square_low_scratch_len, limbs_mod_power_of_two_square,
+    limbs_mod_power_of_two_square_ref, limbs_square_low,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -14,8 +16,9 @@ use malachite_nz_test_util::natural::arithmetic::mod_power_of_two_square::*;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
-    pairs_of_unsigned_and_small_u64_var_2, pairs_of_unsigned_vec_var_26,
-    pairs_of_unsigned_vec_var_27, small_unsigneds,
+    pairs_of_unsigned_and_small_u64_var_2, pairs_of_unsigned_vec_and_small_unsigned_var_4,
+    pairs_of_unsigned_vec_var_26, pairs_of_unsigned_vec_var_27, pairs_of_unsigned_vec_var_4,
+    small_unsigneds,
 };
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_u64_var_1, triples_of_natural_natural_and_u64_var_1,
@@ -56,6 +59,32 @@ fn limbs_square_low_divide_and_conquer_properties() {
         _limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
         verify_limbs_square_low(out_old, xs, &out);
     });
+}
+
+#[test]
+fn limbs_square_low_properties() {
+    test_properties(pairs_of_unsigned_vec_var_4, |&(ref out, ref xs)| {
+        let out_old = out;
+        let mut out = out_old.clone();
+        limbs_square_low(&mut out, xs);
+        verify_limbs_square_low(out_old, xs, &out);
+    });
+}
+
+#[test]
+fn limbs_mod_power_of_two_square_properties() {
+    test_properties(
+        pairs_of_unsigned_vec_and_small_unsigned_var_4,
+        |&(ref xs, pow)| {
+            let xs_old = xs;
+            let mut xs = xs_old.clone();
+            let out = limbs_mod_power_of_two_square(&mut xs, pow);
+            assert_eq!(limbs_mod_power_of_two_square_ref(xs_old, pow), out);
+
+            let expected_square = Natural::from_limbs_asc(xs_old).mod_power_of_two_square(pow);
+            assert_eq!(Natural::from_owned_limbs_asc(out), expected_square);
+        },
+    );
 }
 
 #[test]

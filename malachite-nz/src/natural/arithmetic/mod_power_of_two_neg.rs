@@ -14,7 +14,7 @@ impl ModPowerOfTwoNeg for Natural {
     ///
     /// Additional memory: worst case O(`pow`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -48,7 +48,7 @@ impl<'a> ModPowerOfTwoNeg for &'a Natural {
     ///
     /// Additional memory: worst case O(`pow`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -79,7 +79,7 @@ impl ModPowerOfTwoNegAssign for Natural {
     ///
     /// Additional memory: worst case O(`pow`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

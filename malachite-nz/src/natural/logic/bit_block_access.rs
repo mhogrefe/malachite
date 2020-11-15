@@ -29,7 +29,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `start` > `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_block_access::limbs_slice_get_bits;
 /// use malachite_nz::platform::Limb;
@@ -80,7 +80,7 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 /// # Panics
 /// Panics if `start` > `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_block_access::limbs_vec_get_bits;
 /// use malachite_nz::platform::Limb;
@@ -187,7 +187,7 @@ pub(crate) fn limbs_assign_bits_helper(
 /// # Panics
 /// Panics if `start` >= `end`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 /// use malachite_nz::platform::Limb;
@@ -226,7 +226,7 @@ impl BitBlockAccess for Natural {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -271,7 +271,7 @@ impl BitBlockAccess for Natural {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -320,7 +320,7 @@ impl BitBlockAccess for Natural {
     /// # Panics
     /// Panics if `start` > `end`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

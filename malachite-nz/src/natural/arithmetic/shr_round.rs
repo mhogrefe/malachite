@@ -26,7 +26,7 @@ use platform::Limb;
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round_up;
 ///
@@ -92,7 +92,7 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round_nearest;
 ///
@@ -130,7 +130,7 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_exact;
 ///
@@ -164,7 +164,7 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
@@ -205,7 +205,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_up_in_place;
 ///
@@ -301,7 +301,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_nearest_in_place;
 ///
@@ -371,7 +371,7 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_exact_in_place;
 ///
@@ -431,7 +431,7 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 /// extern crate malachite_nz;

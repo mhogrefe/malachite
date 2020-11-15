@@ -8,7 +8,7 @@ use integer::Integer;
 /// Generates all `Natural`s in a finite interval, in ascending order.
 ///
 /// This `struct` is created by the `integer_increasing_range` and
-/// `integer_increasing_inclusive_range` methods. See their documentation for more.
+/// `integer_increasing_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerIncreasingRange {
     a: Integer,
@@ -42,7 +42,7 @@ impl DoubleEndedIterator for IntegerIncreasingRange {
 
 /// Generates all `Integer`s greater than or equal to some `Integer`, in ascending order.
 ///
-/// This `struct` is created by the `integer_increasing_range_to_infinity` method. See its
+/// This `struct` is created by the `integer_increasing_range_to_infinity` function. See its
 /// documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerIncreasingRangeToInfinity {
@@ -61,8 +61,8 @@ impl Iterator for IntegerIncreasingRangeToInfinity {
 
 /// Generates all `Integer`s less than or equal to some `Integer`, in ascending order.
 ///
-/// This `struct` is created by the `integer_decreasing_range_to_negative_infinity` method. See its
-/// documentation for more.
+/// This `struct` is created by the `integer_decreasing_range_to_negative_infinity` function. See
+/// its documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct IntegerDecreasingRangeToNegativeInfinity {
     a: Integer,
@@ -81,7 +81,7 @@ impl Iterator for IntegerDecreasingRangeToNegativeInfinity {
 /// Generates all `Integer`s in a finite interval, in order of increasing absolute value.
 ///
 /// This `struct` is created by the `exhaustive_integer_range` and
-/// `exhaustive_integer_inclusive_range` methods. See their documentation for more.
+/// `exhaustive_integer_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRange {
     NonNegative(IntegerIncreasingRange),
@@ -106,7 +106,7 @@ impl Iterator for ExhaustiveIntegerRange {
 /// Generates all `Integer`s greater than or equal to some `Integer`, in order of increasing
 /// absolute value.
 ///
-/// This `struct` is created by the `exhaustive_integer_range_to_infinity` method. See its
+/// This `struct` is created by the `exhaustive_integer_range_to_infinity` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRangeToInfinity {
@@ -133,8 +133,8 @@ impl Iterator for ExhaustiveIntegerRangeToInfinity {
 /// Generates all `Integer`s less than or equal to some `Integer`, in order of increasing absolute
 /// value.
 ///
-/// This `struct` is created by the `exhaustive_integer_range_to_negative_infinity` method. See its
-/// documentation for more.
+/// This `struct` is created by the `exhaustive_integer_range_to_negative_infinity` function. See
+/// its documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveIntegerRangeToNegativeInfinity {
     NonPositive(IntegerDecreasingRangeToNegativeInfinity),

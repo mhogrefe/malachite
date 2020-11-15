@@ -20,7 +20,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `limbs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance_limb;
 ///
@@ -46,7 +46,7 @@ pub fn limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
 ///
@@ -72,7 +72,7 @@ pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
 ///
 /// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance;
 ///

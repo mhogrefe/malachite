@@ -41,7 +41,7 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
 /// # Panics
 /// Panics if `pow` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///
@@ -65,7 +65,7 @@ pub fn limbs_mod_power_of_two_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> 
 /// # Panics
 /// Panics if `pow` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///
@@ -90,7 +90,7 @@ pub fn limbs_mod_power_of_two_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::limbs_mod_power_of_two_sub;
 ///
@@ -119,7 +119,7 @@ pub fn limbs_mod_power_of_two_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Lim
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///
@@ -153,7 +153,7 @@ pub fn limbs_mod_power_of_two_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///
@@ -196,7 +196,7 @@ pub fn limbs_mod_power_of_two_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_sub::*;
 ///

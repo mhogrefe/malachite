@@ -11,7 +11,8 @@ pub mod conversion;
 /// This module contains iterators that generate primitive integers without repetition.
 pub mod exhaustive;
 pub mod floats;
-pub mod iterator;
+/// This module contains an iterator that regroups chunks of bits into chunks of a different size.
+pub mod iterators;
 pub mod logic;
 /// This module contains iterators that generate primitive integers randomly.
 pub mod random;

@@ -233,7 +233,7 @@ fn select_fns(
 /// Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
 /// `ms` is even, or if $E$ less than 2.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_pow::{
 ///     limbs_mod_pow_odd,

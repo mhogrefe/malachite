@@ -166,4 +166,5 @@ pub mod half;
 /// assert_eq!(u16::vec_from_other_type(0xabu8), vec![0xab]);
 /// ```
 pub mod slice;
+/// This module defines various traits for converting numbers.
 pub mod traits;

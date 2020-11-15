@@ -2,7 +2,7 @@ use itertools::__std_iter::{once, Chain, Once};
 
 /// Generates all `Options`, except `None`, with values from a given iterator.
 ///
-/// This `struct` is created by the `exhaustive_somes` method. See its documentation for more.
+/// This `struct` is created by the `exhaustive_somes` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct ExhaustiveSomes<I: Iterator> {
     xs: I,

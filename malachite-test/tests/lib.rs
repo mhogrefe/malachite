@@ -98,16 +98,11 @@ pub mod base {
 
         pub mod conversion {
             pub mod from_other_type_slice;
-            pub mod join_halves;
             pub mod lower_half;
             pub mod split_in_half;
             pub mod upper_half;
             pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
-        }
-
-        pub mod comparison {
-            pub mod ord_abs_partial_ord_abs_and_comparators;
         }
 
         pub mod logic {

@@ -15,7 +15,7 @@ use platform::{DoubleLimb, Limb};
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
 ///
@@ -53,7 +53,7 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_with_carry_to_out;
 ///
@@ -95,7 +95,7 @@ pub fn limbs_mul_limb_with_carry_to_out(
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 ///
@@ -124,7 +124,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_slice_mul_limb_with_carry_in_place;
 ///
@@ -155,7 +155,7 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut ca
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 ///
@@ -181,7 +181,7 @@ pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 ///

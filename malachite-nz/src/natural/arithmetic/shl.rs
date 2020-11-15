@@ -19,7 +19,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()` + `bits` / Limb::WIDTH
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shl::limbs_shl;
 ///
@@ -64,7 +64,7 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
 /// `Limb::WIDTH`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shl::limbs_shl_to_out;
 ///
@@ -101,7 +101,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shl::limbs_slice_shl_in_place;
 ///
@@ -140,7 +140,7 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shl::limbs_vec_shl_in_place;
 ///
@@ -184,7 +184,7 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
 /// equal to `Limb::WIDTH`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shl::limbs_shl_with_complement_to_out;
 ///

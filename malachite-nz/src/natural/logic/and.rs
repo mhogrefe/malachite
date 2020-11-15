@@ -19,7 +19,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and_limb;
 ///
@@ -43,7 +43,7 @@ pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
 /// negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and;
 ///
@@ -69,7 +69,7 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and_same_length_to_out;
 ///
@@ -105,7 +105,7 @@ pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// # Panics
 /// Panics if `out` is too short.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and_to_out;
 ///
@@ -145,7 +145,7 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_slice_and_same_length_in_place_left;
 ///
@@ -179,7 +179,7 @@ pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_slice_and_in_place_left;
 ///
@@ -229,7 +229,7 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usi
 /// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
 /// trailing zero limbs.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_vec_and_in_place_left;
 ///
@@ -265,7 +265,7 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
 /// written to the shorter input slice.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::and::limbs_and_in_place_either;
 ///

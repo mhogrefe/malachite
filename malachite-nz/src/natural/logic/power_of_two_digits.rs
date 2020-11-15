@@ -6,7 +6,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, WrappingFrom};
-use malachite_base::num::iterator::iterator_to_bit_chunks;
+use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitBlockAccess, PowerOfTwoDigits, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;

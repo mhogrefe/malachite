@@ -16,7 +16,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `in_limbs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_limb;
 ///
@@ -41,7 +41,7 @@ pub fn limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_limb_to_out;
 ///
@@ -65,7 +65,7 @@ pub fn limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 /// # Panics
 /// Panics if `in_limbs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_limb_in_place;
 ///
@@ -92,7 +92,7 @@ pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_same_length;
 ///
@@ -117,7 +117,7 @@ pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are non-
 /// negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor;
 ///
@@ -153,7 +153,7 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_same_length_to_out;
 ///
@@ -189,7 +189,7 @@ pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_to_out;
 ///
@@ -229,7 +229,7 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_same_length_in_place_left;
 ///
@@ -260,7 +260,7 @@ pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_in_place_left;
 ///
@@ -301,7 +301,7 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative and the result is
 /// written to the longer input slice.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_in_place_either;
 ///

@@ -19,7 +19,7 @@ use platform::Limb;
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr::limbs_shr;
 ///
@@ -67,7 +67,7 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
 /// equal to `Limb::WIDTH`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr::limbs_shr_to_out;
 ///
@@ -114,7 +114,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// # Panics
 /// Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr::limbs_slice_shr_in_place;
 ///
@@ -155,7 +155,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::shr::limbs_vec_shr_in_place;
 ///

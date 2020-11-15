@@ -36,7 +36,7 @@ impl<'a> Iterator for LimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -78,7 +78,7 @@ impl<'a> Iterator for LimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -102,7 +102,7 @@ impl<'a> DoubleEndedIterator for LimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -150,7 +150,7 @@ impl<'a> Index<usize> for LimbIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -193,9 +193,9 @@ impl Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// This method is more efficient than `Natural::to_limbs_desc`.
+    /// This function is more efficient than `Natural::to_limbs_desc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -228,9 +228,9 @@ impl Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// This method is less efficient than `Natural::to_limbs_asc`.
+    /// This function is less efficient than `Natural::to_limbs_asc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -261,9 +261,9 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This method is more efficient than `Natural::into_limbs_desc`.
+    /// This function is more efficient than `Natural::into_limbs_desc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -296,9 +296,9 @@ impl Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// This method is less efficient than `Natural::into_limbs_asc`.
+    /// This function is less efficient than `Natural::into_limbs_asc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -333,7 +333,7 @@ impl Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

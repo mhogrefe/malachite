@@ -19,7 +19,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 ///
@@ -42,7 +42,7 @@ impl IsPowerOfTwo for Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

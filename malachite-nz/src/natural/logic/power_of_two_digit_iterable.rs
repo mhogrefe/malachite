@@ -327,7 +327,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOfTwoDigitPrimitiveItera
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -367,7 +367,7 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOfTwoDigitPrimitiveItera
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -409,7 +409,7 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -458,7 +458,7 @@ impl<'a, T: PrimitiveUnsigned> PowerOfTwoDigitIterator<T>
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -619,7 +619,7 @@ macro_rules! iterables {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -804,7 +804,7 @@ impl<'a> Iterator for NaturalPowerOfTwoDigitIterator<'a> {
     ///
     /// where n = `log_base`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -845,7 +845,7 @@ impl<'a> Iterator for NaturalPowerOfTwoDigitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -886,7 +886,7 @@ impl<'a> DoubleEndedIterator for NaturalPowerOfTwoDigitIterator<'a> {
     ///
     /// where n = `log_base`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -932,7 +932,7 @@ impl<'a> PowerOfTwoDigitIterator<Natural> for NaturalPowerOfTwoDigitIterator<'a>
     ///
     /// where n = `log_base`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -1003,7 +1003,7 @@ impl<'a> PowerOfTwoDigitIterable<Natural> for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

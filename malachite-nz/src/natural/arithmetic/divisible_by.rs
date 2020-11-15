@@ -26,7 +26,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// where n = `ns.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
 ///
@@ -62,7 +62,7 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by;
 ///
@@ -170,7 +170,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
 ///
@@ -281,7 +281,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_ref_val;
 ///
@@ -388,7 +388,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_ref_ref;
 ///
@@ -507,7 +507,7 @@ impl DivisibleBy<Natural> for Natural {
     /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
     /// taken by value.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -548,7 +548,7 @@ impl<'a> DivisibleBy<&'a Natural> for Natural {
     /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
     /// is taken by value and the second by reference.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -589,7 +589,7 @@ impl<'a> DivisibleBy<Natural> for &'a Natural {
     /// number, including zero; but a nonzero number is never divisible by zero. The first `Natural`
     /// is taken by reference and the second by value.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -630,7 +630,7 @@ impl<'a, 'b> DivisibleBy<&'b Natural> for &'a Natural {
     /// number, including zero; but a nonzero number is never divisible by zero. Both `Natural`s are
     /// taken by reference.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///

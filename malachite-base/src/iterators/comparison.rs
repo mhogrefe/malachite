@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 /// Returns an iterator that generates the `Ordering`s of adjacent elements of a given iterator.
 ///
-/// This `struct` is created by the `delta_directions` method. See its documentation for more.
+/// This `struct` is created by the `delta_directions` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct DeltaDirections<I: Iterator>
 where

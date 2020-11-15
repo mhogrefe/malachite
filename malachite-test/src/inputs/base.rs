@@ -2495,14 +2495,15 @@ pub fn pairs_of_unsigned_vec_var_2<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-// All pairs of `Vec<T>`, where `T` is unsigned and first `Vec` is at least as long as the second.
+// All pairs of `Vec<T>`, where `T` is unsigned and the first `Vec` is at least as long as the
+// second.
 pub fn pairs_of_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>)> {
     Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| xs.len() >= ys.len()))
 }
 
-// All pairs of `Vec<T>`, where `T` is unsigned and first `Vec` is at least as long as the second,
+// All pairs of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the second,
 // and neither `Vec` is empty.
 pub fn pairs_of_unsigned_vec_var_4<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
@@ -2809,18 +2810,6 @@ pub fn pairs_of_unsigned_vec_var_27<T: PrimitiveUnsigned + Rand>(
     Box::new(
         pairs_of_unsigned_vec_min_sizes(gm, 2, 2)
             .filter(|&(ref out, ref xs)| out.len() >= xs.len()),
-    )
-}
-
-// All pairs of `Vec<T>`, where `T` is unsigned and `out` and `xs` are valid inputs to
-// both `_limbs_square_low_basecase` and `_limbs_square_low_divide_and_conquer`.
-pub fn pairs_of_unsigned_vec_var_28<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(
-        pairs_of_unsigned_vec_min_sizes(gm, 2, 2).filter(|&(ref xs, ref ys)| {
-            !ys.is_empty() && ys.len() <= SQRLO_DC_THRESHOLD_LIMIT && xs.len() >= ys.len()
-        }),
     )
 }
 
@@ -5367,6 +5356,44 @@ pub fn pairs_of_limb_vec_and_small_u64_var_3(gm: GenerationMode) -> It<(Vec<Limb
             mut_limbs.len() == limbs.len()
         }),
     )
+}
+
+// All pairs of `Vec<Limb>`, and `u64` such that the `Vec` is nonempty and the number of significant
+// bits of the `Vec` does not exceed the `u64`.
+pub fn pairs_of_unsigned_vec_and_small_unsigned_var_4(gm: GenerationMode) -> It<(Vec<Limb>, u64)> {
+    if gm == GenerationMode::Exhaustive {
+        let ps = pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).filter_map(
+            |(mut xs, pow)| {
+                if xs.is_empty() {
+                    None
+                } else {
+                    limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+                    if *xs.last().unwrap() == 0 {
+                        None
+                    } else {
+                        Some((xs, pow))
+                    }
+                }
+            },
+        );
+        Box::new(ps.unique())
+    } else {
+        let ps = pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).filter_map(
+            |(mut xs, pow)| {
+                if xs.is_empty() {
+                    None
+                } else {
+                    limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+                    if *xs.last().unwrap() == 0 {
+                        None
+                    } else {
+                        Some((xs, pow))
+                    }
+                }
+            },
+        );
+        Box::new(ps)
+    }
 }
 
 // All pairs of `Vec<u32>` and `T`, where `T` is unsigned and the `Vec<T>` is nonempty and doesn't

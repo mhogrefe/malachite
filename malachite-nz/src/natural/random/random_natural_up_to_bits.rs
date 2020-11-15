@@ -24,7 +24,7 @@ use natural::Natural;
 /// # Panics
 /// Panics if `bits` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_nz;
 /// extern crate rand;
@@ -67,7 +67,7 @@ pub fn limbs_random_up_to_bits<T: PrimitiveUnsigned + Rand, R: Rng>(
 ///
 /// where n = `bits`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_nz;
 /// extern crate rand;

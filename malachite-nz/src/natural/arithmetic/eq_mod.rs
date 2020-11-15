@@ -116,7 +116,7 @@ pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb 
 /// # Panics
 /// Panics if the length of `xs` is less than 2 or `m` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
 ///
@@ -196,7 +196,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_ref_ref;
 ///
@@ -234,7 +234,7 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_ref_val;
 ///
@@ -272,7 +272,7 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 /// Panics if the length of `xs` or `m` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_val_ref;
 ///
@@ -308,7 +308,7 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool 
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod;
 ///
@@ -364,7 +364,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_ref_ref;
 ///
@@ -419,7 +419,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_ref_val;
 ///
@@ -477,7 +477,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_val_ref;
 ///
@@ -556,7 +556,7 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
 ///
@@ -607,7 +607,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_val;
 ///
@@ -658,7 +658,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_val_ref;
 ///
@@ -727,7 +727,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_val_val;
 ///

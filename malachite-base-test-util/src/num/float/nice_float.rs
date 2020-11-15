@@ -13,7 +13,7 @@ pub trait FmtRyuString: Copy {
     fn fmt_ryu_string(self, f: &mut Formatter<'_>) -> fmt::Result;
 }
 
-macro_rules! impl_to_ryu_string {
+macro_rules! impl_fmt_ryu_string {
     ($f: ident) => {
         impl FmtRyuString for $f {
             #[inline]
@@ -56,8 +56,8 @@ macro_rules! impl_to_ryu_string {
         }
     };
 }
-impl_to_ryu_string!(f32);
-impl_to_ryu_string!(f64);
+impl_fmt_ryu_string!(f32);
+impl_fmt_ryu_string!(f64);
 
 #[derive(Clone, Copy)]
 pub struct NiceFloat<T: PrimitiveFloat + FmtRyuString>(pub T);

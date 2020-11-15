@@ -24,7 +24,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -69,7 +69,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_down(xs: &[Limb], pow: u64) -> Ve
 ///
 /// where n = max(xs.len(), pow / Limb::WIDTH)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -152,7 +152,7 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even(
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -197,7 +197,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest(xs: &[Limb], pow: u64) ->
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
@@ -282,7 +282,7 @@ pub fn limbs_round_to_multiple_of_power_of_two(
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -354,7 +354,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_down_in_place(xs: &mut Vec<Limb>,
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -462,7 +462,7 @@ fn limbs_round_to_multiple_of_power_of_two_half_integer_to_even_in_place(
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::*;
 ///
@@ -533,7 +533,7 @@ pub fn limbs_round_to_multiple_of_power_of_two_nearest_in_place(xs: &mut Vec<Lim
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_base;
 /// extern crate malachite_nz;
@@ -661,7 +661,7 @@ impl RoundToMultipleOfPowerOfTwo<u64> for Natural {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -721,7 +721,7 @@ impl<'a> RoundToMultipleOfPowerOfTwo<u64> for &'a Natural {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -791,7 +791,7 @@ impl RoundToMultipleOfPowerOfTwoAssign<u64> for Natural {
     /// # Panics
     /// Panics if `rm` is `Exact`, but `self` is not a multiple of the power of two.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

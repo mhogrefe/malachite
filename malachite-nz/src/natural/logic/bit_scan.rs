@@ -18,7 +18,7 @@ use platform::Limb;
 ///
 /// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
 ///
@@ -70,7 +70,7 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 ///
 /// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
 ///
@@ -118,7 +118,7 @@ impl<'a> BitScan for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -152,7 +152,7 @@ impl<'a> BitScan for &'a Natural {
     ///
     /// where n = `self.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

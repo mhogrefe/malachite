@@ -8,7 +8,7 @@ impl DivisibleBy<Integer> for Integer {
     /// number, including zero; but a nonzero number is never divisible by zero. Both `Integer`s are
     /// taken by value.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -43,7 +43,7 @@ impl<'a> DivisibleBy<&'a Integer> for Integer {
     /// number, including zero; but a nonzero number is never divisible by zero. The first `Integer`
     /// is taken by value and the second by reference.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -78,7 +78,7 @@ impl<'a> DivisibleBy<Integer> for &'a Integer {
     /// number, including zero; but a nonzero number is never divisible by zero. The first `Integer`
     /// is taken by reference and the second by value.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -113,7 +113,7 @@ impl<'a, 'b> DivisibleBy<&'b Integer> for &'a Integer {
     /// number, including zero; but a nonzero number is never divisible by zero. Both `Integer`s are
     /// taken by reference.
     ///
-    /// This method is more efficient than finding a remainder and checking whether it's zero.
+    /// This function is more efficient than finding a remainder and checking whether it's zero.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///

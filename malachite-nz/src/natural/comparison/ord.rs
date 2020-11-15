@@ -18,7 +18,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::comparison::ord::limbs_cmp_same_length;
 /// use std::cmp::Ordering;
@@ -45,7 +45,7 @@ pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
 /// # Panics
 /// Panics if the last element of `xs` or `ys` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::comparison::ord::limbs_cmp;
 /// use std::cmp::Ordering;

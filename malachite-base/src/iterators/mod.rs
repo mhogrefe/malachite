@@ -7,7 +7,7 @@ use num::basic::traits::Zero;
 
 /// Generates all the nonzero values of a provided iterator.
 ///
-/// This `struct` is created by the `nonzero_values` method. See its documentation for more.
+/// This `struct` is created by the `nonzero_values` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct NonzeroValues<I: Iterator>(I)
 where

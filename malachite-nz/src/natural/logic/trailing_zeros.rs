@@ -20,7 +20,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `limbs` only contains zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 ///

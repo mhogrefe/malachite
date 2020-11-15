@@ -21,7 +21,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_mod_power_of_two;
 ///
@@ -57,7 +57,7 @@ pub fn limbs_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
 ///
@@ -100,7 +100,7 @@ pub fn limbs_slice_mod_power_of_two_in_place(xs: &mut [Limb], pow: u64) {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 ///
@@ -143,7 +143,7 @@ pub fn limbs_vec_mod_power_of_two_in_place(xs: &mut Vec<Limb>, pow: u64) {
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_neg_mod_power_of_two;
 ///
@@ -168,7 +168,7 @@ pub fn limbs_neg_mod_power_of_two(xs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// Additional memory: worst case O(`pow`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two::limbs_neg_mod_power_of_two_in_place;
 ///

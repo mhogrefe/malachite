@@ -16,7 +16,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb;
 ///
@@ -57,7 +57,7 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_to_out;
 ///
@@ -101,7 +101,7 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
 ///
@@ -155,7 +155,7 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub;
 ///
@@ -197,7 +197,7 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 ///
@@ -237,7 +237,7 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_to_out;
 ///
@@ -281,7 +281,7 @@ pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
 ///
@@ -319,7 +319,7 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_left;
 ///
@@ -361,7 +361,7 @@ pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 ///
@@ -398,7 +398,7 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_slice_sub_in_place_right;
 ///
@@ -444,7 +444,7 @@ pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) 
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_vec_sub_in_place_right;
 ///
@@ -489,7 +489,7 @@ pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
 /// # Panics
 /// Panics if `right_start` is greater than `xs.len()`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_with_overlap;
 ///
@@ -528,7 +528,7 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
 /// # Panics
 /// Panics if `xs.len()` is shorter than `ys.len()`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out_with_overlap;
 ///

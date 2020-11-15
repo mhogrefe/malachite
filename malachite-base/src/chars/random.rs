@@ -8,7 +8,7 @@ use vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Uniformly generates random `char`s in a closed interval.
 ///
-/// This `struct` is created by the `random_char_range` and `random_char_inclusive_range` methods.
+/// This `struct` is created by the `random_char_range` and `random_char_inclusive_range` functions.
 /// See their documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomCharRange {
@@ -28,7 +28,7 @@ impl Iterator for RandomCharRange {
 /// `char`s separately.
 ///
 /// This `struct` is created by the `graphic_weighted_random_char_range` and
-/// `graphic_weighted_random_char_inclusive_range` methods. See their documentation for more.
+/// `graphic_weighted_random_char_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug)]
 pub struct WeightedGraphicRandomCharRange {
     xs: WeightedRandomBools,
@@ -39,7 +39,6 @@ pub struct WeightedGraphicRandomCharRange {
 impl Iterator for WeightedGraphicRandomCharRange {
     type Item = char;
 
-    #[inline]
     fn next(&mut self) -> Option<char> {
         if self.xs.next().unwrap() {
             self.graphic.next()
@@ -69,6 +68,7 @@ impl Iterator for WeightedGraphicRandomCharRange {
 ///     "\u{5f771}\u{87234}\u{bcd36}\u{9e195}\u{5da07}\u{36553}\u{45028}\u{1cdfd}\u{d8530}\u{c7f2e}"
 /// )
 /// ```
+#[inline]
 pub fn random_chars(seed: Seed) -> RandomCharRange {
     random_char_inclusive_range(seed, char::MIN, char::MAX)
 }
@@ -98,6 +98,7 @@ pub fn random_chars(seed: Seed) -> RandomCharRange {
 ///     "q^\u{17}bF\\4T!/\u{1}q6\n/\u{11}Y\\wB"
 /// )
 /// ```
+#[inline]
 pub fn random_ascii_chars(seed: Seed) -> RandomCharRange {
     random_char_inclusive_range(seed, char::MIN, '\u{7f}')
 }

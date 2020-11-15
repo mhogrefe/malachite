@@ -262,7 +262,7 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 /// # Panics
 /// Panics if `ns` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3;
 ///
@@ -292,7 +292,7 @@ pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `ns` or if `ns` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3_to_out;
 ///
@@ -329,7 +329,7 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 /// # Panics
 /// Panics if `ns` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3_in_place;
 ///
@@ -365,7 +365,7 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 /// # Panics
 /// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb_to_out;
 ///
@@ -399,7 +399,7 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb;
 ///
@@ -430,7 +430,7 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 ///
@@ -1502,7 +1502,7 @@ pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
 /// zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact;
 ///
@@ -1541,7 +1541,7 @@ pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 /// limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out;
 ///
@@ -1606,7 +1606,7 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 /// limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_val_ref;
 ///
@@ -1678,7 +1678,7 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 /// limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_val;
 ///
@@ -1751,7 +1751,7 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
 /// limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_ref;
 ///

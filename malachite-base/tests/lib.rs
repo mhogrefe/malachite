@@ -261,13 +261,14 @@ pub mod num {
         pub mod iverson;
     }
     pub mod comparison {
-        pub mod ord_abs;
+        pub mod ord_abs_partial_ord_abs_and_comparators;
     }
     pub mod conversion {
         pub mod checked_from_and_exact_from;
         pub mod convertible_from;
         pub mod from;
         pub mod half;
+        pub mod join_halves;
         pub mod overflowing_from;
         pub mod saturating_from;
         pub mod slice;
@@ -287,6 +288,9 @@ pub mod num {
     }
     pub mod float {
         pub mod nice_float;
+    }
+    pub mod iterators {
+        pub mod iterator_to_bit_chunks;
     }
     pub mod logic {
         pub mod bit_access;
@@ -388,9 +392,20 @@ pub mod slices {
     pub mod split_into_chunks_mut;
 }
 pub mod strings {
+    pub mod exhaustive {
+        pub mod exhaustive_fixed_length_strings;
+        pub mod exhaustive_fixed_length_strings_using_chars;
+        pub mod lex_fixed_length_strings;
+        pub mod lex_fixed_length_strings_using_chars;
+    }
+    pub mod random {
+        pub mod random_fixed_length_strings;
+        pub mod random_fixed_length_strings_using_chars;
+    }
     pub mod string_is_subset;
     pub mod string_sort;
     pub mod string_unique;
+    pub mod strings_from_char_vecs;
     pub mod to_binary_string;
     pub mod to_debug_string;
 }

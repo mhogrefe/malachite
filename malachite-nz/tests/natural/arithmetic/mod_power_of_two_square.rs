@@ -12,7 +12,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_power_of_two_square::{
-    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer, _limbs_square_low_scratch_len,
+    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer,
+    _limbs_square_low_scratch_len, limbs_mod_power_of_two_square,
+    limbs_mod_power_of_two_square_ref, limbs_square_low,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -113,6 +115,86 @@ fn limbs_square_low_divide_and_conquer_fail_2() {
 fn limbs_square_low_divide_and_conquer_fail_3() {
     let mut scratch = vec![0; _limbs_square_low_scratch_len(1)];
     _limbs_square_low_divide_and_conquer(&mut [10, 10], &[1], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_square_low() {
+    let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        limbs_square_low(&mut out, xs);
+        assert_eq!(out, out_after);
+
+        let len = xs.len();
+        let x = Natural::from_limbs_asc(xs);
+        let pow = u64::exact_from(len) << Limb::LOG_WIDTH;
+        let expected_square = (&x).square().mod_power_of_two(pow);
+        assert_eq!(x.mod_power_of_two_square(pow), expected_square);
+        let square = Natural::from_limbs_asc(&out_after[..len]);
+        assert_eq!(square, expected_square);
+        assert_eq!(&out_before[len..], &out_after[len..]);
+    };
+    test(&[10; 3], &[1], &[1, 10, 10]);
+    test(&[10; 3], &[123, 456], &[15129, 112176, 10]);
+    test(&[10; 4], &[123, 456, 789], &[15129, 112176, 402030, 10]);
+    test(
+        &[10; 5],
+        &[123, 456, 789, 987],
+        &[15129, 112176, 402030, 962370, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_square_low_fail_1() {
+    limbs_square_low(&mut [10], &[10, 10]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_square_low_fail_2() {
+    limbs_square_low(&mut [10, 10], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_power_of_two_square() {
+    let test = |xs, pow, out: &[Limb]| {
+        assert_eq!(limbs_mod_power_of_two_square_ref(xs, pow), out);
+
+        let mut mut_xs = xs.to_vec();
+        assert_eq!(limbs_mod_power_of_two_square(&mut mut_xs, pow), out);
+
+        let square = Natural::from_limbs_asc(out);
+        assert_eq!(
+            Natural::from_limbs_asc(xs).mod_power_of_two_square(pow),
+            square
+        );
+        assert_eq!(
+            Natural::from_limbs_asc(xs).square().mod_power_of_two(pow),
+            square
+        );
+    };
+    test(&[2], 1, &[0]);
+    test(&[3], 1, &[1]);
+    test(&[25], 5, &[17]);
+    test(&[123, 456], 42, &[15129, 560]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mod_power_of_two_square_fail() {
+    limbs_mod_power_of_two_square(&mut vec![], 2);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_mod_power_of_two_square_ref_fail() {
+    limbs_mod_power_of_two_square_ref(&[], 2);
 }
 
 #[test]

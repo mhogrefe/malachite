@@ -26,7 +26,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Small,
-        benchmark_limbs_mod_power_of_two_mul_algorithms
+        benchmark_limbs_mod_power_of_two_mul_evaluation_strategy
     );
     register_bench!(
         registry,
@@ -159,14 +159,14 @@ fn demo_natural_mod_power_of_two_mul_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_mod_power_of_two_mul_algorithms(
+fn benchmark_limbs_mod_power_of_two_mul_evaluation_strategy(
     gm: GenerationMode,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark_old(
         "limbs_mod_power_of_two_mul(&[Limb], &[Limb], u64)",
-        BenchmarkType::Algorithms,
+        BenchmarkType::EvaluationStrategy,
         triples_of_limb_vec_limb_vec_and_u64_var_16(gm),
         gm.name(),
         limit,

@@ -5,6 +5,7 @@ use num::arithmetic::traits::DivisibleBy;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct SameWidthIteratorToBitChunks<
     I: Iterator<Item = T>,
@@ -36,6 +37,7 @@ fn same_width_iterator_to_bit_chunks<
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct EvenFractionIteratorToBitChunks<
     I: Iterator<Item = T>,
@@ -89,6 +91,7 @@ fn even_fraction_iterator_to_bit_chunks<
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct EvenMultipleIteratorToBitChunks<
     I: Iterator<Item = T>,
@@ -148,6 +151,7 @@ fn even_multiple_iterator_to_bit_chunks<
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct IrregularIteratorToBitChunks<
     I: Iterator<Item = T>,
@@ -225,6 +229,10 @@ fn irregular_iterator_to_bit_chunks<
     }
 }
 
+/// Regroups an iterator of bit chunks into another iterator of bit chunks, possibly with a
+/// different chunk size.
+///
+/// This `enum` is created by the `iterator_to_bit_chunks` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub enum IteratorToBitChunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     SameWidth(SameWidthIteratorToBitChunks<I, T, U>),
@@ -236,7 +244,7 @@ pub enum IteratorToBitChunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pri
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     IteratorToBitChunks<I, T, U>
 {
-    pub fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
+    pub(crate) fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
         match *self {
             IteratorToBitChunks::SameWidth(ref mut xs) => xs.next_with_wrapping(wrap),
             IteratorToBitChunks::EvenFraction(ref mut xs) => xs.next_with_wrapping(wrap),
@@ -257,6 +265,66 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
     }
 }
 
+/// Regroups an iterator of bit chunks into another iterator of bit chunks, possibly with a
+/// different chunk size.
+///
+/// In other words, let $A$ be the input chunk size and $B$ the output chunk size. Let's consider
+/// the lowest $A$ bits of each unsigned value produced by the input iterator, and concatenate them
+/// (least-significant bits first) into a single bit sequence. Then we chop the sequence up into
+/// chunks of $B$ bits, and have the output iterator return each chunk.
+///
+/// Let $(x\_i)\_{i=0}^{n-1}$ be the input iterator, where $n$ may be $\infty$. If $n$ is finite, we
+/// assume that $x\_{n-1} \neq 0$. Then we define the bit sequence $b\_{k=0}^\infty$ such that
+/// $b \in \\{0, 1\\}$, $b\_k=0$ for $k \geq An$, and
+/// $$
+/// x_i = \sum_{k=0}^{A-1} b_{Ai+k}2^k.
+/// $$
+/// Then, let $(y\_j)\_{j=0}^{m-1}$ be a sequence such that
+/// $$
+/// y_j = \sum_{k=0}^{B-1} b_{Bi+k}2^k.
+/// $$
+/// Then we have $f((x\_i)\_{i=0}^{n-1}) = (y\_j)\_{j=0}^{m-1}$.
+/// Note that the sequence $y$ is not uniquely specified, since it may contain arbitrarily many
+/// trailing zeros. However, if $x$ is finite, $y$ is guaranteed to also be finite.
+///
+/// The output length is $An/B + O(1)$, where $n$ is $xs.count()$, $A$ is `in_chunk_size`, and $B$
+/// is `out_chunk_size`.
+///
+/// # Complexity per iteration
+///
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::iterators::iterator_to_bit_chunks;
+///
+/// assert_eq!(
+///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10)
+///         .collect::<Vec<_>>().as_slice(),
+///     &[123, 456]
+/// );
+/// assert_eq!(
+///     iterator_to_bit_chunks::<_, u16, u16>([0b000111111, 0b110010010].iter().cloned(), 9, 3)
+///         .collect::<Vec<_>>().as_slice(),
+///     &[0b111, 0b111, 0b000, 0b010, 0b010, 0b110]
+/// );
+/// assert_eq!(
+///     iterator_to_bit_chunks::<_, u16, u32>(
+///         [0b111, 0b111, 0b000, 0b010, 0b010, 0b110].iter().cloned(),
+///         3,
+///         9
+///     ).collect::<Vec<_>>().as_slice(),
+///     &[0b000111111, 0b110010010]
+/// );
+/// assert_eq!(
+///     iterator_to_bit_chunks::<_, u32, u16>(
+///         [0b1010101, 0b1111101, 0b0100001, 0b110010].iter().cloned(),
+///         7,
+///         6
+///     ).collect::<Vec<_>>().as_slice(),
+///     &[0b010101, 0b111011, 0b000111, 0b010010, 0b110]
+/// );
+/// ```
 pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     xs: I,
     in_chunk_size: u64,

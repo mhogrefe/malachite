@@ -26,9 +26,9 @@ impl Natural {
     ///
     /// where n = `xs.len()`
     ///
-    /// This method is more efficient than `Natural::from_limbs_desc`.
+    /// This function is more efficient than `Natural::from_limbs_desc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
     ///
@@ -58,9 +58,9 @@ impl Natural {
     ///
     /// where n = `xs.len()`
     ///
-    /// This method is less efficient than `Natural::from_limbs_asc`.
+    /// This function is less efficient than `Natural::from_limbs_asc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
     ///
@@ -85,9 +85,9 @@ impl Natural {
     ///
     /// where n = `xs.len()`
     ///
-    /// This method is more efficient than `Natural::from_limbs_desc`.
+    /// This function is more efficient than `Natural::from_limbs_desc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
     ///
@@ -121,9 +121,9 @@ impl Natural {
     ///
     /// where n = `xs.len()`
     ///
-    /// This method is less efficient than `Natural::from_limbs_asc`.
+    /// This function is less efficient than `Natural::from_limbs_asc`.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
     ///

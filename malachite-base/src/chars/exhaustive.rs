@@ -67,7 +67,7 @@ pub const fn chars_increasing() -> RangeInclusive<char> {
 ///     whose `Debug` representations don't start with '\\'
 /// 6. All remaining characters.
 ///
-/// This `struct` is created by the `exhaustive_chars` and `exhaustive_ascii_chars` methods. See
+/// This `struct` is created by the `exhaustive_chars` and `exhaustive_ascii_chars` functions. See
 /// their documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveChars {

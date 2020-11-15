@@ -15,7 +15,7 @@ impl ModNeg<Natural> for Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -47,7 +47,7 @@ impl<'a> ModNeg<&'a Natural> for Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -79,7 +79,7 @@ impl<'a> ModNeg<Natural> for &'a Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -113,7 +113,7 @@ impl<'a, 'b> ModNeg<&'b Natural> for &'a Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -148,7 +148,7 @@ impl ModNegAssign<Natural> for Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -185,7 +185,7 @@ impl<'a> ModNegAssign<&'a Natural> for Natural {
     ///
     /// where n = `m.significant_bits()`
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

@@ -1,6 +1,6 @@
 /// Generates all singletons (1-element tuples) with values from a given iterator.
 ///
-/// This `struct` is created by the `singletons` method. See its documentation for more.
+/// This `struct` is created by the `singletons` function. See its documentation for more.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Singletons<I: Iterator> {
     xs: I,

@@ -10,7 +10,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 /// Generates all primitive integers in an interval.
 ///
 /// This `struct` is created by the `primitive_int_increasing_range` and
-/// `primitive_int_increasing_inclusive_range` methods. See their documentation for more.
+/// `primitive_int_increasing_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveIntIncreasingRange<T: PrimitiveInt> {
     a: Option<T>,
@@ -46,7 +46,7 @@ impl<T: PrimitiveInt> DoubleEndedIterator for PrimitiveIntIncreasingRange<T> {
 /// value.
 ///
 /// This `struct` is created by the `exhaustive_signed_range` and
-/// `exhaustive_signed_inclusive_range` methods. See their documentation for more.
+/// `exhaustive_signed_inclusive_range` functions. See their documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveSignedRange<T: PrimitiveSigned> {
     NonNegative(PrimitiveIntIncreasingRange<T>),

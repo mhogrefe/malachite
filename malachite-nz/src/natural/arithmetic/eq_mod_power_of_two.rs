@@ -22,7 +22,7 @@ use platform::Limb;
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_limb_mod_power_of_two;
 ///
@@ -90,7 +90,7 @@ fn limbs_eq_mod_power_of_two_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool
 ///
 /// where n = min(pow, `xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::eq_mod_power_of_two::limbs_eq_mod_power_of_two;
 ///

@@ -80,6 +80,8 @@ impl Seed {
     /// probability, generate a different seed. Determining the initial seed from the resulting seed
     /// will be (cryptographically) difficult, even if the key is known.
     ///
+    /// # Worst-case complexity
+    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

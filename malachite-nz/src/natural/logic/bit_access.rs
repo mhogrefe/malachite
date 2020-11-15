@@ -15,7 +15,7 @@ use platform::Limb;
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where the input is non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 ///
@@ -46,7 +46,7 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 /// # Panics
 /// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_slice_set_bit;
 ///
@@ -73,7 +73,7 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 ///
 /// Additional memory: worst case O(`index`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_vec_set_bit;
 ///
@@ -107,7 +107,7 @@ pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is non-negative.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 ///
@@ -160,7 +160,7 @@ impl BitAccess for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

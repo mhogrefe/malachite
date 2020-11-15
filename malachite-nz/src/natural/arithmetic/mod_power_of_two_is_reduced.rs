@@ -11,7 +11,7 @@ impl ModPowerOfTwoIsReduced for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

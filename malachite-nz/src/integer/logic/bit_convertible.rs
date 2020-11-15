@@ -125,7 +125,7 @@ impl BitConvertible for Integer {
     /// positive or trailing `true` bits if the `Integer` is negative, except as necessary to
     /// include the correct sign bit. Zero is a special case: it contains no bits.
     ///
-    /// This method is more efficient than `to_bits_desc`.
+    /// This function is more efficient than `to_bits_desc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -173,7 +173,7 @@ impl BitConvertible for Integer {
     ///
     /// This is similar to how BigIntegers in Java are represented.
     ///
-    /// This method is less efficient than `to_bits_asc`.
+    /// This function is less efficient than `to_bits_asc`.
     ///
     /// Time: worst case O(n)
     ///

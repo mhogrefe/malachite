@@ -1,5 +1,6 @@
-use random::Seed;
 use std::iter::{repeat, Repeat};
+
+use random::Seed;
 
 /// Generates random units; repeats `()`.
 ///
@@ -7,7 +8,7 @@ use std::iter::{repeat, Repeat};
 ///
 /// The output length is infinite.
 ///
-/// # Complexity per iteration
+/// # Expected complexity per iteration
 ///
 /// Constant time and additional memory.
 ///
@@ -66,16 +67,16 @@ macro_rules! random_tuples {
         /// # Expected complexity per iteration
         ///
         /// $$
-        /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))
+        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(\sum_{j=0}^{n-1}M_j(i))
+        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
         /// $T_0, T_1, \ldots T_{n-1}$ and $M_0, M_1, \ldots M_{n-1}$ are the time and additional
-        /// memory functions of the input iterators.
+        /// memory of the input iterators.
         ///
         /// # Examples
         ///
@@ -118,12 +119,12 @@ macro_rules! random_tuples {
         ///
         /// # Expected complexity per iteration
         ///
-        /// $T(i, n) = O(nT^\prime(i))$
+        /// $T(n) = O(nT^\prime)$
         ///
-        /// $M(i, n) = O(nM^\prime(i))$
+        /// $M(n) = O(nM^\prime)$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$
-        /// and $M^\prime$ are the time and additional memory functions of `xs`.
+        /// and $M^\prime$ are the time and additional memory of `xs`.
         ///
         /// # Examples
         ///
@@ -293,16 +294,16 @@ macro_rules! random_custom_tuples {
         /// We have
         ///
         /// $$
-        /// T(i, n) = O(\sum_{j=0}^{n-1}T_j(i))
+        /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(\sum_{j=0}^{n-1}M_j(i))
+        /// M(n) = O(\sum_{j=0}^{n-1}M_j)
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
-        /// $T_j$ and $M_j$ are the time and additional memory functions of the iterator
-        /// corresponding to the $j$th output.
+        /// $T_j$ and $M_j$ are the time and additional memory of the iterator corresponding to the
+        /// $j$th output.
         ///
         /// # Examples
         ///

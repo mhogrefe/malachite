@@ -18,7 +18,7 @@ use platform::Limb;
 ///
 /// where n = min(pow, `xs.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::divisible_by_power_of_two::*;
 ///

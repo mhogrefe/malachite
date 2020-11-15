@@ -43,7 +43,7 @@ use platform::{
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or `ys` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater;
 /// use malachite_nz::platform::Limb;
@@ -74,7 +74,7 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if either slice is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul;
 /// use malachite_nz::platform::Limb;
@@ -109,7 +109,7 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_same_length_to_out;
 /// use malachite_nz::platform::Limb;
@@ -128,7 +128,9 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
-    if len < MUL_TOOM22_THRESHOLD {
+    if xs as *const [Limb] == ys as *const [Limb] {
+        limbs_square_to_out(out, xs);
+    } else if len < MUL_TOOM22_THRESHOLD {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if len < MUL_TOOM33_THRESHOLD {
         // Allocate workspace of fixed size on stack: fast!
@@ -173,7 +175,7 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 /// # Panics
 /// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 /// use malachite_nz::platform::Limb;
@@ -194,11 +196,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
     if xs_len == ys_len {
-        if xs as *const [Limb] == ys as *const [Limb] {
-            limbs_square_to_out(out, xs);
-        } else {
-            limbs_mul_same_length_to_out(out, xs, ys);
-        }
+        limbs_mul_same_length_to_out(out, xs, ys);
     } else if ys_len < MUL_TOOM22_THRESHOLD {
         // Plain schoolbook multiplication. Unless xs_len is very large, or else if
         // `limbs_mul_same_length_to_out` applies, perform basecase multiply directly.
@@ -343,7 +341,7 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 /// # Panics
 /// Panics if `out` is too short or either slice is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mul::limbs_mul_to_out;
 /// use malachite_nz::platform::Limb;

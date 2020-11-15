@@ -13,7 +13,7 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 ///

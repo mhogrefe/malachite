@@ -12,12 +12,9 @@ use slices::{random_values_from_slice, RandomValuesFromSlice};
 ///
 /// The output length is infinite.
 ///
-/// # Expected complexity per iteration
-/// $E[T(i)] = O(1)$
+/// # Expected worst-case complexity
 ///
-/// $E[M(i)] = O(1)$
-///
-/// where $T$ is time and $M$ is additional memory.
+/// Constant time and additional memory.
 ///
 /// # Examples
 /// ```

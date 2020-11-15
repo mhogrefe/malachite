@@ -7,6 +7,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
+use natural::arithmetic::mod_power_of_two_square::{
+    limbs_mod_power_of_two_square, limbs_mod_power_of_two_square_ref,
+};
 use natural::arithmetic::mul::limbs_mul;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::InnerNatural::{Large, Small};
@@ -27,7 +30,7 @@ use platform::{DoubleLimb, Limb};
 /// # Panics
 /// Panics if either input is empty. May panic if either input has trailing zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_mul::limbs_mod_power_of_two_mul;
 ///
@@ -45,6 +48,9 @@ use platform::{DoubleLimb, Limb};
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
+    if xs.as_slice() as *const [Limb] == ys.as_slice() as *const [Limb] {
+        return limbs_mod_power_of_two_square(xs, pow);
+    }
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
@@ -72,7 +78,7 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
     product
 }
 
-/// Interpreting a slice of `Limb` and a `Vec<Limb>`s as the limbs (in ascending order) of two
+/// Interpreting a slice of `Limb` and a `Vec<Limb>` as the limbs (in ascending order) of two
 /// `Natural`s, returns a `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>.
 /// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated.
 /// Neither input may be empty or have trailing zeros.
@@ -86,7 +92,7 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
 /// # Panics
 /// Panics if either input is empty. May panic if either input has trailing zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_mul::limbs_mod_power_of_two_mul_val_ref;
 ///
@@ -104,6 +110,9 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) -> Vec<Limb> {
+    if xs.as_slice() as *const [Limb] == ys as *const [Limb] {
+        return limbs_mod_power_of_two_square(xs, pow);
+    }
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
@@ -149,7 +158,7 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
 /// # Panics
 /// Panics if either input is empty. May panic if either input has trailing zeros.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_power_of_two_mul::limbs_mod_power_of_two_mul_ref_ref;
 ///
@@ -167,6 +176,9 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+    if xs as *const [Limb] == ys as *const [Limb] {
+        return limbs_mod_power_of_two_square_ref(xs, pow);
+    }
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     let ys_len = ys.len();
@@ -382,7 +394,6 @@ impl<'a, 'b> ModPowerOfTwoMul<&'b Natural> for &'a Natural {
     /// ```
     fn mod_power_of_two_mul(self, other: &'b Natural, pow: u64) -> Natural {
         match (self, other) {
-            //TODO use mod_square
             (x, &Natural(Small(y))) => x.mod_power_of_two_mul_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_mul_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {

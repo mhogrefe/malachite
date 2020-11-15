@@ -40,7 +40,7 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -93,7 +93,7 @@ impl<'a> Iterator for NaturalBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -119,7 +119,7 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -180,7 +180,7 @@ impl<'a> Index<u64> for NaturalBitIterator<'a> {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -227,7 +227,7 @@ impl<'a> BitIterable for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

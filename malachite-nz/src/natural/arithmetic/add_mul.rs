@@ -23,7 +23,7 @@ use platform::{DoubleLimb, Limb};
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul_limb;
 ///
@@ -59,7 +59,7 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::*;
 ///
@@ -111,7 +111,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::*;
 ///
@@ -156,7 +156,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `ys.len()` - `xs.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_left;
 ///
@@ -222,7 +222,7 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `xs.len()` - `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_right;
 ///
@@ -286,7 +286,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_either;
 ///
@@ -345,7 +345,7 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul;
 ///
@@ -391,7 +391,7 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul_in_place_left;
 ///

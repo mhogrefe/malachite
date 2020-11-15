@@ -19,7 +19,7 @@ macro_rules! impl_partial_ord_limb {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -45,7 +45,7 @@ macro_rules! impl_partial_ord_limb {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -74,7 +74,7 @@ macro_rules! impl_partial_ord_smaller_than_limb {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -99,7 +99,7 @@ macro_rules! impl_partial_ord_smaller_than_limb {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -129,7 +129,7 @@ macro_rules! impl_partial_ord_larger_than_limb_or_usize {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -160,7 +160,7 @@ macro_rules! impl_partial_ord_larger_than_limb {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -206,7 +206,7 @@ macro_rules! impl_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -235,7 +235,7 @@ macro_rules! impl_signed {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///

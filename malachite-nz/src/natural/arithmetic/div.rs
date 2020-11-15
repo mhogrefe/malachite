@@ -138,7 +138,7 @@ pub fn _div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> 
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_limb;
 ///
@@ -168,7 +168,7 @@ pub fn limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_limb_to_out;
 ///
@@ -248,7 +248,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_limb_in_place;
 ///
@@ -1752,7 +1752,7 @@ pub fn _limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div;
 ///
@@ -1784,7 +1784,7 @@ pub fn limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_to_out;
 ///
@@ -1830,7 +1830,7 @@ pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_val_ref;
 ///
@@ -1876,7 +1876,7 @@ pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_val;
 ///
@@ -1922,7 +1922,7 @@ pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_ref;
 ///

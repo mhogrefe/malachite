@@ -10,7 +10,7 @@ impl PowerOfTwo for Natural {
     ///
     /// Additional memory: worst case O(`pow`)
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

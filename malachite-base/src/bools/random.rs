@@ -8,7 +8,7 @@ use random::Seed;
 
 /// Uniformly generates random `bool`s.
 ///
-/// This `struct` is created by the `random_bools` method. See its documentation for more.
+/// This `struct` is created by the `random_bools` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomBools {
     rng: ChaCha20Rng,
@@ -67,7 +67,8 @@ pub fn random_bools(seed: Seed) -> RandomBools {
 
 /// Generates random `bool`s, with a fixed probability of generating `true`.
 ///
-/// This `struct` is created by the `weighted_random_bools` method. See its documentation for more.
+/// This `struct` is created by the `weighted_random_bools` function. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct WeightedRandomBools {
     numerator: u64,

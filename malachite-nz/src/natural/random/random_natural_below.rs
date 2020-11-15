@@ -16,7 +16,7 @@ use natural::Natural;
 /// # Panics
 /// Panics if `n` is 0.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_nz;
 /// extern crate rand;

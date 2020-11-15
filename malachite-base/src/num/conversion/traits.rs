@@ -3,14 +3,16 @@ use std::num::ParseIntError;
 use rounding_modes::RoundingMode;
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
+///
 /// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.
 pub trait CheckedFrom<T>: Sized {
     fn checked_from(value: T) -> Option<Self>;
 }
 
-/// This trait defines a conversion to another type. If the conversion fails, `None` is returned. It
-/// is recommended that this trait is not implemented directly; it is automatically implemented when
-/// `CheckedFrom` is implemented.
+/// This trait defines a conversion to another type. If the conversion fails, `None` is returned.
+///
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `CheckedFrom` is implemented.
 pub trait CheckedInto<T> {
     fn checked_into(self) -> Option<T>;
 }
@@ -23,6 +25,7 @@ impl<T, U: CheckedFrom<T>> CheckedInto<U> for T {
 }
 
 /// This trait defines a conversion from another type. If the conversion fails, the function panics.
+///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when `CheckedFrom` is implemented.
 pub trait ExactFrom<T>: Sized {
@@ -30,6 +33,7 @@ pub trait ExactFrom<T>: Sized {
 }
 
 /// This trait defines a conversion to another type. If the conversion fails, the function panics.
+///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when `ExactFrom` is implemented.
 pub trait ExactInto<T> {
@@ -51,7 +55,7 @@ impl<T, U: ExactFrom<T>> ExactInto<U> for T {
 }
 
 /// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result can wrap around.
+/// result will wrap around.
 ///
 /// If `WrappingFrom` is implemented, it usually makes sense to implement `OverflowingFrom` as well.
 pub trait WrappingFrom<T>: Sized {
@@ -59,7 +63,7 @@ pub trait WrappingFrom<T>: Sized {
 }
 
 /// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// can wrap around.
+/// will wrap around.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
 /// when `WrappingFrom` is implemented.
@@ -97,20 +101,20 @@ impl<T, U: SaturatingFrom<T>> SaturatingInto<U> for T {
 }
 
 /// This trait defines a conversion from another type, where if the conversion is not exact the
-/// result can wrap around.
+/// result will wrap around. The result is returned along with a `bool` that indicates whether
+/// wrapping has occurred.
 ///
-/// The result is returned along with a `bool` that indicates whether wrapping has occurred. If
-/// `OverflowingFrom` is implemented, it usually makes sense to implement `WrappingFrom` as well.
+/// If `OverflowingFrom` is implemented, it usually makes sense to implement `WrappingFrom` as well.
 pub trait OverflowingFrom<T>: Sized {
     fn overflowing_from(value: T) -> (Self, bool);
 }
 
 /// This trait defines a conversion to another type, where if the conversion is not exact the result
-/// can wrap around.
+/// can wrap around. The result is returned along with a `bool` that indicates whether wrapping has
+/// occurred.
 ///
-/// The result is returned along with a `bool` that indicates whether wrapping has occurred. It is
-/// recommended that this trait is not implemented directly; it is automatically implemented when
-/// `OverflowingFrom` is implemented.
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when `OverflowingFrom` is implemented.
 pub trait OverflowingInto<T>: Sized {
     fn overflowing_into(self) -> (T, bool);
 }
@@ -132,7 +136,7 @@ pub trait RoundingFrom<T>: Sized {
 /// specified `RoundingMode`.
 ///
 /// It is recommended that this trait is not implemented directly; it is automatically implemented
-/// when `OverflowingFrom` is implemented.
+/// when `RoundingFrom` is implemented.
 pub trait RoundingInto<T>: Sized {
     fn rounding_into(self, rm: RoundingMode) -> T;
 }
@@ -197,8 +201,7 @@ pub trait SplitInHalf: HasHalf {
     ///
     /// where $T$ is time, $M$ is additional memory, $T_U$ and $T_L$ are the time complexities of
     /// the `upper_half` and `lower_half` functions, respectively, and $M_U$ and $M_L$ are the
-    /// memory complexities of the `upper_half` and `lower_half` functions, respectively,
-    ///
+    /// memory complexities of the `upper_half` and `lower_half` functions, respectively.
     #[inline]
     fn split_in_half(&self) -> (Self::Half, Self::Half) {
         (self.upper_half(), self.lower_half())

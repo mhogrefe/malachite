@@ -25,7 +25,7 @@ use platform::{DoubleLimb, Limb};
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater;
 ///
@@ -62,7 +62,7 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<V
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::*;
 ///
@@ -113,7 +113,7 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater_in_place_left;
 ///
@@ -155,7 +155,7 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::*;
 ///
@@ -214,7 +214,7 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater_in_place_right;
 ///
@@ -267,7 +267,7 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
 /// `zs.len()` - 1.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul;
 ///
@@ -306,7 +306,7 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
 /// `zs.len()` - 1.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_in_place_left;
 ///

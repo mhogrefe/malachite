@@ -18,7 +18,7 @@ use platform::Limb;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::log_two::limbs_floor_log_two;
 ///
@@ -43,7 +43,7 @@ pub fn limbs_floor_log_two(xs: &[Limb]) -> u64 {
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::log_two::limbs_ceiling_log_two;
 ///
@@ -69,7 +69,7 @@ impl<'a> FloorLogTwo for &'a Natural {
     /// # Panics
     /// Panics if `self` is 0.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
@@ -100,7 +100,7 @@ impl<'a> CeilingLogTwo for &'a Natural {
     /// # Panics
     /// Panics if `self` is 0.
     ///
-    /// # Example
+    /// # Examples
     /// ```
     /// extern crate malachite_base;
     /// extern crate malachite_nz;

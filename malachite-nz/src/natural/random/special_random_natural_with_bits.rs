@@ -14,7 +14,7 @@ use natural::Natural;
 ///
 /// where n = `bits`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// extern crate malachite_nz;
 /// extern crate rand;

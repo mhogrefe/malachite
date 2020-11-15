@@ -477,8 +477,8 @@ pub trait ModMulAssign<RHS = Self, M = Self> {
 
 /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
 /// modular multiplications with the same modulus are necessary, it can be quicker to precompute
-/// some piece of data and reuse it in the multiplication calls. This trait provides a method for
-/// precomputing the data and a method for using it during multiplication.
+/// some piece of data and reuse it in the multiplication calls. This trait provides a function for
+/// precomputing the data and a function for using it during multiplication.
 pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     type Output;
     type Data;
@@ -491,7 +491,7 @@ pub trait ModMulPrecomputed<RHS = Self, M = Self> {
 /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If
 /// multiple modular multiplications with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
-/// method for using precomputed data during multiplication. For precomputing the data, use the
+/// function for using precomputed data during multiplication. For precomputing the data, use the
 /// `precompute_mod_mul_data` function in `ModMulPrecomputed`.
 pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, M> {
     fn mod_mul_precomputed_assign(&mut self, other: RHS, m: M, data: &Self::Data);
@@ -1146,8 +1146,8 @@ pub trait ModPowAssign<RHS = Self, M = Self> {
 
 /// Computes `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
 /// modular exponentiations with the same modulus are necessary, it can be quicker to precompute
-/// some piece of data and reuse it in the exponentiation calls. This trait provides a method for
-/// precomputing the data and a method for using it during exponentiation.
+/// some piece of data and reuse it in the exponentiation calls. This trait provides a function for
+/// precomputing the data and a function for using it during exponentiation.
 pub trait ModPowPrecomputed<RHS = Self, M = Self>
 where
     Self: Sized,
@@ -1163,7 +1163,7 @@ where
 /// Replaces `self` with `self.pow(exp)` mod `m`. Assumes the inputs are already reduced mod `m`. If
 /// multiple modular exponentiations with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the exponentiation calls. This trait provides a
-/// method for using precomputed data during exponentiation. For precomputing the data, use the
+/// function for using precomputed data during exponentiation. For precomputing the data, use the
 /// `precompute_mod_pow_data` function in `ModPowPrecomputed`.
 pub trait ModPowPrecomputedAssign<RHS: Two = Self, M = Self>: ModPowPrecomputed<RHS, M> {
     fn mod_pow_precomputed_assign(&mut self, exp: RHS, m: M, data: &Self::Data);

@@ -449,7 +449,7 @@ impl Integer {
     /// This function borrows `self`. If taking ownership of `self` is possible,
     /// `into_twos_complement_limbs_asc` is more efficient.
     ///
-    /// This method is more efficient than `to_twos_complement_limbs_desc`.
+    /// This function is more efficient than `to_twos_complement_limbs_desc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -494,7 +494,7 @@ impl Integer {
     /// This function borrows `self`. If taking ownership of `self` is possible,
     /// `into_twos_complement_limbs_desc` is more efficient.
     ///
-    /// This method is less efficient than `to_twos_complement_limbs_asc`.
+    /// This function is less efficient than `to_twos_complement_limbs_asc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -534,7 +534,7 @@ impl Integer {
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// `to_twos_complement_limbs_asc`.
     ///
-    /// This method is more efficient than `into_twos_complement_limbs_desc`.
+    /// This function is more efficient than `into_twos_complement_limbs_desc`.
     ///
     /// Time: worst case O(n)
     ///
@@ -580,7 +580,7 @@ impl Integer {
     /// This function takes ownership of `self`. If it's necessary to borrow `self` instead, use
     /// `to_twos_complement_limbs_desc`.
     ///
-    /// This method is less efficient than `into_twos_complement_limbs_asc`.
+    /// This function is less efficient than `into_twos_complement_limbs_asc`.
     ///
     /// Time: worst case O(n)
     ///

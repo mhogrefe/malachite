@@ -3,6 +3,7 @@ use std::ops::{Add, AddAssign};
 use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
+use natural::arithmetic::shl::{limbs_shl, limbs_vec_shl_in_place};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
@@ -16,7 +17,7 @@ use platform::Limb;
 ///
 /// where n = `limbs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_limb;
 ///
@@ -59,7 +60,7 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_limb_to_out;
 ///
@@ -101,7 +102,7 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// where n = `xs.len()`
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 ///
@@ -138,7 +139,7 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_vec_add_limb_in_place;
 ///
@@ -183,7 +184,7 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_greater;
 ///
@@ -194,6 +195,9 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 /// This is mpn_add from gmp.h, GMP 6.1.2, where the first input is at least as long as the second,
 /// and the output is returned.
 pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+    if xs as *const [Limb] == ys as *const [Limb] {
+        return limbs_shl(xs, 1);
+    }
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -224,7 +228,7 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add;
 ///
@@ -255,7 +259,7 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_same_length_to_out;
 ///
@@ -294,7 +298,7 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or if `out` is too short.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_greater_to_out;
 ///
@@ -338,7 +342,7 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// # Panics
 /// Panics if `out` is too short.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_add_to_out;
 ///
@@ -403,7 +407,7 @@ pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 ///
@@ -441,7 +445,7 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
 ///
@@ -479,7 +483,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_vec_add_in_place_left;
 ///
@@ -495,6 +499,10 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// This is mpz_add from mpz/aors.h, GMP 6.1.2, where both inputs are non-negative and the output is
 /// written to the first input.
 pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+    if xs.as_slice() as *const [Limb] == ys as *const [Limb] {
+        limbs_vec_shl_in_place(xs, 1);
+        return;
+    }
     let xs_len = xs.len();
     let ys_len = ys.len();
     let carry = if xs_len >= ys_len {
@@ -525,7 +533,7 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_slice_add_in_place_either;
 ///
@@ -568,7 +576,7 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::add::limbs_vec_add_in_place_either;
 ///
@@ -830,7 +838,6 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
     /// ```
     fn add(self, other: &'a Natural) -> Natural {
         match (self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => self << 1,
             (x, &Natural(Small(y))) => x.add_limb_ref(y),
             (&Natural(Small(x)), y) => y.add_limb_ref(x),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => Natural(Large(limbs_add(xs, ys))),
@@ -901,7 +908,6 @@ impl<'a> AddAssign<&'a Natural> for Natural {
     /// ```
     fn add_assign(&mut self, other: &'a Natural) {
         match (&mut *self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => *self <<= 1,
             (x, &Natural(Small(y))) => x.add_assign_limb(y),
             (&mut Natural(Small(x)), y) => *self = y.add_limb_ref(x),
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {

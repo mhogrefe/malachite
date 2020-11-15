@@ -22,7 +22,7 @@ impl StripedBitSource {
     /// Creates a new `StripedBitSource` with mean run length $m$, where $m$ is
     /// `m_numerator` / `m_denominator`.
     ///
-    /// # Worst-case complexity
+    /// # Expected worst-case complexity
     ///
     /// Constant time and additional memory.
     ///
@@ -64,7 +64,7 @@ impl StripedBitSource {
     /// To reset the bit source, so that the next call to `get` has equal probabilities of `true` or
     /// `false`, call `end_block`.
     ///
-    /// # Worst-case complexity
+    /// # Expected worst-case complexity
     ///
     /// Constant time and additional memory.
     pub fn get(&mut self) -> bool {
@@ -80,7 +80,7 @@ impl StripedBitSource {
     /// Resets this `StripedBitSource`, so that the next time `get` is called, the probabilities of
     /// `true` or `false` will be equal.
     ///
-    /// # Worst-case complexity
+    /// # Expected worst-case complexity
     ///
     /// Constant time and additional memory.
     ///
@@ -149,7 +149,8 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedBitChunks<T> {
 
 /// Generates random signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_signeds` method. See its documentation for more.
+/// This `struct` is created by the `striped_random_signeds` function. See its documentation for
+/// more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomSigneds<T: PrimitiveSigned> {
     phantom_data: PhantomData<*const T>,
@@ -178,7 +179,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomSigneds<T> {
 
 /// Generates random natural (non-negative) signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_natural_signeds` method. See its documentation
+/// This `struct` is created by the `striped_random_natural_signeds` function. See its documentation
 /// for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalSigneds<T: PrimitiveSigned> {
@@ -204,8 +205,8 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
 
 /// Generates random negative signed integers from a random striped distribution.
 ///
-/// This `struct` is created by the `striped_random_negative_signeds` method. See its documentation
-/// for more.
+/// This `struct` is created by the `striped_random_negative_signeds` function. See its
+/// documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
     phantom_data: PhantomData<*const T>,
@@ -232,7 +233,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 /// Generates random unsigned integers less than a positive limit, from a random striped
 /// distribution.
 ///
-/// This `struct` is created by the `striped_random_unsigneds_less_than` method. See its
+/// This `struct` is created by the `striped_random_unsigneds_less_than` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsignedsLessThan<T: PrimitiveUnsigned> {
@@ -261,7 +262,7 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedsLessThan<T> {
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -297,7 +298,7 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -332,7 +333,7 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -371,7 +372,7 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -408,7 +409,7 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -447,7 +448,7 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -485,7 +486,7 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///
@@ -522,7 +523,7 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// The output length is infinite.
 ///
-/// # Worst-case complexity
+/// # Expected worst-case complexity
 ///
 /// Constant time and additional memory.
 ///

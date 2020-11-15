@@ -24,7 +24,7 @@ macro_rules! float_impls {
             /// Panics if `value` is NaN or infinite, if it would round to a negative integer, or if
             /// the rounding mode is `Exact` and `value` is not an integer.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -95,7 +95,7 @@ macro_rules! float_impls {
             /// # Panics
             /// Panics if `value` is NaN or infinite, or if it would round to a negative integer.
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// use malachite_nz::natural::Natural;
             ///
@@ -130,7 +130,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
@@ -190,7 +190,7 @@ macro_rules! float_impls {
             ///
             /// Additional memory: worst case O(1)
             ///
-            /// # Example
+            /// # Examples
             /// ```
             /// extern crate malachite_base;
             /// extern crate malachite_nz;

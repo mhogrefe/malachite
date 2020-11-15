@@ -79,7 +79,7 @@ pub fn _mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> 
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 ///
@@ -105,7 +105,7 @@ pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_three_limb_by_two_limb;
@@ -171,7 +171,7 @@ pub fn limbs_mod_three_limb_by_two_limb(
 /// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
 /// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_by_two_limb_normalized;
 ///
@@ -825,7 +825,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
 ///
@@ -857,7 +857,7 @@ pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// Panics if `rs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Example
+/// # Examples
 /// ```
 /// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_to_out;
 ///
