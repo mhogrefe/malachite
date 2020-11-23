@@ -18,3 +18,4 @@ lto = true
 
 [dev-dependencies]
 malachite-base-test-util = { path = "../malachite-base-test-util" }
+maplit = "1.0.2"

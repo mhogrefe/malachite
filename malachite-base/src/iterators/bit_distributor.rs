@@ -63,18 +63,18 @@ impl BitDistributorOutputType {
 ///
 /// In general, setting `output_types` to `[BitDistributorOutputType::normal(1); n]` will generate
 /// $n$-tuples. The elements of the tuples will be very roughly the same size, in the sense that
-/// each element will grow as $O(\sqrt[n]{i})$, where $i$ is the counter. Sometimes we want the
+/// each element will grow as $O(\sqrt\[n\]{i})$, where $i$ is the counter. Sometimes we want the
 /// elements to grow at different rates. To accomplish this, we can change the weights of the output
 /// types. For example, if we set `output_types` to
 /// `[BitDistributorOutputType::normal(1), BitDistributorOutputType::normal(2)]`, the first element
-/// of the generated pairs will grow as $O(\sqrt[3]{i})$ and the second as $O(i^{2/3})$. In general,
-/// if the weights are $w_0, w_1, \\ldots, w_{n-1}$, then the $k$th element of the output
+/// of the generated pairs will grow as $O(\sqrt\[3\]{i})$ and the second as $O(i^{2/3})$. In
+/// general, if the weights are $w_0, w_1, \\ldots, w_{n-1}$, then the $k$th element of the output
 /// tuples will grow as $O(i^{w_i/\sum_{j=0}^{n-1}w_j})$.
 ///
 /// Apart from creating _normal_ output types with different weights, we can create _tiny_ output
 /// types, which indicate that the corresponding tuple element should grow especially slowly. If
 /// `output_types` contains $m$ tiny output types, each tiny tuple element grows as
-/// $O(\sqrt[m]{\log i})$. The growth of the other elements is unaffected. Having only tiny types
+/// $O(\sqrt\[m\]{\log i})$. The growth of the other elements is unaffected. Having only tiny types
 /// in `output_types` is disallowed.
 ///
 /// The above discussion of growth rates assumes that `max_bits` is not specified for any output

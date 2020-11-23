@@ -24,16 +24,15 @@ use platform::Limb;
 /// assert_eq!(limbs_low_mask(100), vec![u32::MAX, u32::MAX, u32::MAX, 0xf]);
 /// ```
 pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
-    let limb_len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
+    let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
     let remaining_bits = bits & Limb::WIDTH_MASK;
-    let mut limbs = vec![Limb::MAX; usize::exact_from(limb_len)];
+    let mut xs = vec![Limb::MAX; usize::exact_from(len)];
     if remaining_bits != 0 {
-        limbs
-            .last_mut()
+        xs.last_mut()
             .unwrap()
             .mod_power_of_two_assign(remaining_bits);
     }
-    limbs
+    xs
 }
 
 impl LowMask for Natural {

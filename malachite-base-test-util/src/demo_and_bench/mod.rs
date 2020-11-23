@@ -29,7 +29,7 @@ macro_rules! unsigned_single_arg_bench {
             file_name: &str,
         ) {
             run_benchmark(
-                &format!("{}.significant_bits()", T::NAME),
+                &format!(concat!("{}.", stringify!($f), "()"), T::NAME),
                 BenchmarkType::Single,
                 unsigned_gen::<T>().get(gm, &config),
                 gm.name(),
@@ -51,7 +51,7 @@ macro_rules! signed_single_arg_bench {
             file_name: &str,
         ) {
             run_benchmark(
-                &format!("{}.significant_bits()", T::NAME),
+                &format!(concat!("{}.", stringify!($f), "()"), T::NAME),
                 BenchmarkType::Single,
                 signed_gen::<T>().get(gm, &config),
                 gm.name(),

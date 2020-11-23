@@ -5,6 +5,7 @@ use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_pow::{
     limbs_mod_pow_odd, limbs_mod_pow_odd_scratch_len,
 };
+use malachite_nz_test_util::natural::arithmetic::mod_pow::_simple_binary_mod_pow;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::quadruples_of_unsigned_vec_var_1;
@@ -31,6 +32,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Large,
         benchmark_natural_mod_pow_assign_evaluation_strategy
     );
+    register_bench!(registry, Large, benchmark_natural_mod_pow_algorithms);
     register_bench!(
         registry,
         Large,
@@ -256,6 +258,26 @@ fn benchmark_natural_mod_pow_assign_evaluation_strategy(
             (
                 "Natural.mod_pow_assign(&Natural, &Natural)",
                 &mut (|(mut x, exp, m)| no_out!(x.mod_pow_assign(&exp, &m))),
+            ),
+        ],
+    );
+}
+
+fn benchmark_natural_mod_pow_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark_old(
+        "Natural.mod_pow(Natural, Natural)",
+        BenchmarkType::Algorithms,
+        triples_of_naturals_var_5(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, _, ref m)| usize::exact_from(m.significant_bits())),
+        "m.significant_bits()",
+        &mut [
+            ("default", &mut (|(x, exp, m)| no_out!(x.mod_pow(exp, m)))),
+            (
+                "simple binary",
+                &mut (|(x, exp, m)| no_out!(_simple_binary_mod_pow(&x, &exp, &m))),
             ),
         ],
     );

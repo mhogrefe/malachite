@@ -302,8 +302,6 @@ impl BitBlockAccess for Natural {
         }
     }
 
-    //TODO clean
-
     /// Writes the bits of `bits` to `self`. The first index that the bits are written to in `self`
     /// is `start` and last index is `end - 1`. The bit indices do not need to be aligned with any
     /// limb boundaries. If `bits` has more than `end` - `start` bits, only the first

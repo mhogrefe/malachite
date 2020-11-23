@@ -10,9 +10,9 @@ impl Integer {
     //TODO test
     pub fn assign_str_radix(&mut self, src: &str, radix: u64) -> Result<(), ParseIntegerError> {
         assert_eq!(radix, 10);
-        if src.starts_with('-') {
+        if let Some(suffix) = src.strip_prefix('-') {
             self.sign = false;
-            self.abs.assign_str_radix(&src[1..], radix)?;
+            self.abs.assign_str_radix(suffix, radix)?;
         } else {
             self.sign = true;
             self.abs.assign_str_radix(src, radix)?;

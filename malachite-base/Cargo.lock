@@ -141,6 +141,7 @@ version = "0.1.0"
 dependencies = [
  "itertools",
  "malachite-base-test-util",
+ "maplit",
  "rand",
  "rand_chacha",
  "sha3",
@@ -157,6 +158,12 @@ dependencies = [
  "ryu",
  "time",
 ]
+
+[[package]]
+name = "maplit"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
 
 [[package]]
 name = "opaque-debug"

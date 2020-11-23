@@ -993,7 +993,10 @@ fn div_round_fail_helper<T: PrimitiveInt>() {
 
 fn div_round_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.div_round(T::NEGATIVE_ONE, RoundingMode::Floor));
-    assert_panic!(T::MIN.div_round_assign(T::NEGATIVE_ONE, RoundingMode::Floor));
+    assert_panic!({
+        let mut n = T::MIN;
+        n.div_round_assign(T::NEGATIVE_ONE, RoundingMode::Floor);
+    });
 }
 
 #[test]

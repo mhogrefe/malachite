@@ -814,9 +814,9 @@ fn _limbs_mul_fft_decompose<'a>(
     a_table
 }
 
-/// input: xss[0] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where N = n * Limb::WIDTH,
-/// and 2 ^ omega is a primitive root mod 2 ^ N + 1.
-/// output: xss[increment * bit_reverse_table[k][i]] <-
+/// input: xss\[0\] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where
+/// N = n * Limb::WIDTH, and 2 ^ omega is a primitive root mod 2 ^ N + 1.
+/// output: xss[increment * bit_reverse_table[k]\[i\]] <-
 ///      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
 ///
 /// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
@@ -898,11 +898,11 @@ pub fn _limbs_mul_fft_fft(
     }
 }
 
-/// input: xs ^ bit_reverse_table[k][0], xs ^ bit_reverse_table[k][1], ...,
+/// input: xs ^ bit_reverse_table\[k\]\[0\], xs ^ bit_reverse_table\[k\]\[1\], ...,
 ///      xs ^ bit_reverse_table[k][K-1]
-/// output: k * xss[0], k * xss[k - 1], ..., k * xss[1].
-/// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[][n] <= 1. This condition is also fulfilled
-/// at exit.
+/// output: k * xss\[0\], k * xss[k - 1], ..., k * xss\[1\].
+/// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[]\[n\] <= 1. This condition is also
+/// fulfilled at exit.
 ///
 /// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
 ///

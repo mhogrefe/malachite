@@ -7,6 +7,7 @@ pub mod eq_mod;
 pub mod mod_mul;
 pub mod mod_op;
 pub mod mod_pow;
+pub mod mod_power_of_two_pow;
 pub mod mod_power_of_two_square;
 pub mod mul;
 pub mod neg;

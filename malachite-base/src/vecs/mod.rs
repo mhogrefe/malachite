@@ -230,7 +230,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # lex_length_[n]_vecs
+/// # lex_length_\[n\]_vecs
 /// ```
 /// use malachite_base::vecs::exhaustive::lex_length_2_vecs;
 ///
@@ -247,7 +247,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// );
 /// ```
 ///
-/// # lex_fixed_length_vecs_[m]_inputs
+/// # lex_fixed_length_vecs_\[m\]_inputs
 /// ```
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -276,7 +276,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// );
 /// ```
 ///
-/// # exhaustive_length_[n]_vecs
+/// # exhaustive_length_\[n\]_vecs
 /// ```
 /// use malachite_base::vecs::exhaustive::exhaustive_length_2_vecs;
 ///
@@ -293,7 +293,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 /// );
 /// ```
 ///
-/// # exhaustive_fixed_length_vecs_[m]_inputs
+/// # exhaustive_fixed_length_vecs_\[m\]_inputs
 /// ```
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -332,7 +332,7 @@ pub mod exhaustive;
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # random_length_[n]_vecs
+/// # random_length_\[n\]_vecs
 /// ```
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -354,7 +354,7 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_fixed_length_vecs_[m]_inputs
+/// # random_fixed_length_vecs_\[m\]_inputs
 /// ```
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;

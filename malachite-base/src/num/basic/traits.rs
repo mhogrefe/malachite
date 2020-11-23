@@ -35,7 +35,7 @@ impl<T: One + Sized + Zero> Iverson for T {
     /// This function is known as the Iverson bracket.
     ///
     /// $$
-    /// f(P) = [P] = \\begin{cases}
+    /// f(P) = \[P\] = \\begin{cases}
     ///     1 & P \\\\
     ///     0 & \\text{otherwise}.
     /// \\end{cases}

@@ -7,18 +7,18 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `u32`s as the limbs of a `Natural` in ascending order, returns the
-/// Hamming distance between that `Natural` and a `u32`. Both have infinitely many implicit leading
-/// zeros. `limbs` cannot be empty.
+/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+/// Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading
+/// zeros. `xs` cannot be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```

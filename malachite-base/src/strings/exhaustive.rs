@@ -102,15 +102,15 @@ pub fn lex_fixed_length_strings(
 ///
 /// If `cs` is finite:
 ///
-/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt[n]{i}))$
+/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
 ///
-/// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
 ///
 /// If `cs` is infinite:
 ///
-/// $T(i, n) = O(n + T^\prime(\sqrt[n]{i}))$
+/// $T(i, n) = O(n + T^\prime(\sqrt\[n\]{i}))$
 ///
-/// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
 ///
 /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
 /// time and additional memory functions of `cs`.
@@ -144,9 +144,9 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// If `cs` is finite:
 ///
-/// $T(i, n) = O(556032^n \sqrt[n]{i})$
+/// $T(i, n) = O(556032^n \sqrt\[n\]{i})$
 ///
-/// $M(i, n) = O(n + \sqrt[n]{i})$
+/// $M(i, n) = O(n + \sqrt\[n\]{i})$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
 ///

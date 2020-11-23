@@ -62,7 +62,10 @@ fn test_div_exact() {
 
 fn div_exact_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.div_exact(T::ZERO));
-    assert_panic!(T::ONE.div_exact_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.div_exact_assign(T::ZERO);
+    });
 }
 
 #[test]

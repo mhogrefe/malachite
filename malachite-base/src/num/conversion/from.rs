@@ -20,7 +20,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::comparison::from` module.
+            /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn checked_from(value: $t) -> Option<$t> {
                 Some(value)
@@ -37,7 +37,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::comparison::from` module.
+            /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn wrapping_from(value: $t) -> $t {
                 value
@@ -54,7 +54,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::comparison::from` module.
+            /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn saturating_from(value: $t) -> $t {
                 value
@@ -72,7 +72,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::comparison::from` module.
+            /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn overflowing_from(value: $t) -> ($t, bool) {
                 (value, false)
@@ -88,7 +88,7 @@ macro_rules! identity_conversion {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::comparison::from` module.
+            /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn convertible_from(_: $t) -> bool {
                 true
@@ -114,7 +114,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
@@ -131,7 +131,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl WrappingFrom<$a> for $b {
             #[inline]
             fn wrapping_from(value: $a) -> $b {
@@ -148,7 +148,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
@@ -166,7 +166,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
@@ -182,7 +182,7 @@ macro_rules! lossless_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]
             fn convertible_from(_: $a) -> bool {
@@ -274,7 +274,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
@@ -300,7 +300,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
             #[inline]
@@ -338,7 +338,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
@@ -364,7 +364,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
@@ -392,7 +392,7 @@ macro_rules! lossy_conversion {
         ///
         /// # Examples
         ///
-        /// See the documentation of the `num::comparison::from` module.
+        /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]
             fn convertible_from(value: $a) -> bool {

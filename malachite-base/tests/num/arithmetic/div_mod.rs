@@ -321,12 +321,18 @@ fn test_div_mod_signed() {
 
 fn div_mod_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.div_mod(T::ZERO));
-    assert_panic!(T::ONE.div_assign_mod(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.div_assign_mod(T::ZERO);
+    });
 }
 
 fn div_mod_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.div_mod(T::NEGATIVE_ONE));
-    assert_panic!(T::MIN.div_assign_mod(T::NEGATIVE_ONE));
+    assert_panic!({
+        let mut n = T::MIN;
+        n.div_assign_mod(T::NEGATIVE_ONE);
+    });
 }
 
 #[test]
@@ -569,12 +575,18 @@ fn test_div_rem_signed() {
 
 fn div_rem_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.div_rem(T::ZERO));
-    assert_panic!(T::ONE.div_assign_rem(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.div_assign_rem(T::ZERO);
+    });
 }
 
 fn div_rem_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.div_rem(T::NEGATIVE_ONE));
-    assert_panic!(T::MIN.div_assign_rem(T::NEGATIVE_ONE));
+    assert_panic!({
+        let mut n = T::MIN;
+        n.div_assign_rem(T::NEGATIVE_ONE);
+    });
 }
 
 #[test]
@@ -652,7 +664,10 @@ fn test_ceiling_div_neg_mod() {
 
 fn ceiling_div_neg_mod_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!(T::ONE.ceiling_div_neg_mod(T::ZERO));
-    assert_panic!(T::ONE.ceiling_div_assign_neg_mod(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.ceiling_div_assign_neg_mod(T::ZERO);
+    });
 }
 
 #[test]
@@ -901,9 +916,15 @@ fn test_ceiling_div_mod() {
 
 fn ceiling_div_mod_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::ONE.ceiling_div_mod(T::ZERO));
-    assert_panic!(T::ONE.ceiling_div_assign_mod(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.ceiling_div_assign_mod(T::ZERO);
+    });
     assert_panic!(T::MIN.ceiling_div_mod(T::NEGATIVE_ONE));
-    assert_panic!(T::MIN.ceiling_div_assign_mod(T::NEGATIVE_ONE));
+    assert_panic!({
+        let mut n = T::MIN;
+        n.ceiling_div_assign_mod(T::NEGATIVE_ONE);
+    });
 }
 
 #[test]

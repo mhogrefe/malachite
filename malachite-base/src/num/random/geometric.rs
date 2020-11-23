@@ -351,9 +351,9 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -427,9 +427,9 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -512,9 +512,9 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ =
 /// `abs_um_numerator` + `abs_um_denominator`.
@@ -588,9 +588,9 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -664,9 +664,9 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -741,9 +741,9 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and
 /// $n$ = `abs_um_numerator` + `abs_um_denominator`.
@@ -835,9 +835,9 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and
 /// $n$ = `abs_um_numerator` + `abs_um_denominator`.
@@ -919,9 +919,9 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -1002,9 +1002,9 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -1103,9 +1103,9 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///
@@ -1222,9 +1222,9 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $E[T] = O(n)$
+/// $E\[T\] = O(n)$
 ///
-/// $E[M] = O(1)$
+/// $E\[M\] = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator` + `um_denominator`.
 ///

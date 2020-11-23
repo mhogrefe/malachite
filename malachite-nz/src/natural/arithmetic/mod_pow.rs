@@ -366,7 +366,7 @@ fn _simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
     }
     let mut out = Natural::ONE;
     for bit in exp.bits().rev() {
-        out.mod_mul_assign(out.clone(), m); // TODO use mod_square_assign
+        out.mod_mul_assign(out.clone(), m);
         if bit {
             out.mod_mul_assign(x, m);
         }

@@ -11,22 +11,18 @@ fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
 macro_rules! impl_partial_ord_abs {
     ($t:ident) => {
         impl PartialOrdAbs<$t> for $t {
-            /// Compare the absolute values of `self` and `other`, taking both by reference. The
-            /// `PartialOrdAbs` interface allows for pairs of incomparable elements, but for
+            /// Compares the absolute values of `self` and `other`, taking both by reference.
+            ///
+            /// The `PartialOrdAbs` interface allows for pairs of incomparable elements, but for
             /// primitive integers these never occur.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-            /// use std::cmp::Ordering;
             ///
-            /// assert_eq!(123i32.partial_cmp_abs(&-456), Some(Ordering::Less));
-            /// assert_eq!(123i32.partial_cmp_abs(&-123), Some(Ordering::Equal));
-            /// ```
+            /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 _partial_cmp_abs(self, other)
@@ -39,21 +35,17 @@ apply_to_primitive_ints!(impl_partial_ord_abs);
 macro_rules! impl_ord_abs_unsigned {
     ($t:ident) => {
         impl OrdAbs for $t {
-            /// Compare the absolute values of `self` and `other`, taking both by reference. For
-            /// unsigned values, this is the same as ordinary comparison.
+            /// Compares the absolute values of `self` and `other`, taking both by reference.
             ///
-            /// Time: worst case O(1)
+            /// For unsigned values, this is the same as ordinary comparison.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::comparison::traits::OrdAbs;
-            /// use std::cmp::Ordering;
             ///
-            /// assert_eq!(123u32.cmp_abs(&456), Ordering::Less);
-            /// assert_eq!(123u32.cmp_abs(&123), Ordering::Equal);
-            /// ```
+            /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
                 self.cmp(other)
@@ -70,20 +62,15 @@ fn _cmp_abs_signed<U: Ord, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> O
 macro_rules! impl_ord_abs_signed {
     ($t:ident) => {
         impl OrdAbs for $t {
-            /// Compare the absolute values of `self` and `other`, taking both by reference.
+            /// Compares the absolute values of `self` and `other`, taking both by reference.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::comparison::traits::OrdAbs;
-            /// use std::cmp::Ordering;
             ///
-            /// assert_eq!(123i32.cmp_abs(&-456), Ordering::Less);
-            /// assert_eq!(123i32.cmp_abs(&-123), Ordering::Equal);
-            /// ```
+            /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
                 _cmp_abs_signed(self, other)

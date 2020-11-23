@@ -1,6 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-
 use malachite_base_test_util::bench::bucketers::{
     pair_max_bit_bucketer, signed_bit_bucketer, triple_max_bit_bucketer, unsigned_bit_bucketer,
 };

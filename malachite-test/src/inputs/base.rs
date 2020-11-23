@@ -36,7 +36,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
     lex_pairs,
 };
-use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
+use malachite_base::vecs::exhaustive::{exhaustive_fixed_length_vecs_from_single, shortlex_vecs};
 use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
@@ -122,8 +122,8 @@ use rust_wheels::iterators::tuples::{
     random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::{
-    exhaustive_vecs, exhaustive_vecs_min_length, exhaustive_vecs_shortlex, random_vecs,
-    random_vecs_min_length, special_random_bool_vecs, special_random_unsigned_vecs,
+    exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
+    special_random_bool_vecs, special_random_unsigned_vecs,
     special_random_unsigned_vecs_min_length,
 };
 
@@ -5492,7 +5492,7 @@ pub fn triples_of_limb_vec_small_unsigned_and_small_unsigned_var_2<T: PrimitiveU
 
 pub fn vecs_of_bool(gm: GenerationMode) -> It<Vec<bool>> {
     match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_vecs_shortlex(exhaustive_bools())),
+        GenerationMode::Exhaustive => Box::new(shortlex_vecs(exhaustive_bools())),
         GenerationMode::Random(scale) => {
             Box::new(random_vecs(&EXAMPLE_SEED, scale, &(|seed| random(seed))))
         }
@@ -6877,8 +6877,11 @@ pub fn pairs_of_u64_and_unsigned_vec_var_1<
                 if log_base > U::WIDTH {
                     Box::new(repeat(None))
                 } else {
-                    let digit_vecs = if log_base == 1 {
-                        exhaustive_vecs_shortlex(primitive_int_increasing_range(U::ZERO, U::TWO))
+                    let digit_vecs: It<Vec<U>> = if log_base == 1 {
+                        Box::new(shortlex_vecs(primitive_int_increasing_range(
+                            U::ZERO,
+                            U::TWO,
+                        )))
                     } else if log_base == U::WIDTH {
                         Box::new(exhaustive_vecs(exhaustive_unsigneds()))
                     } else {
@@ -6944,8 +6947,11 @@ pub fn pairs_of_u64_and_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand + SampleR
                 if log_base > T::WIDTH {
                     Box::new(repeat(None))
                 } else {
-                    let digit_vecs = if log_base == 1 {
-                        exhaustive_vecs_shortlex(primitive_int_increasing_range(T::ZERO, T::TWO))
+                    let digit_vecs: It<Vec<T>> = if log_base == 1 {
+                        Box::new(shortlex_vecs(primitive_int_increasing_range(
+                            T::ZERO,
+                            T::TWO,
+                        )))
                     } else if log_base == T::WIDTH {
                         Box::new(exhaustive_vecs(exhaustive_unsigneds()))
                     } else {

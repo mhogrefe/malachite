@@ -14,7 +14,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
 ///
@@ -32,30 +32,29 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
 pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
-    let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if starting_limb_index >= xs.len() {
+    let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    if starting_index >= xs.len() {
         return start;
     }
-    if let Some(result) = xs[starting_limb_index].index_of_next_false_bit(start & Limb::WIDTH_MASK)
-    {
+    if let Some(result) = xs[starting_index].index_of_next_false_bit(start & Limb::WIDTH_MASK) {
         if result != Limb::WIDTH {
-            return (u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result;
+            return (u64::wrapping_from(starting_index) << Limb::LOG_WIDTH) + result;
         }
     }
-    if starting_limb_index == xs.len() - 1 {
+    if starting_index == xs.len() - 1 {
         return u64::wrapping_from(xs.len()) << Limb::LOG_WIDTH;
     }
-    let false_index = starting_limb_index
+    let false_index = starting_index
         + 1
-        + xs[starting_limb_index + 1..]
+        + xs[starting_index + 1..]
             .iter()
             .take_while(|&&y| y == Limb::MAX)
             .count();
-    let mut result_offset = false_index << Limb::LOG_WIDTH;
+    let mut result_offset = u64::exact_from(false_index) << Limb::LOG_WIDTH;
     if false_index != xs.len() {
-        result_offset += usize::wrapping_from((!xs[false_index]).trailing_zeros());
+        result_offset += TrailingZeros::trailing_zeros(!xs[false_index]);
     }
-    u64::wrapping_from(result_offset)
+    result_offset
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
@@ -66,7 +65,7 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
 ///
@@ -85,26 +84,26 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
 pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
-    let starting_limb_index = usize::exact_from(start >> Limb::LOG_WIDTH);
-    if starting_limb_index >= xs.len() {
-        return None;
-    }
-    if let Some(result) = xs[starting_limb_index].index_of_next_true_bit(start & Limb::WIDTH_MASK) {
-        return Some((u64::wrapping_from(starting_limb_index) << Limb::LOG_WIDTH) + result);
-    }
-    if starting_limb_index == xs.len() - 1 {
-        return None;
-    }
-    let true_index = starting_limb_index + 1 + slice_leading_zeros(&xs[starting_limb_index + 1..]);
-    if true_index == xs.len() {
+    let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
+    if starting_index >= xs.len() {
+        None
+    } else if let Some(result) = xs[starting_index].index_of_next_true_bit(start & Limb::WIDTH_MASK)
+    {
+        Some((u64::wrapping_from(starting_index) << Limb::LOG_WIDTH) + result)
+    } else if starting_index == xs.len() - 1 {
         None
     } else {
-        let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
-        Some(
-            result_offset
-                .checked_add(TrailingZeros::trailing_zeros(xs[true_index]))
-                .unwrap(),
-        )
+        let true_index = starting_index + 1 + slice_leading_zeros(&xs[starting_index + 1..]);
+        if true_index == xs.len() {
+            None
+        } else {
+            let result_offset = u64::wrapping_from(true_index) << Limb::LOG_WIDTH;
+            Some(
+                result_offset
+                    .checked_add(TrailingZeros::trailing_zeros(xs[true_index]))
+                    .unwrap(),
+            )
+        }
     }
 }
 

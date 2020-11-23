@@ -11,7 +11,7 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Examples
 /// ```
@@ -21,7 +21,7 @@ use platform::Limb;
 /// assert_eq!(limbs_count_ones(&[1, u32::MAX]), 33);
 /// ```
 pub fn limbs_count_ones(xs: &[Limb]) -> u64 {
-    xs.iter().map(|x| CountOnes::count_ones(*x)).sum()
+    xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }
 
 impl CountOnes for &Natural {

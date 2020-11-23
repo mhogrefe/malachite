@@ -217,7 +217,10 @@ fn test_div_mod_signed() {
 
 fn mod_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.mod_op(T::ZERO));
-    assert_panic!(T::ONE.mod_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.mod_assign(T::ZERO);
+    });
 }
 
 #[test]
@@ -272,7 +275,10 @@ fn test_neg_mod() {
 
 fn neg_mod_fail_helper<T: PrimitiveUnsigned>() {
     assert_panic!(T::ONE.neg_mod(T::ZERO));
-    assert_panic!(T::ONE.neg_mod_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.neg_mod_assign(T::ZERO);
+    });
 }
 
 #[test]
@@ -454,7 +460,10 @@ fn test_ceiling_mod() {
 
 fn ceiling_mod_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::ONE.ceiling_mod(T::ZERO));
-    assert_panic!(T::ONE.ceiling_mod_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.ceiling_mod_assign(T::ZERO);
+    });
 }
 
 #[test]

@@ -60,10 +60,22 @@ fn round_to_multiple_of_power_of_two_fail_helper<T: PrimitiveInt>() {
     assert_panic!(
         T::exact_from(10).round_to_multiple_of_power_of_two_assign(4, RoundingMode::Exact)
     );
-    assert_panic!(T::MAX.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Up));
-    assert_panic!(T::MAX.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Ceiling));
-    assert_panic!(T::MAX.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Nearest));
-    assert_panic!(T::ONE.round_to_multiple_of_power_of_two_assign(T::WIDTH, RoundingMode::Up));
+    assert_panic!({
+        let mut n = T::MAX;
+        n.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Up);
+    });
+    assert_panic!({
+        let mut n = T::MAX;
+        n.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Ceiling);
+    });
+    assert_panic!({
+        let mut n = T::MAX;
+        n.round_to_multiple_of_power_of_two_assign(4, RoundingMode::Nearest);
+    });
+    assert_panic!({
+        let mut n = T::ONE;
+        n.round_to_multiple_of_power_of_two_assign(T::WIDTH, RoundingMode::Up);
+    });
 }
 
 fn round_to_multiple_of_power_of_two_signed_fail_helper<T: PrimitiveSigned>() {

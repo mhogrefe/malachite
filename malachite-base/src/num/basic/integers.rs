@@ -31,7 +31,7 @@ use num::arithmetic::traits::{
     WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
-use num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
     CheckedFrom, CheckedInto, ExactFrom, ExactInto, OverflowingFrom, OverflowingInto,
     SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
@@ -139,6 +139,7 @@ pub trait PrimitiveInt:
     + DivRound<Self, Output = Self>
     + DivRoundAssign<Self>
     + Eq
+    + EqAbs<Self>
     + EqMod<Self, Self>
     + EqModPowerOfTwo<Self>
     + ExactFrom<u8>

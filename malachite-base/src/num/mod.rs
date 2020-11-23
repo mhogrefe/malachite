@@ -5,6 +5,7 @@ pub mod macros;
 pub mod arithmetic;
 /// This module defines the traits for primitive integers and some of their basic functionality.
 pub mod basic;
+/// This module provides traits for comparing the absolute values of numbers for equality or order.
 pub mod comparison;
 /// This module provides traits for converting to and from numbers.
 pub mod conversion;

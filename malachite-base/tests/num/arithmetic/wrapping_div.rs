@@ -21,7 +21,10 @@ fn test_wrapping_div() {
 }
 
 fn wrapping_div_assign_fail_helper<T: PrimitiveInt>() {
-    assert_panic!(T::ONE.wrapping_div_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.wrapping_div_assign(T::ZERO);
+    });
 }
 
 #[test]

@@ -1029,14 +1029,14 @@ pub fn _limbs_modular_div_mod_barrett(
 /// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
 ///
 /// The straightforward way to compute Q is to cancel one limb at a time, using
-///     qs[i] = D ^ (-1) * ns[i] mod 2 ^ `Limb::WIDTH`
-///     N -= 2 ^ (Limb::WIDTH * i) * qs[i] * D
+///     qs\[i\] = D ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
+///     N -= 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
 ///
 /// But we prefer addition to subtraction, since
 /// `limbs_slice_add_mul_limb_same_length_in_place_left` is often faster than
 /// `limbs_sub_mul_limb_same_length_in_place_left`. Q = -N / D can be computed by iterating
-///     qs[i] = (-D) ^ (-1) * ns[i] mod 2 ^ `Limb::WIDTH`
-///     N += 2 ^ (Limb::WIDTH * i) * qs[i] * D
+///     qs\[i\] = (-D) ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
+///     N += 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
 ///
 /// And then we flip the sign: -Q = ~Q + 1.
 ///

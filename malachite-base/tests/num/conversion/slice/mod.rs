@@ -1,8 +1,7 @@
-use std::fmt::Debug;
-
 use malachite_base::num::conversion::traits::{
     FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice,
 };
+use std::fmt::Debug;
 
 #[test]
 pub fn test_from_other_type_slice() {
@@ -15,7 +14,7 @@ pub fn test_from_other_type_slice() {
 
     test::<u8, u16>(&[0xab], 0xab);
     test::<u8, u16>(&[0xab, 0xcd], 0xcdab);
-    test::<u8, u16>(&[0xab, 0xcd, 0xef], 0xcdab);
+    test::<u8, u16>(&[0xab, 0xcd, 0xef], 0xcdab); 
     test::<u8, u64>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67],
         0x67452301efcdab,
@@ -45,14 +44,4 @@ pub fn test_vec_from_other_type_slice() {
         &[0xcdab, 0x01ef, 0x4523, 0x8967],
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89],
     );
-}
-
-#[test]
-pub fn test_vec_from_other_type() {
-    fn test<T: Debug + Eq, U: Debug + Eq + VecFromOtherType<T>>(value: T, vec: &[U]) {
-        assert_eq!(U::vec_from_other_type(value), vec);
-    };
-    test::<u32, u32>(123, &[123]);
-    test::<u8, u16>(0xab, &[0xab]);
-    test::<u16, u8>(0xcdab, &[0xab, 0xcd]);
 }

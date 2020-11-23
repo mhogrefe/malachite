@@ -98,10 +98,6 @@ pub mod base {
 
         pub mod conversion {
             pub mod from_other_type_slice;
-            pub mod lower_half;
-            pub mod split_in_half;
-            pub mod upper_half;
-            pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
         }
 
@@ -255,6 +251,7 @@ pub mod natural {
         pub mod mod_power_of_two_is_reduced;
         pub mod mod_power_of_two_mul;
         pub mod mod_power_of_two_neg;
+        pub mod mod_power_of_two_pow;
         pub mod mod_power_of_two_shl;
         pub mod mod_power_of_two_shr;
         pub mod mod_power_of_two_square;

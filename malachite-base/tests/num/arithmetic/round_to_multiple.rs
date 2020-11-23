@@ -1035,10 +1035,22 @@ fn round_to_multiple_fail_helper<T: PrimitiveInt>() {
     assert_panic!({
         T::exact_from(10).round_to_multiple_assign(T::exact_from(3), RoundingMode::Exact);
     });
-    assert_panic!(T::MAX.round_to_multiple_assign(T::TWO, RoundingMode::Ceiling));
-    assert_panic!(T::ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Up));
-    assert_panic!(T::ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Ceiling));
-    assert_panic!(T::ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Exact));
+    assert_panic!({
+        let mut n = T::MAX;
+        n.round_to_multiple_assign(T::TWO, RoundingMode::Ceiling);
+    });
+    assert_panic!({
+        let mut n = T::ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Up);
+    });
+    assert_panic!({
+        let mut n = T::ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Ceiling);
+    });
+    assert_panic!({
+        let mut n = T::ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Exact);
+    });
 }
 
 fn round_to_multiple_signed_fail_helper<T: PrimitiveSigned>() {
@@ -1047,10 +1059,22 @@ fn round_to_multiple_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::NEGATIVE_ONE.round_to_multiple(T::ZERO, RoundingMode::Floor));
     assert_panic!(T::NEGATIVE_ONE.round_to_multiple(T::ZERO, RoundingMode::Exact));
 
-    assert_panic!(T::MIN.round_to_multiple_assign(T::exact_from(3), RoundingMode::Floor));
-    assert_panic!(T::NEGATIVE_ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Up));
-    assert_panic!(T::NEGATIVE_ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Floor));
-    assert_panic!(T::NEGATIVE_ONE.round_to_multiple_assign(T::ZERO, RoundingMode::Exact));
+    assert_panic!({
+        let mut n = T::MIN;
+        n.round_to_multiple_assign(T::exact_from(3), RoundingMode::Floor);
+    });
+    assert_panic!({
+        let mut n = T::NEGATIVE_ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Up);
+    });
+    assert_panic!({
+        let mut n = T::NEGATIVE_ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Floor);
+    });
+    assert_panic!({
+        let mut n = T::NEGATIVE_ONE;
+        n.round_to_multiple_assign(T::ZERO, RoundingMode::Exact);
+    });
 }
 
 #[test]

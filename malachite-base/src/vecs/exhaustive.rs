@@ -8,7 +8,14 @@ use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
 use num::arithmetic::traits::CheckedPow;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::exhaustive::{
+    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    PrimitiveIntIncreasingRange,
+};
 use num::logic::traits::SignificantBits;
+use tuples::exhaustive::{
+    lex_dependent_pairs_stop_after_empty_ys, LexDependentPairs, LexDependentPairsYsGenerator,
+};
 
 pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
     let oi_sorted_unique = xs.unique().sorted().collect::<Vec<_>>();
@@ -627,9 +634,9 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If some of `xs`, `ys`, `zs`, ... are infinite, but all the infinite ones are associated
         /// with tiny outputs: Let $k$ be the number of outputs associated with the infinite
@@ -637,11 +644,11 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// additional memory complexities of the outputs' input iterators.
         ///
         /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))
+        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))
+        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
@@ -655,7 +662,7 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// iterators, and let $t$ be the number of tiny outputs associated with infinite iterators.
         /// Then define a weight function $W$ for each of the $k$ infinite outputs.
         /// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt[t]{\log i}$.
+        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
         ///
         /// Finally, we have
         ///
@@ -716,18 +723,18 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
         ///
         /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))
+        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))
+        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
@@ -953,16 +960,16 @@ where
 ///
 /// If all of `xs` is finite:
 ///
-/// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
+/// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
 ///
-/// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+/// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
 ///
 /// If `xs` is infinite:
 ///
 /// Let $s$ be the sum of the weights of the normal output types, and let $t$ be the number of tiny
 /// outputs. Then define a weight function $W$ for each of the $k$ infinite outputs.
 /// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-/// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt[t]{\log i}$.
+/// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
 ///
 /// Finally, we have
 ///
@@ -1036,15 +1043,15 @@ where
 ///
 /// If `xs` is finite:
 ///
-/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt[n]{i}))$
+/// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
 ///
-/// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
 ///
 /// If `xs` is infinite:
 ///
-/// $T(i, n) = O(n + T^\prime(\sqrt[n]{i}))$
+/// $T(i, n) = O(n + T^\prime(\sqrt\[n\]{i}))$
 ///
-/// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+/// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
 ///
 /// where $T$ is time, $M$ is additional memory, $n$ is `len`, and $T^\prime$ and $M^\prime$ are the
 /// time and additional memory functions of `xs`.
@@ -1071,4 +1078,310 @@ where
     I::Item: Clone,
 {
     exhaustive_fixed_length_vecs_1_input(xs, &vec![BitDistributorOutputType::normal(1); len])
+}
+
+#[derive(Clone, Debug)]
+pub struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
+    ys: J,
+}
+
+impl<Y: Clone, J: Clone + Iterator<Item = Y>>
+    LexDependentPairsYsGenerator<usize, Vec<Y>, LexFixedLengthVecsFromSingle<J>>
+    for LexVecsGenerator<Y, J>
+{
+    #[inline]
+    fn get_ys(&self, &x: &usize) -> LexFixedLengthVecsFromSingle<J> {
+        lex_fixed_length_vecs_from_single(x, self.ys.clone())
+    }
+}
+
+#[inline]
+fn shortlex_vecs_from_element_iterator_helper<
+    T: Clone,
+    I: Iterator<Item = usize>,
+    J: Clone + Iterator<Item = T>,
+>(
+    xs: I,
+    ys: J,
+) -> LexDependentPairs<usize, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>> {
+    lex_dependent_pairs_stop_after_empty_ys(xs, LexVecsGenerator { ys })
+}
+
+#[derive(Clone, Debug)]
+pub struct ShortlexVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>>(
+    LexDependentPairs<usize, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>>,
+);
+
+impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterator
+    for ShortlexVecs<T, I, J>
+{
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// iterator.
+///
+/// The length-generating iterator is `xs`, and the element-generating iterator is `ys`.
+///
+/// If the provided lengths are $\ell_0, \ell_1, \ell_2, \ldots$, then first all `Vec`s with length
+/// $\ell_0$ will be generated, in lexicographic order; then all `Vec`s with length $\ell_2$, and so
+/// on. If the lengths iterator has repetitions, then the generated `Vec`s will be repeated too.
+///
+/// `ys` must be finite; if it's infinite, the output will never get past the first nonzero $\ell$.
+///
+/// There's one quirk if `ys` is empty: then the iterator will stop as soon as it encounters a
+/// nonzero $\ell$, even if there are zeros later on. This prevents the iterator hanging when given
+/// an empty `ys` and lengths $0, 1, 2, \ldots$.
+///
+/// If `ys` is empty, the output length is the amount of zeros generated by `xs` before the first
+/// nonzero length. If `ys` is nonempty and `xs` is infinite, the output is infinite. Finally, if
+/// `ys` is nonempty and `xs` is finite, the output length is
+/// $$
+/// \sum_{k=0}^{m-1} n^{\ell_k},
+/// $$
+/// where $n$ is `ys.count()` and $m$ is `xs.count()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::nevers::nevers;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
+///
+/// let xss = exhaustive_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
+///     .collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[false, false][..], &[false, true], &[true, false], &[true, true], &[false], &[true],
+///         &[false, false], &[false, true], &[true, false], &[true, true]
+///     ]
+/// );
+///
+/// let xss = exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
+///     .collect::<Vec<_>>();
+/// // Stops after first empty ys
+/// assert_eq!(xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(), &[&[], &[]]);
+/// ```
+#[inline]
+pub fn exhaustive_vecs_from_length_iterator<
+    T: Clone,
+    I: Iterator<Item = usize>,
+    J: Clone + Iterator<Item = T>,
+>(
+    xs: I,
+    ys: J,
+) -> ShortlexVecs<T, I, J> {
+    ShortlexVecs(shortlex_vecs_from_element_iterator_helper(xs, ys))
+}
+
+/// Generates `Vec`s with elements from a specified iterator, in shortlex order.
+///
+/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
+/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
+/// specified by the input iterator.
+///
+/// `xs` must be finite; if it's infinite, only `Vec`s of length 0 and 1 are ever produced.
+///
+/// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::vecs::exhaustive::shortlex_vecs;
+///
+/// let bss = shortlex_vecs(exhaustive_bools()).take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[][..], &[false], &[true], &[false, false], &[false, true], &[true, false],
+///         &[true, true], &[false, false, false], &[false, false, true], &[false, true, false],
+///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[true, true, true], &[false, false, false, false], &[false, false, false, true],
+///         &[false, false, true, false], &[false, false, true, true], &[false, true, false, false]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_vecs<I: Clone + Iterator>(
+    xs: I,
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
+}
+
+/// Generates all `Vec`s with a minimum length and with elements from a specified iterator, in
+/// shortlex order.
+///
+/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
+/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
+/// specified by the input iterator.
+///
+/// `xs` must be finite; if it's infinite, only `Vec`s of length `min_length` (or 0 and 1, if
+/// `min_length` is 0) are ever produced.
+///
+/// If `xs` is empty and `min_length` is 0, the output length is 1; if `xs` is empty and
+/// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
+///
+/// let bss = shortlex_vecs_min_length(2, exhaustive_bools()).take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[false, false][..], &[false, true], &[true, false], &[true, true],
+///         &[false, false, false], &[false, false, true], &[false, true, false],
+///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[true, true, true], &[false, false, false, false], &[false, false, false, true],
+///         &[false, false, true, false], &[false, false, true, true], &[false, true, false, false],
+///         &[false, true, false, true], &[false, true, true, false], &[false, true, true, true]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_vecs_min_length<I: Clone + Iterator>(
+    min_length: usize,
+    xs: I,
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(
+        primitive_int_increasing_inclusive_range(min_length, usize::MAX),
+        xs,
+    )
+}
+
+/// Generates all `Vec`s with lengths in $[a, b)$ and with elements from a specified iterator, in
+/// shortlex order.
+///
+/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
+/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
+/// specified by the input iterator.
+///
+/// `xs` must be finite; if it's infinite and $a < b$, only `Vec`s of length `a` (or 0 and 1, if `a`
+/// is 0) are ever produced.
+///
+/// The output length is
+/// $$
+/// \sum_{k=a}^{b-1} n^k,
+/// $$
+/// where $k$ is `xs.count()`.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::vecs::exhaustive::shortlex_vecs_length_range;
+///
+/// let bss = shortlex_vecs_length_range(2, 4, exhaustive_bools()).collect::<Vec<_>>();
+/// assert_eq!(
+///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[false, false][..], &[false, true], &[true, false], &[true, true],
+///         &[false, false, false], &[false, false, true], &[false, true, false],
+///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[true, true, true]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_vecs_length_range<I: Clone + Iterator>(
+    a: usize,
+    b: usize,
+    xs: I,
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
+}
+
+/// Generates all `Vec`s with lengths in $[a, b]$ and with elements from a specified iterator, in
+/// shortlex order.
+///
+/// Shortlex order means that the `Vec`s are output from shortest to longest, and `Vec`s of the same
+/// length are output in lexicographic order with respect to the ordering of the `Vec` elements
+/// specified by the input iterator.
+///
+/// `xs` must be finite; if it's infinite, only `Vec`s of length `a` (or 0 and 1, if `a` is 0) are
+/// ever produced.
+///
+/// The output length is
+/// $$
+/// \sum_{k=a}^b n^k,
+/// $$
+/// where $k$ is `xs.count()`.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::vecs::exhaustive::shortlex_vecs_length_inclusive_range;
+///
+/// let bss = shortlex_vecs_length_inclusive_range(2, 3, exhaustive_bools()).collect::<Vec<_>>();
+/// assert_eq!(
+///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[false, false][..], &[false, true], &[true, false], &[true, true],
+///         &[false, false, false], &[false, false, true], &[false, true, false],
+///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[true, true, true]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_vecs_length_inclusive_range<I: Clone + Iterator>(
+    a: usize,
+    b: usize,
+    xs: I,
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(primitive_int_increasing_inclusive_range(a, b), xs)
 }

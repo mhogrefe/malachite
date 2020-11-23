@@ -616,16 +616,16 @@ macro_rules! exhaustive_tuples_1_input {
         ///
         /// If all of `xs` is finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If `xs` is infinite:
         ///
         /// Let $s$ be the sum of the weights of the normal output types, and let $t$ be the number
         /// of tiny outputs. Then define a weight function $W$ for each of the $k$ infinite outputs.
         /// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt[t]{\log i}$.
+        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
         ///
         /// Finally, we have
         ///
@@ -671,15 +671,15 @@ macro_rules! exhaustive_tuples_1_input {
         ///
         /// If `xs` is finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
         ///
         /// If `xs` is infinite:
         ///
-        /// $T(i, n) = O(n + T^\prime(\sqrt[n]{i}))$
+        /// $T(i, n) = O(n + T^\prime(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + M^\prime(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + M^\prime(\sqrt\[n\]{i}))$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the width of the tuples, and
         /// $T^\prime$ and $M^\prime$ are the time and additional memory functions of `xs`.
@@ -903,9 +903,9 @@ macro_rules! exhaustive_tuples {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If some of `xs`, `ys`, `zs`, ... are infinite, but all the infinite ones are associated
         /// with tiny outputs: Let $k$ be the number of outputs associated with the infinite
@@ -913,11 +913,11 @@ macro_rules! exhaustive_tuples {
         /// additional memory complexities of the outputs' input iterators.
         ///
         /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt[n]{i}))
+        /// T(i, n) = O(n + \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))
+        /// M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
@@ -931,7 +931,7 @@ macro_rules! exhaustive_tuples {
         /// iterators, and let $t$ be the number of tiny outputs associated with infinite iterators.
         /// Then define a weight function $W$ for each of the $k$ infinite outputs.
         /// - If the $j$th output has a normal output type with weight $w$, $W_j(i)=i^{w/s}$.
-        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt[t]{\log i}$.
+        /// - If the $j$th output has a tiny output type, $W_j(i)=\sqrt\[t\]{\log i}$.
         ///
         /// Finally, we have
         ///
@@ -974,18 +974,18 @@ macro_rules! exhaustive_tuples {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
         ///
         /// $$
-        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))
+        /// T(i, n) = O(n + \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// $$
-        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))
+        /// M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))
         /// $$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the width of the tuples, and
@@ -1221,15 +1221,15 @@ macro_rules! custom_tuples {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
         ///
-        /// $T(i, n) = O(P(n + \sum_{j=0}^{k-1}T_j(\sqrt[n]{i})))$
+        /// $T(i, n) = O(P(n + \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i})))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the width of the tuples, $T_j$ and
         /// $M_j$ are the time and additional memory functions of the input iterator corresponding
@@ -1275,15 +1275,15 @@ macro_rules! custom_tuples {
         ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
-        /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt[n]{i}))$
+        /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{n-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// If $k$ of `xs`, `ys`, `zs`, ... are infinite:
         ///
-        /// $T(i, n) = O(P(n + \sum_{j=0}^{k-1}T_j(\sqrt[n]{i})))$
+        /// $T(i, n) = O(P(n + \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i})))$
         ///
-        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt[n]{i}))$
+        /// $M(i, n) = O(n + \sum_{j=0}^{k-1}M_j(\sqrt\[n\]{i}))$
         ///
         /// where $T$ is time, $M$ is additional memory, $n$ is the width of the tuples, $T_j$ and
         /// $M_j$ are the time and additional memory functions of the input iterator corresponding
@@ -1358,3 +1358,125 @@ custom_tuples!(
         [2, output_type_ys_2]
     ]
 );
+
+//TODO doc
+pub trait LexDependentPairsYsGenerator<X: Clone, Y, J: Iterator<Item = Y>> {
+    fn get_ys(&self, x: &X) -> J;
+}
+
+//TODO doc
+#[derive(Clone, Debug)]
+pub struct LexDependentPairs<
+    X: Clone,
+    Y,
+    S: LexDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+> {
+    done: bool,
+    stop_after_empty_ys: bool,
+    xs: I,
+    ys: Option<J>,
+    x: Option<X>,
+    ys_generator: S,
+}
+
+impl<
+        X: Clone,
+        Y,
+        S: LexDependentPairsYsGenerator<X, Y, J>,
+        I: Iterator<Item = X>,
+        J: Iterator<Item = Y>,
+    > LexDependentPairs<X, Y, S, I, J>
+{
+    fn advance_xs(&mut self) -> bool {
+        if let Some(next_x) = self.xs.next() {
+            self.x = Some(next_x);
+            self.ys = Some(self.ys_generator.get_ys(self.x.as_ref().unwrap()));
+            false
+        } else {
+            true
+        }
+    }
+}
+
+impl<
+        X: Clone,
+        Y,
+        S: LexDependentPairsYsGenerator<X, Y, J>,
+        I: Iterator<Item = X>,
+        J: Iterator<Item = Y>,
+    > Iterator for LexDependentPairs<X, Y, S, I, J>
+{
+    type Item = (X, Y);
+
+    fn next(&mut self) -> Option<(X, Y)> {
+        if self.done {
+            None
+        } else {
+            let mut new_ys = false;
+            if self.x.is_none() {
+                if self.advance_xs() {
+                    self.done = true;
+                    return None;
+                } else {
+                    new_ys = true;
+                }
+            }
+            loop {
+                if let Some(y) = self.ys.as_mut().unwrap().next() {
+                    return Some((self.x.as_ref().unwrap().clone(), y));
+                } else if self.stop_after_empty_ys && new_ys || self.advance_xs() {
+                    self.done = true;
+                    return None;
+                } else {
+                    new_ys = true;
+                }
+            }
+        }
+    }
+}
+
+//TODO doc
+#[inline]
+pub fn lex_dependent_pairs<
+    X: Clone,
+    Y,
+    S: LexDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+>(
+    xs: I,
+    ys_generator: S,
+) -> LexDependentPairs<X, Y, S, I, J> {
+    LexDependentPairs {
+        done: false,
+        stop_after_empty_ys: false,
+        xs,
+        ys: None,
+        x: None,
+        ys_generator,
+    }
+}
+
+//TODO doc
+#[inline]
+pub fn lex_dependent_pairs_stop_after_empty_ys<
+    X: Clone,
+    Y,
+    S: LexDependentPairsYsGenerator<X, Y, J>,
+    I: Iterator<Item = X>,
+    J: Iterator<Item = Y>,
+>(
+    xs: I,
+    ys_generator: S,
+) -> LexDependentPairs<X, Y, S, I, J> {
+    LexDependentPairs {
+        done: false,
+        stop_after_empty_ys: true,
+        xs,
+        ys: None,
+        x: None,
+        ys_generator,
+    }
+}

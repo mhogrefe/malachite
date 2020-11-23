@@ -281,7 +281,10 @@ fn flip_bit_fail_helper_unsigned<T: PrimitiveUnsigned>() {
 
 fn flip_bit_fail_helper_signed<T: PrimitiveSigned>() {
     assert_panic!(T::exact_from(5).flip_bit(200));
-    assert_panic!(T::NEGATIVE_ONE.flip_bit(200));
+    assert_panic!({
+        let mut n = T::NEGATIVE_ONE;
+        n.flip_bit(200);
+    });
 }
 
 #[test]

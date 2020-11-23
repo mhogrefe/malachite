@@ -34,6 +34,8 @@ extern crate itertools;
 extern crate malachite_base;
 #[macro_use]
 extern crate malachite_base_test_util;
+#[macro_use]
+extern crate maplit;
 extern crate rand;
 extern crate rand_chacha;
 
@@ -261,18 +263,27 @@ pub mod num {
         pub mod iverson;
     }
     pub mod comparison {
+        pub mod eq_abs_partial_eq_abs_and_comparators;
         pub mod ord_abs_partial_ord_abs_and_comparators;
     }
     pub mod conversion {
-        pub mod checked_from_and_exact_from;
-        pub mod convertible_from;
-        pub mod from;
-        pub mod half;
-        pub mod join_halves;
-        pub mod overflowing_from;
-        pub mod saturating_from;
-        pub mod slice;
-        pub mod wrapping_from;
+        pub mod froms {
+            pub mod checked_from_and_exact_from;
+            pub mod convertible_from;
+            pub mod from;
+            pub mod overflowing_from;
+            pub mod saturating_from;
+            pub mod wrapping_from;
+        }
+        pub mod half {
+            pub mod join_halves;
+            pub mod lower_half;
+            pub mod split_in_half;
+            pub mod upper_half;
+        }
+        pub mod slice {
+            pub mod vec_from_other_type;
+        }
     }
     pub mod exhaustive {
         pub mod exhaustive_natural_signeds;
@@ -433,9 +444,15 @@ pub mod vecs {
         pub mod exhaustive_fixed_length_vecs_from_single;
         pub mod exhaustive_fixed_length_vecs_m_inputs;
         pub mod exhaustive_length_n_vecs;
+        pub mod exhaustive_vecs_from_length_iterator;
+        pub mod lex_dependent_pairs;
         pub mod lex_fixed_length_vecs_from_single;
         pub mod lex_fixed_length_vecs_m_inputs;
         pub mod lex_length_n_vecs;
+        pub mod shortlex_vecs;
+        pub mod shortlex_vecs_length_inclusive_range;
+        pub mod shortlex_vecs_length_range;
+        pub mod shortlex_vecs_min_length;
     }
     pub mod random {
         pub mod random_fixed_length_vecs;

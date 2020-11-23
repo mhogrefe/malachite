@@ -1,0 +1,117 @@
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoNeg, ModPowerOfTwoPow,
+    ModPowerOfTwoPowAssign, Parity,
+};
+use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+
+use malachite_test::common::{test_properties, test_properties_no_special};
+use malachite_test::inputs::base::triples_of_unsigned_unsigned_and_small_u64_var_2;
+use malachite_test::inputs::natural::{
+    pairs_of_natural_and_u64_var_1, pairs_of_natural_and_unsigned,
+    quadruples_of_three_naturals_and_u64_var_2, quadruples_of_three_naturals_and_u64_var_3,
+    triples_of_natural_natural_and_u64_var_2,
+};
+
+#[test]
+fn mod_power_of_two_pow_properties() {
+    test_properties(
+        triples_of_natural_natural_and_u64_var_2,
+        |&(ref x, ref exp, pow)| {
+            assert!(x.mod_power_of_two_is_reduced(pow));
+            let power_val_val = x.clone().mod_power_of_two_pow(exp.clone(), pow);
+            let power_val_ref = x.clone().mod_power_of_two_pow(exp, pow);
+            let power_ref_val = x.mod_power_of_two_pow(exp.clone(), pow);
+            let power = x.mod_power_of_two_pow(exp, pow);
+            assert!(power_val_val.is_valid());
+            assert!(power_val_ref.is_valid());
+            assert!(power_ref_val.is_valid());
+            assert!(power.is_valid());
+            assert!(power.mod_power_of_two_is_reduced(pow));
+            assert_eq!(power_val_val, power);
+            assert_eq!(power_val_ref, power);
+            assert_eq!(power_ref_val, power);
+
+            let mut mut_x = x.clone();
+            mut_x.mod_power_of_two_pow_assign(exp.clone(), pow);
+            assert!(mut_x.is_valid());
+            assert_eq!(mut_x, power);
+            let mut mut_x = x.clone();
+            mut_x.mod_power_of_two_pow_assign(exp, pow);
+            assert_eq!(mut_x, power);
+            assert!(mut_x.is_valid());
+
+            if exp.even() {
+                assert_eq!(
+                    x.mod_power_of_two_neg(pow).mod_power_of_two_pow(exp, pow),
+                    power
+                );
+            } else {
+                assert_eq!(
+                    x.mod_power_of_two_neg(pow).mod_power_of_two_pow(exp, pow),
+                    power.mod_power_of_two_neg(pow)
+                );
+            }
+        },
+    );
+
+    test_properties(pairs_of_natural_and_unsigned, |&(ref exp, pow)| {
+        assert_eq!(
+            Natural::ZERO.mod_power_of_two_pow(exp, pow),
+            Natural::iverson(*exp == 0 && pow != 0),
+        );
+        if pow != 0 {
+            assert_eq!(Natural::ONE.mod_power_of_two_pow(exp, pow), 1);
+        }
+    });
+
+    test_properties(pairs_of_natural_and_u64_var_1, |&(ref x, pow)| {
+        assert_eq!(
+            x.mod_power_of_two_pow(Natural::ZERO, pow),
+            Natural::iverson(pow != 0)
+        );
+        assert_eq!(x.mod_power_of_two_pow(Natural::ONE, pow), *x);
+        assert_eq!(
+            x.mod_power_of_two_pow(Natural::TWO, pow),
+            x.mod_power_of_two_mul(x, pow)
+        );
+    });
+
+    test_properties(
+        quadruples_of_three_naturals_and_u64_var_2,
+        |&(ref x, ref y, ref exp, pow)| {
+            assert_eq!(
+                x.mod_power_of_two_mul(y, pow)
+                    .mod_power_of_two_pow(exp, pow),
+                x.mod_power_of_two_pow(exp, pow)
+                    .mod_power_of_two_mul(y.mod_power_of_two_pow(exp, pow), pow)
+            );
+        },
+    );
+
+    test_properties(
+        quadruples_of_three_naturals_and_u64_var_3,
+        |&(ref x, ref e, ref f, pow)| {
+            assert_eq!(
+                x.mod_power_of_two_pow(e + f, pow),
+                x.mod_power_of_two_pow(e, pow)
+                    .mod_power_of_two_mul(x.mod_power_of_two_pow(f, pow), pow)
+            );
+            assert_eq!(
+                x.mod_power_of_two_pow(e * f, pow),
+                x.mod_power_of_two_pow(e, pow).mod_power_of_two_pow(f, pow)
+            );
+        },
+    );
+
+    test_properties_no_special(
+        triples_of_unsigned_unsigned_and_small_u64_var_2::<Limb>,
+        |&(x, exp, pow)| {
+            assert_eq!(
+                x.mod_power_of_two_pow(exp, pow),
+                Natural::from(x).mod_power_of_two_pow(Natural::from(exp), pow)
+            );
+        },
+    );
+}

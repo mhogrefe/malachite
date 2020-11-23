@@ -5,16 +5,16 @@ use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the bitwise or of the `Natural` and a `Limb`. `limbs` cannot be empty.
+/// limbs of the bitwise or of the `Natural` and a `Limb`. `xs` cannot be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```
@@ -30,16 +30,16 @@ pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the bitwise or of the `Natural` and a `Limb` to an output slice. The output slice must
-/// be at least as long as the input slice. `in_limbs` cannot be empty.
+/// be at least as long as the input slice. `xs` cannot be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
+/// Panics if `out` is shorter than `xs` or if `xs` is empty.
 ///
 /// # Examples
 /// ```
@@ -55,15 +55,14 @@ pub fn limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the bitwise or of the `Natural` and a `Limb` to the input slice. `limbs` cannot be
-/// empty.
+/// limbs of the bitwise or of the `Natural` and a `Limb` to the input slice. `xs` cannot be empty.
 ///
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```
@@ -127,15 +126,15 @@ pub fn limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
+    let mut result;
     if xs_len >= ys_len {
-        let mut result = limbs_or_same_length(&xs[..ys_len], ys);
+        result = limbs_or_same_length(&xs[..ys_len], ys);
         result.extend_from_slice(&xs[ys_len..]);
-        result
     } else {
-        let mut result = limbs_or_same_length(xs, &ys[..xs_len]);
+        result = limbs_or_same_length(xs, &ys[..xs_len]);
         result.extend_from_slice(&ys[xs_len..]);
-        result
     }
+    result
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -169,8 +168,8 @@ pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    for i in 0..xs.len() {
-        out[i] = xs[i] | ys[i];
+    for (out_x, (x, y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
+        *out_x = x | y;
     }
 }
 
@@ -243,8 +242,8 @@ pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// ```
 pub fn limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
-    for i in 0..xs.len() {
-        xs[i] |= ys[i];
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        *x |= y;
     }
 }
 
@@ -326,13 +325,13 @@ pub fn limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 pub fn limbs_or_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    if xs_len >= ys_len {
-        limbs_or_same_length_in_place_left(&mut xs[..ys_len], ys);
-        false
-    } else {
+    let right = xs_len < ys_len;
+    if right {
         limbs_or_same_length_in_place_left(&mut ys[..xs_len], xs);
-        true
+    } else {
+        limbs_or_same_length_in_place_left(&mut xs[..ys_len], ys);
     }
+    right
 }
 
 impl Natural {
@@ -357,29 +356,29 @@ impl Natural {
     }
 }
 
-/// Takes the bitwise or of two `Natural`s, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-///     "1000000004095");
-/// ```
 impl BitOr<Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise or of two `Natural`s, taking both by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
+    /// assert_eq!((Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
+    ///     "1000000004095");
+    /// ```
     #[inline]
     fn bitor(mut self, other: Natural) -> Natural {
         self |= other;
@@ -387,30 +386,30 @@ impl BitOr<Natural> for Natural {
     }
 }
 
-/// Takes the bitwise or of two `Natural`s, taking the left `Natural` by value and the right
-/// `Natural` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-///     "1000000004095");
-/// ```
 impl<'a> BitOr<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise or of two `Natural`s, taking the left `Natural` by value and the right
+    /// `Natural` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
+    /// assert_eq!((Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
+    ///     "1000000004095");
+    /// ```
     #[inline]
     fn bitor(mut self, other: &'a Natural) -> Natural {
         self |= other;
@@ -418,30 +417,30 @@ impl<'a> BitOr<&'a Natural> for Natural {
     }
 }
 
-/// Takes the bitwise or of two `Natural`s, taking the left `Natural` by reference and the right
-/// `Natural` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((&Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
-///     "1000000004095");
-/// ```
 impl<'a> BitOr<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Takes the bitwise or of two `Natural`s, taking the left `Natural` by reference and the right
+    /// `Natural` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) | Natural::from(456u32)).to_string(), "507");
+    /// assert_eq!((&Natural::trillion() | (Natural::trillion() - Natural::ONE)).to_string(),
+    ///     "1000000004095");
+    /// ```
     #[inline]
     fn bitor(self, mut other: Natural) -> Natural {
         other |= self;
@@ -449,29 +448,29 @@ impl<'a> BitOr<Natural> for &'a Natural {
     }
 }
 
-/// Takes the bitwise or of two `Natural`s, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
-/// assert_eq!((&Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
-///     "1000000004095");
-/// ```
 impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Takes the bitwise or of two `Natural`s, taking both `Natural`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) | &Natural::from(456u32)).to_string(), "507");
+    /// assert_eq!((&Natural::trillion() | &(Natural::trillion() - Natural::ONE)).to_string(),
+    ///     "1000000004095");
+    /// ```
     fn bitor(self, other: &'a Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.or_limb_ref(y),
@@ -481,31 +480,33 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     }
 }
 
-/// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x |= Natural::from(0x0000000fu32);
-/// x |= Natural::from(0x00000f00u32);
-/// x |= Natural::from(0x000f_0000u32);
-/// x |= Natural::from(0x0f000000u32);
-/// assert_eq!(x, 0x0f0f_0f0f);
-/// ```
+//TODO clean
+
 impl BitOrAssign<Natural> for Natural {
+    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
+    /// value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x |= Natural::from(0x0000000fu32);
+    /// x |= Natural::from(0x00000f00u32);
+    /// x |= Natural::from(0x000f_0000u32);
+    /// x |= Natural::from(0x0f000000u32);
+    /// assert_eq!(x, 0x0f0f_0f0f);
+    /// ```
     fn bitor_assign(&mut self, other: Natural) {
         if let Natural(Small(y)) = other {
             self.or_assign_limb(y);
@@ -521,31 +522,31 @@ impl BitOrAssign<Natural> for Natural {
     }
 }
 
-/// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x |= &Natural::from(0x0000000fu32);
-/// x |= &Natural::from(0x00000f00u32);
-/// x |= &Natural::from(0x000f_0000u32);
-/// x |= &Natural::from(0x0f000000u32);
-/// assert_eq!(x, 0x0f0f_0f0f);
-/// ```
 impl<'a> BitOrAssign<&'a Natural> for Natural {
+    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
+    /// reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x |= &Natural::from(0x0000000fu32);
+    /// x |= &Natural::from(0x00000f00u32);
+    /// x |= &Natural::from(0x000f_0000u32);
+    /// x |= &Natural::from(0x0f000000u32);
+    /// assert_eq!(x, 0x0f0f_0f0f);
+    /// ```
     fn bitor_assign(&mut self, other: &'a Natural) {
         if let Natural(Small(y)) = *other {
             self.or_assign_limb(y);

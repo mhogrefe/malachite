@@ -40,7 +40,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # lex_[n]_tuples
+/// # lex_\[n\]_tuples
 /// ```
 /// use malachite_base::tuples::exhaustive::lex_pairs;
 ///
@@ -53,7 +53,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 ///
-/// # lex_[n]_tuples_from_single
+/// # lex_\[n\]_tuples_from_single
 /// ```
 /// use malachite_base::tuples::exhaustive::lex_pairs_from_single;
 ///

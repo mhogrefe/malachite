@@ -128,33 +128,33 @@ impl BitConvertible for Natural {
     /// );
     /// ```
     fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Natural {
-        let mut limbs = Vec::new();
+        let mut out = Vec::new();
         let mut last_width = 0;
         for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
-            let mut limb = 0;
+            let mut x = 0;
             let mut i = 0;
             for bit in chunk {
-                limb <<= 1;
+                x <<= 1;
                 if bit {
-                    limb |= 1;
+                    x |= 1;
                 }
                 i += 1;
             }
             last_width = i;
-            limbs.push(limb);
+            out.push(x);
         }
-        match limbs.len() {
+        match out.len() {
             0 => Natural::ZERO,
-            1 => Natural::from(limbs[0]),
+            1 => Natural::from(out[0]),
             _ => {
-                limbs.reverse();
+                out.reverse();
                 if last_width != Limb::WIDTH {
-                    let smallest_limb = limbs[0];
-                    limbs[0] = 0;
-                    limbs_slice_shr_in_place(&mut limbs, Limb::WIDTH - last_width);
-                    limbs[0] |= smallest_limb;
+                    let out_0 = out[0];
+                    out[0] = 0;
+                    limbs_slice_shr_in_place(&mut out, Limb::WIDTH - last_width);
+                    out[0] |= out_0;
                 }
-                Natural::from_owned_limbs_asc(limbs)
+                Natural::from_owned_limbs_asc(out)
             }
         }
     }

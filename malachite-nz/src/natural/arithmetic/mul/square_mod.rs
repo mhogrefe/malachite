@@ -88,8 +88,8 @@ fn _limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n
 
 /// Computes {out, min(n, 2 * xs.len())} <- xs ^ 2 mod (B ^ n - 1)
 ///
-/// The result is expected to be zero if and only if the operand already is. Otherwise the class [0]
-/// mod (B ^ n - 1) is represented by B ^ n - 1.
+/// The result is expected to be zero if and only if the operand already is. Otherwise the class
+/// \[0\] mod (B ^ n - 1) is represented by B ^ n - 1.
 ///
 /// It should not be a problem if `_limbs_square_mod_base_pow_n_minus_1` is used to compute the full
 /// square with xs.len() <= 2 * n, because this condition implies (B ^ xs.len() - 1) ^ 2 <

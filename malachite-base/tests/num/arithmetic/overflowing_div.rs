@@ -21,7 +21,10 @@ fn test_overflowing_div() {
 }
 
 fn overflowing_div_assign_fail_helper<T: PrimitiveInt>() {
-    assert_panic!(T::ONE.overflowing_div_assign(T::ZERO));
+    assert_panic!({
+        let mut n = T::ONE;
+        n.overflowing_div_assign(T::ZERO);
+    });
 }
 
 #[test]
