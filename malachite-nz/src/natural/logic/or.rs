@@ -1,3 +1,4 @@
+use std::mem::swap;
 use std::ops::{BitOr, BitOrAssign};
 
 use natural::InnerNatural::{Large, Small};
@@ -68,9 +69,9 @@ pub fn limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 /// ```
 /// use malachite_nz::natural::logic::or::limbs_or_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_or_limb_in_place(&mut limbs, 789);
-/// assert_eq!(limbs, &[895, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_or_limb_in_place(&mut xs, 789);
+/// assert_eq!(xs, &[895, 456]);
 /// ```
 pub fn limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] |= y;
@@ -156,13 +157,13 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 /// use malachite_nz::natural::logic::or::limbs_or_same_length_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_or_same_length_to_out(limbs, &[6, 7], &[1, 2]);
-/// assert_eq!(limbs, &[7, 7, 10, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_or_same_length_to_out(xs, &[6, 7], &[1, 2]);
+/// assert_eq!(xs, &[7, 7, 10, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_or_same_length_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(limbs, &[102, 101, 102, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_or_same_length_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
+/// assert_eq!(xs, &[102, 101, 102, 10]);
 /// ```
 pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
@@ -192,13 +193,13 @@ pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// ```
 /// use malachite_nz::natural::logic::or::limbs_or_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_or_to_out(limbs, &[6, 7], &[1, 2, 3]);
-/// assert_eq!(limbs, &[7, 7, 3, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_or_to_out(xs, &[6, 7], &[1, 2, 3]);
+/// assert_eq!(xs, &[7, 7, 3, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_or_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(limbs, &[102, 101, 102, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_or_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
+/// assert_eq!(xs, &[102, 101, 102, 10]);
 /// ```
 pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -480,8 +481,6 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
     }
 }
 
-//TODO clean
-
 impl BitOrAssign<Natural> for Natural {
     /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
     /// value.
@@ -507,15 +506,13 @@ impl BitOrAssign<Natural> for Natural {
     /// x |= Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
-    fn bitor_assign(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.or_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.or_limb(x);
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_or_in_place_either(xs, &mut ys) {
-                    *xs = ys;
+    fn bitor_assign(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.or_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *self = other.or_limb(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_or_in_place_either(xs, ys) {
+                    swap(xs, ys);
                 }
             }
         }
@@ -548,12 +545,10 @@ impl<'a> BitOrAssign<&'a Natural> for Natural {
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
     fn bitor_assign(&mut self, other: &'a Natural) {
-        if let Natural(Small(y)) = *other {
-            self.or_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.or_limb_ref(x);
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.or_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *self = other.or_limb_ref(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_or_in_place_left(xs, ys);
             }
         }

@@ -35,6 +35,14 @@ impl BitDistributorOutputType {
         }
     }
 
+    /// Creates a tiny output.
+    ///
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
+    ///
+    /// The corresponding element grows logarithmically. See the `BitDistributor` documentation for
+    /// more.
     pub const fn tiny() -> BitDistributorOutputType {
         BitDistributorOutputType {
             weight: 0,

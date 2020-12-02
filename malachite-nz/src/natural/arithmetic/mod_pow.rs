@@ -1,7 +1,7 @@
 use std::cmp::{max, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
-    ModMulAssign, ModPow, ModPowAssign, ModPowerOfTwo, Parity, WrappingNegAssign,
+    ModMulAssign, ModPow, ModPowAssign, ModPowerOfTwo, Parity, PowerOfTwo, WrappingNegAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -37,9 +37,9 @@ use platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THR
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //
-// This is getbits from mpn/generic/powm.c, GMP 6.1.2.
-fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> Limb {
-    if end < len {
+// This is getbits from mpn/generic/powm.c and mpn/generic/powlo.c, GMP 6.1.2.
+pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
+    usize::exact_from(if end < len {
         xs[0].mod_power_of_two(end)
     } else {
         end -= len;
@@ -51,7 +51,7 @@ fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> Limb {
             bits += xs[i + 1] << coend;
         }
         bits.mod_power_of_two(len)
-    }
+    })
 }
 
 // This is mpn_redc_1 from mpn/generic/redc_1.c, GMP 6.1.2.
@@ -82,7 +82,7 @@ fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) 
 const WIDTH_LIMITS: [u64; 10] = [7, 25, 81, 241, 673, 1793, 4609, 11521, 28161, u64::MAX];
 
 // This is win_size from mpn/generic/powm.c, GMP 6.1.2.
-fn get_window_size(width: u64) -> u64 {
+pub(crate) fn get_window_size(width: u64) -> u64 {
     u64::wrapping_from(
         WIDTH_LIMITS
             .iter()
@@ -293,33 +293,27 @@ pub fn limbs_mod_pow_odd(
         redc_fn = &limbs_redc_helper;
     }
     let mut powers = vec![0; ms_len << (window_size - 1)];
-    to_redc(&mut powers, xs, ms);
+    let mut powers: Vec<&mut [Limb]> = powers.chunks_mut(ms_len).collect();
+    to_redc(powers[0], xs, ms);
     // Store x ^ 2 at `out`.
-    limbs_square_to_out(scratch, &powers[..ms_len]);
+    limbs_square_to_out(scratch, powers[0]);
     redc_fn(out, scratch, ms, is);
-    // Precompute odd powers of x and put them in the temporary area at `powers`.
-    let mut chunks = powers.chunks_mut(ms_len);
-    let mut power = chunks.next().unwrap();
-    loop {
-        let next_power = chunks.next();
-        if next_power.is_none() {
-            break;
-        }
-        limbs_mul_same_length_to_out(scratch, power, out);
-        power = next_power.unwrap();
-        redc_fn(power, scratch, ms, is);
+    // Precompute odd powers of x and put them in `powers`.
+    for i in 1..usize::power_of_two(window_size - 1) {
+        let (powers_lo, powers_hi) = powers.split_at_mut(i);
+        limbs_mul_same_length_to_out(scratch, powers_lo[i - 1], out);
+        redc_fn(powers_hi[0], scratch, ms, is);
     }
-    let exp_bits = usize::exact_from(get_bits(es, width, window_size));
+    let exp_bits = get_bits(es, width, window_size);
     let mut bit_index = if width < window_size {
         fail_on_untested_path("limbs_mod_pow_odd, width < window_size");
         0
     } else {
         width - window_size
     };
-    let trailing_zeros = TrailingZeros::trailing_zeros(exp_bits);
+    let trailing_zeros = TrailingZeros::trailing_zeros(Limb::exact_from(exp_bits));
     bit_index += trailing_zeros;
-    let m = ms_len * (exp_bits >> trailing_zeros >> 1);
-    out.copy_from_slice(&powers[m..m + ms_len]);
+    out.copy_from_slice(powers[exp_bits >> trailing_zeros >> 1]);
     let (mul_fn, square_fn, reduce_fn) = select_fns(ms_len);
     'outer: while bit_index != 0 {
         while !limbs_get_bit(es, bit_index - 1) {
@@ -332,7 +326,7 @@ pub fn limbs_mod_pow_odd(
         }
         // The next bit of the exponent is 1. Now extract the largest block of bits <= window_size,
         // and such that the least significant bit is 1.
-        let exp_bits = usize::exact_from(get_bits(es, bit_index, window_size));
+        let exp_bits = get_bits(es, bit_index, window_size);
         let mut this_window_size = window_size;
         if bit_index < window_size {
             this_window_size -= window_size - bit_index;
@@ -340,14 +334,13 @@ pub fn limbs_mod_pow_odd(
         } else {
             bit_index -= window_size;
         }
-        let trailing_zeros = TrailingZeros::trailing_zeros(exp_bits);
+        let trailing_zeros = TrailingZeros::trailing_zeros(Limb::exact_from(exp_bits));
         bit_index += trailing_zeros;
         for _ in 0..this_window_size - trailing_zeros {
             square_fn(scratch, out);
             reduce_fn(out, scratch, ms, is);
         }
-        let m = ms_len * (exp_bits >> trailing_zeros >> 1);
-        mul_fn(scratch, out, &powers[m..m + ms_len]);
+        mul_fn(scratch, out, powers[exp_bits >> trailing_zeros >> 1]);
         reduce_fn(out, scratch, ms, is);
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(ms_len);

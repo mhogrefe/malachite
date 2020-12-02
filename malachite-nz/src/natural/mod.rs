@@ -90,7 +90,7 @@ impl Natural {
         }
     }
 
-    /// A `Large` value used for testing.
+    /// A `Large` value (when using 32-bit limbs) used for testing.
     pub fn trillion() -> Natural {
         Natural::from_str("1000000000000").unwrap()
     }

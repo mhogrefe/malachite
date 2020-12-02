@@ -5,30 +5,9 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
 
 use generators::common::Generator;
-use generators::exhaustive::{
-    exhaustive_bool_gen, exhaustive_char_gen, exhaustive_char_gen_var_1, exhaustive_char_gen_var_2,
-    exhaustive_char_pair_gen, exhaustive_primitive_int_gen_var_1, exhaustive_rounding_mode_gen,
-    exhaustive_rounding_mode_pair_gen, exhaustive_rounding_mode_triple_gen, exhaustive_signed_gen,
-    exhaustive_signed_gen_var_1, exhaustive_signed_gen_var_2, exhaustive_signed_pair_gen,
-    exhaustive_signed_triple_gen, exhaustive_unsigned_gen, exhaustive_unsigned_gen_var_1,
-    exhaustive_unsigned_pair_gen, exhaustive_unsigned_pair_gen_var_1,
-    exhaustive_unsigned_triple_gen,
-};
-use generators::random::{
-    random_bool_gen, random_char_gen, random_char_gen_var_1, random_char_gen_var_2,
-    random_char_pair_gen, random_primitive_int_gen, random_primitive_int_pair_gen,
-    random_primitive_int_triple_gen, random_rounding_mode_gen, random_rounding_mode_pair_gen,
-    random_rounding_mode_triple_gen, random_signed_gen_var_1, random_signed_gen_var_2,
-    random_unsigned_gen_var_1, random_unsigned_gen_var_2, random_unsigned_pair_gen_var_1,
-};
-use generators::special_random::{
-    special_random_char_gen, special_random_char_gen_var_1, special_random_char_gen_var_2,
-    special_random_char_pair_gen, special_random_signed_gen, special_random_signed_gen_var_1,
-    special_random_signed_gen_var_2, special_random_signed_pair_gen,
-    special_random_signed_triple_gen, special_random_unsigned_gen,
-    special_random_unsigned_gen_var_1, special_random_unsigned_pair_gen,
-    special_random_unsigned_triple_gen,
-};
+use generators::exhaustive::*;
+use generators::random::*;
+use generators::special_random::*;
 
 // general
 
@@ -160,6 +139,18 @@ pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
     )
 }
 
+// -- (PrimitiveSigned, PrimitiveUnsigned) --
+
+/// All `(T, U)`s where `T` is signed, `U` is unsigned, and the `U` is small.
+pub fn signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_2,
+        &random_primitive_int_unsigned_pair_gen_var_1,
+        &special_random_signed_unsigned_pair_gen_var_1,
+    )
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn unsigned_gen<T: PrimitiveUnsigned>() -> Generator<T> {
@@ -199,6 +190,25 @@ pub fn unsigned_pair_gen_var_1() -> Generator<(u32, u32)> {
     Generator::new_no_special(
         &exhaustive_unsigned_pair_gen_var_1,
         &random_unsigned_pair_gen_var_1,
+    )
+}
+
+/// All `(T, U)`s where `T` and `U` are unsigned and the `U` is small.
+pub fn unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_2,
+        &random_primitive_int_unsigned_pair_gen_var_1,
+        &special_random_unsigned_pair_gen_var_1,
+    )
+}
+
+/// All `(T, u64)`s where `T` is unsigned and the `U` is smaller than `T::WIDTH`.
+/// TODO unsigned set_bit
+pub fn unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_3,
+        &random_primitive_int_unsigned_pair_gen_var_2,
+        &special_random_unsigned_pair_gen_var_2,
     )
 }
 

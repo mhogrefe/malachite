@@ -1,3 +1,4 @@
+use std::mem::swap;
 use std::ops::{BitXor, BitXorAssign};
 
 use natural::InnerNatural::{Large, Small};
@@ -5,16 +6,16 @@ use natural::Natural;
 use platform::Limb;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the bitwise xor of the `Natural` and a `Limb`. `limbs` cannot be empty.
+/// limbs of the bitwise xor of the `Natural` and a `Limb`. `xs` cannot be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(n)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```
@@ -30,16 +31,16 @@ pub fn limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 /// limbs of the bitwise xor of the `Natural` and a `Limb` to an output slice. The output slice must
-/// be at least as long as the input slice. `in_limbs` cannot be empty.
+/// be at least as long as the input slice. `xs` cannot be empty.
 ///
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `out` is shorter than `in_limbs` or if `in_limbs` is empty.
+/// Panics if `out` is shorter than `xs` or if `xs` is empty.
 ///
 /// # Examples
 /// ```
@@ -55,24 +56,24 @@ pub fn limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 }
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the bitwise xor of the `Natural` and a `Limb` to the input slice. `limbs` cannot be
-/// empty.
+/// limbs of the bitwise xor of the `Natural` and a `Limb` to the input slice. `xs` cannot be empty.
 ///
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
 ///
 /// # Panics
-/// Panics if `in_limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_limb_in_place;
 ///
-/// let mut limbs = vec![123, 456];
-/// limbs_xor_limb_in_place(&mut limbs, 789);
-/// assert_eq!(limbs, &[878, 456]);
+/// let mut xs = vec![123, 456];
+/// limbs_xor_limb_in_place(&mut xs, 789);
+/// assert_eq!(xs, &[878, 456]);
 /// ```
+#[inline]
 pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] ^= y;
 }
@@ -127,15 +128,15 @@ pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
+    let mut result;
     if xs_len >= ys_len {
-        let mut result = limbs_xor_same_length(&xs[..ys_len], ys);
+        result = limbs_xor_same_length(&xs[..ys_len], ys);
         result.extend_from_slice(&xs[ys_len..]);
-        result
     } else {
-        let mut result = limbs_xor_same_length(xs, &ys[..xs_len]);
+        result = limbs_xor_same_length(xs, &ys[..xs_len]);
         result.extend_from_slice(&ys[xs_len..]);
-        result
     }
+    result
 }
 
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
@@ -157,20 +158,20 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_same_length_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_xor_same_length_to_out(limbs, &[6, 7], &[1, 2]);
-/// assert_eq!(limbs, &[7, 5, 10, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_xor_same_length_to_out(xs, &[6, 7], &[1, 2]);
+/// assert_eq!(xs, &[7, 5, 10, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_xor_same_length_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(limbs, &[2, 0, 2, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_xor_same_length_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
+/// assert_eq!(xs, &[2, 0, 2, 10]);
 /// ```
 pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
-    for i in 0..xs.len() {
-        out[i] = xs[i] ^ ys[i];
+    for (z, (x, y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
+        *z = x ^ y;
     }
 }
 
@@ -193,13 +194,13 @@ pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// ```
 /// use malachite_nz::natural::logic::xor::limbs_xor_to_out;
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_xor_to_out(limbs, &[6, 7], &[1, 2, 3]);
-/// assert_eq!(limbs, &[7, 5, 3, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_xor_to_out(xs, &[6, 7], &[1, 2, 3]);
+/// assert_eq!(xs, &[7, 5, 3, 10]);
 ///
-/// let limbs = &mut [10, 10, 10, 10];
-/// limbs_xor_to_out(limbs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(limbs, &[2, 0, 2, 10]);
+/// let xs = &mut [10, 10, 10, 10];
+/// limbs_xor_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
+/// assert_eq!(xs, &[2, 0, 2, 10]);
 /// ```
 pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -243,8 +244,8 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// ```
 pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
-    for i in 0..xs.len() {
-        xs[i] ^= ys[i];
+    for (x, y) in xs.iter_mut().zip(ys.iter()) {
+        *x ^= y;
     }
 }
 
@@ -326,13 +327,13 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 pub fn limbs_xor_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    if xs_len >= ys_len {
-        limbs_xor_same_length_in_place_left(&mut xs[..ys_len], ys);
-        false
-    } else {
+    let right = xs_len < ys_len;
+    if right {
         limbs_xor_same_length_in_place_left(&mut ys[..xs_len], xs);
-        true
+    } else {
+        limbs_xor_same_length_in_place_left(&mut xs[..ys_len], ys);
     }
+    right
 }
 
 impl Natural {
@@ -357,28 +358,28 @@ impl Natural {
     }
 }
 
-/// Takes the bitwise xor of two `Natural`s, taking both by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
-/// assert_eq!((Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(), "8191");
-/// ```
 impl BitXor<Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise xor of two `Natural`s, taking both by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
+    /// assert_eq!(Natural::trillion() ^ (Natural::trillion() - Natural::ONE), 8191);
+    /// ```
     #[inline]
     fn bitxor(mut self, other: Natural) -> Natural {
         self ^= other;
@@ -386,29 +387,29 @@ impl BitXor<Natural> for Natural {
     }
 }
 
-/// Takes the bitwise xor of two `Natural`s, taking the left `Natural` by value and the right
-/// `Natural` by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
-/// assert_eq!((Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(), "8191");
-/// ```
 impl<'a> BitXor<&'a Natural> for Natural {
     type Output = Natural;
 
+    /// Takes the bitwise xor of two `Natural`s, taking the left `Natural` by value and the right
+    /// `Natural` by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
+    /// assert_eq!(Natural::trillion() ^ &(Natural::trillion() - Natural::ONE), 8191);
+    /// ```
     #[inline]
     fn bitxor(mut self, other: &'a Natural) -> Natural {
         self ^= other;
@@ -416,29 +417,29 @@ impl<'a> BitXor<&'a Natural> for Natural {
     }
 }
 
-/// Takes the bitwise xor of two `Natural`s, taking the left `Natural` by reference and the right
-/// `Natural` by value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `self.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
-/// assert_eq!((&Natural::trillion() ^ (Natural::trillion() - Natural::ONE)).to_string(), "8191");
-/// ```
 impl<'a> BitXor<Natural> for &'a Natural {
     type Output = Natural;
 
+    /// Takes the bitwise xor of two `Natural`s, taking the left `Natural` by reference and the
+    /// right `Natural` by value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `self.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) ^ Natural::from(456u32)).to_string(), "435");
+    /// assert_eq!(&Natural::trillion() ^ (Natural::trillion() - Natural::ONE), 8191);
+    /// ```
     #[inline]
     fn bitxor(self, mut other: Natural) -> Natural {
         other ^= self;
@@ -446,28 +447,28 @@ impl<'a> BitXor<Natural> for &'a Natural {
     }
 }
 
-/// Takes the bitwise xor of two `Natural`s, taking both `Natural`s by reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `max(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::One;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!((&Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
-/// assert_eq!((&Natural::trillion() ^ &(Natural::trillion() - Natural::ONE)).to_string(), "8191");
-/// ```
 impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
     type Output = Natural;
 
+    /// Takes the bitwise xor of two `Natural`s, taking both `Natural`s by reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `max(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!((&Natural::from(123u32) ^ &Natural::from(456u32)).to_string(), "435");
+    /// assert_eq!(&Natural::trillion() ^ &(Natural::trillion() - Natural::ONE), 8191);
+    /// ```
     fn bitxor(self, other: &'a Natural) -> Natural {
         match (self, other) {
             (x, &Natural(Small(y))) => x.xor_limb_ref(y),
@@ -479,82 +480,78 @@ impl<'a, 'b> BitXor<&'a Natural> for &'b Natural {
     }
 }
 
-/// Bitwise-xors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// value.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `min(self.significant_bits(), other.significant_bits)`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x ^= Natural::from(0x0000000fu32);
-/// x ^= Natural::from(0x00000f00u32);
-/// x ^= Natural::from(0x000f_0000u32);
-/// x ^= Natural::from(0x0f000000u32);
-/// assert_eq!(x, 0x0f0f_0f0f);
-/// ```
 impl BitXorAssign<Natural> for Natural {
-    fn bitxor_assign(&mut self, other: Natural) {
-        if let Natural(Small(y)) = other {
-            self.xor_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.xor_limb(x);
-        } else if let Natural(Large(mut ys)) = other {
-            if let Natural(Large(ref mut xs)) = *self {
-                if limbs_xor_in_place_either(xs, &mut ys) {
-                    *xs = ys;
+    /// Bitwise-xors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
+    /// value.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(1)
+    ///
+    /// where n = `min(self.significant_bits(), other.significant_bits)`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x ^= Natural::from(0x0000000fu32);
+    /// x ^= Natural::from(0x00000f00u32);
+    /// x ^= Natural::from(0x000f_0000u32);
+    /// x ^= Natural::from(0x0f000000u32);
+    /// assert_eq!(x, 0x0f0f_0f0f);
+    /// ```
+    fn bitxor_assign(&mut self, mut other: Natural) {
+        match (&mut *self, &mut other) {
+            (_, Natural(Small(y))) => self.xor_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *self = other.xor_limb(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref mut ys))) => {
+                if limbs_xor_in_place_either(xs, ys) {
+                    swap(xs, ys);
                 }
+                self.trim();
             }
-            self.trim();
         }
     }
 }
 
-/// Bitwise-xors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// reference.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `other.significant_bits`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::num::basic::traits::Zero;
-/// use malachite_nz::natural::Natural;
-///
-/// let mut x = Natural::ZERO;
-/// x |= Natural::from(0x0000000fu32);
-/// x |= Natural::from(0x00000f00u32);
-/// x |= Natural::from(0x000f_0000u32);
-/// x |= Natural::from(0x0f000000u32);
-/// assert_eq!(x, 0x0f0f_0f0f);
-/// ```
 impl<'a> BitXorAssign<&'a Natural> for Natural {
+    /// Bitwise-xors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
+    /// reference.
+    ///
+    /// Time: worst case O(n)
+    ///
+    /// Additional memory: worst case O(n)
+    ///
+    /// where n = `other.significant_bits`
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut x = Natural::ZERO;
+    /// x |= Natural::from(0x0000000fu32);
+    /// x |= Natural::from(0x00000f00u32);
+    /// x |= Natural::from(0x000f_0000u32);
+    /// x |= Natural::from(0x0f000000u32);
+    /// assert_eq!(x, 0x0f0f_0f0f);
+    /// ```
     fn bitxor_assign(&mut self, other: &'a Natural) {
-        if let Natural(Small(y)) = *other {
-            self.xor_assign_limb(y);
-        } else if let Natural(Small(x)) = *self {
-            *self = other.xor_limb_ref(x);
-        } else if let Natural(Large(ref ys)) = *other {
-            if let Natural(Large(ref mut xs)) = *self {
+        match (&mut *self, other) {
+            (_, Natural(Small(y))) => self.xor_assign_limb(*y),
+            (Natural(Small(ref mut x)), _) => *self = other.xor_limb_ref(*x),
+            (Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
                 limbs_xor_in_place_left(xs, ys);
+                self.trim();
             }
-            self.trim();
         }
     }
 }

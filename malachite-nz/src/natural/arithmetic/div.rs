@@ -1050,12 +1050,16 @@ pub fn _limbs_div_divide_and_conquer_approx(
                 }
                 ns_hi[b] = n_0;
                 if carry {
-                    fail_on_untested_path("_limbs_div_divide_and_conquer_approx, carry");
                     n_1.wrapping_add_assign(d_1);
                     if limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a]) {
+                        fail_on_untested_path(
+                            "_limbs_div_divide_and_conquer_approx, \
+                            limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])",
+                        );
                         n_1.wrapping_add_assign(1);
                     }
                     if q == 0 {
+                        fail_on_untested_path("_limbs_div_divide_and_conquer_approx, q == 0");
                         assert!(highest_q);
                         highest_q = false;
                     }

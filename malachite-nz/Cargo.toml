@@ -21,14 +21,14 @@ serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 lto = true
 
 [dev-dependencies]
-num = "0.2.0"
+num = "0.3.1"
 malachite-base-test-util = { path = "../malachite-base-test-util" }
 malachite-nz-test-util = { path = "../malachite-nz-test-util" }
 serde = "^1.0.0"
 serde_json = "^1.0.32"
 
 [dev-dependencies.rug]
-version = "^1.2.0"
+version = "1.11.0"
 default-features = false
 features = ["integer"]
 

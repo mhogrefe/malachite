@@ -12,9 +12,11 @@ use num::exhaustive::{
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
 };
+use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::SignificantBits;
 use tuples::exhaustive::{
-    lex_dependent_pairs_stop_after_empty_ys, LexDependentPairs, LexDependentPairsYsGenerator,
+    exhaustive_dependent_pairs_stop_after_empty_ys, lex_dependent_pairs_stop_after_empty_ys,
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };
 
 pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
@@ -1080,13 +1082,14 @@ where
     exhaustive_fixed_length_vecs_1_input(xs, &vec![BitDistributorOutputType::normal(1); len])
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
     ys: J,
 }
 
 impl<Y: Clone, J: Clone + Iterator<Item = Y>>
-    LexDependentPairsYsGenerator<usize, Vec<Y>, LexFixedLengthVecsFromSingle<J>>
+    ExhaustiveDependentPairsYsGenerator<usize, Vec<Y>, LexFixedLengthVecsFromSingle<J>>
     for LexVecsGenerator<Y, J>
 {
     #[inline]
@@ -1107,6 +1110,8 @@ fn shortlex_vecs_from_element_iterator_helper<
     lex_dependent_pairs_stop_after_empty_ys(xs, LexVecsGenerator { ys })
 }
 
+/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// iterator.
 #[derive(Clone, Debug)]
 pub struct ShortlexVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>>(
     LexDependentPairs<usize, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>>,
@@ -1117,6 +1122,7 @@ impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterato
 {
     type Item = Vec<T>;
 
+    #[inline]
     fn next(&mut self) -> Option<Vec<T>> {
         self.0.next().map(|p| p.1)
     }
@@ -1149,9 +1155,9 @@ impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterato
 /// ```
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
-/// use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
+/// use malachite_base::vecs::exhaustive::shortlex_vecs_from_length_iterator;
 ///
-/// let xss = exhaustive_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
+/// let xss = shortlex_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
 ///     .collect::<Vec<_>>();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
@@ -1161,13 +1167,13 @@ impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterato
 ///     ]
 /// );
 ///
-/// let xss = exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
+/// let xss = shortlex_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
 ///     .collect::<Vec<_>>();
 /// // Stops after first empty ys
 /// assert_eq!(xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(), &[&[], &[]]);
 /// ```
 #[inline]
-pub fn exhaustive_vecs_from_length_iterator<
+pub fn shortlex_vecs_from_length_iterator<
     T: Clone,
     I: Iterator<Item = usize>,
     J: Clone + Iterator<Item = T>,
@@ -1187,6 +1193,8 @@ pub fn exhaustive_vecs_from_length_iterator<
 /// `xs` must be finite; if it's infinite, only `Vec`s of length 0 and 1 are ever produced.
 ///
 /// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
 ///
@@ -1220,7 +1228,7 @@ pub fn shortlex_vecs<I: Clone + Iterator>(
 where
     I::Item: Clone,
 {
-    exhaustive_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
+    shortlex_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
 }
 
 /// Generates all `Vec`s with a minimum length and with elements from a specified iterator, in
@@ -1235,6 +1243,8 @@ where
 ///
 /// If `xs` is empty and `min_length` is 0, the output length is 1; if `xs` is empty and
 /// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
 ///
@@ -1270,7 +1280,7 @@ pub fn shortlex_vecs_min_length<I: Clone + Iterator>(
 where
     I::Item: Clone,
 {
-    exhaustive_vecs_from_length_iterator(
+    shortlex_vecs_from_length_iterator(
         primitive_int_increasing_inclusive_range(min_length, usize::MAX),
         xs,
     )
@@ -1291,6 +1301,8 @@ where
 /// \sum_{k=a}^{b-1} n^k,
 /// $$
 /// where $k$ is `xs.count()`.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
 ///
@@ -1328,7 +1340,7 @@ pub fn shortlex_vecs_length_range<I: Clone + Iterator>(
 where
     I::Item: Clone,
 {
-    exhaustive_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
+    shortlex_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
 }
 
 /// Generates all `Vec`s with lengths in $[a, b]$ and with elements from a specified iterator, in
@@ -1346,6 +1358,8 @@ where
 /// \sum_{k=a}^b n^k,
 /// $$
 /// where $k$ is `xs.count()`.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
 ///
@@ -1380,6 +1394,314 @@ pub fn shortlex_vecs_length_inclusive_range<I: Clone + Iterator>(
     b: usize,
     xs: I,
 ) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    shortlex_vecs_from_length_iterator(primitive_int_increasing_inclusive_range(a, b), xs)
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct ExhaustiveVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
+    ys: J,
+}
+
+impl<Y: Clone, J: Clone + Iterator<Item = Y>>
+    ExhaustiveDependentPairsYsGenerator<usize, Vec<Y>, ExhaustiveFixedLengthVecs1Input<J>>
+    for ExhaustiveVecsGenerator<Y, J>
+{
+    #[inline]
+    fn get_ys(&self, &x: &usize) -> ExhaustiveFixedLengthVecs1Input<J> {
+        exhaustive_fixed_length_vecs_1_input(
+            self.ys.clone(),
+            &vec![BitDistributorOutputType::normal(1); x],
+        )
+    }
+}
+
+#[allow(clippy::type_complexity)]
+#[inline]
+fn exhaustive_vecs_from_element_iterator_helper<
+    T: Clone,
+    I: Iterator<Item = usize>,
+    J: Clone + Iterator<Item = T>,
+>(
+    xs: I,
+    ys: J,
+) -> ExhaustiveDependentPairs<
+    usize,
+    Vec<T>,
+    RulerSequence<usize>,
+    ExhaustiveVecsGenerator<T, J>,
+    I,
+    ExhaustiveFixedLengthVecs1Input<J>,
+> {
+    exhaustive_dependent_pairs_stop_after_empty_ys(
+        ruler_sequence(),
+        xs,
+        ExhaustiveVecsGenerator { ys },
+    )
+}
+
+/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// iterator.
+#[allow(clippy::type_complexity)]
+#[derive(Clone, Debug)]
+pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>>(
+    ExhaustiveDependentPairs<
+        usize,
+        Vec<T>,
+        RulerSequence<usize>,
+        ExhaustiveVecsGenerator<T, J>,
+        I,
+        ExhaustiveFixedLengthVecs1Input<J>,
+    >,
+);
+
+impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterator
+    for ExhaustiveVecs<T, I, J>
+{
+    type Item = Vec<T>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<T>> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all `Vec`s with elements from a specified iterator and with lengths from another
+/// iterator.
+///
+/// The length-generating iterator is `xs`, and the element-generating iterator is `ys`.
+///
+/// If the lengths iterator has repetitions, then the generated `Vec`s will be repeated too.
+///
+/// There's one quirk if `ys` is empty: then the iterator will stop at some point after it
+/// encounters a nonzero $\ell$, even if there are zeros later on. This prevents the iterator
+/// hanging when given an empty `ys` and lengths $0, 1, 2, \ldots$.
+///
+/// - If `ys` is empty, the output length is finite.
+/// - If `ys` is infinite, the output length is infinite.
+/// - If `ys` is nonempty and finite, and `xs` is infinite, the output is infinite.
+/// - If `ys` is nonempty and finite, and `xs` is finite, the output length is
+///   $$
+///   \sum_{k=0}^{m-1} n^{\ell_k},
+///   $$
+///   where $n$ is `ys.count()` and $m$ is `xs.count()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::nevers::nevers;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
+///
+/// let xss = exhaustive_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
+///     .collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[false, false][..], &[false], &[false, true], &[false, false], &[true, false], &[true],
+///         &[true, true], &[false, true], &[true, false], &[true, true]
+///     ]
+/// );
+///
+/// let xss = exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
+///     .collect::<Vec<_>>();
+/// // Stops at some point after first empty ys
+/// assert_eq!(xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(), &[&[], &[]]);
+/// ```
+#[inline]
+pub fn exhaustive_vecs_from_length_iterator<
+    T: Clone,
+    I: Iterator<Item = usize>,
+    J: Clone + Iterator<Item = T>,
+>(
+    xs: I,
+    ys: J,
+) -> ExhaustiveVecs<T, I, J> {
+    ExhaustiveVecs(exhaustive_vecs_from_element_iterator_helper(xs, ys))
+}
+
+/// Generates `Vec`s with elements from a specified iterator.
+///
+/// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_unsigneds;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs;
+///
+/// let xss = exhaustive_vecs(exhaustive_unsigneds::<u32>()).take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[][..], &[0], &[1], &[0, 0, 0], &[2], &[0, 0], &[3], &[0, 0, 0, 0], &[4], &[0, 1],
+///         &[5], &[0, 0, 1], &[6], &[1, 0], &[7], &[0, 0, 0, 0, 0], &[8], &[1, 1], &[9], &[0, 1, 0]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs<I: Clone + Iterator>(
+    xs: I,
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(exhaustive_unsigneds(), xs)
+}
+
+/// Generates all `Vec`s with a minimum length and with elements from a specified iterator.
+///
+/// If `xs` is empty and `min_length` is 0, the output length is 1; if `xs` is empty and
+/// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_unsigneds;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
+///
+/// let xss = exhaustive_vecs_min_length(2, exhaustive_unsigneds::<u32>())
+///         .take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1],
+///         &[0, 0, 0, 0, 0], &[0, 2], &[0, 1, 0], &[0, 3], &[0, 0, 0, 1], &[1, 2], &[0, 1, 1],
+///         &[1, 3], &[0, 0, 0, 0, 0, 0], &[2, 0], &[1, 0, 0], &[2, 1], &[0, 0, 1, 0]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_min_length<I: Clone + Iterator>(
+    min_length: usize,
+    xs: I,
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(
+        primitive_int_increasing_inclusive_range(min_length, usize::MAX),
+        xs,
+    )
+}
+
+/// Generates all `Vec`s with lengths in $[a, b)$ and with elements from a specified iterator.
+///
+/// - If $a = b$, the output length is 0.
+/// - If $a = 0$ and $b = 1$, the output length is 1.
+/// - If $a < b$, $b > 1$, and `xs` is infinite, the output length is infinite.
+/// - If `xs` is finite, the output length is
+///   $$
+///   \sum_{k=a}^{b-1} n^k,
+///   $$
+///   where $k$ is `xs.count()`.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_unsigneds;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
+///
+/// let xss = exhaustive_vecs_length_range(2, 4, exhaustive_unsigneds::<u32>())
+///         .take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 0, 1], &[0, 2], &[0, 1, 0],
+///         &[0, 3], &[0, 1, 1], &[1, 2], &[1, 3], &[2, 0], &[1, 0, 0], &[2, 1], &[3, 0], &[3, 1],
+///         &[1, 0, 1], &[2, 2], &[2, 3]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_length_range<I: Clone + Iterator>(
+    a: usize,
+    b: usize,
+    xs: I,
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+where
+    I::Item: Clone,
+{
+    exhaustive_vecs_from_length_iterator(primitive_int_increasing_range(a, b), xs)
+}
+
+/// Generates all `Vec`s with lengths in $[a, b]$ and with elements from a specified iterator.
+///
+/// - If $a = b = 0$, the output length is 1.
+/// - If $a < b$, $b > 0$, and `xs` is infinite, the output length is infinite.
+/// - If `xs` is finite, the output length is
+///   $$
+///   \sum_{k=a}^b n^k,
+///   $$
+///   where $k$ is `xs.count()`.
+///
+/// The lengths of the output `Vec`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Panics
+/// Panics if `a` > `b`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::exhaustive::exhaustive_unsigneds;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
+///
+/// let xss = exhaustive_vecs_length_inclusive_range(2, 4, exhaustive_unsigneds::<u32>())
+///         .take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1], &[0, 2],
+///         &[0, 3], &[0, 1, 0], &[1, 2], &[0, 0, 0, 1], &[1, 3], &[0, 1, 1], &[2, 0], &[1, 0, 0],
+///         &[2, 1], &[1, 0, 1], &[3, 0], &[0, 0, 1, 0]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_vecs_length_inclusive_range<I: Clone + Iterator>(
+    a: usize,
+    b: usize,
+    xs: I,
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
 where
     I::Item: Clone,
 {

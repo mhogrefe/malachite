@@ -7,16 +7,18 @@ use std::slice::Iter;
 use itertools::chain;
 
 use malachite_base::tuples::exhaustive::{
-    lex_dependent_pairs, lex_dependent_pairs_stop_after_empty_ys, LexDependentPairsYsGenerator,
+    lex_dependent_pairs, lex_dependent_pairs_stop_after_empty_ys,
+    ExhaustiveDependentPairsYsGenerator,
 };
 
 #[derive(Clone, Debug)]
-pub struct LexGeneratorFromMap<X: Clone + Eq + Hash, Y: 'static + Clone> {
+struct DPGeneratorFromMap<X: Clone + Eq + Hash, Y: 'static + Clone> {
     map: HashMap<X, &'static [Y]>,
 }
 
 impl<X: Clone + Eq + Hash, Y: 'static + Clone>
-    LexDependentPairsYsGenerator<X, Y, Cloned<Iter<'static, Y>>> for LexGeneratorFromMap<X, Y>
+    ExhaustiveDependentPairsYsGenerator<X, Y, Cloned<Iter<'static, Y>>>
+    for DPGeneratorFromMap<X, Y>
 {
     #[inline]
     fn get_ys(&self, x: &X) -> Cloned<Iter<'static, Y>> {
@@ -32,7 +34,7 @@ fn lex_dependent_pairs_helper<I: Iterator, Y>(
     I::Item: Clone + Debug + Eq + Hash,
     Y: Clone + Debug + Eq,
 {
-    let xss = lex_dependent_pairs(xs, LexGeneratorFromMap { map })
+    let xss = lex_dependent_pairs(xs, DPGeneratorFromMap { map })
         .take(20)
         .collect::<Vec<_>>();
     assert_eq!(xss.as_slice(), out);
@@ -110,7 +112,7 @@ fn lex_dependent_pairs_stop_after_empty_ys_helper<I: Iterator, Y>(
     I::Item: Clone + Debug + Eq + Hash,
     Y: Clone + Debug + Eq,
 {
-    let xss = lex_dependent_pairs_stop_after_empty_ys(xs, LexGeneratorFromMap { map })
+    let xss = lex_dependent_pairs_stop_after_empty_ys(xs, DPGeneratorFromMap { map })
         .take(20)
         .collect::<Vec<_>>();
     assert_eq!(xss.as_slice(), out);

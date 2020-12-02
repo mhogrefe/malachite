@@ -11485,7 +11485,17 @@ fn test_limbs_div_divide_and_conquer_approx() {
                 u32::MAX,
                 u32::MAX,
             ],
-        )
+        );
+        // carry
+        // !limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])
+        // q != 0
+        test(
+            &[10; 10],
+            &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            &[0, 0, 0, 1, 0, 2147483648],
+            false,
+            &[0, 0, 4294967292, 4294967295, 4294967295, 1, 10, 10, 10, 10],
+        );
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {

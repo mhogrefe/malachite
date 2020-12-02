@@ -9,7 +9,7 @@ use natural::Natural;
 /// smallest number of bits necessary to represent that `Natural`. 0 has zero significant bits. When
 /// the `Natural` is nonzero, this is equal to 1 + floor(log<sub>2</sub>(`self`)).
 ///
-/// This function assumes that `limbs` is nonempty and the last (most significant) limb is nonzero.
+/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
 ///
 /// Time: worst case O(1)
 ///
@@ -18,7 +18,7 @@ use natural::Natural;
 /// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where base == 2.
 ///
 /// # Panics
-/// Panics if `limbs` is empty.
+/// Panics if `xs` is empty.
 ///
 /// # Examples
 /// ```

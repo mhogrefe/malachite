@@ -5,66 +5,11 @@ use rand::Rand;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_small_unsigned, pairs_of_signed_and_u64_width_range,
-    pairs_of_signed_and_u64_width_range_var_1, pairs_of_signed_and_u64_width_range_var_2,
-    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_and_u64_width_range,
-    triples_of_signed_unsigned_width_range_and_bool_var_1,
-    triples_of_unsigned_unsigned_width_range_and_bool_var_1, unsigneds,
+    pairs_of_signed_and_u64_width_range, pairs_of_signed_and_u64_width_range_var_1,
+    pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
+    pairs_of_unsigned_and_u64_width_range, triples_of_signed_unsigned_width_range_and_bool_var_1,
+    triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
-
-fn get_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
-    test_properties(
-        pairs_of_unsigned_and_small_unsigned::<T, u64>,
-        |&(n, index)| {
-            let bit = n.get_bit(index);
-            if index >= T::WIDTH {
-                assert!(!bit);
-            } else {
-                assert_eq!(bit, !(!n).get_bit(index));
-            }
-        },
-    );
-
-    test_properties(unsigneds, |&n: &T| {
-        let significant_bits = n.significant_bits();
-        assert!(!n.get_bit(significant_bits));
-        if n != T::ZERO {
-            assert!(n.get_bit(significant_bits - 1));
-        }
-    });
-}
-
-fn get_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    test_properties(
-        pairs_of_signed_and_small_unsigned,
-        |&(n, index): &(T, u64)| {
-            let bit = n.get_bit(index);
-            if index >= T::WIDTH {
-                assert_eq!(bit, n < T::ZERO);
-            } else {
-                assert_eq!(bit, !(!n).get_bit(index));
-            }
-        },
-    );
-}
-
-#[test]
-fn get_bit_properties() {
-    get_bit_properties_helper_unsigned::<u8>();
-    get_bit_properties_helper_unsigned::<u16>();
-    get_bit_properties_helper_unsigned::<u32>();
-    get_bit_properties_helper_unsigned::<u64>();
-    get_bit_properties_helper_unsigned::<usize>();
-    get_bit_properties_helper_signed::<i8>();
-    get_bit_properties_helper_signed::<i16>();
-    get_bit_properties_helper_signed::<i32>();
-    get_bit_properties_helper_signed::<i64>();
-    get_bit_properties_helper_signed::<isize>();
-}
 
 fn set_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
     test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {

@@ -1,18 +1,74 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoNeg, ModPowerOfTwoPow,
+    ModPowerOfTwo, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoNeg, ModPowerOfTwoPow,
     ModPowerOfTwoPowAssign, Parity,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_nz::natural::arithmetic::mod_power_of_two_pow::{
+    limbs_mod_power_of_two_pow, limbs_pow_low,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::mod_power_of_two_pow::*;
 
-use malachite_test::common::{test_properties, test_properties_no_special};
-use malachite_test::inputs::base::triples_of_unsigned_unsigned_and_small_u64_var_2;
+use malachite_test::common::{
+    test_properties, test_properties_custom_scale, test_properties_no_special,
+};
+use malachite_test::inputs::base::{
+    pairs_of_unsigned_vec_var_28, triples_of_unsigned_unsigned_and_small_u64_var_2,
+    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_17,
+};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_u64_var_1, pairs_of_natural_and_unsigned,
     quadruples_of_three_naturals_and_u64_var_2, quadruples_of_three_naturals_and_u64_var_3,
     triples_of_natural_natural_and_u64_var_2,
 };
+
+fn verify_limbs_pow_low(xs: &[Limb], es: &[Limb], out: &[Limb]) {
+    let exp = Natural::from_limbs_asc(es);
+    let n = xs.len();
+    let pow = u64::exact_from(n) << Limb::LOG_WIDTH;
+    let x = Natural::from_limbs_asc(xs).mod_power_of_two(pow);
+    let expected = x.mod_power_of_two_pow(exp, pow);
+    assert!(expected.mod_power_of_two_is_reduced(pow));
+    assert_eq!(Natural::from_limbs_asc(&out[..n]), expected);
+}
+
+#[test]
+fn limbs_pow_low_properties() {
+    test_properties_custom_scale(32, pairs_of_unsigned_vec_var_28, |&(ref xs, ref es)| {
+        let xs_old = xs;
+        let mut xs = xs.clone();
+        let mut scratch = vec![0; xs.len()];
+        limbs_pow_low(&mut xs, &es, &mut scratch);
+        verify_limbs_pow_low(xs_old, es, &xs);
+    });
+}
+
+fn verify_limbs_mod_power_of_two_pow(xs: &[Limb], es: &[Limb], pow: u64, out: &[Limb]) {
+    let exp = Natural::from_limbs_asc(es);
+    let x = Natural::from_limbs_asc(xs);
+    assert!(x.mod_power_of_two_is_reduced(pow));
+    let expected = (&x).mod_power_of_two_pow(&exp, pow);
+    assert!(expected.mod_power_of_two_is_reduced(pow));
+    assert_eq!(_simple_binary_mod_power_of_two_pow(&x, &exp, pow), expected);
+    assert_eq!(Natural::from_limbs_asc(out), expected);
+}
+
+#[test]
+fn limbs_mod_power_of_two_pow_properties() {
+    test_properties_custom_scale(
+        32,
+        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_17,
+        |&(ref xs, ref es, pow)| {
+            let xs_old = xs;
+            let mut xs = xs.clone();
+            limbs_mod_power_of_two_pow(&mut xs, &es, pow);
+            verify_limbs_mod_power_of_two_pow(xs_old, es, pow, &xs);
+        },
+    );
+}
 
 #[test]
 fn mod_power_of_two_pow_properties() {

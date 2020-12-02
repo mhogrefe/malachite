@@ -36,7 +36,10 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
     lex_pairs,
 };
-use malachite_base::vecs::exhaustive::{exhaustive_fixed_length_vecs_from_single, shortlex_vecs};
+use malachite_base::vecs::exhaustive::{
+    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
+    shortlex_vecs,
+};
 use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
@@ -122,8 +125,7 @@ use rust_wheels::iterators::tuples::{
     random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::{
-    exhaustive_vecs, exhaustive_vecs_min_length, random_vecs, random_vecs_min_length,
-    special_random_bool_vecs, special_random_unsigned_vecs,
+    random_vecs, random_vecs_min_length, special_random_bool_vecs, special_random_unsigned_vecs,
     special_random_unsigned_vecs_min_length,
 };
 
@@ -2813,6 +2815,17 @@ pub fn pairs_of_unsigned_vec_var_27<T: PrimitiveUnsigned + Rand>(
     )
 }
 
+// All pairs of `Vec<T>` that meet the preconditions for `limbs_pow_low`.
+pub fn pairs_of_unsigned_vec_var_28<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref es)| {
+        !xs.is_empty()
+            && (es.len() > 1 || es.len() == 1 && es[0] > T::ONE)
+            && *es.last().unwrap() != T::ZERO
+    }))
+}
+
 fn pairs_of_unsigned_vec_and_bool<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, bool)> {
@@ -3951,8 +3964,8 @@ fn pairs_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_ys_len as usize, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -3987,7 +4000,7 @@ fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     let xss: It<Vec<T>> =
         match gm {
             GenerationMode::Exhaustive => Box::new(exhaustive_vecs_min_length(
-                min_len << 1,
+                (min_len as usize) << 1,
                 exhaustive_unsigneds(),
             )),
             GenerationMode::Random(scale) => Box::new(random_vecs_min_length(
@@ -4019,7 +4032,7 @@ fn pairs_of_unsigned_vec_min_sizes_2<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
-            exhaustive_vecs_min_length(min_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_len as usize, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs_from_single(
             random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
@@ -4038,9 +4051,9 @@ fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_zs_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_ys_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_zs_len as usize, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -4065,7 +4078,7 @@ fn triples_of_unsigned_vec_min_sizes_1_2<T: PrimitiveUnsigned + Rand>(
     let xss: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_min_sizes_var_1(gm, min_ys_zs_len),
-            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -4087,7 +4100,7 @@ fn triples_of_unsigned_vec_min_sizes_3<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
-            exhaustive_vecs_min_length(min_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_len as usize, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples_from_single(
             random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
@@ -5882,6 +5895,52 @@ pub fn triples_of_limb_vec_limb_vec_and_u64_var_16(
             !xs.is_empty() && !ys.is_empty() && *xs.last().unwrap() != 0 && *ys.last().unwrap() != 0
         }),
     )
+}
+
+// All triples of `Vec<T>`, `Vec<T>`, and `u64` which meet the preconditions of
+// `limbs_mod_power_of_two_pow`.
+pub fn triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_17(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    if gm == GenerationMode::Exhaustive {
+        let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(gm)
+            .filter_map(|(mut xs, es, pow)| {
+                if xs.is_empty()
+                    || es.is_empty()
+                    || *es.last().unwrap() == 0
+                    || es.len() == 1 && es[0] == 1
+                {
+                    None
+                } else {
+                    limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+                    if *xs.last().unwrap() == 0 {
+                        None
+                    } else {
+                        Some((xs, es, pow))
+                    }
+                }
+            });
+        Box::new(ts.unique())
+    } else {
+        let ts = triples_of_unsigned_vec_unsigned_vec_and_small_unsigned::<Limb, u64>(gm)
+            .filter_map(|(mut xs, es, pow)| {
+                if xs.is_empty()
+                    || es.is_empty()
+                    || *es.last().unwrap() == 0
+                    || es.len() == 1 && es[0] == 1
+                {
+                    None
+                } else {
+                    limbs_slice_mod_power_of_two_in_place(&mut xs, pow);
+                    if *xs.last().unwrap() == 0 {
+                        None
+                    } else {
+                        Some((xs, es, pow))
+                    }
+                }
+            });
+        Box::new(ts)
+    }
 }
 
 // All triples of `Vec<T>`, `Vec<T>`, and `T` where `T` is unsigned, the first `Vec` is at least as

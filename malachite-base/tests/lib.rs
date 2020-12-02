@@ -301,10 +301,15 @@ pub mod num {
         pub mod nice_float;
     }
     pub mod iterators {
+        pub mod bit_distributor_sequence;
         pub mod iterator_to_bit_chunks;
+        pub mod ruler_sequence;
     }
     pub mod logic {
-        pub mod bit_access;
+        pub mod bit_access_old;
+        pub mod bit_access {
+            pub mod get_bit;
+        }
         pub mod bit_block_access;
         pub mod bit_convertible;
         pub mod bit_iterable;
@@ -441,15 +446,21 @@ pub mod tuples {
 }
 pub mod vecs {
     pub mod exhaustive {
+        pub mod exhaustive_dependent_pairs;
         pub mod exhaustive_fixed_length_vecs_from_single;
         pub mod exhaustive_fixed_length_vecs_m_inputs;
         pub mod exhaustive_length_n_vecs;
+        pub mod exhaustive_vecs;
         pub mod exhaustive_vecs_from_length_iterator;
+        pub mod exhaustive_vecs_length_inclusive_range;
+        pub mod exhaustive_vecs_length_range;
+        pub mod exhaustive_vecs_min_length;
         pub mod lex_dependent_pairs;
         pub mod lex_fixed_length_vecs_from_single;
         pub mod lex_fixed_length_vecs_m_inputs;
         pub mod lex_length_n_vecs;
         pub mod shortlex_vecs;
+        pub mod shortlex_vecs_from_length_iterator;
         pub mod shortlex_vecs_length_inclusive_range;
         pub mod shortlex_vecs_length_range;
         pub mod shortlex_vecs_min_length;

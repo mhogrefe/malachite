@@ -1,9 +1,10 @@
 use std::cmp::Ordering;
 use std::marker::PhantomData;
 
+use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use num::arithmetic::traits::DivisibleBy;
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::WrappingFrom;
+use num::conversion::traits::{ExactFrom, WrappingFrom};
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
@@ -363,4 +364,137 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
         in_chunk_size,
         out_chunk_size,
     ))
+}
+
+/// A `struct` that holds the state of the ruler sequence.
+///
+/// This `struct` is created by the `ruler_sequence` function. See its documentation for more.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct RulerSequence<T: ExactFrom<u32>> {
+    i: u64,
+    phantom: PhantomData<T>,
+}
+
+impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.i += 1;
+        Some(T::exact_from(self.i.trailing_zeros()))
+    }
+}
+
+/// Returns the ruler sequence.
+///
+/// The ruler sequence (<https://oeis.org/A007814>) is the number of times that 2 divides the
+/// numbers $1, 2, 3, \ldots$.
+///
+/// $(x_i)_{i=1}^\infty = t_i$, where for each $i$, $i = (2k_i+1)2^{t_i}$ for some
+/// $k_i\in \mathbb{Z}$.
+///
+/// The sequence grows logarithmically. Every number occurs infinitely many times, and its first
+/// occurrence is after all smaller numbers have occured.
+///
+/// The output length is infinite.
+///
+/// # Complexity per iteration
+///
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::iterators::ruler_sequence;
+///
+/// assert_eq!(
+///     ruler_sequence::<u32>().take(20).collect::<Vec<_>>(),
+///     &[0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2]
+/// );
+/// ```
+pub fn ruler_sequence<T: ExactFrom<u32>>() -> RulerSequence<T> {
+    RulerSequence {
+        i: 0,
+        phantom: PhantomData,
+    }
+}
+
+/// A `struct` that holds the state of a bit distributor sequence.
+///
+/// This `struct` is created by the `bit_distributor_sequence` function. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct BitDistributorSequence {
+    bit_distributor: BitDistributor,
+}
+
+impl Iterator for BitDistributorSequence {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<usize> {
+        let i = self.bit_distributor.get_output(1);
+        self.bit_distributor.increment_counter();
+        Some(i)
+    }
+}
+
+/// Returns a sequence based on a `BitGenerator`.
+///
+/// The sequence is obtained by taking the second output of a two-output `BitGenerator`. If both
+/// output types are normal with weight 1, the sequence is <https://oeis.org/A059905>.
+///
+/// The smaller the first output type is relative to the second (where tiny outputs are smaller than
+/// normal outputs), the slower the sequence will grow.
+///
+/// - If the first output type is normal and the second is tiny, the sequence grows as $O(n)$.
+/// - If the first output type is tiny and the second is normal, the sequence grows as $O(\log n)$.
+/// - If both output types are normal with weights $p$ and $q$, the sequence grows as
+///   $O(n^\frac{p}{p+q})$.
+/// - The output types cannot both be tiny.
+///
+/// Every number occurs infinitely many times, and its first occurrence is after all smaller numbers
+/// have occured. The sequence increases by no more than 1 at each step, but may decrease by an
+/// unboundedly high amount.
+///
+/// The output length is infinite.
+///
+/// # Complexity per iteration
+///
+/// Constant time and additional memory.
+///
+/// # Panics
+///
+/// Panics if both output types are tiny.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+/// use malachite_base::num::iterators::bit_distributor_sequence;
+///
+/// assert_eq!(
+///     bit_distributor_sequence(
+///         BitDistributorOutputType::normal(1),
+///         BitDistributorOutputType::normal(2)
+///     ).take(50).collect::<Vec<_>>(),
+///     &[
+///         0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2,
+///         3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1
+///     ]
+/// );
+/// assert_eq!(
+///     bit_distributor_sequence(
+///         BitDistributorOutputType::normal(2),
+///         BitDistributorOutputType::normal(1)
+///     ).take(50).collect::<Vec<_>>(),
+///     &[
+///         0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, 10, 11, 8, 9, 10, 11, 12, 13, 14,
+///         15, 12, 13, 14, 15, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9,
+///     ]
+/// );
+/// ```
+pub fn bit_distributor_sequence(
+    x_output_type: BitDistributorOutputType,
+    y_output_type: BitDistributorOutputType,
+) -> BitDistributorSequence {
+    BitDistributorSequence {
+        bit_distributor: BitDistributor::new(&[y_output_type, x_output_type]),
+    }
 }

@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, ModPowerOfTwoSquare, ModPowerOfTwoSquareAssign, ModSquare, PowerOfTwo, Square,
+    ModPowerOfTwo, ModPowerOfTwoMul, ModPowerOfTwoSquare, ModPowerOfTwoSquareAssign, ModSquare,
+    PowerOfTwo, Square,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
@@ -309,6 +310,10 @@ fn benchmark_natural_mod_power_of_two_square_algorithms(
             (
                 "Natural.mod_power_of_two_square(u64)",
                 &mut (|(n, pow)| no_out!(n.mod_power_of_two_square(pow))),
+            ),
+            (
+                "Natural.mod_power_of_two_mul(Natural, u64)",
+                &mut (|(n, pow)| no_out!(n.clone().mod_power_of_two_mul(n, pow))),
             ),
             (
                 "Natural.square().mod_power_of_two(u64)",

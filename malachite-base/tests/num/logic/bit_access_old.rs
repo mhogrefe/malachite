@@ -4,53 +4,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-fn get_bit_helper_unsigned<T: PrimitiveInt>() {
-    let test = |n: u64, index, out| {
-        assert_eq!(T::exact_from(n).get_bit(index), out);
-    };
-
-    test(0, 0, false);
-    test(0, 100, false);
-    test(123, 2, false);
-    test(123, 3, true);
-    test(123, 100, false);
-    if T::WIDTH >= u64::WIDTH {
-        test(1000000000000, 12, true);
-        test(1000000000000, 100, false);
-    }
-}
-
-fn get_bit_helper_signed<T: PrimitiveSigned>() {
-    get_bit_helper_unsigned::<T>();
-
-    let test = |n: i64, index, out| {
-        assert_eq!(T::exact_from(n).get_bit(index), out);
-    };
-
-    test(-123, 0, true);
-    test(-123, 1, false);
-    test(-123, 100, true);
-    if T::WIDTH >= u64::WIDTH {
-        test(-1000000000000, 12, true);
-        test(-1000000000000, 100, true);
-        test(-i64::from(u32::MAX), 0, true);
-        test(-i64::from(u32::MAX), 1, false);
-        test(-i64::from(u32::MAX), 31, false);
-        test(-i64::from(u32::MAX), 32, true);
-        test(-i64::from(u32::MAX), 33, true);
-        test(-i64::from(u32::MAX) - 1, 0, false);
-        test(-i64::from(u32::MAX) - 1, 31, false);
-        test(-i64::from(u32::MAX) - 1, 32, true);
-        test(-i64::from(u32::MAX) - 1, 33, true);
-    }
-}
-
-#[test]
-fn test_get_bit() {
-    apply_fn_to_unsigneds!(get_bit_helper_unsigned);
-    apply_fn_to_signeds!(get_bit_helper_signed);
-}
-
 fn set_bit_helper_unsigned<T: PrimitiveInt>() {
     let test = |n: u64, index, out: u64| {
         let mut n = T::exact_from(n);

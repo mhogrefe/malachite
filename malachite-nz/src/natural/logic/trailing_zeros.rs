@@ -15,10 +15,10 @@ use platform::Limb;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// where n = `limbs.len()`
+/// where n = `xs.len()`
 ///
 /// # Panics
-/// Panics if `limbs` only contains zeros.
+/// Panics if `xs` only contains zeros.
 ///
 /// # Examples
 /// ```
@@ -28,9 +28,9 @@ use platform::Limb;
 /// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
 /// ```
 pub fn limbs_trailing_zeros(xs: &[Limb]) -> u64 {
-    let zero_limbs = slice_leading_zeros(xs);
-    let remaining_zeros = TrailingZeros::trailing_zeros(xs[zero_limbs]);
-    (u64::wrapping_from(zero_limbs) << Limb::LOG_WIDTH) + remaining_zeros
+    let zeros = slice_leading_zeros(xs);
+    let remaining_zeros = TrailingZeros::trailing_zeros(xs[zeros]);
+    (u64::wrapping_from(zeros) << Limb::LOG_WIDTH) + remaining_zeros
 }
 
 impl Natural {

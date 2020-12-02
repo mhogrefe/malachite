@@ -210,7 +210,7 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
-/// Interpreting a `Vec<Limb>`s as the limbs (in ascending order) of a `Natural`, returns a `Vec` of
+/// Interpreting a `Vec<Limb>` as the limbs (in ascending order) of a `Natural`, returns a `Vec` of
 /// the limbs of the square of the `Natural` mod 2<sup>`pow`</sup>. Assumes the input is already
 /// reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated. The input may not be empty or
 /// have trailing zeros.

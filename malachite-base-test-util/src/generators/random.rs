@@ -1,3 +1,4 @@
+use generators::common::{GenConfig, It};
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::random::{random_char_inclusive_range, random_char_range, random_chars};
@@ -5,6 +6,7 @@ use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::random::geometric::geometric_random_unsigneds;
 use malachite_base::num::random::{
     random_natural_signeds, random_positive_unsigneds, random_primitive_ints,
     random_unsigneds_less_than,
@@ -12,9 +14,9 @@ use malachite_base::num::random::{
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::tuples::random::{random_pairs_from_single, random_triples_from_single};
-
-use generators::common::{GenConfig, It};
+use malachite_base::tuples::random::{
+    random_pairs, random_pairs_from_single, random_triples_from_single,
+};
 
 // -- bool --
 
@@ -68,6 +70,34 @@ pub fn random_primitive_int_triple_gen<T: PrimitiveInt>(_config: &GenConfig) -> 
     Box::new(random_triples_from_single(random_primitive_ints(
         EXAMPLE_SEED,
     )))
+}
+
+// -- (PrimitiveInt, PrimitiveUnsigned) --
+
+pub fn random_primitive_int_unsigned_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_int_unsigned_pair_gen_var_2<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| random_unsigneds_less_than(seed, T::WIDTH),
+    ))
 }
 
 // -- PrimitiveSigned --

@@ -9,8 +9,8 @@ name = "malachite_nz_test_util"
 path = "src/lib.rs"
 
 [[bin]]
- name = "malachite_nz_test_util_main"
- path = "src/bin.rs"
+name = "malachite_nz_test_util_main"
+path = "src/bin.rs"
 
 [features]
 32_bit_limbs = ["malachite-nz/32_bit_limbs"]
@@ -20,12 +20,12 @@ fail_on_untested_path = ["malachite-nz/fail_on_untested_path"]
 malachite-base = { path = "../malachite-base" }
 malachite-base-test-util = { path = "../malachite-base-test-util" }
 malachite-nz = { path = "../malachite-nz", default-features = false }
-num = "0.2.0"
+num = "0.3.1"
 
 [profile.release]
 lto = true
 
 [dependencies.rug]
-version = "^1.2.0"
+version = "1.11.0"
 default-features = false
 features = ["integer"]

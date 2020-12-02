@@ -42,8 +42,7 @@ pub trait NotAssign {
 
 /// Provides a function to get the number of significant bits of `self`.
 pub trait SignificantBits {
-    /// The number of bits it takes to represent `self`. This is useful when benchmarking functions;
-    /// the functions' inputs can be bucketed based on their number of significant bits.
+    /// The number of bits it takes to represent `self`.
     fn significant_bits(self) -> u64;
 }
 
@@ -54,9 +53,10 @@ pub trait HammingDistance<RHS = Self> {
 }
 
 /// Returns the Hamming distance between `self` and `other`, or the number of bit flips needed to
-/// turn `self` into `other`. This trait allows for the possibility of the distance being undefined
-/// for some pairs of `self` and `other`, in which case the `checked_hamming_distance` function
-/// should return `None`.
+/// turn `self` into `other`.
+///
+/// This trait allows for the possibility of the distance being undefined for some pairs of `self`
+/// and `other`, in which case the `checked_hamming_distance` function should return `None`.
 pub trait CheckedHammingDistance<RHS = Self> {
     fn checked_hamming_distance(self, other: RHS) -> Option<u64>;
 }
@@ -80,12 +80,14 @@ pub trait BitAccess {
 
     /// Sets the bit at `index` to whichever value `bit` is.
     ///
-    /// Time: worst case O(max(f(n), g(n))), where f(n) is the worst-case time complexity of
-    ///     `Self::set_bit` and g(n) is the worst-case time complexity of `Self::clear_bit`.
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(max(f(n), g(n))), where f(n) is the worst-case
-    ///     additional-memory complexity of `Self::set_bit` and g(n) is the worst-case
-    ///     additional-memory complexity of `Self::clear_bit`.
+    /// $T(n) = O(\max(T_S(n), T_C(n)))$,
+    ///
+    /// $M(n) = O(\max(M_S(n), M_C(n)))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $T_S$ and $M_S$ are the complexities of
+    /// `Self::set_bit`, and $T_C$ and $M_C$ are the complexities of `Self::clear_bit`.
     ///
     /// # Panics
     /// See panics for `set_bit` and `assign_bit`.
@@ -98,16 +100,17 @@ pub trait BitAccess {
         }
     }
 
-    /// Sets the bit at `index` to the opposite of its previous value.
+    /// Sets the bit at `index` to the opposite of its original value.
     ///
-    /// Time: worst case O(f(n) + max(g(n), h(n))), where f(n) is the worst-case time complexity of
-    ///     `Self::get_bit`, g(n) is the worst-case time complexity of `Self::set_bit`, and h(n) is
-    ///     the worst-case time complexity of `Self::clear_bit`.
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(f(n) + max(g(n), h(n))), where f(n) is the worst-case
-    ///     additional-memory complexity of `Self::get_bit`, g(n) is the worst-case
-    ///     additional-memory complexity of `Self::set_bit`, and h(n) is the worst-case
-    ///     additional-memory complexity of `Self::clear_bit`.
+    /// $T(n) = O(T_G(n) + \max(T_S(n), T_C(n)))$,
+    ///
+    /// $M(n) = O(M_G(n) + \max(M_S(n), M_C(n)))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $T_G$ and $M_G$ are the complexities of
+    /// `Self::get_bit`, $T_S$ and $M_S$ are the complexities of `Self::set_bit`, and $T_C$ and
+    /// $M_C$ are the complexities of `Self::clear_bit`.
     ///
     /// # Panics
     /// See panics for `get_bit`, `set_bit` and `assign_bit`.
@@ -203,19 +206,19 @@ pub trait BitIterable {
 /// and the trait is parameterized by the digit type.
 pub trait PowerOfTwoDigits<T> {
     /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
-    /// significant. The base is 2<sup>`log_base`</sup>.
+    /// significant. The base is $2^b$, where $b$ is `log_base`.
     fn to_power_of_two_digits_asc(&self, log_base: u64) -> Vec<T>;
 
     /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
-    /// significant. The base is 2<sup>`log_base`</sup>.
+    /// significant. The base is $2^b$, where $b$ is `log_base`.
     fn to_power_of_two_digits_desc(&self, log_base: u64) -> Vec<T>;
 
     /// Converts an iterator of digits into a value. The input digits are in ascending order: least-
-    /// to most-significant. The base is 2<sup>`log_base`</sup>.
+    /// to most-significant. The base is $2^b$, where $b$ is `log_base`.
     fn from_power_of_two_digits_asc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Self;
 
     /// Converts an iterator of digits into a value. The input digits are in descending order: most-
-    /// to least-significant. The base is 2<sup>`log_base`</sup>.
+    /// to least-significant. The base is $2^b$, where $b$ is `log_base`.
     fn from_power_of_two_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Self;
 }
 
@@ -228,7 +231,9 @@ pub trait PowerOfTwoDigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<I
 pub trait PowerOfTwoDigitIterable<T> {
     type PowerOfTwoDigitIterator: PowerOfTwoDigitIterator<T>;
 
-    /// Returns a double-ended iterator over a value's digits in base 2<sup>`log_base`</sup>. The
-    /// iterator ends after the value's most-significant digit.
+    /// Returns a double-ended iterator over a value's digits in base $2^b$, where $b$ is
+    /// `log_base`.
+    ///
+    /// The iterator ends after the value's most-significant digit.
     fn power_of_two_digits(self, log_base: u64) -> Self::PowerOfTwoDigitIterator;
 }

@@ -17,7 +17,7 @@ pub enum RoundingMode {
 
 impl_named!(RoundingMode);
 
-/// An list of all six rounding modes.
+/// A list of all six rounding modes.
 pub const ROUNDING_MODES: [RoundingMode; 6] = [
     RoundingMode::Down,
     RoundingMode::Up,

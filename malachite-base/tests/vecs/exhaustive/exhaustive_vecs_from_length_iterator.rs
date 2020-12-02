@@ -6,7 +6,7 @@ use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
 
-fn shortlex_vecs_from_element_iterator_helper<I: Iterator<Item = usize>, J: Clone + Iterator>(
+fn exhaustive_vecs_from_element_iterator_helper<I: Iterator<Item = usize>, J: Clone + Iterator>(
     sizes: I,
     xs: J,
     out: &[&[J::Item]],
@@ -23,67 +23,152 @@ fn shortlex_vecs_from_element_iterator_helper<I: Iterator<Item = usize>, J: Clon
 }
 
 #[test]
-fn test_shortlex_vecs_from_element_iterator() {
-    shortlex_vecs_from_element_iterator_helper(empty(), exhaustive_bools(), &[]);
-    shortlex_vecs_from_element_iterator_helper(
+fn test_exhaustive_vecs_from_element_iterator() {
+    exhaustive_vecs_from_element_iterator_helper(empty(), exhaustive_bools(), &[]);
+    exhaustive_vecs_from_element_iterator_helper(
         [2, 1, 2].iter().cloned(),
         exhaustive_bools(),
         &[
             &[false, false],
-            &[false, true],
-            &[true, false],
-            &[true, true],
             &[false],
-            &[true],
+            &[false, true],
             &[false, false],
+            &[true, false],
+            &[true],
+            &[true, true],
             &[false, true],
             &[true, false],
             &[true, true],
         ],
     );
-    shortlex_vecs_from_element_iterator_helper(
+    exhaustive_vecs_from_element_iterator_helper(
         exhaustive_unsigneds::<usize>().map(|u| u * 2),
         exhaustive_bools(),
         &[
             &[],
             &[false, false],
             &[false, true],
+            &[false, false, false, false, false, false],
             &[true, false],
-            &[true, true],
             &[false, false, false, false],
+            &[true, true],
+            &[false, false, false, false, false, false, false, false],
             &[false, false, false, true],
+            &[false, false, false, false, false, true],
             &[false, false, true, false],
+            &[false, false, false, false, false, false, false, true],
             &[false, false, true, true],
+            &[false, false, false, false, true, false],
             &[false, true, false, false],
+            &[
+                false, false, false, false, false, false, false, false, false, false, false, false,
+            ],
             &[false, true, false, true],
+            &[false, false, false, false, true, true],
             &[false, true, true, false],
-            &[false, true, true, true],
-            &[true, false, false, false],
-            &[true, false, false, true],
-            &[true, false, true, false],
-            &[true, false, true, true],
-            &[true, true, false, false],
-            &[true, true, false, true],
-            &[true, true, true, false],
+            &[false, false, false, false, false, false, true, false],
         ],
     );
-    shortlex_vecs_from_element_iterator_helper(
+    exhaustive_vecs_from_element_iterator_helper(
         [2, 1, 0, 2].iter().cloned(),
         exhaustive_bools(),
         &[
             &[false, false],
-            &[false, true],
-            &[true, false],
-            &[true, true],
             &[false],
-            &[true],
+            &[false, true],
             &[],
+            &[true, false],
+            &[true],
+            &[true, true],
             &[false, false],
             &[false, true],
             &[true, false],
             &[true, true],
         ],
     );
+    exhaustive_vecs_from_element_iterator_helper(empty(), exhaustive_unsigneds::<u32>(), &[]);
+    exhaustive_vecs_from_element_iterator_helper(
+        [2, 1, 2].iter().cloned(),
+        exhaustive_unsigneds::<u32>(),
+        &[
+            &[0, 0],
+            &[0],
+            &[0, 1],
+            &[0, 0],
+            &[1, 0],
+            &[1],
+            &[1, 1],
+            &[0, 2],
+            &[0, 3],
+            &[2],
+            &[1, 2],
+            &[0, 1],
+            &[1, 3],
+            &[3],
+            &[2, 0],
+            &[4],
+            &[2, 1],
+            &[5],
+            &[3, 0],
+            &[1, 0],
+        ],
+    );
+    exhaustive_vecs_from_element_iterator_helper(
+        exhaustive_unsigneds::<usize>().map(|u| u * 2),
+        exhaustive_unsigneds::<u32>(),
+        &[
+            &[],
+            &[0, 0],
+            &[0, 1],
+            &[0, 0, 0, 0, 0, 0],
+            &[1, 0],
+            &[0, 0, 0, 0],
+            &[1, 1],
+            &[0, 0, 0, 0, 0, 0, 0, 0],
+            &[0, 2],
+            &[0, 0, 0, 1],
+            &[0, 3],
+            &[0, 0, 0, 0, 0, 1],
+            &[1, 2],
+            &[0, 0, 1, 0],
+            &[1, 3],
+            &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            &[2, 0],
+            &[0, 0, 1, 1],
+            &[2, 1],
+            &[0, 0, 0, 0, 1, 0],
+        ],
+    );
+    exhaustive_vecs_from_element_iterator_helper(
+        [2, 1, 0, 2].iter().cloned(),
+        exhaustive_unsigneds::<u32>(),
+        &[
+            &[0, 0],
+            &[0],
+            &[0, 1],
+            &[],
+            &[1, 0],
+            &[1],
+            &[1, 1],
+            &[0, 0],
+            &[0, 2],
+            &[2],
+            &[0, 3],
+            &[0, 1],
+            &[1, 2],
+            &[3],
+            &[1, 3],
+            &[4],
+            &[2, 0],
+            &[5],
+            &[2, 1],
+            &[1, 0],
+        ],
+    );
     // Stops after first empty ys
-    shortlex_vecs_from_element_iterator_helper([0, 0, 1, 0].iter().cloned(), nevers(), &[&[], &[]]);
+    exhaustive_vecs_from_element_iterator_helper(
+        [0, 0, 1, 0].iter().cloned(),
+        nevers(),
+        &[&[], &[]],
+    );
 }

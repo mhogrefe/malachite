@@ -19,30 +19,18 @@ impl FromStr for Never {
 
     /// Would convert a `String` to a `Never`.
     ///
-    /// TODO
-    /// Since a `Never` can never be instantiated, `from_str`
+    /// Since a `Never` can never be instantiated, `from_str` never succeeds.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
-    ///
-    /// The worst case occurs when the input `&str` is invalid and must be copied into an `Err`.
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rounding_modes::RoundingMode;
+    /// use malachite_base::nevers::Never;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(RoundingMode::from_str("Down"), Ok(RoundingMode::Down));
-    /// assert_eq!(RoundingMode::from_str("Up"), Ok(RoundingMode::Up));
-    /// assert_eq!(RoundingMode::from_str("Floor"), Ok(RoundingMode::Floor));
-    /// assert_eq!(RoundingMode::from_str("Ceiling"), Ok(RoundingMode::Ceiling));
-    /// assert_eq!(RoundingMode::from_str("Nearest"), Ok(RoundingMode::Nearest));
-    /// assert_eq!(RoundingMode::from_str("Exact"), Ok(RoundingMode::Exact));
-    /// assert_eq!(RoundingMode::from_str("abc"), Err("abc".to_string()));
+    /// assert_eq!(Never::from_str("abc"), Err("Never has no possible values"));
     /// ```
     #[inline]
     fn from_str(_: &str) -> Result<Never, &'static str> {

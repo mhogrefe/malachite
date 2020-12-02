@@ -26,7 +26,9 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_xxy, exhaustive_triples_xyy, lex_pairs, lex_pairs_from_single,
     lex_triples_from_single,
 };
-use malachite_base::vecs::exhaustive::{exhaustive_fixed_length_vecs_from_single, shortlex_vecs};
+use malachite_base::vecs::exhaustive::{
+    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, shortlex_vecs,
+};
 use malachite_base_test_util::generators::common::It;
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::natural::exhaustive::{
@@ -61,7 +63,7 @@ use rust_wheels::iterators::tuples::{
     random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
     random_triples, random_triples_from_single,
 };
-use rust_wheels::iterators::vecs::{exhaustive_vecs, random_vecs};
+use rust_wheels::iterators::vecs::random_vecs;
 
 use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, RandomValueAndVecOfBool};

@@ -108,3 +108,13 @@ pub fn triple_max_bit_bucketer<
         ),
     }
 }
+
+pub fn pair_2_bucketer<T, U: Copy>(y_name: &str) -> Bucketer<(T, U)>
+where
+    usize: ExactFrom<U>,
+{
+    Bucketer {
+        bucketing_function: &(|&(_, y)| usize::exact_from(y)),
+        bucketing_label: y_name.to_string(),
+    }
+}
