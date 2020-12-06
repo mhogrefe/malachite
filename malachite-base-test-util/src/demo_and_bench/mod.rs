@@ -36,7 +36,7 @@ macro_rules! unsigned_single_arg_bench {
                 limit,
                 file_name,
                 &unsigned_bit_bucketer(),
-                &mut [("Malachite", &mut (|u| no_out!(u.$f())))],
+                &mut [("Malachite", &mut |u| no_out!(u.$f()))],
             );
         }
     };
@@ -58,7 +58,7 @@ macro_rules! signed_single_arg_bench {
                 limit,
                 file_name,
                 &signed_bit_bucketer(),
-                &mut [("Malachite", &mut (|i| no_out!(i.$f())))],
+                &mut [("Malachite", &mut |i| no_out!(i.$f()))],
             );
         }
     };

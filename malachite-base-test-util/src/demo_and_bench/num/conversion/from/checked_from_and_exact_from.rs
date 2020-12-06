@@ -96,7 +96,7 @@ fn benchmark_primitive_int_checked_from_unsigned<
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::checked_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::checked_from(n)))],
     );
 }
 
@@ -114,7 +114,7 @@ fn benchmark_primitive_int_checked_from_signed<T: CheckedFrom<U> + Named, U: Pri
         limit,
         file_name,
         &signed_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::checked_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::checked_from(n)))],
     );
 }
 
@@ -132,7 +132,7 @@ fn benchmark_primitive_int_exact_from_unsigned<T: CheckedFrom<U> + Named, U: Pri
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::exact_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::exact_from(n)))],
     );
 }
 
@@ -150,6 +150,6 @@ fn benchmark_primitive_int_exact_from_signed<T: CheckedFrom<U> + Named, U: Primi
         limit,
         file_name,
         &signed_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::exact_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::exact_from(n)))],
     );
 }

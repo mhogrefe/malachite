@@ -35,6 +35,6 @@ fn benchmark_char_to_contiguous_range(
         limit,
         file_name,
         &char_bucketer(),
-        &mut [("Malachite", &mut (|c| no_out!(char_to_contiguous_range(c))))],
+        &mut [("Malachite", &mut |c| no_out!(char_to_contiguous_range(c)))],
     );
 }

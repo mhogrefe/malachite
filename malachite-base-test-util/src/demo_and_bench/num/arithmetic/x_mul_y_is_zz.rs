@@ -33,11 +33,10 @@ fn benchmark_unsigned_x_mul_y_is_zz_algorithms<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [
-            ("default", &mut (|(x, y)| no_out!(T::x_mul_y_is_zz(x, y)))),
-            (
-                "explicit",
-                &mut (|(x, y)| no_out!(_explicit_x_mul_y_is_zz(x, y))),
-            ),
+            ("default", &mut |(x, y)| no_out!(T::x_mul_y_is_zz(x, y))),
+            ("explicit", &mut |(x, y)| {
+                no_out!(_explicit_x_mul_y_is_zz(x, y))
+            }),
         ],
     );
 }

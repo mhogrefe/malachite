@@ -5,9 +5,9 @@ use rand::Rand;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_u64_width_range, pairs_of_signed_and_u64_width_range_var_1,
-    pairs_of_signed_and_u64_width_range_var_2, pairs_of_unsigned_and_small_unsigned,
-    pairs_of_unsigned_and_u64_width_range, triples_of_signed_unsigned_width_range_and_bool_var_1,
+    pairs_of_signed_and_u64_width_range_var_1, pairs_of_signed_and_u64_width_range_var_2,
+    pairs_of_unsigned_and_small_unsigned, pairs_of_unsigned_and_u64_width_range,
+    triples_of_signed_unsigned_width_range_and_bool_var_1,
     triples_of_unsigned_unsigned_width_range_and_bool_var_1,
 };
 
@@ -187,44 +187,4 @@ fn assign_bit_properties() {
     assign_bit_properties_helper_signed::<i32>();
     assign_bit_properties_helper_signed::<i64>();
     assign_bit_properties_helper_signed::<isize>();
-}
-
-fn flip_bit_properties_helper_unsigned<T: PrimitiveUnsigned + Rand>() {
-    test_properties(pairs_of_unsigned_and_u64_width_range, |&(n, index)| {
-        let mut mut_n: T = n;
-        mut_n.flip_bit(index);
-        assert_ne!(mut_n, n);
-
-        mut_n.flip_bit(index);
-        assert_eq!(mut_n, n);
-    });
-}
-
-fn flip_bit_properties_helper_signed<T: PrimitiveSigned + Rand>()
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    test_properties(pairs_of_signed_and_u64_width_range, |&(n, index)| {
-        let mut mut_n: T = n;
-        mut_n.flip_bit(index);
-        assert_ne!(mut_n, n);
-
-        mut_n.flip_bit(index);
-        assert_eq!(mut_n, n);
-    });
-}
-
-#[test]
-fn flip_bit_properties() {
-    flip_bit_properties_helper_unsigned::<u8>();
-    flip_bit_properties_helper_unsigned::<u16>();
-    flip_bit_properties_helper_unsigned::<u32>();
-    flip_bit_properties_helper_unsigned::<u64>();
-    flip_bit_properties_helper_unsigned::<usize>();
-    flip_bit_properties_helper_signed::<i8>();
-    flip_bit_properties_helper_signed::<i16>();
-    flip_bit_properties_helper_signed::<i32>();
-    flip_bit_properties_helper_signed::<i64>();
-    flip_bit_properties_helper_signed::<isize>();
 }

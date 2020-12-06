@@ -74,7 +74,7 @@ fn benchmark_primitive_int_wrapping_from_unsigned<
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::wrapping_from(n)))],
     );
 }
 
@@ -92,6 +92,6 @@ fn benchmark_primitive_int_wrapping_from_signed<T: WrappingFrom<U> + Named, U: P
         limit,
         file_name,
         &signed_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::wrapping_from(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::wrapping_from(n)))],
     );
 }

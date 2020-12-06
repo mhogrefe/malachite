@@ -1588,10 +1588,7 @@ pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Natural| {
-                exhaustive_fixed_length_vecs_from_single(
-                    usize::exact_from(n.limb_count()),
-                    exhaustive_bools(),
-                )
+                exhaustive_fixed_length_vecs_from_single(n.limb_count(), exhaustive_bools())
             };
             Box::new(dependent_pairs(exhaustive_naturals(), f))
         }
@@ -1631,10 +1628,7 @@ pub fn pairs_of_natural_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Natural
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Natural| {
-                exhaustive_fixed_length_vecs_from_single(
-                    usize::exact_from(n.significant_bits()),
-                    exhaustive_bools(),
-                )
+                exhaustive_fixed_length_vecs_from_single(n.significant_bits(), exhaustive_bools())
             };
             Box::new(dependent_pairs(exhaustive_naturals(), f))
         }
@@ -1995,10 +1989,8 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
         GenerationMode::Exhaustive => {
             let f = move |(n, log_base): &(Natural, u64)| {
                 exhaustive_fixed_length_vecs_from_single(
-                    usize::exact_from(
-                        n.significant_bits()
-                            .div_round(*log_base, RoundingMode::Ceiling),
-                    ),
+                    n.significant_bits()
+                        .div_round(*log_base, RoundingMode::Ceiling),
                     exhaustive_bools(),
                 )
             };
@@ -2059,10 +2051,8 @@ pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
         GenerationMode::Exhaustive => {
             let f = move |(n, log_base): &(Natural, u64)| {
                 exhaustive_fixed_length_vecs_from_single(
-                    usize::exact_from(
-                        n.significant_bits()
-                            .div_round(*log_base, RoundingMode::Ceiling),
-                    ),
+                    n.significant_bits()
+                        .div_round(*log_base, RoundingMode::Ceiling),
                     exhaustive_bools(),
                 )
             };

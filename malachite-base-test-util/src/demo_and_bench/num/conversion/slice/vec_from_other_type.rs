@@ -47,6 +47,6 @@ fn benchmark_unsigned_vec_from_other_type<T: VecFromOtherType<U> + Named, U: Pri
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|n| no_out!(T::vec_from_other_type(n))))],
+        &mut [("Malachite", &mut |n| no_out!(T::vec_from_other_type(n)))],
     );
 }

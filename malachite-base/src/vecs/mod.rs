@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
 
@@ -180,7 +181,7 @@ pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Optio
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromVec<T: Clone> {
     xs: Vec<T>,
-    indices: RandomUnsignedsLessThan<usize>,
+    indices: RandomUnsignedsLessThan<u64>,
 }
 
 impl<T: Clone> Iterator for RandomValuesFromVec<T> {
@@ -188,7 +189,7 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 
     #[inline]
     fn next(&mut self) -> Option<T> {
-        Some(self.xs[self.indices.next().unwrap()].clone())
+        Some(self.xs[usize::exact_from(self.indices.next().unwrap())].clone())
     }
 }
 
@@ -222,7 +223,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
     if xs.is_empty() {
         panic!("empty Vec");
     }
-    let indices = random_unsigneds_less_than(seed, xs.len());
+    let indices = random_unsigneds_less_than(seed, u64::exact_from(xs.len()));
     RandomValuesFromVec { xs, indices }
 }
 

@@ -11,6 +11,17 @@
 /// assert_eq!(123u32.get_bit(100), false);
 /// assert_eq!(1000000000000u64.get_bit(12), true);
 /// assert_eq!(1000000000000u64.get_bit(100), false);
+///
+/// assert_eq!(123i8.get_bit(2), false);
+/// assert_eq!(123i16.get_bit(3), true);
+/// assert_eq!(123i32.get_bit(100), false);
+/// assert_eq!((-123i8).get_bit(0), true);
+/// assert_eq!((-123i16).get_bit(1), false);
+/// assert_eq!((-123i32).get_bit(100), true);
+/// assert_eq!(1000000000000i64.get_bit(12), true);
+/// assert_eq!(1000000000000i64.get_bit(100), false);
+/// assert_eq!((-1000000000000i64).get_bit(12), true);
+/// assert_eq!((-1000000000000i64).get_bit(100), true);
 /// ```
 ///
 /// # set_bit
@@ -22,6 +33,18 @@
 /// x.set_bit(5);
 /// x.set_bit(6);
 /// assert_eq!(x, 100);
+///
+/// let mut x = 0i8;
+/// x.set_bit(2);
+/// x.set_bit(5);
+/// x.set_bit(6);
+/// assert_eq!(x, 100);
+///
+/// let mut x = -0x100i16;
+/// x.set_bit(2);
+/// x.set_bit(5);
+/// x.set_bit(6);
+/// assert_eq!(x, -156);
 /// ```
 ///
 /// # clear_bit
@@ -34,6 +57,19 @@
 /// x.clear_bit(3);
 /// x.clear_bit(4);
 /// assert_eq!(x, 100);
+///
+/// let mut x = 0x7fi8;
+/// x.clear_bit(0);
+/// x.clear_bit(1);
+/// x.clear_bit(3);
+/// x.clear_bit(4);
+/// assert_eq!(x, 100);
+///
+/// let mut x = -156i16;
+/// x.clear_bit(2);
+/// x.clear_bit(5);
+/// x.clear_bit(6);
+/// assert_eq!(x, -256);
 /// ```
 ///
 /// # assign_bit
@@ -49,6 +85,25 @@
 /// x.assign_bit(5, false);
 /// x.assign_bit(6, false);
 /// assert_eq!(x, 0);
+///
+/// x.assign_bit(2, true);
+/// x.assign_bit(5, true);
+/// x.assign_bit(6, true);
+/// assert_eq!(x, 100);
+/// x.assign_bit(2, false);
+/// x.assign_bit(5, false);
+/// x.assign_bit(6, false);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x100i16;
+/// x.assign_bit(2, true);
+/// x.assign_bit(5, true);
+/// x.assign_bit(6, true);
+/// assert_eq!(x, -156);
+/// x.assign_bit(2, false);
+/// x.assign_bit(5, false);
+/// x.assign_bit(6, false);
+/// assert_eq!(x, -256);
 /// ```
 ///
 /// # flip_bit
@@ -60,6 +115,18 @@
 /// assert_eq!(x, 1024);
 /// x.flip_bit(10);
 /// assert_eq!(x, 0);
+///
+/// let mut x = 0i32;
+/// x.flip_bit(10);
+/// assert_eq!(x, 1024);
+/// x.flip_bit(10);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -1i64;
+/// x.flip_bit(10);
+/// assert_eq!(x, -1025);
+/// x.flip_bit(10);
+/// assert_eq!(x, -1);
 /// ```
 pub mod bit_access;
 pub mod bit_block_access;

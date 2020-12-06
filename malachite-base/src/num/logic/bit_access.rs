@@ -25,8 +25,8 @@ fn _clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
 
 macro_rules! impl_bit_access_unsigned {
     ($t:ident) => {
-        /// Provides functions for accessing and modifying the `index`th bit of a primitive unsigned
-        /// integer, or the coefficient of $2^i$ in its binary expansion.
+        /// Provides functions for accessing and modifying individual bits of a primitive unsigned
+        /// integer.
         impl BitAccess for $t {
             /// Determines whether the `index`th bit of a primitive unsigned integer, or the
             /// coefficient of $2^i$ in its binary expansion, is 0 or 1.
@@ -158,150 +158,136 @@ fn _clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
 
 macro_rules! impl_bit_access_signed {
     ($t:ident) => {
-        /// Provides functions for accessing and modifying the `index`th bit of a primitive signed
-        /// integer, or the coefficient of $2^i$ in its binary expansion.
-        ///
-        /// Negative integers are represented in two's complement.
-        ///
-        /// # Examples
-        /// ```
-        /// use malachite_base::num::logic::traits::BitAccess;
-        ///
-        /// let mut x = 0i8;
-        /// x.assign_bit(2, true);
-        /// x.assign_bit(5, true);
-        /// x.assign_bit(6, true);
-        /// assert_eq!(x, 100);
-        /// x.assign_bit(2, false);
-        /// x.assign_bit(5, false);
-        /// x.assign_bit(6, false);
-        /// assert_eq!(x, 0);
-        ///
-        /// let mut x = -0x100i16;
-        /// x.assign_bit(2, true);
-        /// x.assign_bit(5, true);
-        /// x.assign_bit(6, true);
-        /// assert_eq!(x, -156);
-        /// x.assign_bit(2, false);
-        /// x.assign_bit(5, false);
-        /// x.assign_bit(6, false);
-        /// assert_eq!(x, -256);
-        ///
-        /// let mut x = 0i32;
-        /// x.flip_bit(10);
-        /// assert_eq!(x, 1024);
-        /// x.flip_bit(10);
-        /// assert_eq!(x, 0);
-        ///
-        /// let mut x = -1i64;
-        /// x.flip_bit(10);
-        /// assert_eq!(x, -1025);
-        /// x.flip_bit(10);
-        /// assert_eq!(x, -1);
-        /// ```
+        /// Provides functions for accessing and modifying the individual bits of a primitive signed
+        /// integer.
         impl BitAccess for $t {
-            /// Determines whether the `index`th bit of a primitive signed integer, or the
-            /// coefficient of $2^i$ in its binary expansion, is 0 or 1. `false` means 0, `true`
-            /// means 1.
+            /// Determines whether the `index`th bit of a primitive signed integer is 0 or 1.
             ///
-            /// Negative integers are represented in two's complement.
+            /// `false` means 0 and `true` means 1. Getting bits beyond the type's width is allowed;
+            /// those bits are true if the value is negative, and false otherwise.
             ///
-            /// Accessing bits beyond the type's width is allowed; those bits are false if the
-            /// integer is non-negative and true if it is negative.
+            /// If $n \geq 0$, let
+            /// $$
+            /// n = \sum_{i=0}^\infty 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
+            /// rest are 0. Then $f(n, i) = (b_i = 1)$.
+            ///
+            /// If $n < 0$, let
+            /// $$
+            /// 2^W = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where
+            /// - $W$ is the type's width
+            /// - for all $i$, $b_i\in \\{0, 1\\}$, and $b_i = 1$ for $i \geq W$.
+            ///
+            /// Then $f(n, i) = (b_i = 1)$.
             ///
             /// # Worst-case complexity
             ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
             ///
-            /// assert_eq!(123i8.get_bit(2), false);
-            /// assert_eq!(123i16.get_bit(3), true);
-            /// assert_eq!(123i32.get_bit(100), false);
-            /// assert_eq!((-123i8).get_bit(0), true);
-            /// assert_eq!((-123i16).get_bit(1), false);
-            /// assert_eq!((-123i32).get_bit(100), true);
-            /// assert_eq!(1000000000000i64.get_bit(12), true);
-            /// assert_eq!(1000000000000i64.get_bit(100), false);
-            /// assert_eq!((-1000000000000i64).get_bit(12), true);
-            /// assert_eq!((-1000000000000i64).get_bit(100), true);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
                 _get_bit_signed(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive signed integer, or the coefficient of $2^i$ in
-            /// its binary expansion, to 1.
+            /// Sets the `index`th bit of a primitive signed integer to 1.
             ///
-            /// Negative integers are represented in two's complement.
+            /// Setting bits beyond the type's width is disallowed, if `self` is non-negative.
             ///
-            /// Setting bits beyond the type's width is disallowed if the integer is non-negative;
-            /// if it is negative, it's allowed but does nothing since those bits are already true.
+            /// If $n \geq 0$, let
+            /// $$
+            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// $$
+            /// f(n, i) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 1, b_ {i+1}, \ldots, b_ {W-1}\\},
+            /// $$
+            /// and $i < W$.
+            ///
+            /// If $n < 0$, let
+            /// $$
+            /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// $$
+            /// f(n, i) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 1, b_ {i+1}, \ldots, b_ {W-1}\\}.
+            /// $$
             ///
             /// # Worst-case complexity
             ///
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `index >= Self::WIDTH && self >= 0`.
+            /// Panics if $n \geq 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is
+            /// `$t::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
             ///
-            /// let mut x = 0i8;
-            /// x.set_bit(2);
-            /// x.set_bit(5);
-            /// x.set_bit(6);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -0x100i16;
-            /// x.set_bit(2);
-            /// x.set_bit(5);
-            /// x.set_bit(6);
-            /// assert_eq!(x, -156);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn set_bit(&mut self, index: u64) {
                 _set_bit_signed(self, index)
             }
 
-            /// Sets the `index`th bit of a primitive signed integer, or the coefficient of $2^i$ in
-            /// its binary expansion, to 0.
+            /// Sets the `index`th bit of a primitive signed integer to 0.
             ///
-            /// Negative integers are represented in two's complement.
+            /// Clearing bits beyond the type's width is disallowed, if `self` is negative.
             ///
-            /// Clearing bits beyond the type's width is disallowed if the integer is negative; if
-            /// it is non-negative, it's allowed but does nothing since those bits are already
-            /// false.
+            /// If $n \geq 0$, let
+            /// $$
+            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// $$
+            /// f(n, i) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 0, b_ {i+1}, \ldots, b_ {W-1}\\}.
+            /// $$
+            ///
+            /// If $n < 0$, let
+            /// $$
+            /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
+            /// $$
+            /// f(n, i) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 0, b_ {i+1}, \ldots, b_ {W-1}\\},
+            /// $$
+            /// and $i < W$.
             ///
             /// # Worst-case complexity
             ///
             /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `index >= Self::WIDTH && self < 0`.
+            /// Panics if $n < 0$ and $i \geq W$, where $n$ is `self`, $i$ is `index` and $W$ is
+            /// `$t::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitAccess;
             ///
-            /// let mut x = 0x7fi8;
-            /// x.clear_bit(0);
-            /// x.clear_bit(1);
-            /// x.clear_bit(3);
-            /// x.clear_bit(4);
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -156i16;
-            /// x.clear_bit(2);
-            /// x.clear_bit(5);
-            /// x.clear_bit(6);
-            /// assert_eq!(x, -256);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn clear_bit(&mut self, index: u64) {
                 _clear_bit_signed(self, index)

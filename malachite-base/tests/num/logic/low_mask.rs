@@ -1,8 +1,7 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::panic::catch_unwind;
 
 fn low_mask_primitive_helper<T: PrimitiveInt>() {
     let test = |bits, out| {

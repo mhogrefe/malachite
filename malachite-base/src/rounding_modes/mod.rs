@@ -2,10 +2,12 @@ use named::Named;
 
 /// An enum that specifies how a value should be rounded.
 ///
+/// The ordering on `RoundingMode`s is arbitrary. Nonetheless, it is nice to have an ordering.
+///
 /// For more information, check the module-level documentation.
 ///
 /// A `RoundingMode` takes up 1 byte of space.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum RoundingMode {
     Down,
     Up,

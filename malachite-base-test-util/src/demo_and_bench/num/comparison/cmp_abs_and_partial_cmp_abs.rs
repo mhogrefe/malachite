@@ -70,7 +70,7 @@ fn benchmark_unsigned_cmp_abs<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.cmp_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.cmp_abs(&y)))],
     );
 }
 
@@ -88,7 +88,7 @@ fn benchmark_unsigned_partial_cmp_abs<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
     );
 }
 
@@ -106,7 +106,7 @@ fn benchmark_signed_cmp_abs<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.cmp_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.cmp_abs(&y)))],
     );
 }
 
@@ -124,6 +124,6 @@ fn benchmark_signed_partial_cmp_abs<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.partial_cmp_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.partial_cmp_abs(&y)))],
     );
 }

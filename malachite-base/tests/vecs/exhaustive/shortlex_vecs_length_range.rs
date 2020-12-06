@@ -6,8 +6,8 @@ use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::shortlex_vecs_length_range;
 
 fn shortlex_vecs_length_range_small_helper<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
     out_len: usize,
     out: &[&[I::Item]],

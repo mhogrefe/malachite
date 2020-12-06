@@ -67,6 +67,10 @@ pub fn exhaustive_signed_gen_var_2<T: PrimitiveSigned>() -> It<T> {
     Box::new(exhaustive_natural_signeds())
 }
 
+pub fn exhaustive_signed_gen_var_3<T: PrimitiveSigned>() -> It<T> {
+    Box::new(exhaustive_signeds().filter(|&x| x != T::ZERO && x != T::NEGATIVE_ONE))
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_pair_gen<T: PrimitiveSigned>() -> It<(T, T)> {
@@ -101,6 +105,13 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_3<T: PrimitiveSigned>() -> It<(T,
             exhaustive_unsigneds(),
         )),
     )
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_4<T: PrimitiveSigned>() -> It<(T, u64)> {
+    Box::new(lex_pairs(
+        exhaustive_signeds(),
+        primitive_int_increasing_range(0, T::WIDTH),
+    ))
 }
 
 // -- PrimitiveUnsigned --

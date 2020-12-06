@@ -110,6 +110,10 @@ pub fn random_signed_gen_var_2<T: PrimitiveSigned>(_config: &GenConfig) -> It<T>
     Box::new(random_natural_signeds(EXAMPLE_SEED))
 }
 
+pub fn random_signed_gen_var_3<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
+    Box::new(random_primitive_ints(EXAMPLE_SEED).filter(|&x| x != T::ZERO && x != T::NEGATIVE_ONE))
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn random_unsigned_gen_var_1<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<T> {

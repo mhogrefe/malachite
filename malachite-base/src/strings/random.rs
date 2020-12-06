@@ -38,7 +38,7 @@ use vecs::random::{random_fixed_length_vecs_from_single, RandomFixedLengthVecsFr
 /// ```
 #[inline]
 pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
-    len: usize,
+    len: u64,
     cs: I,
 ) -> StringsFromCharVecs<RandomFixedLengthVecsFromSingle<I>> {
     StringsFromCharVecs {
@@ -79,7 +79,7 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 #[inline]
 pub fn random_fixed_length_strings(
     seed: Seed,
-    len: usize,
+    len: u64,
 ) -> StringsFromCharVecs<RandomFixedLengthVecsFromSingle<RandomCharRange>> {
     random_fixed_length_strings_using_chars(len, random_chars(seed))
 }

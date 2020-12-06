@@ -3,7 +3,7 @@ use std::iter::{empty, once};
 use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
 
 fn lex_fixed_length_strings_using_chars_helper<I: Iterator<Item = char>>(
-    len: usize,
+    len: u64,
     cs: I,
     out: &[&str],
 ) {

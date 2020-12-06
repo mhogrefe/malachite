@@ -163,7 +163,7 @@ fn limbs_slice_shr_in_place_fail_3() {
     limbs_slice_shr_in_place(&mut [123, 456], 100);
 }
 
-macro_rules! tests_and_properties_unsigned {
+macro_rules! tests_unsigned {
     (
         $t:ident,
         $test_shr_u:ident,
@@ -234,9 +234,9 @@ macro_rules! tests_and_properties_unsigned {
         }
     };
 }
-tests_and_properties_unsigned!(u8, test_shr_u8, u, v, out, {});
-tests_and_properties_unsigned!(u16, test_shr_u16, u, v, out, {});
-tests_and_properties_unsigned!(u32, test_shr_u32, u, v, out, {
+tests_unsigned!(u8, test_shr_u8, u, v, out, {});
+tests_unsigned!(u16, test_shr_u16, u, v, out, {});
+tests_unsigned!(u32, test_shr_u32, u, v, out, {
     let mut n = rug::Integer::from_str(u).unwrap();
     n >>= v;
     assert_eq!(n.to_string(), out);
@@ -250,11 +250,11 @@ tests_and_properties_unsigned!(u32, test_shr_u32, u, v, out, {
     let n = &BigUint::from_str(u).unwrap() >> usize::exact_from(v);
     assert_eq!(n.to_string(), out);
 });
-tests_and_properties_unsigned!(u64, test_shr_u64, u, v, out, {});
-tests_and_properties_unsigned!(u128, test_shr_u128, u, v, out, {});
-tests_and_properties_unsigned!(usize, test_shr_usize, u, v, out, {});
+tests_unsigned!(u64, test_shr_u64, u, v, out, {});
+tests_unsigned!(u128, test_shr_u128, u, v, out, {});
+tests_unsigned!(usize, test_shr_usize, u, v, out, {});
 
-macro_rules! tests_and_properties_signed {
+macro_rules! tests_signed {
     (
         $t:ident,
         $test_shr_i:ident,
@@ -347,9 +347,9 @@ macro_rules! tests_and_properties_signed {
         }
     };
 }
-tests_and_properties_signed!(i8, test_shr_i8, i, j, out, {});
-tests_and_properties_signed!(i16, test_shr_i16, i, v, out, {});
-tests_and_properties_signed!(i32, test_shr_i32, i, j, out, {
+tests_signed!(i8, test_shr_i8, i, j, out, {});
+tests_signed!(i16, test_shr_i16, i, v, out, {});
+tests_signed!(i32, test_shr_i32, i, j, out, {
     let mut n = rug::Integer::from_str(i).unwrap();
     n >>= j;
     assert_eq!(n.to_string(), out);
@@ -357,6 +357,6 @@ tests_and_properties_signed!(i32, test_shr_i32, i, j, out, {
     let n = rug::Integer::from_str(i).unwrap() >> j;
     assert_eq!(n.to_string(), out);
 });
-tests_and_properties_signed!(i64, test_shr_i64, i, j, out, {});
-tests_and_properties_signed!(i128, test_shr_i128, i, j, out, {});
-tests_and_properties_signed!(isize, test_shr_isize, i, j, out, {});
+tests_signed!(i64, test_shr_i64, i, j, out, {});
+tests_signed!(i128, test_shr_i128, i, j, out, {});
+tests_signed!(isize, test_shr_isize, i, j, out, {});

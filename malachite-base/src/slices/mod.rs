@@ -1,4 +1,5 @@
 use num::basic::traits::Zero;
+use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
 
@@ -226,7 +227,7 @@ macro_rules! split_into_chunks_mut {
 #[derive(Clone, Debug)]
 pub struct RandomValuesFromSlice<'a, T> {
     xs: &'a [T],
-    indices: RandomUnsignedsLessThan<usize>,
+    indices: RandomUnsignedsLessThan<u64>,
 }
 
 impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
@@ -234,7 +235,7 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 
     #[inline]
     fn next(&mut self) -> Option<&'a T> {
-        Some(&self.xs[self.indices.next().unwrap()])
+        Some(&self.xs[usize::exact_from(self.indices.next().unwrap())])
     }
 }
 
@@ -269,6 +270,6 @@ pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlic
     }
     RandomValuesFromSlice {
         xs,
-        indices: random_unsigneds_less_than(seed, xs.len()),
+        indices: random_unsigneds_less_than(seed, u64::exact_from(xs.len())),
     }
 }

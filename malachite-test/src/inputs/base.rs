@@ -1,4 +1,4 @@
-use std::cmp::{max, Ordering};
+use std::cmp::max;
 use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
@@ -88,7 +88,6 @@ use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
 };
 use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
-use malachite_nz::natural::comparison::ord::limbs_cmp;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
@@ -1780,7 +1779,7 @@ where
     )
 }
 
-// All pairs of signed `T` and `u64`, where the signed `T` i s non-negative or the `u64` is smaller
+// All pairs of signed `T` and `u64`, where the signed `T` is non-negative or the `u64` is smaller
 // than `T::WIDTH`.
 pub fn pairs_of_signed_and_u64_width_range_var_2<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
@@ -2939,6 +2938,13 @@ fn quadruples_of_unsigned_vec<T: PrimitiveUnsigned + Rand>(
 pub fn quadruples_of_unsigned_vec_var_1(
     gm: GenerationMode,
 ) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(quadruples_of_unsigned_vec_var_2(gm).filter(|&(_, _, _, ref ms)| ms[0].odd()))
+}
+
+// All quadruples of `Vec<Limb>` that are valid inputs to `limbs_mod_pow`.
+pub fn quadruples_of_unsigned_vec_var_2(
+    gm: GenerationMode,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
     Box::new(
         quadruples_of_unsigned_vec::<Limb>(gm).filter(|&(ref out, ref bs, ref es, ref ms)| {
             !bs.is_empty()
@@ -2948,8 +2954,6 @@ pub fn quadruples_of_unsigned_vec_var_1(
                 && *bs.last().unwrap() != 0
                 && *es.last().unwrap() != 0
                 && *ms.last().unwrap() != 0
-                && ms[0].odd()
-                && limbs_cmp(bs, ms) == Ordering::Less
         }),
     )
 }
@@ -3964,8 +3968,8 @@ fn pairs_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_ys_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -4000,7 +4004,7 @@ fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
     let xss: It<Vec<T>> =
         match gm {
             GenerationMode::Exhaustive => Box::new(exhaustive_vecs_min_length(
-                (min_len as usize) << 1,
+                min_len << 1,
                 exhaustive_unsigneds(),
             )),
             GenerationMode::Random(scale) => Box::new(random_vecs_min_length(
@@ -4032,7 +4036,7 @@ fn pairs_of_unsigned_vec_min_sizes_2<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
-            exhaustive_vecs_min_length(min_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_len, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs_from_single(
             random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
@@ -4051,9 +4055,9 @@ fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_ys_len as usize, exhaustive_unsigneds()),
-            exhaustive_vecs_min_length(min_zs_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_ys_len, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_zs_len, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples(
             &EXAMPLE_SEED,
@@ -4078,7 +4082,7 @@ fn triples_of_unsigned_vec_min_sizes_1_2<T: PrimitiveUnsigned + Rand>(
     let xss: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
             pairs_of_unsigned_vec_min_sizes_var_1(gm, min_ys_zs_len),
-            exhaustive_vecs_min_length(min_xs_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
@@ -4100,7 +4104,7 @@ fn triples_of_unsigned_vec_min_sizes_3<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     match gm {
         GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
-            exhaustive_vecs_min_length(min_len as usize, exhaustive_unsigneds()),
+            exhaustive_vecs_min_length(min_len, exhaustive_unsigneds()),
         )),
         GenerationMode::Random(scale) => Box::new(random_triples_from_single(
             random_vecs_min_length(&EXAMPLE_SEED, scale, min_len, &(|seed| random(seed))),
@@ -7626,10 +7630,7 @@ pub fn pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
     match gm {
         GenerationMode::Exhaustive => {
             let f = |n: &T| {
-                exhaustive_fixed_length_vecs_from_single(
-                    usize::wrapping_from(n.significant_bits()),
-                    exhaustive_bools(),
-                )
+                exhaustive_fixed_length_vecs_from_single(n.significant_bits(), exhaustive_bools())
             };
             Box::new(dependent_pairs(exhaustive_unsigneds(), f))
         }
@@ -7667,7 +7668,10 @@ where
     match gm {
         GenerationMode::Exhaustive => {
             let f = |n: &T| {
-                exhaustive_fixed_length_vecs_from_single(n.to_bits_asc().len(), exhaustive_bools())
+                exhaustive_fixed_length_vecs_from_single(
+                    u64::exact_from(n.to_bits_asc().len()),
+                    exhaustive_bools(),
+                )
             };
             Box::new(dependent_pairs(exhaustive_signeds(), f))
         }
@@ -7746,8 +7750,8 @@ pub fn triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
         GenerationMode::Exhaustive => {
             let f = |&(u, log_base): &(T, u64)| {
                 exhaustive_fixed_length_vecs_from_single(
-                    usize::wrapping_from(u.significant_bits())
-                        .div_round(usize::wrapping_from(log_base), RoundingMode::Ceiling),
+                    u.significant_bits()
+                        .div_round(log_base, RoundingMode::Ceiling),
                     exhaustive_bools(),
                 )
             };

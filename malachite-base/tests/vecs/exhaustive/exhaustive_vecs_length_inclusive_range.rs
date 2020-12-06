@@ -7,8 +7,8 @@ use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
 
 fn exhaustive_vecs_length_inclusive_range_helper<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
     out: &[&[I::Item]],
 ) where
@@ -24,8 +24,8 @@ fn exhaustive_vecs_length_inclusive_range_helper<I: Clone + Iterator>(
 }
 
 fn exhaustive_vecs_length_inclusive_range_small_helper<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
     out_len: usize,
     out: &[&[I::Item]],

@@ -12,7 +12,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::vecs::random::random_fixed_length_vecs_from_single;
 
 fn random_fixed_length_vecs_from_single_helper<I: Clone + Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
     expected_values: &[Vec<I::Item>],
     expected_common_values: &[(Vec<I::Item>, usize)],

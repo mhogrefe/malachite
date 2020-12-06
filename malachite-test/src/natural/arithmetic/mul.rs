@@ -1934,7 +1934,7 @@ fn benchmark_natural_mul_library_comparison(gm: GenerationMode, limit: usize, fi
     run_benchmark_old(
         "Natural * Natural",
         BenchmarkType::LibraryComparison,
-        nrm_pairs_of_naturals(gm.with_scale(u32::exact_from(16 * Limb::WIDTH))),
+        nrm_pairs_of_naturals(gm.with_scale(1 << 15)),
         gm.name(),
         limit,
         file_name,

@@ -38,7 +38,7 @@ fn benchmark_increment_char(gm: GenMode, config: GenConfig, limit: usize, file_n
         limit,
         file_name,
         &char_bucketer(),
-        &mut [("Malachite", &mut (|mut c| increment_char(&mut c)))],
+        &mut [("Malachite", &mut |mut c| increment_char(&mut c))],
     );
 }
 
@@ -51,6 +51,6 @@ fn benchmark_decrement_char(gm: GenMode, config: GenConfig, limit: usize, file_n
         limit,
         file_name,
         &char_bucketer(),
-        &mut [("Malachite", &mut (|mut c| decrement_char(&mut c)))],
+        &mut [("Malachite", &mut |mut c| decrement_char(&mut c))],
     );
 }

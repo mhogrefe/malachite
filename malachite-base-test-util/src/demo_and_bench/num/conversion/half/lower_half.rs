@@ -38,6 +38,6 @@ fn benchmark_unsigned_lower_half<T: PrimitiveUnsigned + SplitInHalf>(
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|u| no_out!(u.lower_half())))],
+        &mut [("Malachite", &mut |u| no_out!(u.lower_half()))],
     );
 }

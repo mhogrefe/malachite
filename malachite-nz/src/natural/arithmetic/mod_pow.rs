@@ -1,17 +1,20 @@
-use std::cmp::{max, Ordering};
+use std::cmp::{max, min, Ordering};
 
 use malachite_base::num::arithmetic::traits::{
-    ModMulAssign, ModPow, ModPowAssign, ModPowerOfTwo, Parity, PowerOfTwo, WrappingNegAssign,
+    ModPow, ModPowAssign, ModPowerOfTwo, ModPowerOfTwoAssign, Parity, PowerOfTwo, WrappingNegAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{BitIterable, TrailingZeros};
-use malachite_base::slices::slice_set_zero;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
+};
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
 use fail_on_untested_path;
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
+    _limbs_add_to_out_aliased, limbs_add_same_length_to_out,
+    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact::{
@@ -19,19 +22,25 @@ use natural::arithmetic::div_exact::{
 };
 use natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
 use natural::arithmetic::mod_op::limbs_mod_to_out;
+use natural::arithmetic::mod_power_of_two_pow::limbs_pow_low;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
     _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::mul::{_limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
+use natural::arithmetic::mul::{
+    _limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
+};
+use natural::arithmetic::shr::limbs_shr_to_out;
 use natural::arithmetic::square::{_limbs_square_to_out_basecase, limbs_square_to_out};
 use natural::arithmetic::sub::{
-    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_to_out,
 };
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::bit_access::limbs_get_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
+use natural::InnerNatural::Small;
 use natural::Natural;
 use platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
 
@@ -223,8 +232,8 @@ fn select_fns(
 /// Given the limbs of $x$, $E$, and odd $m$, writes the limbs of $x^E \mod m$ to an output slice.
 ///
 /// `xs`, `es`, and `ms` must be nonempty and their last elements must be nonzero. $m$ must be odd,
-/// $x$ must be less than $m$, $E$ must be greater than 1, and `out` must be at least as long as
-/// `ms`.
+/// $E$ must be greater than 1, and `out` must be at least as long as `ms`. It is not required than
+/// `xs` be less than `ms`.
 ///
 /// TODO complexity
 ///
@@ -269,7 +278,6 @@ pub fn limbs_mod_pow_odd(
     let ms_len = ms.len();
     assert_ne!(xs_len, 0);
     assert_ne!(es_len, 0);
-    assert!(xs_len <= ms_len);
     if es_len == 1 {
         assert!(es[0] > 1);
     }
@@ -352,19 +360,122 @@ pub fn limbs_mod_pow_odd(
     }
 }
 
-//TODO use test-utils version
-fn _simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
-    if *m == 1 {
-        return Natural::ZERO;
-    }
-    let mut out = Natural::ONE;
-    for bit in exp.bits().rev() {
-        out.mod_mul_assign(out.clone(), m);
-        if bit {
-            out.mod_mul_assign(x, m);
+/// Interpreting a `Vec<Limb>` and two `&[Limb]` as the limbs (in ascending order) of three
+/// `Natural`s, `x`, `exp`, and `m`, writes the limbs of `x`<sup>`exp`</sup> mod 2<sup>`m`</sup> to
+/// an output slice. Assumes the input is already reduced mod `m`. No input may be empty or have
+/// trailing zeros, the exponent must be greater than 1, and the output slice must be at least as
+/// long as `ms`.
+///
+/// TODO complexity
+///
+/// # Panics
+/// Panics if the exponent has trailing zeros or is 1.
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::mod_pow::limbs_mod_pow;
+///
+/// let mut out = vec![10; 3];
+/// limbs_mod_pow(&mut out, &[3], &[20], &[105]);
+/// assert_eq!(out, &[51, 10, 10]);
+///
+/// let mut out = vec![10; 3];
+/// limbs_mod_pow(&mut out, &[4], &[1, 1], &[0, 6]);
+/// assert_eq!(out, &[0, 4, 10]);
+/// ```
+///
+/// This is mpz_powm from mpn/generic/powm.c, GMP 6.1.2, where b, e, and m are non-negative.
+pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
+    let ms_len = ms.len();
+    let es_len = es.len();
+    let xs_len = xs.len();
+    let mut ms_zero_len = slice_leading_zeros(ms);
+    let mut ms = &ms[ms_zero_len..];
+    let mut ms_nonzero_len = ms_len - ms_zero_len;
+    let mut ms_vec;
+    let mut ms_twos = 0;
+    if ms[0].even() {
+        ms_vec = vec![0; ms_nonzero_len];
+        ms_twos = TrailingZeros::trailing_zeros(ms[0]);
+        limbs_shr_to_out(&mut ms_vec, &ms[..ms_nonzero_len], ms_twos);
+        if ms_vec[ms_nonzero_len - 1] == 0 {
+            ms_nonzero_len -= 1;
         }
+        ms = &ms_vec;
+        ms_zero_len += 1;
     }
-    out
+    let scratch_len = if ms_zero_len != 0 {
+        // We will call both `limbs_mod_pow_odd` and `limbs_pow_low`.
+        let max_invert_len = max(ms_zero_len, ms_nonzero_len);
+        let invert_scratch_len = limbs_modular_invert_scratch_len(max_invert_len);
+        (ms_len << 1) + max(invert_scratch_len, ms_len << 1)
+    } else {
+        // We will call just `limbs_mod_pow_odd`.
+        let invert_scratch_len = limbs_modular_invert_scratch_len(ms_nonzero_len);
+        max(invert_scratch_len, ms_len << 1)
+    };
+    let mut scratch = vec![0; scratch_len];
+    limbs_mod_pow_odd(out, xs, es, &ms[..ms_nonzero_len], &mut scratch);
+    let mut xs_vec;
+    let mut xs = xs;
+    if ms_zero_len != 0 {
+        if xs_len < ms_zero_len {
+            xs_vec = vec![0; ms_zero_len];
+            xs_vec[..xs_len].copy_from_slice(xs);
+            xs = &xs_vec;
+        }
+        let mut do_pow_low = true;
+        let (scratch_lo, scratch_hi) = scratch.split_at_mut(ms_zero_len);
+        if xs[0].even() {
+            if es_len > 1 {
+                slice_set_zero(scratch_lo);
+                do_pow_low = false;
+            } else {
+                assert_eq!(es_len, 1);
+                let t = if ms_twos == 0 {
+                    ms_zero_len << Limb::LOG_WIDTH
+                } else {
+                    ((ms_zero_len - 1) << Limb::LOG_WIDTH) + usize::exact_from(ms_twos)
+                };
+                // Count number of low zero bits in `xs`, up to 3.
+                let bits = (Limb::exact_from(0x1213) >> (xs[0].mod_power_of_two(3) << 1))
+                    .mod_power_of_two(2);
+                // Note that es[0] * bits might overflow, but that just results in a missed
+                // optimization.
+                if let Some(t) = Limb::checked_from(t) {
+                    if es[0].wrapping_mul(bits) >= t {
+                        slice_set_zero(scratch_lo);
+                        do_pow_low = false;
+                    }
+                }
+            }
+        }
+        if do_pow_low {
+            scratch_lo.copy_from_slice(&xs[..ms_zero_len]);
+            limbs_pow_low(scratch_lo, &es[..es_len], scratch_hi);
+        }
+        let mut ms_vec;
+        if ms_nonzero_len < ms_zero_len {
+            ms_vec = vec![0; ms_zero_len];
+            ms_vec[..ms_nonzero_len].copy_from_slice(&ms[..ms_nonzero_len]);
+            ms = &ms_vec;
+        }
+        let (scratch_0_1, scratch_2) = scratch.split_at_mut(ms_len << 1);
+        let (scratch_0, scratch_1) = scratch_0_1.split_at_mut(ms_len);
+        let scratch_0 = &mut scratch_0[..ms_zero_len];
+        limbs_modular_invert(scratch_1, &ms[..ms_zero_len], scratch_2);
+        limbs_sub_in_place_left(scratch_0, &out[..min(ms_zero_len, ms_nonzero_len)]);
+        limbs_mul_low_same_length(scratch_2, &scratch_1[..ms_zero_len], scratch_0);
+        if ms_twos != 0 {
+            scratch_2[ms_zero_len - 1].mod_power_of_two_assign(ms_twos);
+        }
+        limbs_mul_to_out(
+            scratch_0_1,
+            &scratch_2[..ms_zero_len],
+            &ms[..ms_nonzero_len],
+        );
+        _limbs_add_to_out_aliased(out, ms_nonzero_len, &scratch_0_1[..ms_len]);
+    }
 }
 
 impl ModPow<Natural, Natural> for Natural {
@@ -386,8 +497,10 @@ impl ModPow<Natural, Natural> for Natural {
     /// assert_eq!(Natural::from(4u32).mod_pow(Natural::from(13u32), Natural::from(497u32)), 445);
     /// assert_eq!(Natural::from(10u32).mod_pow(Natural::from(1000u32), Natural::from(30u32)), 10);
     /// ```
-    fn mod_pow(self, exp: Natural, m: Natural) -> Natural {
-        _simple_binary_mod_pow(&self, &exp, &m)
+    #[inline]
+    fn mod_pow(mut self, exp: Natural, m: Natural) -> Natural {
+        self.mod_pow_assign(exp, m);
+        self
     }
 }
 
@@ -410,8 +523,10 @@ impl<'a> ModPow<Natural, &'a Natural> for Natural {
     /// assert_eq!(Natural::from(4u32).mod_pow(Natural::from(13u32), &Natural::from(497u32)), 445);
     /// assert_eq!(Natural::from(10u32).mod_pow(Natural::from(1000u32), &Natural::from(30u32)), 10);
     /// ```
-    fn mod_pow(self, exp: Natural, m: &'a Natural) -> Natural {
-        _simple_binary_mod_pow(&self, &exp, m)
+    #[inline]
+    fn mod_pow(mut self, exp: Natural, m: &'a Natural) -> Natural {
+        self.mod_pow_assign(exp, m);
+        self
     }
 }
 
@@ -435,8 +550,10 @@ impl<'a> ModPow<&'a Natural, Natural> for Natural {
     /// assert_eq!(Natural::from(4u32).mod_pow(&Natural::from(13u32), Natural::from(497u32)), 445);
     /// assert_eq!(Natural::from(10u32).mod_pow(&Natural::from(1000u32), Natural::from(30u32)), 10);
     /// ```
-    fn mod_pow(self, exp: &'a Natural, m: Natural) -> Natural {
-        _simple_binary_mod_pow(&self, exp, &m)
+    #[inline]
+    fn mod_pow(mut self, exp: &'a Natural, m: Natural) -> Natural {
+        self.mod_pow_assign(exp, m);
+        self
     }
 }
 
@@ -462,8 +579,10 @@ impl<'a, 'b> ModPow<&'a Natural, &'b Natural> for Natural {
     ///     10
     /// );
     /// ```
-    fn mod_pow(self, exp: &'a Natural, m: &'b Natural) -> Natural {
-        _simple_binary_mod_pow(&self, exp, m)
+    #[inline]
+    fn mod_pow(mut self, exp: &'a Natural, m: &'b Natural) -> Natural {
+        self.mod_pow_assign(exp, m);
+        self
     }
 }
 
@@ -492,8 +611,26 @@ impl<'a> ModPow<Natural, Natural> for &'a Natural {
     ///     10
     /// );
     /// ```
-    fn mod_pow(self, exp: Natural, m: Natural) -> Natural {
-        _simple_binary_mod_pow(self, &exp, &m)
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow(self, mut exp: Natural, mut m: Natural) -> Natural {
+        match (self, &exp, &m) {
+            (_, _, natural_one!()) => Natural::ZERO,
+            (_, natural_zero!(), _) => Natural::ONE,
+            (natural_zero!(), _, _) => Natural::ZERO,
+            (x, natural_one!(), _) => x.clone(),
+            (natural_one!(), _, _) => Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                Natural::from(x.mod_pow(u64::wrapping_from(*e), *m))
+            }
+            _ => {
+                let ms = m.promote_in_place();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, &self.to_limbs_asc(), exp.promote_in_place(), ms);
+                Natural::from_owned_limbs_asc(out)
+            }
+        }
     }
 }
 
@@ -523,8 +660,26 @@ impl<'a, 'b> ModPow<Natural, &'b Natural> for &'a Natural {
     ///     10
     /// );
     /// ```
-    fn mod_pow(self, exp: Natural, m: &'b Natural) -> Natural {
-        _simple_binary_mod_pow(self, &exp, m)
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow(self, mut exp: Natural, m: &'b Natural) -> Natural {
+        match (self, &exp, m) {
+            (_, _, natural_one!()) => Natural::ZERO,
+            (_, natural_zero!(), _) => Natural::ONE,
+            (natural_zero!(), _, _) => Natural::ZERO,
+            (x, natural_one!(), _) => x.clone(),
+            (natural_one!(), _, _) => Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                Natural::from(x.mod_pow(u64::wrapping_from(*e), *m))
+            }
+            _ => {
+                let ms = m.to_limbs_asc();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, &self.to_limbs_asc(), exp.promote_in_place(), &ms);
+                Natural::from_owned_limbs_asc(out)
+            }
+        }
     }
 }
 
@@ -553,8 +708,26 @@ impl<'a, 'b> ModPow<&'b Natural, Natural> for &'a Natural {
     ///     10
     /// );
     /// ```
-    fn mod_pow(self, exp: &'b Natural, m: Natural) -> Natural {
-        _simple_binary_mod_pow(self, exp, &m)
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow(self, exp: &'b Natural, mut m: Natural) -> Natural {
+        match (self, exp, &m) {
+            (_, _, natural_one!()) => Natural::ZERO,
+            (_, natural_zero!(), _) => Natural::ONE,
+            (natural_zero!(), _, _) => Natural::ZERO,
+            (x, natural_one!(), _) => x.clone(),
+            (natural_one!(), _, _) => Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                Natural::from(x.mod_pow(u64::wrapping_from(*e), *m))
+            }
+            _ => {
+                let ms = m.promote_in_place();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, &self.to_limbs_asc(), &exp.to_limbs_asc(), ms);
+                Natural::from_owned_limbs_asc(out)
+            }
+        }
     }
 }
 
@@ -583,8 +756,26 @@ impl<'a, 'b, 'c> ModPow<&'b Natural, &'c Natural> for &'a Natural {
     ///     10
     /// );
     /// ```
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow(self, exp: &'b Natural, m: &'c Natural) -> Natural {
-        _simple_binary_mod_pow(self, exp, m)
+        match (self, exp, m) {
+            (_, _, natural_one!()) => Natural::ZERO,
+            (_, natural_zero!(), _) => Natural::ONE,
+            (natural_zero!(), _, _) => Natural::ZERO,
+            (x, natural_one!(), _) => x.clone(),
+            (natural_one!(), _, _) => Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                Natural::from(x.mod_pow(u64::wrapping_from(*e), *m))
+            }
+            _ => {
+                let ms = m.to_limbs_asc();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, &self.to_limbs_asc(), &exp.to_limbs_asc(), &ms);
+                Natural::from_owned_limbs_asc(out)
+            }
+        }
     }
 }
 
@@ -610,8 +801,31 @@ impl ModPowAssign<Natural, Natural> for Natural {
     /// x.mod_pow_assign(Natural::from(1000u32), Natural::from(30u32));
     /// assert_eq!(x, 10);
     /// ```
-    fn mod_pow_assign(&mut self, exp: Natural, m: Natural) {
-        *self = _simple_binary_mod_pow(&*self, &exp, &m);
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow_assign(&mut self, mut exp: Natural, mut m: Natural) {
+        match (&mut *self, &exp, &m) {
+            (_, _, natural_one!()) => *self = Natural::ZERO,
+            (_, natural_zero!(), _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) => *self = Natural::ZERO,
+            (_, natural_one!(), _) => {}
+            (natural_one!(), _, _) => *self = Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+            }
+            _ => {
+                let ms = m.promote_in_place();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(
+                    &mut out,
+                    self.promote_in_place(),
+                    exp.promote_in_place(),
+                    ms,
+                );
+                *self = Natural::from_owned_limbs_asc(out);
+            }
+        }
     }
 }
 
@@ -637,8 +851,31 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
     /// x.mod_pow_assign(Natural::from(1000u32), &Natural::from(30u32));
     /// assert_eq!(x, 10);
     /// ```
-    fn mod_pow_assign(&mut self, exp: Natural, m: &'a Natural) {
-        *self = _simple_binary_mod_pow(&*self, &exp, m);
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow_assign(&mut self, mut exp: Natural, m: &'a Natural) {
+        match (&mut *self, &exp, m) {
+            (_, _, natural_one!()) => *self = Natural::ZERO,
+            (_, natural_zero!(), _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) => *self = Natural::ZERO,
+            (_, natural_one!(), _) => {}
+            (natural_one!(), _, _) => *self = Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+            }
+            _ => {
+                let ms = m.to_limbs_asc();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(
+                    &mut out,
+                    self.promote_in_place(),
+                    exp.promote_in_place(),
+                    &ms,
+                );
+                *self = Natural::from_owned_limbs_asc(out);
+            }
+        }
     }
 }
 
@@ -664,8 +901,26 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
     /// x.mod_pow_assign(&Natural::from(1000u32), Natural::from(30u32));
     /// assert_eq!(x, 10);
     /// ```
-    fn mod_pow_assign(&mut self, exp: &'a Natural, m: Natural) {
-        *self = _simple_binary_mod_pow(&*self, exp, &m);
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
+    fn mod_pow_assign(&mut self, exp: &'a Natural, mut m: Natural) {
+        match (&mut *self, exp, &m) {
+            (_, _, natural_one!()) => *self = Natural::ZERO,
+            (_, natural_zero!(), _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) => *self = Natural::ZERO,
+            (_, natural_one!(), _) => {}
+            (natural_one!(), _, _) => *self = Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+            }
+            _ => {
+                let ms = m.promote_in_place();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, self.promote_in_place(), &exp.to_limbs_asc(), ms);
+                *self = Natural::from_owned_limbs_asc(out);
+            }
+        }
     }
 }
 
@@ -691,7 +946,25 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
     /// x.mod_pow_assign(&Natural::from(1000u32), &Natural::from(30u32));
     /// assert_eq!(x, 10);
     /// ```
+    #[allow(clippy::match_same_arms)] // matches are order-dependent
     fn mod_pow_assign(&mut self, exp: &'a Natural, m: &'b Natural) {
-        *self = _simple_binary_mod_pow(&*self, exp, m);
+        match (&mut *self, exp, m) {
+            (_, _, natural_one!()) => *self = Natural::ZERO,
+            (_, natural_zero!(), _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) => *self = Natural::ZERO,
+            (_, natural_one!(), _) => {}
+            (natural_one!(), _, _) => *self = Natural::ONE,
+            (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
+                if u64::convertible_from(*e) =>
+            {
+                x.mod_pow_assign(u64::wrapping_from(*e), *m)
+            }
+            _ => {
+                let ms = m.to_limbs_asc();
+                let mut out = vec![0; ms.len()];
+                limbs_mod_pow(&mut out, self.promote_in_place(), &exp.to_limbs_asc(), &ms);
+                *self = Natural::from_owned_limbs_asc(out);
+            }
+        }
     }
 }

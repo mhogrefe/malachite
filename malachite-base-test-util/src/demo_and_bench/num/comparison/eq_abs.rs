@@ -55,7 +55,7 @@ fn benchmark_unsigned_eq_abs<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.eq_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.eq_abs(&y)))],
     );
 }
 
@@ -73,7 +73,7 @@ fn benchmark_unsigned_ne_abs<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ne_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.ne_abs(&y)))],
     );
 }
 
@@ -91,7 +91,7 @@ fn benchmark_signed_eq_abs<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.eq_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.eq_abs(&y)))],
     );
 }
 
@@ -109,6 +109,6 @@ fn benchmark_signed_ne_abs<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(x.ne_abs(&y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.ne_abs(&y)))],
     );
 }

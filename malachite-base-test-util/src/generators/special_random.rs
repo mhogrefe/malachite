@@ -82,6 +82,17 @@ pub fn special_random_signed_gen_var_2<T: PrimitiveSigned>(config: &GenConfig) -
     ))
 }
 
+pub fn special_random_signed_gen_var_3<T: PrimitiveSigned>(config: &GenConfig) -> It<T> {
+    Box::new(
+        striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_run_length_n", T::WIDTH >> 1),
+            config.get_or("mean_run_length_d", 1),
+        )
+        .filter(|&x| x != T::ZERO && x != T::NEGATIVE_ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn special_random_signed_pair_gen<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T)> {
@@ -123,6 +134,22 @@ pub fn special_random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: Prim
                 config.get_or("small_unsigned_mean_d", 1),
             )
         },
+    ))
+}
+
+pub fn special_random_signed_unsigned_pair_gen_var_1_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_run_length_n", T::WIDTH >> 1),
+                config.get_or("mean_run_length_d", 1),
+            )
+        },
+        &|seed| random_unsigneds_less_than(seed, T::WIDTH),
     ))
 }
 

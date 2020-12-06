@@ -101,7 +101,7 @@ pub fn signed_gen<T: PrimitiveSigned>() -> Generator<T> {
     )
 }
 
-/// All `T`s where `T` is signed and the `T` is not `T::MIN`.
+/// All signed `T`s which are not `T::MIN`.
 pub fn signed_gen_var_1<T: PrimitiveSigned>() -> Generator<T> {
     Generator::new(
         &exhaustive_signed_gen_var_1,
@@ -116,6 +116,15 @@ pub fn signed_gen_var_2<T: PrimitiveSigned>() -> Generator<T> {
         &exhaustive_signed_gen_var_2,
         &random_signed_gen_var_2,
         &special_random_signed_gen_var_2,
+    )
+}
+
+/// All signed `T`s that are neither 0 nor -1.
+pub fn signed_gen_var_3<T: PrimitiveSigned>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_signed_gen_var_3,
+        &random_signed_gen_var_3,
+        &special_random_signed_gen_var_3,
     )
 }
 
@@ -151,6 +160,15 @@ pub fn signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     )
 }
 
+/// All `(T, u64)`s where `T` is signed and the `U` is smaller than `T::WIDTH`.
+pub fn signed_unsigned_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_4,
+        &random_primitive_int_unsigned_pair_gen_var_2,
+        &special_random_signed_unsigned_pair_gen_var_1_var_2,
+    )
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn unsigned_gen<T: PrimitiveUnsigned>() -> Generator<T> {
@@ -161,7 +179,7 @@ pub fn unsigned_gen<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
-/// All `T` where `T` is unsigned and the `T` is positive.
+/// All unsigned positive `T`s.
 pub fn unsigned_gen_var_1<T: PrimitiveUnsigned>() -> Generator<T> {
     Generator::new(
         &exhaustive_primitive_int_gen_var_1,

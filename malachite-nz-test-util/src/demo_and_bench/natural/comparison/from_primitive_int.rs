@@ -98,7 +98,7 @@ fn benchmark_natural_from_unsigned<T: PrimitiveUnsigned>(
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut (|u| no_out!(Natural::from(u))))],
+        &mut [("Malachite", &mut |u| no_out!(Natural::from(u)))],
     );
 }
 

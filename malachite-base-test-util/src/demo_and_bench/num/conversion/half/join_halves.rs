@@ -52,6 +52,6 @@ fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut (|(x, y)| no_out!(T::join_halves(x, y))))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(T::join_halves(x, y)))],
     );
 }

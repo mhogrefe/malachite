@@ -308,12 +308,19 @@ pub mod num {
     pub mod logic {
         pub mod bit_access_old;
         pub mod bit_access {
+            pub mod flip_bit;
             pub mod get_bit;
         }
         pub mod bit_block_access;
-        pub mod bit_convertible;
+        pub mod bit_convertible {
+            pub mod from_bits;
+            pub mod to_bits;
+        }
         pub mod bit_iterable;
-        pub mod bit_scan;
+        pub mod bit_scan {
+            pub mod index_of_next_false_bit;
+            pub mod index_of_next_true_bit;
+        }
         pub mod get_highest_bit;
         pub mod hamming_distance;
         pub mod low_mask;
@@ -395,6 +402,7 @@ pub mod rounding_modes {
     pub mod from_str;
     pub mod hash;
     pub mod neg;
+    pub mod ord;
     pub mod random;
     pub mod size;
 }
@@ -444,6 +452,15 @@ pub mod tuples {
     }
     pub mod singletons;
 }
+pub mod unions {
+    pub mod clone;
+    pub mod debug;
+    pub mod display;
+    pub mod eq;
+    pub mod from_str;
+    pub mod ord;
+    pub mod unwrap;
+}
 pub mod vecs {
     pub mod exhaustive {
         pub mod exhaustive_dependent_pairs;
@@ -469,6 +486,11 @@ pub mod vecs {
         pub mod random_fixed_length_vecs;
         pub mod random_fixed_length_vecs_from_single;
         pub mod random_fixed_length_vecs_m_inputs;
+        pub mod random_vecs;
+        pub mod random_vecs_from_length_iterator;
+        pub mod random_vecs_length_inclusive_range;
+        pub mod random_vecs_length_range;
+        pub mod random_vecs_min_length;
     }
     pub mod random_values_from_vec;
     pub mod vec_delete_left;

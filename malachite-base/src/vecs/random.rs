@@ -1,3 +1,12 @@
+use num::conversion::traits::ExactFrom;
+use num::random::geometric::{
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues,
+};
+use num::random::{
+    random_unsigned_inclusive_range, random_unsigned_range, RandomUnsignedInclusiveRange,
+    RandomUnsignedRange,
+};
 use random::Seed;
 use vecs::exhaustive::validate_oi_map;
 
@@ -7,7 +16,7 @@ use vecs::exhaustive::validate_oi_map;
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomFixedLengthVecsFromSingle<I: Iterator> {
-    len: usize,
+    len: u64,
     xs: I,
 }
 
@@ -16,7 +25,7 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 
     #[inline]
     fn next(&mut self) -> Option<Vec<I::Item>> {
-        Some((&mut self.xs).take(self.len).collect())
+        Some((&mut self.xs).take(usize::exact_from(self.len)).collect())
     }
 }
 
@@ -58,7 +67,7 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 /// ```
 #[inline]
 pub fn random_fixed_length_vecs_from_single<I: Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
 ) -> RandomFixedLengthVecsFromSingle<I> {
     RandomFixedLengthVecsFromSingle { len, xs }
@@ -266,3 +275,322 @@ random_fixed_length_vecs!(
     [6, O, ts, ts_gen],
     [7, P, ss, ss_gen]
 );
+
+/// Generates random `Vec`s using elements from an iterator and with lengths from another iterator.
+///
+/// This `struct` is created by the `random_vecs_from_length_iterator` function. See its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomVecs<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> {
+    lengths: I,
+    xs: J,
+}
+
+impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for RandomVecs<T, I, J> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        Some(
+            (&mut self.xs)
+                .take(usize::exact_from(self.lengths.next().unwrap()))
+                .collect(),
+        )
+    }
+}
+
+/// Generates random `Vec`s using elements from an iterator and with lengths from another iterator.
+///
+/// The probability of a particular `Vec` being generated is the product of the probabilities of
+/// each of its elements, multiplied by the probability of its length being generated.
+///
+/// `lengths` and `xs` must be infinite.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::vecs::random::random_vecs_from_length_iterator;
+/// use malachite_base::vecs::random_values_from_vec;
+///
+/// let xs = random_vecs_from_length_iterator(
+///     EXAMPLE_SEED,
+///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///     &random_primitive_ints::<u8>,
+/// );
+/// let values = xs.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[85, 11][..], &[136, 200, 235, 134], &[203, 223], &[38, 235, 217, 177],
+///         &[162, 32, 166, 234], &[30, 218], &[], &[90, 106], &[], &[9, 216, 204, 151],
+///         &[213, 97, 253, 78], &[91, 39], &[191, 175, 170, 232], &[233, 2], &[35, 22, 217, 198],
+///         &[114, 17, 32, 173], &[114, 65, 121, 222], &[], &[173, 25, 144, 148], &[]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_from_length_iterator<T, I: Iterator<Item = u64>, J: Iterator<Item = T>>(
+    seed: Seed,
+    lengths_gen: &dyn Fn(Seed) -> I,
+    xs_gen: &dyn Fn(Seed) -> J,
+) -> RandomVecs<T, I, J> {
+    RandomVecs {
+        lengths: lengths_gen(seed.fork("lengths")),
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
+
+/// Generates random `Vec`s using elements from an iterator.
+///
+/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+///
+/// $$
+/// P((x_0, x_1, \ldots, x_{n-1})) = \frac{m^n}{(m+1)^{n+1}}\prod_{i=0}^{n-1}P(x_i).
+/// $$
+///
+/// The iterators produced by `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(mT^\prime(n))$
+///
+/// $M(n) = O(mM^\prime(n))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is
+/// `mean_length_numerator` / `mean_length_denominator`, and $T^\prime$ and $M^\prime$ are the time
+/// and additional memory functions of the iterators produced by `xs_gen`.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
+/// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs;
+///
+/// let xs = random_vecs(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
+/// let values = xs.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[][..], &[85, 11, 136, 200, 235, 134, 203, 223, 38, 235, 217, 177, 162, 32],
+///         &[166, 234, 30, 218], &[90, 106, 9, 216], &[204], &[], &[151, 213, 97, 253, 78],
+///         &[91, 39], &[191, 175, 170, 232], &[], &[233, 2, 35, 22, 217, 198], &[], &[],
+///         &[114, 17, 32, 173, 114, 65, 121, 222, 173, 25, 144],
+///         &[148, 79, 115, 52, 73, 69, 137, 91], &[], &[153, 178, 112], &[],
+///         &[34, 95, 106, 167, 197], &[130, 168, 122, 207, 172, 177, 86, 150, 221]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs<I: Iterator>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecs<I::Item, GeometricRandomNaturalValues<u64>, I> {
+    random_vecs_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigneds(seed_2, mean_length_numerator, mean_length_denominator)
+        },
+        xs_gen,
+    )
+}
+
+/// Generates random `Vec`s with a minimum length, using elements from an iterator.
+///
+/// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// `min_length`.
+///
+/// $$
+/// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
+///     \frac{(m-a)^{n-a}}{(m+1-a)^{n+1-a}}\prod_{i=0}^{n-1}P(x_i) & n \geq a \\\\
+///     0 & \\text{otherwise},
+/// \\end{cases}
+/// $$
+/// where $a$ is `min_length`.
+///
+/// The iterators produced by `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(mT^\prime(n))$
+///
+/// $M(n) = O(mM^\prime(n))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is
+/// `mean_length_numerator` / `mean_length_denominator`, and $T^\prime$ and $M^\prime$ are the time
+/// and additional memory functions of the iterators produced by `xs_gen`.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, if their ratio is less
+/// than or equal to `min_length`, or, if they are too large and manipulating them leads to
+/// arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_min_length;
+///
+/// let xs = random_vecs_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
+/// let values = xs.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[85, 11][..],
+///         &[136, 200, 235, 134, 203, 223, 38, 235, 217, 177, 162, 32, 166, 234, 30, 218],
+///         &[90, 106, 9, 216, 204, 151], &[213, 97, 253, 78, 91, 39], &[191, 175, 170],
+///         &[232, 233], &[2, 35, 22, 217, 198, 114, 17], &[32, 173, 114, 65],
+///         &[121, 222, 173, 25, 144, 148], &[79, 115], &[52, 73, 69, 137, 91, 153, 178, 112],
+///         &[34, 95], &[106, 167],
+///         &[197, 130, 168, 122, 207, 172, 177, 86, 150, 221, 218, 101, 115],
+///         &[74, 9, 123, 109, 52, 201, 159, 247, 250, 48], &[133, 235], &[196, 40, 97, 104, 68],
+///         &[190, 216], &[7, 216, 157, 43, 43, 112, 217],
+///         &[24, 11, 103, 211, 84, 135, 55, 29, 206, 89, 65]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_min_length<I: Iterator>(
+    seed: Seed,
+    min_length: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecs<I::Item, GeometricRandomNaturalValues<u64>, I> {
+    random_vecs_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigned_inclusive_range(
+                seed_2,
+                min_length,
+                u64::MAX,
+                mean_length_numerator,
+                mean_length_denominator,
+            )
+        },
+        xs_gen,
+    )
+}
+
+/// Generates random `Vec`s with lengths in $[a, b)$, using elements from an iterator.
+///
+/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b)$. $a$ must be less
+/// than $b$.
+///
+/// $$
+/// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
+///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & a \leq n < b \\\\
+///     0 & \\text{otherwise},
+/// \\end{cases}
+/// $$
+/// where $a$ is `min_length`.
+///
+/// The iterators produced by `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O((a+b)T^\prime(n))$
+///
+/// $M(n) = O((a+b)M^\prime(n))$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of the iterators produced by `xs_gen`.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_length_range;
+///
+/// let xs = random_vecs_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[85, 11, 136][..], &[200, 235, 134, 203], &[223, 38, 235], &[217, 177, 162, 32],
+///         &[166, 234, 30, 218], &[90, 106, 9], &[216, 204], &[151, 213, 97], &[253, 78],
+///         &[91, 39, 191, 175], &[170, 232, 233, 2], &[35, 22, 217], &[198, 114, 17, 32],
+///         &[173, 114, 65], &[121, 222, 173, 25], &[144, 148, 79, 115], &[52, 73, 69, 137],
+///         &[91, 153], &[178, 112, 34, 95], &[106, 167]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_length_range<I: Iterator>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> RandomVecs<I::Item, RandomUnsignedRange<u64>, I> {
+    random_vecs_from_length_iterator(seed, &|seed_2| random_unsigned_range(seed_2, a, b), xs_gen)
+}
+
+/// Generates random `Vec`s with lengths in $[a, b]$, using elements from an iterator.
+///
+/// The lengths of the `Vec`s are sampled from a uniform distribution on $[a, b]$. $a$ must be less
+/// than $b$.
+///
+/// $$
+/// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
+///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & a \leq n \leq b \\\\
+///     0 & \\text{otherwise},
+/// \\end{cases}
+/// $$
+/// where $a$ is `min_length`.
+///
+/// The iterators produced by `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O((a+b)T^\prime(n))$
+///
+/// $M(n) = O((a+b)M^\prime(n))$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of the iterators produced by `xs_gen`.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_length_inclusive_range;
+///
+/// let xs = random_vecs_length_inclusive_range(EXAMPLE_SEED, 2, 4, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     &[
+///         &[85, 11, 136][..], &[200, 235, 134, 203], &[223, 38, 235], &[217, 177, 162, 32],
+///         &[166, 234, 30, 218], &[90, 106, 9], &[216, 204], &[151, 213, 97], &[253, 78],
+///         &[91, 39, 191, 175], &[170, 232, 233, 2], &[35, 22, 217], &[198, 114, 17, 32],
+///         &[173, 114, 65], &[121, 222, 173, 25], &[144, 148, 79, 115], &[52, 73, 69, 137],
+///         &[91, 153], &[178, 112, 34, 95], &[106, 167]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_length_inclusive_range<I: Iterator>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> RandomVecs<I::Item, RandomUnsignedInclusiveRange<u64>, I> {
+    random_vecs_from_length_iterator(
+        seed,
+        &|seed_2| random_unsigned_inclusive_range(seed_2, a, b),
+        xs_gen,
+    )
+}

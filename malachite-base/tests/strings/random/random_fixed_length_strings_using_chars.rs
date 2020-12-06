@@ -9,7 +9,7 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::random::random_fixed_length_strings_using_chars;
 
 fn random_fixed_length_strings_using_chars_helper<I: Clone + Iterator<Item = char>>(
-    len: usize,
+    len: u64,
     cs: I,
     expected_values: &[&str],
     expected_common_values: &[(&str, usize)],

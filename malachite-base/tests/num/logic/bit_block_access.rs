@@ -1,11 +1,10 @@
-use std::panic::catch_unwind;
-
 use malachite_base_test_util::num::logic::bit_block_access::{assign_bits_naive, get_bits_naive};
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::BitBlockAccess;
+use std::panic::catch_unwind;
 
 #[test]
 pub fn test_get_bits_unsigned() {

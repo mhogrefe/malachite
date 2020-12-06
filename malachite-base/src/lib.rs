@@ -117,5 +117,57 @@ pub mod slices;
 pub mod strings;
 /// This module contains functions for working with tuples.
 pub mod tuples;
+/// This module contains unions (sum types).
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # unwrap
+/// ```
+/// use malachite_base::unions::Union3;
+///
+/// let mut u: Union3<char, char, char>;
+///
+/// u = Union3::A('a');
+/// assert_eq!(u.unwrap(), 'a');
+///
+/// u = Union3::B('b');
+/// assert_eq!(u.unwrap(), 'b');
+///
+/// u = Union3::C('c');
+/// assert_eq!(u.unwrap(), 'c');
+/// ```
+///
+/// # fmt (Display)
+/// ```
+/// use malachite_base::unions::Union3;
+///
+/// let mut u: Union3<char, u32, bool>;
+///
+/// u = Union3::A('a');
+/// assert_eq!(u.to_string(), "A(a)");
+///
+/// u = Union3::B(5);
+/// assert_eq!(u.to_string(), "B(5)");
+///
+/// u = Union3::C(false);
+/// assert_eq!(u.to_string(), "C(false)");
+/// ```
+///
+/// # from_str
+/// ```
+/// use std::str::FromStr;
+///
+/// use malachite_base::unions::{UnionFromStrError, Union3};
+///
+/// let result: Result<Union3<char, u32, bool>, _> = Union3::from_str("xyz");
+/// assert_eq!(result, Err(UnionFromStrError::Generic("xyz".to_string())));
+///
+/// let result: Result<Union3<char, u32, bool>, _> = Union3::from_str("A(ab)");
+/// if let Err(UnionFromStrError::Specific(Union3::A(_e))) = result {
+/// } else {
+///     panic!("wrong error variant")
+/// }
+/// ```
+pub mod unions;
 /// This module contains functions for working with `Vec`s.
 pub mod vecs;
