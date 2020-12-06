@@ -1,28 +1,25 @@
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::arithmetic::traits::{ModMul, ModNeg, ModPow, ModPowAssign, Parity};
 use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
-use malachite_nz::natural::arithmetic::mod_pow::{
-    limbs_mod_pow_odd, limbs_mod_pow_odd_scratch_len,
-};
+use malachite_nz::natural::arithmetic::mod_pow::{limbs_mod_pow_odd, limbs_mod_pow_odd_scratch_len, limbs_mod_pow};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::mod_pow::_simple_binary_mod_pow;
 
 use malachite_test::common::{test_properties, test_properties_custom_scale};
-use malachite_test::inputs::base::{
-    quadruples_of_unsigned_vec_var_1, triples_of_unsigned_unsigned_and_unsigned_var_1,
-};
+use malachite_test::inputs::base::{quadruples_of_unsigned_vec_var_1, triples_of_unsigned_unsigned_and_unsigned_var_1, quadruples_of_unsigned_vec_var_2};
 use malachite_test::inputs::natural::{
     pairs_of_natural_and_positive_natural, pairs_of_naturals_var_2, quadruples_of_naturals_var_2,
     quadruples_of_naturals_var_3, triples_of_naturals_var_5,
 };
 
-fn verify_limbs_mod_pow_odd(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
-    let x = Natural::from_limbs_asc(xs);
+fn verify_limbs_mod_pow(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
     let exp = Natural::from_limbs_asc(es);
     let m = Natural::from_limbs_asc(ms);
-    assert!(x.mod_is_reduced(&m));
-    let expected = x.mod_pow(exp, &m);
+    let x = Natural::from_limbs_asc(xs) % &m;
+    let expected = (&x).mod_pow(&exp, &m);
     assert!(expected.mod_is_reduced(&m));
+    assert_eq!(_simple_binary_mod_pow(&x, &exp, &m), expected);
     let n = ms.len();
     assert_eq!(Natural::from_limbs_asc(&out_out[..n]), expected);
     assert_eq!(&out_out[n..], &out[n..]);
@@ -38,7 +35,21 @@ fn limbs_mod_pow_odd_properties() {
             let mut out = out.clone();
             let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(ms.len())];
             limbs_mod_pow_odd(&mut out, &xs, &es, &ms, &mut scratch);
-            verify_limbs_mod_pow_odd(out_old, xs, es, ms, &out);
+            verify_limbs_mod_pow(out_old, xs, es, ms, &out);
+        },
+    );
+}
+
+#[test]
+fn limbs_mod_pow_properties() {
+    test_properties_custom_scale(
+        32,
+        quadruples_of_unsigned_vec_var_2,
+        |&(ref out, ref xs, ref es, ref ms)| {
+            let out_old = out;
+            let mut out = out.clone();
+            limbs_mod_pow(&mut out, &xs, &es, &ms);
+            verify_limbs_mod_pow(out_old, xs, es, ms, &out);
         },
     );
 }

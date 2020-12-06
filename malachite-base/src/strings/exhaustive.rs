@@ -45,7 +45,7 @@ use vecs::exhaustive::{
 /// ```
 #[inline]
 pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
-    len: usize,
+    len: u64,
     cs: I,
 ) -> StringsFromCharVecs<LexFixedLengthVecsFromSingle<I>> {
     strings_from_char_vecs(lex_fixed_length_vecs_from_single(len, cs))
@@ -84,7 +84,7 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// ```
 #[inline]
 pub fn lex_fixed_length_strings(
-    len: usize,
+    len: u64,
 ) -> StringsFromCharVecs<LexFixedLengthVecsFromSingle<ExhaustiveChars>> {
     lex_fixed_length_strings_using_chars(len, exhaustive_chars())
 }
@@ -128,7 +128,7 @@ pub fn lex_fixed_length_strings(
 /// ```
 #[inline]
 pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
-    len: usize,
+    len: u64,
     cs: I,
 ) -> StringsFromCharVecs<ExhaustiveFixedLengthVecs1Input<I>> {
     strings_from_char_vecs(exhaustive_fixed_length_vecs_from_single(len, cs))
@@ -165,7 +165,7 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// ```
 #[inline]
 pub fn exhaustive_fixed_length_strings(
-    len: usize,
+    len: u64,
 ) -> StringsFromCharVecs<ExhaustiveFixedLengthVecs1Input<ExhaustiveChars>> {
     exhaustive_fixed_length_strings_using_chars(len, exhaustive_chars())
 }

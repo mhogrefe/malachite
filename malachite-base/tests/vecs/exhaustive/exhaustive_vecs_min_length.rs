@@ -8,7 +8,7 @@ use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
 
 fn exhaustive_vecs_min_length_helper<I: Clone + Iterator>(
-    min_length: usize,
+    min_length: u64,
     xs: I,
     out: &[&[I::Item]],
 ) where

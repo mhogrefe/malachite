@@ -9,15 +9,18 @@ use malachite_nz::natural::arithmetic::mod_pow::{
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::mod_pow::_simple_binary_mod_pow;
+use malachite_nz::natural::arithmetic::mod_pow::limbs_mod_pow;
 
 #[cfg(feature = "32_bit_limbs")]
-fn verify_limbs_mod_pow_odd(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
-    let x = Natural::from_limbs_asc(xs);
+fn verify_limbs_mod_pow(out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]) {
     let exp = Natural::from_limbs_asc(es);
     let m = Natural::from_limbs_asc(ms);
-    assert!(x.mod_is_reduced(&m));
-    let expected = x.mod_pow(exp, &m);
+    let x = Natural::from_limbs_asc(xs) % &m;
+    let expected = (&x).mod_pow(&exp, &m);
     assert!(expected.mod_is_reduced(&m));
+    assert_eq!(_simple_binary_mod_pow(&x, &exp, &m), expected);
     let n = ms.len();
     assert_eq!(Natural::from_limbs_asc(&out_out[..n]), expected);
     assert_eq!(&out_out[n..], &out[n..]);
@@ -32,7 +35,7 @@ fn test_limbs_mod_pow_odd() {
         let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(ms.len())];
         limbs_mod_pow_odd(&mut out, xs, es, ms, &mut scratch);
         assert_eq!(out, out_out);
-        verify_limbs_mod_pow_odd(out_old, xs, es, ms, &out);
+        verify_limbs_mod_pow(out_old, xs, es, ms, &out);
     };
     // ms_len < REDC_1_TO_REDC_N_THRESHOLD
     // ms_len == 1 in to_redc
@@ -161,6 +164,8 @@ fn test_limbs_mod_pow_odd() {
             1152465509, 3085485694, 2286582782, 1487765908, 10, 10,
         ],
     );
+    // xs longer than ms
+    test(&[10; 3], &[123, 456], &[20], &[105], &[36, 10, 10]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -239,6 +244,22 @@ fn limbs_mod_pow_odd_fail_8() {
     let out = &mut [10; 3];
     let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(1)];
     limbs_mod_pow_odd(out, &[3], &[1], &[9], &mut scratch);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_mod_pow() {
+    let test = |out: &[Limb], xs: &[Limb], es: &[Limb], ms: &[Limb], out_out: &[Limb]| {
+        let out_old = out;
+        let mut out = out_old.to_vec();
+        limbs_mod_pow(&mut out, xs, es, ms);
+        assert_eq!(out, out_out);
+        verify_limbs_mod_pow(out_old, xs, es, ms, &out);
+    };
+    test(&[10; 3], &[3], &[20], &[105], &[6]);
+    test(&[10; 3], &[4], &[20], &[105], &[7]);
+    test(&[10; 3], &[4], &[1000000], &[3], &[8]);
+    test(&[10; 3], &[3], &[1000000], &[4], &[9]);
 }
 
 #[test]

@@ -117,5 +117,7 @@ pub mod slices;
 pub mod strings;
 /// This module contains functions for working with tuples.
 pub mod tuples;
+/// This module contains functions for working with unions (sum types).
+pub mod unions;
 /// This module contains functions for working with `Vec`s.
 pub mod vecs;

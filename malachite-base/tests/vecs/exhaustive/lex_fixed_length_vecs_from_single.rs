@@ -7,7 +7,7 @@ use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_from_single;
 
-fn lex_fixed_length_vecs_from_single_helper<I: Iterator>(len: usize, xs: I, out: &[&[I::Item]])
+fn lex_fixed_length_vecs_from_single_helper<I: Iterator>(len: u64, xs: I, out: &[&[I::Item]])
 where
     I::Item: Clone + Debug + Eq,
 {
@@ -21,7 +21,7 @@ where
 }
 
 fn lex_fixed_length_vecs_from_single_small_helper<I: Clone + Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
     out_len: usize,
     out: &[&[I::Item]],

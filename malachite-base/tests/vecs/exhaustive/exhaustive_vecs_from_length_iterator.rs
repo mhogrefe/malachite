@@ -6,7 +6,7 @@ use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
 
-fn exhaustive_vecs_from_element_iterator_helper<I: Iterator<Item = usize>, J: Clone + Iterator>(
+fn exhaustive_vecs_from_element_iterator_helper<I: Iterator<Item = u64>, J: Clone + Iterator>(
     sizes: I,
     xs: J,
     out: &[&[J::Item]],
@@ -42,7 +42,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
         ],
     );
     exhaustive_vecs_from_element_iterator_helper(
-        exhaustive_unsigneds::<usize>().map(|u| u * 2),
+        exhaustive_unsigneds::<u64>().map(|u| u << 1),
         exhaustive_bools(),
         &[
             &[],
@@ -114,7 +114,7 @@ fn test_exhaustive_vecs_from_element_iterator() {
         ],
     );
     exhaustive_vecs_from_element_iterator_helper(
-        exhaustive_unsigneds::<usize>().map(|u| u * 2),
+        exhaustive_unsigneds::<u64>().map(|u| u << 1),
         exhaustive_unsigneds::<u32>(),
         &[
             &[],

@@ -6,11 +6,8 @@ use malachite_base::nevers::nevers;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
 
-fn shortlex_vecs_min_length_helper<I: Clone + Iterator>(
-    min_length: usize,
-    xs: I,
-    out: &[&[I::Item]],
-) where
+fn shortlex_vecs_min_length_helper<I: Clone + Iterator>(min_length: u64, xs: I, out: &[&[I::Item]])
+where
     I::Item: Clone + Debug + Eq,
 {
     let xss = shortlex_vecs_min_length(min_length, xs)

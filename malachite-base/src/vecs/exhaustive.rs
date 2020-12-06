@@ -388,7 +388,7 @@ where
 }
 
 fn lex_fixed_length_vecs_from_single_g<I: Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
 ) -> LexFixedLengthVecsFromSingleG<I>
 where
@@ -398,7 +398,7 @@ where
         first: true,
         done: false,
         xs: IteratorCache::new(xs),
-        counters: vec![0; len],
+        counters: vec![0; usize::exact_from(len)],
         phantom: PhantomData,
     }
 }
@@ -475,7 +475,7 @@ where
 /// );
 /// ```
 pub fn lex_fixed_length_vecs_from_single<I: Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
 ) -> LexFixedLengthVecsFromSingle<I>
 where
@@ -506,7 +506,7 @@ macro_rules! exhaustive_fixed_length_vecs {
         #[derive(Clone, Debug)]
         pub struct $exhaustive_struct<T: Clone, $($it: Iterator<Item=T>,)*> {
             i: u64,
-            len: usize,
+            len: u64,
             limit: Option<u64>,
             distributor: BitDistributor,
             $(
@@ -596,7 +596,7 @@ macro_rules! exhaustive_fixed_length_vecs {
                         )*
                         break;
                     }
-                    let mut out = vec![None; self.len];
+                    let mut out = vec![None; usize::exact_from(self.len)];
                     $(
                         for &output_index in &self.$outputs {
                             let x = self.$xs.get(self.distributor.get_output(output_index));
@@ -680,7 +680,7 @@ macro_rules! exhaustive_fixed_length_vecs {
         ///
         /// # Panics
         ///
-        /// Panics if the `usize`s in `output_types`, do not include all indices from 0 to $m-1$,
+        /// Panics if the `usize`s in `output_types` do not include all indices from 0 to $m-1$,
         /// inclusive, possibly with repetitions. In particular, the length of `output_types` must
         /// be at least $m$.
         ///
@@ -698,7 +698,7 @@ macro_rules! exhaustive_fixed_length_vecs {
             validate_oi_map(_max_input_index, output_to_input_map.iter().cloned());
             $exhaustive_struct {
                 i: 0,
-                len: output_types.len(),
+                len: u64::exact_from(output_types.len()),
                 limit: None,
                 distributor: BitDistributor::new(output_types.iter().map(|(ot, _)| *ot)
                     .collect::<Vec<_>>().as_slice()),
@@ -836,7 +836,7 @@ where
     I::Item: Clone,
 {
     i: u64,
-    len: usize,
+    len: u64,
     limit: Option<u64>,
     distributor: BitDistributor,
     xs: IteratorCache<I>,
@@ -859,7 +859,7 @@ where
             }
             loop {
                 let mut all_are_valid = true;
-                for i in 0..self.len {
+                for i in 0..usize::exact_from(self.len) {
                     if self.xs.get(self.distributor.get_output(i)).is_none() {
                         all_are_valid = false;
                         break;
@@ -869,8 +869,7 @@ where
                     break;
                 } else if !self.xs_done {
                     let xs_len = self.xs.known_len().unwrap();
-                    self.limit =
-                        CheckedPow::checked_pow(u64::exact_from(xs_len), u64::exact_from(self.len));
+                    self.limit = CheckedPow::checked_pow(u64::exact_from(xs_len), self.len);
                     if Some(self.i) == self.limit {
                         return None;
                     }
@@ -884,7 +883,7 @@ where
                     self.distributor.increment_counter();
                 }
             }
-            let out = (0..self.len)
+            let out = (0..usize::exact_from(self.len))
                 .map(|i| self.xs.get(self.distributor.get_output(i)).unwrap().clone())
                 .collect();
             self.i += 1;
@@ -903,7 +902,7 @@ where
 {
     ExhaustiveFixedLengthVecs1InputG {
         i: 0,
-        len: output_types.len(),
+        len: u64::exact_from(output_types.len()),
         limit: None,
         distributor: BitDistributor::new(output_types),
         xs: IteratorCache::new(xs),
@@ -1073,13 +1072,16 @@ where
 /// ```
 #[inline]
 pub fn exhaustive_fixed_length_vecs_from_single<I: Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
 ) -> ExhaustiveFixedLengthVecs1Input<I>
 where
     I::Item: Clone,
 {
-    exhaustive_fixed_length_vecs_1_input(xs, &vec![BitDistributorOutputType::normal(1); len])
+    exhaustive_fixed_length_vecs_1_input(
+        xs,
+        &vec![BitDistributorOutputType::normal(1); usize::exact_from(len)],
+    )
 }
 
 #[doc(hidden)]
@@ -1089,11 +1091,11 @@ pub struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
 }
 
 impl<Y: Clone, J: Clone + Iterator<Item = Y>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<Y>, LexFixedLengthVecsFromSingle<J>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<Y>, LexFixedLengthVecsFromSingle<J>>
     for LexVecsGenerator<Y, J>
 {
     #[inline]
-    fn get_ys(&self, &x: &usize) -> LexFixedLengthVecsFromSingle<J> {
+    fn get_ys(&self, &x: &u64) -> LexFixedLengthVecsFromSingle<J> {
         lex_fixed_length_vecs_from_single(x, self.ys.clone())
     }
 }
@@ -1101,23 +1103,23 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 #[inline]
 fn shortlex_vecs_from_element_iterator_helper<
     T: Clone,
-    I: Iterator<Item = usize>,
+    I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
 >(
     xs: I,
     ys: J,
-) -> LexDependentPairs<usize, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>> {
+) -> LexDependentPairs<u64, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>> {
     lex_dependent_pairs_stop_after_empty_ys(xs, LexVecsGenerator { ys })
 }
 
 /// Generates all `Vec`s with elements from a specified iterator and with lengths from another
 /// iterator.
 #[derive(Clone, Debug)]
-pub struct ShortlexVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>>(
-    LexDependentPairs<usize, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>>,
+pub struct ShortlexVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
+    LexDependentPairs<u64, Vec<T>, LexVecsGenerator<T, J>, I, LexFixedLengthVecsFromSingle<J>>,
 );
 
-impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterator
+impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
     for ShortlexVecs<T, I, J>
 {
     type Item = Vec<T>;
@@ -1175,7 +1177,7 @@ impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterato
 #[inline]
 pub fn shortlex_vecs_from_length_iterator<
     T: Clone,
-    I: Iterator<Item = usize>,
+    I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
 >(
     xs: I,
@@ -1224,7 +1226,7 @@ pub fn shortlex_vecs_from_length_iterator<
 #[inline]
 pub fn shortlex_vecs<I: Clone + Iterator>(
     xs: I,
-) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
@@ -1274,14 +1276,14 @@ where
 /// ```
 #[inline]
 pub fn shortlex_vecs_min_length<I: Clone + Iterator>(
-    min_length: usize,
+    min_length: u64,
     xs: I,
-) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
     shortlex_vecs_from_length_iterator(
-        primitive_int_increasing_inclusive_range(min_length, usize::MAX),
+        primitive_int_increasing_inclusive_range(min_length, u64::MAX),
         xs,
     )
 }
@@ -1333,10 +1335,10 @@ where
 /// ```
 #[inline]
 pub fn shortlex_vecs_length_range<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
-) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
@@ -1390,10 +1392,10 @@ where
 /// ```
 #[inline]
 pub fn shortlex_vecs_length_inclusive_range<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
-) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ShortlexVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
@@ -1407,14 +1409,14 @@ pub struct ExhaustiveVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
 }
 
 impl<Y: Clone, J: Clone + Iterator<Item = Y>>
-    ExhaustiveDependentPairsYsGenerator<usize, Vec<Y>, ExhaustiveFixedLengthVecs1Input<J>>
+    ExhaustiveDependentPairsYsGenerator<u64, Vec<Y>, ExhaustiveFixedLengthVecs1Input<J>>
     for ExhaustiveVecsGenerator<Y, J>
 {
     #[inline]
-    fn get_ys(&self, &x: &usize) -> ExhaustiveFixedLengthVecs1Input<J> {
+    fn get_ys(&self, &x: &u64) -> ExhaustiveFixedLengthVecs1Input<J> {
         exhaustive_fixed_length_vecs_1_input(
             self.ys.clone(),
-            &vec![BitDistributorOutputType::normal(1); x],
+            &vec![BitDistributorOutputType::normal(1); usize::exact_from(x)],
         )
     }
 }
@@ -1423,13 +1425,13 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 #[inline]
 fn exhaustive_vecs_from_element_iterator_helper<
     T: Clone,
-    I: Iterator<Item = usize>,
+    I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
 >(
     xs: I,
     ys: J,
 ) -> ExhaustiveDependentPairs<
-    usize,
+    u64,
     Vec<T>,
     RulerSequence<usize>,
     ExhaustiveVecsGenerator<T, J>,
@@ -1447,9 +1449,9 @@ fn exhaustive_vecs_from_element_iterator_helper<
 /// iterator.
 #[allow(clippy::type_complexity)]
 #[derive(Clone, Debug)]
-pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>>(
+pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
     ExhaustiveDependentPairs<
-        usize,
+        u64,
         Vec<T>,
         RulerSequence<usize>,
         ExhaustiveVecsGenerator<T, J>,
@@ -1458,7 +1460,7 @@ pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterat
     >,
 );
 
-impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterator
+impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
     for ExhaustiveVecs<T, I, J>
 {
     type Item = Vec<T>;
@@ -1513,13 +1515,13 @@ impl<T: Clone, I: Iterator<Item = usize>, J: Clone + Iterator<Item = T>> Iterato
 #[inline]
 pub fn exhaustive_vecs_from_length_iterator<
     T: Clone,
-    I: Iterator<Item = usize>,
+    I: Iterator<Item = u64>,
     J: Clone + Iterator<Item = T>,
 >(
-    xs: I,
-    ys: J,
+    lengths: I,
+    xs: J,
 ) -> ExhaustiveVecs<T, I, J> {
-    ExhaustiveVecs(exhaustive_vecs_from_element_iterator_helper(xs, ys))
+    ExhaustiveVecs(exhaustive_vecs_from_element_iterator_helper(lengths, xs))
 }
 
 /// Generates `Vec`s with elements from a specified iterator.
@@ -1553,7 +1555,7 @@ pub fn exhaustive_vecs_from_length_iterator<
 #[inline]
 pub fn exhaustive_vecs<I: Clone + Iterator>(
     xs: I,
-) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
@@ -1593,14 +1595,14 @@ where
 /// ```
 #[inline]
 pub fn exhaustive_vecs_min_length<I: Clone + Iterator>(
-    min_length: usize,
+    min_length: u64,
     xs: I,
-) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
     exhaustive_vecs_from_length_iterator(
-        primitive_int_increasing_inclusive_range(min_length, usize::MAX),
+        primitive_int_increasing_inclusive_range(min_length, u64::MAX),
         xs,
     )
 }
@@ -1647,10 +1649,10 @@ where
 /// ```
 #[inline]
 pub fn exhaustive_vecs_length_range<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
-) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {
@@ -1698,10 +1700,10 @@ where
 /// ```
 #[inline]
 pub fn exhaustive_vecs_length_inclusive_range<I: Clone + Iterator>(
-    a: usize,
-    b: usize,
+    a: u64,
+    b: u64,
     xs: I,
-) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<usize>, I>
+) -> ExhaustiveVecs<I::Item, PrimitiveIntIncreasingRange<u64>, I>
 where
     I::Item: Clone,
 {

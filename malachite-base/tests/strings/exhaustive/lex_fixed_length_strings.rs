@@ -1,6 +1,6 @@
 use malachite_base::strings::exhaustive::lex_fixed_length_strings;
 
-fn lex_fixed_length_strings_helper(len: usize, out: &[&str]) {
+fn lex_fixed_length_strings_helper(len: u64, out: &[&str]) {
     let css = lex_fixed_length_strings(len).take(20).collect::<Vec<_>>();
     assert_eq!(
         css.iter()

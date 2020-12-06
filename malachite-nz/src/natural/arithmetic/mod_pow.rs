@@ -5,13 +5,14 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitIterable, TrailingZeros};
 use malachite_base::slices::slice_set_zero;
 
 use fail_on_untested_path;
 use natural::arithmetic::add::{
-    limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
+    _limbs_add_to_out_aliased, limbs_add_same_length_to_out,
+    limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div_exact::{
@@ -19,15 +20,20 @@ use natural::arithmetic::div_exact::{
 };
 use natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
 use natural::arithmetic::mod_op::limbs_mod_to_out;
+use natural::arithmetic::mod_power_of_two_pow::limbs_pow_low;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
     _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
-use natural::arithmetic::mul::{_limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
+use natural::arithmetic::mul::{
+    _limbs_mul_greater_to_out_basecase, limbs_mul_to_out, limbs_mul_same_length_to_out,
+};
+use natural::arithmetic::shr::limbs_shr_to_out;
 use natural::arithmetic::square::{_limbs_square_to_out_basecase, limbs_square_to_out};
 use natural::arithmetic::sub::{
-    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_to_out,
 };
 use natural::comparison::ord::limbs_cmp_same_length;
 use natural::logic::bit_access::limbs_get_bit;
@@ -223,8 +229,8 @@ fn select_fns(
 /// Given the limbs of $x$, $E$, and odd $m$, writes the limbs of $x^E \mod m$ to an output slice.
 ///
 /// `xs`, `es`, and `ms` must be nonempty and their last elements must be nonzero. $m$ must be odd,
-/// $x$ must be less than $m$, $E$ must be greater than 1, and `out` must be at least as long as
-/// `ms`.
+/// $E$ must be greater than 1, and `out` must be at least as long as `ms`. It is not required than
+/// `xs` be less than `ms`.
 ///
 /// TODO complexity
 ///
@@ -269,7 +275,6 @@ pub fn limbs_mod_pow_odd(
     let ms_len = ms.len();
     assert_ne!(xs_len, 0);
     assert_ne!(es_len, 0);
-    assert!(xs_len <= ms_len);
     if es_len == 1 {
         assert!(es[0] > 1);
     }
@@ -350,6 +355,105 @@ pub fn limbs_mod_pow_odd(
     if limbs_cmp_same_length(out, ms) != Ordering::Less {
         limbs_sub_same_length_in_place_left(out, ms);
     }
+}
+
+/// m is nonzero, b is nonzero, e > 1
+///
+/// This is mpz_powm from mpn/generic/powm.c, GMP 6.1.2, where b, e, and m are non-negative.
+pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
+    let ms_len = ms.len();
+    let es_len = es.len();
+    let xs_len = xs.len();
+    let mut ncnt = 0;
+    while ms[ncnt] == 0 {
+        ncnt += 1;
+    }
+    let mut mp = &ms[ncnt..];
+    let mut nodd = ms_len - ncnt;
+    let mut newmp;
+    let mut cnt = 0;
+    if mp[0].even() {
+        newmp = vec![0; nodd];
+        cnt = TrailingZeros::trailing_zeros(mp[0]);
+        limbs_shr_to_out(&mut newmp, &mp[..nodd], cnt);
+        nodd -= if newmp[nodd - 1] == 0 { 1 } else { 0 };
+        mp = &newmp;
+        ncnt += 1;
+    }
+    let itch = if ncnt != 0 {
+        // We will call both mpn_powm and mpn_powlo.
+        // rp needs n, mpn_powlo needs 4n, the 2 mpn_binvert might need more
+        let n_largest_binvert = max(ncnt, nodd);
+        let itch_binvert = limbs_modular_invert_scratch_len(n_largest_binvert);
+        3 * ms_len + max(itch_binvert, ms_len << 1)
+    } else {
+        // We will call just mpn_powm.
+        let itch_binvert = limbs_modular_invert_scratch_len(nodd);
+        ms_len + max(itch_binvert, ms_len << 1)
+    };
+    let mut tp = vec![0; itch];
+    let (rp, tp) = tp.split_at_mut(ms_len);
+    limbs_mod_pow_odd(rp, xs, es, &mp[..nodd], tp);
+    let rn = ms_len;
+    let mut newbp;
+    let mut xs = xs;
+    if ncnt != 0 {
+        if xs_len < ncnt {
+            newbp = vec![0; ncnt];
+            newbp[..xs_len].copy_from_slice(&xs[..xs_len]);
+            xs = &newbp;
+        }
+        let mut goto_zero = false;
+        if xs[0].even() {
+            if es_len > 1 {
+                slice_set_zero(&mut tp[..ncnt]);
+                goto_zero = true;
+            } else {
+                assert_eq!(es_len, 1);
+                let t = ((ncnt - (if cnt != 0 { 1 } else { 0 })) << Limb::LOG_WIDTH)
+                    + usize::exact_from(cnt);
+                // Count number of low zero bits in B, up to 3.
+                let bcnt = (0x1213 >> ((xs[0] & 7) << 1)) & 0x3;
+                // Note that ep[0] * bcnt might overflow, but that just results
+                // in a missed optimization.
+                if let Some(t) = Limb::checked_from(t) {
+                    if es[0].wrapping_mul(bcnt) >= t {
+                        slice_set_zero(&mut tp[..ncnt]);
+                        goto_zero = true;
+                    }
+                }
+            }
+        }
+        if !goto_zero {
+            let (tp_lo, tp_hi) = tp.split_at_mut(ncnt);
+            tp_lo.copy_from_slice(&xs[..ncnt]);
+            limbs_pow_low(tp_lo, &es[..es_len], tp_hi);
+        }
+        let mut newmp;
+        if nodd < ncnt {
+            newmp = vec![0; ncnt];
+            newmp[..nodd].copy_from_slice(&mp[..nodd]);
+            mp = &newmp;
+        }
+        let (tp_lo, tp_hi) = tp.split_at_mut(ms_len << 1);
+        let (tp_lo_lo, odd_inv_2exp) = tp_lo.split_at_mut(ms_len);
+        limbs_modular_invert(odd_inv_2exp, &mp[..ncnt], tp_hi);
+        limbs_sub_in_place_left(
+            &mut tp_lo_lo[..ncnt],
+            &rp[..if nodd > ncnt { ncnt } else { nodd }],
+        );
+        let xp = tp_hi;
+        limbs_mul_low_same_length(xp, &odd_inv_2exp[..ncnt], &tp_lo_lo[..ncnt]);
+        if cnt != 0 {
+            xp[ncnt - 1] &= (1 << cnt) - 1;
+        }
+        let yp = tp_lo;
+        limbs_mul_to_out(yp, &xp[..ncnt], &mp[..nodd]);
+        _limbs_add_to_out_aliased(rp, nodd, &yp[..ms_len]);
+        assert!(nodd + ncnt >= ms_len);
+        assert!(nodd + ncnt <= ms_len + 1);
+    }
+    out[..rn].copy_from_slice(&rp[..rn]);
 }
 
 //TODO use test-utils version

@@ -9,7 +9,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{exhaustive_signeds, exhaustive_unsigneds};
 use malachite_base::num::floats::{increment_float, PrimitiveFloat};
@@ -1296,7 +1296,7 @@ pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer
         GenerationMode::Exhaustive => {
             let f = move |i: &Integer| {
                 exhaustive_fixed_length_vecs_from_single(
-                    i.to_twos_complement_limbs_asc().len(),
+                    u64::exact_from(i.to_twos_complement_limbs_asc().len()),
                     exhaustive_bools(),
                 )
             };
@@ -1338,7 +1338,10 @@ pub fn pairs_of_integer_and_vec_of_bool_var_2(gm: GenerationMode) -> It<(Integer
     match gm {
         GenerationMode::Exhaustive => {
             let f = move |n: &Integer| {
-                exhaustive_fixed_length_vecs_from_single(n.to_bits_asc().len(), exhaustive_bools())
+                exhaustive_fixed_length_vecs_from_single(
+                    u64::exact_from(n.to_bits_asc().len()),
+                    exhaustive_bools(),
+                )
             };
             Box::new(dependent_pairs(exhaustive_integers(), f))
         }

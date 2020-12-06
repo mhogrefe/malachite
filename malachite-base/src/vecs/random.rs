@@ -1,3 +1,8 @@
+use num::conversion::traits::ExactFrom;
+use num::random::geometric::{
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues,
+};
 use random::Seed;
 use vecs::exhaustive::validate_oi_map;
 
@@ -7,7 +12,7 @@ use vecs::exhaustive::validate_oi_map;
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomFixedLengthVecsFromSingle<I: Iterator> {
-    len: usize,
+    len: u64,
     xs: I,
 }
 
@@ -16,7 +21,7 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 
     #[inline]
     fn next(&mut self) -> Option<Vec<I::Item>> {
-        Some((&mut self.xs).take(self.len).collect())
+        Some((&mut self.xs).take(usize::exact_from(self.len)).collect())
     }
 }
 
@@ -58,7 +63,7 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 /// ```
 #[inline]
 pub fn random_fixed_length_vecs_from_single<I: Iterator>(
-    len: usize,
+    len: u64,
     xs: I,
 ) -> RandomFixedLengthVecsFromSingle<I> {
     RandomFixedLengthVecsFromSingle { len, xs }
@@ -266,3 +271,64 @@ random_fixed_length_vecs!(
     [6, O, ts, ts_gen],
     [7, P, ss, ss_gen]
 );
+
+#[derive(Clone, Debug)]
+pub struct RandomVecs<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> {
+    lengths: I,
+    xs: J,
+}
+
+impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for RandomVecs<T, I, J> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        Some(
+            (&mut self.xs)
+                .take(usize::exact_from(self.lengths.next().unwrap()))
+                .collect(),
+        )
+    }
+}
+
+#[inline]
+pub fn random_vecs_from_length_iterator<T, I: Iterator<Item = u64>, J: Iterator<Item = T>>(
+    lengths: I,
+    xs: J,
+) -> RandomVecs<T, I, J> {
+    RandomVecs { lengths, xs }
+}
+
+pub fn random_vecs<I: Iterator>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecs<I::Item, GeometricRandomNaturalValues<u64>, I> {
+    RandomVecs {
+        lengths: geometric_random_unsigneds(
+            seed.fork("lengths"),
+            mean_length_numerator,
+            mean_length_denominator,
+        ),
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
+
+pub fn random_vecs_min_length<I: Iterator>(
+    seed: Seed,
+    min_length: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecs<I::Item, GeometricRandomNaturalValues<u64>, I> {
+    RandomVecs {
+        lengths: geometric_random_unsigned_inclusive_range(
+            seed.fork("lengths"),
+            min_length,
+            u64::MAX,
+            mean_length_numerator,
+            mean_length_denominator,
+        ),
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
