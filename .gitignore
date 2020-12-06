@@ -3,4 +3,5 @@ target
 .idea*
 *.iml
 src/integer_old.rs
+*.DS_Store
 
