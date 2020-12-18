@@ -18,6 +18,7 @@ macro_rules! test_mod_power_of_two_shl_unsigned {
 
             let n = Natural::from_str(u).unwrap().mod_power_of_two_shl(v, pow);
             assert!(n.is_valid());
+            assert_eq!(n.to_string(), out);
 
             let n = (&Natural::from_str(u).unwrap()).mod_power_of_two_shl(v, pow);
             assert!(n.is_valid());
@@ -49,6 +50,7 @@ macro_rules! test_mod_power_of_two_shl_signed {
 
             let n = Natural::from_str(u).unwrap().mod_power_of_two_shl(v, pow);
             assert!(n.is_valid());
+            assert_eq!(n.to_string(), out);
 
             let n = (&Natural::from_str(u).unwrap()).mod_power_of_two_shl(v, pow);
             assert!(n.is_valid());

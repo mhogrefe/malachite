@@ -148,6 +148,24 @@ pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
     )
 }
 
+// All `(x, y, z): (T, T, T)` where `T` is signed and x + y * z does not overflow.
+pub fn signed_triple_gen_var_1<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_1,
+        &random_signed_triple_gen_var_1,
+        &special_random_signed_triple_gen_var_1,
+    )
+}
+
+// All `(x, y, z): (T, T, T)` where `T` is signed and x - y * z does not overflow.
+pub fn signed_triple_gen_var_2<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_2,
+        &random_signed_triple_gen_var_2,
+        &special_random_signed_triple_gen_var_2,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 /// All `(T, U)`s where `T` is signed, `U` is unsigned, and the `U` is small.
@@ -240,6 +258,24 @@ pub fn unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
     )
 }
 
+// All `(x, y, z): (T, T, T)` where `T` is unsigned and x + y * z does not overflow.
+pub fn unsigned_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_1,
+        &random_unsigned_triple_gen_var_1,
+        &special_random_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(x, y, z): (T, T, T)` where `T` is unsigned and x - y * z does not overflow.
+pub fn unsigned_triple_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_2,
+        &random_unsigned_triple_gen_var_2,
+        &special_random_unsigned_triple_gen_var_2,
+    )
+}
+
 // -- RoundingMode --
 
 pub fn rounding_mode_gen() -> Generator<RoundingMode> {
@@ -261,6 +297,50 @@ pub fn rounding_mode_triple_gen() -> Generator<(RoundingMode, RoundingMode, Roun
     Generator::new_no_special(
         &exhaustive_rounding_mode_triple_gen,
         &random_rounding_mode_triple_gen,
+    )
+}
+
+// -- String --
+
+pub fn string_gen() -> Generator<String> {
+    Generator::new(
+        &exhaustive_string_gen,
+        &random_string_gen,
+        &special_random_string_gen,
+    )
+}
+
+// All ASCII `String`s.
+pub fn string_gen_var_1() -> Generator<String> {
+    Generator::new(
+        &exhaustive_string_gen_var_1,
+        &random_string_gen_var_1,
+        &special_random_string_gen_var_1,
+    )
+}
+
+// All `String`s containing only characters that appear in the `String` representations of
+// `RoundingMode`s.
+pub fn string_gen_var_2() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_2, &random_string_gen_var_2)
+}
+
+// -- (String, String) --
+
+pub fn string_pair_gen() -> Generator<(String, String)> {
+    Generator::new(
+        &exhaustive_string_pair_gen,
+        &random_string_pair_gen,
+        &special_random_string_pair_gen,
+    )
+}
+
+// All pairs of ASCII `String`s.
+pub fn string_pair_gen_var_1() -> Generator<(String, String)> {
+    Generator::new(
+        &exhaustive_string_pair_gen_var_1,
+        &random_string_pair_gen_var_1,
+        &special_random_string_pair_gen_var_1,
     )
 }
 

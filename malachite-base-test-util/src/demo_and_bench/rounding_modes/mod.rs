@@ -4,6 +4,7 @@ pub(crate) fn register(runner: &mut Runner) {
     clone::register(runner);
     display::register(runner);
     eq::register(runner);
+    from_str::register(runner);
     hash::register(runner);
     neg::register(runner);
 }
@@ -11,5 +12,6 @@ pub(crate) fn register(runner: &mut Runner) {
 mod clone;
 mod display;
 mod eq;
+mod from_str;
 mod hash;
 mod neg;

@@ -1,8 +1,9 @@
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
-use malachite_base::chars::exhaustive::exhaustive_chars;
+use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
 use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::{
@@ -11,6 +12,7 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use malachite_base::tuples::exhaustive::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples_from_single, lex_pairs,
     lex_pairs_from_single, lex_triples_from_single,
@@ -18,6 +20,17 @@ use malachite_base::tuples::exhaustive::{
 
 use generators::common::It;
 use generators::exhaustive_pairs_big_tiny;
+use rounding_modes::ROUNDING_MODE_CHARS;
+
+// general
+
+fn add_mul_inputs_valid<T: PrimitiveInt>(x: T, y: T, z: T) -> bool {
+    x.checked_add_mul(y, z).is_some()
+}
+
+fn sub_mul_inputs_valid<T: PrimitiveInt>(x: T, y: T, z: T) -> bool {
+    x.checked_sub_mul(y, z).is_some()
+}
 
 // -- bool --
 
@@ -81,6 +94,20 @@ pub fn exhaustive_signed_pair_gen<T: PrimitiveSigned>() -> It<(T, T)> {
 
 pub fn exhaustive_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, T, T)> {
     Box::new(exhaustive_triples_from_single(exhaustive_signeds()))
+}
+
+pub fn exhaustive_signed_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_signeds())
+            .filter(|&(x, y, z)| add_mul_inputs_valid(x, y, z)),
+    )
+}
+
+pub fn exhaustive_signed_triple_gen_var_2<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_signeds())
+            .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
@@ -159,6 +186,20 @@ pub fn exhaustive_unsigned_triple_gen<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
     Box::new(exhaustive_triples_from_single(exhaustive_unsigneds()))
 }
 
+pub fn exhaustive_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_unsigneds())
+            .filter(|&(x, y, z)| add_mul_inputs_valid(x, y, z)),
+    )
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_unsigneds())
+            .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+    )
+}
+
 // -- RoundingMode --
 
 pub fn exhaustive_rounding_mode_gen() -> It<RoundingMode> {
@@ -175,4 +216,30 @@ pub fn exhaustive_rounding_mode_pair_gen() -> It<(RoundingMode, RoundingMode)> {
 
 pub fn exhaustive_rounding_mode_triple_gen() -> It<(RoundingMode, RoundingMode, RoundingMode)> {
     Box::new(lex_triples_from_single(exhaustive_rounding_modes()))
+}
+
+// -- String --
+
+pub fn exhaustive_string_gen() -> It<String> {
+    Box::new(exhaustive_strings())
+}
+
+pub fn exhaustive_string_gen_var_1() -> It<String> {
+    Box::new(exhaustive_strings_using_chars(exhaustive_ascii_chars()))
+}
+
+pub fn exhaustive_string_gen_var_2() -> It<String> {
+    Box::new(exhaustive_strings_using_chars(ROUNDING_MODE_CHARS.chars()))
+}
+
+// -- (String, String) --
+
+pub fn exhaustive_string_pair_gen() -> It<(String, String)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_strings()))
+}
+
+pub fn exhaustive_string_pair_gen_var_1() -> It<(String, String)> {
+    Box::new(exhaustive_pairs_from_single(
+        exhaustive_strings_using_chars(exhaustive_ascii_chars()),
+    ))
 }

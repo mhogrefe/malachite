@@ -318,6 +318,27 @@ pub fn pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
     }
 }
 
+pub fn pairs_of_positive_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_positive_naturals(),
+            exhaustive_unsigneds(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_naturals(seed, scale)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_naturals(seed, scale)),
+            &(|seed| special_random_unsigned(seed)),
+        )),
+    }
+}
+
 pub fn nrm_pairs_of_natural_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<((BigUint, T), (rug::Integer, T), (Natural, T))> {
@@ -417,6 +438,31 @@ where
         GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| special_random_signed(seed)),
+        )),
+    }
+}
+
+pub fn pairs_of_positive_natural_and_signed<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T)>
+where
+    T::UnsignedOfEqualWidth: Rand,
+    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
+{
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
+            exhaustive_positive_naturals(),
+            exhaustive_signeds(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| random_positive_naturals(seed, scale)),
+            &(|seed| random(seed)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_positive_naturals(seed, scale)),
             &(|seed| special_random_signed(seed)),
         )),
     }
@@ -1189,6 +1235,69 @@ pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
         )),
     };
     reshape_2_1_to_3(permute_2_1(ps))
+}
+
+fn triples_of_natural_small_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_unsigneds(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
+// All `(Natural, T, Natural)` where `T` is unsigned and the first `Natural` is less than the
+// second.
+pub fn triples_of_natural_small_unsigned_and_natural_var_1<T: PrimitiveUnsigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, Natural)> {
+    Box::new(triples_of_natural_small_unsigned_and_natural(gm).filter(|&(ref x, _, ref z)| x < z))
+}
+
+fn triples_of_natural_small_signed_and_natural<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, Natural)> {
+    match gm {
+        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_signeds(),
+            exhaustive_naturals(),
+        )),
+        GenerationMode::Random(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| random_naturals(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| random_naturals(seed, scale)),
+        )),
+        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
+            &EXAMPLE_SEED,
+            &(|seed| special_random_naturals(seed, scale)),
+            &(|seed| i32s_geometric(seed, scale).flat_map(T::checked_from)),
+            &(|seed| special_random_naturals(seed, scale)),
+        )),
+    }
+}
+
+// All `(Natural, T, Natural)` where `T` is signed and the first `Natural` is less than the second.
+pub fn triples_of_natural_small_signed_and_natural_var_1<T: PrimitiveSigned + Rand>(
+    gm: GenerationMode,
+) -> It<(Natural, T, Natural)> {
+    Box::new(triples_of_natural_small_signed_and_natural(gm).filter(|&(ref x, _, ref z)| x < z))
 }
 
 pub fn rm_triples_of_natural_small_u64_and_bool(

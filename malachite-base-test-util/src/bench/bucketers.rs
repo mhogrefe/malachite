@@ -14,7 +14,7 @@ pub struct Bucketer<'a, T> {
 
 pub fn char_bucketer<'a>() -> Bucketer<'a, char> {
     Bucketer {
-        bucketing_function: &(|&c| usize::exact_from(char_to_contiguous_range(c))),
+        bucketing_function: &|&c| usize::exact_from(char_to_contiguous_range(c)),
         bucketing_label: "char_to_contiguous_range(c)".to_string(),
     }
 }
@@ -24,7 +24,7 @@ where
     usize: ExactFrom<T>,
 {
     Bucketer {
-        bucketing_function: &(|&x| usize::exact_from(x)),
+        bucketing_function: &|&x| usize::exact_from(x),
         bucketing_label: var_name.to_string(),
     }
 }
@@ -52,7 +52,7 @@ where
 
 pub fn bit_bucketer<T: Copy + SignificantBits>(var_name: &str) -> Bucketer<T> {
     Bucketer {
-        bucketing_function: &(|&x| usize::exact_from(x.significant_bits())),
+        bucketing_function: &|&x| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", var_name),
     }
 }
@@ -67,6 +67,20 @@ pub fn unsigned_bit_bucketer<'a, T: PrimitiveUnsigned>() -> Bucketer<'a, T> {
 
 pub fn signed_bit_bucketer<'a, T: PrimitiveSigned>() -> Bucketer<'a, T> {
     bit_bucketer("i")
+}
+
+pub fn string_len_bucketer<'a>() -> Bucketer<'a, String> {
+    Bucketer {
+        bucketing_function: &String::len,
+        bucketing_label: "s.len()".to_string(),
+    }
+}
+
+pub fn pair_string_len_bucketer<'a>() -> Bucketer<'a, (String, String)> {
+    Bucketer {
+        bucketing_function: &|(s, t)| max(s.len(), t.len()),
+        bucketing_label: "max(s.len(), t.len())".to_string(),
+    }
 }
 
 pub fn pair_max_bit_bucketer<'a, T: Copy + SignificantBits, U: Copy + SignificantBits>(

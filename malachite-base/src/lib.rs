@@ -159,6 +159,9 @@ pub mod tuples;
 ///
 /// use malachite_base::unions::{UnionFromStrError, Union3};
 ///
+/// let u3: Union3<bool, u32, char> = Union3::from_str("B(5)").unwrap();
+/// assert_eq!(u3, Union3::B(5));
+///
 /// let result: Result<Union3<char, u32, bool>, _> = Union3::from_str("xyz");
 /// assert_eq!(result, Err(UnionFromStrError::Generic("xyz".to_string())));
 ///

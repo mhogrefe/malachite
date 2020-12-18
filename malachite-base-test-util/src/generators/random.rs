@@ -1,8 +1,10 @@
-use generators::common::{GenConfig, It};
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
-use malachite_base::chars::random::{random_char_inclusive_range, random_char_range, random_chars};
+use malachite_base::chars::random::{
+    random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
+};
 use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -14,9 +16,14 @@ use malachite_base::num::random::{
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::strings::random::{random_strings, random_strings_using_chars};
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples_from_single,
 };
+use malachite_base::vecs::random_values_from_vec;
+
+use generators::common::{GenConfig, It};
+use rounding_modes::ROUNDING_MODE_CHARS;
 
 // -- bool --
 
@@ -114,6 +121,48 @@ pub fn random_signed_gen_var_3<T: PrimitiveSigned>(_config: &GenConfig) -> It<T>
     Box::new(random_primitive_ints(EXAMPLE_SEED).filter(|&x| x != T::ZERO && x != T::NEGATIVE_ONE))
 }
 
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
+
+fn halve_bits<T: PrimitiveSigned>(x: T) -> T {
+    let half_width = (T::WIDTH >> 1) - 1;
+    let half_mask = T::low_mask(half_width);
+    if x >= T::ZERO {
+        x & half_mask
+    } else {
+        x | (T::NEGATIVE_ONE << half_width)
+    }
+}
+
+pub(crate) fn reduce_to_fit_add_mul_signed<T: PrimitiveSigned>(x: T, y: T, z: T) -> (T, T, T) {
+    if x.checked_add_mul(y, z).is_some() {
+        (x, y, z)
+    } else {
+        (halve_bits(x), halve_bits(y), halve_bits(z))
+    }
+}
+
+pub fn random_signed_triple_gen_var_1<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .map(|(x, y, z)| reduce_to_fit_add_mul_signed(x, y, z)),
+    )
+}
+
+pub(crate) fn reduce_to_fit_sub_mul_signed<T: PrimitiveSigned>(x: T, y: T, z: T) -> (T, T, T) {
+    if x.checked_sub_mul(y, z).is_some() {
+        (x, y, z)
+    } else {
+        (halve_bits(x), halve_bits(y), halve_bits(z))
+    }
+}
+
+pub fn random_signed_triple_gen_var_2<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .map(|(x, y, z)| reduce_to_fit_sub_mul_signed(x, y, z)),
+    )
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn random_unsigned_gen_var_1<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<T> {
@@ -131,6 +180,66 @@ pub fn random_unsigned_pair_gen_var_1(_config: &GenConfig) -> It<(u32, u32)> {
         EXAMPLE_SEED,
         NUMBER_OF_CHARS,
     )))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+fn wrapping_shr<T: PrimitiveInt>(x: T, bits: u64) -> T {
+    if bits >= x.significant_bits() {
+        T::ZERO
+    } else {
+        x >> bits
+    }
+}
+
+pub(crate) fn reduce_to_fit_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, T, T) {
+    let (p_hi, p_lo) = T::x_mul_y_is_zz(y, z);
+    let (r_hi, _) = T::xx_add_yy_is_zz(T::ZERO, x, p_hi, p_lo);
+    if r_hi == T::ZERO {
+        (x, y, z)
+    } else {
+        let excess_x: u64 = r_hi.significant_bits();
+        let excess_yz = excess_x.shr_round(1, RoundingMode::Ceiling);
+        (
+            wrapping_shr(x, excess_x),
+            wrapping_shr(y, excess_yz),
+            wrapping_shr(z, excess_yz),
+        )
+    }
+}
+
+pub fn random_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .map(|(x, y, z)| reduce_to_fit_add_mul_unsigned(x, y, z)),
+    )
+}
+
+pub(crate) fn reduce_to_fit_sub_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, T, T) {
+    let x_bits = x.significant_bits();
+    let (p_hi, p_lo) = T::x_mul_y_is_zz(y, z);
+    let product_bits = if p_hi == T::ZERO {
+        p_lo.significant_bits()
+    } else {
+        p_hi.significant_bits() + T::WIDTH
+    };
+    if x_bits > product_bits {
+        (x, y, z)
+    } else {
+        let excess = (product_bits - x_bits + 1).shr_round(1, RoundingMode::Ceiling);
+        (x, wrapping_shr(y, excess), wrapping_shr(z, excess))
+    }
+}
+
+pub fn random_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .map(|(x, y, z)| reduce_to_fit_sub_mul_unsigned(x, y, z)),
+    )
 }
 
 // -- RoundingMode --
@@ -154,5 +263,52 @@ pub fn random_rounding_mode_triple_gen(
 ) -> It<(RoundingMode, RoundingMode, RoundingMode)> {
     Box::new(random_triples_from_single(random_rounding_modes(
         EXAMPLE_SEED,
+    )))
+}
+
+// -- String --
+
+pub fn random_string_gen(config: &GenConfig) -> It<String> {
+    Box::new(random_strings(
+        EXAMPLE_SEED,
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    ))
+}
+
+pub fn random_string_gen_var_1(config: &GenConfig) -> It<String> {
+    Box::new(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &random_ascii_chars,
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    ))
+}
+
+pub fn random_string_gen_var_2(config: &GenConfig) -> It<String> {
+    Box::new(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &|seed| random_values_from_vec(seed, ROUNDING_MODE_CHARS.chars().collect()),
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    ))
+}
+
+// -- (String, String) --
+
+pub fn random_string_pair_gen(config: &GenConfig) -> It<(String, String)> {
+    Box::new(random_pairs_from_single(random_strings(
+        EXAMPLE_SEED,
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    )))
+}
+
+pub fn random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, String)> {
+    Box::new(random_pairs_from_single(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &random_ascii_chars,
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
     )))
 }

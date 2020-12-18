@@ -267,6 +267,10 @@ pub mod num {
         pub mod ord_abs_partial_ord_abs_and_comparators;
     }
     pub mod conversion {
+        pub mod digits {
+            pub mod power_of_two_digit_iterable;
+            pub mod power_of_two_digits;
+        }
         pub mod froms {
             pub mod checked_from_and_exact_from;
             pub mod convertible_from;
@@ -325,8 +329,6 @@ pub mod num {
         pub mod hamming_distance;
         pub mod low_mask;
         pub mod not;
-        pub mod power_of_two_digit_iterable;
-        pub mod power_of_two_digits;
         pub mod rotate;
         pub mod significant_bits;
     }
@@ -419,12 +421,18 @@ pub mod strings {
     pub mod exhaustive {
         pub mod exhaustive_fixed_length_strings;
         pub mod exhaustive_fixed_length_strings_using_chars;
+        pub mod exhaustive_strings;
+        pub mod exhaustive_strings_using_chars;
         pub mod lex_fixed_length_strings;
         pub mod lex_fixed_length_strings_using_chars;
+        pub mod shortlex_strings;
+        pub mod shortlex_strings_using_chars;
     }
     pub mod random {
         pub mod random_fixed_length_strings;
         pub mod random_fixed_length_strings_using_chars;
+        pub mod random_strings;
+        pub mod random_strings_using_chars;
     }
     pub mod string_is_subset;
     pub mod string_sort;
@@ -457,6 +465,10 @@ pub mod unions {
     pub mod debug;
     pub mod display;
     pub mod eq;
+    pub mod exhaustive {
+        pub mod exhaustive_unions;
+        pub mod lex_unions;
+    }
     pub mod from_str;
     pub mod ord;
     pub mod unwrap;

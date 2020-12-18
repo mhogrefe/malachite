@@ -4,8 +4,9 @@ use chars::crement::increment_char;
 use chars::CharType;
 use comparison::traits::{Max, Min};
 
-/// Generates all ASCII `char`s, in ascending order. For a friendlier order (_e.g._ nonprintable
-/// `char`s coming last), try `exhaustive_ascii_char`s.
+/// Generates all ASCII `char`s, in ascending order.
+///
+/// For a friendlier order (_e.g._ nonprintable `char`s coming last), try `exhaustive_ascii_char`s.
 ///
 /// The output length is 128.
 ///
@@ -28,8 +29,9 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
     char::MIN..='\u{7f}'
 }
 
-/// Generates all `char`s, in ascending order. For a friendlier order (_e.g_. nonprintable `char`s
-/// coming last), use `exhaustive_char`s.
+/// Generates all `char`s, in ascending order.
+///
+/// For a friendlier order (_e.g_. nonprintable `char`s coming last), use `exhaustive_char`s.
 ///
 /// The output length is 1,112,064.
 ///
@@ -194,7 +196,7 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
     }
 }
 
-/// Generates all `char`s, in a "friendly" order, so that more familiar characters come first.
+/// Generates all `char`s, in a friendly order, so that more familiar characters come first.
 ///
 /// The order is
 /// 1. Lowercase ASCII letters

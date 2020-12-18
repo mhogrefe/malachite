@@ -77,7 +77,7 @@ pub fn read_command_line_arguments() -> CommandLineArguments {
             let key = chunk.next().unwrap();
             let value =
                 u64::from_str(chunk.next().expect("Bad config")).expect("Invalid config value");
-            config.insert(key.to_string(), value);
+            config.insert(key, value);
         }
     }
     let limit =

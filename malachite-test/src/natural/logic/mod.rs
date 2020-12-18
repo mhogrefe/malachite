@@ -8,7 +8,6 @@ pub mod clear_bit;
 pub mod count_ones;
 pub mod flip_bit;
 pub mod from_bits;
-pub mod from_power_of_two_digits;
 pub mod get_bit;
 pub mod get_bits;
 pub mod hamming_distance;
@@ -18,11 +17,9 @@ pub mod limb_count;
 pub mod low_mask;
 pub mod not;
 pub mod or;
-pub mod power_of_two_digits;
 pub mod set_bit;
 pub mod significant_bits;
 pub mod to_bits;
-pub mod to_power_of_two_digits;
 pub mod trailing_zeros;
 pub mod xor;
 
@@ -35,7 +32,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     count_ones::register(registry);
     flip_bit::register(registry);
     from_bits::register(registry);
-    from_power_of_two_digits::register(registry);
     get_bit::register(registry);
     get_bits::register(registry);
     hamming_distance::register(registry);
@@ -45,11 +41,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     low_mask::register(registry);
     not::register(registry);
     or::register(registry);
-    power_of_two_digits::register(registry);
     set_bit::register(registry);
     significant_bits::register(registry);
     to_bits::register(registry);
-    to_power_of_two_digits::register(registry);
     trailing_zeros::register(registry);
     xor::register(registry);
 }

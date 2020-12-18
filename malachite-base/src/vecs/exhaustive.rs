@@ -1524,7 +1524,7 @@ pub fn exhaustive_vecs_from_length_iterator<
     ExhaustiveVecs(exhaustive_vecs_from_element_iterator_helper(lengths, xs))
 }
 
-/// Generates `Vec`s with elements from a specified iterator.
+/// Generates all `Vec`s with elements from a specified iterator.
 ///
 /// If `xs` is empty, the output length is 1; otherwise, the output is infinite.
 ///

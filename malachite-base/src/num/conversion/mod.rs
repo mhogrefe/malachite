@@ -1,3 +1,5 @@
+/// This module provides traits for working with the digits of numbers.
+pub mod digits;
 /// This module provides traits for converting between different number types.
 ///
 /// Here are usage examples of the macro-generated functions:

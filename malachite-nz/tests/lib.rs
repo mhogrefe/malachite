@@ -174,6 +174,8 @@ pub mod natural {
         pub mod mod_power_of_two_shr;
         pub mod mod_power_of_two_square;
         pub mod mod_power_of_two_sub;
+        pub mod mod_shl;
+        pub mod mod_shr;
         pub mod mod_square;
         pub mod mod_sub;
         pub mod mul;
@@ -208,6 +210,11 @@ pub mod natural {
     }
     pub mod conversion {
         pub mod clone;
+        pub mod digits {
+            pub mod from_power_of_two_digits;
+            pub mod power_of_two_digits;
+            pub mod to_power_of_two_digits;
+        }
         pub mod floating_point_from_natural;
         pub mod from_floating_point;
         pub mod from_limbs;
@@ -232,7 +239,6 @@ pub mod natural {
         pub mod count_ones;
         pub mod flip_bit;
         pub mod from_bits;
-        pub mod from_power_of_two_digits;
         pub mod get_bit;
         pub mod get_bits;
         pub mod hamming_distance;
@@ -242,11 +248,9 @@ pub mod natural {
         pub mod low_mask;
         pub mod not;
         pub mod or;
-        pub mod power_of_two_digits;
         pub mod set_bit;
         pub mod significant_bits;
         pub mod to_bits;
-        pub mod to_power_of_two_digits;
         pub mod trailing_zeros;
         pub mod xor;
     }

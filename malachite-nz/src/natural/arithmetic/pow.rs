@@ -24,7 +24,7 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
 /// This is GMP_NUMB_HALFMAX from mpz/n_pow_ui.c, GMP 6.1.2.
-const HALF_MASK: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
+const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
 pub fn limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = Vec::new();
@@ -36,7 +36,7 @@ pub fn limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
 fn len_1_helper(x_0: &mut Limb, out_0: &mut Limb, trailing_zero_bits_out: &mut u64, exp: &mut u64) {
     // Power up as far as possible within `x_0`. We start here with `exp` != 0, but if `exp` is
     // small then we might reach `exp` == 0 and the whole `x` ^ `exp` in `out_0`.
-    while *x_0 <= HALF_MASK {
+    while *x_0 <= HALF_MAX {
         assert_ne!(*exp, 0);
         if exp.odd() {
             *out_0 *= *x_0;

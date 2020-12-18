@@ -14,8 +14,11 @@ use num::arithmetic::traits::{
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
-use num::conversion::traits::{FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice};
-use num::logic::traits::{HammingDistance, PowerOfTwoDigitIterable, PowerOfTwoDigits};
+use num::conversion::traits::{
+    FromOtherTypeSlice, PowerOfTwoDigitIterable, PowerOfTwoDigits, VecFromOtherType,
+    VecFromOtherTypeSlice,
+};
+use num::logic::traits::HammingDistance;
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:

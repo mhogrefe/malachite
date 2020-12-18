@@ -113,6 +113,10 @@ impl fmt::Binary for Natural {
     }
 }
 
+pub mod digits {
+    pub mod power_of_two_digit_iterable;
+    pub mod power_of_two_digits;
+}
 pub mod floating_point_from_natural;
 pub mod from_floating_point;
 pub mod from_limbs;

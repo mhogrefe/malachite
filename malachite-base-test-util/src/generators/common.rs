@@ -31,8 +31,8 @@ impl GenConfig {
         GenConfig(HashMap::new())
     }
 
-    pub fn insert(&mut self, key: String, value: u64) {
-        self.0.insert(key, value);
+    pub fn insert(&mut self, key: &str, value: u64) {
+        self.0.insert(key.to_string(), value);
     }
 
     pub fn get_or(&self, key: &'static str, default: u64) -> u64 {

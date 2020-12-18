@@ -166,6 +166,8 @@ pub mod arithmetic {
     pub mod mod_power_of_two_shr;
     pub mod mod_power_of_two_square;
     pub mod mod_power_of_two_sub;
+    pub mod mod_shl;
+    pub mod mod_shr;
     pub mod mod_square;
     pub mod mod_sub;
     pub mod mul;
@@ -211,8 +213,6 @@ pub mod logic {
     pub mod low_mask;
     pub mod not;
     pub mod or;
-    pub mod power_of_two_digit_iterable;
-    pub mod power_of_two_digits;
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;

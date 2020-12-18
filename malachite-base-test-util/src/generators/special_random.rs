@@ -1,6 +1,6 @@
 use malachite_base::chars::random::{
-    graphic_weighted_random_char_inclusive_range, graphic_weighted_random_char_range,
-    graphic_weighted_random_chars,
+    graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
+    graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -12,11 +12,16 @@ use malachite_base::num::random::striped::{
     striped_random_unsigneds,
 };
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::strings::random::random_strings_using_chars;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples_from_single,
 };
 
 use generators::common::{GenConfig, It};
+use generators::{
+    reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed,
+    reduce_to_fit_sub_mul_unsigned,
+};
 
 // -- char --
 
@@ -113,6 +118,32 @@ pub fn special_random_signed_triple_gen<T: PrimitiveSigned>(config: &GenConfig) 
     )))
 }
 
+pub fn special_random_signed_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_run_length_n", T::WIDTH >> 1),
+            config.get_or("mean_run_length_d", 1),
+        ))
+        .map(|(x, y, z)| reduce_to_fit_add_mul_signed(x, y, z)),
+    )
+}
+
+pub fn special_random_signed_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_run_length_n", T::WIDTH >> 1),
+            config.get_or("mean_run_length_d", 1),
+        ))
+        .map(|(x, y, z)| reduce_to_fit_sub_mul_signed(x, y, z)),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn special_random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
@@ -157,6 +188,14 @@ pub fn special_random_signed_unsigned_pair_gen_var_1_var_2<T: PrimitiveSigned>(
 
 pub fn special_random_unsigned_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
     Box::new(striped_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_run_length_n", T::WIDTH >> 1),
+        config.get_or("mean_run_length_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_1<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
+    Box::new(striped_random_positive_unsigneds(
         EXAMPLE_SEED,
         config.get_or("mean_run_length_n", T::WIDTH >> 1),
         config.get_or("mean_run_length_d", 1),
@@ -223,10 +262,92 @@ pub fn special_random_unsigned_triple_gen<T: PrimitiveUnsigned>(
     )))
 }
 
-pub fn special_random_unsigned_gen_var_1<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
-    Box::new(striped_random_positive_unsigneds(
+pub fn special_random_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_run_length_n", T::WIDTH >> 1),
+            config.get_or("mean_run_length_d", 1),
+        ))
+        .map(|(x, y, z)| reduce_to_fit_add_mul_unsigned(x, y, z)),
+    )
+}
+
+pub fn special_random_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_run_length_n", T::WIDTH >> 1),
+            config.get_or("mean_run_length_d", 1),
+        ))
+        .map(|(x, y, z)| reduce_to_fit_sub_mul_unsigned(x, y, z)),
+    )
+}
+
+// -- String --
+
+pub fn special_random_string_gen(config: &GenConfig) -> It<String> {
+    Box::new(random_strings_using_chars(
         EXAMPLE_SEED,
-        config.get_or("mean_run_length_n", T::WIDTH >> 1),
-        config.get_or("mean_run_length_d", 1),
+        &|seed| {
+            graphic_weighted_random_chars(
+                seed,
+                config.get_or("graphic_char_weight_n", 50),
+                config.get_or("graphic_char_weight_d", 1),
+            )
+        },
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
     ))
+}
+
+pub fn special_random_string_gen_var_1(config: &GenConfig) -> It<String> {
+    Box::new(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &|seed| {
+            graphic_weighted_random_ascii_chars(
+                seed,
+                config.get_or("graphic_char_weight_n", 50),
+                config.get_or("graphic_char_weight_d", 1),
+            )
+        },
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    ))
+}
+
+// -- (String, String) --
+
+pub fn special_random_string_pair_gen(config: &GenConfig) -> It<(String, String)> {
+    Box::new(random_pairs_from_single(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &|seed| {
+            graphic_weighted_random_chars(
+                seed,
+                config.get_or("graphic_char_weight_n", 50),
+                config.get_or("graphic_char_weight_d", 1),
+            )
+        },
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    )))
+}
+
+pub fn special_random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, String)> {
+    Box::new(random_pairs_from_single(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &|seed| {
+            graphic_weighted_random_ascii_chars(
+                seed,
+                config.get_or("graphic_char_weight_n", 50),
+                config.get_or("graphic_char_weight_d", 1),
+            )
+        },
+        config.get_or("length_mean_n", 32),
+        config.get_or("length_mean_d", 1),
+    )))
 }

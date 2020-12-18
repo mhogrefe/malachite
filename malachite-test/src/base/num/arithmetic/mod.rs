@@ -1,7 +1,6 @@
 use malachite_test::common::DemoBenchRegistry;
 
 pub mod abs;
-pub mod add_mul;
 pub mod arithmetic_checked_shl;
 pub mod arithmetic_checked_shr;
 pub mod checked_add_mul;
@@ -65,7 +64,6 @@ pub mod shl_round;
 pub mod shr_round;
 pub mod sign;
 pub mod square;
-pub mod sub_mul;
 pub mod wrapping_abs;
 pub mod wrapping_add;
 pub mod wrapping_add_mul;
@@ -85,7 +83,6 @@ pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     abs::register(registry);
-    add_mul::register(registry);
     arithmetic_checked_shl::register(registry);
     arithmetic_checked_shr::register(registry);
     checked_add_mul::register(registry);
@@ -149,7 +146,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     shr_round::register(registry);
     sign::register(registry);
     square::register(registry);
-    sub_mul::register(registry);
     wrapping_abs::register(registry);
     wrapping_add::register(registry);
     wrapping_add_mul::register(registry);

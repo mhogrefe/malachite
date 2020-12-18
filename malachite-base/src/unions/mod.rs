@@ -154,3 +154,34 @@ union!(
     [G, G, 'G', g],
     [H, H, 'H', h]
 );
+
+/// This module contains iterators that generate unions without repetition.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # lex_union\[n\]s
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::unions::exhaustive::lex_union2s;
+/// use malachite_base::unions::Union2;
+///
+/// let u2s = lex_union2s(exhaustive_bools(), 0..4).collect::<Vec<_>>();
+/// assert_eq!(
+///     u2s.as_slice(),
+///     &[Union2::A(false), Union2::A(true), Union2::B(0), Union2::B(1), Union2::B(2), Union2::B(3)]
+/// );
+/// ```
+///
+/// # exhaustive_union\[n\]s
+/// ```
+/// use malachite_base::bools::exhaustive::exhaustive_bools;
+/// use malachite_base::unions::exhaustive::exhaustive_union2s;
+/// use malachite_base::unions::Union2;
+///
+/// let u2s = exhaustive_union2s(exhaustive_bools(), 0..4).collect::<Vec<_>>();
+/// assert_eq!(
+///     u2s.as_slice(),
+///     &[Union2::A(false), Union2::B(0), Union2::A(true), Union2::B(1), Union2::B(2), Union2::B(3)]
+/// );
+/// ```
+pub mod exhaustive;

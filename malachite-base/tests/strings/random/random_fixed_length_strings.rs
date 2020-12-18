@@ -13,10 +13,10 @@ fn random_fixed_length_strings_helper(
     expected_common_values: &[(&str, usize)],
     expected_median: (&str, Option<&str>),
 ) {
-    let css = random_fixed_length_strings(EXAMPLE_SEED, len);
-    let values = css.clone().take(20).collect::<Vec<_>>();
-    let common_values = common_values_map(1000000, 10, css.clone());
-    let (median_lo, median_hi) = median(css.take(1000000));
+    let ss = random_fixed_length_strings(EXAMPLE_SEED, len);
+    let values = ss.clone().take(20).collect::<Vec<_>>();
+    let common_values = common_values_map(1000000, 10, ss.clone());
+    let (median_lo, median_hi) = median(ss.take(1000000));
     assert_eq!(
         (
             values

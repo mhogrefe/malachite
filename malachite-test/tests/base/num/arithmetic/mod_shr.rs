@@ -5,9 +5,9 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
 
-use malachite_test::common::test_properties;
+use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
-    pairs_of_signed_and_positive_unsigned, pairs_of_unsigneds_var_5,
+    pairs_of_signed_and_positive_unsigned, pairs_of_unsigneds_var_5, small_signeds,
     triples_of_unsigned_signed_and_unsigned_var_1,
 };
 
@@ -48,6 +48,10 @@ where
 
     test_properties(pairs_of_signed_and_positive_unsigned::<U, T>, |&(u, m)| {
         assert_eq!(T::ZERO.mod_shr(u, m), T::ZERO);
+    });
+
+    test_properties_no_special(small_signeds::<U>, |&i| {
+        assert_eq!(T::ZERO.mod_shl(i, T::ONE), T::ZERO);
     });
 }
 

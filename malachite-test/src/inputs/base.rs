@@ -257,15 +257,6 @@ pub fn unsigneds_var_3<T: PrimitiveInt>(gm: NoSpecialGenerationMode) -> It<u64> 
     }
 }
 
-// All signed `T`s that are not 0 or -1.
-pub fn signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(nonzero_signeds(gm).filter(|&i| i != T::NEGATIVE_ONE))
-}
-
 // All `T`s, where `T` is signed and the square of the `T` is representable.
 pub fn signeds_var_2<T: PrimitiveSigned + Rand + SampleRange>(
     gm: NoSpecialGenerationMode,
@@ -1737,28 +1728,6 @@ pub fn pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>(
         GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
             &EXAMPLE_SEED,
             &(|seed| special_random_unsigned(seed)),
-            &(|seed| random_range_down(seed, T::WIDTH - 1)),
-        )),
-    }
-}
-
-// All pairs of signed `T` and `u64`, where the `u64` is smaller that `T::WIDTH`.
-pub fn pairs_of_signed_and_u64_width_range<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, u64)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_signeds(),
-            primitive_int_increasing_range(0, T::WIDTH),
-        )),
-        GenerationMode::Random(_) => random_pairs_of_primitive_and_u64_width_range(),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_signed(seed)),
             &(|seed| random_range_down(seed, T::WIDTH - 1)),
         )),
     }
@@ -7786,22 +7755,6 @@ pub fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
         NoSpecialGenerationMode::Random(scale) => {
             Box::new(random_strings_with_chars(&EXAMPLE_SEED, scale, &|seed| {
                 random_ascii_chars(seed)
-            }))
-        }
-    }
-}
-
-pub const ROUNDING_MODE_CHARS: &str = "CDEFNUacegilnoprstwx";
-
-// All `Strings` with characters that appear in the `String` representations of `RoundingMode`s
-pub fn strings_var_1(gm: NoSpecialGenerationMode) -> It<String> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            Box::new(exhaustive_strings_with_chars(ROUNDING_MODE_CHARS.chars()))
-        }
-        NoSpecialGenerationMode::Random(scale) => {
-            Box::new(random_strings_with_chars(&EXAMPLE_SEED, scale, &|seed| {
-                random_from_vector(seed, ROUNDING_MODE_CHARS.chars().collect())
             }))
         }
     }

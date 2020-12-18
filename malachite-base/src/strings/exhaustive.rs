@@ -1,9 +1,10 @@
 use chars::exhaustive::{exhaustive_chars, ExhaustiveChars};
-use strings::strings_from_char_vecs;
-use strings::StringsFromCharVecs;
+use num::exhaustive::PrimitiveIntIncreasingRange;
+use strings::{strings_from_char_vecs, StringsFromCharVecs};
 use vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, lex_fixed_length_vecs_from_single,
-    ExhaustiveFixedLengthVecs1Input, LexFixedLengthVecsFromSingle,
+    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, lex_fixed_length_vecs_from_single,
+    shortlex_vecs, ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle,
+    ShortlexVecs,
 };
 
 /// Generates all `String`s of a given length with `char`s from a single iterator, in lexicographic
@@ -168,4 +169,147 @@ pub fn exhaustive_fixed_length_strings(
     len: u64,
 ) -> StringsFromCharVecs<ExhaustiveFixedLengthVecs1Input<ExhaustiveChars>> {
     exhaustive_fixed_length_strings_using_chars(len, exhaustive_chars())
+}
+
+/// Generates `String`s with `char`s from a specified iterator, in shortlex order.
+///
+/// Shortlex order means that the `String`s are output from shortest to longest, and `String`s of
+/// the same length are output in lexicographic order with respect to the ordering of the `char`s
+/// specified by the input iterator.
+///
+/// `cs` must be finite; if it's infinite, only `String`s of length 0 and 1 are ever produced.
+///
+/// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
+///
+/// The lengths of the output `String`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
+///
+/// let ss = shortlex_strings_using_chars('x'..='z').take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     &[
+///         "", "x", "y", "z", "xx", "xy", "xz", "yx", "yy", "yz", "zx", "zy", "zz", "xxx", "xxy",
+///         "xxz", "xyx", "xyy", "xyz", "xzx"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
+    cs: I,
+) -> StringsFromCharVecs<ShortlexVecs<char, PrimitiveIntIncreasingRange<u64>, I>> {
+    strings_from_char_vecs(shortlex_vecs(cs))
+}
+
+/// Generates `String`s in shortlex order.
+///
+/// Shortlex order means that the `String`s are output from shortest to longest, and `String`s of
+/// the same length are output in lexicographic order with respect to the order of
+/// `exhaustive_chars`, which is not the  default lexicographic order for `char`s. If you want that
+/// order, use `shortlex_strings_using_chars(chars_increasing())`.
+///
+/// The output is infinite.
+///
+/// The lengths of the output `String`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::strings::exhaustive::shortlex_strings;
+///
+/// let ss = shortlex_strings().take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     &[
+///         "", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
+///         "r", "s"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_strings(
+) -> StringsFromCharVecs<ShortlexVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
+    shortlex_strings_using_chars(exhaustive_chars())
+}
+
+/// Generates all `String`s with `char`s from a specified iterator.
+///
+/// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
+///
+/// The lengths of the output `String`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
+///
+/// let ss = exhaustive_strings_using_chars('x'..='z').take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     &[
+///         "", "x", "y", "xxx", "z", "xx", "xy", "xxxxx", "yx", "xxy", "yy", "xxxx", "xz", "xyx",
+///         "yz", "xxxxxx", "zx", "xyy", "zy", "xxxy"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
+    cs: I,
+) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, I>> {
+    strings_from_char_vecs(exhaustive_vecs(cs))
+}
+
+/// Generates all `String`s.
+///
+/// The lengths of the output `String`s grow logarithmically.
+///
+/// # Complexity per iteration
+///
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time and $M$ is additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::strings::exhaustive::exhaustive_strings;
+///
+/// let ss = exhaustive_strings().take(20).collect::<Vec<_>>();
+/// assert_eq!(
+///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     &[
+///         "", "a", "b", "aaa", "c", "aa", "d", "aaaa", "e", "ab", "f", "aab", "g", "ba", "h",
+///         "aaaaa", "i", "bb", "j", "aba"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_strings(
+) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, ExhaustiveChars>> {
+    exhaustive_strings_using_chars(exhaustive_chars())
 }
