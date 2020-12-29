@@ -51,11 +51,15 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::iterators::comparison::delta_directions;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     delta_directions([3, 1, 4, 1, 5, 9].into_iter()).collect::<Vec<_>>(),
+///     delta_directions([3, 1, 4, 1, 5, 9].into_iter()).collect_vec(),
 ///     &[Ordering::Less, Ordering::Greater, Ordering::Less, Ordering::Greater, Ordering::Greater]
 /// )
 /// ```

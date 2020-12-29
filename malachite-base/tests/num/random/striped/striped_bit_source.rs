@@ -5,8 +5,8 @@ const BIT_STRING_LENGTH: usize = 80;
 
 fn generate_string(bit_source: &mut StripedBitSource) -> String {
     let mut string = String::with_capacity(BIT_STRING_LENGTH);
-    for _ in 0..BIT_STRING_LENGTH {
-        if bit_source.get() {
+    for bit in bit_source.take(BIT_STRING_LENGTH) {
+        if bit {
             string.push('1');
         } else {
             string.push('0');

@@ -14,9 +14,13 @@ use random::Seed;
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::random::random_units;
 ///
-/// assert_eq!(random_units().take(10).collect::<Vec<_>>(), &[(); 10]);
+/// assert_eq!(random_units().take(10).collect_vec(), &[(); 10]);
 /// ```
 pub fn random_units() -> Repeat<()> {
     repeat(())

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base::bools::exhaustive::exhaustive_bools;
@@ -13,11 +14,8 @@ where
 {
     let xss = exhaustive_fixed_length_vecs_from_single(len, xs)
         .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+        .collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 fn exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
@@ -29,12 +27,12 @@ fn exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
     I::Item: Clone + Debug + Eq,
 {
     let xss = exhaustive_fixed_length_vecs_from_single(len, xs);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

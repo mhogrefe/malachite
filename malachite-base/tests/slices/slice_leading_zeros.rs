@@ -1,4 +1,7 @@
-use malachite_base::slices::slice_leading_zeros;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::slices::{slice_leading_zeros, slice_test_zero, slice_trailing_zeros};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::unsigned_vec_gen;
 
 #[test]
 fn test_slice_leading_zeros() {
@@ -13,4 +16,21 @@ fn test_slice_leading_zeros() {
     test(&[0, 123, 0, 0, 0], 1);
     test(&[1, 2, 3], 0);
     test(&[0, 0, 0, 1, 2, 3], 3);
+}
+
+#[test]
+fn slice_leading_zeros_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_length_d", 1);
+    config.insert("mean_stripe_n", 16 << u8::LOG_WIDTH);
+    config.insert("mean_stripe_d", 1);
+    unsigned_vec_gen::<u8>().test_properties_with_config(&config, |xs| {
+        let leading_zeros = slice_leading_zeros(&xs);
+        assert!(leading_zeros <= xs.len());
+        assert_eq!(leading_zeros == xs.len(), slice_test_zero(&xs));
+        let mut new_xs = xs;
+        new_xs.reverse();
+        assert_eq!(slice_trailing_zeros(&new_xs), leading_zeros);
+    });
 }

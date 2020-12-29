@@ -70,6 +70,7 @@ pub(crate) fn register(runner: &mut Runner) {
     comparison::register(runner);
     num::register(runner);
     rounding_modes::register(runner);
+    slices::register(runner);
     strings::register(runner);
 }
 
@@ -78,4 +79,5 @@ mod chars;
 mod comparison;
 mod num;
 mod rounding_modes;
+mod slices;
 mod strings;

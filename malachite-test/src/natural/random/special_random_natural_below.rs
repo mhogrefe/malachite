@@ -1,10 +1,10 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
-use malachite_nz::natural::random::special_random_natural_below::special_random_natural_below;
 use rand::{IsaacRng, SeedableRng};
 use rust_wheels::iterators::adaptors::{generate_from_function, to_limited_string_binary};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::special_random_natural_below_old;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::positive_naturals;
@@ -21,7 +21,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 fn demo_natural_special_random_natural_below(gm: GenerationMode, limit: usize) {
     for n in positive_naturals(gm).take(limit) {
         let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-        let mut xs = generate_from_function(|| special_random_natural_below(&mut rng, &n));
+        let mut xs = generate_from_function(|| special_random_natural_below_old(&mut rng, &n));
         println!(
             "special_random_natural_below({}) = {}",
             n,
@@ -47,7 +47,7 @@ fn benchmark_natural_special_random_natural_below(
         "n.significant_bits()",
         &mut [(
             "Malachite",
-            &mut (|ref n| no_out!(special_random_natural_below(&mut rng, n))),
+            &mut (|ref n| no_out!(special_random_natural_below_old(&mut rng, n))),
         )],
     );
 }

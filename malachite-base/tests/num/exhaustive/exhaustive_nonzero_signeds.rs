@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -11,7 +12,7 @@ where
         exhaustive_nonzero_signeds::<T>()
             .map(i8::exact_from)
             .take(20)
-            .collect::<Vec<_>>(),
+            .collect_vec(),
         &[1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10]
     );
 }
@@ -20,7 +21,7 @@ fn exhaustive_nonzero_signeds_long_helper<T: PrimitiveSigned>(last_20: &[T]) {
     let expected_len = usize::power_of_two(T::WIDTH) - 1;
     let xs = exhaustive_nonzero_signeds::<T>();
     assert_eq!(xs.clone().count(), expected_len);
-    assert_eq!(xs.skip(expected_len - 20).collect::<Vec<_>>(), last_20)
+    assert_eq!(xs.skip(expected_len - 20).collect_vec(), last_20)
 }
 
 #[test]

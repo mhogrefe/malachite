@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::HashSet;
 
 use malachite_base::chars::exhaustive::chars_increasing;
@@ -42,7 +43,7 @@ fn test_char_type() {
         )
     });
     assert_eq!(
-        first_chars.collect::<Vec<_>>(),
+        first_chars.collect_vec(),
         &[
             (CharType::AsciiLower, 'a'),
             (CharType::AsciiUpper, 'A'),
@@ -63,7 +64,7 @@ fn test_char_type() {
         )
     });
     assert_eq!(
-        last_chars.collect::<Vec<_>>(),
+        last_chars.collect_vec(),
         &[
             (CharType::AsciiLower, 'z'),
             (CharType::AsciiUpper, 'Z'),

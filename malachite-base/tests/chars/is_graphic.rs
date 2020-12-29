@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::chars::char_is_graphic;
 use malachite_base::chars::exhaustive::{ascii_chars_increasing, chars_increasing};
 use malachite_base::iterators::matching_intervals_in_iterator;
@@ -32,7 +33,7 @@ fn test_is_graphic() {
         matching_intervals_in_iterator(chars_increasing(), |&c| char_is_graphic(c))
             .iter()
             .map(|i| (i.0 as u32, i.1 as u32))
-            .collect::<Vec<_>>(),
+            .collect_vec(),
         &[
             (32, 126),
             (161, 172),

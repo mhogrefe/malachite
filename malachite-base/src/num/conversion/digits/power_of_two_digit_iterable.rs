@@ -8,16 +8,20 @@ use num::conversion::traits::{
 use num::logic::traits::BitBlockAccess;
 use rounding_modes::RoundingMode;
 
+/// A double-ended iterator over the base-$2^\ell$ digits of a primitive unsigned integer.
+///
+/// This `struct` is created by the `power_of_two_digits` function in this type's implementation of
+/// `PowerOfTwoDigitIterable`. See its documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     pub(crate) value: T,
     pub(crate) log_base: u64,
     pub(crate) some_remaining: bool,
     // If `n` is nonzero, this index initially points to the least-significant bit of the least-
-    // significant digit, and is left-shifted by next().
+    // significant digit, and is left-shifted by `next`.
     pub(crate) i: u64,
     // If `n` is nonzero, this mask initially points to the least-significant bit of the most-
-    // significant nonzero digit, and is right-shifted by next_back().
+    // significant nonzero digit, and is right-shifted by `next_back`.
     pub(crate) j: u64,
     boo: PhantomData<U>,
 }
@@ -28,11 +32,13 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     type Item = U;
 
     /// A function to iterate through the digits of a primitive unsigned integer in ascending order
-    /// (least-significant first). The base is 2<sup>`log_base`</sup> and the output type is `U`.
+    /// (least-significant first).
     ///
-    /// Time: worst case O(1)
+    /// The base is $2^\ell$ and the output type is `U`.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -64,12 +70,14 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     }
 
     /// A function that returns the length of the digits iterator; that is, the value's significant
-    /// digit count. The format is (lower bound, Option<upper bound>), but in this case it's trivial
-    /// to always have an exact bound.
+    /// digit count.
     ///
-    /// Time: worst case O(1)
+    /// The format is `(lower, Option<upper>)`, but in this case it's trivial to always have an
+    /// exact bound.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -96,11 +104,13 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     DoubleEndedIterator for PrimitivePowerOfTwoDigitIterator<T, U>
 {
     /// A function to iterate through the digits of a primitive unsigned integer in descending order
-    /// (most-significant first). The base is 2<sup>`log_base`</sup> and the output type is `U`.
+    /// (most-significant first).
     ///
-    /// Time: worst case O(1)
+    /// The base is $2^\ell$ and the output type is `U`.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -132,7 +142,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     }
 }
 
-/// This allows for some optimizations, e.g. when collecting into a `Vec`.
+/// This allows for some optimizations, _e.g._ when collecting into a `Vec`.
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
     ExactSizeIterator for PrimitivePowerOfTwoDigitIterator<T, U>
 {
@@ -141,12 +151,21 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
     PowerOfTwoDigitIterator<U> for PrimitivePowerOfTwoDigitIterator<T, U>
 {
-    /// A function to retrieve base-2<sup>`log_base`</sup> digits by index. Indexing at or above the
-    /// significant digit count returns zero. The output type is `U`.
+    /// A function to retrieve base-$2^\ell$ digits by index.
     ///
-    /// Time: worst case O(1)
+    /// Indexing at or above the significant digit count returns zero. The output type is `U`.
     ///
-    /// Additional memory: worst case O(1)
+    /// This function is stateless. It doesn't affect, and isn't affected by, the iterator's
+    /// position.
+    ///
+    /// $f(x, \ell, i) = d_i$, where $0 \leq d_i < 2^\ell$ for all $i$ and
+    /// $$
+    /// \sum_{i=0}^\infty2^{\ell i}d_i = x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -204,43 +223,27 @@ macro_rules! impl_power_of_two_digit_iterable {
                 impl PowerOfTwoDigitIterable<$u> for $t {
                     type PowerOfTwoDigitIterator = PrimitivePowerOfTwoDigitIterator<$t, $u>;
 
-                    /// Returns a double-ended iterator over the base-2<sup>`log_base`</sup> digits
-                    /// of a primitive unsigned integer. The forward order is ascending, so that
-                    /// less significant digits appear first. There are no trailing zeros going
-                    /// forward, or leading zeros going backward. The type of the digits is `$u`.
+                    /// Returns a double-ended iterator over the base-$2^\ell$ digits of a primitive
+                    /// unsigned integer.
+                    ///
+                    /// The forward order is ascending, so that less-significant digits appear
+                    /// first. There are no trailing zeros going forward, or leading zeros going
+                    /// backward. The type of the digits is `$u`.
                     ///
                     /// If it's necessary to get a `Vec` of all the digits, consider using
                     /// `to_power_of_to_digits_asc` or `to_power_of_two_digits_desc` instead.
                     ///
-                    /// Time: worst case O(1)
+                    /// # Worst-case complexity
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// Constant time and additional memory.
                     ///
-                    /// #Panics
+                    /// # Panics
                     ///
                     /// Panics if `log_base` is larger than the width of `$u`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::conversion::digits::power_of_two_digit_iterable::*;
-                    /// use malachite_base::num::conversion::traits::PowerOfTwoDigitIterable;
-                    ///
-                    /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
-                    /// assert!(digits.next().is_none());
-                    ///
-                    /// // 107 = 1101011b
-                    /// let mut digits =
-                    ///     PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-                    /// assert_eq!(digits.collect::<Vec<_>>(), vec![3, 2, 2, 1]);
-                    ///
-                    /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
-                    /// assert!(digits.next_back().is_none());
-                    ///
-                    /// // 107 = 1101011b
-                    /// let mut digits =
-                    ///     PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-                    /// assert_eq!(digits.rev().collect::<Vec<_>>(), vec![1, 2, 2, 3]);
-                    /// ```
+                    /// See the documentation of the
+                    /// `num::conversion::digits::power_of_two_digit_iterable`  module.
                     #[inline]
                     fn power_of_two_digits(
                         self,

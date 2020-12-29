@@ -104,7 +104,6 @@ pub mod base {
         }
 
         pub mod logic {
-            pub mod bit_access;
             pub mod bit_block_access;
             pub mod bit_convertible;
             pub mod bit_iterable;
@@ -116,11 +115,7 @@ pub mod base {
     }
 
     pub mod slices {
-        pub mod slice_leading_zeros;
         pub mod slice_move_left;
-        pub mod slice_set_zero;
-        pub mod slice_test_zero;
-        pub mod slice_trailing_zeros;
     }
 
     pub mod vecs {
@@ -283,6 +278,7 @@ pub mod natural {
         pub mod digits {
             pub mod from_power_of_two_digits;
             pub mod power_of_two_digits;
+            pub mod to_digits;
             pub mod to_power_of_two_digits;
         }
         pub mod floating_point_from_natural;

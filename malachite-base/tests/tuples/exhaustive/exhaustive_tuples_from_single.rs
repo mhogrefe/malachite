@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
@@ -16,7 +17,7 @@ macro_rules! helpers {
         where
             I::Item: Clone + Debug + Eq,
         {
-            let ts = $ts(xs).take(20).collect::<Vec<_>>();
+            let ts = $ts(xs).take(20).collect_vec();
             assert_eq!(ts.as_slice(), out);
         }
 
@@ -25,7 +26,7 @@ macro_rules! helpers {
             I::Item: Clone + Debug + Eq,
         {
             let ts = $ts(xs);
-            let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+            let ts_prefix = ts.clone().take(20).collect_vec();
             assert_eq!(ts_prefix.as_slice(), out);
             assert_eq!(ts.count(), out_len);
         }

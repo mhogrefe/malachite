@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -16,13 +17,13 @@ pub fn to_bits_desc_alt<T: BitConvertible>(n: &T) -> Vec<bool> {
 }
 
 pub fn from_bits_asc_alt<T: BitConvertible, I: Iterator<Item = bool>>(bits: I) -> T {
-    let mut bits: Vec<_> = bits.collect();
+    let mut bits = bits.collect_vec();
     bits.reverse();
     T::from_bits_desc(bits.into_iter())
 }
 
 pub fn from_bits_desc_alt<T: BitConvertible, I: Iterator<Item = bool>>(bits: I) -> T {
-    let mut bits: Vec<_> = bits.collect();
+    let mut bits = bits.collect_vec();
     bits.reverse();
     T::from_bits_asc(bits.into_iter())
 }
@@ -86,7 +87,7 @@ pub fn to_bits_desc_signed_naive<T: PrimitiveSigned>(n: T) -> Vec<bool> {
 }
 
 pub fn from_bits_asc_signed_naive<T: PrimitiveSigned, I: Iterator<Item = bool>>(bits: I) -> T {
-    let bits: Vec<_> = bits.collect();
+    let bits = bits.collect_vec();
     if bits.is_empty() {
         return T::ZERO;
     }

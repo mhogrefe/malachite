@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::{empty, once};
@@ -14,11 +15,8 @@ fn lex_length_2_vecs_helper<T: Clone + Debug + Eq, I: Iterator<Item = T>, J: Ite
     ys: J,
     out: &[&[T]],
 ) {
-    let xss = lex_length_2_vecs(xs, ys).take(20).collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+    let xss = lex_length_2_vecs(xs, ys).take(20).collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 fn lex_length_2_vecs_finite_helper<
@@ -32,12 +30,12 @@ fn lex_length_2_vecs_finite_helper<
     out: &[&[T]],
 ) {
     let xss = lex_length_2_vecs(xs, ys);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );
@@ -264,11 +262,8 @@ fn lex_length_3_vecs_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = lex_length_3_vecs(xs, ys, zs).take(20).collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+    let xss = lex_length_3_vecs(xs, ys, zs).take(20).collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 fn lex_length_3_vecs_finite_helper<
@@ -286,12 +281,12 @@ fn lex_length_3_vecs_finite_helper<
     T: Clone + Debug + Eq,
 {
     let xss = lex_length_3_vecs(xs, ys, zs);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

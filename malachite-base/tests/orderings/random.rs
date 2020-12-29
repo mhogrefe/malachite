@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
@@ -10,7 +11,7 @@ use malachite_base::random::EXAMPLE_SEED;
 #[test]
 fn test_random_orderings() {
     let xs = random_orderings(EXAMPLE_SEED);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

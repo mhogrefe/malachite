@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 use std::iter::empty;
 
@@ -20,12 +21,12 @@ fn exhaustive_fixed_length_vecs_1_input_helper<T, I: Clone + Iterator<Item = T>>
 {
     let output_types = get_sample_output_types(len);
     let xss = exhaustive_fixed_length_vecs_1_input(xs.clone(), &output_types[0]);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );
@@ -191,12 +192,12 @@ fn exhaustive_fixed_length_vecs_2_inputs_helper<
         .zip(input_indices.iter().cloned())
         .collect();
     let xss = exhaustive_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), &output_configs);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

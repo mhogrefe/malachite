@@ -46,7 +46,7 @@ macro_rules! implicit_x_mul_y_is_zz {
             /// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
             /// ```
             ///
-            /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+            /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
             #[inline]
             fn x_mul_y_is_zz(x: $t, y: $t) -> ($t, $t) {
                 _implicit_x_mul_y_is_zz::<$t, $dt>(x, y)
@@ -68,7 +68,7 @@ impl XMulYIsZZ for usize {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+    /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
     fn x_mul_y_is_zz(x: usize, y: usize) -> (usize, usize) {
         if usize::WIDTH == u32::WIDTH {
             let (z_1, z_0) = u32::x_mul_y_is_zz(u32::wrapping_from(x), u32::wrapping_from(y));
@@ -88,7 +88,7 @@ impl XMulYIsZZ for u128 {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is umul_ppmm from longlong.h, GMP 6.1.2, where (w1, w0) is returned.
+    /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
     #[inline]
     fn x_mul_y_is_zz(x: u128, y: u128) -> (u128, u128) {
         _explicit_x_mul_y_is_zz(x, y)

@@ -1,4 +1,5 @@
 use core::hash::Hash;
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
@@ -25,7 +26,7 @@ fn random_triples_xxy_helper<
     expected_median: ((X, X, Y), Option<(X, X, Y)>),
 ) {
     let xs = random_triples_xxy(EXAMPLE_SEED, xs_gen, ys_gen);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(
@@ -133,7 +134,7 @@ fn random_triples_xyx_helper<
     expected_median: ((X, Y, X), Option<(X, Y, X)>),
 ) {
     let xs = random_triples_xyx(EXAMPLE_SEED, xs_gen, ys_gen);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

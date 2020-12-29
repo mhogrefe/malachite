@@ -1,16 +1,12 @@
 use std::iter::{empty, once};
 
+use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 
 fn exhaustive_strings_using_chars_helper<I: Clone + Iterator<Item = char>>(cs: I, out: &[&str]) {
-    let ss = exhaustive_strings_using_chars(cs)
-        .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
-        out
-    );
+    let ss = exhaustive_strings_using_chars(cs).take(20).collect_vec();
+    assert_eq!(ss.iter().map(String::as_str).collect_vec().as_slice(), out);
 }
 
 #[test]

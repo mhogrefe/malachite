@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 use std::iter::empty;
 
@@ -15,11 +16,8 @@ fn exhaustive_vecs_from_element_iterator_helper<I: Iterator<Item = u64>, J: Clon
 {
     let xss = exhaustive_vecs_from_length_iterator(lengths, xs)
         .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+        .collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 #[test]

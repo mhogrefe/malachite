@@ -4,12 +4,6 @@ pub(crate) fn reshape_2_1_to_3<A: 'static, B: 'static, C: 'static>(
     Box::new(it.map(|((a, b), c)| (a, b, c)))
 }
 
-pub(crate) fn reshape_1_2_to_3<A: 'static, B: 'static, C: 'static>(
-    it: Box<dyn Iterator<Item = (A, (B, C))>>,
-) -> Box<dyn Iterator<Item = (A, B, C)>> {
-    Box::new(it.map(|(a, (b, c))| (a, b, c)))
-}
-
 pub(crate) fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
     it: Box<dyn Iterator<Item = ((A, B, C), D)>>,
 ) -> Box<dyn Iterator<Item = (A, B, C, D)>> {

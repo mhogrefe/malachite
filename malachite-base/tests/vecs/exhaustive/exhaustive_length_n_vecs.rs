@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::{empty, once};
@@ -16,13 +17,8 @@ fn exhaustive_length_2_vecs_helper<T, I: Iterator<Item = T>, J: Iterator<Item = 
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_length_2_vecs(xs, ys)
-        .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+    let xss = exhaustive_length_2_vecs(xs, ys).take(20).collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 fn exhaustive_length_2_vecs_finite_helper<
@@ -38,12 +34,12 @@ fn exhaustive_length_2_vecs_finite_helper<
     T: Clone + Debug + Eq,
 {
     let xss = exhaustive_length_2_vecs(xs, ys);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );
@@ -270,13 +266,8 @@ fn exhaustive_length_3_vecs_helper<
 ) where
     T: Clone + Debug + Eq,
 {
-    let xss = exhaustive_length_3_vecs(xs, ys, zs)
-        .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+    let xss = exhaustive_length_3_vecs(xs, ys, zs).take(20).collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 fn exhaustive_length_3_vecs_finite_helper<
@@ -294,12 +285,12 @@ fn exhaustive_length_3_vecs_finite_helper<
     T: Clone + Debug + Eq,
 {
     let xss = exhaustive_length_3_vecs(xs, ys, zs);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

@@ -1,6 +1,7 @@
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
+use itertools::Itertools;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::random::random_strings;
 
@@ -12,20 +13,16 @@ fn random_strings_helper(
     expected_median: (&str, Option<&str>),
 ) {
     let ss = random_strings(EXAMPLE_SEED, mean_length_numerator, mean_length_denominator);
-    let values = ss.clone().take(20).collect::<Vec<_>>();
+    let values = ss.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, ss.clone());
     let (median_lo, median_hi) = median(ss.take(1000000));
     assert_eq!(
         (
-            values
-                .iter()
-                .map(String::as_str)
-                .collect::<Vec<_>>()
-                .as_slice(),
+            values.iter().map(String::as_str).collect_vec().as_slice(),
             common_values
                 .iter()
                 .map(|(s, f)| (s.as_str(), *f))
-                .collect::<Vec<_>>()
+                .collect_vec()
                 .as_slice(),
             (median_lo.as_str(), median_hi.as_deref())
         ),

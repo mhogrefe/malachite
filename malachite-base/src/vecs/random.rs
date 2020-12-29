@@ -49,6 +49,10 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_fixed_length_vecs_from_single;
@@ -56,9 +60,9 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 /// let xss = random_fixed_length_vecs_from_single(
 ///     2,
 ///     random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100)
-/// ).take(10).collect::<Vec<_>>();
+/// ).take(10).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[95, 24], &[99, 71], &[93, 53], &[85, 34], &[48, 2], &[55, 11], &[48, 18], &[90, 93],
 ///         &[67, 93], &[93, 95]
@@ -307,6 +311,10 @@ impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for RandomVecs<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::vecs::random::random_vecs_from_length_iterator;
@@ -317,9 +325,9 @@ impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for RandomVecs<
 ///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
 ///     &random_primitive_ints::<u8>,
 /// );
-/// let values = xs.take(20).collect::<Vec<_>>();
+/// let values = xs.take(20).collect_vec();
 /// assert_eq!(
-///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[85, 11][..], &[136, 200, 235, 134], &[203, 223], &[38, 235, 217, 177],
 ///         &[162, 32, 166, 234], &[30, 218], &[], &[90, 106], &[], &[9, 216, 204, 151],
@@ -367,14 +375,18 @@ pub fn random_vecs_from_length_iterator<T, I: Iterator<Item = u64>, J: Iterator<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_vecs;
 ///
 /// let xs = random_vecs(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
-/// let values = xs.take(20).collect::<Vec<_>>();
+/// let values = xs.take(20).collect_vec();
 /// assert_eq!(
-///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[][..], &[85, 11, 136, 200, 235, 134, 203, 223, 38, 235, 217, 177, 162, 32],
 ///         &[166, 234, 30, 218], &[90, 106, 9, 216], &[204], &[], &[151, 213, 97, 253, 78],
@@ -429,19 +441,23 @@ pub fn random_vecs<I: Iterator>(
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, if their ratio is less
-/// than or equal to `min_length`, or, if they are too large and manipulating them leads to
+/// than or equal to `min_length`, or if they are too large and manipulating them leads to
 /// arithmetic overflow.
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_vecs_min_length;
 ///
 /// let xs = random_vecs_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
-/// let values = xs.take(20).collect::<Vec<_>>();
+/// let values = xs.take(20).collect_vec();
 /// assert_eq!(
-///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[85, 11][..],
 ///         &[136, 200, 235, 134, 203, 223, 38, 235, 217, 177, 162, 32, 166, 234, 30, 218],
@@ -487,10 +503,9 @@ pub fn random_vecs_min_length<I: Iterator>(
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
 ///     \frac{1}{b-a}\prod_{i=0}^{n-1}P(x_i) & a \leq n < b \\\\
-///     0 & \\text{otherwise},
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
-/// where $a$ is `min_length`.
 ///
 /// The iterators produced by `xs_gen` must be infinite.
 ///
@@ -508,14 +523,18 @@ pub fn random_vecs_min_length<I: Iterator>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_vecs_length_range;
 ///
 /// let xs = random_vecs_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
-/// let values = xs.take(20).collect::<Vec<_>>();
+/// let values = xs.take(20).collect_vec();
 /// assert_eq!(
-///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[85, 11, 136][..], &[200, 235, 134, 203], &[223, 38, 235], &[217, 177, 162, 32],
 ///         &[166, 234, 30, 218], &[90, 106, 9], &[216, 204], &[151, 213, 97], &[253, 78],
@@ -543,10 +562,9 @@ pub fn random_vecs_length_range<I: Iterator>(
 /// $$
 /// P((x_0, x_1, \ldots, x_{n-1})) = \\begin{cases}
 ///     \frac{1}{b-a+1}\prod_{i=0}^{n-1}P(x_i) & a \leq n \leq b \\\\
-///     0 & \\text{otherwise},
+///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
-/// where $a$ is `min_length`.
 ///
 /// The iterators produced by `xs_gen` must be infinite.
 ///
@@ -564,14 +582,18 @@ pub fn random_vecs_length_range<I: Iterator>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_vecs_length_inclusive_range;
 ///
 /// let xs = random_vecs_length_inclusive_range(EXAMPLE_SEED, 2, 4, &random_primitive_ints::<u8>);
-/// let values = xs.take(20).collect::<Vec<_>>();
+/// let values = xs.take(20).collect_vec();
 /// assert_eq!(
-///     values.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[85, 11, 136][..], &[200, 235, 134, 203], &[223, 38, 235], &[217, 177, 162, 32],
 ///         &[166, 234, 30, 218], &[90, 106, 9], &[216, 204], &[151, 213, 97], &[253, 78],

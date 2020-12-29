@@ -1,11 +1,13 @@
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::random::special_random_natural_up_to_bits::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::{
+    limbs_special_random_up_to_bits_old, special_random_natural_up_to_bits_old,
+};
 
 use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::{small_positive_unsigneds, small_unsigneds};
@@ -16,7 +18,7 @@ fn test_limbs_special_random_up_to_bits() {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
         assert_eq!(
-            limbs_special_random_up_to_bits::<Limb, _>(&mut rng, bits),
+            limbs_special_random_up_to_bits_old::<Limb, _>(&mut rng, bits),
             out
         );
     };
@@ -43,7 +45,7 @@ fn test_limbs_special_random_up_to_bits() {
 #[should_panic]
 fn limbs_special_random_up_to_bits_fail() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    limbs_special_random_up_to_bits::<Limb, _>(&mut rng, 0);
+    limbs_special_random_up_to_bits_old::<Limb, _>(&mut rng, 0);
 }
 
 #[test]
@@ -51,7 +53,7 @@ fn test_special_random_natural_up_to_bits() {
     let test = |bits, out| {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
-        let x = special_random_natural_up_to_bits(&mut rng, bits);
+        let x = special_random_natural_up_to_bits_old(&mut rng, bits);
         assert_eq!(format!("{:b}", x), out);
         assert!(x.is_valid());
     };
@@ -74,12 +76,12 @@ fn limbs_special_random_up_to_bits_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     test_properties_no_special(small_positive_unsigneds, |&bits| {
         let mut cloned_rng = rng.clone();
-        let random_limbs: Vec<u32> = limbs_special_random_up_to_bits(&mut rng, bits);
+        let random_limbs: Vec<u32> = limbs_special_random_up_to_bits_old(&mut rng, bits);
         #[cfg(not(feature = "32_bit_limbs"))]
         let random_limbs = Limb::vec_from_other_type_slice(&random_limbs);
         assert_eq!(
             Natural::from_owned_limbs_asc(random_limbs),
-            special_random_natural_up_to_bits(&mut cloned_rng, bits)
+            special_random_natural_up_to_bits_old(&mut cloned_rng, bits)
         );
     });
 }
@@ -88,7 +90,7 @@ fn limbs_special_random_up_to_bits_properties() {
 fn special_random_natural_up_to_bits_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     test_properties_no_special(small_unsigneds, |&bits| {
-        let n = special_random_natural_up_to_bits(&mut rng, bits);
+        let n = special_random_natural_up_to_bits_old(&mut rng, bits);
         assert!(n.is_valid());
         assert!(n.significant_bits() <= bits);
     });

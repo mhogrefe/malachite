@@ -24,6 +24,8 @@ use malachite_nz_test_util::natural::arithmetic::div_mod::{
 use num::{BigUint, Integer};
 use rug;
 
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
@@ -34,6 +36,10 @@ use malachite_nz::natural::arithmetic::div_mod::{
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
     limbs_div_mod_three_limb_by_two_limb, limbs_invert_limb,
+};
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_extra, limbs_div_mod_extra_in_place,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -181,6 +187,214 @@ fn limbs_div_limb_to_out_mod_fail_2() {
 #[should_panic]
 fn limbs_div_limb_to_out_mod_fail_3() {
     limbs_div_limb_to_out_mod(&mut [10], &[10, 10], 10);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+fn verify_limbs_div_mod_extra(
+    original_out: &[Limb],
+    fraction_len: usize,
+    ns: &[Limb],
+    d: Limb,
+    out: &[Limb],
+    r: Limb,
+) {
+    let out_len = ns.len() + fraction_len;
+    let mut extended_ns = vec![0; out_len];
+    extended_ns[fraction_len..].copy_from_slice(ns);
+    let n = Natural::from_owned_limbs_asc(extended_ns);
+    let d = Natural::from(d);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let q = Natural::from_limbs_asc(&out[..out_len]);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert_eq!(&out[out_len..], &original_out[out_len..]);
+    assert!(r < d);
+    assert_eq!(q * d + Natural::from(r), n);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_mod_extra() {
+    let test = |out_before: &[Limb],
+                fraction_len: usize,
+                ns: &[Limb],
+                d: Limb,
+                r: Limb,
+                out_after: &[Limb]| {
+        let mut out = out_before.to_vec();
+        let shift = LeadingZeros::leading_zeros(d);
+        let d_inv = limbs_invert_limb(d << shift);
+        assert_eq!(
+            limbs_div_mod_extra(&mut out, fraction_len, ns, d, d_inv, shift),
+            r
+        );
+        assert_eq!(out, out_after);
+        verify_limbs_div_mod_extra(out_before, fraction_len, ns, d, &out, r);
+    };
+    // shift != 0
+    // ns_last >= d
+    // !ns.is_empty()
+    test(&[10, 10, 10, 10], 0, &[123], 7, 4, &[17, 10, 10, 10]);
+    test(
+        &[10, 10, 10, 10],
+        1,
+        &[123],
+        7,
+        2,
+        &[2454267026, 17, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        0,
+        &[123, 456],
+        7,
+        1,
+        &[613566774, 65, 10, 10],
+    );
+    test(
+        &[10, 10, 10, 10],
+        1,
+        &[123, 456],
+        7,
+        4,
+        &[613566756, 613566774, 65, 10],
+    );
+    // ns_last < d
+    // ns.is_empty()
+    test(&[10; 3], 0, &[1], 2, 1, &[0, 10, 10]);
+    test(&[10; 4], 0, &[0, 1], 2, 0, &[0x80000000, 0, 10, 10]);
+    // shift == 0
+    test(
+        &[10; 10],
+        6,
+        &[1494880112, 1342788885],
+        3459538423,
+        503849941,
+        &[
+            3112466029, 4165884652, 3488895153, 1476752580, 2095685273, 2437515973, 1667053127, 0,
+            10, 10,
+        ],
+    );
+    test(
+        &[10; 3],
+        0,
+        &[3702397177],
+        3086378613,
+        616018564,
+        &[1, 10, 10],
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_fail_1() {
+    let d = 7;
+    let shift = LeadingZeros::leading_zeros(d);
+    let d_inv = limbs_invert_limb(d << shift);
+    limbs_div_mod_extra(&mut [10; 2], 1, &[123, 456], d, d_inv, shift);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_fail_2() {
+    limbs_div_mod_extra(&mut [10; 4], 1, &[123, 456], 0, 0, 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_fail_3() {
+    let d = 7;
+    let shift = LeadingZeros::leading_zeros(d);
+    let d_inv = limbs_invert_limb(d << shift);
+    limbs_div_mod_extra(&mut [10; 4], 1, &[], d, d_inv, shift);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+fn verify_limbs_div_mod_extra_in_place(
+    original_ns: &[Limb],
+    fraction_len: usize,
+    d: Limb,
+    ns: &[Limb],
+    r: Limb,
+) {
+    let mut extended_ns = vec![0; ns.len()];
+    extended_ns[fraction_len..].copy_from_slice(&original_ns[fraction_len..]);
+    let n = Natural::from_owned_limbs_asc(extended_ns);
+    let d = Natural::from(d);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let q = Natural::from_limbs_asc(ns);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert!(r < d);
+    assert_eq!(q * d + Natural::from(r), n);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_div_mod_extra_in_place() {
+    let test = |ns_before: &[Limb], fraction_len: usize, d: Limb, r: Limb, ns_after: &[Limb]| {
+        let mut ns = ns_before.to_vec();
+        let shift = LeadingZeros::leading_zeros(d);
+        let d_inv = limbs_invert_limb(d << shift);
+        assert_eq!(
+            limbs_div_mod_extra_in_place(&mut ns, fraction_len, d, d_inv, shift),
+            r
+        );
+        assert_eq!(ns, ns_after);
+        verify_limbs_div_mod_extra_in_place(ns_before, fraction_len, d, &ns, r);
+    };
+    // shift != 0
+    // ns_last >= d
+    // !ns.is_empty()
+    test(&[123], 0, 7, 4, &[17]);
+    test(&[10, 123], 1, 7, 2, &[2454267026, 17]);
+    test(&[123, 456], 0, 7, 1, &[613566774, 65]);
+    test(&[10, 123, 456], 1, 7, 4, &[613566756, 613566774, 65]);
+    // ns_last < d
+    // ns.is_empty()
+    test(&[1], 0, 2, 1, &[0]);
+    test(&[0, 1], 0, 2, 0, &[0x80000000, 0]);
+    // shift == 0
+    test(
+        &[10, 10, 10, 10, 10, 10, 1494880112, 1342788885],
+        6,
+        3459538423,
+        503849941,
+        &[
+            3112466029, 4165884652, 3488895153, 1476752580, 2095685273, 2437515973, 1667053127, 0,
+        ],
+    );
+    test(&[3702397177], 0, 3086378613, 616018564, &[1]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_in_place_fail_1() {
+    limbs_div_mod_extra_in_place(&mut [0, 123, 456], 1, 0, 0, 0);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_in_place_fail_2() {
+    let d = 7;
+    let shift = LeadingZeros::leading_zeros(d);
+    let d_inv = limbs_invert_limb(d << shift);
+    limbs_div_mod_extra_in_place(&mut [], 0, d, d_inv, shift);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_div_mod_extra_in_place_fail_3() {
+    let d = 7;
+    let shift = LeadingZeros::leading_zeros(d);
+    let d_inv = limbs_invert_limb(d << shift);
+    limbs_div_mod_extra_in_place(&mut [123, 456], 2, d, d_inv, shift);
 }
 
 #[cfg(feature = "32_bit_limbs")]

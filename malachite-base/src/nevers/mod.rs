@@ -48,9 +48,13 @@ impl FromStr for Never {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::nevers::nevers;
 ///
-/// assert_eq!(nevers().collect::<Vec<_>>(), &[]);
+/// assert_eq!(nevers().collect_vec(), &[]);
 /// ```
 pub const fn nevers() -> Empty<Never> {
     empty()

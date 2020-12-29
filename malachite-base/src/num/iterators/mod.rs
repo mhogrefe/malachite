@@ -297,16 +297,19 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::iterators::iterator_to_bit_chunks;
 ///
 /// assert_eq!(
-///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10)
-///         .collect::<Vec<_>>().as_slice(),
+///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10).collect_vec(),
 ///     &[123, 456]
 /// );
 /// assert_eq!(
 ///     iterator_to_bit_chunks::<_, u16, u16>([0b000111111, 0b110010010].iter().cloned(), 9, 3)
-///         .collect::<Vec<_>>().as_slice(),
+///         .collect_vec(),
 ///     &[0b111, 0b111, 0b000, 0b010, 0b010, 0b110]
 /// );
 /// assert_eq!(
@@ -314,7 +317,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b111, 0b111, 0b000, 0b010, 0b010, 0b110].iter().cloned(),
 ///         3,
 ///         9
-///     ).collect::<Vec<_>>().as_slice(),
+///     ).collect_vec(),
 ///     &[0b000111111, 0b110010010]
 /// );
 /// assert_eq!(
@@ -322,7 +325,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b1010101, 0b1111101, 0b0100001, 0b110010].iter().cloned(),
 ///         7,
 ///         6
-///     ).collect::<Vec<_>>().as_slice(),
+///     ).collect_vec(),
 ///     &[0b010101, 0b111011, 0b000111, 0b010010, 0b110]
 /// );
 /// ```
@@ -403,10 +406,14 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::iterators::ruler_sequence;
 ///
 /// assert_eq!(
-///     ruler_sequence::<u32>().take(20).collect::<Vec<_>>(),
+///     ruler_sequence::<u32>().take(20).collect_vec(),
 ///     &[0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2]
 /// );
 /// ```
@@ -466,6 +473,10 @@ impl Iterator for BitDistributorSequence {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::num::iterators::bit_distributor_sequence;
 ///
@@ -473,7 +484,7 @@ impl Iterator for BitDistributorSequence {
 ///     bit_distributor_sequence(
 ///         BitDistributorOutputType::normal(1),
 ///         BitDistributorOutputType::normal(2)
-///     ).take(50).collect::<Vec<_>>(),
+///     ).take(50).collect_vec(),
 ///     &[
 ///         0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2,
 ///         3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1
@@ -483,7 +494,7 @@ impl Iterator for BitDistributorSequence {
 ///     bit_distributor_sequence(
 ///         BitDistributorOutputType::normal(2),
 ///         BitDistributorOutputType::normal(1)
-///     ).take(50).collect::<Vec<_>>(),
+///     ).take(50).collect_vec(),
 ///     &[
 ///         0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, 10, 11, 8, 9, 10, 11, 12, 13, 14,
 ///         15, 12, 13, 14, 15, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9,

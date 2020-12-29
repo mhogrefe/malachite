@@ -4,7 +4,7 @@ use std::fmt::Debug;
 use std::iter::{once, repeat, Cloned};
 use std::slice::Iter;
 
-use itertools::chain;
+use itertools::{chain, Itertools};
 
 use malachite_base::tuples::exhaustive::{
     lex_dependent_pairs, lex_dependent_pairs_stop_after_empty_ys,
@@ -36,7 +36,7 @@ fn lex_dependent_pairs_helper<I: Iterator, Y>(
 {
     let xss = lex_dependent_pairs(xs, DPGeneratorFromMap { map })
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(xss.as_slice(), out);
 }
 
@@ -114,7 +114,7 @@ fn lex_dependent_pairs_stop_after_empty_ys_helper<I: Iterator, Y>(
 {
     let xss = lex_dependent_pairs_stop_after_empty_ys(xs, DPGeneratorFromMap { map })
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(xss.as_slice(), out);
 }
 

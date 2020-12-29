@@ -1,10 +1,11 @@
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 
 pub fn median<I: Iterator>(xs: I) -> (I::Item, Option<I::Item>)
 where
     I::Item: Eq + Ord,
 {
-    let mut xs: Vec<I::Item> = xs.collect();
+    let mut xs = xs.collect_vec();
     assert!(!xs.is_empty());
     xs.sort_unstable();
     let n = xs.len();

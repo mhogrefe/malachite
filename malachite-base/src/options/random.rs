@@ -35,12 +35,16 @@ impl<I: Iterator> Iterator for RandomSomes<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::options::random::random_somes;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_somes(random_primitive_ints::<u8>(EXAMPLE_SEED)).take(5).collect::<Vec<_>>(),
+///     random_somes(random_primitive_ints::<u8>(EXAMPLE_SEED)).take(5).collect_vec(),
 ///     &[Some(113), Some(239), Some(69), Some(108), Some(228)],
 /// )
 /// ```
@@ -94,13 +98,17 @@ impl<I: Iterator> Iterator for RandomOptions<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::options::random::random_options;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_options(EXAMPLE_SEED, random_primitive_ints::<u8>(EXAMPLE_SEED.fork("xs")), 1, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[None, Some(85), Some(11), Some(136), None, None, None, Some(200), None, None],
 /// )
 /// ```

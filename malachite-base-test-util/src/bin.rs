@@ -1,3 +1,4 @@
+extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 #[macro_use]
@@ -8,7 +9,7 @@ use malachite_base_test_util::runner::cmd::read_command_line_arguments;
 use malachite_base_test_util::runner::Runner;
 
 fn main() {
-    let args = read_command_line_arguments();
+    let args = read_command_line_arguments("malachite-base test utils");
     let mut runner = Runner::new();
     register(&mut runner);
     if let Some(demo_key) = args.demo_key {

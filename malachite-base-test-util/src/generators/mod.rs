@@ -183,7 +183,39 @@ pub fn signed_unsigned_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(T, u64
     Generator::new(
         &exhaustive_signed_unsigned_pair_gen_var_4,
         &random_primitive_int_unsigned_pair_gen_var_2,
-        &special_random_signed_unsigned_pair_gen_var_1_var_2,
+        &special_random_signed_unsigned_pair_gen_var_2,
+    )
+}
+
+/// All `(T, u64)`s where `T` is signed and the either the `T` is negative or the `u64` is less than
+/// `T::WIDTH`.
+pub fn signed_unsigned_pair_gen_var_3<T: PrimitiveSigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_3,
+        &random_signed_unsigned_pair_gen_var_1,
+        &special_random_signed_unsigned_pair_gen_var_3,
+    )
+}
+
+/// All `(T, u64)`s where `T` is signed and the either the `T` is non-negative or the `u64` is less
+/// than `T::WIDTH`.
+pub fn signed_unsigned_pair_gen_var_4<T: PrimitiveSigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_5,
+        &random_signed_unsigned_pair_gen_var_2,
+        &special_random_signed_unsigned_pair_gen_var_4,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
+
+// All (`T`, `u64`, and `bool`) where `T` is signed and either the `u64` is smaller than `T::WIDTH`
+// or the `bool` is equal to whether the `T` is negative.
+pub fn signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> Generator<(T, u64, bool)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_bool_triple_gen_var_1,
+        &random_primitive_int_unsigned_bool_triple_gen_var_2,
+        &random_signed_unsigned_bool_triple_gen_var_1,
     )
 }
 
@@ -239,12 +271,24 @@ pub fn unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> 
 }
 
 /// All `(T, u64)`s where `T` is unsigned and the `U` is smaller than `T::WIDTH`.
-/// TODO unsigned set_bit
 pub fn unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
     Generator::new(
         &exhaustive_unsigned_pair_gen_var_3,
         &random_primitive_int_unsigned_pair_gen_var_2,
         &special_random_unsigned_pair_gen_var_2,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
+
+// All (`T`, `u64`, `bool`) where `T` is unsigned and either the `bool` is false or the `u64` is
+// smaller than `T::WIDTH`.
+pub fn unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, u64, bool)>
+{
+    Generator::new(
+        &exhaustive_unsigned_unsigned_bool_triple_gen_var_1,
+        &random_primitive_int_unsigned_bool_triple_gen_var_1,
+        &special_random_unsigned_unsigned_bool_triple_gen_var_1,
     )
 }
 
@@ -341,6 +385,16 @@ pub fn string_pair_gen_var_1() -> Generator<(String, String)> {
         &exhaustive_string_pair_gen_var_1,
         &random_string_pair_gen_var_1,
         &special_random_string_pair_gen_var_1,
+    )
+}
+
+// -- Vec<PrimitiveUnsigned> --
+
+pub fn unsigned_vec_gen<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
+    Generator::new(
+        &exhaustive_unsigned_vec_gen,
+        &random_primitive_int_vec_gen,
+        &special_random_unsigned_vec_gen,
     )
 }
 

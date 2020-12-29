@@ -14,11 +14,15 @@ use orderings::ORDERINGS;
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::orderings::exhaustive::orderings_increasing;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     orderings_increasing().collect::<Vec<_>>(),
+///     orderings_increasing().collect_vec(),
 ///     &[Ordering::Less, Ordering::Equal, Ordering::Greater]
 /// );
 /// ```
@@ -39,11 +43,15 @@ pub fn orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::orderings::exhaustive::exhaustive_orderings;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(
-///     exhaustive_orderings().collect::<Vec<_>>(),
+///     exhaustive_orderings().collect_vec(),
 ///     &[Ordering::Equal, Ordering::Less, Ordering::Greater]
 /// );
 /// ```

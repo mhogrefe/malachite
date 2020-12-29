@@ -1,6 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod bit_access;
 pub mod bit_block_access;
 pub mod bit_convertible;
 pub mod bit_iterable;
@@ -10,7 +9,6 @@ pub mod not;
 pub mod rotate;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    bit_access::register(registry);
     bit_block_access::register(registry);
     bit_convertible::register(registry);
     bit_iterable::register(registry);

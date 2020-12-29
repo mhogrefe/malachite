@@ -1,12 +1,13 @@
 use std::fmt::Debug;
 
+use itertools::Itertools;
 use malachite_base::nevers::Never;
 use malachite_base::options::exhaustive::exhaustive_somes;
 
 fn exhaustive_somes_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[Option<T>]) {
     assert_eq!(
         exhaustive_somes(xs.iter().cloned())
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

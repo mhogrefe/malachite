@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::iterators::bit_distributor_sequence;
 
@@ -9,7 +10,7 @@ fn bit_distributor_sequence_helper(
     assert_eq!(
         bit_distributor_sequence(x_output_type, y_output_type)
             .take(50)
-            .collect::<Vec<_>>(),
+            .collect_vec(),
         out
     );
 }

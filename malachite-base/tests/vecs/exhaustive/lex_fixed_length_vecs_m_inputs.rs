@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 use std::iter::empty;
 
@@ -18,12 +19,12 @@ fn lex_fixed_length_vecs_2_inputs_helper<
     out: &[&[T]],
 ) {
     let xss = lex_fixed_length_vecs_2_inputs(xs.clone(), ys.clone(), output_to_input_map);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

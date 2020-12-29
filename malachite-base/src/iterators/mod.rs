@@ -41,10 +41,14 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::iterators::nonzero_values;
 ///
 /// assert_eq!(
-///     nonzero_values([-3i8, -2, -1, 0, 1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     nonzero_values([-3i8, -2, -1, 0, 1, 2, 3].iter().cloned()).collect_vec(),
 ///     &[-3, -2, -1, 1, 2, 3]
 /// )
 /// ```

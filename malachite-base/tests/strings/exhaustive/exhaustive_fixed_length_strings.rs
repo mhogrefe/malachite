@@ -1,16 +1,9 @@
+use itertools::Itertools;
 use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings;
 
 fn exhaustive_fixed_length_strings_helper(len: u64, out: &[&str]) {
-    let css = exhaustive_fixed_length_strings(len)
-        .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        css.iter()
-            .map(String::as_str)
-            .collect::<Vec<_>>()
-            .as_slice(),
-        out
-    );
+    let css = exhaustive_fixed_length_strings(len).take(20).collect_vec();
+    assert_eq!(css.iter().map(String::as_str).collect_vec().as_slice(), out);
 }
 
 #[test]

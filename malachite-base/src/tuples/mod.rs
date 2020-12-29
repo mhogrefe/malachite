@@ -27,9 +27,13 @@ impl<I: Iterator> Iterator for Singletons<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::singletons;
 ///
-/// assert_eq!(singletons([1, 2, 3].iter().cloned()).collect::<Vec<_>>(), &[(1,), (2,), (3,)]);
+/// assert_eq!(singletons([1, 2, 3].iter().cloned()).collect_vec(), &[(1,), (2,), (3,)]);
 /// ```
 #[inline]
 pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
@@ -42,10 +46,14 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_\[n\]_tuples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::lex_pairs;
 ///
 /// assert_eq!(
-///     lex_pairs('a'..'f', 0..3).collect::<Vec<_>>(),
+///     lex_pairs('a'..'f', 0..3).collect_vec(),
 ///     &[
 ///         ('a', 0), ('a', 1), ('a', 2), ('b', 0), ('b', 1), ('b', 2), ('c', 0), ('c', 1),
 ///         ('c', 2), ('d', 0), ('d', 1), ('d', 2), ('e', 0), ('e', 1), ('e', 2)
@@ -55,16 +63,24 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # lex_\[n\]_tuples_from_single
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::lex_pairs_from_single;
 ///
 /// assert_eq!(
-///     lex_pairs_from_single(0..3).collect::<Vec<_>>(),
+///     lex_pairs_from_single(0..3).collect_vec(),
 ///     &[(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
 /// );
 /// ```
 ///
 /// # lex_custom_tuples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::lex_triples_xyx;
 ///
@@ -75,7 +91,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// // from `xs`.
 /// let ts = lex_triples_xyx(exhaustive_ascii_chars(), 0..3);
 /// assert_eq!(
-///     ts.take(20).collect::<Vec<_>>(),
+///     ts.take(20).collect_vec(),
 ///     &[
 ///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 0, 'd'), ('a', 0, 'e'),
 ///         ('a', 0, 'f'), ('a', 0, 'g'), ('a', 0, 'h'), ('a', 0, 'i'), ('a', 0, 'j'),
@@ -87,9 +103,13 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_[n-tuples]
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs;
 ///
-/// let xss = exhaustive_pairs(['a', 'b', 'c'].iter().cloned(), 0..3).collect::<Vec<_>>();
+/// let xss = exhaustive_pairs(['a', 'b', 'c'].iter().cloned(), 0..3).collect_vec();
 /// assert_eq!(
 ///     xss,
 ///     &[('a', 0), ('a', 1), ('b', 0), ('b', 1), ('a', 2), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
@@ -98,6 +118,10 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_[n-tuples]_custom_output
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs_custom_output;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 ///
@@ -106,7 +130,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///     0..3,
 ///     BitDistributorOutputType::normal(1),
 ///     BitDistributorOutputType::tiny(),
-/// ).collect::<Vec<_>>();
+/// ).collect_vec();
 /// assert_eq!(
 ///     xss,
 ///     &[('a', 0), ('a', 1), ('a', 2), ('b', 0), ('b', 1), ('b', 2), ('c', 0), ('c', 1), ('c', 2)]
@@ -115,10 +139,14 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_[n-tuples]_from_single
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::exhaustive_pairs_from_single;
 ///
 /// assert_eq!(
-///     exhaustive_pairs_from_single(0..4).collect::<Vec<_>>(),
+///     exhaustive_pairs_from_single(0..4).collect_vec(),
 ///     &[
 ///         (0, 0), (0, 1), (1, 0), (1, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 0), (2, 1), (3, 0),
 ///         (3, 1), (2, 2), (2, 3), (3, 2), (3, 3)
@@ -128,6 +156,10 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_[n-tuples]_1_input
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::tuples::exhaustive::exhaustive_triples_1_input;
@@ -142,7 +174,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///     BitDistributorOutputType::tiny(),
 /// );
 /// assert_eq!(
-///     ts.take(20).collect::<Vec<_>>(),
+///     ts.take(20).collect_vec(),
 ///     &[
 ///         ('a', 'a', 'a'), ('a', 'a', 'b'), ('a', 'a', 'c'), ('a', 'a', 'd'), ('a', 'b', 'a'),
 ///         ('a', 'b', 'b'), ('a', 'b', 'c'), ('a', 'b', 'd'), ('a', 'a', 'e'), ('a', 'a', 'f'),
@@ -154,6 +186,10 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_custom_tuples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx;
 ///
@@ -164,7 +200,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// // third also from `xs`.
 /// let ts = exhaustive_triples_xyx(exhaustive_ascii_chars(), 0..3);
 /// assert_eq!(
-///     ts.take(20).collect::<Vec<_>>(),
+///     ts.take(20).collect_vec(),
 ///     &[
 ///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 1, 'a'), ('a', 1, 'b'), ('b', 0, 'a'),
 ///         ('b', 0, 'b'), ('b', 1, 'a'), ('b', 1, 'b'), ('a', 0, 'c'), ('a', 0, 'd'),
@@ -176,6 +212,10 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///
 /// # exhaustive_custom_tuples_custom_output
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::tuples::exhaustive::exhaustive_triples_xyx_custom_output;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -196,7 +236,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///     BitDistributorOutputType::tiny()
 /// );
 /// assert_eq!(
-///     ts.take(20).collect::<Vec<_>>(),
+///     ts.take(20).collect_vec(),
 ///     &[
 ///         ('a', 0, 'a'), ('a', 0, 'b'), ('a', 0, 'c'), ('a', 0, 'd'), ('a', 1, 'a'),
 ///         ('a', 1, 'b'), ('a', 1, 'c'), ('a', 1, 'd'), ('a', 0, 'e'), ('a', 0, 'f'),
@@ -212,6 +252,10 @@ pub mod exhaustive;
 ///
 /// # random_[n-tuples]
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -223,7 +267,7 @@ pub mod exhaustive;
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
 /// );
 /// assert_eq!(
-///     ps.take(20).collect::<Vec<_>>().as_slice(),
+///     ps.take(20).collect_vec().as_slice(),
 ///     &[
 ///         (1, 'z'), (1, 'x'), (1, 'z'), (1, 'y'), (2, 'x'), (0, 'z'), (0, 'z'), (0, 'z'),
 ///         (2, 'z'), (0, 'y'), (2, 'x'), (0, 'x'), (2, 'z'), (0, 'z'), (2, 'x'), (2, 'x'),
@@ -234,6 +278,10 @@ pub mod exhaustive;
 ///
 /// # random_[n-tuples]_from_single
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -241,7 +289,7 @@ pub mod exhaustive;
 ///
 /// let ps = random_pairs_from_single(random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 2));
 /// assert_eq!(
-///     ps.take(20).collect::<Vec<_>>().as_slice(),
+///     ps.take(20).collect_vec().as_slice(),
 ///     &[
 ///         (1, 0), (1, 2), (1, 1), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (1, 0), (2, 2), (2, 1),
 ///         (0, 2), (2, 1), (1, 1), (0, 0), (2, 0), (2, 2), (1, 0), (1, 1), (0, 2)
@@ -251,6 +299,10 @@ pub mod exhaustive;
 ///
 /// # random_custom_tuples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -267,7 +319,7 @@ pub mod exhaustive;
 ///     &|seed| random_unsigned_inclusive_range::<u8>(seed, 0, 2),
 /// );
 /// assert_eq!(
-///     ts.take(20).collect::<Vec<_>>().as_slice(),
+///     ts.take(20).collect_vec().as_slice(),
 ///     &[
 ///         ('y', 2, 'y'), ('y', 0, 'y'), ('z', 2, 'x'), ('x', 1, 'x'), ('z', 0, 'x'),
 ///         ('z', 2, 'x'), ('z', 2, 'x'), ('z', 2, 'z'), ('z', 2, 'y'), ('x', 1, 'z'),

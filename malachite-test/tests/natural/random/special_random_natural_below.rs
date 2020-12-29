@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
 use malachite_base::num::basic::traits::Zero;
-use malachite_nz::natural::random::special_random_natural_below::special_random_natural_below;
 use malachite_nz::natural::Natural;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::special_random_natural_below_old;
 
 use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::positive_naturals;
@@ -14,7 +14,7 @@ fn test_special_random_natural_below() {
     let test = |n, out| {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
-        let x = special_random_natural_below(&mut rng, &Natural::from_str(n).unwrap());
+        let x = special_random_natural_below_old(&mut rng, &Natural::from_str(n).unwrap());
         assert_eq!(format!("{:b}", x), out);
         assert!(x.is_valid());
     };
@@ -28,14 +28,14 @@ fn test_special_random_natural_below() {
 #[should_panic]
 fn special_random_natural_below_fail() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
-    special_random_natural_below(&mut rng, &Natural::ZERO);
+    special_random_natural_below_old(&mut rng, &Natural::ZERO);
 }
 
 #[test]
 fn special_random_natural_below_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     test_properties(positive_naturals, |n| {
-        let x = special_random_natural_below(&mut rng, n);
+        let x = special_random_natural_below_old(&mut rng, n);
         assert!(x.is_valid());
         assert!(x < *n);
     });

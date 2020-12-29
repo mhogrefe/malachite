@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap};
 use std::iter::Iterator;
 
@@ -107,8 +108,14 @@ where
             .iter()
             .zip(options.series_options.iter())
         {
-            let sizes: Vec<usize> = median_durations_map.iter().map(|entry| *entry.0).collect();
-            let durations: Vec<u64> = median_durations_map.iter().map(|entry| *entry.1).collect();
+            let sizes = median_durations_map
+                .iter()
+                .map(|entry| *entry.0)
+                .collect_vec();
+            let durations = median_durations_map
+                .iter()
+                .map(|entry| *entry.1)
+                .collect_vec();
             axes.lines(
                 &sizes,
                 &durations,

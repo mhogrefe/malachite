@@ -4,7 +4,7 @@ use std::fmt::Debug;
 use std::iter::{once, repeat, Cloned};
 use std::slice::Iter;
 
-use itertools::chain;
+use itertools::{chain, Itertools};
 
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
@@ -45,7 +45,7 @@ fn exhaustive_dependent_pairs_finite_ys_helper<I: Clone + Iterator, Y>(
         ExhaustiveGeneratorFromMap { map: map.clone() },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_ruler.as_slice(), out_ruler);
     let xss_normal_normal = exhaustive_dependent_pairs(
         bit_distributor_sequence(
@@ -56,7 +56,7 @@ fn exhaustive_dependent_pairs_finite_ys_helper<I: Clone + Iterator, Y>(
         ExhaustiveGeneratorFromMap { map: map.clone() },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_normal_normal.as_slice(), out_normal_normal);
     let xss_tiny_normal = exhaustive_dependent_pairs(
         bit_distributor_sequence(
@@ -67,7 +67,7 @@ fn exhaustive_dependent_pairs_finite_ys_helper<I: Clone + Iterator, Y>(
         ExhaustiveGeneratorFromMap { map },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_tiny_normal.as_slice(), out_tiny_normal);
 }
 
@@ -223,7 +223,7 @@ fn exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper<I: Clone + It
         ExhaustiveGeneratorFromMap { map: map.clone() },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_ruler.as_slice(), out_ruler);
     let xss_normal_normal = exhaustive_dependent_pairs_stop_after_empty_ys(
         bit_distributor_sequence(
@@ -234,7 +234,7 @@ fn exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper<I: Clone + It
         ExhaustiveGeneratorFromMap { map: map.clone() },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_normal_normal.as_slice(), out_normal_normal);
     let xss_tiny_normal = exhaustive_dependent_pairs_stop_after_empty_ys(
         bit_distributor_sequence(
@@ -245,7 +245,7 @@ fn exhaustive_dependent_pairs_finite_ys_stop_after_empty_ys_helper<I: Clone + It
         ExhaustiveGeneratorFromMap { map },
     )
     .take(20)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(xss_tiny_normal.as_slice(), out_tiny_normal);
 }
 
@@ -397,7 +397,7 @@ fn test_exhaustive_dependent_pairs_infinite() {
     let xs = exhaustive_positive_primitive_ints::<u64>();
     let xss_ruler = exhaustive_dependent_pairs(ruler_sequence(), xs.clone(), MultiplesGenerator {})
         .take(50)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(
         xss_ruler.as_slice(),
         &[
@@ -462,7 +462,7 @@ fn test_exhaustive_dependent_pairs_infinite() {
         MultiplesGenerator {},
     )
     .take(50)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(
         xss_normal_normal.as_slice(),
         &[
@@ -527,7 +527,7 @@ fn test_exhaustive_dependent_pairs_infinite() {
         MultiplesGenerator {},
     )
     .take(50)
-    .collect::<Vec<_>>();
+    .collect_vec();
     assert_eq!(
         xss_tiny_normal.as_slice(),
         &[

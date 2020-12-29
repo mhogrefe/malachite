@@ -44,11 +44,15 @@ impl Iterator for RandomBools {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::random::random_bools;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_bools(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
+///     random_bools(EXAMPLE_SEED).take(10).collect_vec(),
 ///     &[true, false, false, false, true, true, true, false, true, true]
 /// )
 /// ```
@@ -103,11 +107,15 @@ impl Iterator for WeightedRandomBools {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::random::weighted_random_bools;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     weighted_random_bools(EXAMPLE_SEED, 3, 1).take(10).collect::<Vec<_>>(),
+///     weighted_random_bools(EXAMPLE_SEED, 3, 1).take(10).collect_vec(),
 ///     &[true, true, false, true, false, false, true, false, true, true]
 /// )
 /// ```

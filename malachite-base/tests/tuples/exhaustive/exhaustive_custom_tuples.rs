@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;
@@ -26,7 +27,7 @@ fn exhaustive_triples_xxy_helper<
     out: &[(X, X, Y)],
 ) {
     let ts = exhaustive_triples_xxy(xs.clone(), ys.clone());
-    assert_eq!(ts.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
     let output_types = get_sample_output_types(3);
@@ -37,7 +38,7 @@ fn exhaustive_triples_xxy_helper<
         output_types[0][1],
         output_types[0][2],
     );
-    let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+    let ts_prefix = ts.clone().take(20).collect_vec();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
     for alt_output_types in &output_types[1..] {
@@ -290,7 +291,7 @@ fn exhaustive_triples_xyx_helper<
     out: &[(X, Y, X)],
 ) {
     let ts = exhaustive_triples_xyx(xs.clone(), ys.clone());
-    assert_eq!(ts.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
     let output_types = get_sample_output_types(3);
@@ -301,7 +302,7 @@ fn exhaustive_triples_xyx_helper<
         output_types[0][1],
         output_types[0][2],
     );
-    let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+    let ts_prefix = ts.clone().take(20).collect_vec();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
     for alt_output_types in &output_types[1..] {

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::str::FromStr;
 
 use num::conversion::traits::ExactFrom;
@@ -143,7 +144,7 @@ pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Optio
     if src.is_empty() {
         return None;
     }
-    let mut tokens = src.split(", ").collect::<Vec<&str>>();
+    let mut tokens = src.split(", ").collect_vec();
     let last_token_index = tokens.len() - 1;
     if tokens[0].is_empty() {
         return None;
@@ -209,12 +210,16 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_values_from_vec;
 ///
 /// let xs = vec![2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect::<Vec<_>>(),
+///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -233,14 +238,18 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// # lex_length_\[n\]_vecs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::vecs::exhaustive::lex_length_2_vecs;
 ///
 /// let xss = lex_length_2_vecs(
 ///     ['a', 'b', 'c'].iter().cloned(),
 ///     ['x', 'y', 'z'].iter().cloned()
-/// ).collect::<Vec<_>>();
+/// ).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['a', 'x'], &['a', 'y'], &['a', 'z'], &['b', 'x'], &['b', 'y'], &['b', 'z'],
 ///         &['c', 'x'], &['c', 'y'], &['c', 'z']
@@ -250,6 +259,10 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// # lex_fixed_length_vecs_\[m\]_inputs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_2_inputs;
@@ -264,9 +277,9 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///     ['x', 'y', 'z'].iter().cloned(),
 ///     &[0, 1, 0],
 /// );
-/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
 ///         &['a', 'x', 'e'], &['a', 'x', 'f'], &['a', 'x', 'g'], &['a', 'x', 'h'],
@@ -279,14 +292,18 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// # exhaustive_length_\[n\]_vecs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::vecs::exhaustive::exhaustive_length_2_vecs;
 ///
 /// let xss = exhaustive_length_2_vecs(
 ///     ['a', 'b', 'c'].iter().cloned(),
 ///     ['x', 'y', 'z'].iter().cloned()
-/// ).collect::<Vec<_>>();
+/// ).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['a', 'x'], &['a', 'y'], &['b', 'x'], &['b', 'y'], &['a', 'z'], &['b', 'z'],
 ///         &['c', 'x'], &['c', 'y'], &['c', 'z']
@@ -296,6 +313,10 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///
 /// # exhaustive_fixed_length_vecs_\[m\]_inputs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_2_inputs;
@@ -316,9 +337,9 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 ///         (BitDistributorOutputType::tiny(), 0),
 ///     ],
 /// );
-/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
 ///         &['a', 'y', 'a'], &['a', 'y', 'b'], &['a', 'y', 'c'], &['a', 'y', 'd'],
@@ -335,6 +356,10 @@ pub mod exhaustive;
 ///
 /// # random_length_\[n\]_vecs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random::random_length_2_vecs;
@@ -343,9 +368,9 @@ pub mod exhaustive;
 ///     EXAMPLE_SEED,
 ///     &|seed| random_char_inclusive_range(seed, 'a', 'c'),
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
-/// ).take(20).collect::<Vec<_>>();
+/// ).take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['b', 'z'], &['b', 'x'], &['b', 'z'], &['b', 'y'], &['c', 'x'], &['a', 'z'],
 ///         &['a', 'z'], &['a', 'z'], &['c', 'z'], &['a', 'y'], &['c', 'x'], &['a', 'x'],
@@ -357,6 +382,10 @@ pub mod exhaustive;
 ///
 /// # random_fixed_length_vecs_\[m\]_inputs
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;
 /// use malachite_base::random::EXAMPLE_SEED;
@@ -372,9 +401,9 @@ pub mod exhaustive;
 ///     &random_ascii_chars,
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
 ///     &[0, 1, 0],
-/// ).take(20).collect::<Vec<_>>();
+/// ).take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['U', 'z', '\u{16}'], &[' ', 'x', 'D'], &['<', 'z', ']'], &['a', 'y', 'e'],
 ///         &['_', 'x', 'M'], &[',', 'z', 'O'], &['\u{1d}', 'z', 'V'], &['(', 'z', '\u{10}'],

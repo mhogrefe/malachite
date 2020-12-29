@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use get_sample_output_types;
@@ -15,7 +16,7 @@ fn exhaustive_pairs_1_input_helper<T, I: Clone + Iterator<Item = T>>(
 {
     let output_types = get_sample_output_types(2);
     let ps = exhaustive_pairs_1_input(xs.clone(), output_types[0][0], output_types[0][1]);
-    assert_eq!(ps.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ps.clone().take(20).collect_vec(), out);
     if let Some(out_len) = out_len {
         assert_eq!(ps.count(), out_len);
     }
@@ -114,7 +115,7 @@ fn exhaustive_triples_1_input_helper<T, I: Clone + Iterator<Item = T>>(
         output_types[0][1],
         output_types[0][2],
     );
-    assert_eq!(ps.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ps.clone().take(20).collect_vec(), out);
     if let Some(out_len) = out_len {
         assert_eq!(ps.count(), out_len);
     }

@@ -21,7 +21,7 @@ use random::Seed;
 /// assert_eq!(xs, [1, 0, 0, 0, 5]);
 /// ```
 ///
-/// This is `mpn_zero` from `mpn/generic/zero.c`, GMP 6.1.2. Note that this is needed less often in
+/// This is `mpn_zero` from `mpn/generic/zero.c`, GMP 6.2.1. Note that this is needed less often in
 /// Malachite than in GMP, since Malachite generally initializes new memory with zeros.
 pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
     for x in xs.iter_mut() {
@@ -46,7 +46,7 @@ pub fn slice_set_zero<T: Zero>(xs: &mut [T]) {
 /// assert!(!slice_test_zero::<u32>(&[0, 1, 0]));
 /// ```
 ///
-/// This is mpn_zero_p from gmp.h, GMP 6.1.2.
+/// This is mpn_zero_p from gmp-h.in, GMP 6.2.1.
 pub fn slice_test_zero<T: Eq + Zero>(xs: &[T]) -> bool {
     let zero = T::ZERO;
     xs.iter().all(|x| x == &zero)
@@ -254,12 +254,16 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_values_from_slice;
 ///
 /// let xs = &[2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect::<Vec<_>>(),
+///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```

@@ -20,6 +20,7 @@ use malachite_base::tuples::exhaustive::{
 
 use generators::common::It;
 use generators::exhaustive_pairs_big_tiny;
+use malachite_base::vecs::exhaustive::exhaustive_vecs;
 use rounding_modes::ROUNDING_MODE_CHARS;
 
 // general
@@ -120,7 +121,6 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_2<T: PrimitiveSigned, U: Primitiv
     ))
 }
 
-//TODO signed set_bit
 pub fn exhaustive_signed_unsigned_pair_gen_var_3<T: PrimitiveSigned>() -> It<(T, u64)> {
     Box::new(
         lex_pairs(
@@ -139,6 +139,36 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_4<T: PrimitiveSigned>() -> It<(T,
         exhaustive_signeds(),
         primitive_int_increasing_range(0, T::WIDTH),
     ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_5<T: PrimitiveSigned>() -> It<(T, u64)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_negative_signeds(),
+            primitive_int_increasing_range(0, T::WIDTH),
+        )
+        .interleave(exhaustive_pairs(
+            exhaustive_natural_signeds(),
+            exhaustive_unsigneds(),
+        )),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
+
+pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, u64, bool)>
+{
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_signeds(), exhaustive_unsigneds())
+            .map(|(x, y)| (x, y, x < T::ZERO))
+            .interleave(
+                lex_pairs(
+                    exhaustive_signeds(),
+                    primitive_int_increasing_range(0, T::WIDTH),
+                )
+                .map(|(x, y)| (x, y, x >= T::ZERO)),
+            ),
+    )
 }
 
 // -- PrimitiveUnsigned --
@@ -178,6 +208,23 @@ pub fn exhaustive_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<(T, u64)
         exhaustive_unsigneds(),
         primitive_int_increasing_range(0, T::WIDTH),
     ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
+
+pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(T, u64, bool)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_unsigneds(), exhaustive_unsigneds())
+            .map(|(x, y)| (x, y, false))
+            .interleave(
+                lex_pairs(
+                    exhaustive_unsigneds(),
+                    primitive_int_increasing_range(0, T::WIDTH),
+                )
+                .map(|(x, y)| (x, y, true)),
+            ),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -242,4 +289,10 @@ pub fn exhaustive_string_pair_gen_var_1() -> It<(String, String)> {
     Box::new(exhaustive_pairs_from_single(
         exhaustive_strings_using_chars(exhaustive_ascii_chars()),
     ))
+}
+
+// -- Vec<PrimitiveUnsigned> --
+
+pub fn exhaustive_unsigned_vec_gen<T: PrimitiveUnsigned>() -> It<Vec<T>> {
+    Box::new(exhaustive_vecs(exhaustive_unsigneds()))
 }

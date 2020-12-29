@@ -1,4 +1,4 @@
-use itertools::__std_iter::{once, Chain, Once};
+use std::iter::{once, Chain, Once};
 
 /// Generates all `Options`, except `None`, with values from a given iterator.
 ///
@@ -28,10 +28,14 @@ impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::options::exhaustive::exhaustive_somes;
 ///
 /// assert_eq!(
-///     exhaustive_somes([1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     exhaustive_somes([1, 2, 3].iter().cloned()).collect_vec(),
 ///     &[Some(1), Some(2), Some(3)]
 /// );
 /// ```
@@ -52,10 +56,14 @@ pub fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::options::exhaustive::exhaustive_options;
 ///
 /// assert_eq!(
-///     exhaustive_options([1, 2, 3].iter().cloned()).collect::<Vec<_>>(),
+///     exhaustive_options([1, 2, 3].iter().cloned()).collect_vec(),
 ///     &[None, Some(1), Some(2), Some(3)]
 /// );
 /// ```

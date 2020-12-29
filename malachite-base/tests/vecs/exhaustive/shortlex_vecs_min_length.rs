@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base::bools::exhaustive::exhaustive_bools;
@@ -12,11 +13,8 @@ where
 {
     let xss = shortlex_vecs_min_length(min_length, xs)
         .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
-        out
-    );
+        .collect_vec();
+    assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
 #[test]

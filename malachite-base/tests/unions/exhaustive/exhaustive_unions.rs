@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;
@@ -22,7 +23,7 @@ fn exhaustive_union2s_helper<
     out: &[Union2<X, Y>],
 ) {
     let us = exhaustive_union2s(xs, ys);
-    let us_prefix = us.clone().take(20).collect::<Vec<_>>();
+    let us_prefix = us.clone().take(20).collect_vec();
     assert_eq!(us_prefix.as_slice(), out);
     assert_eq!(us.count(), out_len);
 }
@@ -134,7 +135,7 @@ fn exhaustive_union3s_helper<
     out: &[Union3<X, Y, Z>],
 ) {
     let ts = exhaustive_union3s(xs, ys, zs);
-    let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+    let ts_prefix = ts.clone().take(20).collect_vec();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
 }

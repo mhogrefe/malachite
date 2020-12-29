@@ -113,7 +113,30 @@ impl fmt::Binary for Natural {
     }
 }
 
+impl fmt::LowerHex for Natural {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Natural(Small(small)) => write!(f, "{:x}", small),
+            Natural(Large(ref limbs)) => {
+                write!(f, "{:x}", limbs.last().unwrap())?;
+                let mut i = limbs.len() - 2;
+                loop {
+                    #[cfg(feature = "32_bit_limbs")]
+                    let result = write!(f, "{:08x}", limbs[i]);
+                    #[cfg(not(feature = "32_bit_limbs"))]
+                    let result = write!(f, "{:016x}", limbs[i]);
+                    if i == 0 {
+                        return result;
+                    }
+                    i -= 1;
+                }
+            }
+        }
+    }
+}
+
 pub mod digits {
+    pub mod general_digits;
     pub mod power_of_two_digit_iterable;
     pub mod power_of_two_digits;
 }

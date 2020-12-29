@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug};
 
@@ -20,7 +21,7 @@ use named::Named;
 /// assert_eq!(string_sort("Mississippi"), "Miiiippssss");
 /// ```
 pub fn string_sort(s: &str) -> String {
-    let mut chars: Vec<char> = s.chars().collect();
+    let mut chars = s.chars().collect_vec();
     chars.sort_unstable();
     chars.iter().collect()
 }
@@ -164,11 +165,15 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::strings_from_char_vecs;
 ///
 /// let ss = &strings_from_char_vecs([vec!['a', 'b'], vec!['c', 'd']].iter().cloned())
-///     .collect::<Vec<_>>();
-/// assert_eq!(ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(), &["ab", "cd"]);
+///     .collect_vec();
+/// assert_eq!(ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(), &["ab", "cd"]);
 /// ```
 #[inline]
 pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsFromCharVecs<I> {

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::panic::{catch_unwind, RefUnwindSafe};
 
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -12,7 +13,7 @@ fn iterator_to_bit_chunks_helper<T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wr
 ) {
     assert_eq!(
         iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), in_chunk_size, out_chunk_size)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

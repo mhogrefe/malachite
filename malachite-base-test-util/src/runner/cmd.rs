@@ -7,6 +7,7 @@ use generators::common::{GenConfig, GenMode};
 
 #[derive(Clone, Debug)]
 pub struct CommandLineArguments {
+    pub codegen_key: Option<String>,
     pub demo_key: Option<String>,
     pub bench_key: Option<String>,
     pub generation_mode: GenMode,
@@ -15,8 +16,8 @@ pub struct CommandLineArguments {
     pub out: String,
 }
 
-pub fn read_command_line_arguments() -> CommandLineArguments {
-    let matches = App::new("malachite-base test utils")
+pub fn read_command_line_arguments(name: &str) -> CommandLineArguments {
+    let matches = App::new(name)
         .version("0.1.0")
         .author("Mikhail Hogrefe <mikhailhogrefe@gmail.com>")
         .about("Runs demos and benchmarks for malachite-base functions.")
@@ -62,6 +63,13 @@ pub fn read_command_line_arguments() -> CommandLineArguments {
                 .help("Specifies the benchmark name")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("codegen")
+                .short("g")
+                .long("codegen")
+                .help("Specifies the code to generate")
+                .takes_value(true),
+        )
         .get_matches();
 
     let generation_mode = match matches.value_of("generation_mode").unwrap_or("exhaustive") {
@@ -85,10 +93,12 @@ pub fn read_command_line_arguments() -> CommandLineArguments {
     let out = matches.value_of("out").unwrap_or("temp.gp").to_string();
     let demo_key = matches.value_of("demo").map(ToString::to_string);
     let bench_key = matches.value_of("bench").map(ToString::to_string);
-    if demo_key.is_none() && bench_key.is_none() {
-        panic!("Must specify demo or bench");
+    let codegen_key = matches.value_of("codegen").map(ToString::to_string);
+    if demo_key.is_none() && bench_key.is_none() && codegen_key.is_none() {
+        panic!("Must specify demo, bench, or codegen");
     }
     CommandLineArguments {
+        codegen_key,
         demo_key,
         bench_key,
         generation_mode,

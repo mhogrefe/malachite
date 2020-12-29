@@ -35,12 +35,15 @@ use vecs::exhaustive::{
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
 ///
-/// let ss = lex_fixed_length_strings_using_chars(2, ['c', 'a', 't'].iter().cloned())
-///     .collect::<Vec<_>>();
+/// let ss = lex_fixed_length_strings_using_chars(2, ['c', 'a', 't'].iter().cloned()).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &["cc", "ca", "ct", "ac", "aa", "at", "tc", "ta", "tt"]
 /// );
 /// ```
@@ -72,11 +75,15 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::lex_fixed_length_strings;
 ///
-/// let ss = lex_fixed_length_strings(2).take(20).collect::<Vec<_>>();
+/// let ss = lex_fixed_length_strings(2).take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &[
 ///         "aa", "ab", "ac", "ad", "ae", "af", "ag", "ah", "ai", "aj", "ak", "al", "am", "an",
 ///         "ao", "ap", "aq", "ar", "as", "at"
@@ -118,12 +125,16 @@ pub fn lex_fixed_length_strings(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings_using_chars;
 ///
 /// let ss = exhaustive_fixed_length_strings_using_chars(2, ['c', 'a', 't'].iter().cloned())
-///     .collect::<Vec<_>>();
+///     .collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &["cc", "ca", "ac", "aa", "ct", "at", "tc", "ta", "tt"]
 /// );
 /// ```
@@ -153,11 +164,15 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::exhaustive_fixed_length_strings;
 ///
-/// let ss = exhaustive_fixed_length_strings(2).take(20).collect::<Vec<_>>();
+/// let ss = exhaustive_fixed_length_strings(2).take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &[
 ///         "aa", "ab", "ba", "bb", "ac", "ad", "bc", "bd", "ca", "cb", "da", "db", "cc", "cd",
 ///         "dc", "dd", "ae", "af", "be", "bf"
@@ -193,11 +208,15 @@ pub fn exhaustive_fixed_length_strings(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
 ///
-/// let ss = shortlex_strings_using_chars('x'..='z').take(20).collect::<Vec<_>>();
+/// let ss = shortlex_strings_using_chars('x'..='z').take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
 ///         "", "x", "y", "z", "xx", "xy", "xz", "yx", "yy", "yz", "zx", "zy", "zz", "xxx", "xxy",
 ///         "xxz", "xyx", "xyy", "xyz", "xzx"
@@ -232,11 +251,15 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::shortlex_strings;
 ///
-/// let ss = shortlex_strings().take(20).collect::<Vec<_>>();
+/// let ss = shortlex_strings().take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
 ///         "", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
 ///         "r", "s"
@@ -265,11 +288,15 @@ pub fn shortlex_strings(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 ///
-/// let ss = exhaustive_strings_using_chars('x'..='z').take(20).collect::<Vec<_>>();
+/// let ss = exhaustive_strings_using_chars('x'..='z').take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
 ///         "", "x", "y", "xxx", "z", "xx", "xy", "xxxxx", "yx", "xxy", "yy", "xxxx", "xz", "xyx",
 ///         "yz", "xxxxxx", "zx", "xyy", "zy", "xxxy"
@@ -297,11 +324,15 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::strings::exhaustive::exhaustive_strings;
 ///
-/// let ss = exhaustive_strings().take(20).collect::<Vec<_>>();
+/// let ss = exhaustive_strings().take(20).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(String::as_str).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
 ///         "", "a", "b", "aaa", "c", "aa", "d", "aaaa", "e", "ab", "f", "aab", "g", "ba", "h",
 ///         "aaaaa", "i", "bb", "j", "aba"

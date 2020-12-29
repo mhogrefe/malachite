@@ -21,7 +21,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_from_single, lex_pairs,
 };
 use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
-use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::integer::exhaustive::{
     exhaustive_integer_range_to_infinity, exhaustive_integer_range_to_negative_infinity,
@@ -59,7 +59,7 @@ use rust_wheels::iterators::tuples::{
 
 use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, signeds, unsigneds, RandomValueAndVecOfBool};
-use inputs::common::{permute_1_3_4_2, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4};
+use inputs::common::{permute_1_3_4_2, reshape_2_1_to_3, reshape_2_2_to_4};
 
 pub fn integers(gm: GenerationMode) -> It<Integer> {
     match gm {

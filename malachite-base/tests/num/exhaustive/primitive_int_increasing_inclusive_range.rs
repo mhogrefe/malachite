@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::panic::catch_unwind;
 
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -23,7 +24,7 @@ fn primitive_int_increasing_inclusive_range_helper_helper<T: PrimitiveInt>(
     let xs = primitive_int_increasing_inclusive_range::<T>(a, b)
         .map(i8::exact_from)
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(xs, values);
     if T::WIDTH <= u16::WIDTH {
         let len = expected_range_len(a, b);
@@ -32,7 +33,7 @@ fn primitive_int_increasing_inclusive_range_helper_helper<T: PrimitiveInt>(
             .rev()
             .skip(len.saturating_sub(20))
             .map(i8::exact_from)
-            .collect::<Vec<_>>();
+            .collect_vec();
         init.reverse();
         assert_eq!(xs, init);
     }
@@ -48,7 +49,7 @@ fn primitive_int_increasing_inclusive_range_rev_helper<T: PrimitiveInt>(
     let xs = primitive_int_increasing_inclusive_range::<T>(a, b)
         .rev()
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(xs, rev_values);
     if T::WIDTH <= u16::WIDTH {
         let len = expected_range_len(a, b);
@@ -58,7 +59,7 @@ fn primitive_int_increasing_inclusive_range_rev_helper<T: PrimitiveInt>(
         );
         let mut tail = primitive_int_increasing_inclusive_range::<T>(a, b)
             .skip(len.saturating_sub(20))
-            .collect::<Vec<_>>();
+            .collect_vec();
         tail.reverse();
         assert_eq!(xs, tail);
     }

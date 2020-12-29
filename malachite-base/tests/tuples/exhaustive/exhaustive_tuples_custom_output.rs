@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;
@@ -26,7 +27,7 @@ fn exhaustive_pairs_helper<
     out: &[(X, Y)],
 ) {
     let ps = exhaustive_pairs(xs.clone(), ys.clone());
-    assert_eq!(ps.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ps.clone().take(20).collect_vec(), out);
     assert_eq!(ps.count(), out_len);
 
     let output_types = get_sample_output_types(2);
@@ -36,7 +37,7 @@ fn exhaustive_pairs_helper<
         output_types[0][0],
         output_types[0][1],
     );
-    assert_eq!(ps.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ps.clone().take(20).collect_vec(), out);
     assert_eq!(ps.count(), out_len);
     for alt_output_types in &output_types[1..] {
         let ps = exhaustive_pairs_custom_output(
@@ -246,7 +247,7 @@ fn exhaustive_triples_helper<
     out: &[(X, Y, Z)],
 ) {
     let ts = exhaustive_triples(xs.clone(), ys.clone(), zs.clone());
-    assert_eq!(ts.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
 
     let output_types = get_sample_output_types(3);
@@ -258,7 +259,7 @@ fn exhaustive_triples_helper<
         output_types[0][1],
         output_types[0][2],
     );
-    assert_eq!(ts.clone().take(20).collect::<Vec<_>>(), out);
+    assert_eq!(ts.clone().take(20).collect_vec(), out);
     assert_eq!(ts.count(), out_len);
     for alt_output_types in &output_types[1..] {
         let ts = exhaustive_triples_custom_output(

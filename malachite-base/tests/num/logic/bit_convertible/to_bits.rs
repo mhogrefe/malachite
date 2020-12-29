@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 use malachite_base_test_util::num::logic::bit_convertible::{
     to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive, to_bits_desc_alt,
@@ -14,7 +15,7 @@ pub fn test_to_bits_asc() {
         assert_eq!(x.to_bits_asc(), out);
         assert_eq!(to_bits_asc_unsigned_naive(x), out);
         assert_eq!(to_bits_asc_alt(&x), out);
-        assert_eq!(x.bits().collect::<Vec<_>>(), out);
+        assert_eq!(x.bits().collect_vec(), out);
     };
     test_unsigned(0u8, &[]);
     test_unsigned(1u16, &[true]);
@@ -27,7 +28,7 @@ pub fn test_to_bits_asc() {
         assert_eq!(x.to_bits_asc(), out);
         assert_eq!(to_bits_asc_signed_naive(x), out);
         assert_eq!(to_bits_asc_alt(&x), out);
-        assert_eq!(x.bits().collect::<Vec<_>>(), out);
+        assert_eq!(x.bits().collect_vec(), out);
     };
     test_signed(0i8, &[]);
     test_signed(1i16, &[true, false]);
@@ -54,7 +55,7 @@ pub fn test_to_bits_desc() {
         assert_eq!(x.to_bits_desc(), out);
         assert_eq!(to_bits_desc_unsigned_naive(x), out);
         assert_eq!(to_bits_desc_alt(&x), out);
-        assert_eq!(x.bits().rev().collect::<Vec<_>>(), out);
+        assert_eq!(x.bits().rev().collect_vec(), out);
     };
     test_unsigned(0u8, &[]);
     test_unsigned(1u16, &[true]);
@@ -67,7 +68,7 @@ pub fn test_to_bits_desc() {
         assert_eq!(x.to_bits_desc(), out);
         assert_eq!(to_bits_desc_signed_naive(x), out);
         assert_eq!(to_bits_desc_alt(&x), out);
-        assert_eq!(x.bits().rev().collect::<Vec<_>>(), out);
+        assert_eq!(x.bits().rev().collect_vec(), out);
     };
     test_signed(0i8, &[]);
     test_signed(1i16, &[false, true]);

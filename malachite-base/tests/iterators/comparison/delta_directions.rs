@@ -1,15 +1,16 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 
 use malachite_base::iterators::comparison::delta_directions;
 
 fn delta_directions_helper(xs: &[u8], result: &[Ordering]) {
-    assert_eq!(delta_directions(xs.iter()).collect::<Vec<_>>(), result);
+    assert_eq!(delta_directions(xs.iter()).collect_vec(), result);
     assert_eq!(result.len(), xs.len().saturating_sub(1));
     assert_eq!(
         delta_directions(xs.iter().rev())
             .map(Ordering::reverse)
-            .collect::<Vec<_>>(),
-        result.iter().cloned().rev().collect::<Vec<_>>()
+            .collect_vec(),
+        result.iter().cloned().rev().collect_vec()
     );
 }
 

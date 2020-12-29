@@ -363,11 +363,15 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_unsigneds;
 ///
 /// assert_eq!(
-///     geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_unsigneds::<u64>(EXAMPLE_SEED, 1, 1).take(10).collect_vec(),
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
@@ -438,12 +442,16 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_positive_unsigneds;
 ///
 /// assert_eq!(
 ///     geometric_random_positive_unsigneds::<u64>(EXAMPLE_SEED, 2, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
@@ -525,11 +533,15 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect_vec(),
 ///     &[-1, -1, -1, 1, -2, 1, 0, 0, 0, 0]
 /// )
 /// ```
@@ -600,11 +612,15 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_natural_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_natural_signeds::<i64>(EXAMPLE_SEED, 1, 1).take(10).collect_vec(),
 ///     &[1, 0, 0, 3, 4, 4, 1, 0, 0, 1]
 /// )
 /// ```
@@ -675,11 +691,15 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_positive_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_positive_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect_vec(),
 ///     &[2, 1, 1, 4, 5, 5, 2, 1, 1, 2]
 /// )
 /// ```
@@ -753,11 +773,15 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_negative_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_negative_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect_vec(),
 ///     &[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2]
 /// )
 /// ```
@@ -847,11 +871,15 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_nonzero_signeds;
 ///
 /// assert_eq!(
-///     geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect::<Vec<_>>(),
+///     geometric_random_nonzero_signeds::<i64>(EXAMPLE_SEED, 2, 1).take(10).collect_vec(),
 ///     &[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1]
 /// )
 /// ```
@@ -932,12 +960,16 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_unsigned_range;
 ///
 /// assert_eq!(
 ///     geometric_random_unsigned_range::<u16>(EXAMPLE_SEED, 1, 7, 3, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
 /// )
 /// ```
@@ -1015,12 +1047,16 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_unsigned_inclusive_range;
 ///
 /// assert_eq!(
 ///     geometric_random_unsigned_inclusive_range::<u16>(EXAMPLE_SEED, 1, 6, 3, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2]
 /// )
 /// ```
@@ -1116,12 +1152,16 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_signed_range;
 ///
 /// assert_eq!(
 ///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 100, 30, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
 /// )
 /// ```
@@ -1235,12 +1275,16 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::geometric::geometric_random_signed_range;
 ///
 /// assert_eq!(
 ///     geometric_random_signed_range::<i8>(EXAMPLE_SEED, -100, 99, 30, 1)
-///         .take(10).collect::<Vec<_>>(),
+///         .take(10).collect_vec(),
 ///     &[-32, -31, -88, 52, -40, 64, -36, -1, -7, 46]
 /// )
 /// ```

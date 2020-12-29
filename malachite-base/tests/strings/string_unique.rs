@@ -22,8 +22,8 @@ fn test_string_unique() {
 #[test]
 fn string_unique_properties() {
     let mut config = GenConfig::new();
-    config.insert("length_mean_n", 128);
-    config.insert("length_mean_d", 1);
+    config.insert("mean_length_n", 128);
+    config.insert("mean_length_d", 1);
     string_gen().test_properties_with_config(&config, |s| {
         let t = string_unique(&s);
         assert!(is_unique(t.chars()));

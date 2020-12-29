@@ -1,7 +1,7 @@
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_nz::natural::random::special_random_natural_with_bits::*;
 use rand::{IsaacRng, SeedableRng, StdRng};
 use rust_wheels::iterators::common::EXAMPLE_SEED;
+use rust_wheels::iterators::naturals::special_random_natural_with_bits_old;
 
 use malachite_test::common::test_properties_no_special;
 use malachite_test::inputs::base::small_unsigneds;
@@ -11,7 +11,7 @@ fn test_special_random_natural_with_bits() {
     let test = |bits, out| {
         let seed: &[_] = &[1, 2, 3, 4];
         let mut rng: StdRng = SeedableRng::from_seed(seed);
-        let x = special_random_natural_with_bits(&mut rng, bits);
+        let x = special_random_natural_with_bits_old(&mut rng, bits);
         assert_eq!(format!("{:b}", x), out);
         assert!(x.is_valid());
     };
@@ -33,7 +33,7 @@ fn test_special_random_natural_with_bits() {
 fn special_random_natural_with_bits_properties() {
     let mut rng = IsaacRng::from_seed(&EXAMPLE_SEED);
     test_properties_no_special(small_unsigneds, |&bits| {
-        let n = special_random_natural_with_bits(&mut rng, bits);
+        let n = special_random_natural_with_bits_old(&mut rng, bits);
         assert!(n.is_valid());
         assert_eq!(n.significant_bits(), bits);
     });

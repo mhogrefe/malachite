@@ -12,8 +12,8 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
     _limbs_invert_newton_approx, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
     limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_invert_limb,
-    limbs_two_limb_inverse_helper,
+    limbs_div_mod_extra, limbs_div_mod_extra_in_place, limbs_div_mod_three_limb_by_two_limb,
+    limbs_div_mod_to_out, limbs_invert_limb, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -35,8 +35,8 @@ use malachite_test::inputs::base::{
     pairs_of_unsigned_vec_and_positive_unsigned_var_1, pairs_of_unsigneds_var_2,
     quadruples_of_limb_vec_var_1, quadruples_of_limb_vec_var_2,
     quadruples_of_three_limb_vecs_and_limb_var_1, quadruples_of_three_limb_vecs_and_limb_var_2,
-    sextuples_of_limbs_var_1, triples_of_limb_vec_var_38, triples_of_limb_vec_var_39,
-    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    quintuples_var_1, sextuples_of_limbs_var_1, sextuples_var_1, triples_of_limb_vec_var_38,
+    triples_of_limb_vec_var_39, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_var_37, unsigneds_var_1,
 };
 use malachite_test::inputs::natural::{
@@ -221,6 +221,47 @@ fn verify_limbs_div_mod_4(ns: &[Limb], ds: &[Limb], qs: &[Limb], rs: &[Limb]) {
     assert_eq!(rs.len(), d_len);
 }
 
+fn verify_limbs_div_mod_extra(
+    original_out: &[Limb],
+    fraction_len: usize,
+    ns: &[Limb],
+    d: Limb,
+    out: &[Limb],
+    r: Limb,
+) {
+    let out_len = ns.len() + fraction_len;
+    let mut extended_xs = vec![0; out_len];
+    extended_xs[fraction_len..].copy_from_slice(ns);
+    let n = Natural::from_owned_limbs_asc(extended_xs);
+    let d = Natural::from(d);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let q = Natural::from_limbs_asc(&out[..out_len]);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert_eq!(&out[out_len..], &original_out[out_len..]);
+    assert!(r < d);
+    assert_eq!(q * d + Natural::from(r), n);
+}
+
+fn verify_limbs_div_mod_extra_in_place(
+    original_ns: &[Limb],
+    fraction_len: usize,
+    d: Limb,
+    ns: &[Limb],
+    r: Limb,
+) {
+    let mut extended_ns = vec![0; ns.len()];
+    extended_ns[fraction_len..].copy_from_slice(&original_ns[fraction_len..]);
+    let n = Natural::from_owned_limbs_asc(extended_ns);
+    let d = Natural::from(d);
+    let (expected_q, expected_r) = (&n).div_mod(&d);
+    let q = Natural::from_limbs_asc(ns);
+    assert_eq!(q, expected_q);
+    assert_eq!(r, expected_r);
+    assert!(r < d);
+    assert_eq!(q * d + Natural::from(r), n);
+}
+
 #[test]
 fn limbs_invert_limb_properties() {
     test_properties(unsigneds_var_1, |&limb| {
@@ -290,6 +331,32 @@ fn limbs_div_limb_in_place_mod_properties() {
             let q_alt = Natural::from_owned_limbs_asc(limbs);
             assert_eq!(q, q_alt);
             assert_eq!(r, r_alt);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_mod_extra_properties() {
+    test_properties(
+        sextuples_var_1,
+        |&(ref out, fraction_len, ref ns, d, d_inv, shift)| {
+            let old_out = out;
+            let mut out = old_out.to_vec();
+            let r = limbs_div_mod_extra(&mut out, fraction_len, &ns, d, d_inv, shift);
+            verify_limbs_div_mod_extra(old_out, fraction_len, ns, d, &out, r);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_mod_extra_in_place_properties() {
+    test_properties(
+        quintuples_var_1,
+        |&(ref ns, fraction_len, d, d_inv, shift)| {
+            let old_ns = ns;
+            let mut ns = old_ns.to_vec();
+            let r = limbs_div_mod_extra_in_place(&mut ns, fraction_len, d, d_inv, shift);
+            verify_limbs_div_mod_extra_in_place(old_ns, fraction_len, d, &ns, r);
         },
     );
 }

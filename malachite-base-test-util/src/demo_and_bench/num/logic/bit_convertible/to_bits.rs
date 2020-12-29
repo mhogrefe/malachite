@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
@@ -114,10 +115,9 @@ fn benchmark_unsigned_to_bits_asc_evaluation_strategy<T: PrimitiveUnsigned>(
             (&format!("{}.to_bits_asc()", T::NAME), &mut |n| {
                 no_out!(n.to_bits_asc())
             }),
-            (
-                &format!("{}.bits().collect::<Vec<bool>>()", T::NAME),
-                &mut |n| no_out!(n.bits().collect::<Vec<bool>>()),
-            ),
+            (&format!("{}.bits().collect_vec()", T::NAME), &mut |n| {
+                no_out!(n.bits().collect_vec())
+            }),
         ],
     );
 }
@@ -141,10 +141,9 @@ fn benchmark_signed_to_bits_asc_evaluation_strategy<T: PrimitiveSigned>(
             (&format!("{}.to_bits_asc()", T::NAME), &mut |n| {
                 no_out!(n.to_bits_asc())
             }),
-            (
-                &format!("{}.bits().collect::<Vec<bool>>()", T::NAME),
-                &mut |n| no_out!(n.bits().collect::<Vec<bool>>()),
-            ),
+            (&format!("{}.bits().collect_vec()", T::NAME), &mut |n| {
+                no_out!(n.bits().collect_vec())
+            }),
         ],
     );
 }
@@ -213,8 +212,8 @@ fn benchmark_unsigned_to_bits_desc_evaluation_strategy<T: PrimitiveUnsigned>(
                 no_out!(n.to_bits_desc())
             }),
             (
-                &format!("{}.bits().rev().collect::<Vec<bool>>()", T::NAME),
-                &mut |n| no_out!(n.bits().rev().collect::<Vec<bool>>()),
+                &format!("{}.bits().rev().collect_vec()", T::NAME),
+                &mut |n| no_out!(n.bits().rev().collect_vec()),
             ),
         ],
     );
@@ -240,8 +239,8 @@ fn benchmark_signed_to_bits_desc_evaluation_strategy<T: PrimitiveSigned>(
                 no_out!(n.to_bits_desc())
             }),
             (
-                &format!("{}.bits().rev().collect::<Vec<bool>>()", T::NAME),
-                &mut |n| no_out!(n.bits().rev().collect::<Vec<bool>>()),
+                &format!("{}.bits().rev().collect_vec()", T::NAME),
+                &mut |n| no_out!(n.bits().rev().collect_vec()),
             ),
         ],
     );

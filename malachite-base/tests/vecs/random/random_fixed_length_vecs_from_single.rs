@@ -21,7 +21,7 @@ fn random_fixed_length_vecs_from_single_helper<I: Clone + Iterator>(
     I::Item: Clone + Debug + Eq + Hash + Ord,
 {
     let xs = random_fixed_length_vecs_from_single(len, xs);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

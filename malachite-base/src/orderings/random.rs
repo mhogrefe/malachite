@@ -18,12 +18,16 @@ use slices::{random_values_from_slice, RandomValuesFromSlice};
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::orderings::random::random_orderings;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use std::cmp::Ordering::{self, Less, Greater, Equal};
 ///
 /// assert_eq!(
-///     random_orderings(EXAMPLE_SEED).take(10).collect::<Vec<_>>(),
+///     random_orderings(EXAMPLE_SEED).take(10).collect_vec(),
 ///     &[Less, Equal, Less, Greater, Less, Less, Equal, Less, Equal, Greater]
 /// )
 /// ```

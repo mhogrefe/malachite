@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -11,7 +12,7 @@ where
         exhaustive_positive_primitive_ints::<T>()
             .map(u8::exact_from)
             .take(20)
-            .collect::<Vec<_>>(),
+            .collect_vec(),
         &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     )
 }
@@ -24,7 +25,7 @@ fn exhaustive_positive_primitive_ints_long_helper<T: PrimitiveInt>(last_20: &[T]
     };
     let xs = exhaustive_positive_primitive_ints::<T>();
     assert_eq!(xs.clone().count(), expected_len);
-    assert_eq!(xs.skip(expected_len - 20).collect::<Vec<_>>(), last_20)
+    assert_eq!(xs.skip(expected_len - 20).collect_vec(), last_20)
 }
 
 #[test]

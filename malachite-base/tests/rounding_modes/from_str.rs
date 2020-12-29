@@ -32,8 +32,8 @@ fn from_str_helper(s: String) {
 #[test]
 fn from_str_properties() {
     let mut config = GenConfig::new();
-    config.insert("length_mean_n", 128);
-    config.insert("length_mean_d", 1);
+    config.insert("mean_length_n", 128);
+    config.insert("mean_length_d", 1);
     string_gen().test_properties_with_config(&config, from_str_helper);
     string_gen_var_2().test_properties_with_config(&config, from_str_helper);
 }

@@ -44,6 +44,14 @@ fn flip_bit_helper_signed<T: PrimitiveSigned>() {
         test(-1000000000000, 10, -999999998976);
         test(-999999998976, 10, -1000000000000);
     }
+
+    let mut n = T::ZERO;
+    n.flip_bit(T::WIDTH - 1);
+    assert_eq!(n, T::MIN);
+
+    let mut n = T::MIN;
+    n.flip_bit(T::WIDTH - 1);
+    assert_eq!(n, T::ZERO);
 }
 
 #[test]

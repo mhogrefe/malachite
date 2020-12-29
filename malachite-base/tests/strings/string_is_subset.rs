@@ -22,8 +22,8 @@ fn test_string_is_subset() {
 #[test]
 fn string_is_subset_properties() {
     let mut config = GenConfig::new();
-    config.insert("length_mean_n", 128);
-    config.insert("length_mean_d", 1);
+    config.insert("mean_length_n", 128);
+    config.insert("mean_length_d", 1);
     string_pair_gen().test_properties_with_config(&config, |(s, t)| {
         let is_subset = string_is_subset(&s, &t);
         assert_eq!(

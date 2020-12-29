@@ -1,6 +1,7 @@
 use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;
 
+use itertools::Itertools;
 use malachite_base::bools::random::weighted_random_bools;
 use malachite_base::random::EXAMPLE_SEED;
 
@@ -12,7 +13,7 @@ fn weighted_random_bools_helper(
     expected_median: (bool, Option<bool>),
 ) {
     let xs = weighted_random_bools(EXAMPLE_SEED, w_numerator, w_denominator);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

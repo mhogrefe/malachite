@@ -317,12 +317,16 @@ impl BitDistributor {
     ///
     /// # Examples
     /// ```
+    /// extern crate itertools;
+    ///
+    /// use itertools::Itertools;
+    ///
     /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
     ///
     /// let mut bd = BitDistributor::new(&[BitDistributorOutputType::normal(1); 2]);
     /// let mut outputs = Vec::new();
     /// for _ in 0..10 {
-    ///     outputs.push((0..2).map(|i| bd.get_output(i)).collect::<Vec<usize>>());
+    ///     outputs.push((0..2).map(|i| bd.get_output(i)).collect_vec());
     ///     bd.increment_counter();
     /// }
     /// let expected_outputs: &[&[usize]] =

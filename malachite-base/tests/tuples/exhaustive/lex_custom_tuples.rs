@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::once;
@@ -22,7 +23,7 @@ fn lex_triples_xxy_helper<
     out: &[(X, X, Y)],
 ) {
     let ts = lex_triples_xxy(xs, ys);
-    let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+    let ts_prefix = ts.clone().take(20).collect_vec();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
 }
@@ -263,7 +264,7 @@ fn lex_triples_xyx_helper<
     out: &[(X, Y, X)],
 ) {
     let ts = lex_triples_xyx(xs, ys);
-    let ts_prefix = ts.clone().take(20).collect::<Vec<_>>();
+    let ts_prefix = ts.clone().take(20).collect_vec();
     assert_eq!(ts_prefix.as_slice(), out);
     assert_eq!(ts.count(), out_len);
 }

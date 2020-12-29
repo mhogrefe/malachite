@@ -1,4 +1,5 @@
 use core::hash::Hash;
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
@@ -25,7 +26,7 @@ fn random_vecs_helper<T: Clone + Debug + Eq + Hash + Ord, I: Clone + Iterator<It
         mean_length_numerator,
         mean_length_denominator,
     );
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

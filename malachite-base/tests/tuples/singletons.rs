@@ -1,15 +1,11 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base::nevers::Never;
 use malachite_base::tuples::singletons;
 
 fn singletons_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[(T,)]) {
-    assert_eq!(
-        singletons(xs.iter().cloned())
-            .collect::<Vec<_>>()
-            .as_slice(),
-        out
-    );
+    assert_eq!(singletons(xs.iter().cloned()).collect_vec().as_slice(), out);
 }
 
 #[test]

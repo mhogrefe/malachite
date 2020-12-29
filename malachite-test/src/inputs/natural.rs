@@ -29,7 +29,7 @@ use malachite_base::tuples::exhaustive::{
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, shortlex_vecs,
 };
-use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
@@ -68,8 +68,7 @@ use rust_wheels::iterators::vecs::random_vecs;
 use common::GenerationMode;
 use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, RandomValueAndVecOfBool};
 use inputs::common::{
-    permute_1_3_4_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4,
-    reshape_3_1_to_4,
+    permute_1_3_4_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {

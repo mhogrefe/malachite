@@ -5,6 +5,7 @@ use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
 
+use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::random::striped::striped_random_nonzero_signeds;
 use malachite_base::random::EXAMPLE_SEED;
@@ -23,11 +24,11 @@ fn striped_random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
         .clone()
         .map(|x| x.to_binary_string())
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     let actual_common_values = common_values_map(1000000, 10, xs.clone())
         .iter()
         .map(|(x, frequency)| (x.to_binary_string(), *frequency))
-        .collect::<Vec<_>>();
+        .collect_vec();
     let actual_sample_median = median(xs.clone().take(1000000));
     let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
@@ -38,14 +39,11 @@ fn striped_random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
             actual_sample_moment_stats
         ),
         (
-            expected_values
-                .iter()
-                .map(|x| x.to_string())
-                .collect::<Vec<_>>(),
+            expected_values.iter().map(|x| x.to_string()).collect_vec(),
             expected_common_values
                 .iter()
                 .map(|(x, frequency)| (x.to_string(), *frequency))
-                .collect::<Vec<_>>(),
+                .collect_vec(),
             expected_sample_median,
             expected_sample_moment_stats
         )

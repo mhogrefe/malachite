@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fmt::Debug;
 
 use malachite_base::bools::exhaustive::exhaustive_bools;
@@ -15,12 +16,12 @@ fn shortlex_vecs_length_range_small_helper<I: Clone + Iterator>(
     I::Item: Clone + Debug + Eq,
 {
     let xss = shortlex_vecs_length_range(a, b, xs);
-    let xss_prefix = xss.clone().take(20).collect::<Vec<_>>();
+    let xss_prefix = xss.clone().take(20).collect_vec();
     assert_eq!(
         xss_prefix
             .iter()
             .map(Vec::as_slice)
-            .collect::<Vec<_>>()
+            .collect_vec()
             .as_slice(),
         out
     );

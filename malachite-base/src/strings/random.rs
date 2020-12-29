@@ -26,6 +26,10 @@ use vecs::random::{
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_fixed_length_strings_using_chars;
@@ -33,9 +37,9 @@ use vecs::random::{
 /// let ss = random_fixed_length_strings_using_chars(
 ///     2,
 ///     random_char_inclusive_range(EXAMPLE_SEED, 'a', 'c')
-/// ).take(10).collect::<Vec<_>>();
+/// ).take(10).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &["ba", "bc", "bb", "ab", "ac", "ba", "bc", "ca", "ba", "cc"]
 /// );
 /// ```
@@ -66,12 +70,16 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_fixed_length_strings;
 ///
-/// let ss = random_fixed_length_strings(EXAMPLE_SEED, 2).take(10).collect::<Vec<_>>();
+/// let ss = random_fixed_length_strings(EXAMPLE_SEED, 2).take(10).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &[
 ///         "\u{5f771}\u{87234}", "\u{bcd36}\u{9e195}", "\u{5da07}\u{36553}", "\u{45028}\u{1cdfd}",
 ///         "\u{d8530}\u{c7f2e}", "\u{ba4bc}\u{ff677}", "\u{a12e2}\u{d775c}", "\u{f827b}\u{bdf7a}",
@@ -114,6 +122,10 @@ pub fn random_fixed_length_strings(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_strings_using_chars;
@@ -123,9 +135,9 @@ pub fn random_fixed_length_strings(
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
 ///     4,
 ///     1,
-/// ).take(10).collect::<Vec<_>>();
+/// ).take(10).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &["", "yyyyzxxxzxzxzx", "zzzy", "xzzx", "y", "", "zyzxz", "zy", "zyyx", ""]
 /// );
 /// ```
@@ -165,12 +177,16 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::random::random_strings;
 ///
-/// let ss = random_strings(EXAMPLE_SEED, 4, 1).take(10).collect::<Vec<_>>();
+/// let ss = random_strings(EXAMPLE_SEED, 4, 1).take(10).collect_vec();
 /// assert_eq!(
-///     ss.iter().map(|cs| cs.as_str()).collect::<Vec<_>>().as_slice(),
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
 ///     &[
 ///         "",
 ///         "\u{81355}\u{a331d}\u{b707b}\u{1354b}\u{b16ac}𣙘\u{67377}\u{4aaa4}\u{a6d6e}\u{45616}\

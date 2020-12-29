@@ -1,5 +1,6 @@
 use std::iter::{empty, once};
 
+use itertools::Itertools;
 use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
 
 fn lex_fixed_length_strings_using_chars_helper<I: Iterator<Item = char>>(
@@ -9,14 +10,8 @@ fn lex_fixed_length_strings_using_chars_helper<I: Iterator<Item = char>>(
 ) {
     let css = lex_fixed_length_strings_using_chars(len, cs)
         .take(20)
-        .collect::<Vec<_>>();
-    assert_eq!(
-        css.iter()
-            .map(String::as_str)
-            .collect::<Vec<_>>()
-            .as_slice(),
-        out
-    );
+        .collect_vec();
+    assert_eq!(css.iter().map(String::as_str).collect_vec().as_slice(), out);
 }
 
 #[test]

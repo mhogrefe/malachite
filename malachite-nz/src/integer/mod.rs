@@ -104,6 +104,13 @@ impl NegativeOne for Integer {
     const NEGATIVE_ONE: Integer = integer_negative_one!();
 }
 
+//TODO doc
+impl Default for Integer {
+    fn default() -> Integer {
+        Integer::ZERO
+    }
+}
+
 // Implement `Named` for `Integer`.
 impl_named!(Integer);
 
@@ -137,7 +144,6 @@ pub mod arithmetic {
     pub mod sub;
     pub mod sub_mul;
 }
-
 pub mod comparison {
     pub mod ord;
     pub mod ord_abs;
@@ -148,11 +154,8 @@ pub mod comparison {
     pub mod partial_ord_natural;
     pub mod partial_ord_primitive_int;
 }
-
 pub mod conversion;
-
 pub mod exhaustive;
-
 pub mod logic {
     pub mod and;
     pub mod bit_access;

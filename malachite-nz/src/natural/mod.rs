@@ -132,6 +132,13 @@ impl Min for Natural {
     const MIN: Natural = natural_zero!();
 }
 
+//TODO doc
+impl Default for Natural {
+    fn default() -> Natural {
+        Natural::ZERO
+    }
+}
+
 // Implement `Named` for `Natural`.
 impl_named!(Natural);
 
@@ -189,18 +196,14 @@ pub mod arithmetic {
     pub mod sub;
     pub mod sub_mul;
 }
-
 pub mod conversion;
-
 pub mod comparison {
     pub mod ord;
     pub mod partial_eq_primitive_int;
     pub mod partial_ord_abs_primitive_int;
     pub mod partial_ord_primitive_int;
 }
-
 pub mod exhaustive;
-
 pub mod logic {
     pub mod and;
     pub mod bit_access;
@@ -216,13 +219,4 @@ pub mod logic {
     pub mod significant_bits;
     pub mod trailing_zeros;
     pub mod xor;
-}
-
-pub mod random {
-    pub mod random_natural_below;
-    pub mod random_natural_up_to_bits;
-    pub mod random_natural_with_bits;
-    pub mod special_random_natural_below;
-    pub mod special_random_natural_up_to_bits;
-    pub mod special_random_natural_with_bits;
 }

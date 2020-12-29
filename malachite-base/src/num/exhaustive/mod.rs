@@ -82,10 +82,14 @@ pub type PrimitiveIntUpDown<T> =
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 ///
 /// assert_eq!(
-///     exhaustive_unsigneds::<u8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_unsigneds::<u8>().take(10).collect_vec(),
 ///     &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 /// )
 /// ```
@@ -108,10 +112,14 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntIncreasingRan
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 ///
 /// assert_eq!(
-///     exhaustive_positive_primitive_ints::<u8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_positive_primitive_ints::<u8>().take(10).collect_vec(),
 ///     &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 /// )
 /// ```
@@ -136,10 +144,14 @@ pub fn exhaustive_positive_primitive_ints<T: PrimitiveInt>() -> PrimitiveIntIncr
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_signeds;
 ///
 /// assert_eq!(
-///     exhaustive_signeds::<i8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_signeds::<i8>().take(10).collect_vec(),
 ///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5]
 /// )
 /// ```
@@ -160,10 +172,14 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveIntUp
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_natural_signeds;
 ///
 /// assert_eq!(
-///     exhaustive_natural_signeds::<i8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_natural_signeds::<i8>().take(10).collect_vec(),
 ///     &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 /// )
 /// ```
@@ -184,10 +200,14 @@ pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntIncreasin
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_negative_signeds;
 ///
 /// assert_eq!(
-///     exhaustive_negative_signeds::<i8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_negative_signeds::<i8>().take(10).collect_vec(),
 ///     &[-1, -2, -3, -4, -5, -6, -7, -8, -9, -10]
 /// )
 /// ```
@@ -212,10 +232,14 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntIncr
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_nonzero_signeds;
 ///
 /// assert_eq!(
-///     exhaustive_nonzero_signeds::<i8>().take(10).collect::<Vec<_>>(),
+///     exhaustive_nonzero_signeds::<i8>().take(10).collect_vec(),
 ///     &[1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
 /// )
 /// ```
@@ -243,10 +267,14 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntUpDown<T>
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::primitive_int_increasing_range;
 ///
 /// assert_eq!(
-///     primitive_int_increasing_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     primitive_int_increasing_range::<i8>(-5, 5).collect_vec(),
 ///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]
 /// )
 /// ```
@@ -282,10 +310,14 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::primitive_int_increasing_inclusive_range;
 ///
 /// assert_eq!(
-///     primitive_int_increasing_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     primitive_int_increasing_inclusive_range::<i8>(-5, 5).collect_vec(),
 ///     &[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
 /// )
 /// ```
@@ -325,10 +357,14 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_signed_range;
 ///
 /// assert_eq!(
-///     exhaustive_signed_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     exhaustive_signed_range::<i8>(-5, 5).collect_vec(),
 ///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, -5]
 /// )
 /// ```
@@ -371,10 +407,14 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_signed_inclusive_range;
 ///
 /// assert_eq!(
-///     exhaustive_signed_inclusive_range::<i8>(-5, 5).collect::<Vec<_>>(),
+///     exhaustive_signed_inclusive_range::<i8>(-5, 5).collect_vec(),
 ///     &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
 /// )
 /// ```

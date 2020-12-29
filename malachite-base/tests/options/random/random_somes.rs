@@ -4,6 +4,7 @@ use std::fmt::Debug;
 use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
+use itertools::Itertools;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::options::random::random_somes;
 use malachite_base::random::EXAMPLE_SEED;
@@ -17,7 +18,7 @@ fn random_somes_helper<I: Clone + Iterator>(
     I::Item: Clone + Debug + Eq + Hash + Ord,
 {
     let xs = random_somes(xs);
-    let values = xs.clone().take(20).collect::<Vec<_>>();
+    let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
     assert_eq!(

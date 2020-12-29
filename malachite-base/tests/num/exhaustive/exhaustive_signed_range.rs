@@ -1,5 +1,6 @@
 use std::panic::catch_unwind;
 
+use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -20,7 +21,7 @@ where
     let xs = exhaustive_signed_range::<T>(a, b)
         .map(i8::exact_from)
         .take(20)
-        .collect::<Vec<_>>();
+        .collect_vec();
     assert_eq!(xs, values);
     if T::WIDTH <= u16::WIDTH {
         assert_eq!(
@@ -38,7 +39,7 @@ where
     assert_eq!(exhaustive_signed_range(a, b).count(), len);
     let mut tail = exhaustive_signed_range::<T>(a, b)
         .skip(len.saturating_sub(20))
-        .collect::<Vec<_>>();
+        .collect_vec();
     tail.reverse();
     assert_eq!(tail, rev_values);
 }

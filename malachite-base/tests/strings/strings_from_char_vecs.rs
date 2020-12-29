@@ -1,16 +1,11 @@
+use itertools::Itertools;
 use std::iter::repeat;
 
 use malachite_base::strings::strings_from_char_vecs;
 
 fn strings_from_char_vecs_helper<I: Iterator<Item = Vec<char>>>(css: I, out: &[&str]) {
-    let css = strings_from_char_vecs(css).take(20).collect::<Vec<_>>();
-    assert_eq!(
-        css.iter()
-            .map(String::as_str)
-            .collect::<Vec<_>>()
-            .as_slice(),
-        out
-    );
+    let css = strings_from_char_vecs(css).take(20).collect_vec();
+    assert_eq!(css.iter().map(String::as_str).collect_vec().as_slice(), out);
 }
 
 #[test]

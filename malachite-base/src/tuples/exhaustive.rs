@@ -19,9 +19,13 @@ use num::logic::traits::SignificantBits;
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::tuples::exhaustive::exhaustive_units;
 ///
-/// assert_eq!(exhaustive_units().collect::<Vec<_>>(), &[()]);
+/// assert_eq!(exhaustive_units().collect_vec(), &[()]);
 /// ```
 pub fn exhaustive_units() -> Once<()> {
     once(())
@@ -1464,8 +1468,11 @@ impl<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
+///
+/// use itertools::Itertools;
 ///
 /// use std::collections::HashMap;
 /// use std::hash::Hash;
@@ -1503,7 +1510,7 @@ impl<
 ///                 "mouse" => &[30, 40][..]
 ///             }
 ///         }
-///     ).take(20).collect::<Vec<_>>();
+///     ).take(20).collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
@@ -1518,7 +1525,7 @@ impl<
 ///         DPGeneratorFromMap {
 ///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
 ///         }
-///     ).take(20).collect::<Vec<_>>();
+///     ).take(20).collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
@@ -1560,8 +1567,11 @@ pub fn lex_dependent_pairs<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
+///
+/// use itertools::Itertools;
 ///
 /// use std::collections::HashMap;
 /// use std::hash::Hash;
@@ -1595,7 +1605,7 @@ pub fn lex_dependent_pairs<
 ///         DPGeneratorFromMap {
 ///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
 ///         }
-///     ).take(20).collect::<Vec<_>>();
+///     ).take(20).collect_vec();
 ///     // Stops after seeing 2, which maps to an empty iterator
 ///     assert_eq!(xss.as_slice(), &[(1, 100), (1, 101), (1, 102)]);
 /// }
@@ -1724,8 +1734,11 @@ impl<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
+///
+/// use itertools::Itertools;
 ///
 /// use std::collections::HashMap;
 /// use std::hash::Hash;
@@ -1793,7 +1806,7 @@ impl<
 ///     let xs = exhaustive_positive_primitive_ints::<u64>();
 ///     let xss = exhaustive_dependent_pairs(ruler_sequence(), xs.clone(), MultiplesGenerator {})
 ///         .take(50)
-///         .collect::<Vec<_>>();
+///         .collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
@@ -1813,7 +1826,7 @@ impl<
 ///         DPGeneratorFromMap {
 ///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
 ///         }
-///     ).take(20).collect::<Vec<_>>();
+///     ).take(20).collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
@@ -1858,8 +1871,11 @@ pub fn exhaustive_dependent_pairs<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// #[macro_use]
 /// extern crate maplit;
+///
+/// use itertools::Itertools;
 ///
 /// use std::collections::HashMap;
 /// use std::hash::Hash;
@@ -1911,7 +1927,7 @@ pub fn exhaustive_dependent_pairs<
 ///         DPGeneratorFromMap {
 ///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
 ///         }
-///     ).take(20).collect::<Vec<_>>();
+///     ).take(20).collect_vec();
 ///     assert_eq!(xss.as_slice(), &[(1, 100)]);
 /// }
 /// ```

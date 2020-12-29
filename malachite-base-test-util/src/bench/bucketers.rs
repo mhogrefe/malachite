@@ -83,6 +83,13 @@ pub fn pair_string_len_bucketer<'a>() -> Bucketer<'a, (String, String)> {
     }
 }
 
+pub fn vec_len_bucketer<'a, T>() -> Bucketer<'a, Vec<T>> {
+    Bucketer {
+        bucketing_function: &Vec::len,
+        bucketing_label: "xs.len()".to_string(),
+    }
+}
+
 pub fn pair_max_bit_bucketer<'a, T: Copy + SignificantBits, U: Copy + SignificantBits>(
     x_name: &str,
     y_name: &str,
@@ -129,6 +136,16 @@ where
 {
     Bucketer {
         bucketing_function: &(|&(_, y)| usize::exact_from(y)),
+        bucketing_label: y_name.to_string(),
+    }
+}
+
+pub fn triple_2_bucketer<T, U: Copy, V>(y_name: &str) -> Bucketer<(T, U, V)>
+where
+    usize: ExactFrom<U>,
+{
+    Bucketer {
+        bucketing_function: &(|&(_, y, _)| usize::exact_from(y)),
         bucketing_label: y_name.to_string(),
     }
 }

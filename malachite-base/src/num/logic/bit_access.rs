@@ -39,7 +39,7 @@ macro_rules! impl_bit_access_unsigned {
             /// n = \sum_{i=0}^\infty 2^{b_i},
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
-            /// rest are 0. Then $f(n, i) = (b_i = 1)$.
+            /// rest are 0. Then $f(n, j) = (b_j = 1)$.
             ///
             /// # Worst-case complexity
             ///
@@ -64,12 +64,12 @@ macro_rules! impl_bit_access_unsigned {
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
             /// $$
-            /// f(n, i) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 1, b_ {i+1}, \ldots, b_ {W-1}\\}.
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\}.
             /// $$
             ///
             /// # Worst-case complexity
@@ -100,12 +100,12 @@ macro_rules! impl_bit_access_unsigned {
             /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
             /// rest are 0. Then
             /// $$
-            /// f(n, i) = \sum_{i=0}^\infty 2^{c_i},
+            /// f(n, j) = \sum_{i=0}^\infty 2^{c_i},
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots \\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 0, b_ {i+1}, \ldots \\}.
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots \\}.
             /// $$
             ///
             /// # Worst-case complexity
@@ -181,7 +181,7 @@ macro_rules! impl_bit_access_signed {
             /// - $W$ is the type's width
             /// - for all $i$, $b_i\in \\{0, 1\\}$, and $b_i = 1$ for $i \geq W$.
             ///
-            /// Then $f(n, i) = (b_i = 1)$.
+            /// Then $f(n, j) = (b_j = 1)$.
             ///
             /// # Worst-case complexity
             ///
@@ -199,33 +199,33 @@ macro_rules! impl_bit_access_signed {
             ///
             /// Setting bits beyond the type's width is disallowed, if `self` is non-negative.
             ///
-            /// If $n \geq 0$, let
+            /// If $n \geq 0$ and $j \neq W - 1$, let
             /// $$
             /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
             /// $$
-            /// f(n, i) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 1, b_ {i+1}, \ldots, b_ {W-1}\\},
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\},
             /// $$
             /// and $i < W$.
             ///
-            /// If $n < 0$, let
+            /// If $n < 0$ or $j = W - 1$, let
             /// $$
             /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
             /// $$
-            /// f(n, i) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// f(n, j) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 1, b_ {i+1}, \ldots, b_ {W-1}\\}.
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\}.
             /// $$
             ///
             /// # Worst-case complexity
@@ -248,32 +248,32 @@ macro_rules! impl_bit_access_signed {
             ///
             /// Clearing bits beyond the type's width is disallowed, if `self` is negative.
             ///
-            /// If $n \geq 0$, let
+            /// If $n \geq 0$ or $j = W - 1$, let
             /// $$
             /// n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
             /// $$
-            /// f(n, i) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// f(n, j) = \sum_{i=0}^{W-1} 2^{c_i},
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 0, b_ {i+1}, \ldots, b_ {W-1}\\}.
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots, b_ {W-1}\\}.
             /// $$
             ///
-            /// If $n < 0$, let
+            /// If $n < 0$ and $j \neq W - 1$, let
             /// $$
             /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
             /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`. Then
             /// $$
-            /// f(n, i) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// f(n, j) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
             /// $$
             /// where
             /// $$
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
-            /// \\{b_0, b_1, b_2, \ldots, b_{i-1}, 0, b_ {i+1}, \ldots, b_ {W-1}\\},
+            /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 0, b_ {j+1}, \ldots, b_ {W-1}\\},
             /// $$
             /// and $i < W$.
             ///

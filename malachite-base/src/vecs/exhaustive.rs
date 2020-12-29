@@ -20,7 +20,7 @@ use tuples::exhaustive::{
 };
 
 pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
-    let oi_sorted_unique = xs.unique().sorted().collect::<Vec<_>>();
+    let oi_sorted_unique = xs.unique().sorted().collect_vec();
     assert_eq!(oi_sorted_unique.len(), max_input_index + 1);
     assert_eq!(*oi_sorted_unique.first().unwrap(), 0);
     assert_eq!(*oi_sorted_unique.last().unwrap(), max_input_index);
@@ -463,11 +463,15 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_from_single;
 ///
-/// let xss = lex_fixed_length_vecs_from_single(2, 0..4).collect::<Vec<_>>();
+/// let xss = lex_fixed_length_vecs_from_single(2, 0..4).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[0, 0], &[0, 1], &[0, 2], &[0, 3], &[1, 0], &[1, 1], &[1, 2], &[1, 3], &[2, 0],
 ///         &[2, 1], &[2, 2], &[2, 3], &[3, 0], &[3, 1], &[3, 2], &[3, 3]
@@ -694,14 +698,14 @@ macro_rules! exhaustive_fixed_length_vecs {
             $(
                 let _max_input_index = $i;
             )*
-            let output_to_input_map: Vec<usize> = output_types.iter().map(|(_, i)| *i).collect();
+            let output_to_input_map = output_types.iter().map(|(_, i)| *i).collect_vec();
             validate_oi_map(_max_input_index, output_to_input_map.iter().cloned());
             $exhaustive_struct {
                 i: 0,
                 len: u64::exact_from(output_types.len()),
                 limit: None,
                 distributor: BitDistributor::new(output_types.iter().map(|(ot, _)| *ot)
-                    .collect::<Vec<_>>().as_slice()),
+                    .collect_vec().as_slice()),
                 $(
                     $xs: IteratorCache::new($xs),
                     $xs_done: false,
@@ -986,8 +990,11 @@ where
 /// time and additional memory functions of `xs`.
 ///
 /// # Examples
-///
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 /// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_1_input;
@@ -1003,9 +1010,9 @@ where
 ///         BitDistributorOutputType::tiny(),
 ///     ],
 /// );
-/// let xss_prefix = xss.take(20).collect::<Vec<_>>();
+/// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &['a', 'a', 'a'], &['a', 'a', 'b'], &['a', 'a', 'c'], &['a', 'a', 'd'],
 ///         &['a', 'b', 'a'], &['a', 'b', 'b'], &['a', 'b', 'c'], &['a', 'b', 'd'],
@@ -1059,11 +1066,15 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 ///
-/// let xss = exhaustive_fixed_length_vecs_from_single(2, 0..4).collect::<Vec<_>>();
+/// let xss = exhaustive_fixed_length_vecs_from_single(2, 0..4).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0],
 ///         &[2, 1], &[3, 0], &[3, 1], &[2, 2], &[2, 3], &[3, 2], &[3, 3]
@@ -1155,14 +1166,18 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_from_length_iterator;
 ///
 /// let xss = shortlex_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
-///     .collect::<Vec<_>>();
+///     .collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[false, false][..], &[false, true], &[true, false], &[true, true], &[false], &[true],
 ///         &[false, false], &[false, true], &[true, false], &[true, true]
@@ -1170,9 +1185,9 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// );
 ///
 /// let xss = shortlex_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
-///     .collect::<Vec<_>>();
+///     .collect_vec();
 /// // Stops after first empty ys
-/// assert_eq!(xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(), &[&[], &[]]);
+/// assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), &[&[], &[]]);
 /// ```
 #[inline]
 pub fn shortlex_vecs_from_length_iterator<
@@ -1208,12 +1223,16 @@ pub fn shortlex_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs;
 ///
-/// let bss = shortlex_vecs(exhaustive_bools()).take(20).collect::<Vec<_>>();
+/// let bss = shortlex_vecs(exhaustive_bools()).take(20).collect_vec();
 /// assert_eq!(
-///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[][..], &[false], &[true], &[false, false], &[false, true], &[true, false],
 ///         &[true, true], &[false, false, false], &[false, false, true], &[false, true, false],
@@ -1258,12 +1277,16 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
 ///
-/// let bss = shortlex_vecs_min_length(2, exhaustive_bools()).take(20).collect::<Vec<_>>();
+/// let bss = shortlex_vecs_min_length(2, exhaustive_bools()).take(20).collect_vec();
 /// assert_eq!(
-///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[false, false][..], &[false, true], &[true, false], &[true, true],
 ///         &[false, false, false], &[false, false, true], &[false, true, false],
@@ -1319,12 +1342,16 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_range;
 ///
-/// let bss = shortlex_vecs_length_range(2, 4, exhaustive_bools()).collect::<Vec<_>>();
+/// let bss = shortlex_vecs_length_range(2, 4, exhaustive_bools()).collect_vec();
 /// assert_eq!(
-///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[false, false][..], &[false, true], &[true, false], &[true, true],
 ///         &[false, false, false], &[false, false, true], &[false, true, false],
@@ -1376,12 +1403,16 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_length_inclusive_range;
 ///
-/// let bss = shortlex_vecs_length_inclusive_range(2, 3, exhaustive_bools()).collect::<Vec<_>>();
+/// let bss = shortlex_vecs_length_inclusive_range(2, 3, exhaustive_bools()).collect_vec();
 /// assert_eq!(
-///     bss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[false, false][..], &[false, true], &[true, false], &[true, true],
 ///         &[false, false, false], &[false, false, true], &[false, true, false],
@@ -1493,14 +1524,18 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::nevers::nevers;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_from_length_iterator;
 ///
 /// let xss = exhaustive_vecs_from_length_iterator([2, 1, 2].iter().cloned(), exhaustive_bools())
-///     .collect::<Vec<_>>();
+///     .collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[false, false][..], &[false], &[false, true], &[false, false], &[true, false], &[true],
 ///         &[true, true], &[false, true], &[true, false], &[true, true]
@@ -1508,9 +1543,9 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// );
 ///
 /// let xss = exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
-///     .collect::<Vec<_>>();
+///     .collect_vec();
 /// // Stops at some point after first empty ys
-/// assert_eq!(xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(), &[&[], &[]]);
+/// assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), &[&[], &[]]);
 /// ```
 #[inline]
 pub fn exhaustive_vecs_from_length_iterator<
@@ -1540,12 +1575,16 @@ pub fn exhaustive_vecs_from_length_iterator<
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs;
 ///
-/// let xss = exhaustive_vecs(exhaustive_unsigneds::<u32>()).take(20).collect::<Vec<_>>();
+/// let xss = exhaustive_vecs(exhaustive_unsigneds::<u32>()).take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[][..], &[0], &[1], &[0, 0, 0], &[2], &[0, 0], &[3], &[0, 0, 0, 0], &[4], &[0, 1],
 ///         &[5], &[0, 0, 1], &[6], &[1, 0], &[7], &[0, 0, 0, 0, 0], &[8], &[1, 1], &[9], &[0, 1, 0]
@@ -1579,13 +1618,17 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
 ///
 /// let xss = exhaustive_vecs_min_length(2, exhaustive_unsigneds::<u32>())
-///         .take(20).collect::<Vec<_>>();
+///         .take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1],
 ///         &[0, 0, 0, 0, 0], &[0, 2], &[0, 1, 0], &[0, 3], &[0, 0, 0, 1], &[1, 2], &[0, 1, 1],
@@ -1633,13 +1676,17 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
 ///
 /// let xss = exhaustive_vecs_length_range(2, 4, exhaustive_unsigneds::<u32>())
-///         .take(20).collect::<Vec<_>>();
+///         .take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 0, 1], &[0, 2], &[0, 1, 0],
 ///         &[0, 3], &[0, 1, 1], &[1, 2], &[1, 3], &[2, 0], &[1, 0, 0], &[2, 1], &[3, 0], &[3, 1],
@@ -1684,13 +1731,17 @@ where
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
 ///
 /// let xss = exhaustive_vecs_length_inclusive_range(2, 4, exhaustive_unsigneds::<u32>())
-///         .take(20).collect::<Vec<_>>();
+///         .take(20).collect_vec();
 /// assert_eq!(
-///     xss.iter().map(Vec::as_slice).collect::<Vec<_>>().as_slice(),
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
 ///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1], &[0, 2],
 ///         &[0, 3], &[0, 1, 0], &[1, 2], &[0, 0, 0, 1], &[1, 3], &[0, 1, 1], &[2, 0], &[1, 0, 0],

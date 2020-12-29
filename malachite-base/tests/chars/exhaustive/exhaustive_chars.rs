@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::exhaustive::exhaustive_chars;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -16,7 +17,7 @@ fn test_exhaustive_chars() {
     );
     let mut chars = exhaustive_chars()
         .skip(usize::exact_from(NUMBER_OF_CHARS) - 200)
-        .collect::<Vec<_>>();
+        .collect_vec();
     chars.reverse();
     assert_eq!(
         chars.iter().collect::<String>(),

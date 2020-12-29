@@ -1,3 +1,31 @@
+/// This module provides a double-ended iterator for iterating over a number's digits, if the base
+/// is a power of two.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # power_of_two_digits
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::conversion::digits::power_of_two_digit_iterable::*;
+/// use malachite_base::num::conversion::traits::PowerOfTwoDigitIterable;
+///
+/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
+/// assert!(digits.next().is_none());
+///
+/// // 107 = 1101011b
+/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
+/// assert_eq!(digits.collect_vec(), vec![3, 2, 2, 1]);
+///
+/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
+/// assert!(digits.next_back().is_none());
+///
+/// // 107 = 1101011b
+/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
+/// assert_eq!(digits.rev().collect_vec(), vec![1, 2, 2, 3]);
+/// ```
 pub mod power_of_two_digit_iterable;
 /// This module provides traits for extracting digits from numbers and constructing numbers from
 /// digits, where the base is a power of two.

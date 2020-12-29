@@ -36,7 +36,6 @@
 extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
-extern crate rand;
 #[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;

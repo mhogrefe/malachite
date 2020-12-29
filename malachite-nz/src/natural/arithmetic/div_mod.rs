@@ -292,6 +292,207 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
     }
 }
 
+/// Let `ns` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This function performs
+/// the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs of the quotient to
+/// `out` and returning the remainder.
+///
+/// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
+/// `limbs_invert_limb(d << shift)`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ns.len()` + `fraction_len`
+///
+/// # Panics
+/// Panics if `out` is shorter than `ns.len()` + `fraction_len`, if `ns` is empty, or if `d` is
+/// zero.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::logic::traits::LeadingZeros;
+/// use malachite_nz::natural::arithmetic::div_mod::{limbs_div_mod_extra, limbs_invert_limb};
+///
+/// let mut out = vec![10; 4];
+/// let ns = &[123, 456];
+/// let d = 7;
+/// let shift = LeadingZeros::leading_zeros(d);
+/// let d_inv = limbs_invert_limb(d << shift);
+/// assert_eq!(limbs_div_mod_extra(&mut out, 1, ns, d, d_inv, shift), 4);
+/// assert_eq!(out, &[613566756, 613566774, 65, 10]);
+/// ```
+///
+/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.1.2, where qp != ap.
+pub fn limbs_div_mod_extra(
+    out: &mut [Limb],
+    fraction_len: usize,
+    mut ns: &[Limb],
+    d: Limb,
+    d_inv: Limb,
+    shift: u64,
+) -> Limb {
+    assert!(!ns.is_empty());
+    assert_ne!(d, 0);
+    let (ns_last, ns_init) = ns.split_last().unwrap();
+    let ns_last = *ns_last;
+    let d_norm = d << shift;
+    let (fraction_out, integer_out) = out.split_at_mut(fraction_len);
+    let mut integer_out = &mut integer_out[..ns.len()];
+    let mut r;
+    if shift == 0 {
+        r = ns_last;
+        let q_high = r >= d_norm;
+        if r >= d_norm {
+            r -= d_norm;
+        }
+        let (integer_out_last, integer_out_init) = integer_out.split_last_mut().unwrap();
+        *integer_out_last = Limb::iverson(q_high);
+        for (q, &n) in integer_out_init.iter_mut().zip(ns_init.iter()).rev() {
+            let (new_q, new_r) = _div_mod_by_preinversion(r, n, d_norm, d_inv);
+            *q = new_q;
+            r = new_r;
+        }
+    } else {
+        r = 0;
+        if ns_last < d {
+            r = ns_last << shift;
+            let (integer_out_last, integer_out_init) = integer_out.split_last_mut().unwrap();
+            *integer_out_last = 0;
+            integer_out = integer_out_init;
+            ns = ns_init;
+        }
+        if !ns.is_empty() {
+            let co_shift = Limb::WIDTH - shift;
+            let (ns_last, ns_init) = ns.split_last().unwrap();
+            let mut previous_n = *ns_last;
+            r |= previous_n >> co_shift;
+            let (integer_out_head, integer_out_tail) = integer_out.split_first_mut().unwrap();
+            for (q, &n) in integer_out_tail.iter_mut().zip(ns_init.iter()).rev() {
+                assert!(r < d_norm);
+                let (new_q, new_r) = _div_mod_by_preinversion(
+                    r,
+                    (previous_n << shift) | (n >> co_shift),
+                    d_norm,
+                    d_inv,
+                );
+                *q = new_q;
+                r = new_r;
+                previous_n = n;
+            }
+            let (new_q, new_r) = _div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
+            *integer_out_head = new_q;
+            r = new_r;
+        }
+    }
+    for q in fraction_out.iter_mut().rev() {
+        let (new_q, new_r) = _div_mod_by_preinversion(r, 0, d_norm, d_inv);
+        *q = new_q;
+        r = new_r;
+    }
+    r >> shift
+}
+
+/// Let `&ns[fraction_len..]` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This
+/// function performs the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs
+/// of the quotient to `ns` and returning the remainder.
+///
+/// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
+/// `limbs_invert_limb(d << shift)`.
+///
+/// Time: worst case O(n)
+///
+/// Additional memory: worst case O(1)
+///
+/// where n = `ns.len()` + `fraction_len`
+///
+/// # Panics
+/// Panics if `ns` is empty, if `ns.len()` is less than `fraction_len`, or if `d` is zero.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::logic::traits::LeadingZeros;
+/// use malachite_nz::natural::arithmetic::div_mod::{
+///     limbs_div_mod_extra_in_place,
+///     limbs_invert_limb
+/// };
+///
+/// let ns = &mut [10, 123, 456];
+/// let d = 7;
+/// let shift = LeadingZeros::leading_zeros(d);
+/// let d_inv = limbs_invert_limb(d << shift);
+/// assert_eq!(limbs_div_mod_extra_in_place(ns, 1, d, d_inv, shift), 4);
+/// assert_eq!(ns, &[613566756, 613566774, 65]);
+/// ```
+///
+/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.1.2, where qp == ap.
+pub fn limbs_div_mod_extra_in_place(
+    ns: &mut [Limb],
+    fraction_len: usize,
+    d: Limb,
+    d_inv: Limb,
+    shift: u64,
+) -> Limb {
+    assert_ne!(d, 0);
+    let (fraction_ns, mut integer_ns) = ns.split_at_mut(fraction_len);
+    let ns_last = *integer_ns.last().unwrap();
+    let d_norm = d << shift;
+    let mut r;
+    if shift == 0 {
+        r = ns_last;
+        let q_high = r >= d_norm;
+        if r >= d_norm {
+            r -= d_norm;
+        }
+        let (integer_ns_last, integer_ns_init) = integer_ns.split_last_mut().unwrap();
+        *integer_ns_last = Limb::iverson(q_high);
+        for q in integer_ns_init.iter_mut().rev() {
+            let (new_q, new_r) = _div_mod_by_preinversion(r, *q, d_norm, d_inv);
+            *q = new_q;
+            r = new_r;
+        }
+    } else {
+        r = 0;
+        if ns_last < d {
+            r = ns_last << shift;
+            let (integer_ns_last, integer_ns_init) = integer_ns.split_last_mut().unwrap();
+            *integer_ns_last = 0;
+            integer_ns = integer_ns_init;
+        }
+        if !integer_ns.is_empty() {
+            let co_shift = Limb::WIDTH - shift;
+            let mut previous_n = *integer_ns.last().unwrap();
+            r |= previous_n >> co_shift;
+            for i in (1..integer_ns.len()).rev() {
+                assert!(r < d_norm);
+                let n = integer_ns[i - 1];
+                let (new_q, new_r) = _div_mod_by_preinversion(
+                    r,
+                    (previous_n << shift) | (n >> co_shift),
+                    d_norm,
+                    d_inv,
+                );
+                integer_ns[i] = new_q;
+                r = new_r;
+                previous_n = n;
+            }
+            let (new_q, new_r) = _div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
+            integer_ns[0] = new_q;
+            r = new_r;
+        }
+    }
+    for q in fraction_ns.iter_mut().rev() {
+        let (new_q, new_r) = _div_mod_by_preinversion(r, 0, d_norm, d_inv);
+        *q = new_q;
+        r = new_r;
+    }
+    r >> shift
+}
+
 /// Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
 /// highest bit of `hi` is set.
 ///

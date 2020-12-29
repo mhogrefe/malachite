@@ -310,10 +310,12 @@ pub mod num {
         pub mod ruler_sequence;
     }
     pub mod logic {
-        pub mod bit_access_old;
         pub mod bit_access {
+            pub mod assign_bit;
+            pub mod clear_bit;
             pub mod flip_bit;
             pub mod get_bit;
+            pub mod set_bit;
         }
         pub mod bit_block_access;
         pub mod bit_convertible {
@@ -362,7 +364,14 @@ pub mod num {
         pub mod random_unsigned_range;
         pub mod random_unsigneds_less_than;
         pub mod striped {
+            pub mod get_striped_bool_vec;
+            pub mod get_striped_unsigned_vec;
             pub mod striped_bit_source;
+            pub mod striped_random_bool_vecs;
+            pub mod striped_random_bool_vecs_from_length_iterator;
+            pub mod striped_random_bool_vecs_length_inclusive_range;
+            pub mod striped_random_bool_vecs_length_range;
+            pub mod striped_random_bool_vecs_min_length;
             pub mod striped_random_natural_signeds;
             pub mod striped_random_negative_signeds;
             pub mod striped_random_nonzero_signeds;
@@ -370,6 +379,11 @@ pub mod num {
             pub mod striped_random_positive_unsigneds;
             pub mod striped_random_signeds;
             pub mod striped_random_unsigned_bit_chunks;
+            pub mod striped_random_unsigned_vecs;
+            pub mod striped_random_unsigned_vecs_from_length_iterator;
+            pub mod striped_random_unsigned_vecs_length_inclusive_range;
+            pub mod striped_random_unsigned_vecs_length_range;
+            pub mod striped_random_unsigned_vecs_min_length;
             pub mod striped_random_unsigneds;
         }
     }
@@ -471,6 +485,9 @@ pub mod unions {
     }
     pub mod from_str;
     pub mod ord;
+    pub mod random {
+        pub mod random_unions;
+    }
     pub mod unwrap;
 }
 pub mod vecs {

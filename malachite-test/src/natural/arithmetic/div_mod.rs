@@ -13,8 +13,9 @@ use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
     _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_limb_in_place_mod,
     limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb,
-    limbs_div_mod_to_out, limbs_invert_limb, limbs_two_limb_inverse_helper,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_extra, limbs_div_mod_extra_in_place,
+    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
@@ -32,9 +33,10 @@ use malachite_test::inputs::base::{
     pairs_of_limb_vec_var_9, pairs_of_unsigned_vec_and_positive_unsigned_var_1,
     pairs_of_unsigneds_var_2, quadruples_of_limb_vec_var_1, quadruples_of_limb_vec_var_2,
     quadruples_of_limb_vec_var_3, quadruples_of_three_limb_vecs_and_limb_var_1,
-    quadruples_of_three_limb_vecs_and_limb_var_2, sextuples_of_four_limb_vecs_and_two_usizes_var_1,
-    sextuples_of_limbs_var_1, triples_of_limb_vec_var_38, triples_of_limb_vec_var_39,
-    triples_of_limb_vec_var_40, triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
+    quadruples_of_three_limb_vecs_and_limb_var_2, quintuples_var_1,
+    sextuples_of_four_limb_vecs_and_two_usizes_var_1, sextuples_of_limbs_var_1, sextuples_var_1,
+    triples_of_limb_vec_var_38, triples_of_limb_vec_var_39, triples_of_limb_vec_var_40,
+    triples_of_unsigned_vec_unsigned_vec_and_positive_unsigned_var_1,
     triples_of_unsigned_vec_var_37, unsigneds_var_1,
 };
 use malachite_test::inputs::natural::{
@@ -49,6 +51,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_div_limb_mod);
     register_demo!(registry, demo_limbs_div_limb_to_out_mod);
     register_demo!(registry, demo_limbs_div_limb_in_place_mod);
+    register_demo!(registry, demo_limbs_div_mod_extra);
+    register_demo!(registry, demo_limbs_div_mod_extra_in_place);
     register_demo!(registry, demo_limbs_two_limb_inverse_helper);
     register_demo!(registry, demo_limbs_div_mod_three_limb_by_two_limb);
     register_demo!(registry, demo_limbs_div_mod_by_two_limb_normalized);
@@ -90,6 +94,8 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
         Small,
         benchmark_limbs_div_limb_in_place_mod_algorithms
     );
+    register_bench!(registry, Small, benchmark_limbs_div_mod_extra);
+    register_bench!(registry, Small, benchmark_limbs_div_mod_extra_in_place);
     register_bench!(
         registry,
         Small,
@@ -219,6 +225,30 @@ fn demo_limbs_div_limb_in_place_mod(gm: GenerationMode, limit: usize) {
         println!(
             "limbs := {:?}; limbs_div_limb_in_place_mod(&mut limbs, {}) = {}; limbs = {:?}",
             limbs_old, limb, remainder, limbs
+        );
+    }
+}
+
+fn demo_limbs_div_mod_extra(gm: GenerationMode, limit: usize) {
+    for (out, fraction_len, ns, d, d_inv, shift) in sextuples_var_1(gm).take(limit) {
+        let out_old = out;
+        let mut out = out_old.to_vec();
+        let remainder = limbs_div_mod_extra(&mut out, fraction_len, &ns, d, d_inv, shift);
+        println!(
+            "out := {:?}; limbs_div_mod_extra(&mut out, {}, {:?}, {}, {}, {}) = {}; out = {:?}",
+            out_old, fraction_len, ns, d, d_inv, shift, remainder, out
+        );
+    }
+}
+
+fn demo_limbs_div_mod_extra_in_place(gm: GenerationMode, limit: usize) {
+    for (ns, fraction_len, d, d_inv, shift) in quintuples_var_1(gm).take(limit) {
+        let ns_old = ns;
+        let mut ns = ns_old.to_vec();
+        let remainder = limbs_div_mod_extra_in_place(&mut ns, fraction_len, d, d_inv, shift);
+        println!(
+            "ns := {:?}; limbs_div_mod_extra_in_place(&mut ns, {}, {}, {}, {}) = {}; ns = {:?}",
+            ns_old, fraction_len, d, d_inv, shift, remainder, ns
         );
     }
 }
@@ -647,6 +677,57 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
                 }),
             ),
         ],
+    );
+}
+
+fn benchmark_limbs_div_mod_extra(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark_old(
+        "limbs_div_mod_extra(&mut [Limb], usize, &[Limb], Limb, Limb, u64)",
+        BenchmarkType::Single,
+        sextuples_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(_, fraction_len, ref ns, _, _, _)| ns.len() + fraction_len),
+        "ns.len() + fraction_len",
+        &mut [(
+            "Malachite",
+            &mut (|(mut out, fraction_len, ns, d, d_inv, shift)| {
+                no_out!(limbs_div_mod_extra(
+                    &mut out,
+                    fraction_len,
+                    &ns,
+                    d,
+                    d_inv,
+                    shift
+                ))
+            }),
+        )],
+    );
+}
+
+fn benchmark_limbs_div_mod_extra_in_place(gm: GenerationMode, limit: usize, file_name: &str) {
+    run_benchmark_old(
+        "limbs_div_mod_extra(&mut [Limb], usize, Limb, Limb, u64)",
+        BenchmarkType::Single,
+        quintuples_var_1(gm),
+        gm.name(),
+        limit,
+        file_name,
+        &(|&(ref ns, _, _, _, _)| ns.len()),
+        "ns.len()",
+        &mut [(
+            "Malachite",
+            &mut (|(mut ns, fraction_len, d, d_inv, shift)| {
+                no_out!(limbs_div_mod_extra_in_place(
+                    &mut ns,
+                    fraction_len,
+                    d,
+                    d_inv,
+                    shift
+                ))
+            }),
+        )],
     );
 }
 
