@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::natural::Natural;
@@ -14,7 +15,7 @@ fn to_bits_asc_properties() {
         let bits = x.to_bits_asc();
         assert_eq!(to_bits_asc_naive(x), bits);
         assert_eq!(to_bits_asc_alt(x), bits);
-        assert_eq!(x.bits().collect::<Vec<bool>>(), bits);
+        assert_eq!(x.bits().collect_vec(), bits);
         assert_eq!(Natural::from_bits_asc(bits.iter().cloned()), *x);
         if *x != 0 {
             assert_eq!(*bits.last().unwrap(), true);
@@ -32,7 +33,7 @@ fn to_bits_desc_properties() {
         let bits = x.to_bits_desc();
         assert_eq!(to_bits_desc_naive(x), bits);
         assert_eq!(to_bits_desc_alt(x), bits);
-        assert_eq!(x.bits().rev().collect::<Vec<bool>>(), bits);
+        assert_eq!(x.bits().rev().collect_vec(), bits);
         assert_eq!(Natural::from_bits_desc(bits.iter().cloned()), *x);
         if *x != 0 {
             assert_eq!(bits[0], true);

@@ -17,6 +17,7 @@ path = "src/bin.rs"
 fail_on_untested_path = ["malachite-nz/fail_on_untested_path"]
 
 [dependencies]
+itertools = "0.9.0"
 malachite-base = { path = "../malachite-base" }
 malachite-base-test-util = { path = "../malachite-base-test-util" }
 malachite-nz = { path = "../malachite-nz", default-features = false }

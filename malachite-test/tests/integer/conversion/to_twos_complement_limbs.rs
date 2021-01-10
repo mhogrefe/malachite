@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::Sign;
@@ -79,11 +80,11 @@ fn to_twos_complement_limbs_asc_properties() {
     test_properties(integers, |x| {
         let limbs = x.to_twos_complement_limbs_asc();
         assert_eq!(x.clone().into_twos_complement_limbs_asc(), limbs);
-        assert_eq!(x.twos_complement_limbs().collect::<Vec<Limb>>(), limbs);
+        assert_eq!(x.twos_complement_limbs().collect_vec(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_asc(&limbs), *x);
         assert_eq!(
             x.to_twos_complement_limbs_desc(),
-            limbs.iter().cloned().rev().collect::<Vec<Limb>>()
+            limbs.iter().cloned().rev().collect_vec()
         );
         match x.sign() {
             Ordering::Equal => assert!(limbs.is_empty()),
@@ -110,14 +111,11 @@ fn limbs_desc_properties() {
     test_properties(integers, |x| {
         let limbs = x.to_twos_complement_limbs_desc();
         assert_eq!(x.clone().into_twos_complement_limbs_desc(), limbs);
-        assert_eq!(
-            x.twos_complement_limbs().rev().collect::<Vec<Limb>>(),
-            limbs
-        );
+        assert_eq!(x.twos_complement_limbs().rev().collect_vec(), limbs);
         assert_eq!(Integer::from_twos_complement_limbs_desc(&limbs), *x);
         assert_eq!(
             x.to_twos_complement_limbs_asc(),
-            limbs.iter().cloned().rev().collect::<Vec<Limb>>()
+            limbs.iter().cloned().rev().collect_vec()
         );
         match x.sign() {
             Ordering::Equal => assert!(limbs.is_empty()),

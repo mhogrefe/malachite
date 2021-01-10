@@ -346,27 +346,29 @@ impl<'a> BitIterable for &'a Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate itertools;
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
+    /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::logic::traits::BitIterable;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO.bits().next(), None);
     /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(Integer::from(105).bits().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(105).bits().collect_vec(),
     ///     vec![true, false, false, true, false, true, true, false]);
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(Integer::from(-105).bits().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(-105).bits().collect_vec(),
     ///     vec![true, true, true, false, true, false, false, true]);
     ///
     /// assert_eq!(Integer::ZERO.bits().next_back(), None);
     /// // 105 = 01101001b, with a leading false bit to indicate sign
-    /// assert_eq!(Integer::from(105).bits().rev().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(105).bits().rev().collect_vec(),
     ///     vec![false, true, true, false, true, false, false, true]);
     /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-    /// assert_eq!(Integer::from(-105).bits().rev().collect::<Vec<bool>>(),
+    /// assert_eq!(Integer::from(-105).bits().rev().collect_vec(),
     ///     vec![true, false, false, true, false, true, true, true]);
     /// ```
     fn bits(self) -> IntegerBitIterator<'a> {

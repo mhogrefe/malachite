@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -38,7 +39,7 @@ fn to_power_of_two_digits_asc_properties_helper<
                 assert_ne!(*digits.last().unwrap(), T::ZERO);
             }
             assert_eq!(
-                digits.iter().cloned().rev().collect::<Vec<T>>(),
+                digits.iter().cloned().rev().collect_vec(),
                 n.to_power_of_two_digits_desc(log_base)
             );
             assert_eq!(
@@ -54,11 +55,7 @@ fn to_power_of_two_digits_asc_properties_helper<
 
             assert_eq!(
                 PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(n, log_base),
-                digits
-                    .iter()
-                    .cloned()
-                    .map(Natural::from)
-                    .collect::<Vec<Natural>>()
+                digits.iter().cloned().map(Natural::from).collect_vec()
             );
         },
     );
@@ -68,7 +65,7 @@ fn to_power_of_two_digits_asc_properties_helper<
             n.to_power_of_two_digits_asc(1)
                 .into_iter()
                 .map(|digit: T| digit == T::ONE)
-                .collect::<Vec<bool>>(),
+                .collect_vec(),
             n.to_bits_asc()
         );
     });
@@ -137,7 +134,7 @@ where
                 assert_ne!(digits[0], T::ZERO);
             }
             assert_eq!(
-                digits.iter().cloned().rev().collect::<Vec<T>>(),
+                digits.iter().cloned().rev().collect_vec(),
                 n.to_power_of_two_digits_asc(log_base)
             );
             assert_eq!(
@@ -153,11 +150,7 @@ where
 
             assert_eq!(
                 PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(n, log_base),
-                digits
-                    .iter()
-                    .cloned()
-                    .map(Natural::from)
-                    .collect::<Vec<Natural>>()
+                digits.iter().cloned().map(Natural::from).collect_vec()
             );
         },
     );
@@ -167,7 +160,7 @@ where
             n.to_power_of_two_digits_desc(1)
                 .into_iter()
                 .map(|digit: T| digit == T::ONE)
-                .collect::<Vec<bool>>(),
+                .collect_vec(),
             n.to_bits_desc()
         );
     });
@@ -212,7 +205,7 @@ fn to_power_of_two_digits_asc_natural_properties() {
     test_properties(
         pairs_of_natural_and_small_unsigned_var_3,
         |&(ref n, log_base)| {
-            let digits = n.to_power_of_two_digits_asc(log_base);
+            let digits: Vec<Natural> = n.to_power_of_two_digits_asc(log_base);
             assert_eq!(
                 n._to_power_of_two_digits_asc_natural_naive(log_base),
                 digits
@@ -225,7 +218,7 @@ fn to_power_of_two_digits_asc_natural_properties() {
                 assert_ne!(*digits.last().unwrap(), 0);
             }
             assert_eq!(
-                digits.iter().cloned().rev().collect::<Vec<Natural>>(),
+                digits.iter().cloned().rev().collect_vec(),
                 PowerOfTwoDigits::<Natural>::to_power_of_two_digits_desc(n, log_base)
             );
             assert_eq!(
@@ -246,7 +239,7 @@ fn to_power_of_two_digits_asc_natural_properties() {
             n.to_power_of_two_digits_asc(1)
                 .into_iter()
                 .map(|digit: Natural| digit == 1)
-                .collect::<Vec<bool>>(),
+                .collect_vec(),
             n.to_bits_asc()
         );
     });
@@ -264,7 +257,7 @@ fn to_power_of_two_digits_desc_natural_properties() {
     test_properties(
         pairs_of_natural_and_small_unsigned_var_3,
         |&(ref n, log_base)| {
-            let digits = n.to_power_of_two_digits_desc(log_base);
+            let digits: Vec<Natural> = n.to_power_of_two_digits_desc(log_base);
             assert_eq!(
                 Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
                 *n
@@ -273,7 +266,7 @@ fn to_power_of_two_digits_desc_natural_properties() {
                 assert_ne!(digits[0], 0);
             }
             assert_eq!(
-                digits.iter().cloned().rev().collect::<Vec<Natural>>(),
+                digits.iter().cloned().rev().collect_vec(),
                 PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(n, log_base)
             );
             assert_eq!(
@@ -294,7 +287,7 @@ fn to_power_of_two_digits_desc_natural_properties() {
             n.to_power_of_two_digits_desc(1)
                 .into_iter()
                 .map(|digit: Natural| digit == 1)
-                .collect::<Vec<bool>>(),
+                .collect_vec(),
             n.to_bits_desc()
         );
     });

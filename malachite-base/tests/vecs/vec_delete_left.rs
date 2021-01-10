@@ -1,4 +1,9 @@
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::vecs::vec_delete_left;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_vec_gen, unsigned_vec_unsigned_pair_gen_var_1,
+};
 
 #[test]
 fn test_vec_delete_left() {
@@ -25,4 +30,34 @@ fn vec_delete_left_fail_1() {
 fn vec_delete_left_fail_2() {
     let mut xs: Vec<u32> = vec![1, 2, 3];
     vec_delete_left(&mut xs, 4);
+}
+
+#[test]
+fn vec_delete_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_length_d", 1);
+    config.insert("mean_stripe_n", 16 << u8::LOG_WIDTH);
+    config.insert("mean_stripe_d", 1);
+    unsigned_vec_unsigned_pair_gen_var_1::<u8>().test_properties_with_config(
+        &config,
+        |(mut xs, amount)| {
+            let old_xs = xs.clone();
+            vec_delete_left(&mut xs, amount);
+            assert_eq!(xs == old_xs, amount == 0);
+            assert_eq!(xs.is_empty(), amount == old_xs.len());
+            assert_eq!(xs.len(), old_xs.len() - amount);
+            assert_eq!(&old_xs[amount..], xs);
+        },
+    );
+
+    unsigned_vec_gen::<u8>().test_properties_with_config(&config, |mut xs| {
+        let old_xs = xs.clone();
+        vec_delete_left(&mut xs, old_xs.len());
+        assert!(xs.is_empty());
+
+        let mut xs = old_xs.clone();
+        vec_delete_left(&mut xs, 0);
+        assert_eq!(xs, old_xs);
+    });
 }

@@ -35,6 +35,7 @@
     clippy::unused_self
 )]
 
+extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 #[macro_use]
@@ -212,8 +213,8 @@ pub mod natural {
         pub mod clone;
         pub mod digits {
             pub mod from_power_of_two_digits;
-            pub mod general_digits;
             pub mod power_of_two_digits;
+            pub mod to_digits;
             pub mod to_power_of_two_digits;
         }
         pub mod floating_point_from_natural;
@@ -254,5 +255,15 @@ pub mod natural {
         pub mod to_bits;
         pub mod trailing_zeros;
         pub mod xor;
+    }
+    pub mod random {
+        pub mod get_random_natural_with_bits;
+        pub mod get_random_natural_with_up_to_bits;
+        pub mod get_striped_random_natural_with_bits;
+        pub mod get_striped_random_natural_with_up_to_bits;
+        pub mod random_naturals;
+        pub mod random_positive_naturals;
+        pub mod striped_random_naturals;
+        pub mod striped_random_positive_naturals;
     }
 }

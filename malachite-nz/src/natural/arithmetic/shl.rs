@@ -29,7 +29,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1968, 7296]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where the result is returned.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
 pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
@@ -77,7 +77,7 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(out, &[2147483648, 61, 0]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
 pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -114,7 +114,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// assert_eq!(xs, &[2147483648, 61]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up.
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
 pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -153,7 +153,7 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 /// assert_eq!(xs, &[2147483648, 61, 228]);
 /// ```
 ///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.1.2, where rp == up and the carry is
+/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
 /// appended to rp.
 pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
@@ -197,7 +197,7 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// assert_eq!(out, &[2147483647, 4294967234, 0]);
 /// ```
 ///
-/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.1.2.
+/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
 pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);

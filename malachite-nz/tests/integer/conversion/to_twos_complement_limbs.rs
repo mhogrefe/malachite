@@ -1,4 +1,6 @@
 #[cfg(feature = "32_bit_limbs")]
+use itertools::Itertools;
+#[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -108,7 +110,7 @@ fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_fail() {
 fn test_twos_complement_limbs_asc() {
     let test = |n, out| {
         let n = Integer::from_str(n).unwrap();
-        assert_eq!(n.twos_complement_limbs().collect::<Vec<Limb>>(), out);
+        assert_eq!(n.twos_complement_limbs().collect_vec(), out);
         assert_eq!(n.to_twos_complement_limbs_asc(), out);
         assert_eq!(n.into_twos_complement_limbs_asc(), out);
     };

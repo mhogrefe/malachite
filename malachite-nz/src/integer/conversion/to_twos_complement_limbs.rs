@@ -626,43 +626,41 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// extern crate itertools;
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
+    /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert!(Integer::ZERO.twos_complement_limbs().next().is_none());
-    /// assert_eq!(Integer::from(123).twos_complement_limbs().collect::<Vec<u32>>(), &[123]);
-    /// assert_eq!(Integer::from(-123).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///     &[4294967173]);
+    /// assert_eq!(Integer::from(123).twos_complement_limbs().collect_vec(), &[123]);
+    /// assert_eq!(Integer::from(-123).twos_complement_limbs().collect_vec(), &[4294967173]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::trillion().twos_complement_limbs().collect::<Vec<u32>>(),
-    ///     &[3567587328, 232]);
+    /// assert_eq!(Integer::trillion().twos_complement_limbs().collect_vec(), &[3567587328, 232]);
     /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().collect::<Vec<u32>>(),
-    ///     &[u32::MAX, 0]);
-    /// assert_eq!((-Integer::trillion()).twos_complement_limbs().collect::<Vec<u32>>(),
+    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().collect_vec(), &[u32::MAX, 0]);
+    /// assert_eq!((-Integer::trillion()).twos_complement_limbs().collect_vec(),
     ///     &[727379968, 4294967063]);
     /// // Sign-extension for a negative `Integer`
-    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs()
-    ///     .collect::<Vec<u32>>(), &[1, u32::MAX]);
+    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs().collect_vec(),
+    ///     &[1, u32::MAX]);
     ///
     /// assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
-    /// assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect::<Vec<u32>>(), &[123]);
-    /// assert_eq!(Integer::from(-123).twos_complement_limbs().rev().collect::<Vec<u32>>(),
-    ///     &[4294967173]);
+    /// assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect_vec(), &[123]);
+    /// assert_eq!(Integer::from(-123).twos_complement_limbs().rev().collect_vec(), &[4294967173]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Integer::trillion().twos_complement_limbs().rev().collect::<Vec<u32>>(),
+    /// assert_eq!(Integer::trillion().twos_complement_limbs().rev().collect_vec(),
     ///     &[232, 3567587328]);
     /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().rev()
-    ///     .collect::<Vec<u32>>(), &[0, u32::MAX]);
-    /// assert_eq!((-Integer::trillion()).twos_complement_limbs().rev().collect::<Vec<u32>>(),
+    /// assert_eq!(Integer::from(u32::MAX).twos_complement_limbs().rev().collect_vec(),
+    ///     &[0, u32::MAX]);
+    /// assert_eq!((-Integer::trillion()).twos_complement_limbs().rev().collect_vec(),
     ///     &[4294967063, 727379968]);
     /// // Sign-extension for a negative `Integer`
-    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs().rev()
-    ///     .collect::<Vec<u32>>(), &[u32::MAX, 1]);
+    /// assert_eq!((-Integer::from(u32::MAX)).twos_complement_limbs().rev().collect_vec(),
+    ///     &[u32::MAX, 1]);
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
         if *self == 0 {

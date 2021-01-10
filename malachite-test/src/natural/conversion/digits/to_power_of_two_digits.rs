@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -226,7 +227,7 @@ fn benchmark_to_power_of_two_digits_asc_algorithms<
                 &mut (|(n, log_base)| {
                     no_out!(
                         PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
-                            .collect::<Vec<Natural>>()
+                            .collect_vec()
                     )
                 }),
             ),
@@ -269,7 +270,7 @@ fn benchmark_natural_to_power_of_two_digits_asc_natural_algorithms(
                     no_out!(
                         PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
                             .rev()
-                            .collect::<Vec<Natural>>()
+                            .collect_vec()
                     )
                 }),
             ),
@@ -346,15 +347,12 @@ macro_rules! demo_and_bench {
                         }),
                     ),
                     (
-                        &format!(
-                            "Natural.power_of_two_digits(u64).collect::<Vec<{}>>()",
-                            $t::NAME,
-                        ),
+                        "Natural.power_of_two_digits(u64).collect_vec()",
                         &mut (|(n, log_base)| {
                             no_out!(PowerOfTwoDigitIterable::<$t>::power_of_two_digits(
                                 &n, log_base
                             )
-                            .collect::<Vec<$t>>())
+                            .collect_vec())
                         }),
                     ),
                 ],
@@ -401,16 +399,13 @@ macro_rules! demo_and_bench {
                         }),
                     ),
                     (
-                        &format!(
-                            "Natural.power_of_two_digits(u64).rev().collect::<Vec<{}>>()",
-                            $t::NAME,
-                        ),
+                        "Natural.power_of_two_digits(u64).rev().collect_vec()",
                         &mut (|(n, log_base)| {
                             no_out!(PowerOfTwoDigitIterable::<$t>::power_of_two_digits(
                                 &n, log_base
                             )
                             .rev()
-                            .collect::<Vec<$t>>())
+                            .collect_vec())
                         }),
                     ),
                 ],

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::strings::ToDebugString;
 
@@ -7,7 +8,7 @@ use malachite_nz::integer::Integer;
 fn integer_increasing_range_to_infinity_helper(a: Integer, values: &str) {
     let xs = integer_increasing_range_to_infinity(a)
         .take(20)
-        .collect::<Vec<_>>()
+        .collect_vec()
         .to_debug_string();
     assert_eq!(xs, values);
 }

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
@@ -12,7 +13,7 @@ fn expected_range_len(a: &Natural, b: &Natural) -> usize {
 fn exhaustive_natural_inclusive_range_helper(a: Natural, b: Natural, values: &str) {
     let xs = exhaustive_natural_inclusive_range(a.clone(), b.clone())
         .take(20)
-        .collect::<Vec<_>>()
+        .collect_vec()
         .to_debug_string();
     assert_eq!(xs, values);
     let len = expected_range_len(&a, &b);
@@ -23,7 +24,7 @@ fn exhaustive_natural_inclusive_range_helper(a: Natural, b: Natural, values: &st
     let mut init = exhaustive_natural_inclusive_range(a, b)
         .rev()
         .skip(len.saturating_sub(20))
-        .collect::<Vec<_>>();
+        .collect_vec();
     init.reverse();
     assert_eq!(xs, init.to_debug_string());
 }

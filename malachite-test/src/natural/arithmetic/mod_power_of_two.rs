@@ -8,6 +8,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_two::{
     limbs_mod_power_of_two, limbs_neg_mod_power_of_two, limbs_neg_mod_power_of_two_in_place,
     limbs_slice_mod_power_of_two_in_place, limbs_vec_mod_power_of_two_in_place,
 };
+use malachite_nz::platform::Limb;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::pairs_of_unsigned_vec_and_small_unsigned;
@@ -81,7 +82,7 @@ fn demo_limbs_mod_power_of_two(gm: GenerationMode, limit: usize) {
 }
 
 fn demo_limbs_slice_mod_power_of_two_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned(gm).take(limit) {
+    for (limbs, pow) in pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm).take(limit) {
         let mut limbs = limbs.to_vec();
         let limbs_old = limbs.clone();
         limbs_slice_mod_power_of_two_in_place(&mut limbs, pow);
@@ -231,7 +232,7 @@ fn demo_natural_neg_mod_power_of_two_ref(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "limbs_mod_power_of_two(&[u32], u64)",
+        "limbs_mod_power_of_two(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -252,9 +253,9 @@ fn benchmark_limbs_slice_mod_power_of_two_in_place(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "limbs_slice_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
+        "limbs_slice_mod_power_of_two_in_place(&mut Vec<T>, u64)",
         BenchmarkType::Single,
-        pairs_of_unsigned_vec_and_small_unsigned(gm),
+        pairs_of_unsigned_vec_and_small_unsigned::<Limb, u64>(gm),
         gm.name(),
         limit,
         file_name,
@@ -273,7 +274,7 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "limbs_vec_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
+        "limbs_vec_mod_power_of_two_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -290,7 +291,7 @@ fn benchmark_limbs_vec_mod_power_of_two_in_place(
 
 fn benchmark_limbs_neg_mod_power_of_two(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "limbs_neg_mod_power_of_two(&[u32], u64)",
+        "limbs_neg_mod_power_of_two(&[Limb], u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),
@@ -311,7 +312,7 @@ fn benchmark_limbs_neg_mod_power_of_two_in_place(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "limbs_neg_mod_power_of_two_in_place(&mut Vec<u32>, u64)",
+        "limbs_neg_mod_power_of_two_in_place(&mut Vec<Limb>, u64)",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_and_small_unsigned(gm),
         gm.name(),

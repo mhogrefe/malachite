@@ -268,8 +268,9 @@ pub mod num {
     }
     pub mod conversion {
         pub mod digits {
+            pub mod from_power_of_two_digits;
             pub mod power_of_two_digit_iterable;
-            pub mod power_of_two_digits;
+            pub mod to_power_of_two_digits;
         }
         pub mod froms {
             pub mod checked_from_and_exact_from;
@@ -286,7 +287,9 @@ pub mod num {
             pub mod upper_half;
         }
         pub mod slice {
+            pub mod from_other_type_slice;
             pub mod vec_from_other_type;
+            pub mod vec_from_other_type_slice;
         }
     }
     pub mod exhaustive {
@@ -372,6 +375,8 @@ pub mod num {
             pub mod striped_random_bool_vecs_length_inclusive_range;
             pub mod striped_random_bool_vecs_length_range;
             pub mod striped_random_bool_vecs_min_length;
+            pub mod striped_random_fixed_length_bool_vecs;
+            pub mod striped_random_fixed_length_unsigned_vecs;
             pub mod striped_random_natural_signeds;
             pub mod striped_random_negative_signeds;
             pub mod striped_random_nonzero_signeds;

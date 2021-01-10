@@ -94,15 +94,6 @@ pub mod base {
             pub mod xxxx_add_yyyy_is_zzzz;
         }
 
-        pub mod conversion {
-            pub mod digits {
-                pub mod power_of_two_digit_iterable;
-                pub mod power_of_two_digits;
-            }
-            pub mod from_other_type_slice;
-            pub mod vec_from_other_type_slice;
-        }
-
         pub mod logic {
             pub mod bit_block_access;
             pub mod bit_convertible;
@@ -112,15 +103,6 @@ pub mod base {
             pub mod not_assign;
             pub mod rotate;
         }
-    }
-
-    pub mod slices {
-        pub mod slice_move_left;
-    }
-
-    pub mod vecs {
-        pub mod vec_delete_left;
-        pub mod vec_pad_left;
     }
 }
 
@@ -245,7 +227,6 @@ pub mod natural {
         pub mod mod_square;
         pub mod mod_sub;
         pub mod mul;
-        pub mod neg;
         pub mod next_power_of_two;
         pub mod parity;
         pub mod pow;
@@ -278,7 +259,6 @@ pub mod natural {
         pub mod digits {
             pub mod from_power_of_two_digits;
             pub mod power_of_two_digits;
-            pub mod to_digits;
             pub mod to_power_of_two_digits;
         }
         pub mod floating_point_from_natural;

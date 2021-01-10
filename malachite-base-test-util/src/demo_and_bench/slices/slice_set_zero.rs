@@ -27,6 +27,6 @@ fn benchmark_slice_set_zero(gm: GenMode, config: GenConfig, limit: usize, file_n
         limit,
         file_name,
         &vec_len_bucketer(),
-        &mut [("Malachite", &mut |mut xs| no_out!(slice_set_zero(&mut xs)))],
+        &mut [("Malachite", &mut |mut xs| slice_set_zero(&mut xs))],
     );
 }

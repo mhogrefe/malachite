@@ -30,7 +30,7 @@ fn test_limbs_slice_set_bit() {
 #[test]
 #[should_panic]
 fn limbs_slice_set_bit_fail() {
-    let mut mut_xs = vec![1, 2, 3];
+    let mut mut_xs = vec![1u32, 2, 3];
     limbs_slice_set_bit(&mut mut_xs, 100);
 }
 

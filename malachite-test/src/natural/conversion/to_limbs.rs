@@ -1,7 +1,7 @@
+use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::natural::{naturals, pairs_of_natural_and_small_unsigned};
@@ -51,17 +51,13 @@ fn demo_natural_into_limbs_desc(gm: GenerationMode, limit: usize) {
 
 fn demo_natural_limbs(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("limbs({}) = {:?}", n, n.limbs().collect::<Vec<Limb>>());
+        println!("limbs({}) = {:?}", n, n.limbs().collect_vec());
     }
 }
 
 fn demo_natural_limbs_rev(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!(
-            "limbs({}).rev() = {:?}",
-            n,
-            n.limbs().rev().collect::<Vec<Limb>>()
-        );
+        println!("limbs({}).rev() = {:?}", n, n.limbs().rev().collect_vec());
     }
 }
 
@@ -98,8 +94,8 @@ fn benchmark_natural_limbs_evaluation_strategy(gm: GenerationMode, limit: usize,
                 &mut (|n| no_out!(n.into_limbs_asc())),
             ),
             (
-                "Natural.limbs().collect::<Vec<Limb>>()",
-                &mut (|n| no_out!(n.limbs().collect::<Vec<Limb>>())),
+                "Natural.limbs().collect_vec()",
+                &mut (|n| no_out!(n.limbs().collect_vec())),
             ),
         ],
     );
@@ -130,8 +126,8 @@ fn benchmark_natural_limbs_rev_evaluation_strategy(
                 &mut (|n| no_out!(n.into_limbs_desc())),
             ),
             (
-                "Natural.limbs().rev().collect::<Vec<Limb>>()",
-                &mut (|n| no_out!(n.limbs().rev().collect::<Vec<Limb>>())),
+                "Natural.limbs().rev().collect_vec()",
+                &mut (|n| no_out!(n.limbs().rev().collect_vec())),
             ),
         ],
     );

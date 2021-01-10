@@ -220,3 +220,4 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
+pub mod random;

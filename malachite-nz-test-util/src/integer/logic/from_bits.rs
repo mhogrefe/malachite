@@ -1,10 +1,11 @@
+use itertools::Itertools;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
 
 pub fn from_bits_asc_naive<I: Iterator<Item = bool>>(bits: I) -> Integer {
-    let bits: Vec<_> = bits.collect();
+    let bits = bits.collect_vec();
     if bits.is_empty() {
         return Integer::ZERO;
     }
@@ -32,7 +33,7 @@ pub fn from_bits_asc_naive<I: Iterator<Item = bool>>(bits: I) -> Integer {
 }
 
 pub fn from_bits_desc_naive<I: Iterator<Item = bool>>(bits: I) -> Integer {
-    let bits: Vec<_> = bits.collect();
+    let bits = bits.collect_vec();
     if bits.is_empty() {
         return Integer::ZERO;
     }

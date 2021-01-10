@@ -11,14 +11,11 @@ use malachite_base_test_util::generators::unsigned_gen;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_unsigned_demos!(runner, demo_unsigned_vec_from_other_type);
-    register_unsigned_unsigned_benches!(runner, benchmark_unsigned_vec_from_other_type);
+    register_unsigned_unsigned_demos!(runner, demo_vec_from_other_type);
+    register_unsigned_unsigned_benches!(runner, benchmark_vec_from_other_type);
 }
 
-fn demo_unsigned_vec_from_other_type<
-    T: Debug + VecFromOtherType<U> + Named,
-    U: PrimitiveUnsigned,
->(
+fn demo_vec_from_other_type<T: Debug + VecFromOtherType<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -33,7 +30,7 @@ fn demo_unsigned_vec_from_other_type<
     }
 }
 
-fn benchmark_unsigned_vec_from_other_type<T: VecFromOtherType<U> + Named, U: PrimitiveUnsigned>(
+fn benchmark_vec_from_other_type<T: VecFromOtherType<U> + Named, U: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

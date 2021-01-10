@@ -1,38 +1,28 @@
-use malachite_base::num::arithmetic::traits::{ModPowerOfTwoAssign, Parity, Pow, ShrRound, Square};
+use malachite_base::num::arithmetic::traits::{
+    ModPowerOfTwo, Parity, Pow, PowerOfTwo, ShrRound, Square,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use std::cmp::Ordering;
 
-// Calculate r satisfying r*d == 1 mod 2^n.
-// This is mpz_invert_2exp from bootstrap.c, GMP 6.2.1.
-fn invert_mod_power_of_two(a: &Natural, n: u64) -> Natural {
-    assert!(a.odd());
-    let mut inv = Natural::ONE;
-    for i in 0..n {
-        let prod = &inv * a;
-        if prod.get_bit(i) {
-            inv.set_bit(i);
+/// Calculate r satisfying r*d == 1 mod 2^n.
+///
+/// This is mpz_invert_2exp from bootstrap.c, GMP 6.2.1.
+fn invert_mod_power_of_two(x: &Natural, pow: u64) -> Natural {
+    assert!(x.odd());
+    let mut inverse = Natural::ONE;
+    for i in 0..pow {
+        if (&inverse * x).get_bit(i) {
+            inverse.set_bit(i);
         }
     }
-    let mut prod = &inv * a;
-    prod.mod_power_of_two_assign(n);
-    assert_eq!(prod, 1);
-    inv
-}
-
-// This is ulog2 from gen-bases.c, GMP 6.2.1.
-fn ulog2(mut x: u64) -> u64 {
-    let mut i = 0;
-    while x != 0 {
-        x >>= 1;
-        i += 1;
-    }
-    i
+    assert_eq!((&inverse * x).mod_power_of_two(pow), 1);
+    inverse
 }
 
 //TODO use real sqrt
@@ -53,40 +43,27 @@ fn simple_sqrt(x: &Natural) -> Natural {
     }
 }
 
-const EXTRA: u64 = 16;
-
-// Compute log(2)/log(b) as a fixnum.
+// Compute log(2) / log(b) as a fixnum.
 //
 // This is mp_2logb from gen-bases.c, GMP 6.2.1.
-fn mp_2logb(bi: u64, prec: u64) -> Natural {
-    let mut t = Natural::ONE;
-    t <<= prec + EXTRA;
-    let mut two = Natural::TWO;
-    two <<= prec + EXTRA;
-    let mut r = Natural::ZERO;
-    let mut b = Natural::from(bi);
-    b <<= prec + EXTRA;
-    let mut i = prec - 1;
-    loop {
-        b <<= prec + EXTRA;
-        b = simple_sqrt(&b);
-        let mut t2 = &t * &b;
-        t2 >>= prec + EXTRA;
-        if t2 < two {
-            r.set_bit(i);
-            t = t2;
-        }
-        if i == 0 {
-            break;
-        } else {
-            i -= 1;
+fn get_log_base_of_2(base: u64, precision: u64) -> Natural {
+    let extended_precision = precision + 16;
+    let mut t = Natural::power_of_two(extended_precision);
+    let two = Natural::power_of_two(extended_precision + 1);
+    let mut log = Natural::ZERO;
+    let mut base = Natural::from(base) << extended_precision;
+    for i in (0..precision).rev() {
+        base = simple_sqrt(&(&base << extended_precision));
+        let next_t = (&t * &base) >> extended_precision;
+        if next_t < two {
+            log.set_bit(i);
+            t = next_t;
         }
     }
-    r
+    log
 }
 
-#[derive(Default)]
-struct State {
+struct BaseData {
     chars_per_limb: u64,
     big_base_trailing_zeros: u64,
     big_base: Natural,
@@ -96,60 +73,60 @@ struct State {
 }
 
 // This is generate from gen-bases.c, GMP 6.2.1
-fn generate(state: &mut State, base: u64) {
-    let mut t = Natural::ONE;
-    t <<= Limb::WIDTH;
-    state.big_base = Natural::ONE;
-    state.chars_per_limb = 0;
-    loop {
-        state.big_base *= Natural::from(base);
-        if state.big_base > t {
-            break;
-        }
-        state.chars_per_limb += 1;
+fn generate(base: u64) -> BaseData {
+    let limit = Natural::power_of_two(Limb::WIDTH);
+    let mut big_base = Natural::ONE;
+    let mut chars_per_limb = 0;
+    while big_base <= limit {
+        chars_per_limb += 1;
+        big_base *= Natural::from(base);
     }
-    state.big_base = Natural::from(base).pow(state.chars_per_limb);
-    state.normalization_steps = Limb::WIDTH.wrapping_sub(state.big_base.significant_bits());
-    t = Natural::ONE;
-    t <<= (Limb::WIDTH << 1).wrapping_sub(state.normalization_steps);
-    state.big_base_inverted = t / &state.big_base;
-    t = Natural::ONE;
-    t <<= Limb::WIDTH;
-    state.big_base_inverted -= t; //TODO use clear_bit
-
-    state.big_base_trailing_zeros = state.big_base.trailing_zeros().unwrap();
-    let big_base_odd = &state.big_base >> state.big_base_trailing_zeros;
-    state.big_base_inverted_mod_b = invert_mod_power_of_two(&big_base_odd, Limb::WIDTH);
+    chars_per_limb -= 1;
+    big_base = Natural::from(base).pow(chars_per_limb);
+    let normalization_steps = Limb::WIDTH.wrapping_sub(big_base.significant_bits());
+    let mut big_base_inverted =
+        Natural::power_of_two((Limb::WIDTH << 1).wrapping_sub(normalization_steps)) / &big_base;
+    big_base_inverted.clear_bit(Limb::WIDTH);
+    let big_base_trailing_zeros = big_base.trailing_zeros().unwrap();
+    let big_base_odd = &big_base >> big_base_trailing_zeros;
+    let big_base_inverted_mod_b = invert_mod_power_of_two(&big_base_odd, Limb::WIDTH);
+    BaseData {
+        chars_per_limb,
+        big_base_trailing_zeros,
+        big_base,
+        normalization_steps,
+        big_base_inverted,
+        big_base_inverted_mod_b,
+    }
 }
 
 // This is header from gen-bases.c, GMP 6.2.1.
 fn header() {
-    let mut state = State::default();
-    generate(&mut state, 10);
+    let data = generate(10);
     println!("// mp_bases[10] data, as literal values");
     println!(
         "pub const MP_BASES_CHARS_PER_LIMB_10: usize = {};",
-        state.chars_per_limb
+        data.chars_per_limb
     );
     println!(
         "pub const MP_BASES_BIG_BASE_CTZ_10: usize = {};",
-        state.big_base_trailing_zeros
+        data.big_base_trailing_zeros
     );
     println!(
         "pub const MP_BASES_BIG_BASE_10: Limb = {:#x};",
-        Limb::exact_from(state.big_base)
+        Limb::exact_from(data.big_base)
     );
     println!(
         "pub const MP_BASES_BIG_BASE_INVERTED_10: Limb = {:#x};",
-        Limb::exact_from(state.big_base_inverted)
+        Limb::exact_from(data.big_base_inverted)
     );
     println!(
         "pub const MP_BASES_BIG_BASE_BINVERTED_10: Limb = {:#x};",
-        Limb::exact_from(state.big_base_inverted_mod_b)
+        Limb::exact_from(data.big_base_inverted_mod_b)
     );
     println!(
         "pub const MP_BASES_NORMALIZATION_STEPS_10: u64 = {};",
-        state.normalization_steps
+        data.normalization_steps
     );
 }
 
@@ -160,26 +137,21 @@ fn table() {
     println!("    (0, 0, 0, 0, 0), // 0");
     println!("    (0, 0, 0, 0, 0), // 1");
     for base in 2..=256 {
-        let mut state = State::default();
-        generate(&mut state, base);
-        let mut r = mp_2logb(base, Limb::WIDTH + 8);
-        let logb2 = &r >> 8;
-        let mut t = Natural::ONE;
-        t <<= (Limb::WIDTH << 1) + 5;
-        t -= Natural::ONE;
-        r += Natural::ONE;
-        let log2b = t / r;
+        let mut data = generate(base);
+        let raw = get_log_base_of_2(base, Limb::WIDTH + 8);
+        let log_base_of_2 = &raw >> 8;
+        let log_2_of_base = Natural::low_mask((Limb::WIDTH << 1) + 5) / (raw + Natural::ONE);
         if base.is_power_of_two() {
-            state.big_base = Natural::from(ulog2(base) - 1);
-            state.big_base_inverted = Natural::ZERO;
+            data.big_base = Natural::from(base.significant_bits() - 1);
+            data.big_base_inverted = Natural::ZERO;
         }
         println!(
             "    ({}, {:#x}, {:#x}, {:#x}, {:#x}), // {}",
-            state.chars_per_limb,
-            Limb::exact_from(logb2),
-            Limb::exact_from(log2b),
-            Limb::exact_from(state.big_base),
-            Limb::exact_from(state.big_base_inverted),
+            data.chars_per_limb,
+            Limb::exact_from(log_base_of_2),
+            Limb::exact_from(log_2_of_base),
+            Limb::exact_from(data.big_base),
+            Limb::exact_from(data.big_base_inverted),
             base
         );
     }

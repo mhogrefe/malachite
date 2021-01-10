@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
 use std::fs;
@@ -111,12 +112,12 @@ impl DemoBenchRegistry {
     }
 
     pub fn benchmark_all(&self, limit: usize) {
-        let files: Vec<String> = fs::read_dir("benchmarks/")
+        let files = fs::read_dir("benchmarks/")
             .unwrap()
             .into_iter()
             .map(|file| file.unwrap().path().display().to_string())
             .filter(|file| file.ends_with(".gp"))
-            .collect();
+            .collect_vec();
         for file in files {
             fs::remove_file(file);
         }

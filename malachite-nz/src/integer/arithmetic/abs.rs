@@ -182,4 +182,12 @@ impl Integer {
     pub const fn unsigned_abs_ref(&self) -> &Natural {
         &self.abs
     }
+
+    //TODO doc and test
+    pub fn unsigned_abs_mut<F: Fn(&mut Natural)>(&mut self, f: F) {
+        f(&mut self.abs);
+        if !self.sign && self.abs == 0 {
+            self.sign = true;
+        }
+    }
 }

@@ -1,19 +1,20 @@
 #[macro_use]
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
+extern crate malachite_nz_test_util;
 
 use malachite_base_test_util::runner::cmd::read_command_line_arguments;
 use malachite_base_test_util::runner::Runner;
 
-use crate::generate::digits_data::generate_string_data;
 use demo_and_bench::register;
+use generate::digits_data::generate_string_data;
 
 // Examples:
 //
 // cargo run -- -l 100000 -m special_random -d demo_natural_from_unsigned_u128 -c
 // "mean_run_length_n 4 mean_run_length_d 1"
 //
-// or
+// cargo run --release -- -l 100000 -m random -b benchmark_limbs_to_digits_small_base_algorithms
 //
 // cargo run -- -g digits_data
 fn main() {
@@ -40,5 +41,6 @@ fn main() {
     }
 }
 
+mod bench;
 mod demo_and_bench;
 mod generate;

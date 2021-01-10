@@ -377,6 +377,8 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 /// limbs_div_exact_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
 /// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
+///
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2.
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns)
@@ -442,6 +444,8 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// limbs_div_exact_limb_in_place(&mut ns, 3);
 /// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
+///
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where dest == src.
 pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)

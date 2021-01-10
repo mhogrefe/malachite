@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
 use iterators::{nonzero_values, NonzeroValues};
 use itertools::Itertools;
@@ -15,6 +13,8 @@ use num::random::{
     RandomUnsignedRange,
 };
 use random::Seed;
+use std::iter::{repeat, Repeat};
+use std::marker::PhantomData;
 
 /// Generates bits from a striped random sequence.
 ///
@@ -702,6 +702,58 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
     }
 }
 
+/// Generates random striped `Vec<bool>`s of a given length.
+///
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// If `len` is 0, the output consists of the empty list, repeated.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_fixed_length_bool_vecs;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let bss = striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 10, 1, 5)
+///     .take(20)
+///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
+///     .collect_vec();
+/// assert_eq!(
+///     bss.iter().map(String::as_str).collect_vec(),
+///     &[
+///         "00000", "00000", "00000", "00000", "00011", "11000", "00000", "11111", "01111",
+///         "11111", "10000", "00011", "00000", "00000", "11000", "00000", "11111", "00000",
+///         "00000", "11111"
+///     ]
+/// );
+/// ```
+pub fn striped_random_fixed_length_bool_vecs(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    len: u64,
+) -> StripedRandomBoolVecs<Repeat<u64>> {
+    striped_random_bool_vecs_from_length_iterator(
+        seed,
+        &|_| repeat(len),
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
+}
+
 /// Generates random striped `Vec<bool>`s.
 ///
 /// The lengths of the `Vec`s are sampled from a geometric distribution with a specified mean $m$,
@@ -980,7 +1032,7 @@ pub fn striped_random_bool_vecs_length_inclusive_range(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bit_len
+/// where $T$ is time, $M$ is additional memory, and `n` is `bit_len`.
 ///
 /// # Examples
 /// ```
@@ -1096,6 +1148,64 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
             mean_stripe_denominator,
         ),
     }
+}
+
+/// Generates random striped unsigned `Vec`s of a given length.
+///
+/// The mean run length (before the bit sequences are truncated) is
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// If `len` is 0, the output consists of the empty list, repeated.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_fixed_length_unsigned_vecs;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let xss = striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 3)
+///     .take(10)
+///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .collect_vec();
+/// let xss = xss
+///     .iter()
+///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
+///     .collect_vec();
+/// assert_eq!(
+///     xss,
+///     &[
+///         &["0", "0", "111000"], &["0", "11111100", "11"], &["11111110", "1111", "0"],
+///         &["0", "0", "11111000"], &["0", "0", "1111110"], &["11111111", "11011111", "11111111"],
+///         &["11110000", "11111111", "11111111"], &["11000011", "11111", "0"],
+///         &["0", "10000000", "11111001"], &["11111111", "0", "0"]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    len: u64,
+) -> StripedRandomUnsignedVecs<T, Repeat<u64>> {
+    striped_random_unsigned_vecs_from_length_iterator(
+        seed,
+        &|_| repeat(len),
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
 }
 
 /// Generates random striped `Vec`s of unsigneds.

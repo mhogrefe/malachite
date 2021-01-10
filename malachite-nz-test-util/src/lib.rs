@@ -33,8 +33,10 @@
     clippy::unused_self
 )]
 
+extern crate itertools;
 extern crate num;
 
 pub mod common;
+pub mod generators;
 pub mod integer;
 pub mod natural;

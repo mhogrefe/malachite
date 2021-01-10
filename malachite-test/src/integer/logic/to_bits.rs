@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
@@ -173,8 +174,8 @@ fn benchmark_integer_to_bits_asc_evaluation_strategy(
         &mut [
             ("Integer.to_bits_asc()", &mut (|n| no_out!(n.to_bits_asc()))),
             (
-                "Integer.bits().collect::<Vec<bool>>()",
-                &mut (|n| no_out!(n.bits().collect::<Vec<bool>>())),
+                "Integer.bits().collect_vec()",
+                &mut (|n| no_out!(n.bits().collect_vec())),
             ),
         ],
     );
@@ -218,8 +219,8 @@ fn benchmark_integer_to_bits_desc_evaluation_strategy(
                 &mut (|n| no_out!(n.to_bits_desc())),
             ),
             (
-                "Integer.bits().rev().collect::<Vec<bool>>()",
-                &mut (|n| no_out!(n.bits().collect::<Vec<bool>>())),
+                "Integer.bits().rev().collect_vec()",
+                &mut (|n| no_out!(n.bits().collect_vec())),
             ),
         ],
     );

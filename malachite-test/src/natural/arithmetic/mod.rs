@@ -35,7 +35,6 @@ pub mod mod_shr;
 pub mod mod_square;
 pub mod mod_sub;
 pub mod mul;
-pub mod neg;
 pub mod next_power_of_two;
 pub mod parity;
 pub mod pow;
@@ -89,7 +88,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     mod_square::register(registry);
     mod_sub::register(registry);
     mul::register(registry);
-    neg::register(registry);
     next_power_of_two::register(registry);
     parity::register(registry);
     pow::register(registry);

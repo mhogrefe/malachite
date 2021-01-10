@@ -43,7 +43,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shr_round_up(&[u32::MAX, u32::MAX], 32), &[0, 1]);
 /// ```
 ///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// the result is returned.
 pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
@@ -254,7 +254,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 /// assert_eq!(xs, &[0, 1]);
 /// ```
 ///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.1.2, where u is non-negative, dir == 1, and
+/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// w == u.
 pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);

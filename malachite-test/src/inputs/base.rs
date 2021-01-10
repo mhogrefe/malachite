@@ -1,10 +1,9 @@
 use std::cmp::max;
-use std::iter::{once, repeat};
+use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
-use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, DivRound, EqMod, ModPowerOfTwo, Parity,
     PowerOfTwo, RoundToMultiple, UnsignedAbs,
@@ -25,21 +24,20 @@ use malachite_base::num::exhaustive::{
     primitive_int_increasing_range,
 };
 use malachite_base::num::logic::traits::{
-    BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, LowMask, SignificantBits,
+    BitAccess, BitBlockAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
 };
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
-use malachite_base::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_octuples_from_single, exhaustive_pairs,
-    exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_quadruples_from_single,
-    exhaustive_quintuples, exhaustive_sextuples_from_single, exhaustive_triples,
-    exhaustive_triples_from_single, lex_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
+    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
+    lex_pairs,
 };
 use malachite_base::vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_length_range,
-    exhaustive_vecs_min_length, shortlex_vecs,
+    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
+    shortlex_vecs,
 };
 use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
@@ -94,7 +92,6 @@ use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
 use rand::distributions::{IndependentSample, Range};
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
-use rust_wheels::iterators::chars::random_ascii_chars;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
     dependent_pairs, exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
@@ -116,7 +113,6 @@ use rust_wheels::iterators::primitive_ints::{
     special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
-use rust_wheels::iterators::strings::{random_strings, random_strings_with_chars};
 use rust_wheels::iterators::tuples::{
     random_octuples_from_single, random_pairs, random_pairs_from_single, random_quadruples,
     random_quadruples_from_single, random_quintuples, random_sextuples_from_single, random_triples,
@@ -132,12 +128,6 @@ use inputs::common::{
     permute_1_2_4_3, permute_1_3_2, permute_1_3_4_2, permute_2_1, permute_2_1_3, reshape_2_1_to_3,
     reshape_2_2_to_4, reshape_3_1_to_4, reshape_3_3_3_to_9, reshape_4_4_4_to_12,
 };
-use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
-use malachite_nz::natural::conversion::digits::general_digits::{
-    _to_digits_asc_naive, GET_STR_PRECOMPUTE_THRESHOLD,
-};
-use rust_wheels::iterators::options::random_options;
 
 //TODO replace with unsigned_gen in Malachite
 pub fn unsigneds<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
@@ -1690,97 +1680,6 @@ where
     }
 }
 
-type ItU<T> = It<(T, u64)>;
-
-fn exhaustive_pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>() -> ItU<T> {
-    Box::new(lex_pairs(
-        exhaustive_unsigneds(),
-        primitive_int_increasing_range(0, T::WIDTH),
-    ))
-}
-
-fn random_pairs_of_primitive_and_u64_width_range<T: PrimitiveInt + Rand>() -> It<(T, u64)> {
-    Box::new(random_pairs(
-        &EXAMPLE_SEED,
-        &random,
-        &(|seed| random_range_down(seed, T::WIDTH - 1)),
-    ))
-}
-
-// All pairs of unsigned `T` and `u64`, where the `u64` is smaller that `T::WIDTH`.
-pub fn pairs_of_unsigned_and_u64_width_range<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => exhaustive_pairs_of_unsigned_and_u64_width_range(),
-        GenerationMode::Random(_) => random_pairs_of_primitive_and_u64_width_range(),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &(|seed| random_range_down(seed, T::WIDTH - 1)),
-        )),
-    }
-}
-
-// All pairs of signed `T` and `u64`, where the signed `T` is negative or the `u64` is smaller than
-// `T::WIDTH`.
-pub fn pairs_of_signed_and_u64_width_range_var_1<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, u64)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(
-        pairs_of_signed_and_small_unsigned(gm)
-            .filter(|&(n, index)| n < T::ZERO || index < T::WIDTH),
-    )
-}
-
-// All pairs of signed `T` and `u64`, where the signed `T` is non-negative or the `u64` is smaller
-// than `T::WIDTH`.
-pub fn pairs_of_signed_and_u64_width_range_var_2<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, u64)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(
-        pairs_of_signed_and_small_unsigned(gm)
-            .filter(|&(n, index)| n >= T::ZERO || index < T::WIDTH),
-    )
-}
-
-// All triples of `T`, `U`, and `bool`, where `T` and `U` are unsigned and the `bool` is false or
-// the `U` is smaller than `T::WIDTH`.
-pub fn triples_of_unsigned_unsigned_width_range_and_bool_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, U, bool)> {
-    let unfiltered: It<(T, U, bool)> = match gm {
-        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            sqrt_pairs_of_unsigneds(),
-            exhaustive_bools(),
-        ))),
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &random,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-            &random,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-            &random,
-        )),
-    };
-    Box::new(unfiltered.filter(|&(_, index, bit)| !bit || index < U::exact_from(T::WIDTH)))
-}
-
 pub fn triples_of_unsigned_small_unsigned_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -2019,42 +1918,6 @@ where
             &special_random_unsigned,
         )),
     }
-}
-
-// All triples of signed `T`, `U`, and `bool`, where `T` is signed, `U` is unsigned, and `U` is
-// smaller than `T::WIDTH` or the `bool` is equal to whether the `T` is negative.
-pub fn triples_of_signed_unsigned_width_range_and_bool_var_1<
-    T: PrimitiveSigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, U, bool)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    let unfiltered: It<(T, U, bool)> = match gm {
-        GenerationMode::Exhaustive => reshape_2_1_to_3(Box::new(lex_pairs(
-            sqrt_pairs_of_signed_and_unsigned(),
-            exhaustive_bools(),
-        ))),
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &random,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-            &random,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &special_random_signed,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-            &random,
-        )),
-    };
-    Box::new(
-        unfiltered
-            .filter(|&(n, index, bit)| index < U::exact_from(T::WIDTH) || bit == (n < T::ZERO)),
-    )
 }
 
 pub fn pairs_of_negative_signed_not_min_and_small_unsigned<
@@ -7697,48 +7560,6 @@ pub fn triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
     }
 }
 
-pub fn strings(gm: NoSpecialGenerationMode) -> It<String> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_strings()),
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_strings(&EXAMPLE_SEED, scale)),
-    }
-}
-
-pub fn ascii_strings(gm: NoSpecialGenerationMode) -> It<String> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            Box::new(exhaustive_strings_using_chars(exhaustive_ascii_chars()))
-        }
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_strings_with_chars(
-            &EXAMPLE_SEED,
-            scale,
-            &random_ascii_chars,
-        )),
-    }
-}
-
-pub fn pairs_of_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs_from_single(exhaustive_strings()))
-        }
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            random_strings(&EXAMPLE_SEED, scale),
-        )),
-    }
-}
-
-pub fn pairs_of_ascii_strings(gm: NoSpecialGenerationMode) -> It<(String, String)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs_from_single(
-            exhaustive_strings_using_chars(exhaustive_ascii_chars()),
-        )),
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            random_strings_with_chars(&EXAMPLE_SEED, scale, &random_ascii_chars),
-        )),
-    }
-}
-
 //TODO replace with something better please
 fn naive_factors(x: usize) -> Vec<(usize, usize)> {
     let mut factors = Vec::new();
@@ -7838,167 +7659,4 @@ pub fn quintuples_var_1(gm: GenerationMode) -> It<(Vec<Limb>, usize, Limb, Limb,
             Some((ns, fraction_len, d, d_inv, shift))
         }
     }))
-}
-
-fn limbs_to_digits_asc_schoolbook_out_len(xs: &[Limb], base: u64) -> usize {
-    _to_digits_asc_naive::<u8, _>(
-        &Natural::low_mask(u64::exact_from(xs.len()) << Limb::LOG_WIDTH),
-        base,
-    )
-    .len()
-}
-
-struct ValidLengthsGenerator {
-    min_out_len: usize,
-}
-
-impl ExhaustiveDependentPairsYsGenerator<usize, Vec<u8>, It<Vec<u8>>> for ValidLengthsGenerator {
-    #[inline]
-    fn get_ys(&self, &len: &usize) -> It<Vec<u8>> {
-        Box::new(exhaustive_vecs_min_length(
-            u64::exact_from(if len == 0 { self.min_out_len } else { len }),
-            exhaustive_unsigneds(),
-        ))
-    }
-}
-
-struct SchoolbookDigitsInputGenerator;
-
-impl ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), (Vec<u8>, usize), It<(Vec<u8>, usize)>>
-    for SchoolbookDigitsInputGenerator
-{
-    #[inline]
-    fn get_ys(&self, p: &(Vec<Limb>, u64)) -> It<(Vec<u8>, usize)> {
-        let min_out_len = limbs_to_digits_asc_schoolbook_out_len(&p.0, p.1);
-        permute_2_1(Box::new(exhaustive_dependent_pairs(
-            ruler_sequence(),
-            once(0).chain(primitive_int_increasing_inclusive_range(
-                min_out_len,
-                usize::MAX,
-            )),
-            ValidLengthsGenerator { min_out_len },
-        )))
-    }
-}
-
-struct SchoolbookDigitsRandomGenerator {
-    bases: It<u64>,
-    xss: It<Vec<Limb>>,
-    excess_lens: It<Option<usize>>,
-    excess_out_lens: It<usize>,
-    bytes: It<u8>,
-}
-
-impl Iterator for SchoolbookDigitsRandomGenerator {
-    type Item = (Vec<u8>, usize, Vec<Limb>, u64);
-
-    fn next(&mut self) -> Option<(Vec<u8>, usize, Vec<Limb>, u64)> {
-        let base = self.bases.next().unwrap();
-        let xs = self.xss.next().unwrap();
-        let min_out_len = limbs_to_digits_asc_schoolbook_out_len(&xs, base);
-        let excess_out_len = self.excess_out_lens.next().unwrap();
-        let (len, out_len) = if let Some(excess) = self.excess_lens.next().unwrap() {
-            (min_out_len + excess, min_out_len + excess + excess_out_len)
-        } else {
-            (0, min_out_len + excess_out_len)
-        };
-        let out = (&mut self.bytes).take(out_len).collect();
-        Some((out, len, xs, base))
-    }
-}
-
-struct SchoolbookDigitsSpecialRandomGenerator {
-    bases: It<u64>,
-    xss: It<Vec<Limb>>,
-    excess_lens: It<Option<usize>>,
-    excess_out_lens: It<usize>,
-    bytes: It<u8>,
-}
-
-impl Iterator for SchoolbookDigitsSpecialRandomGenerator {
-    type Item = (Vec<u8>, usize, Vec<Limb>, u64);
-
-    fn next(&mut self) -> Option<(Vec<u8>, usize, Vec<Limb>, u64)> {
-        let base = self.bases.next().unwrap();
-        let xs = self.xss.next().unwrap();
-        let min_out_len = limbs_to_digits_asc_schoolbook_out_len(&xs, base);
-        let excess_out_len = self.excess_out_lens.next().unwrap();
-        let (len, out_len) = if let Some(excess) = self.excess_lens.next().unwrap() {
-            (min_out_len + excess, min_out_len + excess + excess_out_len)
-        } else {
-            (0, min_out_len + excess_out_len)
-        };
-        let out = (&mut self.bytes).take(out_len).collect();
-        Some((out, len, xs, base))
-    }
-}
-
-// All quadruples of `Vec<u8>`, usize, Vec<Limb>, and u64 that are valid inputs to
-// `_limbs_to_digits_asc_schoolbook`.
-pub fn quadruples_var_1(gm: GenerationMode) -> It<(Vec<u8>, usize, Vec<Limb>, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(
-            exhaustive_dependent_pairs(
-                bit_distributor_sequence(
-                    BitDistributorOutputType::normal(1),
-                    BitDistributorOutputType::normal(1),
-                ),
-                exhaustive_pairs_big_tiny(
-                    exhaustive_vecs_length_range(
-                        0,
-                        u64::wrapping_from(GET_STR_PRECOMPUTE_THRESHOLD),
-                        exhaustive_unsigneds(),
-                    ),
-                    primitive_int_increasing_inclusive_range::<u64>(3, 256)
-                        .filter(|&b| !b.is_power_of_two()),
-                ),
-                SchoolbookDigitsInputGenerator,
-            )
-            .map(|((xs, base), (out, len))| (out, len, xs, base)),
-        ),
-        GenerationMode::Random(scale) => Box::new(SchoolbookDigitsRandomGenerator {
-            bases: Box::new(random_from_vector(
-                &scramble(&EXAMPLE_SEED, "bases"),
-                primitive_int_increasing_inclusive_range::<u64>(3, 256)
-                    .filter(|&b| !b.is_power_of_two())
-                    .collect(),
-            )),
-            xss: Box::new(
-                random_vecs(&scramble(&EXAMPLE_SEED, "xss"), scale, &random)
-                    .filter(|xs| xs.len() < GET_STR_PRECOMPUTE_THRESHOLD),
-            ),
-            excess_lens: Box::new(random_options(
-                &scramble(&EXAMPLE_SEED, "excess_lens"),
-                scale,
-                &|seed| u32s_geometric(seed, scale >> 3).flat_map(usize::checked_from),
-            )),
-            excess_out_lens: Box::new(
-                u32s_geometric(&scramble(&EXAMPLE_SEED, "excess_out_lens"), scale >> 3)
-                    .flat_map(usize::checked_from),
-            ),
-            bytes: Box::new(random(&scramble(&EXAMPLE_SEED, "bytes"))),
-        }),
-        GenerationMode::SpecialRandom(scale) => Box::new(SchoolbookDigitsSpecialRandomGenerator {
-            bases: Box::new(random_from_vector(
-                &scramble(&EXAMPLE_SEED, "bases"),
-                primitive_int_increasing_inclusive_range::<u64>(3, 256)
-                    .filter(|&b| !b.is_power_of_two())
-                    .collect(),
-            )),
-            xss: Box::new(
-                special_random_unsigned_vecs(&scramble(&EXAMPLE_SEED, "xss"), scale)
-                    .filter(|xs| xs.len() < GET_STR_PRECOMPUTE_THRESHOLD),
-            ),
-            excess_lens: Box::new(random_options(
-                &scramble(&EXAMPLE_SEED, "excess_lens"),
-                scale,
-                &|seed| u32s_geometric(seed, scale >> 3).flat_map(usize::checked_from),
-            )),
-            excess_out_lens: Box::new(
-                u32s_geometric(&scramble(&EXAMPLE_SEED, "excess_out_lens"), scale >> 3)
-                    .flat_map(usize::checked_from),
-            ),
-            bytes: Box::new(random(&scramble(&EXAMPLE_SEED, "bytes"))),
-        }),
-    }
 }

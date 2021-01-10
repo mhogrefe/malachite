@@ -335,22 +335,23 @@ impl Natural {
     ///
     /// # Examples
     /// ```
+    /// extern crate itertools;
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
+    /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert!(Natural::ZERO.limbs().next().is_none());
-    /// assert_eq!(Natural::from(123u32).limbs().collect::<Vec<u32>>(), &[123]);
+    /// assert_eq!(Natural::from(123u32).limbs().collect_vec(), &[123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::trillion().limbs().collect::<Vec<u32>>(), &[3567587328, 232]);
+    /// assert_eq!(Natural::trillion().limbs().collect_vec(), &[3567587328, 232]);
     ///
     /// assert!(Natural::ZERO.limbs().rev().next().is_none());
-    /// assert_eq!(Natural::from(123u32).limbs().rev().collect::<Vec<u32>>(), &[123]);
+    /// assert_eq!(Natural::from(123u32).limbs().rev().collect_vec(), &[123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::trillion().limbs().rev().collect::<Vec<u32>>(),
-    ///     &[232, 3567587328]);
+    /// assert_eq!(Natural::trillion().limbs().rev().collect_vec(), &[232, 3567587328]);
     /// ```
     pub fn limbs(&self) -> LimbIterator {
         let limb_count = self.limb_count();

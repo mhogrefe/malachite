@@ -100,7 +100,7 @@ where
         Natural(Large(ref limbs)) => limbs,
     };
     let mut digits =
-        iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base).collect::<Vec<_>>();
+        iterator_to_bit_chunks(limbs.iter().cloned(), Limb::WIDTH, log_base).collect_vec();
     digits.truncate(digits.len() - slice_trailing_zeros(&digits));
     digits
 }
@@ -150,13 +150,12 @@ where
             log_base
         );
     }
-    let digits: Vec<_> = digits.collect();
+    let digits = digits.collect_vec();
     assert!(digits
         .iter()
         .all(|digit| digit.significant_bits() <= log_base));
     Natural::from_owned_limbs_asc(
-        iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH)
-            .collect::<Vec<_>>(),
+        iterator_to_bit_chunks(digits.iter().rev().cloned(), log_base, Limb::WIDTH).collect_vec(),
     )
 }
 
@@ -611,7 +610,7 @@ impl PowerOfTwoDigits<Natural> for Natural {
         digits: I,
     ) -> Natural {
         assert_ne!(log_base, 0);
-        let digits: Vec<_> = digits.collect();
+        let digits = digits.collect_vec();
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));

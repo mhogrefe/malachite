@@ -624,9 +624,11 @@ macro_rules! iterables {
             ///
             /// # Examples
             /// ```
+            /// extern crate itertools;
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
+            /// use itertools::Itertools;
             /// use malachite_base::num::basic::traits::Zero;
             /// use malachite_base::num::conversion::traits::PowerOfTwoDigitIterable;
             /// use malachite_nz::natural::Natural;
@@ -637,8 +639,7 @@ macro_rules! iterables {
             /// // 107 = 1223_4
             /// let n = Natural::from(107u32);
             /// assert_eq!(
-            ///     PowerOfTwoDigitIterable::<u32>::power_of_two_digits(&n, 2)
-            ///         .collect::<Vec<u32>>(),
+            ///     PowerOfTwoDigitIterable::<u32>::power_of_two_digits(&n, 2).collect_vec(),
             ///     vec![3, 2, 2, 1]
             /// );
             ///
@@ -650,8 +651,7 @@ macro_rules! iterables {
             /// // 107 = 1223_4
             /// let n = Natural::from(107u32);
             /// assert_eq!(
-            ///     PowerOfTwoDigitIterable::<u32>::power_of_two_digits(&n, 2).rev()
-            ///         .collect::<Vec<u32>>(),
+            ///     PowerOfTwoDigitIterable::<u32>::power_of_two_digits(&n, 2).rev().collect_vec(),
             ///     vec![1, 2, 2, 3]
             /// );
             /// ```
@@ -1011,9 +1011,11 @@ impl<'a> PowerOfTwoDigitIterable<Natural> for &'a Natural {
     ///
     /// # Examples
     /// ```
+    /// extern crate itertools;
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
+    /// use itertools::Itertools;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_base::num::conversion::traits::PowerOfTwoDigitIterable;
     /// use malachite_nz::natural::Natural;
@@ -1024,8 +1026,7 @@ impl<'a> PowerOfTwoDigitIterable<Natural> for &'a Natural {
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
     /// assert_eq!(
-    ///     PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 2)
-    ///         .collect::<Vec<Natural>>(),
+    ///     PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 2).collect_vec(),
     ///     vec![Natural::from(3u32), Natural::from(2u32), Natural::from(2u32), Natural::from(1u32)]
     /// );
     ///
@@ -1037,8 +1038,7 @@ impl<'a> PowerOfTwoDigitIterable<Natural> for &'a Natural {
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
     /// assert_eq!(
-    ///     PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 2).rev()
-    ///         .collect::<Vec<Natural>>(),
+    ///     PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, 2).rev().collect_vec(),
     ///     vec![Natural::from(1u32), Natural::from(2u32), Natural::from(2u32), Natural::from(3u32)]
     /// );
     /// ```

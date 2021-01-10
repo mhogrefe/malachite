@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::str::FromStr;
 
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
@@ -59,7 +60,7 @@ fn bits_vec_to_twos_complement_bits_negative_fail() {
 fn test_to_bits_asc() {
     let test = |n, out| {
         let n = Integer::from_str(n).unwrap();
-        assert_eq!(n.bits().collect::<Vec<bool>>(), out);
+        assert_eq!(n.bits().collect_vec(), out);
         assert_eq!(n.to_bits_asc(), out);
         assert_eq!(to_bits_asc_naive(&n), out);
         assert_eq!(to_bits_asc_alt(&n), out);
@@ -193,7 +194,7 @@ fn test_to_bits_asc() {
 fn test_to_bits_desc() {
     let test = |n, out| {
         let n = Integer::from_str(n).unwrap();
-        assert_eq!(n.bits().rev().collect::<Vec<bool>>(), out);
+        assert_eq!(n.bits().rev().collect_vec(), out);
         assert_eq!(n.to_bits_desc(), out);
         assert_eq!(to_bits_desc_naive(&n), out);
         assert_eq!(to_bits_desc_alt(&n), out);

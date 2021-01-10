@@ -75,13 +75,15 @@ impl Iterator for ExhaustiveNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// extern crate malachite_base;
 ///
+/// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_naturals;
 ///
 /// assert_eq!(
-///     exhaustive_naturals().take(10).collect::<Vec<_>>().to_debug_string(),
+///     exhaustive_naturals().take(10).collect_vec().to_debug_string(),
 ///     "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
 /// )
 /// ```
@@ -109,13 +111,15 @@ pub const fn exhaustive_naturals() -> ExhaustiveNaturalRangeToInfinity {
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// extern crate malachite_base;
 ///
+/// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 ///
 /// assert_eq!(
-///     exhaustive_positive_naturals().take(10).collect::<Vec<_>>().to_debug_string(),
+///     exhaustive_positive_naturals().take(10).collect_vec().to_debug_string(),
 ///     "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
 /// )
 /// ```
@@ -149,8 +153,10 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// extern crate malachite_base;
 ///
+/// use itertools::Itertools;
 /// use malachite_base::num::conversion::traits::ExactFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_range;
@@ -158,7 +164,7 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 ///
 /// assert_eq!(
 ///     exhaustive_natural_range(Natural::exact_from(5), Natural::exact_from(10))
-///         .collect::<Vec<_>>().to_debug_string(),
+///         .collect_vec().to_debug_string(),
 ///     "[5, 6, 7, 8, 9]"
 /// )
 /// ```
@@ -196,8 +202,10 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// extern crate malachite_base;
 ///
+/// use itertools::Itertools;
 /// use malachite_base::num::conversion::traits::ExactFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
@@ -205,7 +213,7 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 ///
 /// assert_eq!(
 ///     exhaustive_natural_inclusive_range(Natural::exact_from(5), Natural::exact_from(10))
-///         .collect::<Vec<_>>().to_debug_string(),
+///         .collect_vec().to_debug_string(),
 ///     "[5, 6, 7, 8, 9, 10]"
 /// )
 /// ```
@@ -239,8 +247,10 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 ///
 /// # Examples
 /// ```
+/// extern crate itertools;
 /// extern crate malachite_base;
 ///
+/// use itertools::Itertools;
 /// use malachite_base::num::conversion::traits::ExactFrom;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::exhaustive::exhaustive_natural_range_to_infinity;
@@ -248,7 +258,7 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 ///
 /// assert_eq!(
 ///     exhaustive_natural_range_to_infinity(Natural::exact_from(5)).take(10)
-///         .collect::<Vec<_>>().to_debug_string(),
+///         .collect_vec().to_debug_string(),
 ///     "[5, 6, 7, 8, 9, 10, 11, 12, 13, 14]"
 /// )
 /// ```

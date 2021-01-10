@@ -1,3 +1,5 @@
+#[cfg(not(feature = "32_bit_limbs"))]
+use itertools::Itertools;
 use std::str::FromStr;
 
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -17118,7 +17120,7 @@ fn test_limbs_mul_fft_fft() {
         for a in &mut ap_clone {
             ap.push(a);
         }
-        let ll: Vec<&[usize]> = ll.iter().map(Vec::as_slice).collect();
+        let ll = ll.iter().map(Vec::as_slice).collect_vec();
         let mut tp = tp_before;
         _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
@@ -17216,7 +17218,7 @@ fn test_limbs_mul_fft_internal() {
             ap.push(a);
         }
         let mut b = b_before;
-        let fft_l: Vec<&[usize]> = fft_l.iter().map(Vec::as_slice).collect();
+        let fft_l = fft_l.iter().map(Vec::as_slice).collect_vec();
         let mut t = t_before;
         _limbs_mul_fft_internal(&mut op, pl, k, ap, &mut b, l, mp, &fft_l, &mut t, sqr);
         assert_eq!(op, op_after);

@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
@@ -15,17 +16,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 fn demo_natural_bits(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!("bits({}) = {:?}", n, n.bits().collect::<Vec<bool>>());
+        println!("bits({}) = {:?}", n, n.bits().collect_vec());
     }
 }
 
 fn demo_natural_bits_rev(gm: GenerationMode, limit: usize) {
     for n in naturals(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            n,
-            n.bits().rev().collect::<Vec<bool>>()
-        );
+        println!("bits({}).rev() = {:?}", n, n.bits().rev().collect_vec());
     }
 }
 

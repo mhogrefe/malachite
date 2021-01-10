@@ -1929,11 +1929,12 @@ pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
+    assert!(d_len > 1);
     assert!(n_len >= d_len);
     assert!(qs.len() > n_len - d_len);
     let rs = &mut rs[..d_len];
     let ds_last = *ds.last().unwrap();
-    assert!(d_len > 1 && ds_last != 0);
+    assert!(ds_last != 0);
     if d_len == 2 {
         _limbs_div_mod_by_two_limb(qs, rs, ns, ds);
     } else {

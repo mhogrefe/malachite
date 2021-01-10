@@ -20,7 +20,8 @@ use natural::Natural;
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {
         // Returns whether `n` > `$f::MAX_FINITE`.
-        fn $gt_max_finite_float(n: &Natural) -> bool {
+        //TODO test
+        pub fn $gt_max_finite_float(n: &Natural) -> bool {
             match *n {
                 Natural(Small(_)) => false,
                 Natural(Large(ref limbs)) => {

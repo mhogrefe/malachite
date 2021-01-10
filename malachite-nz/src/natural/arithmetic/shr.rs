@@ -36,7 +36,7 @@ use platform::Limb;
 /// assert_eq!(limbs_shr(&[u32::MAX, u32::MAX], 32), &[u32::MAX]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the result is returned.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
 pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -80,7 +80,7 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(out, &[2147483709, 227, 0]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
 pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     assert_ne!(len, 0);
@@ -127,7 +127,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// assert_eq!(xs, &[2147483709, 227]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where the rp == up.
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
 pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -204,7 +204,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 /// assert_eq!(xs, &[u32::MAX]);
 /// ```
 ///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.1.2, where rp == up and if cnt is
+/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
 /// sufficiently large, limbs are removed from rp.
 pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);

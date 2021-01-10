@@ -1,32 +1,39 @@
-use malachite_base::bools::random::random_bools;
+use generators::common::{reshape_1_2_to_3, GenConfig, It};
+use generators::digits_valid;
+use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::random::{
     random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
 };
 use malachite_base::comparison::traits::{Max, Min};
-use malachite_base::num::arithmetic::traits::ShrRound;
+use malachite_base::num::arithmetic::traits::{DivRound, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::geometric::geometric_random_unsigneds;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::random::geometric::{
+    geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
+};
 use malachite_base::num::random::{
     random_natural_signeds, random_negative_signeds, random_positive_unsigneds,
-    random_primitive_ints, random_unsigned_range, random_unsigneds_less_than,
+    random_primitive_ints, random_unsigned_bit_chunks, random_unsigned_inclusive_range,
+    random_unsigned_range, random_unsigneds_less_than, RandomPrimitiveInts,
+    RandomUnsignedInclusiveRange,
 };
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::random::{random_strings, random_strings_using_chars};
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_triples_from_single,
+    random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
 };
-use malachite_base::unions::Union2;
-use malachite_base::vecs::random_values_from_vec;
-
-use generators::common::{reshape_1_2_to_3, GenConfig, It};
 use malachite_base::unions::random::random_union2s;
-use malachite_base::vecs::random::random_vecs;
+use malachite_base::unions::Union2;
+use malachite_base::vecs::random::{random_vecs, random_vecs_length_inclusive_range};
+use malachite_base::vecs::random_values_from_vec;
 use rounding_modes::ROUNDING_MODE_CHARS;
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 // -- bool --
 
@@ -110,6 +117,16 @@ pub fn random_primitive_int_unsigned_pair_gen_var_2<T: PrimitiveInt>(
     ))
 }
 
+pub fn random_primitive_int_unsigned_pair_gen_var_3<T: PrimitiveInt, U: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| random_unsigned_inclusive_range(seed, 1, U::WIDTH),
+    ))
+}
+
 // -- (PrimitiveInt, PrimitiveUnsigned, bool) --
 
 pub fn random_primitive_int_unsigned_bool_triple_gen_var_1<T: PrimitiveInt>(
@@ -161,6 +178,63 @@ pub fn random_primitive_int_unsigned_bool_triple_gen_var_2<T: PrimitiveInt>(
         )
         .map(Union2::unwrap),
     )
+}
+
+// -- (PrimitiveInt, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveInt,
+    U: PrimitiveInt,
+    V: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, u64, V)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| random_unsigned_inclusive_range(seed, 1, U::WIDTH),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+// --(PrimitiveInt, PrimitiveUnsigned, Vec<bool>) --
+
+struct PrimitiveIntUnsignedBoolVecTripleGeneratorVar1<T: PrimitiveInt> {
+    xs: RandomPrimitiveInts<T>,
+    log_bases: RandomUnsignedInclusiveRange<u64>,
+    bs: RandomBools,
+}
+
+impl<T: PrimitiveInt> Iterator for PrimitiveIntUnsignedBoolVecTripleGeneratorVar1<T> {
+    type Item = (T, u64, Vec<bool>);
+
+    fn next(&mut self) -> Option<(T, u64, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let log_base = self.log_bases.next().unwrap();
+        let bs = (&mut self.bs)
+            .take(usize::exact_from(
+                x.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling),
+            ))
+            .collect();
+        Some((x, log_base, bs))
+    }
+}
+
+pub fn random_primitive_int_unsigned_bool_vec_triple_gen_var_1<T: PrimitiveInt, U: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, u64, Vec<bool>)> {
+    Box::new(PrimitiveIntUnsignedBoolVecTripleGeneratorVar1 {
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+        log_bases: random_unsigned_inclusive_range(EXAMPLE_SEED.fork("log_bases"), 1, U::WIDTH),
+        bs: random_bools(EXAMPLE_SEED.fork("bs")),
+    })
 }
 
 // -- PrimitiveSigned --
@@ -281,6 +355,10 @@ pub fn random_unsigned_gen_var_2(_config: &GenConfig) -> It<u32> {
     Box::new(random_unsigneds_less_than(EXAMPLE_SEED, NUMBER_OF_CHARS))
 }
 
+pub fn random_unsigned_gen_var_3<T: PrimitiveInt>(_config: &GenConfig) -> It<u64> {
+    Box::new(random_unsigned_inclusive_range(EXAMPLE_SEED, 1, T::WIDTH))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_unsigned_pair_gen_var_1(_config: &GenConfig) -> It<(u32, u32)> {
@@ -288,6 +366,22 @@ pub fn random_unsigned_pair_gen_var_1(_config: &GenConfig) -> It<(u32, u32)> {
         EXAMPLE_SEED,
         NUMBER_OF_CHARS,
     )))
+}
+
+pub fn random_unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 1, U::WIDTH),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -421,7 +515,7 @@ pub fn random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, String)> 
     )))
 }
 
-// -- Vec<PrimitiveUnsigned> --
+// -- Vec<PrimitiveInt> --
 
 pub fn random_primitive_int_vec_gen<T: PrimitiveInt>(config: &GenConfig) -> It<Vec<T>> {
     Box::new(random_vecs(
@@ -430,4 +524,139 @@ pub fn random_primitive_int_vec_gen<T: PrimitiveInt>(config: &GenConfig) -> It<V
         config.get_or("mean_length_n", 4),
         config.get_or("mean_length_d", 1),
     ))
+}
+
+// --(Vec<PrimitiveInt>, PrimitiveInt) --
+
+pub fn random_primitive_int_vec_primitive_int_pair_gen<T: PrimitiveInt, U: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// --(Vec<PrimitiveInt>, PrimitiveUnsigned) --
+
+struct PrimitiveIntVecUnsignedPairGeneratorVar1<T: PrimitiveInt> {
+    xs: GeometricRandomNaturalValues<usize>,
+    ys: RandomPrimitiveInts<T>,
+}
+
+impl<T: PrimitiveInt> Iterator for PrimitiveIntVecUnsignedPairGeneratorVar1<T> {
+    type Item = (Vec<T>, usize);
+
+    fn next(&mut self) -> Option<(Vec<T>, usize)> {
+        let x_1 = self.xs.next().unwrap();
+        let x_2 = self.xs.next().unwrap();
+        let (len, i) = if x_1 <= x_2 { (x_2, x_1) } else { (x_1, x_2) };
+        Some(((&mut self.ys).take(len).collect(), i))
+    }
+}
+
+pub fn random_primitive_int_vec_unsigned_pair_gen_var_1<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, usize)> {
+    Box::new(PrimitiveIntVecUnsignedPairGeneratorVar1 {
+        xs: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+        ys: random_primitive_ints(EXAMPLE_SEED.fork("ys")),
+    })
+}
+
+// --(Vec<PrimitiveInt>, PrimitiveUnsigned, PrimitiveInt) --
+
+pub fn random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+    V: PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U, V)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 4),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+struct UnsignedVecUnsignedPairGeneratorVar1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+    log_bases: GeometricRandomNaturalValues<u64>,
+    log_base_to_xs: HashMap<u64, It<Vec<U>>>,
+}
+
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
+    for UnsignedVecUnsignedPairGeneratorVar1<T, U>
+{
+    type Item = (Vec<U>, u64);
+
+    fn next(&mut self) -> Option<(Vec<U>, u64)> {
+        let log_base = self.log_bases.next().unwrap();
+        let xs = self.log_base_to_xs.entry(log_base).or_insert_with(move || {
+            Box::new(
+                random_vecs_length_inclusive_range(
+                    EXAMPLE_SEED.fork(&log_base.to_string()),
+                    0,
+                    T::WIDTH.div_round(log_base, RoundingMode::Ceiling),
+                    &|seed| random_unsigned_bit_chunks(seed, log_base),
+                )
+                .filter(move |xs| digits_valid::<T, U>(log_base, xs)),
+            )
+        });
+        Some((xs.next().unwrap(), log_base))
+    }
+}
+
+pub fn random_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<U>, u64)> {
+    Box::new(UnsignedVecUnsignedPairGeneratorVar1::<T, U> {
+        phantom: PhantomData,
+        log_bases: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("log_bases"),
+            1,
+            U::WIDTH,
+            config.get_or("mean_log_base_n", 4),
+            config.get_or("mean_log_base_d", 1),
+        ),
+        log_base_to_xs: HashMap::new(),
+    })
+}
+
+pub fn random_unsigned_vec_unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<U>, u64)> {
+    Box::new(
+        random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>(config)
+            .map(|(xs, y)| (xs.into_iter().rev().collect(), y)),
+    )
 }

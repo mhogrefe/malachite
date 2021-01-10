@@ -131,8 +131,20 @@ impl<T> Generator<T> {
     }
 }
 
+pub fn permute_2_1<A: 'static, B: 'static>(
+    it: Box<dyn Iterator<Item = (A, B)>>,
+) -> Box<dyn Iterator<Item = (B, A)>> {
+    Box::new(it.map(|(a, b)| (b, a)))
+}
+
 pub fn reshape_1_2_to_3<A: 'static, B: 'static, C: 'static>(
     it: Box<dyn Iterator<Item = (A, (B, C))>>,
 ) -> Box<dyn Iterator<Item = (A, B, C)>> {
     Box::new(it.map(|(a, (b, c))| (a, b, c)))
+}
+
+pub fn reshape_2_1_to_3<A: 'static, B: 'static, C: 'static>(
+    it: Box<dyn Iterator<Item = ((A, B), C)>>,
+) -> Box<dyn Iterator<Item = (A, B, C)>> {
+    Box::new(it.map(|((a, b), c)| (a, b, c)))
 }

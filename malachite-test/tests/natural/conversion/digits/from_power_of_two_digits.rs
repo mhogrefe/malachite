@@ -1,5 +1,4 @@
-use std::iter::repeat;
-
+use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -10,6 +9,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
+use std::iter::repeat;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
@@ -184,7 +184,7 @@ fn from_power_of_two_digits_asc_natural_properties() {
         pairs_of_u64_and_unsigned_vec_var_3::<Limb>,
         |&(log_base, ref digits)| {
             let n = Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned());
-            let digits: Vec<Natural> = digits.iter().cloned().map(Natural::from).collect();
+            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
             assert_eq!(
                 Natural::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
                 n
@@ -226,7 +226,7 @@ fn from_power_of_two_digits_desc_natural_properties() {
         pairs_of_u64_and_unsigned_vec_var_3::<Limb>,
         |&(log_base, ref digits)| {
             let n = Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned());
-            let digits: Vec<Natural> = digits.iter().cloned().map(Natural::from).collect();
+            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
             assert_eq!(
                 Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
                 n

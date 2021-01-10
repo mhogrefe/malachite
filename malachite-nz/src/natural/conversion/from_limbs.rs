@@ -70,7 +70,7 @@ impl Natural {
     /// assert_eq!(Natural::from_limbs_desc(&[232, 3567587328]).to_string(), "1000000000000");
     /// ```
     pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
-        Natural::from_limbs_asc(&xs.iter().cloned().rev().collect::<Vec<Limb>>())
+        Natural::from_owned_limbs_asc(xs.iter().cloned().rev().collect())
     }
 
     /// Converts a `Vec` of limbs to a `Natural`, in ascending order, so that less significant limbs

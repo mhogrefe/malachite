@@ -77,9 +77,7 @@ impl Integer {
     ///     "-1000000000000");
     /// ```
     pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Integer {
-        Integer::from_owned_twos_complement_limbs_asc(
-            xs.iter().cloned().rev().collect::<Vec<Limb>>(),
-        )
+        Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect())
     }
 
     /// Converts a slice of limbs to an `Integer`, in ascending order, so that less significant

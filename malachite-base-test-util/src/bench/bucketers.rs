@@ -149,3 +149,45 @@ where
         bucketing_label: y_name.to_string(),
     }
 }
+
+pub fn pair_1_bit_bucketer<T: Copy + SignificantBits, U>(x_name: &str) -> Bucketer<(T, U)> {
+    Bucketer {
+        bucketing_function: &(|&(x, _)| usize::exact_from(x.significant_bits())),
+        bucketing_label: format!("{}.significant_bits", x_name),
+    }
+}
+
+pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> Bucketer<(T, U, V)> {
+    Bucketer {
+        bucketing_function: &(|&(x, _, _)| usize::exact_from(x.significant_bits())),
+        bucketing_label: format!("{}.significant_bits", x_name),
+    }
+}
+
+pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
+    Bucketer {
+        bucketing_function: &(|&(ref xs, _)| xs.len()),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn triple_1_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(Vec<T>, U, V)> {
+    Bucketer {
+        bucketing_function: &(|&(ref xs, _, _)| xs.len()),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn triple_3_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, U, Vec<V>)> {
+    Bucketer {
+        bucketing_function: &(|&(_, _, ref xs)| xs.len()),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn quadruple_3_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U, Vec<V>, W)> {
+    Bucketer {
+        bucketing_function: &(|&(_, _, ref xs, _)| xs.len()),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}

@@ -1,7 +1,10 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_trailing_zeros;
 use malachite_base::tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
 
 use generators::common::Generator;
@@ -45,6 +48,19 @@ pub fn exhaustive_pairs_big_small<
         BitDistributorOutputType::normal(2),
         BitDistributorOutputType::normal(1),
     )
+}
+
+pub(crate) fn digits_valid<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    log_base: u64,
+    digits: &[U],
+) -> bool {
+    let digits = &digits[..digits.len() - slice_trailing_zeros(digits)];
+    if digits.is_empty() {
+        return true;
+    }
+    let significant_bits = ((u64::wrapping_from(digits.len()) - 1) * log_base)
+        + digits.last().unwrap().significant_bits();
+    significant_bits <= T::WIDTH
 }
 
 // -- bool --
@@ -178,7 +194,7 @@ pub fn signed_unsigned_pair_gen_var_1<T: PrimitiveSigned, U: PrimitiveUnsigned>(
     )
 }
 
-/// All `(T, u64)`s where `T` is signed and the `U` is smaller than `T::WIDTH`.
+/// All `(T, u64)`s where `T` is signed and the `u64` is smaller than `T::WIDTH`.
 pub fn signed_unsigned_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(T, u64)> {
     Generator::new(
         &exhaustive_signed_unsigned_pair_gen_var_4,
@@ -243,6 +259,14 @@ pub fn unsigned_gen_var_2() -> Generator<u32> {
     Generator::new_no_special(&exhaustive_unsigned_gen_var_1, &random_unsigned_gen_var_2)
 }
 
+// All `u64`s between 1 and `T::WIDTH`, inclusive, where `T` is a primitive integer.
+pub fn unsigned_gen_var_3<T: PrimitiveInt>() -> Generator<u64> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_2::<T>,
+        &random_unsigned_gen_var_3::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
@@ -270,12 +294,31 @@ pub fn unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> 
     )
 }
 
-/// All `(T, u64)`s where `T` is unsigned and the `U` is smaller than `T::WIDTH`.
+/// All `(T, u64)`s where `T` is unsigned and the `u64` is smaller than `T::WIDTH`.
 pub fn unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
     Generator::new(
         &exhaustive_unsigned_pair_gen_var_3,
         &random_primitive_int_unsigned_pair_gen_var_2,
         &special_random_unsigned_pair_gen_var_2,
+    )
+}
+
+/// All `(T, u64)`s where `T` is unsigned and the `u64` is between 1 and `U::WIDTH`, inclusive.
+pub fn unsigned_pair_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, u64)>
+{
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_4::<T, U>,
+        &random_primitive_int_unsigned_pair_gen_var_3::<T, U>,
+        &special_random_unsigned_pair_gen_var_3::<T, U>,
+    )
+}
+
+/// All `(T, u64)`s where `T` is unsigned, the `T` is small, and the `u64` is between 1 and
+/// `U::WIDTH`, inclusive.
+pub fn unsigned_pair_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveInt>() -> Generator<(T, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_4::<T, U>,
+        &random_unsigned_pair_gen_var_2::<T, U>,
     )
 }
 
@@ -317,6 +360,31 @@ pub fn unsigned_triple_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(T, T, T)>
         &exhaustive_unsigned_triple_gen_var_2,
         &random_unsigned_triple_gen_var_2,
         &special_random_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(T, u64, V)` where `T` is unsigned, the `u64` is between 1 and `U::WIDTH`, inclusive, and
+// `V` is unsigned and the `V` is small.
+pub fn unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveInt, V: PrimitiveUnsigned>(
+) -> Generator<(T, u64, V)> {
+    Generator::new(
+        &exhaustive_unsigned_primitive_int_unsigned_triple_gen_var_3::<T, U, V>,
+        &random_primitive_int_unsigned_unsigned_triple_gen_var_1::<T, U, V>,
+        &special_random_unsigned_triple_gen_var_3::<T, U, V>,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
+
+// All `(T, u64, Vec<bool>)` where `T` is unsigned, the `u64` is between 1 and `U::WIDTH`,
+// inclusive, and the `Vec` has as many elements as the `T` has digits in base $2^\ell$, where
+// $\ell$ is the `u64`.
+pub fn unsigned_unsigned_bool_vec_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
+) -> Generator<(T, u64, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_bool_vec_triple_gen_var_1::<T, U>,
+        &random_primitive_int_unsigned_bool_vec_triple_gen_var_1::<T, U>,
+        &special_random_unsigned_unsigned_bool_vec_triple_gen_var_1::<T, U>,
     )
 }
 
@@ -395,6 +463,64 @@ pub fn unsigned_vec_gen<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
         &exhaustive_unsigned_vec_gen,
         &random_primitive_int_vec_gen,
         &special_random_unsigned_vec_gen,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub fn unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen,
+        &random_primitive_int_vec_primitive_int_pair_gen,
+        &special_random_unsigned_vec_unsigned_pair_gen,
+    )
+}
+
+// All `(Vec<T>, usize)` where `T` is unsigned and the `usize` is less than or equal to the length
+// of the `Vec`.
+pub fn unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, usize)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_1,
+        &random_primitive_int_vec_unsigned_pair_gen_var_1,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_3,
+    )
+}
+
+// All `(Vec<U>, u64)` such that the flipped `(u64, Vec<U>)` is a valid input to
+// `from_power_of_two_digits_asc<T, U>`.
+pub fn unsigned_vec_unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Vec<U>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_2::<T, U>,
+        &random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
+    )
+}
+
+// All `(Vec<U>, u64)` such that the flipped `(u64, Vec<U>)` is a valid input to
+// `from_power_of_two_digits_desc<T, U>`.
+pub fn unsigned_vec_unsigned_pair_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Vec<U>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_3::<T, U>,
+        &random_unsigned_vec_unsigned_pair_gen_var_2::<T, U>,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_2::<T, U>,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// All `(Vec<T>, U, V)` where `T`, `U`, and `V` are unsigned and the `U` is small.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+    V: PrimitiveUnsigned,
+>() -> Generator<(Vec<T>, U, V)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_1,
+        &random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

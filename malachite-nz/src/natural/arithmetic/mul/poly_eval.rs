@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::cmp::Ordering;
 
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
@@ -130,7 +131,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 
     // The degree `degree` is also the number of full-size coefficients, so that the last
     // coefficient, of size `n_high`, starts at `poly[degree * n..]`.
-    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    let coefficients = poly.chunks(n).collect_vec();
     assert_eq!(coefficients.len(), degree + 1);
 
     // The degree `degree` is also the number of full-size coefficients, so that the last
@@ -241,7 +242,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     assert_eq!(scratch.len(), n + 1);
     // The degree `degree` is also the number of full-size coefficients, so that the last
     // coefficient, of size `n_high`, starts at `poly[degree * n..]`.
-    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    let coefficients = poly.chunks(n).collect_vec();
     assert_eq!(coefficients.len(), degree + 1);
     let n_high = coefficients[degree].len();
     let (v_2_last, v_2_init) = v_2.split_last_mut().unwrap();
@@ -339,7 +340,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     assert!(shift * degree_u64 < Limb::WIDTH);
     assert_eq!(v_2_pow.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
-    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    let coefficients = poly.chunks(n).collect_vec();
     assert_eq!(coefficients.len(), degree + 1);
     let n_high = coefficients[degree].len();
     let (scratch_last, scratch_init) = scratch.split_last_mut().unwrap();
@@ -443,7 +444,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     let degree_u64 = u64::exact_from(degree);
     assert_eq!(v_2_pow_neg.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
-    let coefficients: Vec<&[Limb]> = poly.chunks(n).collect();
+    let coefficients = poly.chunks(n).collect_vec();
     assert_eq!(coefficients.len(), degree + 1);
     v_2_pow_neg[n] = limbs_shl_to_out(v_2_pow_neg, coefficients[0], shift * degree_u64);
     scratch[n] = limbs_shl_to_out(scratch, coefficients[1], shift * (degree_u64 - 1));

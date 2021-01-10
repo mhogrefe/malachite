@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::vecs::vec_delete_left;
@@ -40,14 +41,12 @@ fn from_twos_complement_limbs_asc_properties() {
             Integer::from_owned_twos_complement_limbs_asc(limbs.clone()),
             x
         );
-        let mut trimmed_limbs: Vec<Limb> = limbs.iter().cloned().rev().collect();
+        let mut trimmed_limbs = limbs.iter().cloned().rev().collect_vec();
         trim_be_limbs(&mut trimmed_limbs);
         trimmed_limbs.reverse();
         assert_eq!(x.to_twos_complement_limbs_asc(), trimmed_limbs);
         assert_eq!(
-            Integer::from_twos_complement_limbs_desc(
-                &limbs.iter().cloned().rev().collect::<Vec<Limb>>()
-            ),
+            Integer::from_owned_twos_complement_limbs_desc(limbs.iter().cloned().rev().collect()),
             x
         );
         if match x.sign() {
@@ -81,9 +80,7 @@ fn from_twos_complement_limbs_desc_properties() {
         trim_be_limbs(&mut trimmed_limbs);
         assert_eq!(x.to_twos_complement_limbs_desc(), trimmed_limbs);
         assert_eq!(
-            Integer::from_twos_complement_limbs_asc(
-                &limbs.iter().cloned().rev().collect::<Vec<Limb>>()
-            ),
+            Integer::from_owned_twos_complement_limbs_asc(limbs.iter().cloned().rev().collect()),
             x
         );
         if match x.sign() {

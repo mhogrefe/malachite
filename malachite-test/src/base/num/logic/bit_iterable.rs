@@ -1,5 +1,6 @@
 use std::ops::Index;
 
+use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -67,7 +68,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 
 fn demo_unsigned_bits<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for u in unsigneds::<T>(gm).take(limit) {
-        println!("bits({}) = {:?}", u, u.bits().collect::<Vec<bool>>());
+        println!("bits({}) = {:?}", u, u.bits().collect_vec());
     }
 }
 
@@ -77,17 +78,13 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     for i in signeds::<T>(gm).take(limit) {
-        println!("bits({}) = {:?}", i, i.bits().collect::<Vec<bool>>());
+        println!("bits({}) = {:?}", i, i.bits().collect_vec());
     }
 }
 
 fn demo_unsigned_bits_rev<T: PrimitiveUnsigned + Rand>(gm: GenerationMode, limit: usize) {
     for u in unsigneds::<T>(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            u,
-            u.bits().rev().collect::<Vec<bool>>()
-        );
+        println!("bits({}).rev() = {:?}", u, u.bits().rev().collect_vec());
     }
 }
 
@@ -97,11 +94,7 @@ where
     T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
 {
     for i in signeds::<T>(gm).take(limit) {
-        println!(
-            "bits({}).rev() = {:?}",
-            i,
-            i.bits().rev().collect::<Vec<bool>>()
-        );
+        println!("bits({}).rev() = {:?}", i, i.bits().rev().collect_vec());
     }
 }
 

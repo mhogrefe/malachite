@@ -2,6 +2,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
 
+use itertools::Itertools;
 use malachite_nz::integer::exhaustive::integer_increasing_inclusive_range;
 use malachite_nz::integer::Integer;
 
@@ -17,7 +18,7 @@ fn expected_range_len(a: &Integer, b: &Integer) -> usize {
 fn integer_increasing_inclusive_range_helper(a: Integer, b: Integer, values: &str) {
     let xs = integer_increasing_inclusive_range(a.clone(), b.clone())
         .take(20)
-        .collect::<Vec<_>>()
+        .collect_vec()
         .to_debug_string();
     assert_eq!(xs, values);
     let len = expected_range_len(&a, &b);
@@ -28,7 +29,7 @@ fn integer_increasing_inclusive_range_helper(a: Integer, b: Integer, values: &st
     let mut init = integer_increasing_inclusive_range(a, b)
         .rev()
         .skip(len.saturating_sub(20))
-        .collect::<Vec<_>>();
+        .collect_vec();
     init.reverse();
     assert_eq!(xs, init.to_debug_string());
 }

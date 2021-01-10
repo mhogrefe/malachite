@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
@@ -151,7 +152,7 @@ fn demo_integer_twos_complement_limbs(gm: GenerationMode, limit: usize) {
         println!(
             "twos_complement_limbs({}) = {:?}",
             n,
-            n.twos_complement_limbs().collect::<Vec<Limb>>()
+            n.twos_complement_limbs().collect_vec()
         );
     }
 }
@@ -161,7 +162,7 @@ fn demo_integer_twos_complement_limbs_rev(gm: GenerationMode, limit: usize) {
         println!(
             "twos_complement_limbs({}).rev() = {:?}",
             n,
-            n.twos_complement_limbs().rev().collect::<Vec<Limb>>()
+            n.twos_complement_limbs().rev().collect_vec()
         );
     }
 }
@@ -293,8 +294,8 @@ fn benchmark_integer_to_twos_complement_limbs_asc_evaluation_strategy(
                 &mut (|n| no_out!(n.into_twos_complement_limbs_asc())),
             ),
             (
-                "Integer.twos_complement_limbs().collect::<Vec<Limb>>()",
-                &mut (|n| no_out!(n.twos_complement_limbs().collect::<Vec<Limb>>())),
+                "Integer.twos_complement_limbs().collect_vec()",
+                &mut (|n| no_out!(n.twos_complement_limbs().collect_vec())),
             ),
         ],
     );
@@ -324,8 +325,8 @@ fn benchmark_integer_to_twos_complement_limbs_desc_evaluation_strategy(
                 &mut (|n| no_out!(n.into_twos_complement_limbs_desc())),
             ),
             (
-                "Integer.twos_complement_limbs().rev().collect::<Vec<Limb>>()",
-                &mut (|n| no_out!(n.twos_complement_limbs().collect::<Vec<Limb>>())),
+                "Integer.twos_complement_limbs().rev().collect_vec()",
+                &mut (|n| no_out!(n.twos_complement_limbs().collect_vec())),
             ),
         ],
     );

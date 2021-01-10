@@ -1,17 +1,17 @@
 #[cfg(feature = "32_bit_limbs")]
+use itertools::Itertools;
+#[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_to_limbs_asc() {
     let test = |n, out| {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(n.limbs().collect::<Vec<Limb>>(), out);
+        assert_eq!(n.limbs().collect_vec(), out);
         assert_eq!(n.to_limbs_asc(), out);
         assert_eq!(n.into_limbs_asc(), out);
     };
@@ -59,7 +59,7 @@ fn test_to_limbs_asc() {
 fn test_to_limbs_desc() {
     let test = |n, out| {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(n.limbs().rev().collect::<Vec<Limb>>(), out);
+        assert_eq!(n.limbs().rev().collect_vec(), out);
         assert_eq!(n.to_limbs_desc(), out);
         assert_eq!(n.into_limbs_desc(), out);
     };

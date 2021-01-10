@@ -1,7 +1,7 @@
+use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::small_unsigneds;
@@ -14,7 +14,7 @@ fn to_limbs_asc_properties() {
     test_properties(naturals, |x| {
         let limbs = x.to_limbs_asc();
         assert_eq!(x.clone().into_limbs_asc(), limbs);
-        assert_eq!(x.limbs().collect::<Vec<Limb>>(), limbs);
+        assert_eq!(x.limbs().collect_vec(), limbs);
         assert_eq!(Natural::from_limbs_asc(&limbs), *x);
         if *x != 0 {
             assert_ne!(*limbs.last().unwrap(), 0);
@@ -27,7 +27,7 @@ fn to_limbs_desc_properties() {
     test_properties(naturals, |x| {
         let limbs = x.to_limbs_desc();
         assert_eq!(x.clone().into_limbs_desc(), limbs);
-        assert_eq!(x.limbs().rev().collect::<Vec<Limb>>(), limbs);
+        assert_eq!(x.limbs().rev().collect_vec(), limbs);
         assert_eq!(Natural::from_limbs_desc(&limbs), *x);
         if *x != 0 {
             assert_ne!(limbs[0], 0);

@@ -16,25 +16,12 @@ extern crate rug;
 extern crate rust_wheels;
 extern crate time;
 
+use itertools::Itertools;
+use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
 use std::env;
 
-use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};
-use tune::tune;
-
-fn optionally_tune(args: &[String]) -> bool {
-    if args.len() == 3 && args[1] == "tune" {
-        tune(&args[2]);
-        true
-    } else {
-        false
-    }
-}
-
 pub fn main() {
-    let args: Vec<String> = env::args().collect();
-    if optionally_tune(&args) {
-        return;
-    }
+    let args = env::args().collect_vec();
     if args.len() != 3 && args.len() != 4 {
         panic!("Usage: [exhaustive|random|special_random] [limit] [demo/bench name]");
     }
@@ -83,4 +70,3 @@ fn register(registry: &mut DemoBenchRegistry) {
 pub mod base;
 pub mod integer;
 pub mod natural;
-pub mod tune;

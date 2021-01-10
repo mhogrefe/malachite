@@ -142,6 +142,8 @@ fn test_from_power_of_two_digits_desc() {
     );
 }
 
+//TODO clean
+
 macro_rules! from_power_of_two_digits_desc_fail_helper {
     ($t:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident) => {
         #[test]

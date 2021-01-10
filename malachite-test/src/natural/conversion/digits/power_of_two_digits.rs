@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
@@ -138,8 +139,7 @@ macro_rules! demo_and_bench {
                     "power_of_two_digits({}, {}) = {:?}",
                     n,
                     log_base,
-                    PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&n, log_base)
-                        .collect::<Vec<$t>>()
+                    PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&n, log_base).collect_vec()
                 );
             }
         }
@@ -152,7 +152,7 @@ macro_rules! demo_and_bench {
                     log_base,
                     PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&n, log_base)
                         .rev()
-                        .collect::<Vec<$t>>()
+                        .collect_vec()
                 );
             }
         }
@@ -318,8 +318,7 @@ fn demo_natural_power_of_two_digits_natural(gm: GenerationMode, limit: usize) {
             "power_of_two_digits({}, {}) = {:?}",
             n,
             log_base,
-            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
-                .collect::<Vec<Natural>>()
+            PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base).collect_vec()
         );
     }
 }
@@ -332,7 +331,7 @@ fn demo_natural_power_of_two_digits_rev_natural(gm: GenerationMode, limit: usize
             log_base,
             PowerOfTwoDigitIterable::<Natural>::power_of_two_digits(&n, log_base)
                 .rev()
-                .collect::<Vec<Natural>>()
+                .collect_vec()
         );
     }
 }
